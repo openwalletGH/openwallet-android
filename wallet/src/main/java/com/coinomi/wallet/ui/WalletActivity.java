@@ -14,9 +14,13 @@ import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
 
 import com.coinomi.wallet.R;
+import com.coinomi.wallet.WalletApplication;
 
-
-public class WalletActivity extends ActionBarActivity
+/**
+ * @author Giannis Dzegoutanis
+ * @author Andreas Schildbach
+ */
+final public class WalletActivity extends AbstractWalletActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
     /**
@@ -42,6 +46,17 @@ public class WalletActivity extends ActionBarActivity
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+
+        getWalletApplication().startBlockchainService(true);
+
+        //TODO
+//        checkLowStorageAlert();
     }
 
     @Override

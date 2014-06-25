@@ -16,8 +16,26 @@ public class Configuration {
 
     private final SharedPreferences prefs;
 
+    public static final String PREFS_KEY_BTC_PRECISION = "btc_precision";
+    public static final String PREFS_KEY_CONNECTIVITY_NOTIFICATION = "connectivity_notification";
+    public static final String PREFS_KEY_EXCHANGE_CURRENCY = "exchange_currency";
+    public static final String PREFS_KEY_TRUSTED_PEER = "trusted_peer";
+    public static final String PREFS_KEY_TRUSTED_PEER_ONLY = "trusted_peer_only";
+    public static final String PREFS_KEY_DISCLAIMER = "disclaimer";
+    public static final String PREFS_KEY_SELECTED_ADDRESS = "selected_address";
+    private static final String PREFS_KEY_LABS_QR_PAYMENT_REQUEST = "labs_qr_payment_request";
+
     private static final String PREFS_KEY_LAST_VERSION = "last_version";
     private static final String PREFS_KEY_LAST_USED = "last_used";
+    private static final String PREFS_KEY_BEST_CHAIN_HEIGHT_EVER = "best_chain_height_ever";
+    private static final String PREFS_KEY_CACHED_EXCHANGE_CURRENCY = "cached_exchange_currency";
+    private static final String PREFS_KEY_CACHED_EXCHANGE_RATE = "cached_exchange_rate";
+    private static final String PREFS_KEY_LAST_EXCHANGE_DIRECTION = "last_exchange_direction";
+    private static final String PREFS_KEY_CHANGE_LOG_VERSION = "change_log_version";
+    public static final String PREFS_KEY_REMIND_BACKUP = "remind_backup";
+
+    private static final int PREFS_DEFAULT_BTC_SHIFT = 3;
+    private static final int PREFS_DEFAULT_BTC_PRECISION = 2;
 
     private static final Logger log = LoggerFactory.getLogger(Configuration.class);
 
@@ -52,5 +70,10 @@ public class Configuration {
         prefs.edit().putLong(PREFS_KEY_LAST_USED, now).commit();
 
         log.info("just being used - last used {} minutes ago", (now - prefsLastUsed) / DateUtils.MINUTE_IN_MILLIS);
+    }
+
+    public void setBestChainHeightEver(final int bestChainHeightEver)
+    {
+        prefs.edit().putInt(PREFS_KEY_BEST_CHAIN_HEIGHT_EVER, bestChainHeightEver).commit();
     }
 }
