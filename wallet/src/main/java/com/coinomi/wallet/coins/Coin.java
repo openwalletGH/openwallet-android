@@ -1,20 +1,27 @@
 package com.coinomi.wallet.coins;
 
 
+import com.google.bitcoin.core.NetworkParameters;
+
 /**
  * @author Giannis Dzegoutanis
  */
 final public class Coin {
     final private String name;
     final private String symbol;
+    final private int bip44Index;
     final private boolean isTest;
     final private CoinIcon icon;
+    final private NetworkParameters networkParams;
 
-    public Coin(String name, String symbol, boolean isTest, CoinIcon icon) {
+
+    public Coin(String name, String symbol, int bip44Index, boolean isTest, CoinIcon icon, NetworkParameters networkParams) {
         this.name = name;
         this.symbol = symbol;
+        this.bip44Index = bip44Index;
         this.isTest = isTest;
         this.icon = icon;
+        this.networkParams = networkParams;
     }
 
     public String getName() {
@@ -23,6 +30,10 @@ final public class Coin {
 
     public String getSymbol() {
         return symbol;
+    }
+
+    public int getBip44Index() {
+        return bip44Index;
     }
 
     public boolean isTest() {
@@ -65,5 +76,9 @@ final public class Coin {
         result = 31 * result + (isTest ? 1 : 0);
         result = 31 * result + icon.hashCode();
         return result;
+    }
+
+    public NetworkParameters getNetworkParams() {
+        return networkParams;
     }
 }

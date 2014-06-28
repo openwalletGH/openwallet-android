@@ -1,54 +1,58 @@
 package com.coinomi.wallet;
 
+import com.coinomi.wallet.coins.Coin;
+import com.google.bitcoin.core.Address;
 import com.google.bitcoin.core.Sha256Hash;
 import com.google.bitcoin.core.Transaction;
-import com.google.bitcoin.crypto.MnemonicCode;
-import com.google.bitcoin.crypto.MnemonicException;
-
+import com.google.bitcoin.crypto.*;
+import com.google.bitcoin.wallet.DeterministicSeed;
+import com.google.common.collect.ImmutableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Giannis Dzegoutanis
  */
-public class WalletImpl implements Wallet {
+final public class WalletImpl implements Wallet {
     private static final Logger log = LoggerFactory.getLogger(WalletImpl.class);
+    private final DeterministicKey rootKey;
+    private final DeterministicHierarchy bip44Hierarchy;
+    private final ConcurrentHashMap<Coin, AccountHierarchy> coinAccounts =
+            new ConcurrentHashMap<Coin, AccountHierarchy>();
     private int lastBlockSeenHeight;
 
+
+    private int account = 0;
+    String BIP_44_KEY_PATH = "44'/%d'/%d'/%d/%d";
+
+    private static final int EXTERNAL_ADDRESS_INDEX = 0;
+    private static final int INTERNAL_ADDRESS_INDEX = 1;
+
+    private class SimpleHierarchy {
+        DeterministicKey master;
+        ArrayList<DeterministicKey> keys = new ArrayList<DeterministicKey>();
+    }
+
+    private class AccountHierarchy {
+        SimpleHierarchy external;
+        SimpleHierarchy internal;
+    }
+
     public WalletImpl(List<String> mnemonic) throws IOException, MnemonicException {
-//        MnemonicCode mc = new MnemonicCode();
-//        mc.check(mnemonic);
-//
-//        DeterministicSeed seed = new DeterministicSeed(mnemonic, 0);
-//        DeterministicKey rootKey = HDKeyDerivation.createMasterPrivateKey(seed.getSecretBytes());
-//        System.out.println(rootKey.serializePrivB58());
-//
-//        DeterministicHierarchy hierarchy = new DeterministicHierarchy(rootKey);
-//
-//        ImmutableList<ChildNumber> BITCOIN_TESTNET = ImmutableList.of(new ChildNumber(44, true), new ChildNumber(1, true), new ChildNumber(0, true));
-//        DeterministicKey key = hierarchy.get(BITCOIN_TESTNET, false, true);
-//
-//
-////
-//        DeterministicKey externalKey = hierarchy.deriveChild(BITCOIN_TESTNET, false, false, ChildNumber.ZERO);
-//        DeterministicKey internalKey = hierarchy.deriveChild(BITCOIN_TESTNET, false, false, ChildNumber.ONE);
-//
-//        System.out.println(externalKey.toString());
-////		for (ChildNumber c : externalKey.getPath()) {
-////			System.out.print(c.toString());
-////		}
-//
-//        DeterministicKey k1 = HDKeyDerivation.deriveChildKey(externalKey, new ChildNumber(0, false));
-//        System.out.println(k1);
-//        DeterministicKey k2 = HDKeyDerivation.deriveChildKey(externalKey, new ChildNumber(1, false));
-//        System.out.println(k2);
+        MnemonicCode mc = new MnemonicCode();
+        mc.check(mnemonic);
 
-
+        DeterministicSeed seed = new DeterministicSeed(mnemonic, 0);
+        rootKey = HDKeyDerivation.createMasterPrivateKey(seed.getSecretBytes());
+        // this is /44'/ path
+        bip44Hierarchy = new DeterministicHierarchy(HDKeyDerivation.deriveChildKey(rootKey, new ChildNumber(44, true)));
     }
 
     public static List<String> generateMnemonic() throws IOException {
@@ -66,6 +70,34 @@ public class WalletImpl implements Wallet {
         }
 
         return mnemonic;
+    }
+
+    private List<ChildNumber> getPath(Coin coin, int chain, int keyIndex) {
+        String path = String.format(BIP_44_KEY_PATH, coin.getBip44Index(), account, chain, keyIndex);
+        return HDUtils.parsePath(path);
+    }
+
+    public DeterministicKey getExternalKey(Coin coin, int keyIndex) {
+        List<ChildNumber> path = getPath(coin, EXTERNAL_ADDRESS_INDEX, keyIndex);
+        return bip44Hierarchy.get(path, false, true);
+    }
+
+
+
+    public Address getExternalAddress(Coin coin, int keyIndex) {
+        DeterministicKey key = getExternalKey(coin, keyIndex);
+        return key.toAddress(coin.getNetworkParams());
+    }
+
+
+    public DeterministicKey getInternalKey(Coin coin, int keyIndex) {
+        List<ChildNumber> path = getPath(coin, INTERNAL_ADDRESS_INDEX, keyIndex);
+        return bip44Hierarchy.get(path, false, true);
+    }
+
+    public Address getInternalAddress(Coin coin, int keyIndex) {
+        DeterministicKey key = getExternalKey(coin, keyIndex);
+        return key.toAddress(coin.getNetworkParams());
     }
 
     @Override
