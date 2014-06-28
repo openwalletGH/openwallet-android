@@ -2,11 +2,9 @@ package com.coinomi.wallet.network;
 
 import com.coinomi.stratumj.ServerAddress;
 import com.coinomi.stratumj.StratumClient;
-import com.coinomi.wallet.Wallet;
+import com.coinomi.wallet.WalletImpl;
 import com.coinomi.wallet.coins.Coin;
 import com.google.common.collect.HashBiMap;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.Service;
 import com.google.common.util.concurrent.ServiceManager;
@@ -15,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -28,7 +25,7 @@ public class ServerClient {
     private HashBiMap<Coin, StratumClient> connections;
 
     final ServiceManager manager;
-    private Wallet wallet;
+    private WalletImpl wallet;
 
     public ServerClient(List<CoinAddress> coins) {
         connections = HashBiMap.create(coins.size());
@@ -69,7 +66,7 @@ public class ServerClient {
     }
 
 
-    public void addWallet(Wallet wallet) {
+    public void addWallet(WalletImpl wallet) {
         this.wallet = wallet;
     }
 

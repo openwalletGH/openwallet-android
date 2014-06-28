@@ -26,7 +26,7 @@ import android.content.res.Resources;
 import android.os.Build;
 
 import com.coinomi.wallet.Constants;
-import com.coinomi.wallet.Wallet;
+import com.coinomi.wallet.WalletImpl;
 import com.coinomi.wallet.WalletApplication;
 
 import org.slf4j.Logger;
@@ -44,7 +44,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Formatter;
 import java.util.List;
-import java.util.Set;
 
 import javax.annotation.Nonnull;
 
@@ -205,7 +204,7 @@ public class CrashReporter
 
         // TODO
 //		report.append("Network: " + Constants.NETWORK_PARAMETERS.getId() + "\n");
-		final Wallet wallet = application.getWallet();
+		final WalletImpl wallet = application.getWallet();
 //		report.append("Keychain size: " + wallet.getKeychainSize() + "\n");
 //
 //		final Set<Transaction> transactions = wallet.getTransactions(true);
