@@ -1,5 +1,6 @@
 package com.coinomi.stratumj;
 
+import com.coinomi.stratumj.messages.BaseMessage;
 import com.coinomi.stratumj.messages.CallMessage;
 import com.coinomi.stratumj.messages.MessageException;
 import com.coinomi.stratumj.messages.ResultMessage;
@@ -16,6 +17,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
@@ -39,25 +42,24 @@ public class StratumClient extends AbstractExecutionThreadService {
 	final private ConcurrentHashMap<Long, SettableFuture<ResultMessage>> callers =
 			new ConcurrentHashMap<Long, SettableFuture<ResultMessage>>();
 
-	final private ConcurrentHashMap<Long, SubscribeResult> subscribes =
-			new ConcurrentHashMap<Long, SubscribeResult>();
+    final private ConcurrentHashMap<String, List<SubscribeResult>> subscribes =
+            new ConcurrentHashMap<String, List<SubscribeResult>>();
 
-	final private BlockingQueue<ResultMessage> queue = new LinkedBlockingDeque<ResultMessage>();
+	final private BlockingQueue<BaseMessage> queue = new LinkedBlockingDeque<BaseMessage>();
 
 
 	public interface SubscribeResult {
-		public void handle(ResultMessage message);
+		public void handle(CallMessage message);
 	}
 
 	private class MessageHandler implements Runnable {
 		@Override
 		public void run() {
 			while (!pool.isShutdown()) {
-				ResultMessage message = null;
+				BaseMessage message = null;
 				try {
 					message = queue.take();
-				} catch (InterruptedException ignored) {
-				}
+				} catch (InterruptedException ignored) {}
 
 				if (message != null) {
 					handle(message);
@@ -66,25 +68,48 @@ public class StratumClient extends AbstractExecutionThreadService {
 			log.debug("Shut down message handler thread: " + Thread.currentThread().getName());
 		}
 
-		private void handle(ResultMessage reply) {
-			if (callers.containsKey(reply.getId())) {
-				SettableFuture<ResultMessage> future = callers.get(reply.getId());
-				future.set(reply);
-				callers.remove(reply.getId());
-			} else if (subscribes.containsKey(reply.getId())) {
-				SubscribeResult handler = subscribes.get(reply.getId());
-				try {
-					log.debug("Running subscriber handler with result: " + reply);
-					handler.handle(reply);
-				} catch (RuntimeException e) {
-					log.error("Error while executing subscriber handler", e);
-				}
-			} else {
-				log.error("Got reply from server by could find any caller or subscriber",
-						new MessageException("Orphaned reply", reply.toString()));
-			}
-		}
-	}
+		private void handle(BaseMessage message) {
+            if (message instanceof ResultMessage) {
+                ResultMessage reply = (ResultMessage) message;
+                if (callers.containsKey(reply.getId())) {
+                    SettableFuture<ResultMessage> future = callers.get(reply.getId());
+                    future.set(reply);
+                    callers.remove(reply.getId());
+                } else {
+                    log.error("Got reply from server by could find any caller",
+                            new MessageException("Orphaned reply", reply.toString()));
+                }
+            }
+            else if (message instanceof CallMessage) {
+                CallMessage reply = (CallMessage) message;
+                if (subscribes.containsKey(reply.getMethod())) {
+                    List<SubscribeResult> subs;
+
+                    synchronized (subscribes.get(reply.getMethod())) {
+                        // Make a defensive copy
+                        subs = ImmutableList.copyOf(subscribes.get(reply.getMethod()));
+                    }
+
+                    for (SubscribeResult handler : subs) {
+                        try {
+                            log.debug("Running subscriber handler with result: " + reply);
+                            handler.handle(reply);
+                        } catch (RuntimeException e) {
+                            log.error("Error while executing subscriber handler", e);
+                        }
+                    }
+                } else {
+                    log.error("Got a call from server by could find any subscriber",
+                            new MessageException("Orphaned call", reply.toString()));
+                }
+
+            }
+            else {
+                log.error("Cannot handle message",
+                        new MessageException("Unhandled message", message.toString()));
+            }
+        }
+    }
 
 
 	public StratumClient(List<ServerAddress> address) {
@@ -149,9 +174,9 @@ public class StratumClient extends AbstractExecutionThreadService {
 
 			log.debug("Got message from server: " + serverMessage);
 
-			ResultMessage reply;
+			BaseMessage reply;
 			try {
-				reply = new ResultMessage(serverMessage);
+				reply = new BaseMessage(serverMessage);
 			} catch (JSONException e) {
 				log.error("Server sent malformed data", e);
 				continue;
@@ -170,7 +195,20 @@ public class StratumClient extends AbstractExecutionThreadService {
 //				}
 			} else {
 				boolean added = false;
-				while (!added) {
+
+                try {
+                    if (reply.isResult()) {
+                        reply = new ResultMessage(serverMessage);
+                    }
+                    else if (reply.isCall()) {
+                        reply = new CallMessage(serverMessage);
+                    }
+                } catch (JSONException e) {
+                    // Should not happen as we already checked this exception
+                    throw new RuntimeException(e);
+                }
+
+                while (!added) {
 					try {
 						queue.put(reply);
 						added = true;
@@ -195,10 +233,21 @@ public class StratumClient extends AbstractExecutionThreadService {
 		return future;
 	}
 
-	public void subscribe(CallMessage message, SubscribeResult handler) throws IOException {
-		message.setId(idCounter.getAndIncrement());
-		toServer.writeBytes(message.toString());
+	public ListenableFuture<ResultMessage> subscribe(CallMessage message, SubscribeResult handler) throws IOException {
+		ListenableFuture<ResultMessage> future = call(message);
 
-		subscribes.put(message.getId(), handler);
+		if (!subscribes.contains(message.getMethod())) {
+			List<SubscribeResult> handlers =
+					Collections.synchronizedList(new ArrayList<SubscribeResult>());
+			handlers.add(handler);
+			subscribes.put(message.getMethod(), handlers);
+		} else {
+			// Add handler if needed
+			if (!subscribes.get(message.getMethod()).contains(handler)) {
+				subscribes.get(message.getMethod()).add(handler);
+			}
+		}
+
+		return future;
 	}
 }

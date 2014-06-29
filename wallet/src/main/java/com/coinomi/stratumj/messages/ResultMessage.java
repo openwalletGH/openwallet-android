@@ -14,14 +14,13 @@ public class ResultMessage extends BaseMessage {
 	public JSONArray getResult() {
 		if (has("result")) {
 			if (opt("result") instanceof JSONArray) {
-                try {
-                    return getJSONArray("result");
-                } catch (JSONException e) {
+				try {
+					return getJSONArray("result");
+				} catch (JSONException e) {
 					// Should not happen
 					throw new RuntimeException(e);
-                }
-            }
-			else {
+				}
+			} else {
 				JSONArray result = new JSONArray();
 				try {
 					result.put(get("result"));
@@ -29,10 +28,9 @@ public class ResultMessage extends BaseMessage {
 					// Should not happen
 					throw new RuntimeException(e);
 				}
-                return result;
+				return result;
 			}
-		}
-		else {
+		} else {
 			return new JSONArray();
 		}
 	}

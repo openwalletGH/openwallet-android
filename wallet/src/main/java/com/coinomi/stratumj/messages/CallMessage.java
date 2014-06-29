@@ -33,13 +33,13 @@ public class CallMessage extends BaseMessage {
 
 	private void createParamsIfNeeded() {
 		if (!has("params")) {
-            try {
-                put("params", new JSONArray());
-            } catch (JSONException e) {
-                // Should never happen because "params" is a valid JSON name
+			try {
+				put("params", new JSONArray());
+			} catch (JSONException e) {
+				// Should never happen because "params" is a valid JSON name
 				throw new RuntimeException(e);
-            }
-        }
+			}
+		}
 	}
 
 	public String getMethod() {
@@ -47,32 +47,32 @@ public class CallMessage extends BaseMessage {
 	}
 
 	public void setMethod(String method) {
-        try {
-            put("method", method);
-        } catch (JSONException e) {
-            // Should never happen because "method" is a valid JSON name
+		try {
+			put("method", method);
+		} catch (JSONException e) {
+			// Should never happen because "method" is a valid JSON name
 			throw new RuntimeException(e);
-        }
-    }
+		}
+	}
 
 	public JSONArray getParams() {
 		createParamsIfNeeded();
-        try {
-            return getJSONArray("params");
-        } catch (JSONException e) {
-            // Should never happen because we created the params
-            return new JSONArray();
-        }
-    }
+		try {
+			return getJSONArray("params");
+		} catch (JSONException e) {
+			// Should never happen because we created the params
+			return new JSONArray();
+		}
+	}
 
 	public void setParams(Collection params) {
-        try {
-            put("params", params);
-        } catch (JSONException e) {
-            // Should never happen because "params" is a valid JSON name
+		try {
+			put("params", params);
+		} catch (JSONException e) {
+			// Should never happen because "params" is a valid JSON name
 			throw new RuntimeException(e);
-        }
-    }
+		}
+	}
 
 	public void addParams(Collection params) {
 		getParams().put(params);

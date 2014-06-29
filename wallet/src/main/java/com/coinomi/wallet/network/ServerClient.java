@@ -55,6 +55,7 @@ public class ServerClient {
 
             public void healthy() {
                 log.info("All coin clients are running");
+                syncWallet();
             }
 
             public void failure(Service service) {
@@ -76,6 +77,13 @@ public class ServerClient {
                 }
             }
         });
+    }
+
+    private void syncWallet() {
+//        for (Coin c : connections.keySet()) {
+//            wallet.
+//            getUnspentTx(c, )
+//        }
     }
 
 

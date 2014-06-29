@@ -13,7 +13,6 @@ public class BaseMessage extends JSONObject {
 	}
 
 	public BaseMessage(String source) throws JSONException {
-		// TODO test if id is null, as it is good to always put an id
 		super(source);
 	}
 
@@ -22,13 +21,21 @@ public class BaseMessage extends JSONObject {
 	}
 
 	public void setId(long id) {
-        try {
-            put("id", id);
-        } catch (JSONException e) {
-            // Should never happen because "id" is a valid JSON name
+		try {
+			put("id", id);
+		} catch (JSONException e) {
+			// Should never happen because "id" is a valid JSON name
 			throw new RuntimeException(e);
-        }
-    }
+		}
+	}
+
+	public boolean isResult() {
+		return has("result");
+	}
+
+	public boolean isCall() {
+		return has("method");
+	}
 
 	public boolean errorOccured() {
 		return !optString("error").equals("");
