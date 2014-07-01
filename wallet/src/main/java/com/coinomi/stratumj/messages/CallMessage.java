@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -16,17 +17,24 @@ public class CallMessage extends BaseMessage {
 		super(source);
 	}
 
-	public CallMessage(String method, Optional<List<Object>> params) {
-		super(0);
+	public CallMessage(String method, List params) {
+		super();
 		setMethod(method);
-		if (params.isPresent()) {
-			setParams(params.get());
-		} else {
-			createParamsIfNeeded();
-		}
+		setParams(params);
 	}
 
-	public CallMessage(long id, String method, Optional<List<Object>> params) {
+	public CallMessage(String method, String param) {
+		super();
+		setMethod(method);
+		setParams(Arrays.asList(param));
+	}
+
+	public CallMessage(long id, String method, String param) {
+		this(method, param);
+		setId(id);
+	}
+
+	public CallMessage(long id, String method, List params) {
 		this(method, params);
 		setId(id);
 	}
@@ -63,6 +71,10 @@ public class CallMessage extends BaseMessage {
 			// Should never happen because we created the params
 			return new JSONArray();
 		}
+	}
+
+	public void setParam(String param) {
+		setParams(Arrays.asList(param));
 	}
 
 	public void setParams(Collection params) {

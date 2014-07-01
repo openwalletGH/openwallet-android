@@ -8,6 +8,10 @@ import org.json.JSONObject;
  */
 public class BaseMessage extends JSONObject {
 
+	public BaseMessage() {
+		setId(-1);
+	}
+
 	public BaseMessage(long id) {
 		setId(id);
 	}
@@ -22,7 +26,12 @@ public class BaseMessage extends JSONObject {
 
 	public void setId(long id) {
 		try {
-			put("id", id);
+			if (id < 0) {
+				put("id", JSONObject.NULL);
+			}
+			else {
+				put("id", id);
+			}
 		} catch (JSONException e) {
 			// Should never happen because "id" is a valid JSON name
 			throw new RuntimeException(e);

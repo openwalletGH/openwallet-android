@@ -24,10 +24,10 @@ final public class WalletImpl implements Wallet {
     private static final Logger log = LoggerFactory.getLogger(WalletImpl.class);
     private final DeterministicKey rootKey;
     private final DeterministicHierarchy bip44Hierarchy;
-    private final ConcurrentHashMap<Coin, AccountHierarchy> coinAccounts =
-            new ConcurrentHashMap<Coin, AccountHierarchy>();
     private int lastBlockSeenHeight;
 
+    private ConcurrentHashMap<String, String> addressStatus =
+            new ConcurrentHashMap<String, String>();
 
     private int account = 0;
     String BIP_44_KEY_PATH = "44'/%d'/%d'/%d/%d";
@@ -35,24 +35,18 @@ final public class WalletImpl implements Wallet {
     private static final int EXTERNAL_ADDRESS_INDEX = 0;
     private static final int INTERNAL_ADDRESS_INDEX = 1;
 
-    private class SimpleHierarchy {
-        DeterministicKey master;
-        ArrayList<DeterministicKey> keys = new ArrayList<DeterministicKey>();
-    }
-
-    private class AccountHierarchy {
-        SimpleHierarchy external;
-        SimpleHierarchy internal;
-    }
-
     public WalletImpl(List<String> mnemonic) throws IOException, MnemonicException {
-        MnemonicCode mc = new MnemonicCode();
-        mc.check(mnemonic);
+        // TODO
+        rootKey = null;
+        bip44Hierarchy = null;
 
-        DeterministicSeed seed = new DeterministicSeed(mnemonic, 0);
-        rootKey = HDKeyDerivation.createMasterPrivateKey(seed.getSecretBytes());
-        // this is /44'/ path
-        bip44Hierarchy = new DeterministicHierarchy(HDKeyDerivation.deriveChildKey(rootKey, new ChildNumber(44, true)));
+//        MnemonicCode mc = new MnemonicCode();
+//        mc.check(mnemonic);
+//
+//        DeterministicSeed seed = new DeterministicSeed(mnemonic, 0);
+//        rootKey = HDKeyDerivation.createMasterPrivateKey(seed.getSecretBytes());
+//        // this is /44'/ path
+//        bip44Hierarchy = new DeterministicHierarchy(HDKeyDerivation.deriveChildKey(rootKey, new ChildNumber(44, true)));
     }
 
     public static List<String> generateMnemonic() throws IOException {
@@ -83,7 +77,6 @@ final public class WalletImpl implements Wallet {
     }
 
 
-
     public Address getExternalAddress(Coin coin, int keyIndex) {
         DeterministicKey key = getExternalKey(coin, keyIndex);
         return key.toAddress(coin.getNetworkParams());
@@ -98,6 +91,15 @@ final public class WalletImpl implements Wallet {
     public Address getInternalAddress(Coin coin, int keyIndex) {
         DeterministicKey key = getExternalKey(coin, keyIndex);
         return key.toAddress(coin.getNetworkParams());
+    }
+
+    public boolean statusChanged(Coin coin, String address, String lastStatus) {
+        if (addressStatus.contains(address)) {
+            return addressStatus.get(address).equals(lastStatus);
+        }
+        else {
+            return true; // If there is no
+        }
     }
 
     @Override

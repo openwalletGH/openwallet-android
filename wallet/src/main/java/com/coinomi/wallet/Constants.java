@@ -34,18 +34,18 @@ public class Constants {
     public static final List<String> TEST_MNEMONIC = ImmutableList.of("citizen", "fever", "scale", "nurse", "brief", "round", "ski", "fiction", "car", "fitness", "pluck", "act");
 
     // TODO make dynamic
-    public static final List<CoinAddress> COINS_ADDRESSES = ImmutableList.of(
-            new CoinAddress(new Coin("Bitcoin", "BTC", false, new CoinIconSvg(R.raw.bitcoin)),
-                    new ServerAddress("test.coinomi.com",15001)),
-            new CoinAddress(new Coin("Litecoin", "LTC", false, new CoinIconSvg(R.raw.litecoin)),
-                    new ServerAddress("test.coinomi.com",15002)),
-            new CoinAddress(new Coin("Dogecoin", "DOGE", false, new CoinIconSvg(R.raw.dogecoin)),
-                    new ServerAddress("test.coinomi.com",15003)),
-            new CoinAddress(new Coin("Bitcoin", "BTC", true, new CoinIconSvg(R.raw.bitcoin_test)),
-                    new ServerAddress("test.coinomi.com",15001)),
-            new CoinAddress(new Coin("Litecoin", "LTC", true, new CoinIconSvg(R.raw.litecoin_test)),
-                    new ServerAddress("test.coinomi.com",15002)),
-            new CoinAddress(new Coin("Dogecoin", "DOGE", true, new CoinIconSvg(R.raw.dogecoin_test)),
-                    new ServerAddress("test.coinomi.com",15003)));
+//    public static final List<CoinAddress> COINS_ADDRESSES = ImmutableList.of(
+//            new CoinAddress(new Coin("Bitcoin", "BTC", false, new CoinIconSvg(R.raw.bitcoin)),
+//                    new ServerAddress("test.coinomi.com",15001)),
+//            new CoinAddress(new Coin("Litecoin", "LTC", false, new CoinIconSvg(R.raw.litecoin)),
+//                    new ServerAddress("test.coinomi.com",15002)),
+//            new CoinAddress(new Coin("Dogecoin", "DOGE", false, new CoinIconSvg(R.raw.dogecoin)),
+//                    new ServerAddress("test.coinomi.com",15003)),
+//            new CoinAddress(new Coin("Bitcoin", "BTC", true, new CoinIconSvg(R.raw.bitcoin_test)),
+//                    new ServerAddress("test.coinomi.com",15001)),
+//            new CoinAddress(new Coin("Litecoin", "LTC", true, new CoinIconSvg(R.raw.litecoin_test)),
+//                    new ServerAddress("test.coinomi.com",15002)),
+//            new CoinAddress(new Coin("Dogecoin", "DOGE", true, new CoinIconSvg(R.raw.dogecoin_test)),
+//                    new ServerAddress("test.coinomi.com",15003)));
 
 }

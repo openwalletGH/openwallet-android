@@ -6,6 +6,7 @@ import com.coinomi.stratumj.messages.CallMessage;
 import com.coinomi.stratumj.messages.ResultMessage;
 import com.coinomi.wallet.WalletImpl;
 import com.coinomi.wallet.coins.Coin;
+import com.google.bitcoin.core.Address;
 import com.google.common.base.Optional;
 import com.google.common.collect.HashBiMap;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -27,6 +28,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import static com.google.common.base.Preconditions.*;
 
 /**
  * @author Giannis Dzegoutanis
@@ -80,10 +83,34 @@ public class ServerClient {
     }
 
     private void syncWallet() {
+        // TODO
 //        for (Coin c : connections.keySet()) {
-//            wallet.
-//            getUnspentTx(c, )
+//            subscribeToAddresses(c);
 //        }
+    }
+
+    private void subscribeToAddresses(Coin coin) throws IOException {
+
+        StratumClient client = checkNotNull(connections.get(coin));
+
+        CallMessage callMessage = new CallMessage("blockchain.address.subscribe", (List)null);
+
+        StratumClient.SubscribeResult addressHandler = new StratumClient.SubscribeResult() {
+            @Override
+            public void handle(CallMessage message) {
+                // TODO
+
+            }
+        };
+
+        for (int i = 0; i < 20; i++) {
+            Address external = wallet.getExternalAddress(coin, i);
+            Address internal = wallet.getInternalAddress(coin, i);
+
+            callMessage.setParam(external.toString());
+
+            ListenableFuture<ResultMessage> reply = client.subscribe(callMessage, addressHandler);
+        }
     }
 
 
@@ -99,14 +126,14 @@ public class ServerClient {
         manager.stopAsync();
     }
 
+
     public ListenableFuture<Transaction[]> getUnspentTx(Coin coin, String address) throws Exception {
-        StratumClient client = connections.get(coin);
-        assert client != null;
+        StratumClient client = checkNotNull(connections.get(coin));
 
         final SettableFuture<Transaction[]> future = SettableFuture.create();
 
         final ListenableFuture<ResultMessage> call = client.call(new CallMessage("blockchain.address.listunspent",
-                Optional.of(Arrays.asList((Object) address))));
+                Arrays.asList(address)));
         call.addListener(new Runnable() {
             @Override
             public void run() {
