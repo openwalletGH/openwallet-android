@@ -1,11 +1,13 @@
 package com.coinomi.wallet.ui;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,6 +35,11 @@ final public class WalletActivity extends AbstractWalletActivity
      */
     private CharSequence mTitle;
 
+    /**
+     * For SharedPreferences, used to check if first launch ever.
+     */
+    final String PREFS_NAME = "SharedPrefsFile";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,6 +53,19 @@ final public class WalletActivity extends AbstractWalletActivity
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
+
+        //If app has never been launched, this code will be executed.
+
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+        if (settings.getBoolean("firstLaunch", true)) {
+            Log.d("Comments", "First time");
+
+            // First time, run this.
+            System.out.println("Testing... Testing... Testing...");
+
+            //Set the boolean to false to make sure this code never runs again.
+            settings.edit().putBoolean("firstLaunch", false).commit();
+        }
     }
 
     @Override
