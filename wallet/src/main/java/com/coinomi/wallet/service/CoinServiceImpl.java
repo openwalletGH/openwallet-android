@@ -16,8 +16,7 @@ import android.os.PowerManager;
 import android.text.format.DateUtils;
 
 import com.coinomi.wallet.Configuration;
-import com.coinomi.wallet.Constants;
-import com.coinomi.wallet.WalletImpl;
+import com.coinomi.wallet.Wallet;
 import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.network.ServerClient;
 import com.google.bitcoin.core.Address;
@@ -313,7 +312,7 @@ public class CoinServiceImpl extends Service implements CoinService {
         @SuppressLint("Wakelock")
         private void check()
         {
-            final WalletImpl wallet = application.getWallet();
+            final Wallet wallet = application.getWallet();
             final boolean hasEverything = hasConnectivity && hasStorage;
 
             if (hasEverything && client == null) {
@@ -838,7 +837,7 @@ public class CoinServiceImpl extends Service implements CoinService {
 
     private void maybeRotateKeys()
     {
-        final WalletImpl wallet = application.getWallet();
+        final Wallet wallet = application.getWallet();
 //        wallet.setKeyRotationEnabled(false);
 //
 //        final StoredBlock chainHead = blockChain.getChainHead();

@@ -51,7 +51,7 @@ public class WalletApplication extends Application {
     private Intent coinServiceResetBlockchainIntent;
 
     private File walletFile;
-    private WalletImpl wallet;
+    private Wallet wallet;
     private PackageInfo packageInfo;
 
     private static final Logger log = LoggerFactory.getLogger(WalletApplication.class);
@@ -171,7 +171,7 @@ public class WalletApplication extends Application {
         return config;
     }
 
-    public WalletImpl getWallet()
+    public Wallet getWallet()
     {
         return wallet;
     }
@@ -242,7 +242,7 @@ public class WalletApplication extends Application {
         {
             // TODO handle exceptions
             try {
-                wallet = new WalletImpl(Constants.TEST_MNEMONIC);
+                wallet = new Wallet(Constants.TEST_MNEMONIC);
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (MnemonicException e) {
@@ -271,7 +271,7 @@ public class WalletApplication extends Application {
         }
     }
 
-    private void protobufSerializeWallet(@Nonnull final WalletImpl wallet) throws IOException
+    private void protobufSerializeWallet(@Nonnull final Wallet wallet) throws IOException
     {
         final long start = System.currentTimeMillis();
 

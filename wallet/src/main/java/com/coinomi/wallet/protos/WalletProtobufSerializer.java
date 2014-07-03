@@ -1,7 +1,7 @@
 package com.coinomi.wallet.protos;
 
 import com.coinomi.wallet.Constants;
-import com.coinomi.wallet.WalletImpl;
+import com.coinomi.wallet.Wallet;
 import com.google.bitcoin.store.UnreadableWalletException;
 
 import java.io.InputStream;
@@ -11,10 +11,10 @@ import java.io.InputStream;
  */
 public class WalletProtobufSerializer {
 
-    public WalletImpl readWallet(InputStream input) throws UnreadableWalletException {
+    public Wallet readWallet(InputStream input) throws UnreadableWalletException {
         //TODO
         try {
-            return new WalletImpl(Constants.TEST_MNEMONIC);
+            return new Wallet(Constants.TEST_MNEMONIC);
         } catch (Exception e) {
             throw new UnreadableWalletException(e.getMessage());
         }
