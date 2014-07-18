@@ -17,9 +17,9 @@ import android.text.format.DateUtils;
 
 import com.coinomi.wallet.Configuration;
 import com.coinomi.wallet.Constants;
-import com.coinomi.wallet.WalletImpl;
+import com.coinomi.core.Wallet;
 import com.coinomi.wallet.WalletApplication;
-import com.coinomi.wallet.network.ServerClient;
+import com.coinomi.core.network.ServerClient;
 import com.google.bitcoin.core.Address;
 import com.google.bitcoin.core.Sha256Hash;
 import com.google.bitcoin.core.StoredBlock;
@@ -313,7 +313,7 @@ public class CoinServiceImpl extends Service implements CoinService {
         @SuppressLint("Wakelock")
         private void check()
         {
-            final WalletImpl wallet = application.getWallet();
+            final Wallet wallet = application.getWallet();
             final boolean hasEverything = hasConnectivity && hasStorage;
 
             if (hasEverything && client == null) {
@@ -332,9 +332,9 @@ public class CoinServiceImpl extends Service implements CoinService {
 //                }
 
                 log.info("starting coin client");
-//                client = new ServerClient(Constants.COINS_ADDRESSES);
-//                client.addWallet(wallet);
-//                client.startAsync();
+                client = new ServerClient(Constants.COINS_ADDRESSES_TEST);
+                client.addWallet(wallet);
+                client.startAsync();
                 //TODO
 
 //                log.info("starting peergroup");
@@ -838,7 +838,7 @@ public class CoinServiceImpl extends Service implements CoinService {
 
     private void maybeRotateKeys()
     {
-        final WalletImpl wallet = application.getWallet();
+        final Wallet wallet = application.getWallet();
 //        wallet.setKeyRotationEnabled(false);
 //
 //        final StoredBlock chainHead = blockChain.getChainHead();

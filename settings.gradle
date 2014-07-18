@@ -1,1 +1,1 @@
-include ':wallet'
+include ':wallet', ':core'

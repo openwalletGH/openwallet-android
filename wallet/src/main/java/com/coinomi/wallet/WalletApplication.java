@@ -10,7 +10,8 @@ import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
-import com.coinomi.wallet.protos.WalletProtobufSerializer;
+import com.coinomi.core.Wallet;
+import com.coinomi.core.protos.WalletProtobufSerializer;
 import com.coinomi.wallet.service.CoinService;
 import com.coinomi.wallet.service.CoinServiceImpl;
 import com.coinomi.wallet.util.CrashReporter;
@@ -51,7 +52,7 @@ public class WalletApplication extends Application {
     private Intent coinServiceResetBlockchainIntent;
 
     private File walletFile;
-    private WalletImpl wallet;
+    private Wallet wallet;
     private PackageInfo packageInfo;
 
     private static final Logger log = LoggerFactory.getLogger(WalletApplication.class);
@@ -116,8 +117,7 @@ public class WalletApplication extends Application {
 //        migrateBackup();
     }
 
-    private void initLogging()
-    {
+    private void initLogging() {
 //        final File logDir = getDir("log", Constants.TEST ? Context.MODE_WORLD_READABLE : MODE_PRIVATE);
 //        final File logFile = new File(logDir, "wallet.log");
 //
@@ -171,7 +171,7 @@ public class WalletApplication extends Application {
         return config;
     }
 
-    public WalletImpl getWallet()
+    public Wallet getWallet()
     {
         return wallet;
     }
@@ -242,7 +242,10 @@ public class WalletApplication extends Application {
         {
             // TODO handle exceptions
             try {
-                wallet = new WalletImpl(Constants.TEST_MNEMONIC);
+                log.info("Creating a new wallet from mnemonic");
+                wallet = new Wallet(Constants.TEST_MNEMONIC);
+                log.info("Adding coin pockets for some coins");
+                wallet.createCoinPockets(Constants.COINS_TEST);
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (MnemonicException e) {
@@ -271,7 +274,7 @@ public class WalletApplication extends Application {
         }
     }
 
-    private void protobufSerializeWallet(@Nonnull final WalletImpl wallet) throws IOException
+    private void protobufSerializeWallet(@Nonnull final Wallet wallet) throws IOException
     {
         final long start = System.currentTimeMillis();
 
