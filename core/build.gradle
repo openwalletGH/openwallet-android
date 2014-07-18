@@ -1,0 +1,41 @@
+apply plugin: 'java'
+
+configurations {
+    unitTestCompile.extendsFrom runtime
+    unitTestRuntime.extendsFrom unitTestCompile
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+
+    compile 'com.google.guava:guava:17.0'
+    //    compile 'com.google:bitcoinj:0.11.2'
+    compile 'com.google.code.findbugs:jsr305:1.3.9'
+    compile 'com.madgag.spongycastle:core:1.50.0.0'
+    compile 'com.google.protobuf:protobuf-java:2.5.0'
+    //    compile 'net.jcip:jcip-annotations:1.0'
+    compile 'org.slf4j:slf4j-jdk14:1.7.6'
+
+//    compile 'org.json:json:20140107'
+    compile 'org.json:json:20080701'
+
+    testCompile 'junit:junit:4.11'
+    testCompile 'org.mockito:mockito-all:1.9.5'
+}
+
+sourceSets {
+    unitTest {
+        java.srcDir file('src/test/java')
+        resources.srcDir file('src/test/resources')
+    }
+}
+
+// add the unitTest task
+task unitTest(type:Test, dependsOn: assemble) {
+    description = "run unit tests"
+    testClassesDir = project.sourceSets.unitTest.output.classesDir
+    classpath = project.sourceSets.unitTest.runtimeClasspath
+}
+
+// bind to check
+check.dependsOn unitTest

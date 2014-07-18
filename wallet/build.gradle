@@ -1,8 +1,15 @@
-apply plugin: 'android'
+apply plugin: 'com.android.application'
 
 android {
+    packagingOptions {
+        exclude 'LICENSE.txt'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE'
+    }
+
     compileSdkVersion 19
-    buildToolsVersion "19.1.0"
+    buildToolsVersion '19.1.0'
 
     defaultConfig {
         applicationId "com.coinomi.wallet"
@@ -17,6 +24,19 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    sourceSets {
+        androidTest {
+            setRoot('src/test')
+        }
+    }
+}
+
+sourceSets {
+    unitTest {
+        java.srcDir file('src/test/java')
+        resources.srcDir file('src/test/resources')
+    }
 }
 
 dependencies {
@@ -24,18 +44,35 @@ dependencies {
     compile 'com.android.support:gridlayout-v7:19.1.0'
     compile 'com.android.support:support-v4:19.1.0'
     compile 'com.android.support:appcompat-v7:19.1.0'
-
     compile 'com.google.guava:guava:17.0'
-
     //    compile 'com.google:bitcoinj:0.11.2'
-
     compile 'com.google.code.findbugs:jsr305:1.3.9'
     compile 'com.madgag.spongycastle:core:1.50.0.0'
-//    compile 'com.google.protobuf:protobuf-java:2.5.0'
-//    compile 'net.jcip:jcip-annotations:1.0'
-
-    compile 'org.slf4j:slf4j-jdk14:1.7.6'
-
+    compile 'com.google.protobuf:protobuf-java:2.5.0'
+    //    compile 'net.jcip:jcip-annotations:1.0'
+//    compile 'org.slf4j:slf4j-jdk14:1.7.6'
 //    compile 'com.github.tony19:logback-android-classic:1.1.1-1'
 //    compile 'com.github.tony19:logback-android-core:1.1.1-1'
+    // Testing
+    androidTestCompile 'junit:junit:4.11'
+    androidTestCompile 'org.robolectric:robolectric:2.3'
+    androidTestCompile 'com.squareup:fest-android:1.0.+'
+    compile project(':core')
+}
+
+
+apply plugin: 'robolectric'
+
+robolectric {
+    include '**/*Test.class'
+    exclude '**/espresso/**/*.class'
+}
+
+
+apply plugin: 'idea'
+
+idea {
+    module {
+        testOutputDir = file('build/test-classes/debug')
+    }
 }

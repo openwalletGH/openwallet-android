@@ -16,9 +16,10 @@ import android.os.PowerManager;
 import android.text.format.DateUtils;
 
 import com.coinomi.wallet.Configuration;
-import com.coinomi.wallet.Wallet;
+import com.coinomi.wallet.Constants;
+import com.coinomi.core.Wallet;
 import com.coinomi.wallet.WalletApplication;
-import com.coinomi.wallet.network.ServerClient;
+import com.coinomi.core.network.ServerClient;
 import com.google.bitcoin.core.Address;
 import com.google.bitcoin.core.Sha256Hash;
 import com.google.bitcoin.core.StoredBlock;
@@ -331,9 +332,9 @@ public class CoinServiceImpl extends Service implements CoinService {
 //                }
 
                 log.info("starting coin client");
-//                client = new ServerClient(Constants.COINS_ADDRESSES);
-//                client.addWallet(wallet);
-//                client.startAsync();
+                client = new ServerClient(Constants.COINS_ADDRESSES_TEST);
+                client.addWallet(wallet);
+                client.startAsync();
                 //TODO
 
 //                log.info("starting peergroup");

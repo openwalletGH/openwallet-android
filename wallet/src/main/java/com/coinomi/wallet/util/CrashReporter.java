@@ -26,7 +26,7 @@ import android.content.res.Resources;
 import android.os.Build;
 
 import com.coinomi.wallet.Constants;
-import com.coinomi.wallet.Wallet;
+import com.coinomi.core.Wallet;
 import com.coinomi.wallet.WalletApplication;
 
 import org.slf4j.Logger;
