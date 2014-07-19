@@ -15,6 +15,7 @@ public class DarkcoinTest extends CoinType {
 
         name = "Darkcoin Test";
         symbol = "DRK";
+        uriScheme = "darkcoin";
         bip44Index = 9;
     }
 

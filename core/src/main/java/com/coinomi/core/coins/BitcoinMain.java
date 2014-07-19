@@ -15,6 +15,7 @@ public class BitcoinMain extends CoinType {
 
         name = "Bitcoin";
         symbol = "BTC";
+        uriScheme = "bitcoin";
         bip44Index = 0;
     }
 

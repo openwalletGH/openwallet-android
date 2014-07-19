@@ -15,6 +15,7 @@ public class LitecoinMain extends CoinType {
         
         name = "Litecoin";
         symbol = "LTC";
+        uriScheme = "litecoin";
         bip44Index = 2;
     }
 

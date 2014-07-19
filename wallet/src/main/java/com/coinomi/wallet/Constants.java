@@ -27,10 +27,6 @@ public class Constants {
 
     public static final String WALLET_FILENAME_PROTOBUF = "wallet" + FILENAME_NETWORK_SUFFIX;
 
-    public static final int PORT = 15001;
-    public static final String HOST = "test.coinomi.com";
-
-
     public static final Charset UTF_8 = Charset.forName("UTF-8");
     public static final Charset US_ASCII = Charset.forName("US-ASCII");
 

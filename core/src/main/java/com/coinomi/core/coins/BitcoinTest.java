@@ -15,6 +15,7 @@ public class BitcoinTest extends CoinType {
 
         name = "Bitcoin Test";
         symbol = "BTC";
+        uriScheme = "bitcoin";
         bip44Index = 1;
     }
 

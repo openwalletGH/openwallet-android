@@ -2,7 +2,7 @@ package com.coinomi.wallet.ui;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
-import android.support.v7.app.ActionBarActivity;
+import android.net.Uri;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -14,16 +14,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
+import android.widget.Toast;
 
+import com.coinomi.core.coins.DogecoinTest;
 import com.coinomi.wallet.R;
-import com.coinomi.wallet.WalletApplication;
 
 /**
  * @author Giannis Dzegoutanis
  * @author Andreas Schildbach
  */
-final public class WalletActivity extends AbstractWalletActivity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks {
+final public class WalletActivity extends AbstractWalletActivity implements
+        NavigationDrawerFragment.NavigationDrawerCallbacks {
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -81,11 +82,16 @@ final public class WalletActivity extends AbstractWalletActivity
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
+        Fragment fragment;
+        if (position == 2) {
+            fragment = WalletSendCoins.newInstance(DogecoinTest.get());
+        }
+        else {
+            fragment = PlaceholderFragment.newInstance(position + 1);
+        }
         // update the main content by replacing fragments
         FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
-                .commit();
+        fragmentManager.beginTransaction().replace(R.id.container, fragment).commit();
     }
 
     public void onSectionAttached(int number) {
@@ -163,8 +169,7 @@ final public class WalletActivity extends AbstractWalletActivity
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_wallet, container, false);
-            return rootView;
+            return inflater.inflate(R.layout.fragment_wallet, container, false);
         }
 
         @Override

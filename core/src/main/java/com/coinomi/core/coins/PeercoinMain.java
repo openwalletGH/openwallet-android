@@ -15,6 +15,7 @@ public class PeercoinMain extends CoinType {
 
         name = "Peercoin";
         symbol = "PPC";
+        uriScheme = "peercoin"; // TODO verify, could be ppcoin?
         bip44Index = 6;
     }
 

@@ -15,6 +15,7 @@ public class DogecoinMain extends CoinType {
 
         name = "Dogecoin";
         symbol = "DOGE";
+        uriScheme = "dogecoin";
         bip44Index = 4;
     }
 

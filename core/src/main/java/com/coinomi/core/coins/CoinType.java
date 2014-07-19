@@ -5,16 +5,20 @@ import com.google.bitcoin.core.NetworkParameters;
 import com.google.bitcoin.crypto.ChildNumber;
 import com.google.bitcoin.crypto.HDUtils;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * @author Giannis Dzegoutanis
  */
-abstract public class CoinType extends NetworkParameters{
-    String BIP_44_KEY_PATH = "44'/%d'/%d'";
+abstract public class CoinType extends NetworkParameters implements Serializable{
+    private static final long serialVersionUID = 1L;
+
+    private static final String BIP_44_KEY_PATH = "44'/%d'/%d'";
 
     protected String name;
     protected String symbol;
+    protected String uriScheme;
     protected int bip44Index;
 
     public String getName() {
@@ -23,6 +27,10 @@ abstract public class CoinType extends NetworkParameters{
 
     public String getSymbol() {
         return symbol;
+    }
+
+    public String getUriScheme() {
+        return uriScheme;
     }
 
     public int getBip44Index() {
