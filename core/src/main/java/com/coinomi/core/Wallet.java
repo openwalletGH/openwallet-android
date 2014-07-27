@@ -5,9 +5,15 @@ import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.network.ServerClient;
 import com.coinomi.core.network.interfaces.ConnectionEventListener;
 import com.google.bitcoin.core.Address;
+import com.google.bitcoin.core.Coin;
+import com.google.bitcoin.core.InsufficientMoneyException;
 import com.google.bitcoin.core.Sha256Hash;
 import com.google.bitcoin.core.Transaction;
-import com.google.bitcoin.crypto.*;
+import com.google.bitcoin.crypto.DeterministicHierarchy;
+import com.google.bitcoin.crypto.DeterministicKey;
+import com.google.bitcoin.crypto.HDKeyDerivation;
+import com.google.bitcoin.crypto.MnemonicCode;
+import com.google.bitcoin.crypto.MnemonicException;
 import com.google.bitcoin.utils.Threading;
 import com.google.bitcoin.wallet.DeterministicSeed;
 import com.google.common.collect.ImmutableList;
@@ -20,7 +26,6 @@ import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.annotation.Nullable;
@@ -124,14 +129,18 @@ final public class Wallet implements ConnectionEventListener {
         try {
 
             if (!pockets.containsKey(coinType)) {
-                DeterministicHierarchy hierarchy = new DeterministicHierarchy(masterKey);
-                DeterministicKey rootKey = hierarchy.get(BitcoinMain.get().getBip44Path(account), false, true);
-                pockets.put(coinType, new WalletPocket(new KeyChain(rootKey), coinType));
+                createPocket(coinType);
             }
             return pockets.get(coinType);
         } finally {
             lock.unlock();
         }
+    }
+
+    private void createPocket(CoinType coinType) {
+        DeterministicHierarchy hierarchy = new DeterministicHierarchy(masterKey);
+        DeterministicKey rootKey = hierarchy.get(BitcoinMain.get().getBip44Path(account), false, true);
+        pockets.put(coinType, new WalletPocket(new KeyChain(rootKey), coinType));
     }
 
     List<CoinType> getCoinTypes() {
@@ -175,4 +184,9 @@ final public class Wallet implements ConnectionEventListener {
     }
 
 
+    public void sendCoins(Address address, Coin amount) throws InsufficientMoneyException {
+        WalletPocket pocket = getPocket((CoinType) address.getParameters());
+
+        pocket.sendCoins(address, amount);
+    }
 }

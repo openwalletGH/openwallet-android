@@ -1,6 +1,7 @@
 package com.coinomi.core.coins;
 
 import com.coinomi.core.Constants;
+import com.google.bitcoin.core.Coin;
 
 /**
  * @author Giannis Dzegoutanis
@@ -17,6 +18,7 @@ public class DogecoinMain extends CoinType {
         symbol = "DOGE";
         uriScheme = "dogecoin";
         bip44Index = 4;
+        feePerKb = Coin.valueOf(100000000L);
     }
 
     private static DogecoinMain instance;

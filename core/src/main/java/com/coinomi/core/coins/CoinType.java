@@ -1,6 +1,7 @@
 package com.coinomi.core.coins;
 
 
+import com.google.bitcoin.core.Coin;
 import com.google.bitcoin.core.NetworkParameters;
 import com.google.bitcoin.crypto.ChildNumber;
 import com.google.bitcoin.crypto.HDUtils;
@@ -20,6 +21,7 @@ abstract public class CoinType extends NetworkParameters implements Serializable
     protected String symbol;
     protected String uriScheme;
     protected int bip44Index;
+    protected Coin feePerKb;
 
     public String getName() {
         return name;
@@ -35,6 +37,10 @@ abstract public class CoinType extends NetworkParameters implements Serializable
 
     public int getBip44Index() {
         return bip44Index;
+    }
+
+    public Coin getFeePerKb() {
+        return feePerKb;
     }
 
     public List<ChildNumber> getBip44Path(int account) {
