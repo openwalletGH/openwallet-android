@@ -97,7 +97,7 @@ public class WalletApplication extends Application {
 
         walletFile = getFileStreamPath(Constants.WALLET_FILENAME_PROTOBUF);
 
-        loadWalletFromProtobuf();
+//        loadWalletFromProtobuf();
 
         config.updateLastVersionCode(packageInfo.versionCode);
 
@@ -176,8 +176,7 @@ public class WalletApplication extends Application {
         return wallet;
     }
 
-    private void loadWalletFromProtobuf()
-    {
+    private void loadWalletFromProtobuf() {
         if (walletFile.exists())
         {
             final long start = System.currentTimeMillis();
@@ -289,10 +288,10 @@ public class WalletApplication extends Application {
 
     public void startBlockchainService(final boolean cancelCoinsReceived)
     {
-        if (cancelCoinsReceived)
-            startService(coinServiceCancelCoinsReceivedIntent);
-        else
-            startService(coinServiceIntent);
+//        if (cancelCoinsReceived)
+//            startService(coinServiceCancelCoinsReceivedIntent);
+//        else
+//            startService(coinServiceIntent);
     }
 
     public void stopBlockchainService()

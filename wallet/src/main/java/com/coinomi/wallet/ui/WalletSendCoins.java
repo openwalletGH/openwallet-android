@@ -51,6 +51,8 @@ public class WalletSendCoins extends Fragment {
     private EditText sendToAddress;
 
 
+
+
 //    private OnFragmentInteractionListener mListener;
 
     /**

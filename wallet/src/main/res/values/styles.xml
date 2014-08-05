@@ -9,4 +9,18 @@
         <item name="android:background">#ffff8900</item>
     </style>
 
+    <style name="Amount" parent="@android:style/TextAppearance">
+        <item name="android:textSize">@dimen/amount_text_size</item>
+        <item name="android:textColor">#555555</item>
+        <item name="android:singleLine">true</item>
+    </style>
+    <style name="AmountBig" parent="Amount">
+        <item name="android:textSize">@dimen/amount_text_size_big</item>
+    </style>
+    <style name="AmountSymbol" parent="@android:style/TextAppearance">
+        <item name="android:textSize">@dimen/amount_symbol_text_size</item>
+        <item name="android:textColor">#898989</item>
+        <item name="android:singleLine">true</item>
+    </style>
+
 </resources>

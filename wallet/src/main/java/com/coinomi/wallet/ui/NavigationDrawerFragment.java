@@ -78,6 +78,10 @@ public class NavigationDrawerFragment extends Fragment {
         }
 
         // Select either the default item (0) or the last selected item.
+        reselectLastItem();
+    }
+
+    void reselectLastItem() {
         selectItem(mCurrentSelectedPosition);
     }
 
@@ -189,6 +193,8 @@ public class NavigationDrawerFragment extends Fragment {
 
         mDrawerLayout.setDrawerListener(mDrawerToggle);
     }
+
+
 
     private void selectItem(int position) {
         mCurrentSelectedPosition = position;

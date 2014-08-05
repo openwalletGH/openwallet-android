@@ -1,0 +1,55 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:coinomi="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.InfoFragment">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_horizontal|top">
+
+        <com.coinomi.wallet.ui.widget.Amount
+            android:id="@+id/main_amount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/amount_margin"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal|top"
+            coinomi:show_big="true" />
+
+        <com.coinomi.wallet.ui.widget.Amount
+            android:id="@+id/amount_btc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_alignEnd="@id/main_amount"
+            android:layout_alignRight="@id/main_amount"
+            android:layout_below="@+id/main_amount" />
+
+        <com.coinomi.wallet.ui.widget.Amount
+            android:id="@+id/amount_usd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_alignEnd="@id/main_amount"
+            android:layout_alignLeft="@id/main_amount"
+            android:layout_below="@+id/amount_btc" />
+
+        <com.coinomi.wallet.ui.widget.Amount
+            android:id="@+id/amount_eur"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_alignEnd="@id/main_amount"
+            android:layout_alignRight="@id/main_amount"
+            android:layout_below="@+id/amount_btc"
+            android:layout_toLeftOf="@+id/amount_usd" />
+
+
+
+    </RelativeLayout>
+
+</FrameLayout>

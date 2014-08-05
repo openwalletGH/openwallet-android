@@ -1,8 +1,11 @@
 package com.coinomi.wallet.ui;
 
 import android.app.Activity;
+import android.app.FragmentTransaction;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -16,6 +19,7 @@ import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
 import android.widget.Toast;
 
+import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.DogecoinTest;
 import com.coinomi.wallet.R;
 
@@ -24,7 +28,11 @@ import com.coinomi.wallet.R;
  * @author Andreas Schildbach
  */
 final public class WalletActivity extends AbstractWalletActivity implements
-        NavigationDrawerFragment.NavigationDrawerCallbacks {
+        NavigationDrawerFragment.NavigationDrawerCallbacks, ActionBar.TabListener {
+
+    private static final int RECEIVE = 0;
+    private static final int INFO = 1;
+    private static final int SEND = 2;
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -40,6 +48,8 @@ final public class WalletActivity extends AbstractWalletActivity implements
      * For SharedPreferences, used to check if first launch ever.
      */
     final String PREFS_NAME = "SharedPrefsFile";
+    private ViewPager mViewPager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,8 +65,27 @@ final public class WalletActivity extends AbstractWalletActivity implements
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
 
-        //If app has never been launched, this code will be executed.
+        // Set up the ViewPager, attaching the adapter and setting up a listener for when the
+        // user swipes between sections.
+        mViewPager = (ViewPager) findViewById(R.id.pager);
+        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+            @Override
+            public void onPageSelected(int position) {
+                // When swiping between different app sections, select the corresponding tab.
+                // We can also use ActionBar.Tab#select() to do this if we have a reference to the
+                // Tab.
+                //TODO
+//                actionBar.setSelectedNavigationItem(position);
+                Toast.makeText(WalletActivity.this, "Touched " + position, Toast.LENGTH_LONG);
+            }
+        });
 
+        // Hack to make the ViewPager work
+        mNavigationDrawerFragment.reselectLastItem();
+
+
+
+        //If app has never been launched, this code will be executed.
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
         if (settings.getBoolean("firstLaunch", true)) {
             Log.d("Comments", "First time");
@@ -82,16 +111,30 @@ final public class WalletActivity extends AbstractWalletActivity implements
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
-        Fragment fragment;
-        if (position == 2) {
-            fragment = WalletSendCoins.newInstance(DogecoinTest.get());
+//        Fragment fragment;
+//        if (position == 0) {
+//            fragment = InfoFragment.newInstance(DogecoinTest.get());
+//        }
+//        else if (position == 2) {
+//            fragment = WalletSendCoins.newInstance(DogecoinTest.get());
+//        }
+//        else {
+//            fragment = PlaceholderFragment.newInstance(position + 1);
+//        }
+
+
+
+        if (mViewPager != null) {
+            AppSectionsPagerAdapter adapter =
+                    new AppSectionsPagerAdapter(this, DogecoinTest.get());
+            mViewPager.setAdapter(adapter);
+            mViewPager.setCurrentItem(INFO);
         }
-        else {
-            fragment = PlaceholderFragment.newInstance(position + 1);
-        }
+
+
         // update the main content by replacing fragments
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.container, fragment).commit();
+//        FragmentManager fragmentManager = getSupportFragmentManager();
+//        fragmentManager.beginTransaction().replace(R.id.container, fragment).commit();
     }
 
     public void onSectionAttached(int number) {
@@ -141,6 +184,22 @@ final public class WalletActivity extends AbstractWalletActivity implements
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onTabSelected(ActionBar.Tab tab, android.support.v4.app.FragmentTransaction fragmentTransaction) {
+        // When the given tab is selected, switch to the corresponding page in the ViewPager.
+//        mViewPager.setCurrentItem(tab.getPosition());
+    }
+
+    @Override
+    public void onTabUnselected(ActionBar.Tab tab, android.support.v4.app.FragmentTransaction fragmentTransaction) {
+
+    }
+
+    @Override
+    public void onTabReselected(ActionBar.Tab tab, android.support.v4.app.FragmentTransaction fragmentTransaction) {
+
+    }
+
     /**
      * A placeholder fragment containing a simple view.
      */
@@ -177,6 +236,52 @@ final public class WalletActivity extends AbstractWalletActivity implements
             super.onAttach(activity);
             ((WalletActivity) activity).onSectionAttached(
                     getArguments().getInt(ARG_SECTION_NUMBER));
+        }
+    }
+
+
+
+
+    private static class AppSectionsPagerAdapter extends FragmentPagerAdapter {
+
+        private final CoinType type;
+        private final WalletActivity walletActivity;
+
+        public AppSectionsPagerAdapter(WalletActivity walletActivity, CoinType type) {
+            super(walletActivity.getSupportFragmentManager());
+            this.walletActivity = walletActivity;
+            this.type = type;
+        }
+
+        @Override
+        public Fragment getItem(int i) {
+            switch (i) {
+                case RECEIVE:
+                    return ReceiveFragment.newInstance(type.getName(), type.getSymbol());
+                case SEND:
+                    return WalletSendCoins.newInstance(type);
+                case INFO:
+                default:
+                    return InfoFragment.newInstance(type);
+            }
+        }
+
+        @Override
+        public int getCount() {
+            return 3;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            switch (position) {
+                case RECEIVE:
+                    return walletActivity.getString(R.string.wallet_title_receive);
+                case SEND:
+                    return walletActivity.getString(R.string.wallet_title_send);
+                case INFO:
+                default:
+                    return walletActivity.getString(R.string.wallet_title_info);
+            }
         }
     }
 
