@@ -9,8 +9,24 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="action_example">Action</string>
     <string name="action_settings">Settings</string>
-    <string name="scan_qr_code">QR-code</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+
+
+    <string name="send_coins_fragment_scan_qr_code">QR-code</string>
+    <string name="send_coins_fragment_receiving_address_label">Pay to</string>
+    <string name="send_coins_fragment_receiving_address_error">Invalid Bitcoin Address!</string>
+    <string name="send_coins_fragment_amount_label">Amount to pay</string>
+    <string name="send_coins_fragment_button_send">Send</string>
+    <string name="send_coins_fragment_button_back">Back</string>
+    <string name="send_coins_preparation_msg">Signing…</string>
+    <string name="send_coins_sending_msg">Sending…</string>
+    <string name="send_coins_sent_msg">Sent!</string>
+    <string name="send_coins_failed_msg">Failed!</string>
+    <string name="send_coins_error_msg">Problem sending coins!</string>
+
+
+    <!-- generic buttons -->
+    <string name="button_dismiss">Dismiss</string>
 
     <string name="wallet_title_receive">receive</string>
     <string name="wallet_title_info">info</string>

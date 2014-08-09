@@ -1,12 +1,18 @@
 package com.coinomi.wallet.ui;
 
 import android.app.Activity;
-import android.bluetooth.BluetoothAdapter;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,8 +26,8 @@ import com.coinomi.core.uri.CoinURIParseException;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
 import com.google.bitcoin.core.Address;
-import com.google.bitcoin.uri.BitcoinURI;
-import com.google.bitcoin.uri.BitcoinURIParseException;
+import com.google.bitcoin.core.Coin;
+import com.google.bitcoin.core.InsufficientMoneyException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,12 +52,47 @@ public class WalletSendCoins extends Fragment {
 
     private CoinType coinType;
     private WalletApplication application;
+    private FragmentManager fragmentManager;
     private Handler handler = new Handler();
-    private Button scanQrCode;
-    private EditText sendToAddress;
+    private EditText receivingAddressView;
+    private EditText sendAmountView;
+    private Button scanQrCodeButton;
+    private Button sendConfirmButton;
 
 
+    private State state = State.INPUT;
+    private Address validatedAddress;
+    private Coin sendAmount;
+    private DialogFragment popupWindow;
+    private Activity activity;
 
+//    private Transaction sentTransaction = null;
+
+    private enum State {
+        INPUT, PREPARATION, SENDING, SENT, FAILED
+    }
+
+    private final class SendAmountListener implements View.OnFocusChangeListener, TextWatcher {
+        @Override
+        public void onFocusChange(final View v, final boolean hasFocus) {
+            if (!hasFocus) {
+                validateAmount(true);
+            }
+        }
+
+        @Override
+        public void afterTextChanged(final Editable s) {
+            validateAmount(false);
+        }
+
+        @Override
+        public void beforeTextChanged(final CharSequence s, final int start, final int count, final int after) { }
+
+        @Override
+        public void onTextChanged(final CharSequence s, final int start, final int before, final int count) { }
+    }
+
+    private final SendAmountListener sendAmountListener = new SendAmountListener();
 
 //    private OnFragmentInteractionListener mListener;
 
@@ -87,14 +128,32 @@ public class WalletSendCoins extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_wallet_send_coins, container, false);
 
-        scanQrCode = (Button) view.findViewById(R.id.scan_qr_code);
-        scanQrCode.setOnClickListener(new View.OnClickListener() {
+        receivingAddressView = (EditText) view.findViewById(R.id.send_to_address);
+        sendAmountView = (EditText) view.findViewById(R.id.send_amount);
+        sendAmountView.setOnFocusChangeListener(sendAmountListener);
+        sendAmountView.addTextChangedListener(sendAmountListener);
+
+        scanQrCodeButton = (Button) view.findViewById(R.id.scan_qr_code);
+        scanQrCodeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 handleScan();
             }
         });
-        sendToAddress = (EditText) view.findViewById(R.id.send_to_address);
+
+        sendConfirmButton = (Button) view.findViewById(R.id.send_confirm);
+        sendConfirmButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                validateReceivingAddress(true);
+
+                if (everythingValid())
+                    handleSendConfirm();
+                else
+                    requestFocusFirst();
+            }
+        });
         
         return view;
     }
@@ -104,8 +163,23 @@ public class WalletSendCoins extends Fragment {
         startActivityForResult(new Intent(getActivity(), ScanActivity.class), REQUEST_CODE_SCAN);
     }
 
+    private void handleSendConfirm() {
+        state = State.PREPARATION;
+        updateView();
 
-    @Override
+        Toast.makeText(activity, R.string.send_coins_preparation_msg, Toast.LENGTH_LONG).show();
+
+
+        try {
+            application.getWallet().sendCoins(validatedAddress, sendAmount);
+        } catch (InsufficientMoneyException e) {
+            // TODO handle this case better
+            Toast.makeText(activity, R.string.send_coins_error_msg, Toast.LENGTH_LONG).show();
+        }
+    }
+
+
+        @Override
     public void onActivityResult(final int requestCode, final int resultCode, final Intent intent) {
         if (requestCode == REQUEST_CODE_SCAN) {
             if (resultCode == Activity.RESULT_OK) {
@@ -117,11 +191,11 @@ public class WalletSendCoins extends Fragment {
                 {
                     final CoinURI coinUri = new CoinURI(coinType, input);
 
-                    final Address address = coinUri.getAddress();
-                    if (address == null)
+                    validatedAddress = coinUri.getAddress();
+                    if (validatedAddress == null)
                         throw new CoinURIParseException("missing address");
 
-                    updateStateFrom(address);
+                    updateStateFrom(validatedAddress);
 
 //                    if (address.getParameters().equals(Constants.NETWORK_PARAMETERS))
 //                        handlePaymentIntent(PaymentIntent.fromBitcoinUri(bitcoinUri));
@@ -166,11 +240,111 @@ public class WalletSendCoins extends Fragment {
         {
             @Override
             public void run() {
-                WalletSendCoins.this.sendToAddress.setText(address.toString());
+                receivingAddressView.setText(address.toString());
+                requestFocusFirst();
+                updateView();
             }
         });
     }
 
+    private void updateView() {
+
+//        viewCancel.setEnabled(state != State.PREPARATION);
+        sendConfirmButton.setEnabled(everythingValid());
+
+        // enable actions
+        if (scanQrCodeButton != null) {
+            scanQrCodeButton.setEnabled(state == State.INPUT);
+        }
+    }
+
+    private boolean isOutputsValid() {
+        return validatedAddress != null;
+    }
+
+    private boolean isAmountValid() {
+        return isAmountValid(sendAmount);
+    }
+
+    private boolean isAmountValid(Coin amount) {
+        return amount != null && amount.signum() > 0;
+    }
+
+    private boolean everythingValid() {
+        return state == State.INPUT && isOutputsValid() && isAmountValid();
+    }
+
+    private void requestFocusFirst()
+    {
+        if (!isOutputsValid())
+            receivingAddressView.requestFocus();
+        else if (!isAmountValid())
+            sendAmountView.requestFocus();
+        else if (everythingValid())
+            sendConfirmButton.requestFocus();
+        else
+            log.warn("unclear focus");
+    }
+
+    private void validateAmount(final boolean popups) {
+        try {
+            Coin amount = Coin.parseCoin(String.valueOf(sendAmountView.getText()));
+            if (isAmountValid(amount)) {
+                sendAmount = amount;
+            }
+            else {
+                sendAmount = null;
+            }
+        } catch (IllegalArgumentException ignore) {
+            sendAmount = null;
+        }
+        updateView();
+    }
+
+    private void validateReceivingAddress(final boolean popups)
+    {
+        // TODO implement validation
+//        try
+//        {
+//            final String addressStr = receivingAddressView.getText().toString().trim();
+//            if (!addressStr.isEmpty())
+//            {
+//                final NetworkParameters addressParams = Address.getParametersFromAddress(addressStr);
+//                if (addressParams != null && !addressParams.equals(Constants.NETWORK_PARAMETERS))
+//                {
+//                    // address is valid, but from different known network
+//                    if (popups)
+//                        popupMessage(receivingAddressView,
+//                                getString(R.string.send_coins_fragment_receiving_address_error_cross_network, addressParams.getId()));
+//                }
+//                else if (addressParams == null)
+//                {
+//                    // address is valid, but from different unknown network
+//                    if (popups)
+//                        popupMessage(receivingAddressView, getString(R.string.send_coins_fragment_receiving_address_error_cross_network_unknown));
+//                }
+//                else
+//                {
+//                    // valid address
+//                    final String label = AddressBookProvider.resolveLabel(activity, addressStr);
+//                    validatedAddress = new AddressAndLabel(Constants.NETWORK_PARAMETERS, addressStr, label);
+//                    receivingAddressView.setText(null);
+//                }
+//            }
+//            else
+//            {
+//                // empty field should not raise error message
+//            }
+//        }
+//        catch (final AddressFormatException x)
+//        {
+//            // could not decode address at all
+//            if (popups)
+//                popupMessage(receivingAddressView, getString(R.string.send_coins_fragment_receiving_address_error));
+//        }
+//
+//        updateView();
+    }
 
     //    // TODO: Rename method, update argument and hook method into UI event
 //    public void onButtonPressed(Uri uri) {
@@ -179,11 +353,60 @@ public class WalletSendCoins extends Fragment {
 //        }
 //    }
 
+    private void popupMessage(@Nonnull final View anchorNotUsed, @Nonnull final String message) {
+        dismissPopup();
+
+        Bundle bundle = new Bundle();
+        bundle.putString(ErrorDialogFragment.MESSAGE, message);
+        popupWindow = new ErrorDialogFragment();
+        popupWindow.setArguments(bundle);
+        popupWindow.show(fragmentManager, ErrorDialogFragment.TAG);
+    }
+
+    private void dismissPopup() {
+        if (popupWindow != null) {
+            popupWindow.dismiss();
+            popupWindow = null;
+        }
+    }
+
+    public static class ErrorDialogFragment extends DialogFragment {
+        public static final String TAG = "error_dialog_fragment";
+        public static final String MESSAGE = "message";
+        private String message;
+
+        public ErrorDialogFragment() {}
+
+        @Override
+        public void setArguments(Bundle args) {
+            super.setArguments(args);
+            message = args.getString(MESSAGE);
+        }
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the Builder class for convenient dialog construction
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setMessage(message)
+                    .setNeutralButton(R.string.button_dismiss, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+//                            dismissPopup();
+                            dismiss();
+                        }
+                    });
+            // Create the AlertDialog object and return it
+            return builder.create();
+        }
+    }
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
 
+        this.activity = activity;
         application = (WalletApplication) activity.getApplication();
+        fragmentManager = getFragmentManager();
 //        try {
 //            mListener = (OnFragmentInteractionListener) activity;
 //        } catch (ClassCastException e) {

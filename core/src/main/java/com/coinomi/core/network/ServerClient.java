@@ -10,6 +10,7 @@ import com.coinomi.stratumj.messages.CallMessage;
 import com.coinomi.stratumj.messages.ResultMessage;
 import com.google.bitcoin.core.Address;
 import com.google.bitcoin.core.AddressFormatException;
+import com.google.bitcoin.core.Utils;
 import com.google.bitcoin.utils.ListenerRegistration;
 import com.google.bitcoin.utils.Threading;
 import com.google.common.collect.HashBiMap;
@@ -204,16 +205,16 @@ public class ServerClient {
             @Override
             public void onSuccess(ResultMessage result) {
                 JSONArray resTxs = result.getResult();
-                ImmutableList.Builder<Transaction> txs = ImmutableList.builder();
+                ImmutableList.Builder<UnspentTx> utxes = ImmutableList.builder();
                 try {
                     for (int i = 0; i < resTxs.length(); i++) {
-                        txs.add(new Transaction(resTxs.getJSONObject(i)));
+                        utxes.add(new UnspentTx(resTxs.getJSONObject(i)));
                     }
                 } catch (JSONException e) {
                     onFailure(e);
                     return;
                 }
-                listener.onUnspentTransactionUpdate(status, txs.build());
+                listener.onUnspentTransactionUpdate(status, utxes.build());
             }
 
             @Override
@@ -223,13 +224,41 @@ public class ServerClient {
         }, Threading.USER_THREAD);
     }
 
-    public static class Transaction {
+    public void getTx(CoinType coinType, final UnspentTx utx, final TransactionEventListener listener) {
+// {"params": ["a52418acead4fbc25252cba18f26de88166ef065e7237200253d27ef7ca53505"], "id": 27, "method": "blockchain.transaction.get"}
+
+        StratumClient client = checkNotNull(connections.get(coinType));
+
+        CallMessage message = new CallMessage("blockchain.transaction.get", Arrays.asList(utx.getTxHash()));
+        final ListenableFuture<ResultMessage> result = client.call(message);
+
+        Futures.addCallback(result, new FutureCallback<ResultMessage>() {
+
+            @Override
+            public void onSuccess(ResultMessage result) {
+                try {
+                    String rawTx = result.getResult().getString(0);
+                    listener.onTransactionUpdate(utx, Utils.HEX.decode(rawTx));
+                } catch (JSONException e) {
+                    onFailure(e);
+                    return;
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                log.error("Could not get reply for blockchain.transaction.get", t);
+            }
+        }, Threading.USER_THREAD);
+    }
+
+    public static class UnspentTx {
         private String txHash;
         private int txPos;
         private long value;
         private int height;
 
-        public Transaction(JSONObject json) throws JSONException {
+        public UnspentTx(JSONObject json) throws JSONException {
             txHash = json.getString("tx_hash");
             txPos = json.getInt("tx_pos");
             value = json.getLong("value");
@@ -251,5 +280,7 @@ public class ServerClient {
         public int getHeight() {
             return height;
         }
+
+
     }
 }
