@@ -6,6 +6,7 @@
     <color name="fg_less_significant">#ff666666</color>
     <color name="fg_insignificant">#ffcccccc</color>
     <color name="fg_error">#ffff0000</color>
+    <color name="fg_tabs">#fffefefe</color>
 
     <!-- background -->
     <color name="bg_bright">#ffffffff</color>
@@ -15,6 +16,7 @@
     <color name="bg_list">#40ffffff</color>
     <color name="bg_list_selected">#40808090</color>
     <color name="bg_dialog_title">#ffb8b8b0</color>
+    <color name="bg_tabs">#ff33b5e5</color>
 
     <!-- scanner -->
     <color name="scan_mask">#60000000</color>
