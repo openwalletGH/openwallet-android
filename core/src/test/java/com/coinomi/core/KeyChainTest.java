@@ -124,9 +124,13 @@ public class KeyChainTest {
         assertEquals(6, firstEvent.size());  // 5 lookahead keys and 1 to satisfy the request.
         assertTrue(firstEvent.contains(key));   // order is not specified.
         listenerKeys.clear();
+        chain.getKey(KeyChain.KeyPurpose.CHANGE);
+        chain.getKey(KeyChain.KeyPurpose.CHANGE);
+        chain.getKey(KeyChain.KeyPurpose.CHANGE);
+        chain.getKey(KeyChain.KeyPurpose.CHANGE);
         key = chain.getKey(KeyChain.KeyPurpose.CHANGE);
         assertEquals(1, listenerKeys.size());  // 1 event
-        assertEquals(1, listenerKeys.get(0).size());  // 1 key.
+        assertEquals(5, listenerKeys.get(0).size());  // 5 keys.
         DeterministicKey eventKey = (DeterministicKey) listenerKeys.get(0).get(0);
         assertNotEquals(key, eventKey);  // The key added is not the one that's served.
         assertEquals(6, eventKey.getChildNumber().i());

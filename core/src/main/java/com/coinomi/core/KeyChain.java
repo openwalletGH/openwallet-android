@@ -642,6 +642,8 @@ public class KeyChain implements EncryptableKeyChain {
         lock.lock();
         try {
             this.lookaheadSize = lookaheadSize;
+            if (this.lookaheadThreshold >= lookaheadSize)
+                setLookaheadThreshold(lookaheadSize - 1);
         } finally {
             lock.unlock();
         }
