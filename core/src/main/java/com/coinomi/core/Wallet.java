@@ -140,7 +140,7 @@ final public class Wallet implements ConnectionEventListener {
     private void createPocket(CoinType coinType) {
         DeterministicHierarchy hierarchy = new DeterministicHierarchy(masterKey);
         DeterministicKey rootKey = hierarchy.get(BitcoinMain.get().getBip44Path(account), false, true);
-        pockets.put(coinType, new WalletPocket(new KeyChain(rootKey), coinType));
+        pockets.put(coinType, new WalletPocket(new HDKeyChain(rootKey), coinType));
     }
 
     List<CoinType> getCoinTypes() {

@@ -1,33 +1,38 @@
 package com.coinomi.core;
 
 
-
-import com.coinomi.core.coins.BitcoinTest;
-import com.google.bitcoin.core.Address;
+import com.coinomi.core.keychains.EncryptableKeyChain;
+import com.coinomi.core.protos.Protos;
 import com.google.bitcoin.core.BloomFilter;
 import com.google.bitcoin.core.ECKey;
-import com.google.bitcoin.crypto.*;
+import com.google.bitcoin.crypto.ChildNumber;
+import com.google.bitcoin.crypto.DeterministicHierarchy;
+import com.google.bitcoin.crypto.DeterministicKey;
+import com.google.bitcoin.crypto.HDKeyDerivation;
+import com.google.bitcoin.crypto.HDUtils;
+import com.google.bitcoin.crypto.KeyCrypter;
+import com.google.bitcoin.crypto.KeyCrypterException;
+import com.google.bitcoin.crypto.KeyCrypterScrypt;
 import com.google.bitcoin.store.UnreadableWalletException;
 import com.google.bitcoin.utils.Threading;
 import com.google.bitcoin.wallet.BasicKeyChain;
-import com.google.bitcoin.wallet.EncryptableKeyChain;
 import com.google.bitcoin.wallet.KeyChainEventListener;
 import com.google.common.collect.ImmutableList;
 
-import org.bitcoinj.wallet.Protos;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.crypto.params.KeyParameter;
-
-import javax.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static com.google.common.base.Preconditions.*;
-import static com.google.common.collect.Lists.newLinkedList;
+import javax.annotation.Nullable;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * @author Giannis Dzegoutanis
@@ -35,8 +40,8 @@ import static com.google.common.collect.Lists.newLinkedList;
  */
 
 
-public class KeyChain implements EncryptableKeyChain {
-    private static final Logger log = LoggerFactory.getLogger(KeyChain.class);
+public class HDKeyChain implements EncryptableKeyChain {
+    private static final Logger log = LoggerFactory.getLogger(HDKeyChain.class);
 
     private final ReentrantLock lock = Threading.lock("KeyChain");
 
@@ -79,13 +84,13 @@ public class KeyChain implements EncryptableKeyChain {
      * balances and generally follow along, but spending is not possible with such a chain. Currently you can't use
      * this method to watch an arbitrary fragment of some other tree, this limitation may be removed in future.
      */
-    public KeyChain(DeterministicKey rootkey) {
+    public HDKeyChain(DeterministicKey rootkey) {
         basicKeyChain = new BasicKeyChain();
         initializeHierarchyUnencrypted(rootkey);
     }
 
     // For use in encryption.
-    private KeyChain(KeyCrypter crypter, KeyParameter aesKey, KeyChain chain) {
+    private HDKeyChain(KeyCrypter crypter, KeyParameter aesKey, HDKeyChain chain) {
         checkArgument(!chain.rootKey.isEncrypted(), "Chain already encrypted");
 
         this.issuedExternalKeys = chain.issuedExternalKeys;
@@ -117,7 +122,7 @@ public class KeyChain implements EncryptableKeyChain {
         }
     }
 
-    private DeterministicKey encryptNonLeaf(KeyParameter aesKey, KeyChain chain,
+    private DeterministicKey encryptNonLeaf(KeyParameter aesKey, HDKeyChain chain,
                                             DeterministicKey parent, ImmutableList<ChildNumber> path) {
         DeterministicKey key = chain.hierarchy.get(path, true, false);
         key = key.encrypt(checkNotNull(basicKeyChain.getKeyCrypter()), aesKey, parent);
@@ -233,7 +238,7 @@ public class KeyChain implements EncryptableKeyChain {
 
     /**
      * Mark the DeterministicKeys as used, if they match the pubkeyHash
-     * See {@link KeyChain#markKeyAsUsed(DeterministicKey)} for more info on this.
+     * See {@link HDKeyChain#markKeyAsUsed(DeterministicKey)} for more info on this.
      */
     public boolean markPubHashAsUsed(byte[] pubkeyHash) {
         lock.lock();
@@ -249,7 +254,7 @@ public class KeyChain implements EncryptableKeyChain {
 
     /**
      * Mark the DeterministicKeys as used, if they match the pubkey
-     * See {@link KeyChain#markKeyAsUsed(DeterministicKey)} for more info on this.
+     * See {@link HDKeyChain#markKeyAsUsed(DeterministicKey)} for more info on this.
      */
     public boolean markPubKeyAsUsed(byte[] pubkey) {
         lock.lock();
@@ -382,7 +387,7 @@ public class KeyChain implements EncryptableKeyChain {
      * Returns all the key chains found in the given list of keys. Typically there will only be one, but in the case of
      * key rotation it can happen that there are multiple chains found.
      */
-    public static List<KeyChain> fromProtobuf(List<Protos.Key> keys, @Nullable KeyCrypter crypter) throws UnreadableWalletException {
+    public static List<HDKeyChain> fromProtobuf(List<Protos.Key> keys, @Nullable KeyCrypter crypter) throws UnreadableWalletException {
         throw new RuntimeException("not implemented");
 //        List<KeyChain> chains = newLinkedList();
 //        DeterministicSeed seed = null;
@@ -522,7 +527,7 @@ public class KeyChain implements EncryptableKeyChain {
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Override
-    public KeyChain toEncrypted(CharSequence password) {
+    public HDKeyChain toEncrypted(CharSequence password) {
         checkNotNull(password);
         checkArgument(password.length() > 0);
         checkState(rootKey.isPubKeyOnly() != false, "Attempt to encrypt a watching chain.");
@@ -533,12 +538,12 @@ public class KeyChain implements EncryptableKeyChain {
     }
 
     @Override
-    public KeyChain toEncrypted(KeyCrypter keyCrypter, KeyParameter aesKey) {
-        return new KeyChain(keyCrypter, aesKey, this);
+    public HDKeyChain toEncrypted(KeyCrypter keyCrypter, KeyParameter aesKey) {
+        return new HDKeyChain(keyCrypter, aesKey, this);
     }
 
     @Override
-    public KeyChain toDecrypted(CharSequence password) {
+    public HDKeyChain toDecrypted(CharSequence password) {
         checkNotNull(password);
         checkArgument(password.length() > 0);
         KeyCrypter crypter = getKeyCrypter();
@@ -548,11 +553,11 @@ public class KeyChain implements EncryptableKeyChain {
     }
 
     @Override
-    public KeyChain toDecrypted(KeyParameter aesKey) {
+    public HDKeyChain toDecrypted(KeyParameter aesKey) {
         checkState(getKeyCrypter() != null, "Key chain not encrypted");
         checkState(rootKey.isEncrypted());
         DeterministicKey decKey = rootKey.decrypt(getKeyCrypter(), aesKey);
-        KeyChain chain = new KeyChain(decKey);
+        HDKeyChain chain = new HDKeyChain(decKey);
         // Now double check that the keys match to catch the case where the key is wrong but padding didn't catch it.
         if (!chain.getWatchingKey().getPubKeyPoint().equals(getWatchingKey().getPubKeyPoint()))
             throw new KeyCrypterException("Provided AES key is wrong");

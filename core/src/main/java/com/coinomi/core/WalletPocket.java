@@ -56,13 +56,13 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
 
     private final HashMap<String, Transaction> unspentTransactions;
 //    private final ArrayList<ServerClient.Transaction> unspentTransactions;
-    private final KeyChain keys;
+    private final HDKeyChain keys;
 
     @Nullable private ServerClient serverClient;
 
     protected transient CoinSelector coinSelector = new DefaultCoinSelector();
 
-    public WalletPocket(KeyChain keys, CoinType coinType) {
+    public WalletPocket(HDKeyChain keys, CoinType coinType) {
         this.keys = keys;
         this.coinType = coinType;
         addressStatus = new HashMap<Address, String>();
@@ -604,10 +604,10 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
 
     /** Returns the address used for change outputs. Note: this will probably go away in future. */
     public Address getChangeAddress() {
-        return currentAddress(KeyChain.KeyPurpose.CHANGE);
+        return currentAddress(HDKeyChain.KeyPurpose.CHANGE);
     }
 
-    public Address currentAddress(KeyChain.KeyPurpose purpose) {
+    public Address currentAddress(HDKeyChain.KeyPurpose purpose) {
         lock.lock();
         try {
             // TODO make return an unused address
