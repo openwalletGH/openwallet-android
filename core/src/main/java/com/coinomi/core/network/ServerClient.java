@@ -34,6 +34,8 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import javax.annotation.Nullable;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -64,17 +66,20 @@ public class ServerClient {
         ServiceManager.Listener managerListener = new ServiceManager.Listener() {
             public void stopped() {
                 log.info("All coin clients stopped");
+                broadcastOnDisconnect();
             }
 
             public void healthy() {
                 log.info("All coin clients are running");
-                syncWallet();
+                broadcastOnConnection();
             }
 
             public void failure(Service service) {
                 StratumClient client = (StratumClient) service;
 
                 log.error("Client failed: " + connections.inverse().get(client));
+
+                // TODO try to reconnect
             }
         };
 
@@ -91,6 +96,13 @@ public class ServerClient {
                 }
             }
         });
+    }
+
+    /**
+     * Returns true if all services are currently in running.
+     */
+    public boolean isHealthy() {
+        return manager.isHealthy();
     }
 
     /**
@@ -117,12 +129,23 @@ public class ServerClient {
         return ListenerRegistration.removeFromList(listener, eventListeners);
     }
 
-    private void syncWallet() {
+    private void broadcastOnConnection() {
         for (final ListenerRegistration<ConnectionEventListener> registration : eventListeners) {
             registration.executor.execute(new Runnable() {
                 @Override
                 public void run() {
                     registration.listener.onConnection(ServerClient.this);
+                }
+            });
+        }
+    }
+
+    private void broadcastOnDisconnect() {
+        for (final ListenerRegistration<ConnectionEventListener> registration : eventListeners) {
+            registration.executor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    registration.listener.onDisconnect();
                 }
             });
         }
@@ -250,6 +273,27 @@ public class ServerClient {
                 log.error("Could not get reply for blockchain.transaction.get", t);
             }
         }, Threading.USER_THREAD);
+    }
+
+    public void ping() {
+        for (final CoinType type : connections.keySet()) {
+            CallMessage pingMsg = new CallMessage("server.version", ImmutableList.of());
+            ListenableFuture<ResultMessage> pong = connections.get(type).call(pingMsg);
+            Futures.addCallback(pong, new FutureCallback<ResultMessage>() {
+                @Override
+                public void onSuccess(@Nullable ResultMessage result) {
+                    try {
+                        log.info("Server {} version {} OK", type.getName(),
+                                result.getResult().get(0));
+                    } catch (JSONException ignore) { }
+                }
+
+                @Override
+                public void onFailure(Throwable t) {
+                    log.error("Server {} ping failed", type.getName());
+                }
+            }, Threading.USER_THREAD);
+        }
     }
 
     public static class UnspentTx {

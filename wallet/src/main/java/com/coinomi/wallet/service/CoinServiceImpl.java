@@ -15,6 +15,7 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.text.format.DateUtils;
 
+import com.coinomi.core.network.interfaces.ConnectionEventListener;
 import com.coinomi.wallet.Configuration;
 import com.coinomi.wallet.Constants;
 import com.coinomi.core.Wallet;
@@ -320,92 +321,27 @@ public class CoinServiceImpl extends Service implements CoinService {
                 log.debug("acquiring wakelock");
                 wakeLock.acquire();
 
-                // TODO
-//                // consistency check
-//                final int walletLastBlockSeenHeight = wallet.getLastBlockSeenHeight();
-//                final int bestChainHeight = blockChain.getBestChainHeight();
-//                if (walletLastBlockSeenHeight != -1 && walletLastBlockSeenHeight != bestChainHeight)
-//                {
-//                    final String message = "wallet/blockchain out of sync: " + walletLastBlockSeenHeight + "/" + bestChainHeight;
-//                    log.error(message);
-//                    CrashReporter.saveBackgroundTrace(new RuntimeException(message), application.packageInfo());
-//                }
-
                 log.info("starting coin client");
                 client = new ServerClient(Constants.COINS_ADDRESSES_TEST);
+                client.addEventListener(new ConnectionEventListener() {
+                    @Override
+                    public void onConnection(ServerClient ignored) { }
+
+                    @Override
+                    public void onDisconnect() {
+                        log.info("stratum client disconnected");
+                        client.stopAsync();
+                        client = null;
+                    }
+                });
                 client.addWallet(wallet);
                 client.startAsync();
-                //TODO
-
-//                log.info("starting peergroup");
-//                peerGroup = new PeerGroup(Constants.NETWORK_PARAMETERS, blockChain);
-//                peerGroup.addWallet(wallet);
-//                peerGroup.setUserAgent(Constants.USER_AGENT, application.packageInfo().versionName);
-//                peerGroup.addEventListener(peerConnectivityListener);
-//
-//                final int maxConnectedPeers = application.maxConnectedPeers();
-//
-//                final String trustedPeerHost = config.getTrustedPeerHost();
-//                final boolean hasTrustedPeer = !trustedPeerHost.isEmpty();
-//
-//                final boolean connectTrustedPeerOnly = hasTrustedPeer && config.getTrustedPeerOnly();
-//                peerGroup.setMaxConnections(connectTrustedPeerOnly ? 1 : maxConnectedPeers);
-//
-//                peerGroup.addPeerDiscovery(new PeerDiscovery()
-//                {
-//                    private final PeerDiscovery normalPeerDiscovery = new DnsDiscovery(Constants.NETWORK_PARAMETERS);
-//
-//                    @Override
-//                    public InetSocketAddress[] getPeers(final long timeoutValue, final TimeUnit timeoutUnit) throws PeerDiscoveryException
-//                    {
-//                        final List<InetSocketAddress> peers = new LinkedList<InetSocketAddress>();
-//
-//                        boolean needsTrimPeersWorkaround = false;
-//
-//                        if (hasTrustedPeer)
-//                        {
-//                            log.info("trusted peer '" + trustedPeerHost + "'" + (connectTrustedPeerOnly ? " only" : ""));
-//
-//                            final InetSocketAddress addr = new InetSocketAddress(trustedPeerHost, Constants.NETWORK_PARAMETERS.getPort());
-//                            if (addr.getAddress() != null)
-//                            {
-//                                peers.add(addr);
-//                                needsTrimPeersWorkaround = true;
-//                            }
-//                        }
-//
-//                        if (!connectTrustedPeerOnly)
-//                            peers.addAll(Arrays.asList(normalPeerDiscovery.getPeers(timeoutValue, timeoutUnit)));
-//
-//                        // workaround because PeerGroup will shuffle peers
-//                        if (needsTrimPeersWorkaround)
-//                            while (peers.size() >= maxConnectedPeers)
-//                                peers.remove(peers.size() - 1);
-//
-//                        return peers.toArray(new InetSocketAddress[0]);
-//                    }
-//
-//                    @Override
-//                    public void shutdown()
-//                    {
-//                        normalPeerDiscovery.shutdown();
-//                    }
-//                });
-//
-//                // start peergroup
-//                peerGroup.start();
-//                peerGroup.startBlockChainDownload(blockchainDownloadListener);
             }
             else if (!hasEverything && client != null)
             {
                 log.info("stopping stratum client");
                 client.stopAsync();
                 client = null;
-//                log.info("stopping peergroup");
-//                peerGroup.removeEventListener(peerConnectivityListener);
-//                peerGroup.removeWallet(wallet);
-//                peerGroup.stop();
-//                peerGroup = null;
 
                 log.debug("releasing wakelock");
                 wakeLock.release();
@@ -444,8 +380,12 @@ public class CoinServiceImpl extends Service implements CoinService {
         private final List<ActivityHistoryEntry> activityHistory = new LinkedList<ActivityHistoryEntry>();
 
         @Override
-        public void onReceive(final Context context, final Intent intent)
-        {
+        public void onReceive(final Context context, final Intent intent) {
+            log.info("Received a tick {}", intent);
+
+            if (client != null) {
+                client.ping();
+            }
 //            final int chainHeight = blockChain.getBestChainHeight();
 //
 //            if (lastChainHeight > 0)

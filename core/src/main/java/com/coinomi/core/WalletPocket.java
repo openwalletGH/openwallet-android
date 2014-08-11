@@ -107,7 +107,7 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
         lock.lock();
         try {
             if (addressStatus.containsKey(status.getAddress())) {
-                return addressStatus.get(status.getAddress()).equals(status.getStatus());
+                return !addressStatus.get(status.getAddress()).equals(status.getStatus());
             }
             else {
                 return true;

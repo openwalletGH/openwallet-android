@@ -20,7 +20,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.widget.Toast;
 
 import com.coinomi.core.coins.CoinType;
-import com.coinomi.core.coins.DogecoinTest;
+import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 
 /**
@@ -126,7 +126,7 @@ final public class WalletActivity extends AbstractWalletActivity implements
 
         if (mViewPager != null) {
             AppSectionsPagerAdapter adapter =
-                    new AppSectionsPagerAdapter(this, DogecoinTest.get());
+                    new AppSectionsPagerAdapter(this, Constants.COINS_TEST.get(0));
             mViewPager.setAdapter(adapter);
             mViewPager.setCurrentItem(INFO);
         }
