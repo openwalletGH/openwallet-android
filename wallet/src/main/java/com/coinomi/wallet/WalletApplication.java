@@ -11,6 +11,8 @@ import android.preference.PreferenceManager;
 import android.widget.Toast;
 
 import com.coinomi.core.Wallet;
+import com.coinomi.core.WalletPocket;
+import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.protos.WalletProtobufSerializer;
 import com.coinomi.wallet.service.CoinService;
 import com.coinomi.wallet.service.CoinServiceImpl;
@@ -97,7 +99,7 @@ public class WalletApplication extends Application {
 
         walletFile = getFileStreamPath(Constants.WALLET_FILENAME_PROTOBUF);
 
-//        loadWalletFromProtobuf();
+        loadWalletFromProtobuf();
 
         config.updateLastVersionCode(packageInfo.versionCode);
 
@@ -288,10 +290,10 @@ public class WalletApplication extends Application {
 
     public void startBlockchainService(final boolean cancelCoinsReceived)
     {
-//        if (cancelCoinsReceived)
-//            startService(coinServiceCancelCoinsReceivedIntent);
-//        else
-//            startService(coinServiceIntent);
+        if (cancelCoinsReceived)
+            startService(coinServiceCancelCoinsReceivedIntent);
+        else
+            startService(coinServiceIntent);
     }
 
     public void stopBlockchainService()
@@ -317,4 +319,7 @@ public class WalletApplication extends Application {
         return packageInfo;
     }
 
+    public WalletPocket getWalletPocket(CoinType type) {
+        return wallet.getPocket(type);
+    }
 }

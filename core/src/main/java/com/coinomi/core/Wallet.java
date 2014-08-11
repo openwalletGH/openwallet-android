@@ -124,7 +124,7 @@ final public class Wallet implements ConnectionEventListener {
         }
     }
 
-    WalletPocket getPocket(CoinType coinType) {
+    public WalletPocket getPocket(CoinType coinType) {
         lock.lock();
         try {
 

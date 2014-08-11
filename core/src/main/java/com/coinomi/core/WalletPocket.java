@@ -18,6 +18,7 @@ import com.google.bitcoin.core.TransactionOutput;
 import com.google.bitcoin.core.Utils;
 import com.google.bitcoin.core.VarInt;
 import com.google.bitcoin.script.Script;
+import com.google.bitcoin.utils.ListenerRegistration;
 import com.google.bitcoin.utils.Threading;
 import com.google.bitcoin.wallet.CoinSelection;
 import com.google.bitcoin.wallet.CoinSelector;
@@ -34,6 +35,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Executor;
 import java.util.concurrent.locks.ReentrantLock;
 
 
@@ -62,14 +65,34 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
 
     protected transient CoinSelector coinSelector = new DefaultCoinSelector();
 
+    private final CopyOnWriteArrayList<ListenerRegistration<WalletPocketEventListener>> listeners;
+
     public WalletPocket(HDKeyChain keys, CoinType coinType) {
-        this.keys = keys;
-        this.coinType = coinType;
+        this.keys = checkNotNull(keys);
+        this.coinType = checkNotNull(coinType);
         addressStatus = new HashMap<Address, String>();
         unspentTransactions = new HashMap<String, Transaction>();
+        listeners = new CopyOnWriteArrayList<ListenerRegistration<WalletPocketEventListener>>();
 //        unspentTransactions = new ArrayList<ServerClient.Transaction>();
     }
 
+    public Coin getBalance() {
+        lock.lock();
+        try {
+            Coin value = Coin.ZERO;
+            for (Transaction tx : unspentTransactions.values()) {
+                for (TransactionOutput txo : tx.getOutputs()) {
+                    if (txo.isAvailableForSpending()) {
+                        value = value.add(txo.getValue());
+                    }
+                }
+            }
+            return value;
+        }
+        finally {
+            lock.unlock();
+        }
+    }
 
     private void updateAddressStatus(AddressStatus newStatus) {
         lock.lock();
@@ -160,6 +183,7 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
                 unspentTransactions.put(utx.getTxHash(), newTx);
             }
             markAsUnspent(utx);
+            queueOnNewBalance();
         }
         finally {
             lock.unlock();
@@ -197,6 +221,42 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
         log.info("Created tx {}", Utils.HEX.encode(tx.bitcoinSerialize()));
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Event listener support
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public void addEventListener(WalletPocketEventListener listener) {
+        addEventListener(listener, Threading.USER_THREAD);
+    }
+
+    public void addEventListener(WalletPocketEventListener listener, Executor executor) {
+        listeners.add(new ListenerRegistration<WalletPocketEventListener>(listener, executor));
+    }
+
+    public boolean removeEventListener(WalletPocketEventListener listener) {
+        return ListenerRegistration.removeFromList(listener, listeners);
+    }
+
+    private void queueOnNewBalance() {
+        checkState(lock.isHeldByCurrentThread());
+        final Coin newBalance = getBalance();
+        for (final ListenerRegistration<WalletPocketEventListener> registration : listeners) {
+            registration.executor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    registration.listener.onNewBalance(newBalance);
+                }
+            });
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Transaction signing support
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * Sends coins to the given address but does not broadcast the resulting pending transaction.
