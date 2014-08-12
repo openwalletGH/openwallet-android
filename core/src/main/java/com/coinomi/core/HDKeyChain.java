@@ -17,14 +17,18 @@ import com.google.bitcoin.store.UnreadableWalletException;
 import com.google.bitcoin.utils.Threading;
 import com.google.bitcoin.wallet.BasicKeyChain;
 import com.google.bitcoin.wallet.KeyChainEventListener;
+import com.google.bitcoin.wallet.RedeemData;
 import com.google.common.collect.ImmutableList;
+import com.google.protobuf.ByteString;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.crypto.params.KeyParameter;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -33,6 +37,7 @@ import javax.annotation.Nullable;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.collect.Lists.newLinkedList;
 
 /**
  * @author Giannis Dzegoutanis
@@ -66,7 +71,11 @@ public class HDKeyChain implements EncryptableKeyChain {
     // The lookahead threshold causes us to batch up creation of new keys to minimize the frequency of Bloom filter
     // regenerations, which are expensive and will (in future) trigger chain download stalls/retries. One third
     // is an efficiency tradeoff.
-    private int lookaheadThreshold = lookaheadSize / 3;
+    private int lookaheadThreshold = calcDefaultLookaheadThreshold();
+
+    private int calcDefaultLookaheadThreshold() {
+        return lookaheadSize / 3;
+    }
 
     // The parent keys for external keys (handed out to other people) and internal keys (used for change addresses).
     private DeterministicKey externalKey, internalKey;
@@ -147,7 +156,7 @@ public class HDKeyChain implements EncryptableKeyChain {
     /** Returns a freshly derived key that has not been returned by this method before. */
     @Override
     public DeterministicKey getKey(KeyPurpose purpose) {
-        return getKeys(purpose,1).get(0);
+        return getKeys(purpose, 1).get(0);
     }
 
     /** Returns freshly derived key/s that have not been returned by this method before. */
@@ -177,12 +186,23 @@ public class HDKeyChain implements EncryptableKeyChain {
                 default:
                     throw new UnsupportedOperationException();
             }
-            List<DeterministicKey> lookahead = maybeLookAhead(parentKey, index);
+            // Optimization: potentially do a very quick key generation for just the number of keys we need if we
+            // didn't already create them, ignoring the configured lookahead size. This ensures we'll be able to
+            // retrieve the keys in the following loop, but if we're totally fresh and didn't get a chance to
+            // calculate the lookahead keys yet, this will not block waiting to calculate 100+ EC point multiplies.
+            // On slow/crappy Android phones looking ahead 100 keys can take ~5 seconds but the OS will kill us
+            // if we block for just one second on the UI thread. Because UI threads may need an address in order
+            // to render the screen, we need getKeys to be fast even if the wallet is totally brand new and lookahead
+            // didn't happen yet.
+            //
+            // It's safe to do this because when a network thread tries to calculate a Bloom filter, we'll go ahead
+            // and calculate the full lookahead zone there, so network requests will always use the right amount.
+            List<DeterministicKey> lookahead = maybeLookAhead(parentKey, index, 0, 0);
             basicKeyChain.importKeys(lookahead);
             List<DeterministicKey> keys = new ArrayList<DeterministicKey>(numberOfKeys);
-
-            for (int i = 1; i <= numberOfKeys; i++) {
-                keys.add(hierarchy.get(HDUtils.append(parentKey.getPath(), new ChildNumber((index-numberOfKeys+i) - 1, false)), false, false));
+            for (int i = 0; i < numberOfKeys; i++) {
+                ImmutableList<ChildNumber> path = HDUtils.append(parentKey.getPath(), new ChildNumber(index - numberOfKeys + i, false));
+                keys.add(hierarchy.get(path, false, false));
             }
             return keys;
         } finally {
@@ -234,6 +254,13 @@ public class HDKeyChain implements EncryptableKeyChain {
         } finally {
             lock.unlock();
         }
+    }
+
+    @Nullable
+    @Override
+    public RedeemData findRedeemDataFromScriptHash(byte[] bytes) {
+        log.warn("Method findRedeemDataFromScriptHash not implemented");
+        return null;
     }
 
     /**
@@ -298,9 +325,13 @@ public class HDKeyChain implements EncryptableKeyChain {
 
     @Override
     public int numKeys() {
-        // We need to return here the total number of keys including the lookahead zone, not the number of keys we
-        // have issued via getKey/freshReceiveKey.
-        return basicKeyChain.numKeys();
+        lock.lock();
+        try {
+            maybeLookAhead();
+            return basicKeyChain.numKeys();
+        } finally {
+            lock.unlock();
+        }
     }
 
     /**
@@ -367,10 +398,10 @@ public class HDKeyChain implements EncryptableKeyChain {
 //                    detKey.setIssuedSubkeys(issuedInternalKeys);
 //                    detKey.setLookaheadSize(lookaheadSize);
 //                }
-//                // Flag the very first key of following keychain.
-//                if (entries.isEmpty() && isFollowing()) {
-//                    detKey.setIsFollowing(true);
-//                }
+////                // Flag the very first key of following keychain.
+////                if (entries.isEmpty() && isFollowing()) {
+////                    detKey.setIsFollowing(true);
+////                }
 //                if (key.getParent() != null) {
 //                    // HD keys inherit the timestamp of their parent if they have one, so no need to serialize it.
 //                    proto.clearCreationTimestamp();
@@ -617,8 +648,14 @@ public class HDKeyChain implements EncryptableKeyChain {
 
     @Override
     public BloomFilter getFilter(int size, double falsePositiveRate, long tweak) {
-        checkArgument(size >= numBloomFilterEntries());
-        return basicKeyChain.getFilter(size, falsePositiveRate, tweak);
+        lock.lock();
+        try {
+            checkArgument(size >= numBloomFilterEntries());
+            maybeLookAhead();
+            return basicKeyChain.getFilter(size, falsePositiveRate, tweak);
+        } finally {
+            lock.unlock();
+        }
     }
 
     /**
@@ -641,14 +678,16 @@ public class HDKeyChain implements EncryptableKeyChain {
      * Sets a new lookahead size. See {@link #getLookaheadSize()} for details on what this is. Setting a new size
      * that's larger than the current size will return immediately and the new size will only take effect next time
      * a fresh filter is requested (e.g. due to a new peer being connected). So you should set this before starting
-     * to sync the chain, if you want to modify it.
+     * to sync the chain, if you want to modify it. If you haven't modified the lookahead threshold manually then
+     * it will be automatically set to be a third of the new size.
      */
     public void setLookaheadSize(int lookaheadSize) {
         lock.lock();
         try {
+            boolean readjustThreshold = this.lookaheadThreshold == calcDefaultLookaheadThreshold();
             this.lookaheadSize = lookaheadSize;
-            if (this.lookaheadThreshold >= lookaheadSize)
-                setLookaheadThreshold(lookaheadSize - 1);
+            if (readjustThreshold)
+                this.lookaheadThreshold = calcDefaultLookaheadThreshold();
         } finally {
             lock.unlock();
         }
@@ -687,8 +726,11 @@ public class HDKeyChain implements EncryptableKeyChain {
         }
     }
 
-    // Pre-generate enough keys to reach the lookahead size.
-    private void maybeLookAhead() {
+    /**
+     * Pre-generate enough keys to reach the lookahead size. You can call this if you need to explicitly invoke
+     * the lookahead procedure, but it's normally unnecessary as it will be done automatically when needed.
+     */
+    public void maybeLookAhead() {
         lock.lock();
         try {
             List<DeterministicKey> keys = maybeLookAhead(externalKey, issuedExternalKeys);
@@ -702,28 +744,30 @@ public class HDKeyChain implements EncryptableKeyChain {
         }
     }
 
+    private List<DeterministicKey> maybeLookAhead(DeterministicKey parent, int issued) {
+        checkState(lock.isHeldByCurrentThread());
+        return maybeLookAhead(parent, issued, getLookaheadSize(), getLookaheadThreshold());
+    }
+
     /**
      * Pre-generate enough keys to reach the lookahead size, but only if there are more than the lookaheadThreshold to
      * be generated, so that the Bloom filter does not have to be regenerated that often.
      *
-     * The return mutable list of keys must be inserted into the basic key chain.
+     * The returned mutable list of keys must be inserted into the basic key chain.
      */
-    private List<DeterministicKey> maybeLookAhead(DeterministicKey parent, int issued) {
+    private List<DeterministicKey> maybeLookAhead(DeterministicKey parent, int issued, int lookaheadSize, int lookaheadThreshold) {
         checkState(lock.isHeldByCurrentThread());
         final int numChildren = hierarchy.getNumChildren(parent.getPath());
-        final int needed = issued + getLookaheadSize() - numChildren;
+        final int needed = issued + lookaheadSize + lookaheadThreshold - numChildren;
 
-        log.info("maybeLookAhead(): {} needed = lookaheadSize({}) - (numChildren({}) - issued({}) = {} < lookaheadThreshold({}))",
-                parent.getPathAsString(), getLookaheadSize(), numChildren,
-                issued, needed, getLookaheadThreshold());
-
-        /* Even if needed is negative, we have more than enough */
-        if (needed <= getLookaheadThreshold())
+        if (needed <= lookaheadThreshold)
             return new ArrayList<DeterministicKey>();
+
+        log.info("{} keys needed for {} = {} issued + {} lookahead size + {} lookahead threshold - {} num children",
+                needed, parent.getPathAsString(), issued, lookaheadSize, lookaheadThreshold, numChildren);
 
         List<DeterministicKey> result  = new ArrayList<DeterministicKey>(needed);
         long now = System.currentTimeMillis();
-        log.info("maybeLookAhead(): Pre-generating {} keys for {}", needed, parent.getPathAsString());
         int nextChild = numChildren;
         for (int i = 0; i < needed; i++) {
             DeterministicKey key = HDKeyDerivation.deriveThisOrNextChildKey(parent, nextChild);
@@ -732,7 +776,7 @@ public class HDKeyChain implements EncryptableKeyChain {
             result.add(key);
             nextChild = key.getChildNumber().num() + 1;
         }
-        log.info("maybeLookAhead(): Took {} msec", System.currentTimeMillis() - now);
+        log.info("Took {} msec", System.currentTimeMillis() - now);
         return result;
     }
 
@@ -762,18 +806,33 @@ public class HDKeyChain implements EncryptableKeyChain {
         }
     }
 
-    // For internal usage only (for printing keys in KeyChainGroup).
-    /* package */ List<ECKey> getKeys() {
-        return basicKeyChain.getKeys();
+    // For internal usage only
+    /* package */ List<ECKey> getKeys(boolean includeLookahead) {
+        List<ECKey> keys = basicKeyChain.getKeys();
+        if (!includeLookahead) {
+            int treeSize = internalKey.getPath().size();
+            List<ECKey> issuedKeys = new LinkedList<ECKey>();
+            for (ECKey key : keys) {
+                DeterministicKey detkey = (DeterministicKey) key;
+                DeterministicKey parent = detkey.getParent();
+                if (parent == null) continue;
+                if (detkey.getPath().size() <= treeSize) continue;
+                if (parent.equals(internalKey) && detkey.getChildNumber().i() > issuedInternalKeys) continue;
+                if (parent.equals(externalKey) && detkey.getChildNumber().i() > issuedExternalKeys) continue;
+                issuedKeys.add(detkey);
+            }
+            return issuedKeys;
+        }
+        return keys;
     }
 
 
     /**
-     * Returns leaf keys issued by this chain (not including lookahead zone)
+     * Returns leaf keys issued by this chain (including lookahead zone)
      */
     public List<DeterministicKey> getLeafKeys() {
         ImmutableList.Builder<DeterministicKey> keys = ImmutableList.builder();
-        for (ECKey key : getKeys()) {
+        for (ECKey key : getKeys(true)) {
             DeterministicKey dKey = (DeterministicKey) key;
             if (dKey.getPath().size() > 2) {
                 keys.add(dKey);
