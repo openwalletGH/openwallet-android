@@ -1,6 +1,6 @@
 package com.coinomi.core.network;
 
-import com.coinomi.core.Wallet;
+import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.network.interfaces.ConnectionEventListener;
 import com.coinomi.core.network.interfaces.TransactionEventListener;

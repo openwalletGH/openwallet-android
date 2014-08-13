@@ -10,8 +10,8 @@ import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
-import com.coinomi.core.Wallet;
-import com.coinomi.core.WalletPocket;
+import com.coinomi.core.wallet.Wallet;
+import com.coinomi.core.wallet.WalletPocket;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.protos.WalletProtobufSerializer;
 import com.coinomi.wallet.service.CoinService;
@@ -30,7 +30,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.List;
 
 import javax.annotation.Nonnull;
 

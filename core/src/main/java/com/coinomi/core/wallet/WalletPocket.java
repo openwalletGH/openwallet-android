@@ -1,4 +1,4 @@
-package com.coinomi.core;
+package com.coinomi.core.wallet;
 
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.network.AddressStatus;

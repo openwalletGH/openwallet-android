@@ -1,7 +1,7 @@
 package com.coinomi.core.protos;
 
 import com.coinomi.core.Constants;
-import com.coinomi.core.Wallet;
+import com.coinomi.core.wallet.Wallet;
 import com.google.bitcoin.store.UnreadableWalletException;
 
 import java.io.InputStream;

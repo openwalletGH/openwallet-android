@@ -2239,9 +2239,9 @@ public final class Protos {
      */
     com.google.protobuf.ByteString getSecretBytes();
 
-    // optional .com.coinomi.core.protos.EncryptedData encrypted_data = 6;
+    // optional .com.coinomi.core.protos.EncryptedData encrypted_data = 3;
     /**
-     * <code>optional .com.coinomi.core.protos.EncryptedData encrypted_data = 6;</code>
+     * <code>optional .com.coinomi.core.protos.EncryptedData encrypted_data = 3;</code>
      *
      * <pre>
      * If the secret data is encrypted, then secret_bytes is missing and this field is set.
@@ -2249,7 +2249,7 @@ public final class Protos {
      */
     boolean hasEncryptedData();
     /**
-     * <code>optional .com.coinomi.core.protos.EncryptedData encrypted_data = 6;</code>
+     * <code>optional .com.coinomi.core.protos.EncryptedData encrypted_data = 3;</code>
      *
      * <pre>
      * If the secret data is encrypted, then secret_bytes is missing and this field is set.
@@ -2257,7 +2257,7 @@ public final class Protos {
      */
     com.coinomi.core.protos.Protos.EncryptedData getEncryptedData();
     /**
-     * <code>optional .com.coinomi.core.protos.EncryptedData encrypted_data = 6;</code>
+     * <code>optional .com.coinomi.core.protos.EncryptedData encrypted_data = 3;</code>
      *
      * <pre>
      * If the secret data is encrypted, then secret_bytes is missing and this field is set.
@@ -2265,9 +2265,9 @@ public final class Protos {
      */
     com.coinomi.core.protos.Protos.EncryptedDataOrBuilder getEncryptedDataOrBuilder();
 
-    // optional bytes public_key = 3;
+    // optional bytes public_key = 4;
     /**
-     * <code>optional bytes public_key = 3;</code>
+     * <code>optional bytes public_key = 4;</code>
      *
      * <pre>
      * The public EC key derived from the private key. We allow both to be stored to avoid mobile clients having to
@@ -2276,7 +2276,7 @@ public final class Protos {
      */
     boolean hasPublicKey();
     /**
-     * <code>optional bytes public_key = 3;</code>
+     * <code>optional bytes public_key = 4;</code>
      *
      * <pre>
      * The public EC key derived from the private key. We allow both to be stored to avoid mobile clients having to
@@ -2285,9 +2285,9 @@ public final class Protos {
      */
     com.google.protobuf.ByteString getPublicKey();
 
-    // optional string label = 4;
+    // optional string label = 5;
     /**
-     * <code>optional string label = 4;</code>
+     * <code>optional string label = 5;</code>
      *
      * <pre>
      * User-provided label associated with the key.
@@ -2295,7 +2295,7 @@ public final class Protos {
      */
     boolean hasLabel();
     /**
-     * <code>optional string label = 4;</code>
+     * <code>optional string label = 5;</code>
      *
      * <pre>
      * User-provided label associated with the key.
@@ -2303,7 +2303,7 @@ public final class Protos {
      */
     java.lang.String getLabel();
     /**
-     * <code>optional string label = 4;</code>
+     * <code>optional string label = 5;</code>
      *
      * <pre>
      * User-provided label associated with the key.
@@ -2312,37 +2312,17 @@ public final class Protos {
     com.google.protobuf.ByteString
         getLabelBytes();
 
-    // optional int64 creation_timestamp = 5;
+    // optional .com.coinomi.core.protos.DeterministicKey deterministic_key = 6;
     /**
-     * <code>optional int64 creation_timestamp = 5;</code>
-     *
-     * <pre>
-     * Timestamp stored as millis since epoch. Useful for skipping block bodies before this point. Only reason it's
-     * optional is that some very old wallets don't have this data.
-     * </pre>
-     */
-    boolean hasCreationTimestamp();
-    /**
-     * <code>optional int64 creation_timestamp = 5;</code>
-     *
-     * <pre>
-     * Timestamp stored as millis since epoch. Useful for skipping block bodies before this point. Only reason it's
-     * optional is that some very old wallets don't have this data.
-     * </pre>
-     */
-    long getCreationTimestamp();
-
-    // optional .com.coinomi.core.protos.DeterministicKey deterministic_key = 7;
-    /**
-     * <code>optional .com.coinomi.core.protos.DeterministicKey deterministic_key = 7;</code>
+     * <code>optional .com.coinomi.core.protos.DeterministicKey deterministic_key = 6;</code>
      */
     boolean hasDeterministicKey();
     /**
-     * <code>optional .com.coinomi.core.protos.DeterministicKey deterministic_key = 7;</code>
+     * <code>optional .com.coinomi.core.protos.DeterministicKey deterministic_key = 6;</code>
      */
     com.coinomi.core.protos.Protos.DeterministicKey getDeterministicKey();
     /**
-     * <code>optional .com.coinomi.core.protos.DeterministicKey deterministic_key = 7;</code>
+     * <code>optional .com.coinomi.core.protos.DeterministicKey deterministic_key = 6;</code>
      */
     com.coinomi.core.protos.Protos.DeterministicKeyOrBuilder getDeterministicKeyOrBuilder();
   }
@@ -2425,21 +2405,6 @@ public final class Protos {
               break;
             }
             case 26: {
-              bitField0_ |= 0x00000008;
-              publicKey_ = input.readBytes();
-              break;
-            }
-            case 34: {
-              bitField0_ |= 0x00000010;
-              label_ = input.readBytes();
-              break;
-            }
-            case 40: {
-              bitField0_ |= 0x00000020;
-              creationTimestamp_ = input.readInt64();
-              break;
-            }
-            case 50: {
               com.coinomi.core.protos.Protos.EncryptedData.Builder subBuilder = null;
               if (((bitField0_ & 0x00000004) == 0x00000004)) {
                 subBuilder = encryptedData_.toBuilder();
@@ -2452,9 +2417,19 @@ public final class Protos {
               bitField0_ |= 0x00000004;
               break;
             }
-            case 58: {
+            case 34: {
+              bitField0_ |= 0x00000008;
+              publicKey_ = input.readBytes();
+              break;
+            }
+            case 42: {
+              bitField0_ |= 0x00000010;
+              label_ = input.readBytes();
+              break;
+            }
+            case 50: {
               com.coinomi.core.protos.Protos.DeterministicKey.Builder subBuilder = null;
-              if (((bitField0_ & 0x00000040) == 0x00000040)) {
+              if (((bitField0_ & 0x00000020) == 0x00000020)) {
                 subBuilder = deterministicKey_.toBuilder();
               }
               deterministicKey_ = input.readMessage(com.coinomi.core.protos.Protos.DeterministicKey.PARSER, extensionRegistry);
@@ -2462,7 +2437,7 @@ public final class Protos {
                 subBuilder.mergeFrom(deterministicKey_);
                 deterministicKey_ = subBuilder.buildPartial();
               }
-              bitField0_ |= 0x00000040;
+              bitField0_ |= 0x00000020;
               break;
             }
           }
@@ -2693,11 +2668,11 @@ public final class Protos {
       return secretBytes_;
     }
 
-    // optional .com.coinomi.core.protos.EncryptedData encrypted_data = 6;
-    public static final int ENCRYPTED_DATA_FIELD_NUMBER = 6;
+    // optional .com.coinomi.core.protos.EncryptedData encrypted_data = 3;
+    public static final int ENCRYPTED_DATA_FIELD_NUMBER = 3;
     private com.coinomi.core.protos.Protos.EncryptedData encryptedData_;
     /**
-     * <code>optional .com.coinomi.core.protos.EncryptedData encrypted_data = 6;</code>
+     * <code>optional .com.coinomi.core.protos.EncryptedData encrypted_data = 3;</code>
      *
      * <pre>
      * If the secret data is encrypted, then secret_bytes is missing and this field is set.
@@ -2707,7 +2682,7 @@ public final class Protos {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
-     * <code>optional .com.coinomi.core.protos.EncryptedData encrypted_data = 6;</code>
+     * <code>optional .com.coinomi.core.protos.EncryptedData encrypted_data = 3;</code>
      *
      * <pre>
      * If the secret data is encrypted, then secret_bytes is missing and this field is set.
@@ -2717,7 +2692,7 @@ public final class Protos {
       return encryptedData_;
     }
     /**
-     * <code>optional .com.coinomi.core.protos.EncryptedData encrypted_data = 6;</code>
+     * <code>optional .com.coinomi.core.protos.EncryptedData encrypted_data = 3;</code>
      *
      * <pre>
      * If the secret data is encrypted, then secret_bytes is missing and this field is set.
@@ -2727,11 +2702,11 @@ public final class Protos {
       return encryptedData_;
     }
 
-    // optional bytes public_key = 3;
-    public static final int PUBLIC_KEY_FIELD_NUMBER = 3;
+    // optional bytes public_key = 4;
+    public static final int PUBLIC_KEY_FIELD_NUMBER = 4;
     private com.google.protobuf.ByteString publicKey_;
     /**
-     * <code>optional bytes public_key = 3;</code>
+     * <code>optional bytes public_key = 4;</code>
      *
      * <pre>
      * The public EC key derived from the private key. We allow both to be stored to avoid mobile clients having to
@@ -2742,7 +2717,7 @@ public final class Protos {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
-     * <code>optional bytes public_key = 3;</code>
+     * <code>optional bytes public_key = 4;</code>
      *
      * <pre>
      * The public EC key derived from the private key. We allow both to be stored to avoid mobile clients having to
@@ -2753,11 +2728,11 @@ public final class Protos {
       return publicKey_;
     }
 
-    // optional string label = 4;
-    public static final int LABEL_FIELD_NUMBER = 4;
+    // optional string label = 5;
+    public static final int LABEL_FIELD_NUMBER = 5;
     private java.lang.Object label_;
     /**
-     * <code>optional string label = 4;</code>
+     * <code>optional string label = 5;</code>
      *
      * <pre>
      * User-provided label associated with the key.
@@ -2767,7 +2742,7 @@ public final class Protos {
       return ((bitField0_ & 0x00000010) == 0x00000010);
     }
     /**
-     * <code>optional string label = 4;</code>
+     * <code>optional string label = 5;</code>
      *
      * <pre>
      * User-provided label associated with the key.
@@ -2788,7 +2763,7 @@ public final class Protos {
       }
     }
     /**
-     * <code>optional string label = 4;</code>
+     * <code>optional string label = 5;</code>
      *
      * <pre>
      * User-provided label associated with the key.
@@ -2808,49 +2783,23 @@ public final class Protos {
       }
     }
 
-    // optional int64 creation_timestamp = 5;
-    public static final int CREATION_TIMESTAMP_FIELD_NUMBER = 5;
-    private long creationTimestamp_;
+    // optional .com.coinomi.core.protos.DeterministicKey deterministic_key = 6;
+    public static final int DETERMINISTIC_KEY_FIELD_NUMBER = 6;
+    private com.coinomi.core.protos.Protos.DeterministicKey deterministicKey_;
     /**
-     * <code>optional int64 creation_timestamp = 5;</code>
-     *
-     * <pre>
-     * Timestamp stored as millis since epoch. Useful for skipping block bodies before this point. Only reason it's
-     * optional is that some very old wallets don't have this data.
-     * </pre>
+     * <code>optional .com.coinomi.core.protos.DeterministicKey deterministic_key = 6;</code>
      */
-    public boolean hasCreationTimestamp() {
+    public boolean hasDeterministicKey() {
       return ((bitField0_ & 0x00000020) == 0x00000020);
     }
     /**
-     * <code>optional int64 creation_timestamp = 5;</code>
-     *
-     * <pre>
-     * Timestamp stored as millis since epoch. Useful for skipping block bodies before this point. Only reason it's
-     * optional is that some very old wallets don't have this data.
-     * </pre>
-     */
-    public long getCreationTimestamp() {
-      return creationTimestamp_;
-    }
-
-    // optional .com.coinomi.core.protos.DeterministicKey deterministic_key = 7;
-    public static final int DETERMINISTIC_KEY_FIELD_NUMBER = 7;
-    private com.coinomi.core.protos.Protos.DeterministicKey deterministicKey_;
-    /**
-     * <code>optional .com.coinomi.core.protos.DeterministicKey deterministic_key = 7;</code>
-     */
-    public boolean hasDeterministicKey() {
-      return ((bitField0_ & 0x00000040) == 0x00000040);
-    }
-    /**
-     * <code>optional .com.coinomi.core.protos.DeterministicKey deterministic_key = 7;</code>
+     * <code>optional .com.coinomi.core.protos.DeterministicKey deterministic_key = 6;</code>
      */
     public com.coinomi.core.protos.Protos.DeterministicKey getDeterministicKey() {
       return deterministicKey_;
     }
     /**
-     * <code>optional .com.coinomi.core.protos.DeterministicKey deterministic_key = 7;</code>
+     * <code>optional .com.coinomi.core.protos.DeterministicKey deterministic_key = 6;</code>
      */
     public com.coinomi.core.protos.Protos.DeterministicKeyOrBuilder getDeterministicKeyOrBuilder() {
       return deterministicKey_;
@@ -2862,7 +2811,6 @@ public final class Protos {
       encryptedData_ = com.coinomi.core.protos.Protos.EncryptedData.getDefaultInstance();
       publicKey_ = com.google.protobuf.ByteString.EMPTY;
       label_ = "";
-      creationTimestamp_ = 0L;
       deterministicKey_ = com.coinomi.core.protos.Protos.DeterministicKey.getDefaultInstance();
     }
     private byte memoizedIsInitialized = -1;
@@ -2899,20 +2847,17 @@ public final class Protos {
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeBytes(2, secretBytes_);
       }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeMessage(3, encryptedData_);
+      }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeBytes(3, publicKey_);
+        output.writeBytes(4, publicKey_);
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
-        output.writeBytes(4, getLabelBytes());
+        output.writeBytes(5, getLabelBytes());
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
-        output.writeInt64(5, creationTimestamp_);
-      }
-      if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeMessage(6, encryptedData_);
-      }
-      if (((bitField0_ & 0x00000040) == 0x00000040)) {
-        output.writeMessage(7, deterministicKey_);
+        output.writeMessage(6, deterministicKey_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -2931,25 +2876,21 @@ public final class Protos {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(2, secretBytes_);
       }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(3, encryptedData_);
+      }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(3, publicKey_);
+          .computeBytesSize(4, publicKey_);
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(4, getLabelBytes());
+          .computeBytesSize(5, getLabelBytes());
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt64Size(5, creationTimestamp_);
-      }
-      if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(6, encryptedData_);
-      }
-      if (((bitField0_ & 0x00000040) == 0x00000040)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(7, deterministicKey_);
+          .computeMessageSize(6, deterministicKey_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -3094,14 +3035,12 @@ public final class Protos {
         bitField0_ = (bitField0_ & ~0x00000008);
         label_ = "";
         bitField0_ = (bitField0_ & ~0x00000010);
-        creationTimestamp_ = 0L;
-        bitField0_ = (bitField0_ & ~0x00000020);
         if (deterministicKeyBuilder_ == null) {
           deterministicKey_ = com.coinomi.core.protos.Protos.DeterministicKey.getDefaultInstance();
         } else {
           deterministicKeyBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000040);
+        bitField0_ = (bitField0_ & ~0x00000020);
         return this;
       }
 
@@ -3157,10 +3096,6 @@ public final class Protos {
         if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
           to_bitField0_ |= 0x00000020;
         }
-        result.creationTimestamp_ = creationTimestamp_;
-        if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
-          to_bitField0_ |= 0x00000040;
-        }
         if (deterministicKeyBuilder_ == null) {
           result.deterministicKey_ = deterministicKey_;
         } else {
@@ -3198,9 +3133,6 @@ public final class Protos {
           bitField0_ |= 0x00000010;
           label_ = other.label_;
           onChanged();
-        }
-        if (other.hasCreationTimestamp()) {
-          setCreationTimestamp(other.getCreationTimestamp());
         }
         if (other.hasDeterministicKey()) {
           mergeDeterministicKey(other.getDeterministicKey());
@@ -3340,12 +3272,12 @@ public final class Protos {
         return this;
       }
 
-      // optional .com.coinomi.core.protos.EncryptedData encrypted_data = 6;
+      // optional .com.coinomi.core.protos.EncryptedData encrypted_data = 3;
       private com.coinomi.core.protos.Protos.EncryptedData encryptedData_ = com.coinomi.core.protos.Protos.EncryptedData.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           com.coinomi.core.protos.Protos.EncryptedData, com.coinomi.core.protos.Protos.EncryptedData.Builder, com.coinomi.core.protos.Protos.EncryptedDataOrBuilder> encryptedDataBuilder_;
       /**
-       * <code>optional .com.coinomi.core.protos.EncryptedData encrypted_data = 6;</code>
+       * <code>optional .com.coinomi.core.protos.EncryptedData encrypted_data = 3;</code>
        *
        * <pre>
        * If the secret data is encrypted, then secret_bytes is missing and this field is set.
@@ -3355,7 +3287,7 @@ public final class Protos {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       /**
-       * <code>optional .com.coinomi.core.protos.EncryptedData encrypted_data = 6;</code>
+       * <code>optional .com.coinomi.core.protos.EncryptedData encrypted_data = 3;</code>
        *
        * <pre>
        * If the secret data is encrypted, then secret_bytes is missing and this field is set.
@@ -3369,7 +3301,7 @@ public final class Protos {
         }
       }
       /**
-       * <code>optional .com.coinomi.core.protos.EncryptedData encrypted_data = 6;</code>
+       * <code>optional .com.coinomi.core.protos.EncryptedData encrypted_data = 3;</code>
        *
        * <pre>
        * If the secret data is encrypted, then secret_bytes is missing and this field is set.
@@ -3389,7 +3321,7 @@ public final class Protos {
         return this;
       }
       /**
-       * <code>optional .com.coinomi.core.protos.EncryptedData encrypted_data = 6;</code>
+       * <code>optional .com.coinomi.core.protos.EncryptedData encrypted_data = 3;</code>
        *
        * <pre>
        * If the secret data is encrypted, then secret_bytes is missing and this field is set.
@@ -3407,7 +3339,7 @@ public final class Protos {
         return this;
       }
       /**
-       * <code>optional .com.coinomi.core.protos.EncryptedData encrypted_data = 6;</code>
+       * <code>optional .com.coinomi.core.protos.EncryptedData encrypted_data = 3;</code>
        *
        * <pre>
        * If the secret data is encrypted, then secret_bytes is missing and this field is set.
@@ -3430,7 +3362,7 @@ public final class Protos {
         return this;
       }
       /**
-       * <code>optional .com.coinomi.core.protos.EncryptedData encrypted_data = 6;</code>
+       * <code>optional .com.coinomi.core.protos.EncryptedData encrypted_data = 3;</code>
        *
        * <pre>
        * If the secret data is encrypted, then secret_bytes is missing and this field is set.
@@ -3447,7 +3379,7 @@ public final class Protos {
         return this;
       }
       /**
-       * <code>optional .com.coinomi.core.protos.EncryptedData encrypted_data = 6;</code>
+       * <code>optional .com.coinomi.core.protos.EncryptedData encrypted_data = 3;</code>
        *
        * <pre>
        * If the secret data is encrypted, then secret_bytes is missing and this field is set.
@@ -3459,7 +3391,7 @@ public final class Protos {
         return getEncryptedDataFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .com.coinomi.core.protos.EncryptedData encrypted_data = 6;</code>
+       * <code>optional .com.coinomi.core.protos.EncryptedData encrypted_data = 3;</code>
        *
        * <pre>
        * If the secret data is encrypted, then secret_bytes is missing and this field is set.
@@ -3473,7 +3405,7 @@ public final class Protos {
         }
       }
       /**
-       * <code>optional .com.coinomi.core.protos.EncryptedData encrypted_data = 6;</code>
+       * <code>optional .com.coinomi.core.protos.EncryptedData encrypted_data = 3;</code>
        *
        * <pre>
        * If the secret data is encrypted, then secret_bytes is missing and this field is set.
@@ -3493,10 +3425,10 @@ public final class Protos {
         return encryptedDataBuilder_;
       }
 
-      // optional bytes public_key = 3;
+      // optional bytes public_key = 4;
       private com.google.protobuf.ByteString publicKey_ = com.google.protobuf.ByteString.EMPTY;
       /**
-       * <code>optional bytes public_key = 3;</code>
+       * <code>optional bytes public_key = 4;</code>
        *
        * <pre>
        * The public EC key derived from the private key. We allow both to be stored to avoid mobile clients having to
@@ -3507,7 +3439,7 @@ public final class Protos {
         return ((bitField0_ & 0x00000008) == 0x00000008);
       }
       /**
-       * <code>optional bytes public_key = 3;</code>
+       * <code>optional bytes public_key = 4;</code>
        *
        * <pre>
        * The public EC key derived from the private key. We allow both to be stored to avoid mobile clients having to
@@ -3518,7 +3450,7 @@ public final class Protos {
         return publicKey_;
       }
       /**
-       * <code>optional bytes public_key = 3;</code>
+       * <code>optional bytes public_key = 4;</code>
        *
        * <pre>
        * The public EC key derived from the private key. We allow both to be stored to avoid mobile clients having to
@@ -3535,7 +3467,7 @@ public final class Protos {
         return this;
       }
       /**
-       * <code>optional bytes public_key = 3;</code>
+       * <code>optional bytes public_key = 4;</code>
        *
        * <pre>
        * The public EC key derived from the private key. We allow both to be stored to avoid mobile clients having to
@@ -3549,10 +3481,10 @@ public final class Protos {
         return this;
       }
 
-      // optional string label = 4;
+      // optional string label = 5;
       private java.lang.Object label_ = "";
       /**
-       * <code>optional string label = 4;</code>
+       * <code>optional string label = 5;</code>
        *
        * <pre>
        * User-provided label associated with the key.
@@ -3562,7 +3494,7 @@ public final class Protos {
         return ((bitField0_ & 0x00000010) == 0x00000010);
       }
       /**
-       * <code>optional string label = 4;</code>
+       * <code>optional string label = 5;</code>
        *
        * <pre>
        * User-provided label associated with the key.
@@ -3580,7 +3512,7 @@ public final class Protos {
         }
       }
       /**
-       * <code>optional string label = 4;</code>
+       * <code>optional string label = 5;</code>
        *
        * <pre>
        * User-provided label associated with the key.
@@ -3600,7 +3532,7 @@ public final class Protos {
         }
       }
       /**
-       * <code>optional string label = 4;</code>
+       * <code>optional string label = 5;</code>
        *
        * <pre>
        * User-provided label associated with the key.
@@ -3617,7 +3549,7 @@ public final class Protos {
         return this;
       }
       /**
-       * <code>optional string label = 4;</code>
+       * <code>optional string label = 5;</code>
        *
        * <pre>
        * User-provided label associated with the key.
@@ -3630,7 +3562,7 @@ public final class Protos {
         return this;
       }
       /**
-       * <code>optional string label = 4;</code>
+       * <code>optional string label = 5;</code>
        *
        * <pre>
        * User-provided label associated with the key.
@@ -3647,71 +3579,18 @@ public final class Protos {
         return this;
       }
 
-      // optional int64 creation_timestamp = 5;
-      private long creationTimestamp_ ;
-      /**
-       * <code>optional int64 creation_timestamp = 5;</code>
-       *
-       * <pre>
-       * Timestamp stored as millis since epoch. Useful for skipping block bodies before this point. Only reason it's
-       * optional is that some very old wallets don't have this data.
-       * </pre>
-       */
-      public boolean hasCreationTimestamp() {
-        return ((bitField0_ & 0x00000020) == 0x00000020);
-      }
-      /**
-       * <code>optional int64 creation_timestamp = 5;</code>
-       *
-       * <pre>
-       * Timestamp stored as millis since epoch. Useful for skipping block bodies before this point. Only reason it's
-       * optional is that some very old wallets don't have this data.
-       * </pre>
-       */
-      public long getCreationTimestamp() {
-        return creationTimestamp_;
-      }
-      /**
-       * <code>optional int64 creation_timestamp = 5;</code>
-       *
-       * <pre>
-       * Timestamp stored as millis since epoch. Useful for skipping block bodies before this point. Only reason it's
-       * optional is that some very old wallets don't have this data.
-       * </pre>
-       */
-      public Builder setCreationTimestamp(long value) {
-        bitField0_ |= 0x00000020;
-        creationTimestamp_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional int64 creation_timestamp = 5;</code>
-       *
-       * <pre>
-       * Timestamp stored as millis since epoch. Useful for skipping block bodies before this point. Only reason it's
-       * optional is that some very old wallets don't have this data.
-       * </pre>
-       */
-      public Builder clearCreationTimestamp() {
-        bitField0_ = (bitField0_ & ~0x00000020);
-        creationTimestamp_ = 0L;
-        onChanged();
-        return this;
-      }
-
-      // optional .com.coinomi.core.protos.DeterministicKey deterministic_key = 7;
+      // optional .com.coinomi.core.protos.DeterministicKey deterministic_key = 6;
       private com.coinomi.core.protos.Protos.DeterministicKey deterministicKey_ = com.coinomi.core.protos.Protos.DeterministicKey.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           com.coinomi.core.protos.Protos.DeterministicKey, com.coinomi.core.protos.Protos.DeterministicKey.Builder, com.coinomi.core.protos.Protos.DeterministicKeyOrBuilder> deterministicKeyBuilder_;
       /**
-       * <code>optional .com.coinomi.core.protos.DeterministicKey deterministic_key = 7;</code>
+       * <code>optional .com.coinomi.core.protos.DeterministicKey deterministic_key = 6;</code>
        */
       public boolean hasDeterministicKey() {
-        return ((bitField0_ & 0x00000040) == 0x00000040);
+        return ((bitField0_ & 0x00000020) == 0x00000020);
       }
       /**
-       * <code>optional .com.coinomi.core.protos.DeterministicKey deterministic_key = 7;</code>
+       * <code>optional .com.coinomi.core.protos.DeterministicKey deterministic_key = 6;</code>
        */
       public com.coinomi.core.protos.Protos.DeterministicKey getDeterministicKey() {
         if (deterministicKeyBuilder_ == null) {
@@ -3721,7 +3600,7 @@ public final class Protos {
         }
       }
       /**
-       * <code>optional .com.coinomi.core.protos.DeterministicKey deterministic_key = 7;</code>
+       * <code>optional .com.coinomi.core.protos.DeterministicKey deterministic_key = 6;</code>
        */
       public Builder setDeterministicKey(com.coinomi.core.protos.Protos.DeterministicKey value) {
         if (deterministicKeyBuilder_ == null) {
@@ -3733,11 +3612,11 @@ public final class Protos {
         } else {
           deterministicKeyBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000040;
+        bitField0_ |= 0x00000020;
         return this;
       }
       /**
-       * <code>optional .com.coinomi.core.protos.DeterministicKey deterministic_key = 7;</code>
+       * <code>optional .com.coinomi.core.protos.DeterministicKey deterministic_key = 6;</code>
        */
       public Builder setDeterministicKey(
           com.coinomi.core.protos.Protos.DeterministicKey.Builder builderForValue) {
@@ -3747,15 +3626,15 @@ public final class Protos {
         } else {
           deterministicKeyBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000040;
+        bitField0_ |= 0x00000020;
         return this;
       }
       /**
-       * <code>optional .com.coinomi.core.protos.DeterministicKey deterministic_key = 7;</code>
+       * <code>optional .com.coinomi.core.protos.DeterministicKey deterministic_key = 6;</code>
        */
       public Builder mergeDeterministicKey(com.coinomi.core.protos.Protos.DeterministicKey value) {
         if (deterministicKeyBuilder_ == null) {
-          if (((bitField0_ & 0x00000040) == 0x00000040) &&
+          if (((bitField0_ & 0x00000020) == 0x00000020) &&
               deterministicKey_ != com.coinomi.core.protos.Protos.DeterministicKey.getDefaultInstance()) {
             deterministicKey_ =
               com.coinomi.core.protos.Protos.DeterministicKey.newBuilder(deterministicKey_).mergeFrom(value).buildPartial();
@@ -3766,11 +3645,11 @@ public final class Protos {
         } else {
           deterministicKeyBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000040;
+        bitField0_ |= 0x00000020;
         return this;
       }
       /**
-       * <code>optional .com.coinomi.core.protos.DeterministicKey deterministic_key = 7;</code>
+       * <code>optional .com.coinomi.core.protos.DeterministicKey deterministic_key = 6;</code>
        */
       public Builder clearDeterministicKey() {
         if (deterministicKeyBuilder_ == null) {
@@ -3779,19 +3658,19 @@ public final class Protos {
         } else {
           deterministicKeyBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000040);
+        bitField0_ = (bitField0_ & ~0x00000020);
         return this;
       }
       /**
-       * <code>optional .com.coinomi.core.protos.DeterministicKey deterministic_key = 7;</code>
+       * <code>optional .com.coinomi.core.protos.DeterministicKey deterministic_key = 6;</code>
        */
       public com.coinomi.core.protos.Protos.DeterministicKey.Builder getDeterministicKeyBuilder() {
-        bitField0_ |= 0x00000040;
+        bitField0_ |= 0x00000020;
         onChanged();
         return getDeterministicKeyFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .com.coinomi.core.protos.DeterministicKey deterministic_key = 7;</code>
+       * <code>optional .com.coinomi.core.protos.DeterministicKey deterministic_key = 6;</code>
        */
       public com.coinomi.core.protos.Protos.DeterministicKeyOrBuilder getDeterministicKeyOrBuilder() {
         if (deterministicKeyBuilder_ != null) {
@@ -3801,7 +3680,7 @@ public final class Protos {
         }
       }
       /**
-       * <code>optional .com.coinomi.core.protos.DeterministicKey deterministic_key = 7;</code>
+       * <code>optional .com.coinomi.core.protos.DeterministicKey deterministic_key = 6;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
           com.coinomi.core.protos.Protos.DeterministicKey, com.coinomi.core.protos.Protos.DeterministicKey.Builder, com.coinomi.core.protos.Protos.DeterministicKeyOrBuilder> 
@@ -16161,75 +16040,74 @@ public final class Protos {
       "crypted_private_key\030\002 \002(\014\"y\n\020Determinist" +
       "icKey\022\022\n\nchain_code\030\001 \002(\014\022\014\n\004path\030\002 \003(\r\022" +
       "\026\n\016issued_subkeys\030\003 \001(\r\022\026\n\016lookahead_siz" +
-      "e\030\004 \001(\r\022\023\n\013isFollowing\030\005 \001(\010\"\364\002\n\003Key\022/\n\004" +
+      "e\030\004 \001(\r\022\023\n\013isFollowing\030\005 \001(\010\"\330\002\n\003Key\022/\n\004" +
       "type\030\001 \002(\0162!.com.coinomi.core.protos.Key" +
       ".Type\022\024\n\014secret_bytes\030\002 \001(\014\022>\n\016encrypted",
-      "_data\030\006 \001(\0132&.com.coinomi.core.protos.En" +
-      "cryptedData\022\022\n\npublic_key\030\003 \001(\014\022\r\n\005label" +
-      "\030\004 \001(\t\022\032\n\022creation_timestamp\030\005 \001(\003\022D\n\021de" +
-      "terministic_key\030\007 \001(\0132).com.coinomi.core" +
-      ".protos.DeterministicKey\"a\n\004Type\022\014\n\010ORIG" +
-      "INAL\020\001\022\030\n\024ENCRYPTED_SCRYPT_AES\020\002\022\032\n\026DETE" +
-      "RMINISTIC_MNEMONIC\020\003\022\025\n\021DETERMINISTIC_KE" +
-      "Y\020\004\"5\n\006Script\022\017\n\007program\030\001 \002(\014\022\032\n\022creati" +
-      "on_timestamp\030\002 \002(\003\"\222\001\n\020TransactionInput\022" +
-      "\"\n\032transaction_out_point_hash\030\001 \002(\014\022#\n\033t",
-      "ransaction_out_point_index\030\002 \002(\r\022\024\n\014scri" +
-      "pt_bytes\030\003 \002(\014\022\020\n\010sequence\030\004 \001(\r\022\r\n\005valu" +
-      "e\030\005 \001(\003\"\177\n\021TransactionOutput\022\r\n\005value\030\001 " +
-      "\002(\003\022\024\n\014script_bytes\030\002 \002(\014\022!\n\031spent_by_tr" +
-      "ansaction_hash\030\003 \001(\014\022\"\n\032spent_by_transac" +
-      "tion_index\030\004 \001(\005\"\317\003\n\025TransactionConfiden" +
-      "ce\022A\n\004type\030\001 \001(\01623.com.coinomi.core.prot" +
-      "os.TransactionConfidence.Type\022\032\n\022appeare" +
-      "d_at_height\030\002 \001(\005\022\036\n\026overriding_transact" +
-      "ion\030\003 \001(\014\022\r\n\005depth\030\004 \001(\005\022\021\n\twork_done\030\005 ",
-      "\001(\003\022:\n\014broadcast_by\030\006 \003(\0132$.com.coinomi." +
-      "core.protos.PeerAddress\022E\n\006source\030\007 \001(\0162" +
-      "5.com.coinomi.core.protos.TransactionCon" +
-      "fidence.Source\"O\n\004Type\022\013\n\007UNKNOWN\020\000\022\014\n\010B" +
-      "UILDING\020\001\022\013\n\007PENDING\020\002\022\025\n\021NOT_IN_BEST_CH" +
-      "AIN\020\003\022\010\n\004DEAD\020\004\"A\n\006Source\022\022\n\016SOURCE_UNKN" +
-      "OWN\020\000\022\022\n\016SOURCE_NETWORK\020\001\022\017\n\013SOURCE_SELF" +
-      "\020\002\"\363\004\n\013Transaction\022\017\n\007version\030\001 \002(\005\022\014\n\004h" +
-      "ash\030\002 \002(\014\0227\n\004pool\030\003 \001(\0162).com.coinomi.co" +
-      "re.protos.Transaction.Pool\022\021\n\tlock_time\030",
-      "\004 \001(\r\022\022\n\nupdated_at\030\005 \001(\003\022D\n\021transaction" +
-      "_input\030\006 \003(\0132).com.coinomi.core.protos.T" +
-      "ransactionInput\022F\n\022transaction_output\030\007 " +
-      "\003(\0132*.com.coinomi.core.protos.Transactio" +
-      "nOutput\022\022\n\nblock_hash\030\010 \003(\014\022 \n\030block_rel" +
-      "ativity_offsets\030\013 \003(\005\022B\n\nconfidence\030\t \001(" +
-      "\0132..com.coinomi.core.protos.TransactionC" +
-      "onfidence\022F\n\007purpose\030\n \001(\0162,.com.coinomi" +
-      ".core.protos.Transaction.Purpose:\007UNKNOW" +
-      "N\"Y\n\004Pool\022\013\n\007UNSPENT\020\004\022\t\n\005SPENT\020\005\022\014\n\010INA",
-      "CTIVE\020\002\022\010\n\004DEAD\020\n\022\013\n\007PENDING\020\020\022\024\n\020PENDIN" +
-      "G_INACTIVE\020\022\":\n\007Purpose\022\013\n\007UNKNOWN\020\000\022\020\n\014" +
-      "USER_PAYMENT\020\001\022\020\n\014KEY_ROTATION\020\002\"N\n\020Scry" +
-      "ptParameters\022\014\n\004salt\030\001 \002(\014\022\020\n\001n\030\002 \001(\003:\0051" +
-      "6384\022\014\n\001r\030\003 \001(\005:\0018\022\014\n\001p\030\004 \001(\005:\0011\"8\n\tExte" +
-      "nsion\022\n\n\002id\030\001 \002(\t\022\014\n\004data\030\002 \002(\014\022\021\n\tmanda" +
-      "tory\030\003 \002(\010\" \n\003Tag\022\013\n\003tag\030\001 \002(\t\022\014\n\004data\030\002" +
-      " \002(\014\"\250\005\n\006Wallet\022\032\n\022network_identifier\030\001 " +
-      "\002(\t\022\034\n\024last_seen_block_hash\030\002 \001(\014\022\036\n\026las" +
-      "t_seen_block_height\030\014 \001(\r\022!\n\031last_seen_b",
-      "lock_time_secs\030\016 \001(\003\022)\n\003key\030\003 \003(\0132\034.com." +
-      "coinomi.core.protos.Key\0229\n\013transaction\030\004" +
-      " \003(\0132$.com.coinomi.core.protos.Transacti" +
-      "on\0227\n\016watched_script\030\017 \003(\0132\037.com.coinomi" +
-      ".core.protos.Script\022T\n\017encryption_type\030\005" +
-      " \001(\0162..com.coinomi.core.protos.Wallet.En" +
-      "cryptionType:\013UNENCRYPTED\022H\n\025encryption_" +
-      "parameters\030\006 \001(\0132).com.coinomi.core.prot" +
-      "os.ScryptParameters\022\022\n\007version\030\007 \001(\005:\0011\022" +
-      "5\n\textension\030\n \003(\0132\".com.coinomi.core.pr",
-      "otos.Extension\022\023\n\013description\030\013 \001(\t\022\031\n\021k" +
-      "ey_rotation_time\030\r \001(\004\022*\n\004tags\030\020 \003(\0132\034.c" +
-      "om.coinomi.core.protos.Tag\";\n\016Encryption" +
-      "Type\022\017\n\013UNENCRYPTED\020\001\022\030\n\024ENCRYPTED_SCRYP" +
-      "T_AES\020\002B!\n\027com.coinomi.core.protosB\006Prot" +
-      "os"
+      "_data\030\003 \001(\0132&.com.coinomi.core.protos.En" +
+      "cryptedData\022\022\n\npublic_key\030\004 \001(\014\022\r\n\005label" +
+      "\030\005 \001(\t\022D\n\021deterministic_key\030\006 \001(\0132).com." +
+      "coinomi.core.protos.DeterministicKey\"a\n\004" +
+      "Type\022\014\n\010ORIGINAL\020\001\022\030\n\024ENCRYPTED_SCRYPT_A" +
+      "ES\020\002\022\032\n\026DETERMINISTIC_MNEMONIC\020\003\022\025\n\021DETE" +
+      "RMINISTIC_KEY\020\004\"5\n\006Script\022\017\n\007program\030\001 \002" +
+      "(\014\022\032\n\022creation_timestamp\030\002 \002(\003\"\222\001\n\020Trans" +
+      "actionInput\022\"\n\032transaction_out_point_has" +
+      "h\030\001 \002(\014\022#\n\033transaction_out_point_index\030\002",
+      " \002(\r\022\024\n\014script_bytes\030\003 \002(\014\022\020\n\010sequence\030\004" +
+      " \001(\r\022\r\n\005value\030\005 \001(\003\"\177\n\021TransactionOutput" +
+      "\022\r\n\005value\030\001 \002(\003\022\024\n\014script_bytes\030\002 \002(\014\022!\n" +
+      "\031spent_by_transaction_hash\030\003 \001(\014\022\"\n\032spen" +
+      "t_by_transaction_index\030\004 \001(\005\"\317\003\n\025Transac" +
+      "tionConfidence\022A\n\004type\030\001 \001(\01623.com.coino" +
+      "mi.core.protos.TransactionConfidence.Typ" +
+      "e\022\032\n\022appeared_at_height\030\002 \001(\005\022\036\n\026overrid" +
+      "ing_transaction\030\003 \001(\014\022\r\n\005depth\030\004 \001(\005\022\021\n\t" +
+      "work_done\030\005 \001(\003\022:\n\014broadcast_by\030\006 \003(\0132$.",
+      "com.coinomi.core.protos.PeerAddress\022E\n\006s" +
+      "ource\030\007 \001(\01625.com.coinomi.core.protos.Tr" +
+      "ansactionConfidence.Source\"O\n\004Type\022\013\n\007UN" +
+      "KNOWN\020\000\022\014\n\010BUILDING\020\001\022\013\n\007PENDING\020\002\022\025\n\021NO" +
+      "T_IN_BEST_CHAIN\020\003\022\010\n\004DEAD\020\004\"A\n\006Source\022\022\n" +
+      "\016SOURCE_UNKNOWN\020\000\022\022\n\016SOURCE_NETWORK\020\001\022\017\n" +
+      "\013SOURCE_SELF\020\002\"\363\004\n\013Transaction\022\017\n\007versio" +
+      "n\030\001 \002(\005\022\014\n\004hash\030\002 \002(\014\0227\n\004pool\030\003 \001(\0162).co" +
+      "m.coinomi.core.protos.Transaction.Pool\022\021" +
+      "\n\tlock_time\030\004 \001(\r\022\022\n\nupdated_at\030\005 \001(\003\022D\n",
+      "\021transaction_input\030\006 \003(\0132).com.coinomi.c" +
+      "ore.protos.TransactionInput\022F\n\022transacti" +
+      "on_output\030\007 \003(\0132*.com.coinomi.core.proto" +
+      "s.TransactionOutput\022\022\n\nblock_hash\030\010 \003(\014\022" +
+      " \n\030block_relativity_offsets\030\013 \003(\005\022B\n\ncon" +
+      "fidence\030\t \001(\0132..com.coinomi.core.protos." +
+      "TransactionConfidence\022F\n\007purpose\030\n \001(\0162," +
+      ".com.coinomi.core.protos.Transaction.Pur" +
+      "pose:\007UNKNOWN\"Y\n\004Pool\022\013\n\007UNSPENT\020\004\022\t\n\005SP" +
+      "ENT\020\005\022\014\n\010INACTIVE\020\002\022\010\n\004DEAD\020\n\022\013\n\007PENDING",
+      "\020\020\022\024\n\020PENDING_INACTIVE\020\022\":\n\007Purpose\022\013\n\007U" +
+      "NKNOWN\020\000\022\020\n\014USER_PAYMENT\020\001\022\020\n\014KEY_ROTATI" +
+      "ON\020\002\"N\n\020ScryptParameters\022\014\n\004salt\030\001 \002(\014\022\020" +
+      "\n\001n\030\002 \001(\003:\00516384\022\014\n\001r\030\003 \001(\005:\0018\022\014\n\001p\030\004 \001(" +
+      "\005:\0011\"8\n\tExtension\022\n\n\002id\030\001 \002(\t\022\014\n\004data\030\002 " +
+      "\002(\014\022\021\n\tmandatory\030\003 \002(\010\" \n\003Tag\022\013\n\003tag\030\001 \002" +
+      "(\t\022\014\n\004data\030\002 \002(\014\"\250\005\n\006Wallet\022\032\n\022network_i" +
+      "dentifier\030\001 \002(\t\022\034\n\024last_seen_block_hash\030" +
+      "\002 \001(\014\022\036\n\026last_seen_block_height\030\014 \001(\r\022!\n" +
+      "\031last_seen_block_time_secs\030\016 \001(\003\022)\n\003key\030",
+      "\003 \003(\0132\034.com.coinomi.core.protos.Key\0229\n\013t" +
+      "ransaction\030\004 \003(\0132$.com.coinomi.core.prot" +
+      "os.Transaction\0227\n\016watched_script\030\017 \003(\0132\037" +
+      ".com.coinomi.core.protos.Script\022T\n\017encry" +
+      "ption_type\030\005 \001(\0162..com.coinomi.core.prot" +
+      "os.Wallet.EncryptionType:\013UNENCRYPTED\022H\n" +
+      "\025encryption_parameters\030\006 \001(\0132).com.coino" +
+      "mi.core.protos.ScryptParameters\022\022\n\007versi" +
+      "on\030\007 \001(\005:\0011\0225\n\textension\030\n \003(\0132\".com.coi" +
+      "nomi.core.protos.Extension\022\023\n\013descriptio",
+      "n\030\013 \001(\t\022\031\n\021key_rotation_time\030\r \001(\004\022*\n\004ta" +
+      "gs\030\020 \003(\0132\034.com.coinomi.core.protos.Tag\";" +
+      "\n\016EncryptionType\022\017\n\013UNENCRYPTED\020\001\022\030\n\024ENC" +
+      "RYPTED_SCRYPT_AES\020\002B!\n\027com.coinomi.core." +
+      "protosB\006Protos"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -16259,7 +16137,7 @@ public final class Protos {
           internal_static_com_coinomi_core_protos_Key_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_com_coinomi_core_protos_Key_descriptor,
-              new java.lang.String[] { "Type", "SecretBytes", "EncryptedData", "PublicKey", "Label", "CreationTimestamp", "DeterministicKey", });
+              new java.lang.String[] { "Type", "SecretBytes", "EncryptedData", "PublicKey", "Label", "DeterministicKey", });
           internal_static_com_coinomi_core_protos_Script_descriptor =
             getDescriptor().getMessageTypes().get(4);
           internal_static_com_coinomi_core_protos_Script_fieldAccessorTable = new

@@ -1,4 +1,4 @@
-package com.coinomi.core;
+package com.coinomi.core.wallet;
 
 import com.coinomi.core.coins.BitcoinMain;
 import com.coinomi.core.coins.CoinType;

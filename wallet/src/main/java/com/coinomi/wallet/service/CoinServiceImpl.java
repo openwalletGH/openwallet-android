@@ -18,7 +18,7 @@ import android.text.format.DateUtils;
 import com.coinomi.core.network.interfaces.ConnectionEventListener;
 import com.coinomi.wallet.Configuration;
 import com.coinomi.wallet.Constants;
-import com.coinomi.core.Wallet;
+import com.coinomi.core.wallet.Wallet;
 import com.coinomi.wallet.WalletApplication;
 import com.coinomi.core.network.ServerClient;
 import com.google.bitcoin.core.Address;

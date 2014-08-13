@@ -9,8 +9,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.coinomi.core.WalletPocket;
-import com.coinomi.core.WalletPocketEventListener;
+import com.coinomi.core.wallet.WalletPocket;
+import com.coinomi.core.wallet.WalletPocketEventListener;
 import com.coinomi.core.coins.BitcoinMain;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.other.Eur;

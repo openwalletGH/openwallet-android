@@ -106,20 +106,16 @@ message Key {
   // If the secret is encrypted, or this is a "watching entry" then this is missing.
   optional bytes secret_bytes = 2;
   // If the secret data is encrypted, then secret_bytes is missing and this field is set.
-  optional EncryptedData encrypted_data = 6;
+  optional EncryptedData encrypted_data = 3;
 
   // The public EC key derived from the private key. We allow both to be stored to avoid mobile clients having to
   // do lots of slow EC math on startup. For DETERMINISTIC_MNEMONIC entries this is missing.
-  optional bytes public_key = 3;
+  optional bytes public_key = 4;
 
   // User-provided label associated with the key.
-  optional string label = 4;
+  optional string label = 5;
 
-  // Timestamp stored as millis since epoch. Useful for skipping block bodies before this point. Only reason it's
-  // optional is that some very old wallets don't have this data.
-  optional int64 creation_timestamp = 5;
-
-  optional DeterministicKey deterministic_key = 7;
+  optional DeterministicKey deterministic_key = 6;
 }
 
 message Script {
