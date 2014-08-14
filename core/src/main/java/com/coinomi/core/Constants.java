@@ -13,14 +13,14 @@ public class Constants {
 
     public static final int LOOKAHEAD = 20;
 
-    public static final String ID_BITCOIN_MAIN = "com.coinomi.bitcoin";
-    public static final String ID_BITCOIN_TEST = "com.coinomi.bitcoin.test";
-    public static final String ID_LITECOIN_MAIN = "com.coinomi.litecoin";
-    public static final String ID_LITECOIN_TEST = "com.coinomi.litecoin.test";
-    public static final String ID_PEERCOIN_MAIN = "com.coinomi.bitcoin";
-    public static final String ID_PEERCOIN_TEST = "com.coinomi.bitcoin.test";
-    public static final String ID_DOGECOIN_MAIN = "com.coinomi.dogecoin";
-    public static final String ID_DOGECOIN_TEST = "com.coinomi.dogecoin.test";
-    public static final String ID_DARKCOIN_MAIN = "com.coinomi.bitcoin";
-    public static final String ID_DARKCOIN_TEST = "com.coinomi.bitcoin.test";
+    public static final String ID_BITCOIN_MAIN = "bitcoin.main";
+    public static final String ID_BITCOIN_TEST = "bitcoin.test";
+    public static final String ID_LITECOIN_MAIN = "litecoin.main";
+    public static final String ID_LITECOIN_TEST = "litecoin.test";
+    public static final String ID_PEERCOIN_MAIN = "peercoin.main";
+    public static final String ID_PEERCOIN_TEST = "peercoin.test";
+    public static final String ID_DOGECOIN_MAIN = "dogecoin.main";
+    public static final String ID_DOGECOIN_TEST = "dogecoin.test";
+    public static final String ID_DARKCOIN_MAIN = "darkcoin.main";
+    public static final String ID_DARKCOIN_TEST = "darkcoin.test";
 }

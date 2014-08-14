@@ -12,7 +12,7 @@ public class LitecoinMain extends CoinType {
         addressHeader = 48;
         p2shHeader = 5;
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
-        
+
         name = "Litecoin";
         symbol = "LTC";
         uriScheme = "litecoin";
