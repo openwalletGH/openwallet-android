@@ -6,6 +6,7 @@ import com.coinomi.core.protos.Protos;
 import com.google.bitcoin.core.Address;
 import com.google.bitcoin.core.ECKey;
 import com.google.bitcoin.core.Sha256Hash;
+import com.google.bitcoin.crypto.ChildNumber;
 import com.google.bitcoin.crypto.DeterministicHierarchy;
 import com.google.bitcoin.crypto.DeterministicKey;
 import com.google.bitcoin.crypto.HDKeyDerivation;
@@ -17,6 +18,7 @@ import com.google.bitcoin.wallet.AbstractKeyChainEventListener;
 import com.google.bitcoin.wallet.DeterministicSeed;
 import com.google.bitcoin.wallet.KeyChain;
 import com.google.common.base.Charsets;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.io.Resources;
 
@@ -31,9 +33,9 @@ import static org.junit.Assert.*;
 /**
  * @author Giannis Dzegoutanis
  */
-public class HDKeyChainTest {
+public class SimpleHDKeyChainTest {
 
-    private HDKeyChain chain;
+    private SimpleHDKeyChain chain;
     private DeterministicKey masterKey;
     private final byte[] ENTROPY = Sha256Hash.create("don't use a string seed like this in real life".getBytes()).getBytes();
 
@@ -48,14 +50,16 @@ public class HDKeyChainTest {
         DeterministicSeed seed = new DeterministicSeed(ENTROPY, "", secs);
         masterKey = HDKeyDerivation.createMasterPrivateKey(seed.getSeedBytes());
         masterKey.setCreationTimeSeconds(secs);
-        chain = new HDKeyChain(masterKey);
+        DeterministicHierarchy hierarchy = new DeterministicHierarchy(masterKey);
+        DeterministicKey rootKey = hierarchy.get(ImmutableList.of(ChildNumber.ZERO_HARDENED), false, true);
+        chain = new SimpleHDKeyChain(rootKey);
         chain.setLookaheadSize(10);
     }
 
     @Test
     public void derive() throws Exception {
-        ECKey key1 = chain.getKey(HDKeyChain.KeyPurpose.RECEIVE_FUNDS);
-        ECKey key2 = chain.getKey(HDKeyChain.KeyPurpose.RECEIVE_FUNDS);
+        ECKey key1 = chain.getKey(SimpleHDKeyChain.KeyPurpose.RECEIVE_FUNDS);
+        ECKey key2 = chain.getKey(SimpleHDKeyChain.KeyPurpose.RECEIVE_FUNDS);
 
         final Address address = new Address(UnitTestParams.get(), "n1bQNoEx8uhmCzzA5JPG6sFdtsUQhwiQJV");
         assertEquals(address, key1.toAddress(UnitTestParams.get()));
@@ -65,7 +69,7 @@ public class HDKeyChainTest {
 
         key1.sign(Sha256Hash.ZERO_HASH);
 
-        ECKey key3 = chain.getKey(HDKeyChain.KeyPurpose.CHANGE);
+        ECKey key3 = chain.getKey(SimpleHDKeyChain.KeyPurpose.CHANGE);
         assertEquals("mqumHgVDqNzuXNrszBmi7A2UpmwaPMx4HQ", key3.toAddress(UnitTestParams.get()).toString());
         key3.sign(Sha256Hash.ZERO_HASH);
     }
@@ -74,25 +78,25 @@ public class HDKeyChainTest {
     public void deriveCoin() throws Exception {
         DeterministicHierarchy hierarchy = new DeterministicHierarchy(masterKey);
         DeterministicKey rootKey = hierarchy.get(BitcoinMain.get().getBip44Path(0), false, true);
-        chain = new HDKeyChain(rootKey);
+        chain = new SimpleHDKeyChain(rootKey);
 
-        ECKey key1 = chain.getKey(HDKeyChain.KeyPurpose.RECEIVE_FUNDS);
-        ECKey key2 = chain.getKey(HDKeyChain.KeyPurpose.RECEIVE_FUNDS);
+        ECKey key1 = chain.getKey(SimpleHDKeyChain.KeyPurpose.RECEIVE_FUNDS);
+        ECKey key2 = chain.getKey(SimpleHDKeyChain.KeyPurpose.RECEIVE_FUNDS);
 
-        final Address address = new Address(BitcoinMain.get(), "1Q3gb4JDYszDdq2vbwYnjfjw9QpSQzWDn2");
+        final Address address = new Address(BitcoinMain.get(), "1Fp7CA7ZVqZNFVNQ9TpeqWUas7K28K9zig");
         assertEquals(address, key1.toAddress(BitcoinMain.get()));
-        assertEquals("15yXWFMXsiaLoXq2AhmEsdpPX7E2y2wwXj", key2.toAddress(BitcoinMain.get()).toString());
+        assertEquals("1AKqkQM4VqyVis6hscj8695WHPCCzgHNY3", key2.toAddress(BitcoinMain.get()).toString());
         assertEquals(key1, chain.findKeyFromPubHash(address.getHash160()));
         assertEquals(key2, chain.findKeyFromPubKey(key2.getPubKey()));
 
         key1.sign(Sha256Hash.ZERO_HASH);
 
-        ECKey key3 = chain.getKey(HDKeyChain.KeyPurpose.CHANGE);
-        assertEquals("1BZDuurD5DZ4T56pUXShiREkKz6S1dC3aU", key3.toAddress(BitcoinMain.get()).toString());
+        ECKey key3 = chain.getKey(SimpleHDKeyChain.KeyPurpose.CHANGE);
+        assertEquals("18YvGiRqXKxrzB72ckfrRSizWeHgwRP94V", key3.toAddress(BitcoinMain.get()).toString());
         key3.sign(Sha256Hash.ZERO_HASH);
 
-        ECKey key4 = chain.getKey(HDKeyChain.KeyPurpose.CHANGE);
-        assertEquals("18Ro4ucrdHfW3rDHmsmL4QuDD86EswExab", key4.toAddress(BitcoinMain.get()).toString());
+        ECKey key4 = chain.getKey(SimpleHDKeyChain.KeyPurpose.CHANGE);
+        assertEquals("1861TX2MbyPEUrxDQVWgV4Tp9991bK1zpy", key4.toAddress(BitcoinMain.get()).toString());
         key4.sign(Sha256Hash.ZERO_HASH);
     }
 
@@ -110,7 +114,7 @@ public class HDKeyChainTest {
         assertEquals(0, listenerKeys.size());
         chain.setLookaheadSize(5);
         assertEquals(0, listenerKeys.size());
-        ECKey key = chain.getKey(HDKeyChain.KeyPurpose.CHANGE);
+        ECKey key = chain.getKey(SimpleHDKeyChain.KeyPurpose.CHANGE);
         assertEquals(1, listenerKeys.size());  // 1 event
         final List<ECKey> firstEvent = listenerKeys.get(0);
         assertEquals(1, firstEvent.size());
@@ -122,19 +126,22 @@ public class HDKeyChainTest {
         assertEquals(12, secondEvent.size());  // (5 lookahead keys, +1 lookahead threshold) * 2 chains
         listenerKeys.clear();
 
-        chain.getKey(HDKeyChain.KeyPurpose.CHANGE);
+        chain.getKey(SimpleHDKeyChain.KeyPurpose.CHANGE);
         // At this point we've entered the threshold zone so more keys won't immediately trigger more generations.
         assertEquals(0, listenerKeys.size());  // 1 event
         final int lookaheadThreshold = chain.getLookaheadThreshold() + chain.getLookaheadSize();
         for (int i = 0; i < lookaheadThreshold; i++)
-            chain.getKey(HDKeyChain.KeyPurpose.CHANGE);
+            chain.getKey(SimpleHDKeyChain.KeyPurpose.CHANGE);
         assertEquals(1, listenerKeys.size());  // 1 event
         assertEquals(1, listenerKeys.get(0).size());  // 1 key.
     }
 
     @Test
     public void serializeUnencryptedNormal() throws UnreadableWalletException {
-        serializeUnencrypted(masterKey, DETERMINISTIC_WALLET_SERIALIZATION_TXT_MASTER_KEY);
+        DeterministicHierarchy hierarchy = new DeterministicHierarchy(masterKey);
+        DeterministicKey rootKey = hierarchy.get(ImmutableList.of(ChildNumber.ZERO_HARDENED), false, true);
+        rootKey.setCreationTimeSeconds(0);
+        serializeUnencrypted(rootKey, DETERMINISTIC_WALLET_SERIALIZATION_TXT_MASTER_KEY);
     }
 
     @Test
@@ -148,7 +155,7 @@ public class HDKeyChainTest {
 
 
     public void serializeUnencrypted(DeterministicKey rootKey, String expectedSerialization) throws UnreadableWalletException {
-        chain = new HDKeyChain(rootKey);
+        chain = new SimpleHDKeyChain(rootKey);
         chain.setLookaheadSize(10);
 
         chain.maybeLookAhead();
@@ -158,8 +165,7 @@ public class HDKeyChainTest {
         List<Protos.Key> keys = chain.toProtobuf();
         // 1 master key, 1 account key, 2 internal keys, 3 derived, 20 lookahead and 5 lookahead threshold.
         int numItems =
-                1  // master key
-                        + 1  // account key
+                          1  // master key/account key
                         + 2  // ext/int parent keys
                         + (chain.getLookaheadSize() + chain.getLookaheadThreshold()) * 2   // lookahead zone on each chain
                 ;
@@ -173,7 +179,7 @@ public class HDKeyChainTest {
 
         // Round trip the data back and forth to check it is preserved.
         int oldLookaheadSize = chain.getLookaheadSize();
-        chain = HDKeyChain.fromProtobuf(keys, null).get(0);
+        chain = SimpleHDKeyChain.fromProtobuf(keys, null).get(0);
         assertEquals(expectedSerialization, protoToString(chain.toProtobuf()));
         assertEquals(key1, chain.findKeyFromPubHash(key1.getPubKeyHash()));
         assertEquals(key2, chain.findKeyFromPubHash(key2.getPubKeyHash()));
@@ -220,24 +226,12 @@ public class HDKeyChainTest {
                     "}\n" +
                     "\n" +
                     "type: DETERMINISTIC_KEY\n" +
-                    "secret_bytes: \"|\\236\\344\\221u\\347\\225\\304$>\\354\\235\\005I\\211\\333O\\343\\345A\\322\\253\\340\\352\\354R\\020\\216J\\232\\372\\312\"\n" +
-                    "public_key: \"\\002\\000l@WL\\305Dj~)\\347n\\241\\210\\245\\326{7\\351\\373\\354\\257\\022{ eE\u007F\\004\\355\\267\\362\"\n" +
+                    "secret_bytes: \"\\362\\305\\242\\3637\\2748Z?]\\035s\\272\\253J\\300\\033\\250\\022r\\350\\020\\277U\\036K<\\335\\237\\333/\\303\"\n" +
+                    "public_key: \"\\003\\2471\\326i\\331A\\337|\\373\\276\\3214\\257\\363\\266Q\\315x\\341\\317\\200\\243\\234\\336<s}\\261\\240,\\233\\371\"\n" +
                     "deterministic_key {\n" +
-                    "  chain_code: \"3\\250\\206*.#8$\\237\\n\\222\\255Jv\\302U5m\\027\\301\\302X\\260\\245\\3456|\\2515\\204&\\310\"\n" +
+                    "  chain_code: \"Pd\\032#\\325\\213\\332\\307\\3755\\020\\316\\276\\002\\037\\262\\241\\213\\211k\\376\\254\\220R\\351\\270\\\"\\260V\\260\\362\\257\"\n" +
                     "  path: 2147483692\n" +
                     "  path: 2147483649\n" +
-                    "  path: 2147483648\n" +
-                    "  path: 2147483648\n" +
-                    "}\n" +
-                    "\n" +
-                    "type: DETERMINISTIC_KEY\n" +
-                    "secret_bytes: \"\\243\\310\\252\\245B\\032\\212\\246\\227\\270 G\\'Y\\016\\026\\223\\271\\206\\303\\356>A\\364Zkm82\\250\\244\\311\"\n" +
-                    "public_key: \"\\003\\262(\\306\\234K\\373\\311q]eR\\237\\330Ch\\221\\321\\335a\\234B\\\\~\\353SA:\\2031W\\372;\"\n" +
-                    "deterministic_key {\n" +
-                    "  chain_code: \"\\n\\265\\313\\322\u007F;K\\352e\\300\\306\\226\\314\\363\\241\\347\\203\\364\\357\\005<\\372\\320\\356\\226\\327\\375k\\271*,:\"\n" +
-                    "  path: 2147483692\n" +
-                    "  path: 2147483649\n" +
-                    "  path: 2147483648\n" +
                     "  path: 2147483648\n" +
                     "  path: 0\n" +
                     "  issued_subkeys: 2\n" +
@@ -245,13 +239,12 @@ public class HDKeyChainTest {
                     "}\n" +
                     "\n" +
                     "type: DETERMINISTIC_KEY\n" +
-                    "secret_bytes: \"Om\\022\\235\\351\\004\\206\\206\\006\\302\\326\\033\\206\\030\\273i\\035\\34404\\313\\237x\\373D\\247\\374\\266\\032p-\\326\"\n" +
-                    "public_key: \"\\002\\377m\\343\\227P\\320\\3254\\247\\347\\367\\311\\250\\300\\311\\2762\\204\\367\\a\\311\\nX\\032\\331>]\\005x\\332A5\"\n" +
+                    "secret_bytes: \"\\311\\327\\205Q\\005\\346\\030\\365\\026\\0331\\356\\346\\036\\234\\024\\b\\322\\202\\3726I\\351\\001 \\373\\200\\003\\260\\276\\216\\000\"\n" +
+                    "public_key: \"\\003\\334\\214L\\003Zq\\365\\212P\\203b~l\\367C@T\\341\\300\\216\\037\\375\\002\\224\\t=\\301:\\266l\u007F\\364\"\n" +
                     "deterministic_key {\n" +
-                    "  chain_code: \"\\242\\312$\\360\\323:\\025{\\210\\305\\360\\252\\255;2#)=[t\\232\\2046\\237\\033\\v\\322\\257\\241\\2239D\"\n" +
+                    "  chain_code: \"\\036\\277^\\322!\\227i^Z\\212\\347\\272\\365C\\016\\342\\371\\236a\\022\\\\\\n\\037\\304\\264\\021\\335\\344\\340=\\234T\"\n" +
                     "  path: 2147483692\n" +
                     "  path: 2147483649\n" +
-                    "  path: 2147483648\n" +
                     "  path: 2147483648\n" +
                     "  path: 1\n" +
                     "  issued_subkeys: 1\n" +
@@ -259,325 +252,292 @@ public class HDKeyChainTest {
                     "}\n" +
                     "\n" +
                     "type: DETERMINISTIC_KEY\n" +
-                    "public_key: \"\\002\\304\\317\\3124_\\372\\242\\022v\\255\\312\\267\\234\\231\\222\\304\\364J}b\\311,\\240\\345\\033\\321\\025\\336\\333v\\002N\"\n" +
+                    "public_key: \"\\002\\232\u007F\\236W\\2235py\\021\\331i\\350\\026H\\235\\nO\\217\\231\\361M/}5\\211v\\023Kc\\253\\2307\"\n" +
                     "deterministic_key {\n" +
-                    "  chain_code: \"\\347\\3713K#\\224\\356\\004\\335 \\227\\316\\225V15)\\321\\341.\\276\\t?2\\f\\226I\\265z\\315r:\"\n" +
+                    "  chain_code: \"\\032\\366\\331\\360\\276Yo\\243;!\\023\\005\\305\\246\\354\\337N\\203\\302\\264\\250\\355\\275\\346\\271!L\\\\\\252\\270\\364t\"\n" +
                     "  path: 2147483692\n" +
                     "  path: 2147483649\n" +
-                    "  path: 2147483648\n" +
                     "  path: 2147483648\n" +
                     "  path: 0\n" +
                     "  path: 0\n" +
                     "}\n" +
                     "\n" +
                     "type: DETERMINISTIC_KEY\n" +
-                    "public_key: \"\\002k\\256\\016\\236B\\027<\\362\\212\\t\\305\\314\\270\\237\\267\\224\\214\\250\\223\\325\\237\\215\\273\\345\\347E\\026f\\373\\331\\272\\371\"\n" +
+                    "public_key: \"\\003\\231\\254]q\\030g3\\316u\\322h\\304Ao4\\246f\\026\\266\\374\\nY\\233\\022\\034\\243\\'\\000\\030\\256\\342\\006\"\n" +
                     "deterministic_key {\n" +
-                    "  chain_code: \"\\316\\037\\202\\242\\261\\273\\270w\\277\\214\\302\\350QeV+\\207\\250\\311\\244\\335\\221\\351\\263k\\260=\\nf\\247\\243\\266\"\n" +
+                    "  chain_code: \"\\364\\201U66\\201$7l%Sy\\365]A\\265\\277&\\370\\256\\364\\347\\356\\334T\\323\\375\\347mB0\\374\"\n" +
                     "  path: 2147483692\n" +
                     "  path: 2147483649\n" +
-                    "  path: 2147483648\n" +
                     "  path: 2147483648\n" +
                     "  path: 0\n" +
                     "  path: 1\n" +
                     "}\n" +
                     "\n" +
                     "type: DETERMINISTIC_KEY\n" +
-                    "public_key: \"\\003\\f\\262\\300b\\251\\2278\\037.\\334\\026\\336\\333\\2328Gepm<\\022\\257\\367\\rW\\212LTT\\2559*\"\n" +
+                    "public_key: \"\\002/ \\336M\\347\\357pl@z\\204\\3240\\027\\366\\0170\\307\\337\\327\\312_$\\n\\'\\216\\237W\\017\\263bg\"\n" +
                     "deterministic_key {\n" +
-                    "  chain_code: \"\\370\\260\\303\\025\\225[\\032\\024i@-\\n\\025\\t7pD:\\357\\\"\\355\\2325zT\\0057D\\336\\2559f\"\n" +
+                    "  chain_code: \"i\\206:\\003\\205BLMI\\376\\347S~\\315\\0306\\255\\274>\\220\\017\\302\\241u\\017DvD\\2662\\342\\316\"\n" +
                     "  path: 2147483692\n" +
                     "  path: 2147483649\n" +
-                    "  path: 2147483648\n" +
                     "  path: 2147483648\n" +
                     "  path: 0\n" +
                     "  path: 2\n" +
                     "}\n" +
                     "\n" +
                     "type: DETERMINISTIC_KEY\n" +
-                    "public_key: \"\\002\\221r\\2246c\\030\\035u\\203\\215Mp\\356\\225f\\355\\277\\252\\354O\\017\\332E\u007FZ\\224\\3062 Q\\337\\255\"\n" +
+                    "public_key: \"\\003 1\\316\\277\\355_\\343\\214}\\a\\205\\233\\325\\232\\241n\\256\\325\\300\\2369\\020\\nh\\335\\0243\\355\\362$?7\"\n" +
                     "deterministic_key {\n" +
-                    "  chain_code: \"\\376\\341tZ\u007Fyb\\264\\202\\\"q\\300\\027o\\3055?#X\\350h\\222\\346\\032\\2114\\3126J\\345\\204\\024\"\n" +
+                    "  chain_code: \"\\334(\\\\u\\022\\245\\370\\t*\\372\\315\\330\\365\\256Ms\\254J_{B\\035[f\\333\\351\\272\\261\\363\\373_\\023\"\n" +
                     "  path: 2147483692\n" +
                     "  path: 2147483649\n" +
-                    "  path: 2147483648\n" +
                     "  path: 2147483648\n" +
                     "  path: 0\n" +
                     "  path: 3\n" +
                     "}\n" +
                     "\n" +
                     "type: DETERMINISTIC_KEY\n" +
-                    "public_key: \"\\002\\332J\\22109\\020V\\270\\274N\\354\\363\\204Rpa8[\\255\\353U\\230\\3517=<NYF\\225\\373\\357\"\n" +
+                    "public_key: \"\\003\\354\\fhI\\2731\\026\\222\\v\\274\\027\\357\\327\\033X\\324\\270\\323\\252}\\314}\\221\\213\\272\\\\\\362k\\352\\334\u007F#\"\n" +
                     "deterministic_key {\n" +
-                    "  chain_code: \"\\323\\231\\000\\017\\002f\\234k\\246Y\\377\\024Y\\231\\334\\367\\215\\330\\376\\354\\241*\\2132\\360\\210:2+\\221\\354\\000\"\n" +
+                    "  chain_code: \"#\\351\\\"(\\t\\245\\006\\351\\354f\\334\\216(\\272\\252\\200\\226\\337\\370\\260XO\\375\\016/\\377\\306\\263yE\\222\\311\"\n" +
                     "  path: 2147483692\n" +
                     "  path: 2147483649\n" +
-                    "  path: 2147483648\n" +
                     "  path: 2147483648\n" +
                     "  path: 0\n" +
                     "  path: 4\n" +
                     "}\n" +
                     "\n" +
                     "type: DETERMINISTIC_KEY\n" +
-                    "public_key: \"\\002\\033x\\202\\365=t\\237\\364\\360\\212O2\\372\\237,Q\\245\\207\\345J\\244\\017\\2015|\\266$\\326\\205\\365\\306\\202\"\n" +
+                    "public_key: \"\\002-7\\rx2\u007FzP\\r(B\\247\\350\\026\\205\\210w\\251G\\b\\254\\213\\000\\227\\271Q\\272\\342\\357\\304>G\"\n" +
                     "deterministic_key {\n" +
-                    "  chain_code: \"!\\357\\261w\\315^\\363\\230\\004\\026\\353\\251\\362WP\\324\\3556L\\260\\375\\376\\n\\204!\\304|8;\\025\\221\\323\"\n" +
+                    "  chain_code: \"US\\242J\\307\\2672<\\373l\\217\\200[\\316\\352\\361*~\\324\\f\\304\\267oD\\273\\300_\\340K\\247V\\370\"\n" +
                     "  path: 2147483692\n" +
                     "  path: 2147483649\n" +
-                    "  path: 2147483648\n" +
                     "  path: 2147483648\n" +
                     "  path: 0\n" +
                     "  path: 5\n" +
                     "}\n" +
                     "\n" +
                     "type: DETERMINISTIC_KEY\n" +
-                    "public_key: \"\\002\\020)\\230\\313\\270t\\205\\252T;\\371\\241\\231\\351\\254\\301\\332\\236`\\f<u\\327k\\226\\333hs\\271\\000\\254a\"\n" +
+                    "public_key: \"\\002Y\\260\\332\\377;T\\263\\335\\331\\004\\020kv\\207E=\\311|\\270*hP>)\\340\\272\\203LD\\036\\313\\271\"\n" +
                     "deterministic_key {\n" +
-                    "  chain_code: \"2\\315\\241\\203\\277w7\\240n?\\321\\334\\321\\345\\025\\344p\\\\s\\347*&j\\351O]`j\\017fL\\317\"\n" +
+                    "  chain_code: \"\\r34\\'I\\027\\266\\272\\300\\003\\366f\\274\\333\\260\\006\\311\\3556!\\227\\216\\301\\361\\247\\354\\025\\305\\321\\376\\274\\214\"\n" +
                     "  path: 2147483692\n" +
                     "  path: 2147483649\n" +
-                    "  path: 2147483648\n" +
                     "  path: 2147483648\n" +
                     "  path: 0\n" +
                     "  path: 6\n" +
                     "}\n" +
                     "\n" +
                     "type: DETERMINISTIC_KEY\n" +
-                    "public_key: \"\\002\\364E\\264cY \\253b\\313\\'\\2658\\274\\3177\\253I\\377\\365^\\352\\253QN\\311Fk\\244\\201\\2461\\270\"\n" +
+                    "public_key: \"\\002I\\367x\\235p9\\334\\234\\034\\366\\247&\\321\\237\\217\\241V\\252\\017`w\\212\\301\\000\\305-\\312\\003\\352`\\302V\"\n" +
                     "deterministic_key {\n" +
-                    "  chain_code: \"\\231\\375l\\336\\002:\\321+\\305\\243\\277V\\353!\\332PB\\025\\305N\\016\\333<\\301\\3627#\\255\\213\\017\\222\\036\"\n" +
+                    "  chain_code: \"\\257\\001\\375\\203E\\315\\221W\\316&\\035\\244\\306\\037\\351\\361\\027\\020\\346\\305^Z\\274O\\212\\363P\\036\\273n\\367\\326\"\n" +
                     "  path: 2147483692\n" +
                     "  path: 2147483649\n" +
-                    "  path: 2147483648\n" +
                     "  path: 2147483648\n" +
                     "  path: 0\n" +
                     "  path: 7\n" +
                     "}\n" +
                     "\n" +
                     "type: DETERMINISTIC_KEY\n" +
-                    "public_key: \"\\003\\315J\\003+\\333\\215+\\233(\\312U+bCO\\207\\222\\211C\\242I3 \\247\\373\\321\\266\\221,\\271\\030T\"\n" +
+                    "public_key: \"\\0029\\373\\030u\\305\\214S\\345/\\373y%\\t\\252~\\267\\f\\016t|\\354\\020\\356\\306\\313\\317\\027\\325\\376\\232kh\"\n" +
                     "deterministic_key {\n" +
-                    "  chain_code: \"\\237GF\\342J\\331\\207@\\272\\346(\\346\\351!!Q\\026\\367\\2562\\357/\\264\\357Xa\\323G\\374\\267\\b\\221\"\n" +
+                    "  chain_code: \"\\260\\203\\277\\231\\352\\265y\\020\\356r_bO\\374l\\347\\002\\032i\\216Ct\\260\\221-\\207\\200\\243\\364;\\247I\"\n" +
                     "  path: 2147483692\n" +
                     "  path: 2147483649\n" +
-                    "  path: 2147483648\n" +
                     "  path: 2147483648\n" +
                     "  path: 0\n" +
                     "  path: 8\n" +
                     "}\n" +
                     "\n" +
                     "type: DETERMINISTIC_KEY\n" +
-                    "public_key: \"\\002\\v\\330\\370\\3158\\026\\210\\202\\2714\\372j\\343\\to\\225S\\2724\\017Z\\333\\373Ey\\263\\\"\\373\\242d\\'\\354\"\n" +
+                    "public_key: \"\\002[\\304\\301.\\342\\253\\256\\364\\025\\'\\017\\356-t\\340R\\250Z\\327\\374\\250\\r\\331\\221`\\334\\362a[q\\260\\271\"\n" +
                     "deterministic_key {\n" +
-                    "  chain_code: \"u\\275FL\\034\\3603\\230?\\2632W\\241\\270\\016\\032Y\\3024\\246&\\303\\206l{I\\322\\337\\202\\026f%\"\n" +
+                    "  chain_code: \"\\376\\277#\\275\\035S\\362`\\323\\246<b~D\\253\\250p\\263\\256\\364\\257\\256\\201\\016\\223[\\305\\261\\2758\\353\\203\"\n" +
                     "  path: 2147483692\n" +
                     "  path: 2147483649\n" +
-                    "  path: 2147483648\n" +
                     "  path: 2147483648\n" +
                     "  path: 0\n" +
                     "  path: 9\n" +
                     "}\n" +
                     "\n" +
                     "type: DETERMINISTIC_KEY\n" +
-                    "public_key: \"\\002\\236\\222\\222\\303u\\\"X\\025\\304\\f\\203\\363\\313\\037{{^z\\263\\024\\211 \\250$C\\000\\370\\370}\\346dr\"\n" +
+                    "public_key: \"\\002\\253\\213j!\\316\\\\\\372-tA\\331\\362T\\363\\252)\\302\\2620\\246=X#\\201\\274\\212\\331Gi9\\362\\366\"\n" +
                     "deterministic_key {\n" +
-                    "  chain_code: \"\\333\\373\\332\\313hE\\275\\271\\030\\326\\355\\357`\\021\\255\\352\\203\\237\\307\\313\\'\\020\\247\\251 \\361\\235\\251T8\\032\\374\"\n" +
+                    "  chain_code: \"S`\\237\\003Q\\021\\201\\301\\341Ij\\\"\\270:\\335\\374;\\320\\037\\350m\\037\\331\\343\\3208\\211E\\276y\\215.\"\n" +
                     "  path: 2147483692\n" +
                     "  path: 2147483649\n" +
-                    "  path: 2147483648\n" +
                     "  path: 2147483648\n" +
                     "  path: 0\n" +
                     "  path: 10\n" +
                     "}\n" +
                     "\n" +
                     "type: DETERMINISTIC_KEY\n" +
-                    "public_key: \"\\002\\230:\\2174\\005\\v\\237r\\343%x\\225>\\300\\335\\372\\224\\020\\323\\32565\\206\\300\\265\\'\\244-\\377\\234\\003\\302\"\n" +
+                    "public_key: \"\\002\\231\\323\\307\\3348\\267\\357\\310\\323\\nWf$\\326\\334\\v\\360\\273\\357\\207\\0207\\036)\\270Api\\346\\321\\270\\351\"\n" +
                     "deterministic_key {\n" +
-                    "  chain_code: \"\\0344,\\241\\270\\312\\361\\206\\204t\\004@\\202,\\264\\241z\\277\\337j\\366\\310\\342\\344\\331\\'6u\\361\\355\\3555\"\n" +
+                    "  chain_code: \"\\232Y6\\020\\317@\\r\\251]\\204m\\37796\\v5\\006\\300\\t\\342\\246.\\231r\\336Vt\\370\\373\\023_M\"\n" +
                     "  path: 2147483692\n" +
                     "  path: 2147483649\n" +
-                    "  path: 2147483648\n" +
                     "  path: 2147483648\n" +
                     "  path: 0\n" +
                     "  path: 11\n" +
                     "}\n" +
                     "\n" +
                     "type: DETERMINISTIC_KEY\n" +
-                    "public_key: \"\\003nir\\350\\206\\247\\020\\242\\272\\311\\307\\034@\\373\\233\\214-\\321w\\023\\027\\355\\376\\374\\351B\\002\\327T@\\030\\336\"\n" +
+                    "public_key: \"\\003\\3647\\fs\\313\\367\\022\\317\\207\\276\\305\\370W\\b \\276\\274\\343\\344r\\351\\303\\035\\235\\227X\\a\\347Q2\\325\\351\"\n" +
                     "deterministic_key {\n" +
-                    "  chain_code: \"q&\\211ng*\\245\\332\\312\\226`\\aBR<e\\242\\023\\327\\232\\217\\343v\\275\\255-\\251\\206\\020\\001\\313K\"\n" +
+                    "  chain_code: \"\\030F|\\234$0\\315\\215\\203\\234\\037\\0054\\344M\\253\\343\\214S\\360\\274_\\330\\2663\\364L\\025\\250\\v\\236\\247\"\n" +
                     "  path: 2147483692\n" +
                     "  path: 2147483649\n" +
-                    "  path: 2147483648\n" +
                     "  path: 2147483648\n" +
                     "  path: 0\n" +
                     "  path: 12\n" +
                     "}\n" +
                     "\n" +
                     "type: DETERMINISTIC_KEY\n" +
-                    "public_key: \"\\002\\200\\270\\255f\\273\\337w\\362\\215B5f#\\335\\363l\\241\\374\\f\\027\\374\\v\\212\\263*\\346\\222&\\3749\\337\\304\"\n" +
+                    "public_key: \"\\003\\273\\t\\2539\\246\\023^H\\232\\202}Hi+\\226Q\\337\\371\\002\\021\\201\\276\\261*\\236\\353\\'\\247\\325\\367t^\"\n" +
                     "deterministic_key {\n" +
-                    "  chain_code: \"x\\303\\352{\\2010\\232,\\024\\276\\355\\020t&\\277\\275-\\236\\361QK\\303U\\030\\031\\347}I}\\211R\\\\\"\n" +
+                    "  chain_code: \"\\233\\314\\253j\\213|Y\\344\\200k\\217\\357*\\\\\\030\\347`\\016\\266\\033g|\\273\\330\\261\\226cj\\204\\351\\234Z\"\n" +
                     "  path: 2147483692\n" +
                     "  path: 2147483649\n" +
-                    "  path: 2147483648\n" +
                     "  path: 2147483648\n" +
                     "  path: 1\n" +
                     "  path: 0\n" +
                     "}\n" +
                     "\n" +
                     "type: DETERMINISTIC_KEY\n" +
-                    "public_key: \"\\003!\\204z\\n\\242\\317\\216C6\\237\\212EtupH\\217\\365\\256\\230\\363\\236\\335\\272u@\\'\\330!\\024J\\211\"\n" +
+                    "public_key: \"\\002\\266}M\\017f0\\350\\357\\232\\037\\2713\\203N\\nei\\202_\\t\\034\\0343X,\\006Y\\260\\356\\340\\031W\"\n" +
                     "deterministic_key {\n" +
-                    "  chain_code: \"\\212\\372\\322\\301\\201\\032{=H\\210\\314\\240\\r\\a\\336\\315S=\\354@$(X!\\314\\206\\326\\214\\336&\\350Z\"\n" +
+                    "  chain_code: \"\\2569jU\\231\\242\\230rH\\202\\025\\356C\\373\\327\\374-\\305\\313\\277Jy5mx\\034\\350\\2264\\321\\327J\"\n" +
                     "  path: 2147483692\n" +
                     "  path: 2147483649\n" +
-                    "  path: 2147483648\n" +
                     "  path: 2147483648\n" +
                     "  path: 1\n" +
                     "  path: 1\n" +
                     "}\n" +
                     "\n" +
                     "type: DETERMINISTIC_KEY\n" +
-                    "public_key: \"\\003\\\"\\335[|\\262\\244\\214,)\\001\\241\\034\\375\\301\\350\\003j:\\002A\\364\\321\\263\\244g\\272\\271\\336\\331\\335M\\026\"\n" +
+                    "public_key: \"\\002\\221o\\254\\027\\3547s\\260&\\217b\\252r\\fo)~\\2107\\016\\255\\273\\223\\245A\\234\\247ay\\204\\021H\"\n" +
                     "deterministic_key {\n" +
-                    "  chain_code: \"m\\245\\244\\304\\341:\\364\\307\\247V;\\264\\314S\\304\\242\\263\\302$\\361\\314\\317NY\\206Dd%p\\360Z\\201\"\n" +
+                    "  chain_code: \"\\265\\233\\233\\354DG\\226\\326\\215\\024\\230\\334\\262J\\257LL\\363R\\316$\\357\\347\\017v\\371rpA\\244PK\"\n" +
                     "  path: 2147483692\n" +
                     "  path: 2147483649\n" +
-                    "  path: 2147483648\n" +
                     "  path: 2147483648\n" +
                     "  path: 1\n" +
                     "  path: 2\n" +
                     "}\n" +
                     "\n" +
                     "type: DETERMINISTIC_KEY\n" +
-                    "public_key: \"\\002\\225q\\346\\256\\206M\\354\\024\\324\\242\\351\\315\\355\\377\\'\\234\\251B\\333@\\223l\\336E\\336}\\301\\0314\\223/\\003\"\n" +
+                    "public_key: \"\\003\\301\\036A\\004O\\323\\350\\240\\227>C73n\\326P]{\\260@\\327\\242\\'\\263$H\\271\\371\\371YIJ\"\n" +
                     "deterministic_key {\n" +
-                    "  chain_code: \"T\\2351\\026\\020\\256\\305\\275\\204]\\312\\320\\246W\\370\\326\\2304\\006\\323\\a\\n\\006\\215R\\371V\\003\\267DV[\"\n" +
+                    "  chain_code: \"9\\214\\315\\275\\300\\206\\253U;\\235\\002\u007FfA\\016\\215\\222\\235K\\253\\311\\3648w20\\2005\\343\\310\\\\:\"\n" +
                     "  path: 2147483692\n" +
                     "  path: 2147483649\n" +
-                    "  path: 2147483648\n" +
                     "  path: 2147483648\n" +
                     "  path: 1\n" +
                     "  path: 3\n" +
                     "}\n" +
                     "\n" +
                     "type: DETERMINISTIC_KEY\n" +
-                    "public_key: \"\\002\\213t\\311\\215k\\376}\\243\\217j\\3726\\255\\001I\\275\\004\\305\\r\\201\\317\\273\\365?y\\b\\236p\\275/;\\334\"\n" +
+                    "public_key: \"\\002!\\373+L\\341\\025\\265\\232\\a\\247J?v\\274\\273|v\\035g\\033\\211\\026\\332\\233\\37378c\\226\\020\\304\\360\"\n" +
                     "deterministic_key {\n" +
-                    "  chain_code: \"\\314\\216$\\255\\336\\273\\240*\\366\\375\\234\\334_5\\226`\\266\\350\\370(\\0168\\344\\235\\307\\002\\341\\033K\\250$\\267\"\n" +
+                    "  chain_code: \"i\\003w\\037b!Y]\\214l\\373]`x\\355Je\\\\\\v\\205\\n\\310\\254s\\301\\272\\246\\315\\024}\\366\\037\"\n" +
                     "  path: 2147483692\n" +
                     "  path: 2147483649\n" +
-                    "  path: 2147483648\n" +
                     "  path: 2147483648\n" +
                     "  path: 1\n" +
                     "  path: 4\n" +
                     "}\n" +
                     "\n" +
                     "type: DETERMINISTIC_KEY\n" +
-                    "public_key: \"\\002\\026@\\272\\333\\252\\326\\224\\261\\320\\326\\020\\347\\031t\\0321\\275;\\260\\032\\b\\000\\006 1#80\\300\\236\\317R\"\n" +
+                    "public_key: \"\\002p\\261|\\230%\\350\\a\\347?-}\\317\\274W\\210\\032\\331\\006\\350\\320\\016\\331\\300\\024\\302\\321[O\\210E\\231\\342\"\n" +
                     "deterministic_key {\n" +
-                    "  chain_code: \"8\\222\\242\\025N\\320\\0169\\205\\267\\300\\213<\\205\\352\\377]\\333v\\006\\202{?Q\\032\\344\\3207\\343\\267\\320\\221\"\n" +
+                    "  chain_code: \"\\367\\263\\236B#W\\223\\3206\\3644!?Im\\250\\277\\vY\\322\\302\\254\\212A\\227\\352\\244\\003\\031)\\374b\"\n" +
                     "  path: 2147483692\n" +
                     "  path: 2147483649\n" +
-                    "  path: 2147483648\n" +
                     "  path: 2147483648\n" +
                     "  path: 1\n" +
                     "  path: 5\n" +
                     "}\n" +
                     "\n" +
                     "type: DETERMINISTIC_KEY\n" +
-                    "public_key: \"\\003\\243\\367\\356\\2064\\204\\373fH\\224\\327e\\370\\267?o\\247\\315luaYC\\n\\221\\312\\337\\273\\252)e\\374\"\n" +
+                    "public_key: \"\\003\\355\\213b\\333\\3157\\262iu\\361\\274\\252\\271\\223\\346\\276^\\350\\260q\\272m\\025.\\256\\353\\006\\005\\020\\255&\\017\"\n" +
                     "deterministic_key {\n" +
-                    "  chain_code: \"^u\\250\\320\\373\\2316\\332\\026\\334\\323\\301\\376\\214\\373m]\\376-N\\322\\200T\\255\\231\\347\\347J\\345\\020\\262M\"\n" +
+                    "  chain_code: \"\\003\\265\\376U\\001\\240P\\'X\\364\\326\\326\\275\\375s\\306\\225\\373\\264\\306H5[\\356\\b\\301>\\227\\325\\323\\315\\344\"\n" +
                     "  path: 2147483692\n" +
                     "  path: 2147483649\n" +
-                    "  path: 2147483648\n" +
                     "  path: 2147483648\n" +
                     "  path: 1\n" +
                     "  path: 6\n" +
                     "}\n" +
                     "\n" +
                     "type: DETERMINISTIC_KEY\n" +
-                    "public_key: \"\\003F\\000\\246\\210J\\376\\0220\\a\\005\\335\\344\\315\\375BN\\220\\306\\001Wn\\247 T\\206A8\\312u\\263i\\\\\"\n" +
+                    "public_key: \"\\003\\317\\215\\311\\246\\322\\335\\226,\\355\\243\\274E\\270\\027\\307I\\264\\344\\260\\350_\\230\\372\\034\\340\\363\\3113T\\222\\274c\"\n" +
                     "deterministic_key {\n" +
-                    "  chain_code: \"\\273\\274^@\\001\\375\\202R\\250\\336\\356\\375\u007F\\273\\372\\375\\353?[x\\375\\310\\223<\\272U4N\\rO]-\"\n" +
+                    "  chain_code: \"r\\203\\252\\217hI\\312S\\323\\377](\\331C\\2711\\214T.\\031\\277\\333\\267,U|\\323x\\006\\003\\263\\233\"\n" +
                     "  path: 2147483692\n" +
                     "  path: 2147483649\n" +
-                    "  path: 2147483648\n" +
                     "  path: 2147483648\n" +
                     "  path: 1\n" +
                     "  path: 7\n" +
                     "}\n" +
                     "\n" +
                     "type: DETERMINISTIC_KEY\n" +
-                    "public_key: \"\\003\\334I$\\372x\\ts\\f\\030\\364\\001\\344\\361\\211\\257\\212\\221\\\\\\253\\027\\222\\017J\\255Y\\233\\000|*\\207i\\306\"\n" +
+                    "public_key: \"\\002\\277\\306\\215\\221N\\224\\b=\\v\\001\\216Ui\\033v\\250\\326\\361\\221\\332\\215\\343$\\344A\\306\\357f\\236\\330\\241\\337\"\n" +
                     "deterministic_key {\n" +
-                    "  chain_code: \"\\334\\311\\217\\260a\\254\\232\\270\\034\\301mg2\\030\\365\\314Nc\\023$D\\233+\\vt\\252\\352\\312\\301\\260\\311,\"\n" +
+                    "  chain_code: \"1n@\\331(\\246#4\\262\\017\\006\\360a\\206i\\270\\211n\\344\\363\\343Y\\0000\\372,\\231\\352\\252f\\272!\"\n" +
                     "  path: 2147483692\n" +
                     "  path: 2147483649\n" +
-                    "  path: 2147483648\n" +
                     "  path: 2147483648\n" +
                     "  path: 1\n" +
                     "  path: 8\n" +
                     "}\n" +
                     "\n" +
                     "type: DETERMINISTIC_KEY\n" +
-                    "public_key: \"\\002\\034\\212\\031\\002\\351\\367\\032Mb\\374\\2271\\246=\\306\\201\\376\\323>\\212~\\n81/\\226\\366j\\257\\2579\\306\"\n" +
+                    "public_key: \"\\002!\\032\\210\\034\\267\\234\\t\u007F\\311T\\'(~c-dKt;\\366\\030fI5[\\026\\242\\372\\310\\342\\'\\205\"\n" +
                     "deterministic_key {\n" +
-                    "  chain_code: \"O`\\002\\35619\\320\\022\\b\\017\\367\\342\\227_5\\245\\017\\257x\\301\\344/B\\210\\026\\025\\211\\307\\361^\\320\\r\"\n" +
+                    "  chain_code: \"\\004AX{\\301\\030\\035K\\353\\353S\\223m\\271\\352\\323\\272\\'\\202=_5\\322\\240J.\\227\\370[gZ?\"\n" +
                     "  path: 2147483692\n" +
                     "  path: 2147483649\n" +
-                    "  path: 2147483648\n" +
                     "  path: 2147483648\n" +
                     "  path: 1\n" +
                     "  path: 9\n" +
                     "}\n" +
                     "\n" +
                     "type: DETERMINISTIC_KEY\n" +
-                    "public_key: \"\\002\\333\\303fa\\016\\311.\\210F\\200\\376j\\017\\023N|Q4%P\\027\\346\\331&\\257\\234kA\\222\\317\\\"\\224\"\n" +
+                    "public_key: \"\\002KZ\\215?\\f\\365\\\"o\\364\\035\\n\\240\\276_\\335\\\\\\256\\277\\212J\\247\\201A\\325\\220\\361\\356\\213/!\\301\\224\"\n" +
                     "deterministic_key {\n" +
-                    "  chain_code: \"^8\\377\\312\\331\\245A8\\334\\315\\341?\\313\\331y\\030b\\331P\\0311\\271[R\\335\\317n\\302\\b\\f\\334\\034\"\n" +
+                    "  chain_code: \"\\247\\233H)F\\252\\276\\242\\370\\350\\263\\270\\b:^\\247d]\\232\\316QUA2\\n\\262\\321\u007FU\\003\\r]\"\n" +
                     "  path: 2147483692\n" +
                     "  path: 2147483649\n" +
-                    "  path: 2147483648\n" +
                     "  path: 2147483648\n" +
                     "  path: 1\n" +
                     "  path: 10\n" +
                     "}\n" +
                     "\n" +
                     "type: DETERMINISTIC_KEY\n" +
-                    "public_key: \"\\002\\374\\245\\271R\\314\\230D\\332\\216r\\004\\004\\217y\\231\\252f\\000\\021O\\330\\020\\200\\200\\205^-\\326iV\\301\\243\"\n" +
+                    "public_key: \"\\002\\204U\\310%\\024\\\"\\363\\267\\340\\220\\031\\341koQ\\210\\037\\022\\224Y\\354\\016\\370\\360\\374\\346\\216\\354@B\\247\\233\"\n" +
                     "deterministic_key {\n" +
-                    "  chain_code: \"\\330\\275bNw\\205\\300\\210#\\001\\265\\341\\254\\360\\'\\3018\\023\u007F\\206\\227\\330\\355\u007FO\\t3\\320\\247\\030\\233\\376\"\n" +
+                    "  chain_code: \"w\\265\\277h\\352\\025\\351\\274\\233\\310;rk\\264`*-H-r\\026\\326\\237%\\230\\034\\005\\236_6#a\"\n" +
                     "  path: 2147483692\n" +
                     "  path: 2147483649\n" +
-                    "  path: 2147483648\n" +
                     "  path: 2147483648\n" +
                     "  path: 1\n" +
                     "  path: 11\n" +
                     "}\n" +
                     "\n" +
                     "type: DETERMINISTIC_KEY\n" +
-                    "public_key: \"\\002\\2573\\356O\\217\\232\\2724\\337;\\233\\232\\225\\222P\\375j\\272\\001\\305+\\266)\\312\\217?{njb\\324c\"\n" +
+                    "public_key: \"\\002\\213\\241A\\022c\\322\\031\\367O\\273\\375\\3354\\'Vh\\371\\362\\202\\220\\253\\366\\206:\\033\\347\\300\\227<6\\252\\034\"\n" +
                     "deterministic_key {\n" +
-                    "  chain_code: \"J\\263\\327\\257\\036\\344\\325$\\355~D\\004<\\341\\'\\345:\\360\\325\\2067\\005E\\'N\\211x\\031\\302\\031\\332\\301\"\n" +
+                    "  chain_code: \"R\\222\\341\\341.\\352\\306O\\340+\\276\\266#K\\211\\022\\264\\203\\225\\240\\246\\263\\023l\\327\\356 \\350\\342\\242]F\"\n" +
                     "  path: 2147483692\n" +
                     "  path: 2147483649\n" +
-                    "  path: 2147483648\n" +
                     "  path: 2147483648\n" +
                     "  path: 1\n" +
                     "  path: 12\n" +
                     "}";
 
     private final static String DETERMINISTIC_WALLET_SERIALIZATION_TXT_MASTER_KEY =
-            "type: DETERMINISTIC_KEY\n" +
-            "secret_bytes: \"\\270E0\\202(\\362b\\023\\276\\264\\347\\226E2\\360\\221\\347\\325\\233L\\203\\3276\\272\\213\\2436&\\304\\373\\221\\025\"\n" +
-            "public_key: \"\\002\\342$\\253\\332\\031\\352\\324q\\316M\\251}\\274\\267\\370X$\\366>Q\\316\\005\\330\\376\\353f!WHLL\\a\"\n" +
-            "deterministic_key {\n" +
-            "  chain_code: \"XL\\240FW\\203\\316\\230\\334\\374J\\003\\357=\\215\\001\\206\\365\\207Z\\006m\\334X`\\236,;_\\304\\000^\"\n" +
-            "}\n" +
-            "\n" +
             "type: DETERMINISTIC_KEY\n" +
             "secret_bytes: \"\\354B\\331\\275;\\000\\254?\\3428\\006\\220G\\365\\243\\333s\\260s\\213R\\313\\307\\377f\\331B\\351\\327=\\001\\333\"\n" +
             "public_key: \"\\002\\357\\\\\\252\\376]\\023\\315\\'\\316`\\317\\362\\032@\\232\\\"\\360\\331\\335\\221] `\\016,\\351<\\b\\300\\225\\032m\"\n" +

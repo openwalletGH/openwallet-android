@@ -17,7 +17,7 @@
 /*
  * Authors: Jim Burton, Miron Cuperman, Andreas Schildbach
  */
- 
+
 /* Notes:
  * - Endianness: All byte arrays that represent numbers (such as hashes and private keys) are Big Endian
  * - To regenerate after editing, run: mvn generate-sources -DupdateProtobuf
@@ -118,14 +118,6 @@ message Key {
   optional DeterministicKey deterministic_key = 6;
 }
 
-message Script {
-  required bytes program = 1;
-
-  // Timestamp stored as millis since epoch. Useful for skipping block bodies before this point
-  // when watching for scripts on the blockchain.
-  required int64 creation_timestamp = 2;
-}
-
 message TransactionInput {
   // Hash of the transaction this input is using.
   required bytes transaction_out_point_hash = 1;
@@ -159,8 +151,7 @@ message TransactionConfidence {
     UNKNOWN = 0;
     BUILDING = 1; // In best chain.  If and only if appeared_at_height is present.
     PENDING = 2; // Unconfirmed and sitting in the networks memory pools, waiting to be included in the chain.
-    NOT_IN_BEST_CHAIN = 3; // Deprecated: equivalent to PENDING.
-    DEAD = 4; // Either if overriding_transaction is present or transaction is dead coinbase
+    DEAD = 3; // Either if overriding_transaction is present or transaction is dead coinbase
   }
 
   // This is optional in case we add confidence types to prevent parse errors - backwards compatible.
@@ -189,10 +180,7 @@ message TransactionConfidence {
     SOURCE_UNKNOWN = 0;  // We don't know where it came from, or this is a wallet from the future.
     SOURCE_NETWORK = 1;  // We received it from a network broadcast. This is the normal way to get payments.
     SOURCE_SELF = 2;     // We made it ourselves, so we know it should be valid.
-    // In future:
-    // - direct from trusted counterparty, eg via bluetooth/wifi direct
-    // - direct from untrusted counterparty
-    // - from a wallet that uses trusted computing/secure hardware that won't create double spends
+    SOURCE_TRUSTED = 3;  // We received it from a trusted source.
   }
   optional Source source = 7;
 }
@@ -202,13 +190,13 @@ message TransactionConfidence {
 message Transaction {
   /**
    * This is a bitfield oriented enum, with the following bits:
-   * 
+   *
    * bit 0 - spent
    * bit 1 - appears in alt chain
    * bit 2 - appears in best chain
    * bit 3 - double-spent
    * bit 4 - pending (we would like the tx to go into the best chain)
-   * 
+   *
    * Not all combinations are interesting, just the ones actually used in the enum.
    */
   enum Pool {
@@ -239,10 +227,10 @@ message Transaction {
   // A list of blocks in which the transaction has been observed (on any chain). Also, a number used to disambiguate
   // ordering within a block.
   repeated bytes block_hash = 8;
-  repeated int32 block_relativity_offsets = 11;
+  repeated int32 block_relativity_offsets = 9;
 
   // Data describing where the transaction is in the chain.
-  optional TransactionConfidence confidence = 9;
+  optional TransactionConfidence confidence = 10;
 
   // For what purpose the transaction was created.
   enum Purpose {
@@ -254,9 +242,34 @@ message Transaction {
     KEY_ROTATION = 2;
     // In future: de/refragmentation, privacy boosting/mixing, child-pays-for-parent fees, etc.
   }
-  optional Purpose purpose = 10 [default = UNKNOWN];
+  optional Purpose purpose = 11 [default = UNKNOWN];
 
   // Next tag: 12
+}
+
+message AddressStatus {
+    required string address = 1; // The address that the wallet watches
+    required string status = 2; // The address status
+}
+
+/** A wallet pocket*/
+message WalletPocket {
+    required string network_identifier = 1; // the network used by this wallet
+
+    // A UTF8 encoded text description of the wallet that is intended for end user provided text.
+    optional string description = 2;
+
+    repeated Key key = 3;
+
+    // The SHA256 hash of the head of the best chain seen by this wallet.
+    optional bytes last_seen_block_hash = 4;
+    // The height in the chain of the last seen block.
+    optional uint32 last_seen_block_height = 5;
+    optional int64 last_seen_block_time_secs = 6;
+
+    repeated Transaction transaction = 7;
+
+    repeated AddressStatus address_status = 8;
 }
 
 /** The parameters used in the scrypt key derivation function.
@@ -266,30 +279,10 @@ message Transaction {
  *  http://stackoverflow.com/questions/11126315/what-are-optimal-scrypt-work-factors
  */
 message ScryptParameters {
-  required bytes salt = 1;                        // Salt to use in generation of the wallet password (8 bytes)
-  optional int64 n = 2 [default = 16384];         // CPU/ memory cost parameter
-  optional int32 r = 3 [default = 8];             // Block size parameter
-  optional int32 p = 4 [default = 1];             // Parallelisation parameter
-}
-
-/** An extension to the wallet */
-message Extension {
-  required string id = 1;   // like org.whatever.foo.bar
-  required bytes data = 2;
-  // If we do not understand a mandatory extension, abort to prevent data loss.
-  // For example, this could be applied to a new type of holding, such as a contract, where
-  // dropping of an extension in a read/write cycle could cause loss of value.
-  required bool mandatory = 3;
-}
-
-/**
- * A simple key->value mapping that has no interpreted content at all. A bit like the extensions mechanism except
- * an extension is keyed by the ID of a piece of code that's loaded with the given data, and has the concept of
- * being mandatory if that code isn't found. Whereas this is just a blind key/value store.
- */
-message Tag {
-    required string tag = 1;
-    required bytes data = 2;
+    required bytes salt = 1;                        // Salt to use in generation of the wallet password (8 bytes)
+    optional int64 n = 2 [default = 16384];         // CPU/ memory cost parameter
+    optional int32 r = 3 [default = 8];             // Block size parameter
+    optional int32 p = 4 [default = 1];             // Parallelisation parameter
 }
 
 /** A bitcoin wallet */
@@ -304,45 +297,17 @@ message Wallet {
   enum EncryptionType {
     UNENCRYPTED = 1;                 // All keys in the wallet are unencrypted
     ENCRYPTED_SCRYPT_AES = 2;        // All keys are encrypted with a passphrase based KDF of scrypt and AES encryption
+    ENCRYPTED_AES = 3;               // All keys are encrypted with AES encryption
   }
-
-  required string network_identifier = 1; // the network used by this wallet
-  // org.bitcoin.production = production network (Satoshi genesis block)
-  // org.bitcoin.test = test network (Andresen genesis block)
-
-  // The SHA256 hash of the head of the best chain seen by this wallet.
-  optional bytes last_seen_block_hash = 2;
-  // The height in the chain of the last seen block.
-  optional uint32 last_seen_block_height = 12;
-  optional int64 last_seen_block_time_secs = 14;
-
-  repeated Key key = 3;
-  repeated Transaction transaction = 4;
-  repeated Script watched_script = 15;
-
-  optional EncryptionType encryption_type = 5 [default=UNENCRYPTED];
-  optional ScryptParameters encryption_parameters = 6;
 
   // The version number of the wallet - used to detect wallets that were produced in the future
   // (i.e the wallet may contain some future format this protobuf/ code does not know about)
-  optional int32 version = 7 [default = 1];
+  optional int32 version = 1 [default = 1];
 
-  // deprecated - do not recycle this numeric identifier
-  // optional int32 minor_version = 8;
+  required Key master_key = 2;
 
-  repeated Extension extension = 10;
+  optional EncryptionType encryption_type = 3 [default=UNENCRYPTED];
+  optional ScryptParameters encryption_parameters = 4;
 
-  // A UTF8 encoded text description of the wallet that is intended for end user provided text.
-  optional string description = 11;
-
-  // (The field number 12 is used by last_seen_block_height)
-
-  // UNIX time in seconds since the epoch. If set, then any keys created before this date are assumed to be no longer
-  // wanted. Money sent to them will be re-spent automatically to the first key that was created after this time. It
-  // can be used to recover a compromised wallet, or just as part of preventative defence-in-depth measures.
-  optional uint64 key_rotation_time = 13;
-
-  repeated Tag tags = 16;
-
-  // Next tag: 17
+  repeated WalletPocket pockets = 5;
 }

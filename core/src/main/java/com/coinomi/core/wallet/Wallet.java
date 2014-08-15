@@ -46,7 +46,7 @@ final public class Wallet implements ConnectionEventListener {
     private int lastBlockSeenHeight;
 
 
-    private int account = 0;
+    private final static int ACCOUNT_ZERO = 0;
 
     @Nullable transient ServerClient serverClient;
 
@@ -84,7 +84,7 @@ final public class Wallet implements ConnectionEventListener {
     }
 
 //    private List<ChildNumber> getPath(CoinType coinType, int chain, int keyIndex) {
-//        String path = String.format(BIP_44_KEY_PATH, coinType.getBip44Index(), account, chain, keyIndex);
+//        String path = String.format(BIP_44_KEY_PATH, coinType.getBip44Index(), ACCOUNT_ZERO, chain, keyIndex);
 //        return HDUtils.parsePath(path);
 //    }
 
@@ -139,8 +139,8 @@ final public class Wallet implements ConnectionEventListener {
 
     private void createPocket(CoinType coinType) {
         DeterministicHierarchy hierarchy = new DeterministicHierarchy(masterKey);
-        DeterministicKey rootKey = hierarchy.get(BitcoinMain.get().getBip44Path(account), false, true);
-        pockets.put(coinType, new WalletPocket(new HDKeyChain(rootKey), coinType));
+        DeterministicKey rootKey = hierarchy.get(BitcoinMain.get().getBip44Path(ACCOUNT_ZERO), false, true);
+        pockets.put(coinType, new WalletPocket(rootKey, coinType));
     }
 
     List<CoinType> getCoinTypes() {

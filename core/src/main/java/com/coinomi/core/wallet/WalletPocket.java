@@ -1,3 +1,21 @@
+/**
+ * Copyright 2013 Google Inc.
+ * Copyright 2014 Andreas Schildbach
+ * Copyright 2014 Giannis Dzegoutanis
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.coinomi.core.wallet;
 
 import com.coinomi.core.coins.CoinType;
@@ -5,36 +23,48 @@ import com.coinomi.core.network.AddressStatus;
 import com.coinomi.core.network.ServerClient;
 import com.coinomi.core.network.interfaces.ConnectionEventListener;
 import com.coinomi.core.network.interfaces.TransactionEventListener;
+import com.coinomi.core.protos.Protos;
 import com.google.bitcoin.core.Address;
 import com.google.bitcoin.core.Coin;
 import com.google.bitcoin.core.ECKey;
 import com.google.bitcoin.core.InsufficientMoneyException;
 import com.google.bitcoin.core.NetworkParameters;
 import com.google.bitcoin.core.ScriptException;
+import com.google.bitcoin.core.Sha256Hash;
 import com.google.bitcoin.core.Transaction;
 import com.google.bitcoin.core.TransactionConfidence;
 import com.google.bitcoin.core.TransactionInput;
 import com.google.bitcoin.core.TransactionOutput;
 import com.google.bitcoin.core.Utils;
 import com.google.bitcoin.core.VarInt;
+import com.google.bitcoin.crypto.DeterministicKey;
 import com.google.bitcoin.script.Script;
 import com.google.bitcoin.utils.ListenerRegistration;
 import com.google.bitcoin.utils.Threading;
 import com.google.bitcoin.wallet.CoinSelection;
 import com.google.bitcoin.wallet.CoinSelector;
 import com.google.bitcoin.wallet.DefaultCoinSelector;
+import com.google.bitcoin.wallet.WalletTransaction;
+import com.google.bitcoin.wallet.WalletTransaction.Pool;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.collect.Lists.newLinkedList;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executor;
 import java.util.concurrent.locks.ReentrantLock;
@@ -55,25 +85,223 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
     private final ReentrantLock lock = Threading.lock("WalletPocket");
 
     private final CoinType coinType;
-    private final HashMap<Address, String> addressStatus;
 
+    private String description;
+
+    @Nullable private Sha256Hash lastBlockSeenHash;
+    private int lastBlockSeenHeight;
+    private long lastBlockSeenTimeSecs;
+
+    // Holds the status of every address we are watching. When connecting to the server, if we get a
+    // different status for a particular address this means that there are new transactions for that
+    // address and we have to fetch them.
+    @VisibleForTesting final HashMap<Address, String> addressStatus;
+
+
+    // The various pools below give quick access to wallet-relevant transactions by the state they're in:
+    //
+    // Pending:  Transactions that didn't make it into the best chain yet. Pending transactions can be killed if a
+    //           double-spend against them appears in the best chain, in which case they move to the dead pool.
+    //           If a double-spend appears in the pending state as well, currently we just ignore the second
+    //           and wait for the miners to resolve the race.
+    // Unspent:  Transactions that appeared in the best chain and have outputs we can spend. Note that we store the
+    //           entire transaction in memory even though for spending purposes we only really need the outputs, the
+    //           reason being that this simplifies handling of re-orgs. It would be worth fixing this in future.
+    // Spent:    Transactions that appeared in the best chain but don't have any spendable outputs. They're stored here
+    //           for history browsing/auditing reasons only and in future will probably be flushed out to some other
+    //           kind of cold storage or just removed.
+    // Dead:     Transactions that we believe will never confirm get moved here, out of pending. Note that the Satoshi
+    //           client has no notion of dead-ness: the assumption is that double spends won't happen so there's no
+    //           need to notify the user about them. We take a more pessimistic approach and try to track the fact that
+    //           transactions have been double spent so applications can do something intelligent (cancel orders, show
+    //           to the user in the UI, etc). A transaction can leave dead and move into spent/unspent if there is a
+    //           re-org to a chain that doesn't include the double spend.
+
+    @VisibleForTesting final Map<Sha256Hash, Transaction> pending;
+    @VisibleForTesting final Map<Sha256Hash, Transaction> unspent;
+    @VisibleForTesting final Map<Sha256Hash, Transaction> spent;
+    @VisibleForTesting final Map<Sha256Hash, Transaction> dead;
+
+    // All transactions together.
+    protected final Map<Sha256Hash, Transaction> transactions;
+
+    @Deprecated
     private final HashMap<String, Transaction> unspentTransactions;
 //    private final ArrayList<ServerClient.Transaction> unspentTransactions;
-    private final HDKeyChain keys;
+    @VisibleForTesting final SimpleHDKeyChain keys;
 
-    @Nullable private ServerClient serverClient;
+    @Nullable private transient ServerClient serverClient;
 
     protected transient CoinSelector coinSelector = new DefaultCoinSelector();
 
-    private final CopyOnWriteArrayList<ListenerRegistration<WalletPocketEventListener>> listeners;
+    private final transient CopyOnWriteArrayList<ListenerRegistration<WalletPocketEventListener>> listeners;
 
-    public WalletPocket(HDKeyChain keys, CoinType coinType) {
+    public WalletPocket(DeterministicKey rootKey, CoinType coinType) {
+        this(new SimpleHDKeyChain(rootKey), coinType);
+    }
+
+    WalletPocket(SimpleHDKeyChain keys, CoinType coinType) {
         this.keys = checkNotNull(keys);
         this.coinType = checkNotNull(coinType);
         addressStatus = new HashMap<Address, String>();
+        unspent = new HashMap<Sha256Hash, Transaction>();
+        spent = new HashMap<Sha256Hash, Transaction>();
+        pending = new HashMap<Sha256Hash, Transaction>();
+        dead = new HashMap<Sha256Hash, Transaction>();
+        transactions = new HashMap<Sha256Hash, Transaction>();
         unspentTransactions = new HashMap<String, Transaction>();
         listeners = new CopyOnWriteArrayList<ListenerRegistration<WalletPocketEventListener>>();
 //        unspentTransactions = new ArrayList<ServerClient.Transaction>();
+    }
+
+
+    /******************************************************************************************************************/
+
+    //region Vending transactions and other internal state
+
+    /**
+     * Returns a set of all transactions in the wallet.
+     * @param includeDead     If true, transactions that were overridden by a double spend are included.
+     */
+    public Set<Transaction> getTransactions(boolean includeDead) {
+        lock.lock();
+        try {
+            Set<Transaction> all = new HashSet<Transaction>();
+            all.addAll(unspent.values());
+            all.addAll(spent.values());
+            all.addAll(pending.values());
+            if (includeDead)
+                all.addAll(dead.values());
+            return all;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Returns a set of all WalletTransactions in the wallet.
+     */
+    public Iterable<WalletTransaction> getWalletTransactions() {
+        lock.lock();
+        try {
+            Set<WalletTransaction> all = new HashSet<WalletTransaction>();
+            addWalletTransactionsToSet(all, Pool.UNSPENT, unspent.values());
+            addWalletTransactionsToSet(all, Pool.SPENT, spent.values());
+            addWalletTransactionsToSet(all, Pool.DEAD, dead.values());
+            addWalletTransactionsToSet(all, Pool.PENDING, pending.values());
+            return all;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    private static void addWalletTransactionsToSet(Set<WalletTransaction> txs,
+                                                   Pool poolType, Collection<Transaction> pool) {
+        for (Transaction tx : pool) {
+            txs.add(new WalletTransaction(poolType, tx));
+        }
+    }
+
+    public CoinType getCoinType() {
+        return coinType;
+    }
+
+    /** Returns the hash of the last seen best-chain block, or null if the wallet is too old to store this data. */
+    @Nullable
+    public Sha256Hash getLastBlockSeenHash() {
+        lock.lock();
+        try {
+            return lastBlockSeenHash;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public void setLastBlockSeenHash(@Nullable Sha256Hash lastBlockSeenHash) {
+        lock.lock();
+        try {
+            this.lastBlockSeenHash = lastBlockSeenHash;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public void setLastBlockSeenHeight(int lastBlockSeenHeight) {
+        lock.lock();
+        try {
+            this.lastBlockSeenHeight = lastBlockSeenHeight;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public void setLastBlockSeenTimeSecs(long timeSecs) {
+        lock.lock();
+        try {
+            lastBlockSeenTimeSecs = timeSecs;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Returns the UNIX time in seconds since the epoch extracted from the last best seen block header. This timestamp
+     * is <b>not</b> the local time at which the block was first observed by this application but rather what the block
+     * (i.e. miner) self declares. It is allowed to have some significant drift from the real time at which the block
+     * was found, although most miners do use accurate times. If this wallet is old and does not have a recorded
+     * time then this method returns zero.
+     */
+    public long getLastBlockSeenTimeSecs() {
+        lock.lock();
+        try {
+            return lastBlockSeenTimeSecs;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Returns a {@link Date} representing the time extracted from the last best seen block header. This timestamp
+     * is <b>not</b> the local time at which the block was first observed by this application but rather what the block
+     * (i.e. miner) self declares. It is allowed to have some significant drift from the real time at which the block
+     * was found, although most miners do use accurate times. If this wallet is old and does not have a recorded
+     * time then this method returns null.
+     */
+    @Nullable
+    public Date getLastBlockSeenTime() {
+        final long secs = getLastBlockSeenTimeSecs();
+        if (secs == 0)
+            return null;
+        else
+            return new Date(secs * 1000);
+    }
+
+    /**
+     * Returns the height of the last seen best-chain block. Can be 0 if a wallet is brand new or -1 if the wallet
+     * is old and doesn't have that data.
+     */
+    public int getLastBlockSeenHeight() {
+        lock.lock();
+        try {
+            return lastBlockSeenHeight;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Set the description of the wallet.
+     * This is a Unicode encoding string typically entered by the user as descriptive text for the wallet.
+     */
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    /**
+     * Get the description of the wallet. See {@link WalletPocket#setDescription(String))}
+     */
+    public String getDescription() {
+        return description;
     }
 
     public Coin getBalance() {
@@ -93,6 +321,25 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
             lock.unlock();
         }
     }
+
+
+    public List<AddressStatus> getAddressStatus() {
+        lock.lock();
+        try {
+            ArrayList<AddressStatus> statuses = new ArrayList<AddressStatus>(addressStatus.size());
+            for (Map.Entry<Address, String> status : addressStatus.entrySet()) {
+                statuses.add(new AddressStatus(status.getKey(), status.getValue()));
+            }
+            return statuses;
+        }
+        finally {
+            lock.unlock();
+        }
+    }
+
+    //endregion
+
+    /******************************************************************************************************************/
 
     private void updateAddressStatus(AddressStatus newStatus) {
         lock.lock();
@@ -118,7 +365,7 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
         }
     }
 
-    List<Address> getWatchingAddresses() {
+    @VisibleForTesting List<Address> getWatchingAddresses() {
         ImmutableList.Builder<Address> addresses = ImmutableList.builder();
         for (ECKey key : keys.getLeafKeys()) {
             addresses.add(key.toAddress(coinType));
@@ -249,6 +496,30 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
                     registration.listener.onNewBalance(newBalance);
                 }
             });
+        }
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Serialization support
+    //
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    List<Protos.Key> serializeKeychainToProtobuf() {
+        lock.lock();
+        try {
+            return keys.toProtobuf();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @VisibleForTesting Protos.WalletPocket toProtobuf() {
+        lock.lock();
+        try {
+            return WalletPocketSerializer.toProtobuf(this);
+        } finally {
+            lock.unlock();
         }
     }
 
@@ -664,10 +935,10 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
 
     /** Returns the address used for change outputs. Note: this will probably go away in future. */
     public Address getChangeAddress() {
-        return currentAddress(HDKeyChain.KeyPurpose.CHANGE);
+        return currentAddress(SimpleHDKeyChain.KeyPurpose.CHANGE);
     }
 
-    public Address currentAddress(HDKeyChain.KeyPurpose purpose) {
+    public Address currentAddress(SimpleHDKeyChain.KeyPurpose purpose) {
         lock.lock();
         try {
             // TODO make return an unused address
