@@ -11,8 +11,6 @@ public class Constants {
     // TODO implement mnemonic generation activity and use Wallet.generateMnemonic()
     public static final List<String> TEST_MNEMONIC = ImmutableList.of("citizen", "fever", "scale", "nurse", "brief", "round", "ski", "fiction", "car", "fitness", "pluck", "act");
 
-    public static final int LOOKAHEAD = 20;
-
     public static final String ID_BITCOIN_MAIN = "bitcoin.main";
     public static final String ID_BITCOIN_TEST = "bitcoin.test";
     public static final String ID_LITECOIN_MAIN = "litecoin.main";

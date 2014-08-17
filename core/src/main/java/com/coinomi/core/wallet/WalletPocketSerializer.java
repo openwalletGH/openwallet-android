@@ -19,7 +19,6 @@ package com.coinomi.core.wallet;
 
 import com.coinomi.core.network.AddressStatus;
 import com.coinomi.core.protos.Protos;
-import com.coinomi.core.wallet.WalletPocket;
 import com.google.bitcoin.core.PeerAddress;
 import com.google.bitcoin.core.Sha256Hash;
 import com.google.bitcoin.core.Transaction;
@@ -29,11 +28,8 @@ import com.google.bitcoin.core.TransactionOutput;
 import com.google.bitcoin.wallet.WalletTransaction;
 import com.google.protobuf.ByteString;
 
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Giannis Dzegoutanis
@@ -48,10 +44,10 @@ public class WalletPocketSerializer {
             walletBuilder.setDescription(pocket.getDescription());
         }
 
-        for (AddressStatus status : pocket.getAddressStatus()) {
+        for (AddressStatus status : pocket.getAddressesStatus()) {
             Protos.AddressStatus.Builder addressStatus = Protos.AddressStatus.newBuilder();
             addressStatus.setAddress(status.getAddress().toString());
-            addressStatus.setStatus(status.getStatus());
+            addressStatus.setStatus(status.getStatus()); // TODO check null values
 
             walletBuilder.addAddressStatus(addressStatus.build());
         }

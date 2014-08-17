@@ -241,7 +241,7 @@ public class StratumClient extends AbstractExecutionThreadService {
         try {
             toServer.writeBytes(message.toString());
             callers.put(message.getId(), future);
-        } catch (IOException e) {
+        } catch (Exception e) {
             future.setException(e);
         }
 

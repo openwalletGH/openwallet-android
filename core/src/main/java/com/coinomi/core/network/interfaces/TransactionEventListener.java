@@ -13,5 +13,5 @@ public interface TransactionEventListener {
     void onUnspentTransactionUpdate(AddressStatus status,
                                     List<ServerClient.UnspentTx> unspentTxes);
 
-    void onTransactionUpdate(ServerClient.UnspentTx tx, byte[] rawTx);
+    void onTransactionUpdate(AddressStatus status, ServerClient.UnspentTx tx, byte[] rawTx);
 }

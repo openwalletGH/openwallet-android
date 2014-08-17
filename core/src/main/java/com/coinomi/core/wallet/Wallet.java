@@ -2,7 +2,7 @@ package com.coinomi.core.wallet;
 
 import com.coinomi.core.coins.BitcoinMain;
 import com.coinomi.core.coins.CoinType;
-import com.coinomi.core.network.ServerClient;
+import com.coinomi.core.network.BlockchainConnection;
 import com.coinomi.core.network.interfaces.ConnectionEventListener;
 import com.google.bitcoin.core.Address;
 import com.google.bitcoin.core.Coin;
@@ -48,7 +48,7 @@ final public class Wallet implements ConnectionEventListener {
 
     private final static int ACCOUNT_ZERO = 0;
 
-    @Nullable transient ServerClient serverClient;
+    @Nullable transient BlockchainConnection blockchainConnection;
 
     public Wallet(List<String> mnemonic) throws IOException, MnemonicException {
         this(mnemonic, "");
@@ -139,7 +139,7 @@ final public class Wallet implements ConnectionEventListener {
 
     private void createPocket(CoinType coinType) {
         DeterministicHierarchy hierarchy = new DeterministicHierarchy(masterKey);
-        DeterministicKey rootKey = hierarchy.get(BitcoinMain.get().getBip44Path(ACCOUNT_ZERO), false, true);
+        DeterministicKey rootKey = hierarchy.get(coinType.getBip44Path(ACCOUNT_ZERO), false, true);
         pockets.put(coinType, new WalletPocket(rootKey, coinType));
     }
 
@@ -168,19 +168,19 @@ final public class Wallet implements ConnectionEventListener {
     }
 
     @Override
-    public void onConnection(ServerClient serverClient) {
-        this.serverClient = serverClient;
+    public void onConnection(BlockchainConnection blockchainConnection) {
+        this.blockchainConnection = blockchainConnection;
         for (CoinType coin : getCoinTypes()) {
             WalletPocket pocket = getPocket(coin);
-            if (serverClient != null) {
-                pocket.onConnection(serverClient);
+            if (blockchainConnection != null) {
+                pocket.onConnection(blockchainConnection);
             }
         }
     }
 
     @Override
     public void onDisconnect() {
-        this.serverClient = null;
+        this.blockchainConnection = null;
     }
 
 

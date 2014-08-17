@@ -10,6 +10,7 @@ import com.coinomi.stratumj.messages.CallMessage;
 import com.coinomi.stratumj.messages.ResultMessage;
 import com.google.bitcoin.core.Address;
 import com.google.bitcoin.core.AddressFormatException;
+import com.google.bitcoin.core.Sha256Hash;
 import com.google.bitcoin.core.Utils;
 import com.google.bitcoin.utils.ListenerRegistration;
 import com.google.bitcoin.utils.Threading;
@@ -41,7 +42,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * @author Giannis Dzegoutanis
  */
-public class ServerClient {
+public class ServerClient implements BlockchainConnection {
     private static final Logger log = LoggerFactory.getLogger(ServerClient.class);
 
     private HashBiMap<CoinType, StratumClient> connections;
@@ -165,6 +166,7 @@ public class ServerClient {
     }
 
 
+    @Override
     public void subscribeToAddresses(final CoinType coin, List<Address> addresses,
                                      final TransactionEventListener listener) {
 
@@ -178,7 +180,13 @@ public class ServerClient {
             public void handle(CallMessage message) {
                 try {
                     Address address = new Address(coin, message.getParams().getString(0));
-                    AddressStatus status = new AddressStatus(address, message.getParams().getString(1));
+                    AddressStatus status;
+                    if (message.getParams().isNull(1)) {
+                        status = new AddressStatus(address, null);
+                    }
+                    else {
+                        status = new AddressStatus(address, message.getParams().getString(1));
+                    }
                     listener.onAddressStatusUpdate(status);
                 } catch (AddressFormatException e) {
                     log.error("Address subscribe sent a malformed address", e);
@@ -189,31 +197,38 @@ public class ServerClient {
         };
 
         for (final Address address : addresses) {
+            log.info("Going to subscribe to {}", address);
             callMessage.setParam(address.toString());
 
-                ListenableFuture<ResultMessage> reply = client.subscribe(callMessage, addressHandler);
+            ListenableFuture<ResultMessage> reply = client.subscribe(callMessage, addressHandler);
 
-                Futures.addCallback(reply, new FutureCallback<ResultMessage>() {
+            Futures.addCallback(reply, new FutureCallback<ResultMessage>() {
 
-                    @Override
-                    public void onSuccess(ResultMessage result) {
-                        AddressStatus status = null;
-                        try {
-                            status = new AddressStatus(address, result.getResult().getString(0));
-                            listener.onAddressStatusUpdate(status);
-                        } catch (JSONException e) {
-                            log.error("Unexpected JSON format", e);
+                @Override
+                public void onSuccess(ResultMessage result) {
+                    AddressStatus status = null;
+                    try {
+                        if (result.getResult().isNull(0)) {
+                            status = new AddressStatus(address, null);
                         }
+                        else {
+                            status = new AddressStatus(address, result.getResult().getString(0));
+                        }
+                        listener.onAddressStatusUpdate(status);
+                    } catch (JSONException e) {
+                        log.error("Unexpected JSON format", e);
                     }
+                }
 
-                    @Override
-                    public void onFailure(Throwable t) {
-                        log.error("Could not get reply for address subscribe", t);
-                    }
-                }, Threading.USER_THREAD);
+                @Override
+                public void onFailure(Throwable t) {
+                    log.error("Could not get reply for address subscribe", t);
+                }
+            }, Threading.USER_THREAD);
         }
     }
 
+    @Override
     public void getUnspentTx(final CoinType coinType, final AddressStatus status,
                              final TransactionEventListener listener) {
 
@@ -247,12 +262,13 @@ public class ServerClient {
         }, Threading.USER_THREAD);
     }
 
-    public void getTx(CoinType coinType, final UnspentTx utx, final TransactionEventListener listener) {
+    @Override
+    public void getTx(CoinType coinType, final AddressStatus status, final UnspentTx utx, final TransactionEventListener listener) {
 // {"params": ["a52418acead4fbc25252cba18f26de88166ef065e7237200253d27ef7ca53505"], "id": 27, "method": "blockchain.transaction.get"}
 
         StratumClient client = checkNotNull(connections.get(coinType));
 
-        CallMessage message = new CallMessage("blockchain.transaction.get", Arrays.asList(utx.getTxHash()));
+        CallMessage message = new CallMessage("blockchain.transaction.get", Arrays.asList(utx.getTxHash().toString()));
         final ListenableFuture<ResultMessage> result = client.call(message);
 
         Futures.addCallback(result, new FutureCallback<ResultMessage>() {
@@ -261,7 +277,7 @@ public class ServerClient {
             public void onSuccess(ResultMessage result) {
                 try {
                     String rawTx = result.getResult().getString(0);
-                    listener.onTransactionUpdate(utx, Utils.HEX.decode(rawTx));
+                    listener.onTransactionUpdate(status, utx, Utils.HEX.decode(rawTx));
                 } catch (JSONException e) {
                     onFailure(e);
                     return;
@@ -275,6 +291,7 @@ public class ServerClient {
         }, Threading.USER_THREAD);
     }
 
+    @Override
     public void ping() {
         for (final CoinType type : connections.keySet()) {
             CallMessage pingMsg = new CallMessage("server.version", ImmutableList.of());
@@ -297,19 +314,27 @@ public class ServerClient {
     }
 
     public static class UnspentTx {
-        private String txHash;
+        private Sha256Hash txHash;
         private int txPos;
         private long value;
         private int height;
 
         public UnspentTx(JSONObject json) throws JSONException {
-            txHash = json.getString("tx_hash");
+            txHash = new Sha256Hash(json.getString("tx_hash"));
             txPos = json.getInt("tx_pos");
             value = json.getLong("value");
             height = json.getInt("height");
         }
 
-        public String getTxHash() {
+        public static List<UnspentTx> fromArray(JSONArray jsonArray) throws JSONException {
+            ImmutableList.Builder<UnspentTx> list = ImmutableList.builder();
+            for (int i = 0; i < jsonArray.length(); i++) {
+                list.add(new UnspentTx(jsonArray.getJSONObject(i)));
+            }
+            return list.build();
+        }
+
+        public Sha256Hash getTxHash() {
             return txHash;
         }
 
@@ -325,6 +350,28 @@ public class ServerClient {
             return height;
         }
 
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
 
+            UnspentTx unspentTx = (UnspentTx) o;
+
+            if (height != unspentTx.height) return false;
+            if (txPos != unspentTx.txPos) return false;
+            if (value != unspentTx.value) return false;
+            if (!txHash.equals(unspentTx.txHash)) return false;
+
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = txHash.hashCode();
+            result = 31 * result + txPos;
+            result = 31 * result + (int) (value ^ (value >>> 32));
+            result = 31 * result + height;
+            return result;
+        }
     }
 }

@@ -15,6 +15,7 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.text.format.DateUtils;
 
+import com.coinomi.core.network.BlockchainConnection;
 import com.coinomi.core.network.interfaces.ConnectionEventListener;
 import com.coinomi.wallet.Configuration;
 import com.coinomi.wallet.Constants;
@@ -325,7 +326,7 @@ public class CoinServiceImpl extends Service implements CoinService {
                 client = new ServerClient(Constants.COINS_ADDRESSES_TEST);
                 client.addEventListener(new ConnectionEventListener() {
                     @Override
-                    public void onConnection(ServerClient ignored) { }
+                    public void onConnection(BlockchainConnection ignored) { }
 
                     @Override
                     public void onDisconnect() {

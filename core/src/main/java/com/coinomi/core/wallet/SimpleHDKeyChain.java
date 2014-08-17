@@ -2,6 +2,7 @@ package com.coinomi.core.wallet;
 
 
 import com.coinomi.core.Constants;
+import com.coinomi.core.coins.DogecoinTest;
 import com.coinomi.core.protos.Protos;
 import com.google.bitcoin.core.BloomFilter;
 import com.google.bitcoin.core.ECKey;
@@ -52,6 +53,8 @@ import static com.google.common.collect.Lists.newLinkedList;
 public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
     private static final Logger log = LoggerFactory.getLogger(SimpleHDKeyChain.class);
 
+    public static final int LOOKAHEAD = 20;
+
     private final ReentrantLock lock = Threading.lock("KeyChain");
 
     private DeterministicHierarchy hierarchy;
@@ -70,7 +73,7 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
     // yet. For new chains it's set to whatever the default is, unless overridden by setLookaheadSize. For deserialized
     // chains, it will be calculated on demand from the number of loaded keys.
     private static final int LAZY_CALCULATE_LOOKAHEAD = -1;
-    private int lookaheadSize = Constants.LOOKAHEAD;
+    private int lookaheadSize = LOOKAHEAD;
     // The lookahead threshold causes us to batch up creation of new keys to minimize the frequency of Bloom filter
     // regenerations, which are expensive and will (in future) trigger chain download stalls/retries. One third
     // is an efficiency tradeoff.
