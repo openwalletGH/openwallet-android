@@ -99,7 +99,7 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
 
     @VisibleForTesting final transient ArrayList<Address> addressesSubscribed;
     @VisibleForTesting final transient ArrayList<Address> addressesPendingSubscription;
-    @VisibleForTesting final transient HashMap<String, List<UnspentTx>> statusPendingUpdate;
+    @VisibleForTesting final transient HashMap<AddressStatus, List<UnspentTx>> statusPendingUpdate;
 
     // The various pools below give quick access to wallet-relevant transactions by the state they're in:
     //
@@ -146,8 +146,7 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
         addressesStatus = new HashMap<Address, String>(2 * SimpleHDKeyChain.LOOKAHEAD);
         addressesSubscribed = new ArrayList(2 * SimpleHDKeyChain.LOOKAHEAD);
         addressesPendingSubscription = new ArrayList(2 * SimpleHDKeyChain.LOOKAHEAD);
-//        statusPendingUpdate = new ArrayList(2 * SimpleHDKeyChain.LOOKAHEAD);
-        statusPendingUpdate = new HashMap<String, List<UnspentTx>>(2 * SimpleHDKeyChain.LOOKAHEAD);
+        statusPendingUpdate = new HashMap<AddressStatus, List<UnspentTx>>(2 * SimpleHDKeyChain.LOOKAHEAD);
         unspent = new HashMap<Sha256Hash, Transaction>();
         spent = new HashMap<Sha256Hash, Transaction>();
         pending = new HashMap<Sha256Hash, Transaction>();
@@ -346,8 +345,8 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
      *
      * Returns true if registered successfully or false if status already updating
      */
-    @VisibleForTesting boolean registerStatusForUpdate(String status) {
-        checkNotNull(status);
+    @VisibleForTesting boolean registerStatusForUpdate(AddressStatus status) {
+        checkNotNull(status.getStatus());
 
         lock.lock();
         try {
@@ -364,8 +363,8 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
         }
     }
 
-    @VisibleForTesting boolean registerTransactionsForUpdate(String status, Collection<UnspentTx> txHashes) {
-        checkNotNull(status);
+    @VisibleForTesting boolean registerTransactionsForUpdate(AddressStatus status, Collection<UnspentTx> txHashes) {
+        checkNotNull(status.getStatus());
 
         lock.lock();
         try {
@@ -388,17 +387,15 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
      *
      * Returns true if this status was pending update
      */
-    @VisibleForTesting void clearPendingStatusUpdate(AddressStatus newStatus, UnspentTx txHash) {
+    @VisibleForTesting void clearPendingStatusUpdate(AddressStatus status, UnspentTx txHash) {
         lock.lock();
         try {
-            String status = newStatus.getStatus();
-
             if (statusPendingUpdate.containsKey(status)) {
                 List<UnspentTx> txHashes = statusPendingUpdate.get(status);
                 txHashes.remove(txHash);
                 if (txHashes.size() == 0) {
                     statusPendingUpdate.remove(status);
-                    updateAddressStatus(newStatus);
+                    updateAddressStatus(status);
                 }
             }
         }
@@ -492,7 +489,7 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
 
                 if (isAddressStatusChanged(status)) {
                     // Status changed, time to update
-                    if (registerStatusForUpdate(status.getStatus())) {
+                    if (registerStatusForUpdate(status)) {
                         log.info("Must get UTXOs for address {}, status changes {}", status.getAddress(),
                                 status.getStatus());
 
@@ -504,6 +501,10 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
                         log.info("Status {} already updating", status.getStatus());
                     }
                 }
+            }
+            else {
+                // Address not used, just update the status
+                updateAddressStatus(status);
             }
         }
         finally {
@@ -528,7 +529,7 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
                     }
                 }
                 if (txToGet.size() > 0) {
-                    registerTransactionsForUpdate(status.getStatus(), txToGet);
+                    registerTransactionsForUpdate(status, txToGet);
                     for (UnspentTx tx : txToGet) {
                         log.info("Must get raw transaction {}", tx.getTxHash());
                         if (blockchainConnection != null) {

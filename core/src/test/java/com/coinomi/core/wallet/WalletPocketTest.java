@@ -59,6 +59,29 @@ public class WalletPocketTest {
 
     @Test
     public void fillTransactions() throws AddressFormatException, JSONException {
+        fillDummyTransactions();
+
+        // Issued keys
+        assertEquals(18, pocket.keys.getIssuedExternalKeys());
+        assertEquals(9, pocket.keys.getIssuedInternalKeys());
+
+        // No addresses left to subscribe
+        List<Address> addressesToWatch = pocket.getAddressesToWatch();
+        assertEquals(0, addressesToWatch.size());
+
+        // 18 external issued + 20 lookahead +  9 external issued + 20 lookahead
+        assertEquals(67, pocket.addressesStatus.size());
+        assertEquals(67, pocket.addressesSubscribed.size());
+
+        pocket.getReceiveAddress();
+        assertEquals(19, pocket.keys.getIssuedExternalKeys());
+        assertEquals(68, pocket.addressesStatus.size());
+        assertEquals(68, pocket.addressesSubscribed.size());
+
+        // TODO added more tests to insure it uses the "holes" in the keychain
+    }
+
+    void fillDummyTransactions() throws AddressFormatException, JSONException {
         final HashMap<Address, AddressStatus> statuses = getDummyStatuses();
         final HashMap<Address, List<ServerClient.UnspentTx>> utxs = getDummyUTXs();
         final HashMap<Sha256Hash, byte[]> rawTxs = getDummyRawTXs();
@@ -86,7 +109,7 @@ public class WalletPocketTest {
 
             @Override
             public void getTx(CoinType coinType, AddressStatus status, ServerClient.UnspentTx utx, TransactionEventListener listener) {
-                listener.onTransactionUpdate(utx, rawTxs.get(utx.getTxHash()));
+                listener.onTransactionUpdate(status, utx, rawTxs.get(utx.getTxHash()));
             }
 
             @Override
@@ -94,34 +117,17 @@ public class WalletPocketTest {
 
             }
         });
-
-        // Issued keys
-        assertEquals(18, pocket.keys.getIssuedExternalKeys());
-        assertEquals(9, pocket.keys.getIssuedInternalKeys());
-
-        // No addresses left to subscribe
-        List<Address> addressesToWatch = pocket.getAddressesToWatch();
-        assertEquals(0, addressesToWatch.size());
-
-        // 18 external issued + 20 lookahead +  9 external issued + 20 lookahead
-        assertEquals(67, pocket.addressesStatus.size());
-        assertEquals(67, pocket.addressesSubscribed.size());
-
-        pocket.getReceiveAddress();
-        assertEquals(19, pocket.keys.getIssuedExternalKeys());
-        assertEquals(68, pocket.addressesStatus.size());
-        assertEquals(68, pocket.addressesSubscribed.size());
-
-        // TODO added more tests to insure it uses the "holes" in the keychain
     }
 
 
     @Test
-    public void serializeUnencryptedNormal() throws UnreadableWalletException {
+    public void serializeUnencryptedNormal() throws Exception {
         serializeUnencrypted("");
     }
 
-    public void serializeUnencrypted(String expectedSerialization) throws UnreadableWalletException {
+    public void serializeUnencrypted(String expectedSerialization) throws Exception {
+        fillDummyTransactions();
+
         Protos.WalletPocket walletPocketProto = pocket.toProtobuf();
 
         assertEquals(expectedSerialization, walletPocketProto.toString());
