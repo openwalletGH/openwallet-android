@@ -20,8 +20,7 @@ package com.coinomi.core.wallet;
 
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.network.AddressStatus;
-import com.coinomi.core.network.BlockchainConnection;
-import com.coinomi.core.network.ServerClient;
+import com.coinomi.core.network.interfaces.BlockchainConnection;
 import com.coinomi.core.network.ServerClient.UnspentTx;
 import com.coinomi.core.network.interfaces.ConnectionEventListener;
 import com.coinomi.core.network.interfaces.TransactionEventListener;

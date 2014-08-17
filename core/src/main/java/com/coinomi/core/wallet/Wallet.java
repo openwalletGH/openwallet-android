@@ -1,8 +1,7 @@
 package com.coinomi.core.wallet;
 
-import com.coinomi.core.coins.BitcoinMain;
 import com.coinomi.core.coins.CoinType;
-import com.coinomi.core.network.BlockchainConnection;
+import com.coinomi.core.network.interfaces.BlockchainConnection;
 import com.coinomi.core.network.interfaces.ConnectionEventListener;
 import com.google.bitcoin.core.Address;
 import com.google.bitcoin.core.Coin;

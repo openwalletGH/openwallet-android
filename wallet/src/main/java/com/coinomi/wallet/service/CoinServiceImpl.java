@@ -15,7 +15,7 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.text.format.DateUtils;
 
-import com.coinomi.core.network.BlockchainConnection;
+import com.coinomi.core.network.interfaces.BlockchainConnection;
 import com.coinomi.core.network.interfaces.ConnectionEventListener;
 import com.coinomi.wallet.Configuration;
 import com.coinomi.wallet.Constants;
