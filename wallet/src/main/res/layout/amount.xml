@@ -11,7 +11,7 @@
         android:layout_alignParentTop="true"
         android:gravity="right"
         android:minWidth="@android:dimen/thumbnail_width"
-        android:text="0" />
+        android:id="0" />
 
     <TextView
         android:id="@+id/symbol"
@@ -21,6 +21,6 @@
         android:layout_below="@+id/amount"
         android:layout_alignRight="@+id/amount"
         android:layout_alignEnd="@+id/amount"
-        android:text="SYMBL" />
+        android:id="SYMBL" />
 
 </RelativeLayout>

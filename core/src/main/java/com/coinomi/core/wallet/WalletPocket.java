@@ -81,7 +81,7 @@ import static com.google.common.base.Preconditions.checkState;
  *
  */
 public class WalletPocket implements TransactionEventListener, ConnectionEventListener, Serializable {
-    private static final Logger log = LoggerFactory.getLogger(Wallet.class);
+    private static final Logger log = LoggerFactory.getLogger(WalletPocket.class);
     private final ReentrantLock lock = Threading.lock("WalletPocket");
 
     private final CoinType coinType;
@@ -89,8 +89,8 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
     private String description;
 
     @Nullable private Sha256Hash lastBlockSeenHash;
-    private int lastBlockSeenHeight;
-    private long lastBlockSeenTimeSecs;
+    private int lastBlockSeenHeight = -1;
+    private long lastBlockSeenTimeSecs = 0;
 
     // Holds the status of every address we are watching. When connecting to the server, if we get a
     // different status for a particular address this means that there are new transactions for that
@@ -200,6 +200,61 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
                                                    Pool poolType, Collection<Transaction> pool) {
         for (Transaction tx : pool) {
             txs.add(new WalletTransaction(poolType, tx));
+        }
+    }
+
+    /**
+     * Adds a transaction that has been associated with a particular wallet pool. This is intended for usage by
+     * deserialization code, such as the {@link WalletPocketSerializer} class. It isn't normally useful for
+     * applications. It does not trigger auto saving.
+     */
+    public void addWalletTransaction(WalletTransaction wtx) {
+        lock.lock();
+        try {
+            addWalletTransaction(wtx.getPool(), wtx.getTransaction());
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Adds the given transaction to the given pools and registers a confidence change listener on it.
+     */
+    private void addWalletTransaction(Pool pool, Transaction tx) {
+        checkState(lock.isHeldByCurrentThread());
+        transactions.put(tx.getHash(), tx);
+        switch (pool) {
+            case UNSPENT:
+                checkState(unspent.put(tx.getHash(), tx) == null);
+                break;
+            case SPENT:
+                checkState(spent.put(tx.getHash(), tx) == null);
+                break;
+            case PENDING:
+                checkState(pending.put(tx.getHash(), tx) == null);
+                break;
+            case DEAD:
+                checkState(dead.put(tx.getHash(), tx) == null);
+                break;
+            default:
+                throw new RuntimeException("Unknown wallet transaction type " + pool);
+        }
+        // This is safe even if the listener has been added before, as TransactionConfidence ignores duplicate
+        // registration requests. That makes the code in the wallet simpler.
+        // TODO add txConfidenceListener
+//        tx.getConfidence().addEventListener(txConfidenceListener, Threading.SAME_THREAD);
+    }
+
+    /**
+     * Returns a transaction object given its hash, if it exists in this wallet, or null otherwise.
+     */
+    @Nullable
+    public Transaction getTransaction(Sha256Hash hash) {
+        lock.lock();
+        try {
+            return transactions.get(hash);
+        } finally {
+            lock.unlock();
         }
     }
 
@@ -404,7 +459,7 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
         }
     }
 
-    private void updateAddressStatus(AddressStatus newStatus) {
+    void updateAddressStatus(AddressStatus newStatus) {
         lock.lock();
         try {
             addressesStatus.put(newStatus.getAddress(), newStatus.getStatus());
@@ -428,6 +483,22 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
                 else {
                     return true;
                 }
+            }
+        }
+        finally {
+            lock.unlock();
+        }
+    }
+
+    @Nullable
+    public AddressStatus getAddressStatus(Address address) {
+        lock.lock();
+        try {
+            if (addressesStatus.containsKey(address)) {
+                return new AddressStatus(address, addressesStatus.get(address));
+            }
+            else {
+                return null;
             }
         }
         finally {

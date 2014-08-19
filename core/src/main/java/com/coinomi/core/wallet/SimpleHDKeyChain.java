@@ -439,8 +439,14 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
     }
 
     /**
-     * Returns all the key chains found in the given list of keys. Typically there will only be one, but in the case of
-     * key rotation it can happen that there are multiple chains found.
+     * Returns the key chain found in the given list of keys. Used for unencrypted chains
+     */
+    public static SimpleHDKeyChain fromProtobuf(List<Protos.Key> keys) throws UnreadableWalletException {
+        return fromProtobuf(keys, null);
+    }
+
+    /**
+     * Returns the key chain found in the given list of keys.
      */
     public static SimpleHDKeyChain fromProtobuf(List<Protos.Key> keys, @Nullable KeyCrypter crypter) throws UnreadableWalletException {
         SimpleHDKeyChain chain = null;
@@ -835,7 +841,5 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
         }
         return keys.build();
     }
-
-
 }
 

@@ -10,6 +10,7 @@ import com.coinomi.core.protos.Protos;
 import com.google.bitcoin.core.Address;
 import com.google.bitcoin.core.AddressFormatException;
 import com.google.bitcoin.core.Sha256Hash;
+import com.google.bitcoin.core.Transaction;
 import com.google.bitcoin.core.Utils;
 import com.google.bitcoin.crypto.DeterministicHierarchy;
 import com.google.bitcoin.crypto.DeterministicKey;
@@ -59,7 +60,7 @@ public class WalletPocketTest {
 
     @Test
     public void fillTransactions() throws AddressFormatException, JSONException {
-        fillDummyTransactions();
+        pocket.onConnection(getBlockchainConnection());
 
         // Issued keys
         assertEquals(18, pocket.keys.getIssuedExternalKeys());
@@ -81,12 +82,11 @@ public class WalletPocketTest {
         // TODO added more tests to insure it uses the "holes" in the keychain
     }
 
-    void fillDummyTransactions() throws AddressFormatException, JSONException {
+    private BlockchainConnection getBlockchainConnection() throws AddressFormatException, JSONException {
         final HashMap<Address, AddressStatus> statuses = getDummyStatuses();
         final HashMap<Address, List<ServerClient.UnspentTx>> utxs = getDummyUTXs();
         final HashMap<Sha256Hash, byte[]> rawTxs = getDummyRawTXs();
-
-        pocket.onConnection(new BlockchainConnection() {
+        return new BlockchainConnection() {
             @Override
             public void subscribeToAddresses(CoinType coin, List<Address> addresses, TransactionEventListener listener) {
                 for (Address a : addresses) {
@@ -116,21 +116,47 @@ public class WalletPocketTest {
             public void ping() {
 
             }
-        });
+        };
     }
-
 
     @Test
     public void serializeUnencryptedNormal() throws Exception {
-        serializeUnencrypted("");
-    }
-
-    public void serializeUnencrypted(String expectedSerialization) throws Exception {
-        fillDummyTransactions();
+        pocket.onConnection(getBlockchainConnection());
 
         Protos.WalletPocket walletPocketProto = pocket.toProtobuf();
 
-        assertEquals(expectedSerialization, walletPocketProto.toString());
+        WalletPocket newPocket = new WalletPocketSerializer().readWallet(walletPocketProto, null);
+
+        assertEquals(pocket.getCoinType(), newPocket.getCoinType());
+        assertEquals(pocket.getDescription(), newPocket.getDescription());
+        assertEquals(pocket.keys.toProtobuf().toString(), newPocket.keys.toProtobuf().toString());
+        assertEquals(pocket.getLastBlockSeenHash(), newPocket.getLastBlockSeenHash());
+        assertEquals(pocket.getLastBlockSeenHeight(), newPocket.getLastBlockSeenHeight());
+        assertEquals(pocket.getLastBlockSeenTimeSecs(), newPocket.getLastBlockSeenTimeSecs());
+
+        for (Transaction tx : pocket.getTransactions(true)) {
+            assertEquals(tx, newPocket.getTransaction(tx.getHash()));
+        }
+
+        for (AddressStatus status : pocket.getAddressesStatus()) {
+            if (status.getStatus() == null) continue;
+            assertEquals(status, newPocket.getAddressStatus(status.getAddress()));
+        }
+
+
+        // Issued keys
+        assertEquals(18, newPocket.keys.getIssuedExternalKeys());
+        assertEquals(9, newPocket.keys.getIssuedInternalKeys());
+
+        newPocket.onConnection(getBlockchainConnection());
+
+        // No addresses left to subscribe
+        List<Address> addressesToWatch = newPocket.getAddressesToWatch();
+        assertEquals(0, addressesToWatch.size());
+
+        // 18 external issued + 20 lookahead +  9 external issued + 20 lookahead
+        assertEquals(67, newPocket.addressesStatus.size());
+        assertEquals(67, newPocket.addressesSubscribed.size());
     }
 
 
@@ -166,47 +192,48 @@ public class WalletPocketTest {
         return rawTxs;
     }
 
+    // Mock data
     String[] addresses = {
-            "nYFeqwDM3Wgoa6uSpxHoXrTHKaEH2DzJt7",
-            "nfgMcGAFcXqHnzJkGPhxAYK9nmDPmfFipP",
-            "ns1bSy9bbS5iW7f156iLvCXqzDx5KbZBkK",
-            "nV6qdoT3y4cVfTYUYWShhf1kraVDEUQLWk",
-            "nsRxBPxUwPnNH9gP13hhGHYxBGfYFuDmvw",
-            "nc6f6D7g2ZGri3etd1qvoVaZ2ws8nuSwe6",
-            "nYr9JVhDGdvpmgeM6qHiKSKpzTKwkKiZy7",
-            "nXbPMkrHsm2376JHV5fExjJV5ir5FLwqB3",
-            "nbNnS9CpedCzUD5h83MMP1ViDZVz8ogZ87",
-            "nXuh974fJejhcBZhYqedyGJ2mFHi6q6Xby",
-            "ns3onfhQNfoUtxKJoRPG1TmgRSdHBvc7Ae",
-            "naJzuBsmcN2JRQ1F2bUuuMWqvqEapYPcV4",
-            "nkQUsdUivWTMb5AQSs4KA2NLFzsHAdGnF1",
-            "nYZ8UnuSw6CVzgafX9SjLer2Vne83o49Vu",
-            "nVALmju3ZTrG3ZnoKMdDWc5h7mw5ZpGUXi",
-            "nksLoC68mXgHEbmKvLRt3uy1T99r3kFJnx",
-            "nnoCjmceF5sEaSUVjyJGZ82Lt5JPtxfSTW",
-            "nYtgLvqnUGfH1bsdtT89pbHnwhyTmMDUUZ",
-            "nVy9vTMs3Fd3LeWZfSufAVqcymiqNA7Ej4",
-            "nUZMEXha6DqVCCLXUavbpNQT9EA8x7zsKF",
-            "ncCd8qUxmuMQmyxfWHfZwXmuj1U5Fd8bFh",
-            "nX719JSGwSTABddKFk5i6VSGsANSVq3Quy",
-            "ns8g4haVJpS9hq5jCErmgpyaMqrmkaZttx",
-            "nUWeegDyag2FFxQaEbYSw5QZv5TnYU1rTC",
-            "ncAM9qkZZQ6ncH5eTTq5x2GM1ziwvtn671",
-            "npSJBfhVeJvo6gvwkU4ZxnrJBfRzjzwTwx",
-            "nUgx4NJqjHcka1HNg3MxHTVxKRWj1meDk5",
-            "nqpUfJnKXuZoRegF7GUzzFfjEuCFSqdwZa",
-            "nmXS4wzdadXs73bvHJgQr3kwCyYxMbAXoQ",
-            "nn4XWZRsNjPsZMa9eU3p7pSSTmowXGMxsw",
-            "ndfhy13fYFbVFhjyDcsH6kRAGnkHxuSNgV",
-            "nUWF48YWZqprfKPtB9TemaCQjXME7ufxNs",
-            "nX8z9Hsa47TeEyFCAAe48azBAZdL5JzsNo",
-            "niWd7u3bkSnJSomA2LFBqiyXFkrgv6G1WJ",
-            "nnSg5ePzYyx7BEWXdcbSWDWHd3dJUwiLh1",
-            "nhbXcTtx5BzSMvhpyEoCKHcfss8zGoLP5K",
-            "nipWJ97boZtn26Fg8SHWMz9PH8TgDS2bem",
-            "nrFHEkMkk47uKAvp6aT5z2aBg1LshrfpBz",
-            "ndNYuT9kEFMdWcNnXXndzjcvmMbGmtoufm",
-            "nmGojMLim2J33e9SJo72y93AkqEZbHMn9V"
+            "nnfP8VuPfZXhNtMDzvX1bKurzcV1k7HNrQ",
+            "nf4AUKiaGdx4GTbbh222KvtuCbAuvbcdE2",
+            "npGkmbWtdWybFNSZQXUK6zZxbEocMtrTzz",
+            "nVaN45bbs6AUc1EUpP71hHGBGb2qciNrJc",
+            "nrdHFZP1AfdKBrjsSQmwFm8R2i2mzMef75",
+            "niGZgfbhFYn6tJqksmC8CnzSRL1GHNsu7e",
+            "nh6w8yu1zoKYoT837ffkVmuPjTaP69Pc5E",
+            "nbyMgmEghsL9tpk7XfdH9gLGudh6Lrbbuf",
+            "naX9akzYuWY1gKbcZo3t36aBKc1gqbzgSs",
+            "nqcPVTGeAfCowELB2D5PdVF3FWFjFtkkFf",
+            "nd4vVvPTpp2LfcsMPsmG3Dh7MFAsqRHp4g",
+            "nVK4Uz5Sf56ygrr6RiwXcRvH8AuUVbjjHi",
+            "nbipkRwT1NCSXZSrm8uAAEgQAA2s2NWMkG",
+            "nZU6QAMAdCQcVDxEmL7GEY6ykFm8m6u6am",
+            "nbFqayssM5s7hLjLFwf2d95JXKRWBk2pBH",
+            "nacZfcNgVi47hamLscWdUGQhUQGGpSdgq8",
+            "niiMT7ZYeFnaLPYtqQFBBX1sP3dT5JtcEw",
+            "ns6GyTaniLWaiYrvAf5tk4D8tWrbcCLGyj",
+            "nhdwQfptLTzLJGbLF3vvtqyBaqPMPecDmE",
+            "neMUAGeTzwxLbSkXMsdmWf1fTKS1UsJjXY",
+            "nXsAMeXxtpx8jaxnU3Xv9ZQ6ZcRcD1xYhR",
+            "ns35rKnnWf6xP3KSj5WPkMCVVaADGi6Ndk",
+            "nk4wcXYBEWs5HkhNLsuaQJoAjJHoK6SQmG",
+            "npsJQWu8fsALoTPum8D4j8FDkyeusk8fU8",
+            "nZNhZo4Vz3DnwQGPL3SJTZgUw2Kh4g9oay",
+            "nnxDTYB8WMHMgLnCY2tuaEtysvdhRnWehZ",
+            "nb2iaDXG1EqkcE47H87WQFkQNkeVK66Z21",
+            "nWHAkpn2DB3DJRsbiK3vpbigoa3M2uVuF8",
+            "nViKdC7Gm6TMmCuWTBwVE9i4rJhyfwbfqg",
+            "nZQV5BifbGPzaxTrB4efgHruWH5rufemqP",
+            "nVvZaLvnkCVAzpLYPoHeqU4w9zJ5yrZgUn",
+            "nrMp6pRCk98WYWkCWq9Pqthz9HbpQu8BT3",
+            "nnA3aYsLqysKT6gAu1dr4EKm586cmKiRxS",
+            "nVfcVgMY7DL6nqoSxwJy7B7hKXirQwj6ic",
+            "ni4oAzi6nCVuEdjoHyVMVKWb1DqTd3qY3H",
+            "nnpf3gx442yomniRJPMGPapgjHrraPZXxJ",
+            "nkuFnF8wUmHFkMycaFMvyjBoiMeR5KBKGd",
+            "nXKccwjaUyrQkLrdqKT6aq6cDiFgBBVgNz",
+            "nZMSNsXSAL7i1YD6KP5FrhATuZ2CWvnxqR",
+            "nUEkQ3LjH9m4ScbP6NGtnAdnnUsdtWv99Q"
     };
 
     String[] statuses = {

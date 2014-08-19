@@ -15,7 +15,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/send_coins_fragment_receiving_address_label"
+            android:id="@string/send_coins_fragment_receiving_address_label"
             android:id="@+id/address_label"
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
@@ -32,7 +32,7 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/send_coins_fragment_scan_qr_code"
+            android:id="@string/send_coins_fragment_scan_qr_code"
             android:id="@+id/scan_qr_code"
             android:layout_below="@+id/send_to_address"
             android:layout_alignRight="@+id/send_to_address"
@@ -41,7 +41,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/send_coins_fragment_amount_label"
+            android:id="@string/send_coins_fragment_amount_label"
             android:id="@+id/amount_label"
             android:layout_below="@+id/scan_qr_code"
             android:layout_alignParentLeft="true"
@@ -61,7 +61,7 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/send_coins_fragment_button_send"
+            android:id="@string/send_coins_fragment_button_send"
             android:id="@+id/send_confirm"
             android:layout_alignParentBottom="true"
             android:layout_alignRight="@+id/send_to_address"
