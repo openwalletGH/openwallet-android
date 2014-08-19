@@ -139,7 +139,7 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
         for (ECKey eckey : chain.simpleKeyChain.getKeys()) {
             DeterministicKey key = (DeterministicKey) eckey;
             if (!isLeaf(key)) continue; // Not a leaf key.
-            DeterministicKey parent = hierarchy.get(checkNotNull(key.getParent()).getPath(), true, false);
+            DeterministicKey parent = hierarchy.get(checkNotNull(key.getParent()).getPath(), false, false);
             // Clone the key to the new encrypted hierarchy.
             key = new DeterministicKey(key.getPubOnly(), parent);
             hierarchy.putKey(key);
@@ -442,8 +442,7 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
      * Returns all the key chains found in the given list of keys. Typically there will only be one, but in the case of
      * key rotation it can happen that there are multiple chains found.
      */
-    public static List<SimpleHDKeyChain> fromProtobuf(List<Protos.Key> keys, @Nullable KeyCrypter crypter) throws UnreadableWalletException {
-        List<SimpleHDKeyChain> chains = newLinkedList();
+    public static SimpleHDKeyChain fromProtobuf(List<Protos.Key> keys, @Nullable KeyCrypter crypter) throws UnreadableWalletException {
         SimpleHDKeyChain chain = null;
         int lookaheadSize = -1;
         // If the root key is a child of another hierarchy, the depth will be > 0
@@ -461,75 +460,51 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
                 // Deserialize the public key and path.
                 ECPoint pubkey = ECKey.CURVE.getCurve().decodePoint(key.getPublicKey().toByteArray());
                 final ImmutableList<ChildNumber> immutablePath = ImmutableList.copyOf(path);
-                // Possibly create the chain, if we didn't already do so yet.
-                boolean isWatchingAccountKey = false;
-                boolean isFollowingKey = false;
-                // save previous chain if any if the key is marked as following. Current key and the next ones are to be
-                // placed in new following key chain
-                if (key.getDeterministicKey().getIsFollowing()) {
-                    if (chain != null) {
-                        checkState(lookaheadSize >= 0);
-                        chain.setLookaheadSize(lookaheadSize);
-                        chain.maybeLookAhead();
-                        chains.add(chain);
-                        chain = null;
-                    }
-                    isFollowingKey = true;
-                }
+
                 if (chain == null) {
                     DeterministicKey newRootKey = getDeterministicKey(crypter, key, chainCode,
                             pubkey, immutablePath, null);
                     chain = new SimpleHDKeyChain(newRootKey, crypter);
                     chain.lookaheadSize = LAZY_CALCULATE_LOOKAHEAD; // TODO check if needed
                     rootTreeSize = immutablePath.size();
-//                    if (immutablePath.size() == 2) { // 44' / COIN_INDEX' /
-//                    }
-//                    else {
-//                        throw new UnreadableWalletException("Expecting account key but found key with path: " +
-//                                HDUtils.formatPath(immutablePath));
-//                    }
                 }
                 // Find the parent key assuming this is not the root key, and not an account key for a watching chain.
                 DeterministicKey parent = null;
-                if (path.size() > rootTreeSize && !isWatchingAccountKey) {
+                if (path.size() > rootTreeSize) {
                     ChildNumber index = path.removeLast();
                     parent = chain.hierarchy.get(path, false, false);
                     path.add(index);
                 }
                 DeterministicKey detkey = getDeterministicKey(crypter, key, chainCode, pubkey, immutablePath, parent);
-                if (log.isDebugEnabled())
+                if (log.isDebugEnabled()) {
                     log.debug("Deserializing: DETERMINISTIC_KEY: {}", detkey);
-                if (!isWatchingAccountKey) {
-                    // If the non-encrypted case, the non-leaf keys (account, internal, external) have already been
-                    // rederived and inserted at this point and the two lines below are just a no-op. In the encrypted
-                    // case though, we can't rederive and we must reinsert, potentially building the heirarchy object
-                    // if need be.
-                    if (path.size() == rootTreeSize) {
-                        // Master key.
-                        chain.rootKey = detkey;
-                        chain.hierarchy = new DeterministicHierarchy(detkey);
-                    } else if (path.size() == rootTreeSize + EXTERNAL_PATH.size()) {
-                        if (EXTERNAL_PATH_NUM.equals(detkey.getChildNumber())) {
-                            chain.externalKey = detkey;
-                            chain.issuedExternalKeys = key.getDeterministicKey().getIssuedSubkeys();
-                            lookaheadSize = Math.max(lookaheadSize, key.getDeterministicKey().getLookaheadSize());
-                        } else if (INTERNAL_PATH_NUM.equals(detkey.getChildNumber())) {
-                            chain.internalKey = detkey;
-                            chain.issuedInternalKeys = key.getDeterministicKey().getIssuedSubkeys();
-                        }
+                }
+                // If the non-encrypted case, the non-leaf keys (account, internal, external) have already been
+                // rederived and inserted at this point and the two lines below are just a no-op. In the encrypted
+                // case though, we can't rederive and we must reinsert, potentially building the heirarchy object
+                // if need be.
+                if (path.size() == rootTreeSize) {
+                    // Master key.
+                    chain.rootKey = detkey;
+                    chain.hierarchy = new DeterministicHierarchy(detkey);
+                } else if (path.size() == rootTreeSize + EXTERNAL_PATH.size()) {
+                    if (EXTERNAL_PATH_NUM.equals(detkey.getChildNumber())) {
+                        chain.externalKey = detkey;
+                        chain.issuedExternalKeys = key.getDeterministicKey().getIssuedSubkeys();
+                        lookaheadSize = Math.max(lookaheadSize, key.getDeterministicKey().getLookaheadSize());
+                    } else if (INTERNAL_PATH_NUM.equals(detkey.getChildNumber())) {
+                        chain.internalKey = detkey;
+                        chain.issuedInternalKeys = key.getDeterministicKey().getIssuedSubkeys();
                     }
                 }
                 chain.hierarchy.putKey(detkey);
                 chain.simpleKeyChain.importKey(detkey);
             }
         }
-        if (chain != null) {
-            checkState(lookaheadSize >= 0);
-            chain.setLookaheadSize(lookaheadSize);
-            chain.maybeLookAhead();
-            chains.add(chain);
-        }
-        return chains;
+        checkState(lookaheadSize >= 0);
+        chain.setLookaheadSize(lookaheadSize);
+        chain.maybeLookAhead();
+        return chain;
     }
 
     private static DeterministicKey getDeterministicKey(KeyCrypter crypter, Protos.Key key,
@@ -573,8 +548,8 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
     public SimpleHDKeyChain toEncrypted(CharSequence password) {
         checkNotNull(password);
         checkArgument(password.length() > 0);
-        checkState(rootKey.isPubKeyOnly() != false, "Attempt to encrypt a watching chain.");
         checkState(!rootKey.isEncrypted());
+        checkState(!rootKey.isPubKeyOnly(), "Attempt to encrypt a watching chain.");
         KeyCrypter scrypt = new KeyCrypterScrypt();
         KeyParameter derivedKey = scrypt.deriveKey(password);
         return toEncrypted(scrypt, derivedKey);
@@ -611,7 +586,7 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
             DeterministicKey key = (DeterministicKey) eckey;
             if (!isLeaf(key)) continue; // Not a leaf key.
             checkState(key.isEncrypted());
-            DeterministicKey parent = chain.hierarchy.get(checkNotNull(key.getParent()).getPath(), true, false);
+            DeterministicKey parent = chain.hierarchy.get(checkNotNull(key.getParent()).getPath(), false, false);
             // Clone the key to the new decrypted hierarchy.
             key = new DeterministicKey(key.getPubOnly(), parent);
             chain.hierarchy.putKey(key);
@@ -860,5 +835,7 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
         }
         return keys.build();
     }
+
+
 }
 

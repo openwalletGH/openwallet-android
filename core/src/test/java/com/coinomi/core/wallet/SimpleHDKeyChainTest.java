@@ -24,10 +24,12 @@ import com.google.common.io.Resources;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.spongycastle.crypto.params.KeyParameter;
 
 import java.io.IOException;
 import java.util.List;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.junit.Assert.*;
 
 /**
@@ -42,14 +44,9 @@ public class SimpleHDKeyChainTest {
     @Before
     public void setup() {
         BriefLogFormatter.init();
-        // You should use a random seed instead. The secs constant comes from the unit test file, so we can compare
-        // serialized data properly.
-        long secs = 1389353062L;
 
-
-        DeterministicSeed seed = new DeterministicSeed(ENTROPY, "", secs);
+        DeterministicSeed seed = new DeterministicSeed(ENTROPY, "", 0);
         masterKey = HDKeyDerivation.createMasterPrivateKey(seed.getSeedBytes());
-        masterKey.setCreationTimeSeconds(secs);
         DeterministicHierarchy hierarchy = new DeterministicHierarchy(masterKey);
         DeterministicKey rootKey = hierarchy.get(ImmutableList.of(ChildNumber.ZERO_HARDENED), false, true);
         chain = new SimpleHDKeyChain(rootKey);
@@ -138,58 +135,53 @@ public class SimpleHDKeyChainTest {
 
     @Test
     public void serializeUnencryptedNormal() throws UnreadableWalletException {
-        DeterministicHierarchy hierarchy = new DeterministicHierarchy(masterKey);
-        DeterministicKey rootKey = hierarchy.get(ImmutableList.of(ChildNumber.ZERO_HARDENED), false, true);
-        rootKey.setCreationTimeSeconds(0);
-        serializeUnencrypted(rootKey, DETERMINISTIC_WALLET_SERIALIZATION_TXT_MASTER_KEY);
+        serializeUnencrypted(chain, DETERMINISTIC_WALLET_SERIALIZATION_TXT_MASTER_KEY);
     }
 
     @Test
     public void serializeUnencryptedChildRoot() throws UnreadableWalletException {
         DeterministicHierarchy hierarchy = new DeterministicHierarchy(masterKey);
         DeterministicKey rootKey = hierarchy.get(BitcoinTest.get().getBip44Path(0), false, true);
-        rootKey.setCreationTimeSeconds(0);
-
-        serializeUnencrypted(rootKey, DETERMINISTIC_WALLET_SERIALIZATION_TXT_CHILD_ROOT_KEY);
+        SimpleHDKeyChain newChain = new SimpleHDKeyChain(rootKey);
+        serializeUnencrypted(newChain, DETERMINISTIC_WALLET_SERIALIZATION_TXT_CHILD_ROOT_KEY);
     }
 
 
-    public void serializeUnencrypted(DeterministicKey rootKey, String expectedSerialization) throws UnreadableWalletException {
-        chain = new SimpleHDKeyChain(rootKey);
-        chain.setLookaheadSize(10);
+    public void serializeUnencrypted(SimpleHDKeyChain keyChain, String expectedSerialization) throws UnreadableWalletException {
+        keyChain.setLookaheadSize(10);
 
-        chain.maybeLookAhead();
-        DeterministicKey key1 = chain.getKey(KeyChain.KeyPurpose.RECEIVE_FUNDS);
-        DeterministicKey key2 = chain.getKey(KeyChain.KeyPurpose.RECEIVE_FUNDS);
-        DeterministicKey key3 = chain.getKey(KeyChain.KeyPurpose.CHANGE);
-        List<Protos.Key> keys = chain.toProtobuf();
+        keyChain.maybeLookAhead();
+        DeterministicKey key1 = keyChain.getKey(KeyChain.KeyPurpose.RECEIVE_FUNDS);
+        DeterministicKey key2 = keyChain.getKey(KeyChain.KeyPurpose.RECEIVE_FUNDS);
+        DeterministicKey key3 = keyChain.getKey(KeyChain.KeyPurpose.CHANGE);
+        List<Protos.Key> keys = keyChain.toProtobuf();
         // 1 master key, 1 account key, 2 internal keys, 3 derived, 20 lookahead and 5 lookahead threshold.
         int numItems =
                           1  // master key/account key
                         + 2  // ext/int parent keys
-                        + (chain.getLookaheadSize() + chain.getLookaheadThreshold()) * 2   // lookahead zone on each chain
+                        + (keyChain.getLookaheadSize() + keyChain.getLookaheadThreshold()) * 2   // lookahead zone on each chain
                 ;
         assertEquals(numItems, keys.size());
 
         // Get another key that will be lost during round-tripping, to ensure we can derive it again.
-        DeterministicKey key4 = chain.getKey(KeyChain.KeyPurpose.CHANGE);
+        DeterministicKey key4 = keyChain.getKey(KeyChain.KeyPurpose.CHANGE);
 
         String sb = protoToString(keys);
         assertEquals(expectedSerialization, sb);
 
         // Round trip the data back and forth to check it is preserved.
-        int oldLookaheadSize = chain.getLookaheadSize();
-        chain = SimpleHDKeyChain.fromProtobuf(keys, null).get(0);
-        assertEquals(expectedSerialization, protoToString(chain.toProtobuf()));
-        assertEquals(key1, chain.findKeyFromPubHash(key1.getPubKeyHash()));
-        assertEquals(key2, chain.findKeyFromPubHash(key2.getPubKeyHash()));
-        assertEquals(key3, chain.findKeyFromPubHash(key3.getPubKeyHash()));
-        assertEquals(key4, chain.getKey(KeyChain.KeyPurpose.CHANGE));
+        int oldLookaheadSize = keyChain.getLookaheadSize();
+        keyChain = SimpleHDKeyChain.fromProtobuf(keys, null);
+        assertEquals(expectedSerialization, protoToString(keyChain.toProtobuf()));
+        assertEquals(key1, keyChain.findKeyFromPubHash(key1.getPubKeyHash()));
+        assertEquals(key2, keyChain.findKeyFromPubHash(key2.getPubKeyHash()));
+        assertEquals(key3, keyChain.findKeyFromPubHash(key3.getPubKeyHash()));
+        assertEquals(key4, keyChain.getKey(KeyChain.KeyPurpose.CHANGE));
         key1.sign(Sha256Hash.ZERO_HASH);
         key2.sign(Sha256Hash.ZERO_HASH);
         key3.sign(Sha256Hash.ZERO_HASH);
         key4.sign(Sha256Hash.ZERO_HASH);
-        assertEquals(oldLookaheadSize, chain.getLookaheadSize());
+        assertEquals(oldLookaheadSize, keyChain.getLookaheadSize());
     }
 
     private String protoToString(List<Protos.Key> keys) {
@@ -212,6 +204,72 @@ public class SimpleHDKeyChainTest {
         }
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void notEncrypted() {
+        chain.toDecrypted("fail");
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void encryptTwice() {
+        chain = chain.toEncrypted("once");
+        chain = chain.toEncrypted("twice");
+    }
+
+    private void checkEncryptedKeyChain(SimpleHDKeyChain encChain, DeterministicKey key1) {
+        // Check we can look keys up and extend the chain without the AES key being provided.
+        DeterministicKey encKey1 = encChain.findKeyFromPubKey(key1.getPubKey());
+        DeterministicKey encKey2 = encChain.getKey(KeyChain.KeyPurpose.RECEIVE_FUNDS);
+        assertFalse(key1.isEncrypted());
+        assertTrue(encKey1.isEncrypted());
+        assertEquals(encKey1.getPubKeyPoint(), key1.getPubKeyPoint());
+        final KeyParameter aesKey = checkNotNull(encChain.getKeyCrypter()).deriveKey("open secret");
+        encKey1.sign(Sha256Hash.ZERO_HASH, aesKey);
+        encKey2.sign(Sha256Hash.ZERO_HASH, aesKey);
+        assertTrue(encChain.checkAESKey(aesKey));
+        assertFalse(encChain.checkPassword("access denied"));
+        assertTrue(encChain.checkPassword("open secret"));
+    }
+
+    @Test
+    public void encryptionNormal() throws UnreadableWalletException {
+        encryption(chain);
+    }
+
+    @Test
+    public void encryptionChildRoot() throws UnreadableWalletException {
+        DeterministicHierarchy hierarchy = new DeterministicHierarchy(masterKey);
+        DeterministicKey rootKey = hierarchy.get(BitcoinTest.get().getBip44Path(0), false, true);
+        SimpleHDKeyChain newChain = new SimpleHDKeyChain(rootKey);
+
+        encryption(newChain);
+    }
+
+    public void encryption(SimpleHDKeyChain unencChain) throws UnreadableWalletException {
+        DeterministicKey key1 = unencChain.getKey(KeyChain.KeyPurpose.RECEIVE_FUNDS);
+        SimpleHDKeyChain encChain = unencChain.toEncrypted("open secret");
+        DeterministicKey encKey1 = encChain.findKeyFromPubKey(key1.getPubKey());
+        checkEncryptedKeyChain(encChain, key1);
+
+        // Round-trip to ensure de/serialization works and that we can store two chains and they both deserialize.
+        List<Protos.Key> serialized = encChain.toProtobuf();
+        System.out.println(protoToString(serialized));
+        encChain = SimpleHDKeyChain.fromProtobuf(serialized, encChain.getKeyCrypter());
+        checkEncryptedKeyChain(encChain, unencChain.findKeyFromPubKey(key1.getPubKey()));
+
+        DeterministicKey encKey2 = encChain.getKey(KeyChain.KeyPurpose.RECEIVE_FUNDS);
+        // Decrypt and check the keys match.
+        SimpleHDKeyChain decChain = encChain.toDecrypted("open secret");
+        DeterministicKey decKey1 = decChain.findKeyFromPubHash(encKey1.getPubKeyHash());
+        DeterministicKey decKey2 = decChain.findKeyFromPubHash(encKey2.getPubKeyHash());
+        assertEquals(decKey1.getPubKeyPoint(), encKey1.getPubKeyPoint());
+        assertEquals(decKey2.getPubKeyPoint(), encKey2.getPubKeyPoint());
+        assertFalse(decKey1.isEncrypted());
+        assertFalse(decKey2.isEncrypted());
+        assertNotEquals(encKey1.getParent(), decKey1.getParent());   // parts of a different hierarchy
+        // Check we can once again derive keys from the decrypted chain.
+        decChain.getKey(KeyChain.KeyPurpose.RECEIVE_FUNDS).sign(Sha256Hash.ZERO_HASH);
+        decChain.getKey(KeyChain.KeyPurpose.CHANGE).sign(Sha256Hash.ZERO_HASH);
+    }
 
     // FIXME For some reason it doesn't read the resource file
     private final static String DETERMINISTIC_WALLET_SERIALIZATION_TXT_CHILD_ROOT_KEY =

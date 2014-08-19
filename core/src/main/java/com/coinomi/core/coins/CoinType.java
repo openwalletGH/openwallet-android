@@ -5,9 +5,15 @@ import com.google.bitcoin.core.Coin;
 import com.google.bitcoin.core.NetworkParameters;
 import com.google.bitcoin.crypto.ChildNumber;
 import com.google.bitcoin.crypto.HDUtils;
+import com.google.bitcoin.params.MainNetParams;
+import com.google.bitcoin.params.RegTestParams;
+import com.google.bitcoin.params.TestNet3Params;
+import com.google.bitcoin.params.UnitTestParams;
 
 import java.io.Serializable;
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 /**
  * @author Giannis Dzegoutanis
@@ -48,10 +54,16 @@ abstract public class CoinType extends NetworkParameters implements Serializable
         return HDUtils.parsePath(path);
     }
 
-
     @Override
     public String getPaymentProtocolId() {
         throw new RuntimeException("Method not implemented");
+    }
+
+    @Nullable
+    public static CoinType fromID(String id) {
+
+            return null;
+
     }
 
     @Override

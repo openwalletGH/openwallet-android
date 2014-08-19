@@ -17,6 +17,7 @@
  */
 package com.coinomi.core.wallet;
 
+import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.network.AddressStatus;
 import com.coinomi.core.protos.Protos;
 import com.google.bitcoin.core.PeerAddress;
@@ -25,11 +26,18 @@ import com.google.bitcoin.core.Transaction;
 import com.google.bitcoin.core.TransactionConfidence;
 import com.google.bitcoin.core.TransactionInput;
 import com.google.bitcoin.core.TransactionOutput;
+import com.google.bitcoin.crypto.KeyCrypter;
+import com.google.bitcoin.crypto.KeyCrypterScrypt;
+import com.google.bitcoin.store.UnreadableWalletException;
 import com.google.bitcoin.wallet.WalletTransaction;
 import com.google.protobuf.ByteString;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ListIterator;
 import java.util.Map;
+
+import javax.annotation.Nullable;
 
 /**
  * @author Giannis Dzegoutanis
@@ -134,16 +142,6 @@ public class WalletPocketSerializer {
             writeConfidence(txBuilder, confidence, confidenceBuilder);
         }
 
-        Protos.Transaction.Purpose purpose;
-        switch (tx.getPurpose()) {
-            case UNKNOWN: purpose = Protos.Transaction.Purpose.UNKNOWN; break;
-            case USER_PAYMENT: purpose = Protos.Transaction.Purpose.USER_PAYMENT; break;
-            case KEY_ROTATION: purpose = Protos.Transaction.Purpose.KEY_ROTATION; break;
-            default:
-                throw new RuntimeException("New tx purpose serialization not implemented.");
-        }
-        txBuilder.setPurpose(purpose);
-
         return txBuilder.build();
     }
 
@@ -204,4 +202,104 @@ public class WalletPocketSerializer {
     public static ByteString hashToByteString(Sha256Hash hash) {
         return ByteString.copyFrom(hash.getBytes());
     }
+
+    /**
+     * <p>Loads wallet data from the given protocol buffer and inserts it into the given Wallet object. This is primarily
+     * useful when you wish to pre-register extension objects. Note that if loading fails the provided Wallet object
+     * may be in an indeterminate state and should be thrown away.</p>
+     *
+     * <p>A wallet can be unreadable for various reasons, such as inability to open the file, corrupt data, internally
+     * inconsistent data, a wallet extension marked as mandatory that cannot be handled and so on. You should always
+     * handle {@link UnreadableWalletException} and communicate failure to the user in an appropriate manner.</p>
+     *
+     * @throws UnreadableWalletException thrown in various error conditions (see description).
+     */
+//    public Wallet readWallet(Protos.WalletPocket walletProto, @Nullable KeyCrypter keyCrypter) throws UnreadableWalletException {
+//        final String paramsID = walletProto.getNetworkIdentifier();
+//        CoinType params = CoinType.fromID(paramsID);
+//        if (params == null)
+//            throw new UnreadableWalletException("Unknown network parameters ID " + paramsID);
+//
+//        // Read the scrypt parameters that specify how encryption and decryption is performed.
+//        SimpleHDKeyChain chain;
+//        if (keyCrypter != null) {
+//            chain = SimpleHDKeyChain.fromProtobufEncrypted(params, walletProto.getKeyList(), keyCrypter);
+//        } else {
+//            chain = SimpleHDKeyChain.fromProtobufUnencrypted(params, walletProto.getKeyList());
+//        }
+//        Wallet wallet = factory.create(params, chain);
+//
+//        List<Script> scripts = Lists.newArrayList();
+//        for (Protos.Script protoScript : walletProto.getWatchedScriptList()) {
+//            try {
+//                Script script =
+//                        new Script(protoScript.getProgram().toByteArray(),
+//                                protoScript.getCreationTimestamp() / 1000);
+//                scripts.add(script);
+//            } catch (ScriptException e) {
+//                throw new UnreadableWalletException("Unparseable script in wallet");
+//            }
+//        }
+//
+//        wallet.addWatchedScripts(scripts);
+//
+//        if (walletProto.hasDescription()) {
+//            wallet.setDescription(walletProto.getDescription());
+//        }
+//
+//        // Read all transactions and insert into the txMap.
+//        for (Protos.Transaction txProto : walletProto.getTransactionList()) {
+//            readTransaction(txProto, wallet.getParams());
+//        }
+//
+//        // Update transaction outputs to point to inputs that spend them
+//        for (Protos.Transaction txProto : walletProto.getTransactionList()) {
+//            WalletTransaction wtx = connectTransactionOutputs(txProto);
+//            wallet.addWalletTransaction(wtx);
+//        }
+//
+//        // Update the lastBlockSeenHash.
+//        if (!walletProto.hasLastSeenBlockHash()) {
+//            wallet.setLastBlockSeenHash(null);
+//        } else {
+//            wallet.setLastBlockSeenHash(byteStringToHash(walletProto.getLastSeenBlockHash()));
+//        }
+//        if (!walletProto.hasLastSeenBlockHeight()) {
+//            wallet.setLastBlockSeenHeight(-1);
+//        } else {
+//            wallet.setLastBlockSeenHeight(walletProto.getLastSeenBlockHeight());
+//        }
+//        // Will default to zero if not present.
+//        wallet.setLastBlockSeenTimeSecs(walletProto.getLastSeenBlockTimeSecs());
+//
+//        if (walletProto.hasKeyRotationTime()) {
+//            wallet.setKeyRotationTime(new Date(walletProto.getKeyRotationTime() * 1000));
+//        }
+//
+//        loadExtensions(wallet, extensions != null ? extensions : new WalletExtension[0], walletProto);
+//
+//        for (Protos.Tag tag : walletProto.getTagsList()) {
+//            wallet.setTag(tag.getTag(), tag.getData());
+//        }
+//
+//        if (walletProto.hasVersion()) {
+//            wallet.setVersion(walletProto.getVersion());
+//        }
+//
+//        // Make sure the object can be re-used to read another wallet without corruption.
+//        txMap.clear();
+//
+//        return wallet;
+//    }
+//
+//
+//    /**
+//     * Returns the loaded protocol buffer from the given byte stream. You normally want
+//     * {@link Wallet#loadFromFile(java.io.File)} instead - this method is designed for low level work involving the
+//     * wallet file format itself.
+//     */
+//    public static Protos.WalletPocket parseToProto(InputStream input) throws IOException {
+//        return Protos.WalletPocket.parseFrom(input);
+//    }
+
 }

@@ -7247,16 +7247,6 @@ public final class Protos {
      * </pre>
      */
     com.coinomi.core.protos.Protos.TransactionConfidenceOrBuilder getConfidenceOrBuilder();
-
-    // optional .com.coinomi.core.protos.Transaction.Purpose purpose = 11 [default = UNKNOWN];
-    /**
-     * <code>optional .com.coinomi.core.protos.Transaction.Purpose purpose = 11 [default = UNKNOWN];</code>
-     */
-    boolean hasPurpose();
-    /**
-     * <code>optional .com.coinomi.core.protos.Transaction.Purpose purpose = 11 [default = UNKNOWN];</code>
-     */
-    com.coinomi.core.protos.Protos.Transaction.Purpose getPurpose();
   }
   /**
    * Protobuf type {@code com.coinomi.core.protos.Transaction}
@@ -7396,17 +7386,6 @@ public final class Protos {
                 confidence_ = subBuilder.buildPartial();
               }
               bitField0_ |= 0x00000020;
-              break;
-            }
-            case 88: {
-              int rawValue = input.readEnum();
-              com.coinomi.core.protos.Protos.Transaction.Purpose value = com.coinomi.core.protos.Protos.Transaction.Purpose.valueOf(rawValue);
-              if (value == null) {
-                unknownFields.mergeVarintField(11, rawValue);
-              } else {
-                bitField0_ |= 0x00000040;
-                purpose_ = value;
-              }
               break;
             }
           }
@@ -7637,125 +7616,6 @@ public final class Protos {
       }
 
       // @@protoc_insertion_point(enum_scope:com.coinomi.core.protos.Transaction.Pool)
-    }
-
-    /**
-     * Protobuf enum {@code com.coinomi.core.protos.Transaction.Purpose}
-     *
-     * <pre>
-     * For what purpose the transaction was created.
-     * </pre>
-     */
-    public enum Purpose
-        implements com.google.protobuf.ProtocolMessageEnum {
-      /**
-       * <code>UNKNOWN = 0;</code>
-       *
-       * <pre>
-       * Old wallets or the purpose genuinely is a mystery (e.g. imported from some external source).
-       * </pre>
-       */
-      UNKNOWN(0, 0),
-      /**
-       * <code>USER_PAYMENT = 1;</code>
-       *
-       * <pre>
-       * Created in response to a user request for payment. This is the normal case.
-       * </pre>
-       */
-      USER_PAYMENT(1, 1),
-      /**
-       * <code>KEY_ROTATION = 2;</code>
-       *
-       * <pre>
-       * Created automatically to move money from rotated keys.
-       * </pre>
-       */
-      KEY_ROTATION(2, 2),
-      ;
-
-      /**
-       * <code>UNKNOWN = 0;</code>
-       *
-       * <pre>
-       * Old wallets or the purpose genuinely is a mystery (e.g. imported from some external source).
-       * </pre>
-       */
-      public static final int UNKNOWN_VALUE = 0;
-      /**
-       * <code>USER_PAYMENT = 1;</code>
-       *
-       * <pre>
-       * Created in response to a user request for payment. This is the normal case.
-       * </pre>
-       */
-      public static final int USER_PAYMENT_VALUE = 1;
-      /**
-       * <code>KEY_ROTATION = 2;</code>
-       *
-       * <pre>
-       * Created automatically to move money from rotated keys.
-       * </pre>
-       */
-      public static final int KEY_ROTATION_VALUE = 2;
-
-
-      public final int getNumber() { return value; }
-
-      public static Purpose valueOf(int value) {
-        switch (value) {
-          case 0: return UNKNOWN;
-          case 1: return USER_PAYMENT;
-          case 2: return KEY_ROTATION;
-          default: return null;
-        }
-      }
-
-      public static com.google.protobuf.Internal.EnumLiteMap<Purpose>
-          internalGetValueMap() {
-        return internalValueMap;
-      }
-      private static com.google.protobuf.Internal.EnumLiteMap<Purpose>
-          internalValueMap =
-            new com.google.protobuf.Internal.EnumLiteMap<Purpose>() {
-              public Purpose findValueByNumber(int number) {
-                return Purpose.valueOf(number);
-              }
-            };
-
-      public final com.google.protobuf.Descriptors.EnumValueDescriptor
-          getValueDescriptor() {
-        return getDescriptor().getValues().get(index);
-      }
-      public final com.google.protobuf.Descriptors.EnumDescriptor
-          getDescriptorForType() {
-        return getDescriptor();
-      }
-      public static final com.google.protobuf.Descriptors.EnumDescriptor
-          getDescriptor() {
-        return com.coinomi.core.protos.Protos.Transaction.getDescriptor().getEnumTypes().get(1);
-      }
-
-      private static final Purpose[] VALUES = values();
-
-      public static Purpose valueOf(
-          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
-        if (desc.getType() != getDescriptor()) {
-          throw new java.lang.IllegalArgumentException(
-            "EnumValueDescriptor is not for this type.");
-        }
-        return VALUES[desc.getIndex()];
-      }
-
-      private final int index;
-      private final int value;
-
-      private Purpose(int index, int value) {
-        this.index = index;
-        this.value = value;
-      }
-
-      // @@protoc_insertion_point(enum_scope:com.coinomi.core.protos.Transaction.Purpose)
     }
 
     private int bitField0_;
@@ -8044,22 +7904,6 @@ public final class Protos {
       return confidence_;
     }
 
-    // optional .com.coinomi.core.protos.Transaction.Purpose purpose = 11 [default = UNKNOWN];
-    public static final int PURPOSE_FIELD_NUMBER = 11;
-    private com.coinomi.core.protos.Protos.Transaction.Purpose purpose_;
-    /**
-     * <code>optional .com.coinomi.core.protos.Transaction.Purpose purpose = 11 [default = UNKNOWN];</code>
-     */
-    public boolean hasPurpose() {
-      return ((bitField0_ & 0x00000040) == 0x00000040);
-    }
-    /**
-     * <code>optional .com.coinomi.core.protos.Transaction.Purpose purpose = 11 [default = UNKNOWN];</code>
-     */
-    public com.coinomi.core.protos.Protos.Transaction.Purpose getPurpose() {
-      return purpose_;
-    }
-
     private void initFields() {
       version_ = 0;
       hash_ = com.google.protobuf.ByteString.EMPTY;
@@ -8071,7 +7915,6 @@ public final class Protos {
       blockHash_ = java.util.Collections.emptyList();
       blockRelativityOffsets_ = java.util.Collections.emptyList();
       confidence_ = com.coinomi.core.protos.Protos.TransactionConfidence.getDefaultInstance();
-      purpose_ = com.coinomi.core.protos.Protos.Transaction.Purpose.UNKNOWN;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -8141,9 +7984,6 @@ public final class Protos {
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
         output.writeMessage(10, confidence_);
       }
-      if (((bitField0_ & 0x00000040) == 0x00000040)) {
-        output.writeEnum(11, purpose_.getNumber());
-      }
       getUnknownFields().writeTo(output);
     }
 
@@ -8202,10 +8042,6 @@ public final class Protos {
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(10, confidence_);
-      }
-      if (((bitField0_ & 0x00000040) == 0x00000040)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(11, purpose_.getNumber());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -8358,8 +8194,6 @@ public final class Protos {
           confidenceBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000200);
-        purpose_ = com.coinomi.core.protos.Protos.Transaction.Purpose.UNKNOWN;
-        bitField0_ = (bitField0_ & ~0x00000400);
         return this;
       }
 
@@ -8444,10 +8278,6 @@ public final class Protos {
         } else {
           result.confidence_ = confidenceBuilder_.build();
         }
-        if (((from_bitField0_ & 0x00000400) == 0x00000400)) {
-          to_bitField0_ |= 0x00000040;
-        }
-        result.purpose_ = purpose_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -8553,9 +8383,6 @@ public final class Protos {
         }
         if (other.hasConfidence()) {
           mergeConfidence(other.getConfidence());
-        }
-        if (other.hasPurpose()) {
-          setPurpose(other.getPurpose());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -9661,42 +9488,6 @@ public final class Protos {
           confidence_ = null;
         }
         return confidenceBuilder_;
-      }
-
-      // optional .com.coinomi.core.protos.Transaction.Purpose purpose = 11 [default = UNKNOWN];
-      private com.coinomi.core.protos.Protos.Transaction.Purpose purpose_ = com.coinomi.core.protos.Protos.Transaction.Purpose.UNKNOWN;
-      /**
-       * <code>optional .com.coinomi.core.protos.Transaction.Purpose purpose = 11 [default = UNKNOWN];</code>
-       */
-      public boolean hasPurpose() {
-        return ((bitField0_ & 0x00000400) == 0x00000400);
-      }
-      /**
-       * <code>optional .com.coinomi.core.protos.Transaction.Purpose purpose = 11 [default = UNKNOWN];</code>
-       */
-      public com.coinomi.core.protos.Protos.Transaction.Purpose getPurpose() {
-        return purpose_;
-      }
-      /**
-       * <code>optional .com.coinomi.core.protos.Transaction.Purpose purpose = 11 [default = UNKNOWN];</code>
-       */
-      public Builder setPurpose(com.coinomi.core.protos.Protos.Transaction.Purpose value) {
-        if (value == null) {
-          throw new NullPointerException();
-        }
-        bitField0_ |= 0x00000400;
-        purpose_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional .com.coinomi.core.protos.Transaction.Purpose purpose = 11 [default = UNKNOWN];</code>
-       */
-      public Builder clearPurpose() {
-        bitField0_ = (bitField0_ & ~0x00000400);
-        purpose_ = com.coinomi.core.protos.Protos.Transaction.Purpose.UNKNOWN;
-        onChanged();
-        return this;
       }
 
       // @@protoc_insertion_point(builder_scope:com.coinomi.core.protos.Transaction)
@@ -14961,7 +14752,7 @@ public final class Protos {
       "ence.Source\"8\n\004Type\022\013\n\007UNKNOWN\020\000\022\014\n\010BUIL" +
       "DING\020\001\022\013\n\007PENDING\020\002\022\010\n\004DEAD\020\003\"U\n\006Source\022" +
       "\022\n\016SOURCE_UNKNOWN\020\000\022\022\n\016SOURCE_NETWORK\020\001\022" +
-      "\017\n\013SOURCE_SELF\020\002\022\022\n\016SOURCE_TRUSTED\020\003\"\363\004\n" +
+      "\017\n\013SOURCE_SELF\020\002\022\022\n\016SOURCE_TRUSTED\020\003\"\357\003\n" +
       "\013Transaction\022\017\n\007version\030\001 \002(\005\022\014\n\004hash\030\002 " +
       "\002(\014\0227\n\004pool\030\003 \001(\0162).com.coinomi.core.pro" +
       "tos.Transaction.Pool\022\021\n\tlock_time\030\004 \001(\r\022" +
@@ -14972,34 +14763,31 @@ public final class Protos {
       "t\022\022\n\nblock_hash\030\010 \003(\014\022 \n\030block_relativit" +
       "y_offsets\030\t \003(\005\022B\n\nconfidence\030\n \001(\0132..co" +
       "m.coinomi.core.protos.TransactionConfide" +
-      "nce\022F\n\007purpose\030\013 \001(\0162,.com.coinomi.core." +
-      "protos.Transaction.Purpose:\007UNKNOWN\"Y\n\004P" +
-      "ool\022\013\n\007UNSPENT\020\004\022\t\n\005SPENT\020\005\022\014\n\010INACTIVE\020" +
-      "\002\022\010\n\004DEAD\020\n\022\013\n\007PENDING\020\020\022\024\n\020PENDING_INAC" +
-      "TIVE\020\022\":\n\007Purpose\022\013\n\007UNKNOWN\020\000\022\020\n\014USER_P",
-      "AYMENT\020\001\022\020\n\014KEY_ROTATION\020\002\"0\n\rAddressSta" +
-      "tus\022\017\n\007address\030\001 \002(\t\022\016\n\006status\030\002 \002(\t\"\306\002\n" +
-      "\014WalletPocket\022\032\n\022network_identifier\030\001 \002(" +
-      "\t\022\023\n\013description\030\002 \001(\t\022)\n\003key\030\003 \003(\0132\034.co" +
-      "m.coinomi.core.protos.Key\022\034\n\024last_seen_b" +
-      "lock_hash\030\004 \001(\014\022\036\n\026last_seen_block_heigh" +
-      "t\030\005 \001(\r\022!\n\031last_seen_block_time_secs\030\006 \001" +
-      "(\003\0229\n\013transaction\030\007 \003(\0132$.com.coinomi.co" +
-      "re.protos.Transaction\022>\n\016address_status\030" +
-      "\010 \003(\0132&.com.coinomi.core.protos.AddressS",
-      "tatus\"N\n\020ScryptParameters\022\014\n\004salt\030\001 \002(\014\022" +
-      "\020\n\001n\030\002 \001(\003:\00516384\022\014\n\001r\030\003 \001(\005:\0018\022\014\n\001p\030\004 \001" +
-      "(\005:\0011\"\366\002\n\006Wallet\022\022\n\007version\030\001 \001(\005:\0011\0220\n\n" +
-      "master_key\030\002 \002(\0132\034.com.coinomi.core.prot" +
-      "os.Key\022T\n\017encryption_type\030\003 \001(\0162..com.co" +
-      "inomi.core.protos.Wallet.EncryptionType:" +
-      "\013UNENCRYPTED\022H\n\025encryption_parameters\030\004 " +
-      "\001(\0132).com.coinomi.core.protos.ScryptPara" +
-      "meters\0226\n\007pockets\030\005 \003(\0132%.com.coinomi.co" +
-      "re.protos.WalletPocket\"N\n\016EncryptionType",
-      "\022\017\n\013UNENCRYPTED\020\001\022\030\n\024ENCRYPTED_SCRYPT_AE" +
-      "S\020\002\022\021\n\rENCRYPTED_AES\020\003B!\n\027com.coinomi.co" +
-      "re.protosB\006Protos"
+      "nce\"Y\n\004Pool\022\013\n\007UNSPENT\020\004\022\t\n\005SPENT\020\005\022\014\n\010I" +
+      "NACTIVE\020\002\022\010\n\004DEAD\020\n\022\013\n\007PENDING\020\020\022\024\n\020PEND" +
+      "ING_INACTIVE\020\022\"0\n\rAddressStatus\022\017\n\007addre" +
+      "ss\030\001 \002(\t\022\016\n\006status\030\002 \002(\t\"\306\002\n\014WalletPocke" +
+      "t\022\032\n\022network_identifier\030\001 \002(\t\022\023\n\013descrip",
+      "tion\030\002 \001(\t\022)\n\003key\030\003 \003(\0132\034.com.coinomi.co" +
+      "re.protos.Key\022\034\n\024last_seen_block_hash\030\004 " +
+      "\001(\014\022\036\n\026last_seen_block_height\030\005 \001(\r\022!\n\031l" +
+      "ast_seen_block_time_secs\030\006 \001(\003\0229\n\013transa" +
+      "ction\030\007 \003(\0132$.com.coinomi.core.protos.Tr" +
+      "ansaction\022>\n\016address_status\030\010 \003(\0132&.com." +
+      "coinomi.core.protos.AddressStatus\"N\n\020Scr" +
+      "yptParameters\022\014\n\004salt\030\001 \002(\014\022\020\n\001n\030\002 \001(\003:\005" +
+      "16384\022\014\n\001r\030\003 \001(\005:\0018\022\014\n\001p\030\004 \001(\005:\0011\"\366\002\n\006Wa" +
+      "llet\022\022\n\007version\030\001 \001(\005:\0011\0220\n\nmaster_key\030\002",
+      " \002(\0132\034.com.coinomi.core.protos.Key\022T\n\017en" +
+      "cryption_type\030\003 \001(\0162..com.coinomi.core.p" +
+      "rotos.Wallet.EncryptionType:\013UNENCRYPTED" +
+      "\022H\n\025encryption_parameters\030\004 \001(\0132).com.co" +
+      "inomi.core.protos.ScryptParameters\0226\n\007po" +
+      "ckets\030\005 \003(\0132%.com.coinomi.core.protos.Wa" +
+      "lletPocket\"N\n\016EncryptionType\022\017\n\013UNENCRYP" +
+      "TED\020\001\022\030\n\024ENCRYPTED_SCRYPT_AES\020\002\022\021\n\rENCRY" +
+      "PTED_AES\020\003B!\n\027com.coinomi.core.protosB\006P" +
+      "rotos"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -15053,7 +14841,7 @@ public final class Protos {
           internal_static_com_coinomi_core_protos_Transaction_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_com_coinomi_core_protos_Transaction_descriptor,
-              new java.lang.String[] { "Version", "Hash", "Pool", "LockTime", "UpdatedAt", "TransactionInput", "TransactionOutput", "BlockHash", "BlockRelativityOffsets", "Confidence", "Purpose", });
+              new java.lang.String[] { "Version", "Hash", "Pool", "LockTime", "UpdatedAt", "TransactionInput", "TransactionOutput", "BlockHash", "BlockRelativityOffsets", "Confidence", });
           internal_static_com_coinomi_core_protos_AddressStatus_descriptor =
             getDescriptor().getMessageTypes().get(8);
           internal_static_com_coinomi_core_protos_AddressStatus_fieldAccessorTable = new
