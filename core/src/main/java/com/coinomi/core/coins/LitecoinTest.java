@@ -7,7 +7,7 @@ import com.coinomi.core.Constants;
  */
 public class LitecoinTest extends CoinType {
     public LitecoinTest() {
-        id = Constants.ID_LITECOIN_TEST;
+        id = "litecoin.test";
 
         addressHeader = 111;
         p2shHeader = 196;
@@ -16,7 +16,7 @@ public class LitecoinTest extends CoinType {
         name = "Litecoin Test";
         symbol = "LTC";
         uriScheme = "litecoin";
-        bip44Index = 3;
+        bip44Index = 1;
     }
 
     private static LitecoinTest instance;

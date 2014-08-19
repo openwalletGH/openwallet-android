@@ -5,10 +5,6 @@ import com.google.bitcoin.core.Coin;
 import com.google.bitcoin.core.NetworkParameters;
 import com.google.bitcoin.crypto.ChildNumber;
 import com.google.bitcoin.crypto.HDUtils;
-import com.google.bitcoin.params.MainNetParams;
-import com.google.bitcoin.params.RegTestParams;
-import com.google.bitcoin.params.TestNet3Params;
-import com.google.bitcoin.params.UnitTestParams;
 
 import java.io.Serializable;
 import java.util.List;
@@ -61,9 +57,7 @@ abstract public class CoinType extends NetworkParameters implements Serializable
 
     @Nullable
     public static CoinType fromID(String id) {
-
-            return null;
-
+        return CoinID.fromId(id).getCoinType();
     }
 
     @Override

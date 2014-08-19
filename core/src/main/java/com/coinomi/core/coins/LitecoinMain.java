@@ -7,7 +7,7 @@ import com.coinomi.core.Constants;
  */
 public class LitecoinMain extends CoinType {
     public LitecoinMain() {
-        id = Constants.ID_LITECOIN_MAIN;
+        id = "litecoin.main";
 
         addressHeader = 48;
         p2shHeader = 5;

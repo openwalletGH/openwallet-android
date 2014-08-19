@@ -7,7 +7,7 @@ import com.coinomi.core.Constants;
  */
 public class DarkcoinMain extends CoinType {
     public DarkcoinMain() {
-        id = Constants.ID_DARKCOIN_MAIN;
+        id = "darkcoin.main";
 
         addressHeader = 76;
         p2shHeader = 5;
@@ -16,7 +16,7 @@ public class DarkcoinMain extends CoinType {
         name = "Darkcoin";
         symbol = "DRK";
         uriScheme = "darkcoin";
-        bip44Index = 8;
+        bip44Index = 5;
     }
 
     private static DarkcoinMain instance;

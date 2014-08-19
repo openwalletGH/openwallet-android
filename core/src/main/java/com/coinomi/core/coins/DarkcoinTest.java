@@ -7,7 +7,7 @@ import com.coinomi.core.Constants;
  */
 public class DarkcoinTest extends CoinType {
     public DarkcoinTest() {
-        id = Constants.ID_DARKCOIN_TEST;
+        id = "darkcoin.test";
 
         addressHeader = 111;
         p2shHeader = 196;
@@ -16,7 +16,7 @@ public class DarkcoinTest extends CoinType {
         name = "Darkcoin Test";
         symbol = "DRK";
         uriScheme = "darkcoin";
-        bip44Index = 9;
+        bip44Index = 1;
     }
 
     private static DarkcoinTest instance;

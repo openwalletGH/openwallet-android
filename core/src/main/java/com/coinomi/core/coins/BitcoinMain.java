@@ -7,7 +7,7 @@ import com.coinomi.core.Constants;
  */
 public class BitcoinMain extends CoinType {
     public BitcoinMain() {
-        id = Constants.ID_BITCOIN_MAIN;
+        id = "bitcoin.main";
 
         addressHeader = 0;
         p2shHeader = 5;

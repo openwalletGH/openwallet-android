@@ -8,7 +8,7 @@ import com.google.bitcoin.core.Coin;
  */
 public class DogecoinTest extends CoinType {
     public DogecoinTest() {
-        id = Constants.ID_DOGECOIN_TEST;
+        id = "dogecoin.test";
 
         addressHeader = 113;
         p2shHeader = 196;
@@ -17,7 +17,7 @@ public class DogecoinTest extends CoinType {
         name = "Dogecoin Test";
         symbol = "DOGE";
         uriScheme = "dogecoin";
-        bip44Index = 5;
+        bip44Index = 1;
         feePerKb = Coin.valueOf(100000000L);
     }
 

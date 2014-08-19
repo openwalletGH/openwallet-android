@@ -7,7 +7,7 @@ import com.coinomi.core.Constants;
  */
 public class PeercoinTest extends CoinType {
     public PeercoinTest() {
-        id = Constants.ID_PEERCOIN_TEST;
+        id = "peercoin.test";
 
         addressHeader = 111;
         p2shHeader = 196;
@@ -16,7 +16,7 @@ public class PeercoinTest extends CoinType {
         name = "Peercoin Test";
         symbol = "PPC";
         uriScheme = "peercoin"; // TODO verify, could be ppcoin?
-        bip44Index = 7;
+        bip44Index = 1;
     }
 
     private static PeercoinTest instance;

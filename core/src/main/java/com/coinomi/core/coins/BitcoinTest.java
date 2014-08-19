@@ -7,8 +7,8 @@ import com.coinomi.core.Constants;
  */
 public class BitcoinTest extends CoinType {
     public BitcoinTest() {
-        id = Constants.ID_BITCOIN_TEST;
-        
+        id = "bitcoin.test";
+
         addressHeader = 111;
         p2shHeader = 196;
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
