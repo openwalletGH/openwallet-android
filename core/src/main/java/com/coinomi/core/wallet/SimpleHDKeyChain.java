@@ -458,22 +458,14 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
             if (t == Protos.Key.Type.DETERMINISTIC_KEY) {
                 if (!key.hasDeterministicKey())
                     throw new UnreadableWalletException("Deterministic key missing extra data: " + key.toString());
-                byte[] chainCode = key.getDeterministicKey().getChainCode().toByteArray();
-                // Deserialize the path through the tree.
-                LinkedList<ChildNumber> path = newLinkedList();
-                for (int i : key.getDeterministicKey().getPathList())
-                    path.add(new ChildNumber(i));
-                // Deserialize the public key and path.
-                ECPoint pubkey = ECKey.CURVE.getCurve().decodePoint(key.getPublicKey().toByteArray());
-                final ImmutableList<ChildNumber> immutablePath = ImmutableList.copyOf(path);
 
                 if (chain == null) {
-                    DeterministicKey newRootKey = getDeterministicKey(crypter, key, chainCode,
-                            pubkey, immutablePath, null);
-                    chain = new SimpleHDKeyChain(newRootKey, crypter);
-                    chain.lookaheadSize = LAZY_CALCULATE_LOOKAHEAD; // TODO check if needed
-                    rootTreeSize = immutablePath.size();
+                    DeterministicKey rootKey = getDeterministicKey(crypter, key, null);
+                    chain = new SimpleHDKeyChain(rootKey, crypter);
+                    chain.lookaheadSize = LAZY_CALCULATE_LOOKAHEAD;
+                    rootTreeSize = rootKey.getPath().size();
                 }
+                LinkedList<ChildNumber> path = newLinkedList(getKeyProtoPath(key));
                 // Find the parent key assuming this is not the root key, and not an account key for a watching chain.
                 DeterministicKey parent = null;
                 if (path.size() > rootTreeSize) {
@@ -481,7 +473,7 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
                     parent = chain.hierarchy.get(path, false, false);
                     path.add(index);
                 }
-                DeterministicKey detkey = getDeterministicKey(crypter, key, chainCode, pubkey, immutablePath, parent);
+                DeterministicKey detkey = getDeterministicKey(crypter, key, parent);
                 if (log.isDebugEnabled()) {
                     log.debug("Deserializing: DETERMINISTIC_KEY: {}", detkey);
                 }
@@ -507,16 +499,24 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
                 chain.simpleKeyChain.importKey(detkey);
             }
         }
+        if (chain == null) {
+            throw new UnreadableWalletException("Could not create a key chain.");
+        }
         checkState(lookaheadSize >= 0);
         chain.setLookaheadSize(lookaheadSize);
         chain.maybeLookAhead();
         return chain;
     }
 
-    private static DeterministicKey getDeterministicKey(KeyCrypter crypter, Protos.Key key,
-                                                        byte[] chainCode, ECPoint pubkey,
-                                                        ImmutableList<ChildNumber> immutablePath,
-                                                        DeterministicKey parent) {
+    public static DeterministicKey getDeterministicKey(@Nullable KeyCrypter crypter, Protos.Key key,
+                                                       DeterministicKey parent) {
+        // Deserialize the path through the tree.
+        final ImmutableList<ChildNumber> immutablePath = getKeyProtoPath(key);
+        // Deserialize the public key.
+        ECPoint pubkey = ECKey.CURVE.getCurve().decodePoint(key.getPublicKey().toByteArray());
+        // Deserialize the chain code.
+        byte[] chainCode = key.getDeterministicKey().getChainCode().toByteArray();
+
         DeterministicKey detkey;
         if (key.hasSecretBytes()) {
             // Not encrypted: private key is available.
@@ -537,6 +537,14 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
             }
         }
         return detkey;
+    }
+
+    private static ImmutableList<ChildNumber> getKeyProtoPath(Protos.Key key) {
+        ImmutableList.Builder<ChildNumber> pathBuilder = ImmutableList.builder();
+        for (int i : key.getDeterministicKey().getPathList()) {
+            pathBuilder.add(new ChildNumber(i));
+        }
+        return pathBuilder.build();
     }
 
     @Override
