@@ -13,7 +13,7 @@ import android.widget.Toast;
 import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.wallet.WalletPocket;
 import com.coinomi.core.coins.CoinType;
-import com.coinomi.core.protos.WalletProtobufSerializer;
+import com.coinomi.core.wallet.WalletProtobufSerializer;
 import com.coinomi.wallet.service.CoinService;
 import com.coinomi.wallet.service.CoinServiceImpl;
 import com.coinomi.wallet.util.CrashReporter;

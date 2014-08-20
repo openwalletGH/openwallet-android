@@ -1,4 +1,4 @@
-package com.coinomi.core.protos;
+package com.coinomi.core.wallet;
 
 import com.coinomi.core.Constants;
 import com.coinomi.core.wallet.Wallet;

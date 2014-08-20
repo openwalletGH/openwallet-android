@@ -15,7 +15,6 @@ import com.google.bitcoin.core.Utils;
 import com.google.bitcoin.crypto.DeterministicHierarchy;
 import com.google.bitcoin.crypto.DeterministicKey;
 import com.google.bitcoin.crypto.HDKeyDerivation;
-import com.google.bitcoin.store.UnreadableWalletException;
 import com.google.bitcoin.utils.BriefLogFormatter;
 import com.google.bitcoin.wallet.DeterministicSeed;
 import com.google.common.collect.ImmutableList;
@@ -125,7 +124,7 @@ public class WalletPocketTest {
 
         Protos.WalletPocket walletPocketProto = pocket.toProtobuf();
 
-        WalletPocket newPocket = new WalletPocketSerializer().readWallet(walletPocketProto, null);
+        WalletPocket newPocket = new WalletPocketProtobufSerializer().readWallet(walletPocketProto, null);
 
         assertEquals(pocket.getCoinType(), newPocket.getCoinType());
         assertEquals(pocket.getDescription(), newPocket.getDescription());

@@ -205,7 +205,7 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
 
     /**
      * Adds a transaction that has been associated with a particular wallet pool. This is intended for usage by
-     * deserialization code, such as the {@link WalletPocketSerializer} class. It isn't normally useful for
+     * deserialization code, such as the {@link WalletPocketProtobufSerializer} class. It isn't normally useful for
      * applications. It does not trigger auto saving.
      */
     public void addWalletTransaction(WalletTransaction wtx) {
@@ -743,7 +743,7 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
     @VisibleForTesting Protos.WalletPocket toProtobuf() {
         lock.lock();
         try {
-            return WalletPocketSerializer.toProtobuf(this);
+            return WalletPocketProtobufSerializer.toProtobuf(this);
         } finally {
             lock.unlock();
         }

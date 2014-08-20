@@ -32,7 +32,6 @@ import com.google.bitcoin.core.TransactionInput;
 import com.google.bitcoin.core.TransactionOutPoint;
 import com.google.bitcoin.core.TransactionOutput;
 import com.google.bitcoin.crypto.KeyCrypter;
-import com.google.bitcoin.crypto.KeyCrypterScrypt;
 import com.google.bitcoin.store.UnreadableWalletException;
 import com.google.bitcoin.wallet.WalletTransaction;
 import com.google.protobuf.ByteString;
@@ -40,8 +39,6 @@ import com.google.protobuf.ByteString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -57,8 +54,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * @author Giannis Dzegoutanis
  */
-public class WalletPocketSerializer {
-    private static final Logger log = LoggerFactory.getLogger(WalletPocketSerializer.class);
+public class WalletPocketProtobufSerializer {
+    private static final Logger log = LoggerFactory.getLogger(WalletPocketProtobufSerializer.class);
 
     // Used for de-serialization
     protected Map<ByteString, Transaction> txMap = new HashMap<ByteString, Transaction>();
@@ -297,16 +294,6 @@ public class WalletPocketSerializer {
 
         return wallet;
     }
-//
-//
-//    /**
-//     * Returns the loaded protocol buffer from the given byte stream. You normally want
-//     * {@link Wallet#loadFromFile(java.io.File)} instead - this method is designed for low level work involving the
-//     * wallet file format itself.
-//     */
-//    public static Protos.WalletPocket parseToProto(InputStream input) throws IOException {
-//        return Protos.WalletPocket.parseFrom(input);
-//    }
 
     private void readTransaction(Protos.Transaction txProto, CoinType params) throws UnreadableWalletException {
         Transaction tx = new Transaction(params);
