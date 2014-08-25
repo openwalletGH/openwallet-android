@@ -30,6 +30,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.GuardedBy;
 
+import static com.google.common.base.Preconditions.checkState;
+
 /**
  * @author Giannis Dzegoutanis
  */
@@ -48,6 +50,7 @@ final public class Wallet implements ConnectionEventListener {
     private final static int ACCOUNT_ZERO = 0;
 
     @Nullable transient BlockchainConnection blockchainConnection;
+    private int version;
 
     public Wallet(List<String> mnemonic) throws IOException, MnemonicException {
         this(mnemonic, "");
@@ -55,13 +58,14 @@ final public class Wallet implements ConnectionEventListener {
 
     public Wallet(List<String> mnemonic, String password) throws IOException, MnemonicException {
         new MnemonicCode().check(mnemonic);
-
-
-
         DeterministicSeed seed = new DeterministicSeed(mnemonic, "", 0);
-//        masterKey = HDKeyDerivation.createMasterPrivateKey(seed.getSeedBytes());
-        masterKey = HDKeyDerivation.createMasterPrivateKey(seed.getSeedBytes());
 
+        masterKey = HDKeyDerivation.createMasterPrivateKey(seed.getSeedBytes());
+        pockets = new LinkedHashMap<CoinType, WalletPocket>();
+    }
+
+    public Wallet(DeterministicKey masterKey) {
+        this.masterKey = masterKey;
         pockets = new LinkedHashMap<CoinType, WalletPocket>();
     }
 
@@ -142,6 +146,12 @@ final public class Wallet implements ConnectionEventListener {
         pockets.put(coinType, new WalletPocket(rootKey, coinType));
     }
 
+
+    public void addPocket(WalletPocket pocket) {
+        checkState(pockets.containsKey(pocket.getCoinType()) == false, "Cannot replace wallet pocket");
+        pockets.put(pocket.getCoinType(), pocket);
+    }
+
     List<CoinType> getCoinTypes() {
         lock.lock();
         try {
@@ -187,5 +197,13 @@ final public class Wallet implements ConnectionEventListener {
         WalletPocket pocket = getPocket((CoinType) address.getParameters());
 
         pocket.sendCoins(address, amount);
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
+    }
+
+    public int getVersion() {
+        return version;
     }
 }

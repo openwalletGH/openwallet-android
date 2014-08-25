@@ -460,7 +460,7 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
                     throw new UnreadableWalletException("Deterministic key missing extra data: " + key.toString());
 
                 if (chain == null) {
-                    DeterministicKey rootKey = getDeterministicKey(crypter, key, null);
+                    DeterministicKey rootKey = getDeterministicKey(key, null, crypter);
                     chain = new SimpleHDKeyChain(rootKey, crypter);
                     chain.lookaheadSize = LAZY_CALCULATE_LOOKAHEAD;
                     rootTreeSize = rootKey.getPath().size();
@@ -473,7 +473,7 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
                     parent = chain.hierarchy.get(path, false, false);
                     path.add(index);
                 }
-                DeterministicKey detkey = getDeterministicKey(crypter, key, parent);
+                DeterministicKey detkey = getDeterministicKey(key, parent, crypter);
                 if (log.isDebugEnabled()) {
                     log.debug("Deserializing: DETERMINISTIC_KEY: {}", detkey);
                 }
@@ -508,8 +508,9 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
         return chain;
     }
 
-    public static DeterministicKey getDeterministicKey(@Nullable KeyCrypter crypter, Protos.Key key,
-                                                       DeterministicKey parent) {
+    public static DeterministicKey getDeterministicKey(Protos.Key key,
+                                                       @Nullable DeterministicKey parent,
+                                                       @Nullable KeyCrypter crypter) {
         // Deserialize the path through the tree.
         final ImmutableList<ChildNumber> immutablePath = getKeyProtoPath(key);
         // Deserialize the public key.
