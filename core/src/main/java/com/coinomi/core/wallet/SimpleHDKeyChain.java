@@ -168,6 +168,16 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
         addToBasicChain(internalKey);
     }
 
+    public boolean isEncrypted() {
+        lock.lock();
+        try {
+            return rootKey.isEncrypted();
+        }
+        finally {
+            lock.unlock();
+        }
+    }
+
     /** Returns a freshly derived key that has not been returned by this method before. */
     @Override
     public DeterministicKey getKey(KeyPurpose purpose) {

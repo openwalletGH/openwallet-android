@@ -3,6 +3,7 @@ package com.coinomi.core.wallet;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.network.interfaces.BlockchainConnection;
 import com.coinomi.core.network.interfaces.ConnectionEventListener;
+import com.coinomi.core.protos.Protos;
 import com.google.bitcoin.core.Address;
 import com.google.bitcoin.core.Coin;
 import com.google.bitcoin.core.InsufficientMoneyException;
@@ -11,17 +12,23 @@ import com.google.bitcoin.core.Transaction;
 import com.google.bitcoin.crypto.DeterministicHierarchy;
 import com.google.bitcoin.crypto.DeterministicKey;
 import com.google.bitcoin.crypto.HDKeyDerivation;
+import com.google.bitcoin.crypto.KeyCrypter;
 import com.google.bitcoin.crypto.MnemonicCode;
 import com.google.bitcoin.crypto.MnemonicException;
+import com.google.bitcoin.store.UnreadableWalletException;
 import com.google.bitcoin.utils.Threading;
 import com.google.bitcoin.wallet.DeterministicSeed;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.spongycastle.crypto.params.KeyParameter;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.SecureRandom;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -30,6 +37,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.GuardedBy;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 /**
@@ -76,7 +84,7 @@ final public class Wallet implements ConnectionEventListener {
         sr.nextBytes(entropy);
 
         MnemonicCode mc = new MnemonicCode();
-        List<String> mnemonic = null;
+        List<String> mnemonic;
         try {
             mnemonic = mc.toMnemonic(entropy);
         } catch (MnemonicException.MnemonicLengthException e) {
@@ -85,40 +93,6 @@ final public class Wallet implements ConnectionEventListener {
 
         return mnemonic;
     }
-
-//    private List<ChildNumber> getPath(CoinType coinType, int chain, int keyIndex) {
-//        String path = String.format(BIP_44_KEY_PATH, coinType.getBip44Index(), ACCOUNT_ZERO, chain, keyIndex);
-//        return HDUtils.parsePath(path);
-//    }
-
-//    public DeterministicKey getExternalKey(CoinType parameters, int keyIndex) {
-//        List<ChildNumber> path = getPath(parameters, EXTERNAL_ADDRESS_INDEX, keyIndex);
-//        return bip44Hierarchy.get(path, false, true);
-//    }
-
-
-//    public Address getExternalAddress(CoinType parameters, int keyIndex) {
-//        DeterministicKey key = getExternalKey(parameters, keyIndex);
-//        return key.toAddress(parameters);
-//    }
-
-
-//    public DeterministicKey getInternalKey(CoinType parameters, int keyIndex) {
-//        List<ChildNumber> path = getPath(parameters, INTERNAL_ADDRESS_INDEX, keyIndex);
-//        return bip44Hierarchy.get(path, false, true);
-//    }
-
-//    public Address getInternalAddress(CoinType parameters, int keyIndex) {
-//        DeterministicKey key = getExternalKey(parameters, keyIndex);
-//        return key.toAddress(parameters);
-//    }
-
-//    List<Address> getKeyToWatch(CoinType parameters) {
-//        KeyChain chain = getPocket(parameters);
-//
-//
-//        chain.getKeys();
-//    }
 
     public void createCoinPockets(List<CoinType> coins) {
         for (CoinType coin : coins) {
@@ -130,7 +104,6 @@ final public class Wallet implements ConnectionEventListener {
     public WalletPocket getPocket(CoinType coinType) {
         lock.lock();
         try {
-
             if (!pockets.containsKey(coinType)) {
                 createPocket(coinType);
             }
@@ -140,16 +113,35 @@ final public class Wallet implements ConnectionEventListener {
         }
     }
 
+    public List<WalletPocket> getPockets() {
+        lock.lock();
+        try {
+            return ImmutableList.copyOf(pockets.values());
+        } finally {
+            lock.unlock();
+        }
+    }
+
     private void createPocket(CoinType coinType) {
         DeterministicHierarchy hierarchy = new DeterministicHierarchy(masterKey);
         DeterministicKey rootKey = hierarchy.get(coinType.getBip44Path(ACCOUNT_ZERO), false, true);
-        pockets.put(coinType, new WalletPocket(rootKey, coinType));
+        pockets.put(coinType, new WalletPocket(rootKey, coinType, masterKey.getKeyCrypter()));
     }
 
 
     public void addPocket(WalletPocket pocket) {
-        checkState(pockets.containsKey(pocket.getCoinType()) == false, "Cannot replace wallet pocket");
+        checkState(!pockets.containsKey(pocket.getCoinType()), "Cannot replace an existing wallet pocket");
+        //TODO check if key crypter is the same
         pockets.put(pocket.getCoinType(), pocket);
+    }
+
+    public DeterministicKey getMasterKey() {
+        lock.lock();
+        try {
+            return masterKey;
+        } finally {
+            lock.unlock();
+        }
     }
 
     List<CoinType> getCoinTypes() {
@@ -161,6 +153,16 @@ final public class Wallet implements ConnectionEventListener {
         }
     }
 
+    /** Returns the {@link KeyCrypter} in use or null if the key chain is not encrypted. */
+    @Nullable
+    public KeyCrypter getKeyCrypter() {
+        lock.lock();
+        try {
+            return masterKey.getKeyCrypter();
+        } finally {
+            lock.unlock();
+        }
+    }
 
     public int getLastBlockSeenHeight() {
         //TODO
@@ -206,4 +208,72 @@ final public class Wallet implements ConnectionEventListener {
     public int getVersion() {
         return version;
     }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Serialization support
+    //
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    @VisibleForTesting
+    Protos.Wallet toProtobuf() {
+        lock.lock();
+        try {
+            return WalletProtobufSerializer.toProtobuf(this);
+        } finally {
+            lock.unlock();
+        }
+    }
+    /**
+     * Returns a wallet deserialized from the given file.
+     */
+    public static Wallet loadFromFile(File f) throws UnreadableWalletException {
+        try {
+            FileInputStream stream = null;
+            try {
+                stream = new FileInputStream(f);
+                return loadFromFileStream(stream);
+            } finally {
+                if (stream != null) stream.close();
+            }
+        } catch (IOException e) {
+            throw new UnreadableWalletException("Could not open file", e);
+        }
+    }
+
+    /**
+     * Returns a wallet deserialized from the given input stream.
+     */
+    public static Wallet loadFromFileStream(InputStream stream) throws UnreadableWalletException {
+        return WalletProtobufSerializer.readWallet(stream);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Encryption support
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Encrypt the keys in the group using the KeyCrypter and the AES key. A good default KeyCrypter to use is
+     * {@link com.google.bitcoin.crypto.KeyCrypterScrypt}.
+     *
+     * @throws com.google.bitcoin.crypto.KeyCrypterException Thrown if the wallet encryption fails for some reason,
+     *         leaving the group unchanged.
+     */
+    public void encrypt(KeyCrypter keyCrypter, KeyParameter aesKey) {
+        checkNotNull(keyCrypter);
+        checkNotNull(aesKey);
+
+        lock.lock();
+        try {
+            for (WalletPocket pocket : pockets.values()) {
+                pocket.encrypt(keyCrypter, aesKey);
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    // Full decryption is not needed as the keys can be decrypted on the fly when signing transactions
 }

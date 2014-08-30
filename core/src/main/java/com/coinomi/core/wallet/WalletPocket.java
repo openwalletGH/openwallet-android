@@ -39,6 +39,7 @@ import com.google.bitcoin.core.TransactionOutput;
 import com.google.bitcoin.core.Utils;
 import com.google.bitcoin.core.VarInt;
 import com.google.bitcoin.crypto.DeterministicKey;
+import com.google.bitcoin.crypto.KeyCrypter;
 import com.google.bitcoin.script.Script;
 import com.google.bitcoin.utils.ListenerRegistration;
 import com.google.bitcoin.utils.Threading;
@@ -54,6 +55,7 @@ import com.google.common.collect.Lists;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.spongycastle.crypto.params.KeyParameter;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -128,7 +130,7 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
     // All transactions together.
     protected final Map<Sha256Hash, Transaction> transactions;
 
-    @VisibleForTesting final SimpleHDKeyChain keys;
+    @VisibleForTesting SimpleHDKeyChain keys;
 
     @Nullable private transient BlockchainConnection blockchainConnection;
 
@@ -136,8 +138,8 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
 
     private final transient CopyOnWriteArrayList<ListenerRegistration<WalletPocketEventListener>> listeners;
 
-    public WalletPocket(DeterministicKey rootKey, CoinType coinType) {
-        this(new SimpleHDKeyChain(rootKey), coinType);
+    public WalletPocket(DeterministicKey rootKey, CoinType coinType, @Nullable KeyCrypter keyCrypter) {
+        this(new SimpleHDKeyChain(rootKey, keyCrypter), coinType);
     }
 
     WalletPocket(SimpleHDKeyChain keys, CoinType coinType) {
@@ -260,6 +262,15 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
 
     public CoinType getCoinType() {
         return coinType;
+    }
+
+    /**
+     * Get the wallet pocket's KeyCrypter, or null if the wallet pocket is not encrypted.
+     * (Used in encrypting/ decrypting an ECKey).
+     */
+    @Nullable
+    public KeyCrypter getKeyCrypter() {
+        return keys.getKeyCrypter();
     }
 
     /** Returns the hash of the last seen best-chain block, or null if the wallet is too old to store this data. */
@@ -664,10 +675,12 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
     private void subscribeIfNeeded() {
         lock.lock();
         try {
-            List<Address> addressesToWatch = getAddressesToWatch();
-            if (addressesToWatch.size() > 0) {
-                addressesPendingSubscription.addAll(addressesToWatch);
-                blockchainConnection.subscribeToAddresses(coinType, addressesToWatch, this);
+            if (blockchainConnection != null) {
+                List<Address> addressesToWatch = getAddressesToWatch();
+                if (addressesToWatch.size() > 0) {
+                    addressesPendingSubscription.addAll(addressesToWatch);
+                    blockchainConnection.subscribeToAddresses(coinType, addressesToWatch, this);
+                }
             }
         } catch (Exception e) {
             log.error("Error subscribing to addresses", e);
@@ -751,9 +764,70 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //
+    // Encryption support
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Encrypt the keys in the group using the KeyCrypter and the AES key. A good default KeyCrypter to use is
+     * {@link com.google.bitcoin.crypto.KeyCrypterScrypt}.
+     *
+     * @throws com.google.bitcoin.crypto.KeyCrypterException Thrown if the wallet encryption fails for some reason,
+     *         leaving the group unchanged.
+     */
+    public void encrypt(KeyCrypter keyCrypter, KeyParameter aesKey) {
+        checkNotNull(keyCrypter);
+        checkNotNull(aesKey);
+
+        lock.lock();
+        try {
+            this.keys = this.keys.toEncrypted(keyCrypter, aesKey);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Decrypt the keys in the group using the previously given key crypter and the AES key. A good default
+     * KeyCrypter to use is {@link com.google.bitcoin.crypto.KeyCrypterScrypt}.
+     *
+     * @throws com.google.bitcoin.crypto.KeyCrypterException Thrown if the wallet decryption fails for some reason, leaving the group unchanged.
+     */
+    /* package */ void decrypt(KeyParameter aesKey) {
+        checkNotNull(aesKey);
+
+        lock.lock();
+        try {
+            this.keys = this.keys.toDecrypted(aesKey);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //
     // Transaction signing support
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Sends coins to the given address but does not broadcast the resulting pending transaction.
+     */
+    public Transaction sendCoinsOffline(Address address, Coin amount) throws InsufficientMoneyException {
+        return sendCoinsOffline(address, amount, null);
+    }
+
+    /**
+     * Sends coins to the given address but does not broadcast the resulting pending transaction.
+     */
+    public Transaction sendCoinsOffline(Address address, Coin amount, @Nullable KeyParameter aesKey)
+            throws InsufficientMoneyException {
+        checkState(address.getParameters() instanceof CoinType);
+        SendRequest request = SendRequest.to(address, amount);
+        request.feePerKb = ((CoinType)address.getParameters()).getFeePerKb();
+
+        return sendCoinsOffline(request);
+    }
 
     /**
      * Sends coins to the given address but does not broadcast the resulting pending transaction.
@@ -866,8 +940,12 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
 
             // Now sign the inputs, thus proving that we are entitled to redeem the connected outputs.
             if (req.signInputs) {
-//                req.tx.signInputs(Transaction.SigHash.ALL, this, req.aesKey);
-                req.tx.signInputs(Transaction.SigHash.ALL, true, keys);
+                if (keys.isEncrypted()) {
+                    req.tx.signInputs(Transaction.SigHash.ALL, true, keys.toDecrypted(req.aesKey));
+                }
+                else {
+                    req.tx.signInputs(Transaction.SigHash.ALL, true, keys);
+                }
             }
 
             // Check size.
@@ -1168,7 +1246,7 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
         return currentAddress(SimpleHDKeyChain.KeyPurpose.RECEIVE_FUNDS);
     }
 
-    Address currentAddress(SimpleHDKeyChain.KeyPurpose purpose) {
+    @VisibleForTesting Address currentAddress(SimpleHDKeyChain.KeyPurpose purpose) {
         lock.lock();
         try {
             // TODO make return an unused address
@@ -1177,6 +1255,19 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
             lock.unlock();
 
             subscribeIfNeeded();
+        }
+    }
+
+    /**
+     * Used to force keys creation, could take long time to complete so use it in a background
+     * thread.
+     */
+    @VisibleForTesting void initializeAllKeysIfNeeded() {
+        lock.lock();
+        try {
+            keys.maybeLookAhead();
+        } finally {
+            lock.unlock();
         }
     }
 }
