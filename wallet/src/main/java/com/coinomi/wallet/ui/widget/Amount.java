@@ -9,6 +9,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.coinomi.wallet.R;
+import com.coinomi.wallet.util.Fonts;
 import com.google.bitcoin.core.Coin;
 
 /**
@@ -40,11 +41,8 @@ public class Amount extends RelativeLayout{
             if (isBig) {
                 amount.setTextAppearance(context, R.style.AmountBig);
             }
-            Typeface robotoLight = Typeface.createFromAsset(context.getAssets(), "fonts/Roboto-Light.ttf");
-            Typeface robotoThin = Typeface.createFromAsset(context.getAssets(), "fonts/Roboto-Thin.ttf");
-
-            amount.setTypeface(isBig ? robotoThin : robotoLight);
-            symbol.setTypeface(robotoLight);
+            Fonts.setTypeface(amount, isBig ? Fonts.Font.ROBOTO_THIN : Fonts.Font.ROBOTO_LIGHT);
+            Fonts.setTypeface(symbol, Fonts.Font.ROBOTO_LIGHT);
         } catch (RuntimeException ignore) { }
 
     }
