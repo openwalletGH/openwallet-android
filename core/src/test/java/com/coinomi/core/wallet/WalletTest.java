@@ -33,7 +33,7 @@ public class WalletTest {
         wallet = new Wallet(MNEMONIC);
 
         wallet.createCoinPockets(ImmutableList.of(BitcoinMain.get(),
-                LitecoinMain.get(), DogecoinMain.get()));
+                LitecoinMain.get(), DogecoinMain.get()), true);
     }
 
     @Test

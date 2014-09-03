@@ -265,7 +265,7 @@ public class ServerClient implements BlockchainConnection {
 
     @Override
     public void getTx(CoinType coinType, final AddressStatus status, final UnspentTx utx, final TransactionEventListener listener) {
-// {"params": ["a52418acead4fbc25252cba18f26de88166ef065e7237200253d27ef7ca53505"], "id": 27, "method": "blockchain.transaction.get"}
+    // {"params": ["a52418acead4fbc25252cba18f26de88166ef065e7237200253d27ef7ca53505"], "id": 27, "method": "blockchain.transaction.get"}
 
         StratumClient client = checkNotNull(connections.get(coinType));
 

@@ -9,10 +9,7 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="action_example">Action</string>
     <string name="action_settings">Settings</string>
-
-
-
-    <string name="send_coins_fragment_scan_qr_code">QR-code</string>
+    <string name="action_restore_wallet">Restore wallet</string>
     <string name="send_coins_fragment_receiving_address_label">Pay to</string>
     <string name="send_coins_fragment_receiving_address_error">Invalid Bitcoin Address!</string>
     <string name="send_coins_fragment_amount_label">Amount to pay</string>
@@ -24,11 +21,32 @@
     <string name="send_coins_failed_msg">Failed!</string>
     <string name="send_coins_error_msg">Problem sending coins!</string>
 
+    <!-- Errors -->
+    <string name="error_could_not_read_wallet">Could not read wallet</string>
 
-    <!-- generic buttons -->
+    <!-- Generic buttons -->
     <string name="button_dismiss">Dismiss</string>
-
+    <string name="button_next">next</string>
+    <string name="button_scan_qr_code">Scan QR code</string>
     <string name="wallet_title_receive">receive</string>
     <string name="wallet_title_info">info</string>
     <string name="wallet_title_send">send</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_test">TestActivity</string>
+
+    <!-- Welcome fragment -->
+    <string name="welcome_text">Welcome to Coinomi wallet</string>
+    <string name="create_wallet">Create a new wallet</string>
+    <string name="restore_wallet">Restore a wallet</string>
+
+    <!-- Passphrase fragment -->
+    <string name="passphrase_info">This is your secret passphrase to access your wallet. Please write it down on a paper and keep it in a secret place, as anyone with access to it has access to your funds. If you lose your passphrase, we cannot do anything to recover your wallet.</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!-- Restore fragment -->
+    <string name="restore_info">Please enter your secret passphrase:</string>
+    <string name="restore_verifying">Please wait while your passphrase is being verified</string>
+    <string name="restore_error">Could not restore wallet</string>
+    <string name="extra_entropy">Extra entropy</string>
+
 </resources>

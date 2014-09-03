@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Typeface;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
@@ -17,9 +18,8 @@ import com.coinomi.core.wallet.WalletProtobufSerializer;
 import com.coinomi.wallet.service.CoinService;
 import com.coinomi.wallet.service.CoinServiceImpl;
 import com.coinomi.wallet.util.CrashReporter;
-import com.coinomi.wallet.util.Io;
+import com.coinomi.wallet.util.Fonts;
 import com.coinomi.wallet.util.LinuxSecureRandom;
-import com.google.bitcoin.crypto.MnemonicException;
 import com.google.bitcoin.store.UnreadableWalletException;
 import com.google.bitcoin.utils.Threading;
 
@@ -30,8 +30,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
 
-import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 //import ch.qos.logback.classic.Level;
 //import ch.qos.logback.classic.LoggerContext;
@@ -46,6 +47,7 @@ import javax.annotation.Nonnull;
  * @author Andreas Schildbach
  */
 public class WalletApplication extends Application {
+    private static HashMap<String, Typeface> typefaces;
     private Configuration config;
     private ActivityManager activityManager;
 
@@ -54,7 +56,7 @@ public class WalletApplication extends Application {
     private Intent coinServiceResetBlockchainIntent;
 
     private File walletFile;
-    private Wallet wallet;
+    @Nullable private Wallet wallet;
     private PackageInfo packageInfo;
 
     private static final Logger log = LoggerFactory.getLogger(WalletApplication.class);
@@ -99,13 +101,17 @@ public class WalletApplication extends Application {
 
         walletFile = getFileStreamPath(Constants.WALLET_FILENAME_PROTOBUF);
 
-        loadWalletFromProtobuf();
+        loadWallet();
 
         config.updateLastVersionCode(packageInfo.versionCode);
 
         afterLoadWallet();
 
+        Fonts.initFonts(this.getAssets());
     }
+
+
+
 
     private void afterLoadWallet()
     {
@@ -173,12 +179,26 @@ public class WalletApplication extends Application {
         return config;
     }
 
-    public Wallet getWallet()
-    {
+    @Nullable
+    public Wallet getWallet() {
         return wallet;
     }
 
-    private void loadWalletFromProtobuf() {
+    @Nullable
+    public WalletPocket getWalletPocket(CoinType type) {
+        if (wallet != null) {
+            return wallet.getPocket(type);
+        }
+        else { return null; }
+    }
+
+    public void setWallet(Wallet wallet) {
+        this.wallet = wallet;
+        this.wallet.autosaveToFile(walletFile,
+                Constants.WALLET_WRITE_DELAY, Constants.WALLET_WRITE_DELAY_UNIT, null);
+    }
+
+    private void loadWallet() {
         if (walletFile.exists())
         {
             final long start = System.currentTimeMillis();
@@ -189,30 +209,24 @@ public class WalletApplication extends Application {
             {
                 walletStream = new FileInputStream(walletFile);
 
-                wallet = new WalletProtobufSerializer().readWallet(walletStream);
+                setWallet(WalletProtobufSerializer.readWallet(walletStream));
 
-//                if (!wallet.getParams().equals(Constants.NETWORK_PARAMETERS))
-//                    throw new UnreadableWalletException("bad wallet network parameters: " + wallet.getParams().getId());
+
+                System.out.println(WalletProtobufSerializer.toProtobuf(wallet).toString());
+
 
                 log.info("wallet loaded from: '" + walletFile + "', took " + (System.currentTimeMillis() - start) + "ms");
             }
             catch (final FileNotFoundException x)
             {
                 log.error("problem loading wallet", x);
-
-                Toast.makeText(WalletApplication.this, x.getClass().getName(), Toast.LENGTH_LONG).show();
-
-                //TODO show wallet restoration activity
-//                wallet = restoreWalletFromBackup();
+                Toast.makeText(WalletApplication.this, R.string.error_could_not_read_wallet, Toast.LENGTH_LONG).show();
             }
             catch (final UnreadableWalletException x)
             {
                 log.error("problem loading wallet", x);
 
-                Toast.makeText(WalletApplication.this, x.getClass().getName(), Toast.LENGTH_LONG).show();
-
-                //TODO show wallet restoration activity
-//                wallet = restoreWalletFromBackup();
+                Toast.makeText(WalletApplication.this, R.string.error_could_not_read_wallet, Toast.LENGTH_LONG).show();
             }
             finally
             {
@@ -239,22 +253,21 @@ public class WalletApplication extends Application {
 //            if (!wallet.getParams().equals(Constants.NETWORK_PARAMETERS))
 //                throw new Error("bad wallet network parameters: " + wallet.getParams().getId());
         }
-        else
-        {
-            // TODO handle exceptions
-            try {
-                log.info("Creating a new wallet from mnemonic");
-                wallet = new Wallet(Constants.TEST_MNEMONIC);
-                log.info("Adding coin pockets for some coins");
-                wallet.createCoinPockets(Constants.COINS_TEST);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (MnemonicException e) {
-                e.printStackTrace();
-            }
-
-            log.info("new wallet created");
-        }
+        // ELSE create a wallet later
+//        else
+//        {
+//            // TODO handle exceptions
+//            try {
+//                log.info("Creating a new wallet from mnemonic");
+//                wallet = new Wallet(Constants.TEST_MNEMONIC);
+//                log.info("Adding coin pockets for some coins");
+//                wallet.createCoinPockets(Constants.COINS_TEST);
+//            } catch (MnemonicException e) {
+//                e.printStackTrace();
+//            }
+//
+//            log.info("new wallet created");
+//        }
 
         // TODO check if needed
         // this check is needed so encrypted wallets won't get their private keys removed accidently
@@ -263,29 +276,18 @@ public class WalletApplication extends Application {
 //                throw new Error("found read-only key, but wallet is likely an encrypted wallet from the future");
     }
 
-    public void saveWallet()
-    {
-        try
-        {
-            protobufSerializeWallet(wallet);
-        }
-        catch (final IOException x)
-        {
-            throw new RuntimeException(x);
+
+
+    public void saveWalletNow() {
+        if (wallet != null) {
+            wallet.saveNow();
         }
     }
 
-    private void protobufSerializeWallet(@Nonnull final Wallet wallet) throws IOException
-    {
-        final long start = System.currentTimeMillis();
-
-        wallet.saveToFile(walletFile);
-
-        // make wallets world accessible in test mode
-        if (Constants.TEST)
-            Io.chmod(walletFile, 0777);
-
-        log.debug("wallet saved to: '" + walletFile + "', took " + (System.currentTimeMillis() - start) + "ms");
+    public void saveWalletLater() {
+        if (wallet != null) {
+            wallet.saveLater();
+        }
     }
 
     public void startBlockchainService(final boolean cancelCoinsReceived)
@@ -317,9 +319,5 @@ public class WalletApplication extends Application {
     public PackageInfo packageInfo()
     {
         return packageInfo;
-    }
-
-    public WalletPocket getWalletPocket(CoinType type) {
-        return wallet.getPocket(type);
     }
 }

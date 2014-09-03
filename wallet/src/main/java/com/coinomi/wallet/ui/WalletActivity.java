@@ -2,6 +2,7 @@ package com.coinomi.wallet.ui;
 
 import android.app.Activity;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -10,6 +11,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -22,12 +24,13 @@ import android.widget.Toast;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
+import com.coinomi.wallet.WalletApplication;
 
 /**
  * @author Giannis Dzegoutanis
  * @author Andreas Schildbach
  */
-final public class WalletActivity extends AbstractWalletActivity implements
+final public class WalletActivity extends ActionBarActivity implements
         NavigationDrawerFragment.NavigationDrawerCallbacks, ActionBar.TabListener {
 
     private static final int RECEIVE = 0;
@@ -56,6 +59,11 @@ final public class WalletActivity extends AbstractWalletActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wallet);
 
+        if (getWalletApplication().getWallet() == null) {
+            startIntro();
+            finish();
+        }
+
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
         mTitle = getTitle();
@@ -68,22 +76,20 @@ final public class WalletActivity extends AbstractWalletActivity implements
         // Set up the ViewPager, attaching the adapter and setting up a listener for when the
         // user swipes between sections.
         mViewPager = (ViewPager) findViewById(R.id.pager);
-        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-            @Override
-            public void onPageSelected(int position) {
-                // When swiping between different app sections, select the corresponding tab.
-                // We can also use ActionBar.Tab#select() to do this if we have a reference to the
-                // Tab.
-                //TODO
-//                actionBar.setSelectedNavigationItem(position);
-                Toast.makeText(WalletActivity.this, "Touched " + position, Toast.LENGTH_LONG);
-            }
-        });
+//        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+//            @Override
+//            public void onPageSelected(int position) {
+//                // When swiping between different app sections, select the corresponding tab.
+//                // We can also use ActionBar.Tab#select() to do this if we have a reference to the
+//                // Tab.
+//                //TODO
+////                actionBar.setSelectedNavigationItem(position);
+//                Toast.makeText(WalletActivity.this, "Touched " + position, Toast.LENGTH_LONG);
+//            }
+//        });
 
         // Hack to make the ViewPager work
         mNavigationDrawerFragment.reselectLastItem();
-
-
 
         //If app has never been launched, this code will be executed.
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
@@ -107,6 +113,10 @@ final public class WalletActivity extends AbstractWalletActivity implements
 
         //TODO
 //        checkLowStorageAlert();
+    }
+
+    protected WalletApplication getWalletApplication() {
+        return (WalletApplication) getApplication();
     }
 
     @Override
@@ -180,8 +190,23 @@ final public class WalletActivity extends AbstractWalletActivity implements
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             return true;
+        } else if (id == R.id.action_restore_wallet) {
+            startRestore();
+            finish();
+            return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void startIntro() {
+        Intent introIntent = new Intent(this, IntroActivity.class);
+        startActivity(introIntent);
+    }
+
+    private void startRestore() {
+        Intent restoreIntent = new Intent(this, IntroActivity.class);
+        restoreIntent.putExtra(IntroActivity.RESTORE, true);
+        startActivity(restoreIntent);
     }
 
     @Override

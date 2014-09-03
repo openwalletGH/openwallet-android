@@ -60,14 +60,12 @@ dependencies {
     compile 'com.google.zxing:core:3.1.0'
 }
 
-
 //apply plugin: 'robolectric'
 
 //robolectric {
 //    include '**/*Test.class'
 //    exclude '**/espresso/**/*.class'
 //}
-
 
 //apply plugin: 'idea'
 

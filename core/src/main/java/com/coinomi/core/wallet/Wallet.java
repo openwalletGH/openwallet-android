@@ -7,8 +7,6 @@ import com.coinomi.core.protos.Protos;
 import com.google.bitcoin.core.Address;
 import com.google.bitcoin.core.Coin;
 import com.google.bitcoin.core.InsufficientMoneyException;
-import com.google.bitcoin.core.Sha256Hash;
-import com.google.bitcoin.core.Transaction;
 import com.google.bitcoin.crypto.DeterministicHierarchy;
 import com.google.bitcoin.crypto.DeterministicKey;
 import com.google.bitcoin.crypto.HDKeyDerivation;
@@ -27,11 +25,14 @@ import org.spongycastle.crypto.params.KeyParameter;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.SecureRandom;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.annotation.Nullable;
@@ -45,6 +46,19 @@ import static com.google.common.base.Preconditions.checkState;
  */
 final public class Wallet implements ConnectionEventListener {
     private static final Logger log = LoggerFactory.getLogger(Wallet.class);
+    public static int ENTROPY_SIZE_DEBUG = -1;
+    public static final MnemonicCode mnemonicCode;
+
+    static {
+        MnemonicCode mc;
+        try {
+            mc = new MnemonicCode();
+        } catch (IOException e) {
+            mc = null;
+            log.error("Could not initialize wallet: {}", e.getMessage());
+        }
+        mnemonicCode = mc;
+    }
 
     private final ReentrantLock lock = Threading.lock("KeyChain");
 
@@ -52,21 +66,22 @@ final public class Wallet implements ConnectionEventListener {
 
     private final DeterministicKey masterKey;
 
-    private int lastBlockSeenHeight;
+    protected volatile WalletFiles vFileManager;
 
-
+    // FIXME, make multi account capable
     private final static int ACCOUNT_ZERO = 0;
 
     @Nullable transient BlockchainConnection blockchainConnection;
     private int version;
 
-    public Wallet(List<String> mnemonic) throws IOException, MnemonicException {
-        this(mnemonic, "");
+    public Wallet(List<String> mnemonic) throws MnemonicException {
+        this(mnemonic, null);
     }
 
-    public Wallet(List<String> mnemonic, String password) throws IOException, MnemonicException {
-        new MnemonicCode().check(mnemonic);
-        DeterministicSeed seed = new DeterministicSeed(mnemonic, "", 0);
+    public Wallet(List<String> mnemonic, @Nullable String password) throws MnemonicException {
+        mnemonicCode.check(mnemonic);
+        password = password == null ? "" : password;
+        DeterministicSeed seed = new DeterministicSeed(mnemonic, password, 0);
 
         masterKey = HDKeyDerivation.createMasterPrivateKey(seed.getSeedBytes());
         pockets = new LinkedHashMap<CoinType, WalletPocket>();
@@ -77,16 +92,20 @@ final public class Wallet implements ConnectionEventListener {
         pockets = new LinkedHashMap<CoinType, WalletPocket>();
     }
 
-    public static List<String> generateMnemonic() throws IOException {
-        byte[] entropy = new byte[16];
+    public static List<String> generateMnemonic(int entropyBits) throws IOException {
+        byte[] entropy;
+        if (ENTROPY_SIZE_DEBUG > 0) {
+            entropy = new byte[ENTROPY_SIZE_DEBUG];
+        } else {
+            entropy = new byte[entropyBits / 8];
+        }
 
         SecureRandom sr = new SecureRandom();
         sr.nextBytes(entropy);
 
-        MnemonicCode mc = new MnemonicCode();
         List<String> mnemonic;
         try {
-            mnemonic = mc.toMnemonic(entropy);
+            mnemonic = mnemonicCode.toMnemonic(entropy);
         } catch (MnemonicException.MnemonicLengthException e) {
             throw new RuntimeException(e); // should not happen, we have 16bytes of entropy
         }
@@ -94,10 +113,13 @@ final public class Wallet implements ConnectionEventListener {
         return mnemonic;
     }
 
-    public void createCoinPockets(List<CoinType> coins) {
+    public void createCoinPockets(List<CoinType> coins, boolean generateAllKeys) {
         for (CoinType coin : coins) {
             log.info("Creating coin pocket for {}", coin);
-            getPocket(coin);
+            WalletPocket pocket = getPocket(coin);
+            if (generateAllKeys) {
+                pocket.initializeAllKeysIfNeeded();
+            }
         }
     }
 
@@ -125,7 +147,7 @@ final public class Wallet implements ConnectionEventListener {
     private void createPocket(CoinType coinType) {
         DeterministicHierarchy hierarchy = new DeterministicHierarchy(masterKey);
         DeterministicKey rootKey = hierarchy.get(coinType.getBip44Path(ACCOUNT_ZERO), false, true);
-        pockets.put(coinType, new WalletPocket(rootKey, coinType, masterKey.getKeyCrypter()));
+        addPocket(new WalletPocket(rootKey, coinType, masterKey.getKeyCrypter()));
     }
 
 
@@ -133,6 +155,7 @@ final public class Wallet implements ConnectionEventListener {
         checkState(!pockets.containsKey(pocket.getCoinType()), "Cannot replace an existing wallet pocket");
         //TODO check if key crypter is the same
         pockets.put(pocket.getCoinType(), pocket);
+        pocket.setWallet(this);
     }
 
     public DeterministicKey getMasterKey() {
@@ -162,20 +185,6 @@ final public class Wallet implements ConnectionEventListener {
         } finally {
             lock.unlock();
         }
-    }
-
-    public int getLastBlockSeenHeight() {
-        //TODO
-        return lastBlockSeenHeight;
-    }
-
-    public Transaction getTransaction(Sha256Hash hash) {
-        //TODO
-        return null;
-    }
-
-    public void saveToFile(File walletFile) {
-        //TODO
     }
 
     @Override
@@ -247,6 +256,131 @@ final public class Wallet implements ConnectionEventListener {
     public static Wallet loadFromFileStream(InputStream stream) throws UnreadableWalletException {
         return WalletProtobufSerializer.readWallet(stream);
     }
+
+    /**
+     * Uses protobuf serialization to save the wallet to the given file stream. To learn more about this file format, see
+     * {@link WalletProtobufSerializer}.
+     */
+    public void saveToFileStream(OutputStream f) throws IOException {
+        lock.lock();
+        try {
+            WalletProtobufSerializer.writeWallet(this, f);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /** Saves the wallet first to the given temp file, then renames to the dest file. */
+    public void saveToFile(File temp, File destFile) throws IOException {
+        FileOutputStream stream = null;
+        lock.lock();
+        try {
+            stream = new FileOutputStream(temp);
+            saveToFileStream(stream);
+            // Attempt to force the bits to hit the disk. In reality the OS or hard disk itself may still decide
+            // to not write through to physical media for at least a few seconds, but this is the best we can do.
+            stream.flush();
+            stream.getFD().sync();
+            stream.close();
+            stream = null;
+            if (!temp.renameTo(destFile)) {
+                throw new IOException("Failed to rename " + temp + " to " + destFile);
+            }
+        } catch (RuntimeException e) {
+            log.error("Failed whilst saving wallet", e);
+            throw e;
+        } finally {
+            lock.unlock();
+            if (stream != null) {
+                stream.close();
+            }
+            if (temp.exists()) {
+                log.warn("Temp file still exists after failed save.");
+            }
+        }
+    }
+
+    /**
+     * <p>Sets up the wallet to auto-save itself to the given file, using temp files with atomic renames to ensure
+     * consistency. After connecting to a file, you no longer need to save the wallet manually, it will do it
+     * whenever necessary. Protocol buffer serialization will be used.</p>
+     *
+     * <p>If delayTime is set, a background thread will be created and the wallet will only be saved to
+     * disk every so many time units. If no changes have occurred for the given time period, nothing will be written.
+     * In this way disk IO can be rate limited. It's a good idea to set this as otherwise the wallet can change very
+     * frequently, eg if there are a lot of transactions in it or during block sync, and there will be a lot of redundant
+     * writes. Note that when a new key is added, that always results in an immediate save regardless of
+     * delayTime. <b>You should still save the wallet manually when your program is about to shut down as the JVM
+     * will not wait for the background thread.</b></p>
+     *
+     * <p>An event listener can be provided. If a delay >0 was specified, it will be called on a background thread
+     * with the wallet locked when an auto-save occurs. If delay is zero or you do something that always triggers
+     * an immediate save, like adding a key, the event listener will be invoked on the calling threads.</p>
+     *
+     * @param f The destination file to save to.
+     * @param delayTime How many time units to wait until saving the wallet on a background thread.
+     * @param timeUnit the unit of measurement for delayTime.
+     * @param eventListener callback to be informed when the auto-save thread does things, or null
+     */
+    public WalletFiles autosaveToFile(File f, long delayTime, TimeUnit timeUnit,
+                                      @Nullable WalletFiles.Listener eventListener) {
+        lock.lock();
+        try {
+            checkState(vFileManager == null, "Already auto saving this wallet.");
+            WalletFiles manager = new WalletFiles(this, f, delayTime, timeUnit);
+            if (eventListener != null) {
+                manager.setListener(eventListener);
+            }
+            vFileManager = manager;
+            return manager;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * <p>
+     * Disables auto-saving, after it had been enabled with
+     * {@link Wallet#autosaveToFile(java.io.File, long, java.util.concurrent.TimeUnit, com.coinomi.core.wallet.WalletFiles.Listener)}
+     * before. This method blocks until finished.
+     * </p>
+     */
+    public void shutdownAutosaveAndWait() {
+        lock.lock();
+        try {
+            WalletFiles files = vFileManager;
+            vFileManager = null;
+            checkState(files != null, "Auto saving not enabled.");
+            files.shutdownAndWait();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /** Requests an asynchronous save on a background thread */
+    public void saveLater() {
+        WalletFiles files = vFileManager;
+        if (files != null) {
+            files.saveLater();
+        }
+    }
+
+    /** If auto saving is enabled, do an immediate sync write to disk ignoring any delays. */
+    public void saveNow() {
+        WalletFiles files = vFileManager;
+        if (files != null) {
+            try {
+                files.saveNow();  // This calls back into saveToFile().
+            } catch (IOException e) {
+                // Can't really do much at this point, just let the API user know.
+                log.error("Failed to save wallet to disk!", e);
+                Thread.UncaughtExceptionHandler handler = Threading.uncaughtExceptionHandler;
+                if (handler != null)
+                    handler.uncaughtException(Thread.currentThread(), e);
+            }
+        }
+    }
+
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //

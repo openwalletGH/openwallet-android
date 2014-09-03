@@ -5,8 +5,13 @@
         <item name="actionBarStyle">@style/CustomActionBar</item>
     </style>
 
-    <style name="CustomActionBar" parent="android:Widget.ActionBar">
-        <item name="android:background">#ffff8900</item>
+    <style name="CustomActionBar" parent="Widget.AppCompat.Light.ActionBar">
+        <!-- TODO add foreground colors -->
+        <!--<item name="android:background">#ffff8900</item>-->
+    </style>
+
+    <style name="NoTitleBar" parent="AppTheme">
+        <item name="android:windowNoTitle">true</item>
     </style>
 
     <style name="Amount" parent="@android:style/TextAppearance">

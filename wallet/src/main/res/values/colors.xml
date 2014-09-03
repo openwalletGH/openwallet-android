@@ -1,12 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- http://www.google.com/design/spec/style/color.html#color-ui-color-application -->
+    <color name="primary_500">#03a9f4</color>
+    <color name="primary_100">#b3e5fc</color>
+    <color name="primary_700">#0288d1</color>
+    <color name="accent_A200">#ffff00</color>
+
+    <color name="gray_87_text">#dd000000</color>
+    <color name="gray_54_sec_text_icons">#89000000</color>
+    <color name="gray_26_hint_text">#42000000</color>
+    <color name="gray_12_dividers">#1e000000</color>
+
+    <color name="fg_tabs">#fefefe</color>
+    <color name="bg_tabs">@color/primary_500</color>
 
     <!-- foreground -->
     <color name="fg_significant">#ff000000</color>
     <color name="fg_less_significant">#ff666666</color>
     <color name="fg_insignificant">#ffcccccc</color>
     <color name="fg_error">#ffff0000</color>
-    <color name="fg_tabs">#fffefefe</color>
+
 
     <!-- background -->
     <color name="bg_bright">#ffffffff</color>
@@ -16,7 +29,6 @@
     <color name="bg_list">#40ffffff</color>
     <color name="bg_list_selected">#40808090</color>
     <color name="bg_dialog_title">#ffb8b8b0</color>
-    <color name="bg_tabs">#ff33b5e5</color>
 
     <!-- scanner -->
     <color name="scan_mask">#60000000</color>

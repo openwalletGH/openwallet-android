@@ -9,4 +9,7 @@
         android:title="@string/action_settings"
         android:orderInCategory="100"
         app:showAsAction="never" />
+    <item android:id="@+id/action_restore_wallet"
+        android:title="@string/action_restore_wallet"
+        app:showAsAction="never" />
 </menu>

@@ -316,7 +316,7 @@ public class CoinServiceImpl extends Service implements CoinService {
         private void check()
         {
             final Wallet wallet = application.getWallet();
-            final boolean hasEverything = hasConnectivity && hasStorage;
+            final boolean hasEverything = hasConnectivity && hasStorage && (wallet != null);
 
             if (hasEverything && client == null) {
                 log.debug("acquiring wakelock");
@@ -584,7 +584,7 @@ public class CoinServiceImpl extends Service implements CoinService {
         else if (CoinService.ACTION_BROADCAST_TRANSACTION.equals(action))
         {
             final Sha256Hash hash = new Sha256Hash(intent.getByteArrayExtra(CoinService.ACTION_BROADCAST_TRANSACTION_HASH));
-            final Transaction tx = application.getWallet().getTransaction(hash);
+            final Transaction tx = null; // FIXME
 
             if (client != null)
             {
@@ -659,7 +659,7 @@ public class CoinServiceImpl extends Service implements CoinService {
             throw new RuntimeException(x);
         }
 
-        application.saveWallet();
+        application.saveWalletNow();
 
         if (wakeLock.isHeld())
         {

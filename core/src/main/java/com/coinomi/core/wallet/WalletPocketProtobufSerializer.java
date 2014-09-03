@@ -68,7 +68,7 @@ public class WalletPocketProtobufSerializer {
             walletBuilder.setDescription(pocket.getDescription());
         }
 
-        for (AddressStatus status : pocket.getAddressesStatus()) {
+        for (AddressStatus status : pocket.getAllAddressStatus()) {
             Protos.AddressStatus.Builder addressStatus = Protos.AddressStatus.newBuilder();
             if (status.getStatus() == null) {
                 continue; // Don't serialize null statuses

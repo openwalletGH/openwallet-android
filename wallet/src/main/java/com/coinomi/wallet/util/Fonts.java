@@ -2,6 +2,7 @@ package com.coinomi.wallet.util;
 
 import android.content.res.AssetManager;
 import android.graphics.Typeface;
+import android.view.View;
 import android.widget.TextView;
 
 import java.util.HashMap;
@@ -14,6 +15,7 @@ public class Fonts {
     private final static HashMap<Font, Typeface> typefaces = new HashMap<Font, Typeface>();
 
     public enum Font {
+        ROBOTO_REGULAR("fonts/Roboto-Regular.ttf"),
         ROBOTO_LIGHT("fonts/Roboto-Light.ttf"),
         ROBOTO_THIN("fonts/Roboto-Thin.ttf");
 
@@ -33,9 +35,9 @@ public class Fonts {
         }
     }
 
-    public static synchronized void setTypeface(TextView textView, Font font) {
-        if (typefaces.containsKey(font)) {
-            textView.setTypeface(typefaces.get(font));
+    public static synchronized void setTypeface(View textView, Font font) {
+        if (typefaces.containsKey(font) && textView instanceof TextView) {
+            ((TextView)textView).setTypeface(typefaces.get(font));
         }
     }
 }

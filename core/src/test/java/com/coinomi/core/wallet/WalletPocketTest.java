@@ -109,7 +109,7 @@ public class WalletPocketTest {
             assertEquals(tx, newPocket.getTransaction(tx.getHash()));
         }
 
-        for (AddressStatus status : pocket.getAddressesStatus()) {
+        for (AddressStatus status : pocket.getAllAddressStatus()) {
             if (status.getStatus() == null) continue;
             assertEquals(status, newPocket.getAddressStatus(status.getAddress()));
         }

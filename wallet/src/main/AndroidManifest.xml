@@ -52,21 +52,29 @@
         android:hardwareAccelerated="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/Theme.AppCompat.Light" >
+        android:theme="@style/AppTheme" >
 
         <activity
             android:name=".ui.WalletActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
         <activity
+            android:name=".ui.IntroActivity"
+            android:theme="@style/NoTitleBar"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize" >
+        </activity>
+
+        <activity
             android:name=".ui.ScanActivity"
             android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@style/NoTitleBar"
             android:screenOrientation="landscape"
             android:stateNotNeeded="true"
             android:windowSoftInputMode="stateAlwaysHidden" />
@@ -74,6 +82,8 @@
         <service
             android:name=".service.CoinServiceImpl"
             android:exported="false" />
+
+
     </application>
 
 </manifest>

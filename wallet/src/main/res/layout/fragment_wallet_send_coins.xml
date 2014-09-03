@@ -32,7 +32,7 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/send_coins_fragment_scan_qr_code"
+            android:text="@string/button_scan_qr_code"
             android:id="@+id/scan_qr_code"
             android:layout_below="@+id/send_to_address"
             android:layout_alignRight="@+id/send_to_address"

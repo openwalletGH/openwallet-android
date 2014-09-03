@@ -137,6 +137,7 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
     protected transient CoinSelector coinSelector = new DefaultCoinSelector();
 
     private final transient CopyOnWriteArrayList<ListenerRegistration<WalletPocketEventListener>> listeners;
+    @Nullable private transient Wallet wallet = null;
 
     public WalletPocket(DeterministicKey rootKey, CoinType coinType, @Nullable KeyCrypter keyCrypter) {
         this(new SimpleHDKeyChain(rootKey, keyCrypter), coinType);
@@ -213,9 +214,24 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
     public void addWalletTransaction(WalletTransaction wtx) {
         lock.lock();
         try {
+            markOwnOutputs(wtx.getTransaction());
             addWalletTransaction(wtx.getPool(), wtx.getTransaction());
         } finally {
             lock.unlock();
+        }
+    }
+
+    /**
+     * Marks outputs available for spending, only for keys that we have
+     */
+    private void markOwnOutputs(Transaction transaction) {
+        for (TransactionOutput txo : transaction.getOutputs()) {
+            if (txo.isAvailableForSpending()) {
+                // We don't have keys for this txo therefore it is not ours
+                if (keys.findKeyFromPubHash(txo.getScriptPubKey().getPubKeyHash()) == null) {
+                    txo.markAsSpent(null);
+                }
+            }
         }
     }
 
@@ -245,6 +261,7 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
         // registration requests. That makes the code in the wallet simpler.
         // TODO add txConfidenceListener
 //        tx.getConfidence().addEventListener(txConfidenceListener, Threading.SAME_THREAD);
+        walletSaveLater();
     }
 
     /**
@@ -291,6 +308,7 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
         } finally {
             lock.unlock();
         }
+        walletSaveLater();
     }
 
     public void setLastBlockSeenHeight(int lastBlockSeenHeight) {
@@ -300,6 +318,7 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
         } finally {
             lock.unlock();
         }
+        walletSaveLater();
     }
 
     public void setLastBlockSeenTimeSecs(long timeSecs) {
@@ -309,6 +328,7 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
         } finally {
             lock.unlock();
         }
+        walletSaveLater();
     }
 
     /**
@@ -361,7 +381,10 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
      * This is a Unicode encoding string typically entered by the user as descriptive text for the wallet.
      */
     public void setDescription(String description) {
+        lock.lock();
         this.description = description;
+        lock.unlock();
+        walletSaveNow();
     }
 
     /**
@@ -478,7 +501,9 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
         finally {
             lock.unlock();
         }
+        walletSaveLater();
     }
+
     private boolean isAddressStatusChanged(AddressStatus status) {
         lock.lock();
         try {
@@ -517,7 +542,7 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
         }
     }
 
-    public List<AddressStatus> getAddressesStatus() {
+    public List<AddressStatus> getAllAddressStatus() {
         lock.lock();
         try {
             ArrayList<AddressStatus> statuses = new ArrayList<AddressStatus>(addressesStatus.size());
@@ -762,6 +787,19 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
         }
     }
 
+    // Util
+    private void walletSaveLater() {
+        if (wallet != null) {
+            wallet.saveLater();
+        }
+    }
+
+    private void walletSaveNow() {
+        if (wallet != null) {
+            wallet.saveNow();
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //
     // Encryption support
@@ -841,6 +879,14 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
         } finally {
             lock.unlock();
         }
+    }
+
+    public void setWallet(Wallet wallet) {
+        this.wallet = wallet;
+    }
+
+    public Wallet getWallet() {
+        return wallet;
     }
 
     private static class FeeCalculation {
