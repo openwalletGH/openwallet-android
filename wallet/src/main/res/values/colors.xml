@@ -6,6 +6,8 @@
     <color name="primary_700">#0288d1</color>
     <color name="accent_A200">#ffff00</color>
 
+    <color name="white">#FFFFFF</color>
+
     <color name="gray_87_text">#dd000000</color>
     <color name="gray_54_sec_text_icons">#89000000</color>
     <color name="gray_26_hint_text">#42000000</color>

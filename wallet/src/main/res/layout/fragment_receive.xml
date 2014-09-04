@@ -4,6 +4,45 @@
     android:layout_height="match_parent"
     tools:context=".ui.ReceiveFragment">
 
-    <!-- TODO: Update blank fragment layout -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/activity_margin"
+        android:layout_gravity="center">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/receive_address"
+            android:textColor="@color/gray_87_text"
+            android:paddingTop="@dimen/activity_vertical_margin"
+            android:gravity="center_horizontal"
+            android:id="@+id/receive_address"
+            android:text="@string/sample_address_format"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/receive_address_label"
+            android:textColor="@color/gray_54_sec_text_icons"
+            android:layout_below="@+id/receive_address"
+            android:layout_alignRight="@+id/receive_address"
+            android:layout_alignEnd="@+id/receive_address"
+            android:paddingBottom="@dimen/activity_margin"
+            android:id="@+id/receive_address_label" />
+
+        <ImageView
+            android:layout_width="@dimen/qr_code"
+            android:layout_height="@dimen/qr_code"
+            android:id="@+id/qr_code"
+            android:background="@color/white"
+            android:layout_below="@+id/receive_address_label"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="@dimen/activity_margin"
+            android:padding="@dimen/activity_margin" />
+
+    </RelativeLayout>
 
 </FrameLayout>

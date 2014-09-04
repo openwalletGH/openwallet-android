@@ -9,7 +9,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:gravity="right"
+        android:gravity="end"
         android:minWidth="@android:dimen/thumbnail_width"
         android:text="0" />
 

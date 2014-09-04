@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.coinomi.core.coins.other.Cny;
 import com.coinomi.core.wallet.WalletPocket;
 import com.coinomi.core.wallet.WalletPocketEventListener;
 import com.coinomi.core.coins.BitcoinMain;
@@ -126,6 +127,10 @@ public class InfoFragment extends Fragment implements WalletPocketEventListener 
             Amount eurAmount = (Amount) view.findViewById(R.id.amount_eur);
             eurAmount.setAmount(Coin.ZERO);
             eurAmount.setSymbol(Eur.get().getSymbol());
+
+            Amount cnyAmount = (Amount) view.findViewById(R.id.amount_cny);
+            cnyAmount.setAmount(Coin.ZERO);
+            cnyAmount.setSymbol(Cny.get().getSymbol());
         }
     }
 

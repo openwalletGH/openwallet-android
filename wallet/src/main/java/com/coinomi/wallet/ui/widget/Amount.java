@@ -41,7 +41,7 @@ public class Amount extends RelativeLayout{
             if (isBig) {
                 amount.setTextAppearance(context, R.style.AmountBig);
             }
-            Fonts.setTypeface(amount, isBig ? Fonts.Font.ROBOTO_THIN : Fonts.Font.ROBOTO_LIGHT);
+            Fonts.setTypeface(amount, isBig ? Fonts.Font.ROBOTO_LIGHT : Fonts.Font.ROBOTO_REGULAR);
             Fonts.setTypeface(symbol, Fonts.Font.ROBOTO_LIGHT);
         } catch (RuntimeException ignore) { }
 

@@ -41,12 +41,20 @@
 
     <!-- Passphrase fragment -->
     <string name="passphrase_info">This is your secret passphrase to access your wallet. Please write it down on a paper and keep it in a secret place, as anyone with access to it has access to your funds. If you lose your passphrase, we cannot do anything to recover your wallet.</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <!-- Restore fragment -->
     <string name="restore_info">Please enter your secret passphrase:</string>
     <string name="restore_verifying">Please wait while your passphrase is being verified</string>
     <string name="restore_error">Could not restore wallet</string>
-    <string name="extra_entropy">Extra entropy</string>
+    <string name="extra_entropy">extra entropy</string>
 
+    <!-- Receive fragment -->
+    <string name="sample_address_format">XXXX XXXX XXXX XXXXX\nXXXX XXXX XXXX XXXXX</string>
+    <string name="receive_address_label">my address</string>
+
+    <!-- Send fragment -->
+    <string name="pay_to_label">pay to</string>
+    <string name="amount_to_send_label">amount to send</string>
+    <string name="send_coins_label">send</string>
+    <string name="history_label">history</string>
 </resources>

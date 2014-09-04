@@ -91,17 +91,17 @@ final public class WalletActivity extends ActionBarActivity implements
         // Hack to make the ViewPager work
         mNavigationDrawerFragment.reselectLastItem();
 
-        //If app has never been launched, this code will be executed.
-        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-        if (settings.getBoolean("firstLaunch", true)) {
-            Log.d("Comments", "First time");
-
-            // First time, run this.
-            System.out.println("Testing... Testing... Testing...");
-
-            //Set the boolean to false to make sure this code never runs again.
-            settings.edit().putBoolean("firstLaunch", false).commit();
-        }
+//        //If app has never been launched, this code will be executed.
+//        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+//        if (settings.getBoolean("firstLaunch", true)) {
+//            Log.d("Comments", "First time");
+//
+//            // First time, run this.
+//            System.out.println("Testing... Testing... Testing...");
+//
+//            //Set the boolean to false to make sure this code never runs again.
+//            settings.edit().putBoolean("firstLaunch", false).commit();
+//        }
     }
 
     @Override

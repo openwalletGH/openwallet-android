@@ -25,6 +25,7 @@ import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.ui.widget.QrCodeButton;
+import com.coinomi.wallet.util.Keyboard;
 import com.google.bitcoin.crypto.MnemonicException;
 
 import org.slf4j.Logger;
@@ -59,24 +60,25 @@ public class RestoreFragment extends Fragment {
             }
         });
 
-
         // Setup auto complete the mnemonic words
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(),
                 android.R.layout.simple_dropdown_item_1line, Wallet.mnemonicCode.getWordList());
         mnemonicTextView = (MultiAutoCompleteTextView) view.findViewById(R.id.mnemonic);
         mnemonicTextView.setAdapter(adapter);
         mnemonicTextView.setTokenizer(new SpaceTokenizer());
-        mnemonicTextView.requestFocus();
-        // Show keyboard
-        // http://stackoverflow.com/questions/23380123/why-android-inputmethodmanager-showsoftinput-returns-false
-        mnemonicTextView.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                InputMethodManager mgr = (InputMethodManager) getActivity().
-                        getSystemService(Context.INPUT_METHOD_SERVICE);
-                mgr.showSoftInput(mnemonicTextView, InputMethodManager.SHOW_IMPLICIT);
-            }
-        }, 100);
+
+        Keyboard.focusAndShowKeyboard(mnemonicTextView, getActivity());
+//        mnemonicTextView.requestFocus();
+//        // Show keyboard
+//        // http://stackoverflow.com/questions/23380123/why-android-inputmethodmanager-showsoftinput-returns-false
+//        mnemonicTextView.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                InputMethodManager mgr = (InputMethodManager) getActivity().
+//                        getSystemService(Context.INPUT_METHOD_SERVICE);
+//                mgr.showSoftInput(mnemonicTextView, InputMethodManager.SHOW_IMPLICIT);
+//            }
+//        }, 100);
 
         view.findViewById(R.id.button_next).setOnClickListener(getOnFinishListener());
 

@@ -25,6 +25,8 @@ import com.coinomi.core.uri.CoinURI;
 import com.coinomi.core.uri.CoinURIParseException;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
+import com.coinomi.wallet.ui.widget.QrCodeButton;
+import com.coinomi.wallet.util.Keyboard;
 import com.google.bitcoin.core.Address;
 import com.google.bitcoin.core.Coin;
 import com.google.bitcoin.core.InsufficientMoneyException;
@@ -56,7 +58,7 @@ public class WalletSendCoins extends Fragment {
     private Handler handler = new Handler();
     private EditText receivingAddressView;
     private EditText sendAmountView;
-    private Button scanQrCodeButton;
+    private QrCodeButton scanQrCodeButton;
     private Button sendConfirmButton;
 
 
@@ -133,7 +135,7 @@ public class WalletSendCoins extends Fragment {
         sendAmountView.setOnFocusChangeListener(sendAmountListener);
         sendAmountView.addTextChangedListener(sendAmountListener);
 
-        scanQrCodeButton = (Button) view.findViewById(R.id.scan_qr_code);
+        scanQrCodeButton = (QrCodeButton) view.findViewById(R.id.scan_qr_code);
         scanQrCodeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -279,7 +281,7 @@ public class WalletSendCoins extends Fragment {
         if (!isOutputsValid())
             receivingAddressView.requestFocus();
         else if (!isAmountValid())
-            sendAmountView.requestFocus();
+            Keyboard.focusAndShowKeyboard(sendAmountView, getActivity());
         else if (everythingValid())
             sendConfirmButton.requestFocus();
         else

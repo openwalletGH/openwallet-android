@@ -1,22 +1,32 @@
 package com.coinomi.wallet.ui;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.coinomi.core.coins.DogecoinMain;
+import com.coinomi.core.uri.CoinURI;
 import com.coinomi.wallet.R;
+import com.coinomi.wallet.WalletApplication;
+import com.coinomi.wallet.util.AddressFormater;
+import com.coinomi.wallet.util.Fonts;
+import com.coinomi.wallet.util.Qr;
+import com.google.bitcoin.core.Address;
+import com.google.bitcoin.core.Coin;
+import com.google.bitcoin.uri.BitcoinURI;
+
+import java.math.BigInteger;
+
+import javax.annotation.Nullable;
 
 /**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link ReceiveFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link ReceiveFragment#newInstance} factory method to
- * create an instance of this fragment.
  *
  */
 public class ReceiveFragment extends Fragment {
@@ -63,7 +73,34 @@ public class ReceiveFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_receive, container, false);
+        View view = inflater.inflate(R.layout.fragment_receive, container, false);
+
+        WalletApplication walletApplication = (WalletApplication) getActivity().getApplication();
+
+        TextView addressView = (TextView) view.findViewById(R.id.receive_address);
+        Fonts.setTypeface(addressView, Fonts.Font.UBUNTU_MONO_REGULAR);
+
+        Address receiveAddress = walletApplication.getWalletPocket(DogecoinMain.get()).
+                getReceiveAddress();
+
+        addressView.setText(AddressFormater.eightGroups(receiveAddress.toString()));
+
+        ImageView qrView = (ImageView) view.findViewById(R.id.qr_code);
+
+        Coin amount = null; //FIXME get amount from interface
+
+        // update qr-code
+        final int size = (int) (256 * getResources().getDisplayMetrics().density);
+        final String qrContent = CoinURI.convertToCoinURI(receiveAddress, amount, null, null);
+        Bitmap qrCodeBitmap = Qr.bitmap(qrContent, size);
+        qrView.setImageBitmap(qrCodeBitmap);
+
+        return view;
+    }
+
+    private String determineBitcoinRequestStr(final Address address, @Nullable final Coin amount) {
+        final StringBuilder uri = new StringBuilder();
+        return uri.toString();
     }
 
 }

@@ -322,28 +322,31 @@ public class CoinURI {
     public static String convertToBitcoinURI(Address address, Coin amount, String label, String message) {
         checkNotNull(address.getParameters());
         checkState(address.getParameters() instanceof CoinType);
-        return convertToCoinURI((CoinType) address.getParameters(), address.toString(), amount, label, message);
+        return convertToCoinURI(address, amount, label, message);
     }
 
     /**
      * Simple coin URI builder using known good fields.
      * 
-     * @param type The coin type
      * @param address The coin address
      * @param amount The amount
      * @param label A label
      * @param message A message
      * @return A String containing the coin URI
      */
-    public static String convertToCoinURI(CoinType type, String address, @Nullable Coin amount,
+    public static String convertToCoinURI(Address address, @Nullable Coin amount,
                                           @Nullable String label, @Nullable String message) {
         checkNotNull(address);
+
+        CoinType type = (CoinType) address.getParameters();
+        String addressStr = address.toString();
+
         if (amount != null && amount.signum() < 0) {
             throw new IllegalArgumentException("Coin must be positive");
         }
         
         StringBuilder builder = new StringBuilder();
-        builder.append(type.getUriScheme()).append(":").append(address);
+        builder.append(type.getUriScheme()).append(":").append(addressStr);
         
         boolean questionMarkHasBeenOutput = false;
         

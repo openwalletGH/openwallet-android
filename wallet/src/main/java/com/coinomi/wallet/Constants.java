@@ -32,9 +32,6 @@ public class Constants {
     public static final Charset UTF_8 = Charset.forName("UTF-8");
     public static final Charset US_ASCII = Charset.forName("US-ASCII");
 
-    static final CoinIcon btcIcon = new CoinIconSvg(R.raw.bitcoin);
-    static final CoinIcon btcIconTest = new CoinIconSvg(R.raw.bitcoin_test);
-
     // TODO make dynamic
     public static final List<CoinAddress> COINS_ADDRESSES = ImmutableList.of(
             new CoinAddress(BitcoinMain.get(), new ServerAddress("test.coinomi.com", 5001)),
