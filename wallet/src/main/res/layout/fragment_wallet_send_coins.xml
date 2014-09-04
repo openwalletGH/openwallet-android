@@ -61,6 +61,7 @@
             android:layout_height="wrap_content"
             android:text="@string/amount_to_send_label"
             android:id="@+id/amount_to_send_label"
+            android:textColor="@color/gray_54_sec_text_icons"
             android:layout_below="@+id/send_amount"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true" />

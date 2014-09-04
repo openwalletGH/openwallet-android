@@ -4,7 +4,6 @@ package com.coinomi.wallet.ui;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -13,13 +12,10 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.MultiAutoCompleteTextView;
 import android.widget.Toast;
 
-import com.coinomi.core.uri.CoinURI;
-import com.coinomi.core.uri.CoinURIParseException;
 import com.coinomi.core.wallet.Wallet;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
@@ -31,7 +27,7 @@ import com.google.bitcoin.crypto.MnemonicException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -128,10 +124,14 @@ public class RestoreFragment extends Fragment {
         }
 
         protected Wallet doInBackground(String... passphraseText) {
-            String[] passphrase = passphraseText[0].trim().split(" ");
+            ArrayList<String> passphrase = new ArrayList<String>();
+            for (String word : passphraseText[0].trim().split(" ")) {
+                if (word.isEmpty()) continue;
+                passphrase.add(word);
+            }
             Wallet wallet = null;
             try {
-                wallet = new Wallet(Arrays.asList(passphrase), null);
+                wallet = new Wallet(passphrase, null);
                 wallet.createCoinPockets(Constants.DEFAULT_COINS, true);
                 getWalletApplication().setWallet(wallet);
                 getWalletApplication().saveWalletNow();
