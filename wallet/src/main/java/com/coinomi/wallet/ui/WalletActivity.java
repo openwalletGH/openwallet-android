@@ -264,9 +264,6 @@ final public class WalletActivity extends ActionBarActivity implements
         }
     }
 
-
-
-
     private static class AppSectionsPagerAdapter extends FragmentPagerAdapter {
 
         private final CoinType type;
@@ -282,7 +279,7 @@ final public class WalletActivity extends ActionBarActivity implements
         public Fragment getItem(int i) {
             switch (i) {
                 case RECEIVE:
-                    return ReceiveFragment.newInstance(type.getName(), type.getSymbol());
+                    return ReceiveFragment.newInstance(type);
                 case SEND:
                     return WalletSendCoins.newInstance(type);
                 case INFO:

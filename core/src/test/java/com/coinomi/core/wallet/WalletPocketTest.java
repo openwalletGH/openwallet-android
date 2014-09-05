@@ -34,6 +34,7 @@ import java.util.List;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Giannis Dzegoutanis
@@ -55,6 +56,7 @@ public class WalletPocketTest {
         BriefLogFormatter.init();
 
         pocket = new WalletPocket(rootKey, type, null);
+        pocket.keys.setLookaheadSize(20);
     }
 
     @Test
@@ -82,10 +84,17 @@ public class WalletPocketTest {
         assertEquals(67, pocket.addressesStatus.size());
         assertEquals(67, pocket.addressesSubscribed.size());
 
-        pocket.getReceiveAddress();
-        assertEquals(19, pocket.keys.getIssuedExternalKeys());
-        assertEquals(68, pocket.addressesStatus.size());
-        assertEquals(68, pocket.addressesSubscribed.size());
+        Address receiveAddr = pocket.getReceiveAddress();
+        // This key is not issued
+        assertEquals(18, pocket.keys.getIssuedExternalKeys());
+        assertEquals(67, pocket.addressesStatus.size());
+        assertEquals(67, pocket.addressesSubscribed.size());
+
+        DeterministicKey key = pocket.keys.findKeyFromPubHash(receiveAddr.getHash160());
+        assertNotNull(key);
+        // 18 here is the key index, not issued keys count
+        assertEquals(18, key.getChildNumber().num());
+
 
         // TODO added more tests to insure it uses the "holes" in the keychain
     }
@@ -177,7 +186,9 @@ public class WalletPocketTest {
 
         Transaction tx = pocket.sendCoinsOffline(toAddr, Coin.valueOf(2700000000L));
 
-        assertArrayEquals(Utils.HEX.decode(expectedTx), tx.bitcoinSerialize());
+        Transaction txExpected = new Transaction(type, Utils.HEX.decode(expectedTx));
+
+        assertEquals(expectedTx, Utils.HEX.encode(tx.bitcoinSerialize()));
     }
 
 

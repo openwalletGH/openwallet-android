@@ -1295,8 +1295,11 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
     @VisibleForTesting Address currentAddress(SimpleHDKeyChain.KeyPurpose purpose) {
         lock.lock();
         try {
-            // TODO make return an unused address
-            return keys.getKey(purpose).toAddress(coinType);
+            DeterministicKey key = keys.getCurrentUnusedKey(purpose);
+//            DeterministicKey key = keys.getKey(purpose);
+            log.info("Current address, get key n. {} {}", key.getChildNumber().num(),
+                    key.toAddress(coinType));
+            return key.toAddress(coinType);
         } finally {
             lock.unlock();
 

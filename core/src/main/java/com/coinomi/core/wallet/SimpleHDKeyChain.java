@@ -53,7 +53,7 @@ import static com.google.common.collect.Lists.newLinkedList;
 public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
     private static final Logger log = LoggerFactory.getLogger(SimpleHDKeyChain.class);
 
-    public static final int LOOKAHEAD = 20;
+    public static final int LOOKAHEAD = 20; // BIP 44
 
     private final ReentrantLock lock = Threading.lock("KeyChain");
 
@@ -178,6 +178,32 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
         }
     }
 
+    /**
+     * Get an unused key, without actually issuing it.
+     * This is useful to show a receiving key in the interface
+     */
+    public DeterministicKey getCurrentUnusedKey(KeyPurpose purpose) {
+        lock.lock();
+        try {
+            List<DeterministicKey> keys = null;
+            switch (purpose) {
+                case RECEIVE_FUNDS:
+                case REFUND:
+                    keys = getDeterministicKeys(1, externalKey, issuedExternalKeys + 1);
+                    break;
+                case CHANGE:
+                    keys = getDeterministicKeys(1, internalKey, issuedInternalKeys + 1);
+                    break;
+                default:
+                    throw new UnsupportedOperationException();
+            }
+
+            return keys.get(0);
+        } finally {
+            lock.unlock();
+        }
+    }
+
     /** Returns a freshly derived key that has not been returned by this method before. */
     @Override
     public DeterministicKey getKey(KeyPurpose purpose) {
@@ -211,6 +237,17 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
                 default:
                     throw new UnsupportedOperationException();
             }
+            List<DeterministicKey> keys = getDeterministicKeys(numberOfKeys, parentKey, index);
+
+            return keys;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    private List<DeterministicKey> getDeterministicKeys(int numberOfKeys, DeterministicKey parentKey, int index) {
+        lock.lock();
+        try {
             // Optimization: potentially do a very quick key generation for just the number of keys we need if we
             // didn't already create them, ignoring the configured lookahead size. This ensures we'll be able to
             // retrieve the keys in the following loop, but if we're totally fresh and didn't get a chance to
@@ -226,7 +263,8 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
             simpleKeyChain.importKeys(lookahead);
             List<DeterministicKey> keys = new ArrayList<DeterministicKey>(numberOfKeys);
             for (int i = 0; i < numberOfKeys; i++) {
-                ImmutableList<ChildNumber> path = HDUtils.append(parentKey.getPath(), new ChildNumber(index - numberOfKeys + i, false));
+                ImmutableList<ChildNumber> path = HDUtils.append(parentKey.getPath(),
+                        new ChildNumber(index - numberOfKeys + i, false));
                 keys.add(hierarchy.get(path, false, false));
             }
             return keys;
