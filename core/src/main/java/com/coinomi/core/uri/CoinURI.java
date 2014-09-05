@@ -304,7 +304,7 @@ public class CoinURI {
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder("BitcoinURI[");
+        StringBuilder builder = new StringBuilder("CoinURI[");
         boolean first = true;
         for (Map.Entry<String, Object> entry : parameterMap.entrySet()) {
             if (first) {
