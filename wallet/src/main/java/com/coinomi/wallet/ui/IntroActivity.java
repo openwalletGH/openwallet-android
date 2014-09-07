@@ -16,30 +16,20 @@ import android.os.Build;
 import android.widget.ImageView;
 
 import com.coinomi.wallet.R;
-import com.larvalabs.svgandroid.SVG;
-import com.larvalabs.svgandroid.SVGParser;
 
 public class IntroActivity extends android.support.v4.app.FragmentActivity implements WelcomeFragment.OnFragmentInteractionListener {
-
-    public static final String RESTORE = "restore";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_intro);
 
-        if (savedInstanceState != null && savedInstanceState.getBoolean(RESTORE, false)) {
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new RestoreFragment())
-                    .commit();
-        }
-        else {
+        if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.container, new WelcomeFragment())
                     .commit();
         }
     }
-
 
     @Override
     public void onCreateNewWallet() {

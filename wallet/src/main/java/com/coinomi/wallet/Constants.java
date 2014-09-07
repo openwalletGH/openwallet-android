@@ -1,17 +1,11 @@
 package com.coinomi.wallet;
 
-import com.coinomi.core.coins.CoinType;
-import com.coinomi.core.wallet.Wallet;
-import com.coinomi.stratumj.ServerAddress;
 import com.coinomi.core.coins.BitcoinMain;
-import com.coinomi.core.coins.BitcoinTest;
-import com.coinomi.wallet.ui.CoinIcon;
-import com.coinomi.wallet.ui.CoinIconSvg;
+import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.DogecoinMain;
-import com.coinomi.core.coins.DogecoinTest;
 import com.coinomi.core.coins.LitecoinMain;
-import com.coinomi.core.coins.LitecoinTest;
 import com.coinomi.core.network.CoinAddress;
+import com.coinomi.stratumj.ServerAddress;
 import com.google.common.collect.ImmutableList;
 
 import java.nio.charset.Charset;

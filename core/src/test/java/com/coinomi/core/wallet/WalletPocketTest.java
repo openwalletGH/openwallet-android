@@ -265,10 +265,12 @@ public class WalletPocketTest {
         }
 
         @Override
+        public void broadcastTx(CoinType coinType, Transaction tx, TransactionEventListener listener) {
+
+        }
+
+        @Override
         public void ping() {}
-
-
-
     }
 
     private MockBlockchainConnection getBlockchainConnection() throws Exception {

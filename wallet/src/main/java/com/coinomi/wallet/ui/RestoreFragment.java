@@ -64,17 +64,6 @@ public class RestoreFragment extends Fragment {
         mnemonicTextView.setTokenizer(new SpaceTokenizer());
 
         Keyboard.focusAndShowKeyboard(mnemonicTextView, getActivity());
-//        mnemonicTextView.requestFocus();
-//        // Show keyboard
-//        // http://stackoverflow.com/questions/23380123/why-android-inputmethodmanager-showsoftinput-returns-false
-//        mnemonicTextView.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                InputMethodManager mgr = (InputMethodManager) getActivity().
-//                        getSystemService(Context.INPUT_METHOD_SERVICE);
-//                mgr.showSoftInput(mnemonicTextView, InputMethodManager.SHOW_IMPLICIT);
-//            }
-//        }, 100);
 
         view.findViewById(R.id.button_next).setOnClickListener(getOnFinishListener());
 

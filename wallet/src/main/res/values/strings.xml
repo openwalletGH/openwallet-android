@@ -7,7 +7,7 @@
     <string name="title_section3">Dogecoin</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="action_example">Action</string>
+    <string name="scan_qr_code_menu">Scan</string>
     <string name="action_settings">Settings</string>
     <string name="action_restore_wallet">Restore wallet</string>
     <string name="send_coins_fragment_receiving_address_label">Pay to</string>
@@ -46,7 +46,7 @@
     <string name="restore_info">Please enter your secret passphrase:</string>
     <string name="restore_verifying">Please wait while your passphrase is being verified</string>
     <string name="restore_error">Could not restore wallet</string>
-    <string name="extra_entropy">extra entropy</string>
+    <string name="extra_security">extra security</string>
 
     <!-- Receive fragment -->
     <string name="sample_address_format">XXXX XXXX XXXX XXXXX\nXXXX XXXX XXXX XXXXX</string>

@@ -12,6 +12,7 @@ import com.coinomi.stratumj.messages.ResultMessage;
 import com.google.bitcoin.core.Address;
 import com.google.bitcoin.core.AddressFormatException;
 import com.google.bitcoin.core.Sha256Hash;
+import com.google.bitcoin.core.Transaction;
 import com.google.bitcoin.core.Utils;
 import com.google.bitcoin.utils.ListenerRegistration;
 import com.google.bitcoin.utils.Threading;
@@ -39,6 +40,7 @@ import java.util.concurrent.TimeoutException;
 import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * @author Giannis Dzegoutanis
@@ -265,7 +267,7 @@ public class ServerClient implements BlockchainConnection {
 
     @Override
     public void getTx(CoinType coinType, final AddressStatus status, final UnspentTx utx, final TransactionEventListener listener) {
-    // {"params": ["a52418acead4fbc25252cba18f26de88166ef065e7237200253d27ef7ca53505"], "id": 27, "method": "blockchain.transaction.get"}
+        // {"params": ["a52418acead4fbc25252cba18f26de88166ef065e7237200253d27ef7ca53505"], "id": 27, "method": "blockchain.transaction.get"}
 
         StratumClient client = checkNotNull(connections.get(coinType));
 
@@ -288,6 +290,39 @@ public class ServerClient implements BlockchainConnection {
             @Override
             public void onFailure(Throwable t) {
                 log.error("Could not get reply for blockchain.transaction.get", t);
+            }
+        }, Threading.USER_THREAD);
+    }
+
+    @Override
+    public void broadcastTx(CoinType coinType, final Transaction tx, final TransactionEventListener listener) {
+        StratumClient client = checkNotNull(connections.get(coinType));
+
+        CallMessage message = new CallMessage("blockchain.transaction.broadcast",
+                Arrays.asList(Utils.HEX.encode(tx.bitcoinSerialize())));
+        final ListenableFuture<ResultMessage> result = client.call(message);
+
+        Futures.addCallback(result, new FutureCallback<ResultMessage>() {
+
+            @Override
+            public void onSuccess(ResultMessage result) {
+                try {
+                    String txId = result.getResult().getString(0);
+
+                    // FIXME will crash due to transaction malleability
+                    checkState(tx.getHash().toString().equals(txId));
+
+                    listener.onTransactionBroadcast(tx);
+                } catch (JSONException e) {
+                    onFailure(e);
+                    return;
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                log.error("Could not get reply for blockchain.transaction.broadcast", t);
+                listener.onTransactionBroadcastError(tx, t);
             }
         }, Threading.USER_THREAD);
     }

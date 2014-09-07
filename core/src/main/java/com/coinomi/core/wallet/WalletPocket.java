@@ -214,7 +214,6 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
     public void addWalletTransaction(WalletTransaction wtx) {
         lock.lock();
         try {
-            markOwnOutputs(wtx.getTransaction());
             addWalletTransaction(wtx.getPool(), wtx.getTransaction());
         } finally {
             lock.unlock();
@@ -240,6 +239,7 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
      */
     private void addWalletTransaction(Pool pool, Transaction tx) {
         checkState(lock.isHeldByCurrentThread());
+        markOwnOutputs(tx);
         transactions.put(tx.getHash(), tx);
         switch (pool) {
             case UNSPENT:
@@ -680,6 +680,23 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
         }
     }
 
+    @Override
+    public void onTransactionBroadcast(Transaction transaction) {
+        lock.lock();
+        try {
+
+            log.info("Transaction sent {}", transaction);
+
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @Override
+    public void onTransactionBroadcastError(Transaction transaction, Throwable throwable) {
+
+    }
+
     private void markAsUnspent(UnspentTx utx) {
         lock.lock();
         try {
@@ -730,6 +747,10 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
 
 
         log.info("Created tx {}", Utils.HEX.encode(tx.bitcoinSerialize()));
+
+        if (blockchainConnection != null) {
+            blockchainConnection.broadcastTx(coinType, tx, this);
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////

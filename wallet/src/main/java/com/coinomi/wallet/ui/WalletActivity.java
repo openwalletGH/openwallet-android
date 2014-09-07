@@ -1,25 +1,19 @@
 package com.coinomi.wallet.ui;
 
 import android.app.Activity;
-import android.app.FragmentTransaction;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.net.Uri;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.support.v4.widget.DrawerLayout;
-import android.widget.Toast;
 
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.wallet.Constants;
@@ -31,7 +25,7 @@ import com.coinomi.wallet.WalletApplication;
  * @author Andreas Schildbach
  */
 final public class WalletActivity extends ActionBarActivity implements
-        NavigationDrawerFragment.NavigationDrawerCallbacks, ActionBar.TabListener {
+        NavigationDrawerFragment.NavigationDrawerCallbacks {
 
     private static final int RECEIVE = 0;
     private static final int INFO = 1;
@@ -76,19 +70,11 @@ final public class WalletActivity extends ActionBarActivity implements
         // Set up the ViewPager, attaching the adapter and setting up a listener for when the
         // user swipes between sections.
         mViewPager = (ViewPager) findViewById(R.id.pager);
-//        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-//            @Override
-//            public void onPageSelected(int position) {
-//                // When swiping between different app sections, select the corresponding tab.
-//                // We can also use ActionBar.Tab#select() to do this if we have a reference to the
-//                // Tab.
-//                //TODO
-////                actionBar.setSelectedNavigationItem(position);
-//                Toast.makeText(WalletActivity.this, "Touched " + position, Toast.LENGTH_LONG);
-//            }
-//        });
+        // Set OffscreenPageLimit to 2 because receive fragment draws a QR code and we don't
+        // want to re-render that if we go to the SendFragment and back
+        mViewPager.setOffscreenPageLimit(2);
 
-        // Hack to make the ViewPager work
+        // Hack to make the ViewPager select the InfoFragment
         mNavigationDrawerFragment.reselectLastItem();
 
 //        //If app has never been launched, this code will be executed.
@@ -204,25 +190,7 @@ final public class WalletActivity extends ActionBarActivity implements
     }
 
     private void startRestore() {
-        Intent restoreIntent = new Intent(this, IntroActivity.class);
-        restoreIntent.putExtra(IntroActivity.RESTORE, true);
-        startActivity(restoreIntent);
-    }
-
-    @Override
-    public void onTabSelected(ActionBar.Tab tab, android.support.v4.app.FragmentTransaction fragmentTransaction) {
-        // When the given tab is selected, switch to the corresponding page in the ViewPager.
-//        mViewPager.setCurrentItem(tab.getPosition());
-    }
-
-    @Override
-    public void onTabUnselected(ActionBar.Tab tab, android.support.v4.app.FragmentTransaction fragmentTransaction) {
-
-    }
-
-    @Override
-    public void onTabReselected(ActionBar.Tab tab, android.support.v4.app.FragmentTransaction fragmentTransaction) {
-
+        startActivity(new Intent(this, IntroActivity.class));
     }
 
     /**
