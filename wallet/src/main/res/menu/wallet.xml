@@ -9,10 +9,15 @@
         app:showAsAction="withText|ifRoom" />
     <item android:id="@+id/action_settings"
         android:title="@string/action_settings"
+        android:enabled="false"
         android:orderInCategory="100"
         app:showAsAction="never" />
     <item android:id="@+id/action_restore_wallet"
         android:title="@string/action_restore_wallet"
         android:orderInCategory="101"
+        app:showAsAction="never" />
+    <item android:id="@+id/action_refresh_wallet"
+        android:title="@string/action_refresh_wallet"
+        android:orderInCategory="102"
         app:showAsAction="never" />
 </menu>

@@ -204,7 +204,7 @@ final public class Wallet implements ConnectionEventListener {
     }
 
 
-    public void sendCoins(Address address, Coin amount) throws InsufficientMoneyException {
+    public void sendCoins(Address address, Coin amount) throws InsufficientMoneyException, IOException {
         WalletPocket pocket = getPocket((CoinType) address.getParameters());
 
         pocket.sendCoins(address, amount);
@@ -216,6 +216,18 @@ final public class Wallet implements ConnectionEventListener {
 
     public int getVersion() {
         return version;
+    }
+
+    public void refresh() {
+        lock.lock();
+        try {
+            for (WalletPocket pocket : getPockets()) {
+                pocket.refresh();
+            }
+            saveNow();
+        } finally {
+            lock.unlock();
+        }
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -359,25 +371,35 @@ final public class Wallet implements ConnectionEventListener {
 
     /** Requests an asynchronous save on a background thread */
     public void saveLater() {
-        WalletFiles files = vFileManager;
-        if (files != null) {
-            files.saveLater();
+        lock.lock();
+        try {
+            WalletFiles files = vFileManager;
+            if (files != null) {
+                files.saveLater();
+            }
+        } finally {
+            lock.unlock();
         }
     }
 
     /** If auto saving is enabled, do an immediate sync write to disk ignoring any delays. */
     public void saveNow() {
-        WalletFiles files = vFileManager;
-        if (files != null) {
-            try {
-                files.saveNow();  // This calls back into saveToFile().
-            } catch (IOException e) {
-                // Can't really do much at this point, just let the API user know.
-                log.error("Failed to save wallet to disk!", e);
-                Thread.UncaughtExceptionHandler handler = Threading.uncaughtExceptionHandler;
-                if (handler != null)
-                    handler.uncaughtException(Thread.currentThread(), e);
+        lock.lock();
+        try {
+            WalletFiles files = vFileManager;
+            if (files != null) {
+                try {
+                    files.saveNow();  // This calls back into saveToFile().
+                } catch (IOException e) {
+                    // Can't really do much at this point, just let the API user know.
+                    log.error("Failed to save wallet to disk!", e);
+                    Thread.UncaughtExceptionHandler handler = Threading.uncaughtExceptionHandler;
+                    if (handler != null)
+                        handler.uncaughtException(Thread.currentThread(), e);
+                }
             }
+        } finally {
+            lock.unlock();
         }
     }
 

@@ -2,6 +2,7 @@ package com.coinomi.wallet.ui;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -46,6 +47,7 @@ final public class WalletActivity extends ActionBarActivity implements
      */
     final String PREFS_NAME = "SharedPrefsFile";
     private ViewPager mViewPager;
+    private AsyncTask<Void, Void, Void> refreshTask;
 
 
     @Override
@@ -180,8 +182,34 @@ final public class WalletActivity extends ActionBarActivity implements
             startRestore();
             finish();
             return true;
+        } else if (id == R.id.action_refresh_wallet) {
+            refreshWallet();
+            return true;
         }
+
         return super.onOptionsItemSelected(item);
+    }
+
+    private void refreshWallet() {
+        if (refreshTask == null) {
+            refreshTask = new AsyncTask<Void, Void, Void>() {
+                @Override
+                protected Void doInBackground(Void... params) {
+                    if (getWalletApplication().getWallet() != null) {
+                        getWalletApplication().getWallet().refresh();
+                    }
+                    return null;
+                }
+                @Override
+                protected void onPostExecute(Void aVoid) {
+                    refreshTask = null;
+                    Intent introIntent = new Intent(WalletActivity.this, WalletActivity.class);
+                    startActivity(introIntent);
+                    finish();
+                }
+            };
+            refreshTask.execute();
+        }
     }
 
     private void startIntro() {

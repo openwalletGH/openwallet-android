@@ -34,7 +34,10 @@ import com.google.bitcoin.core.InsufficientMoneyException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -176,65 +179,40 @@ public class WalletSendCoins extends Fragment {
             application.getWallet().sendCoins(validatedAddress, sendAmount);
         } catch (InsufficientMoneyException e) {
             // TODO handle this case better
-            Toast.makeText(activity, R.string.send_coins_error_msg, Toast.LENGTH_LONG).show();
+            Toast.makeText(activity, R.string.send_coins_error_not_enough_money, Toast.LENGTH_LONG).show();
+        } catch (IOException e) {
+            Toast.makeText(activity, R.string.send_coins_error_network, Toast.LENGTH_LONG).show();
         }
     }
 
 
-        @Override
+    @Override
     public void onActivityResult(final int requestCode, final int resultCode, final Intent intent) {
         if (requestCode == REQUEST_CODE_SCAN) {
             if (resultCode == Activity.RESULT_OK) {
                 final String input = intent.getStringExtra(ScanActivity.INTENT_EXTRA_RESULT);
 
-
-                // Todo use StringInputParser and PaymentIntent
-                try
-                {
+                try {
                     final CoinURI coinUri = new CoinURI(coinType, input);
 
                     validatedAddress = coinUri.getAddress();
-                    if (validatedAddress == null)
+                    if (validatedAddress == null) {
                         throw new CoinURIParseException("missing address");
+                    }
+                    Coin amount = coinUri.getAmount();
+                    String label = coinUri.getLabel();
 
-                    updateStateFrom(validatedAddress);
-
-//                    if (address.getParameters().equals(Constants.NETWORK_PARAMETERS))
-//                        handlePaymentIntent(PaymentIntent.fromBitcoinUri(bitcoinUri));
-//                    else
-//                        error(R.string.input_parser_invalid_address, input);
-                }
-                catch (final CoinURIParseException x)
-                {
+                    updateStateFrom(validatedAddress, amount, label);
+                } catch (final CoinURIParseException x) {
                     log.info("got invalid bitcoin uri: '" + input + "'", x);
                 }
-
-//                new StringInputParser(input)
-//                {
-//                    @Override
-//                    protected void handlePaymentIntent(final PaymentIntent paymentIntent)
-//                    {
-//                        updateStateFrom(paymentIntent);
-//                    }
-//
-//                    @Override
-//                    protected void handleDirectTransaction(final Transaction transaction)
-//                    {
-//                        cannotClassify(input);
-//                    }
-//
-//                    @Override
-//                    protected void error(final int messageResId, final Object... messageArgs)
-//                    {
-//                        dialog(activity, null, R.string.button_scan, messageResId, messageArgs);
-//                    }
-//                }.parse();
             }
         }
     }
 
 
-    private void updateStateFrom(final @Nonnull Address address) {
+    private void updateStateFrom(final @Nonnull Address address, final @Nullable Coin amount,
+                                 final @Nullable String label) {
         log.info("got {}", address);
 
         // delay these actions until fragment is resumed
@@ -243,6 +221,10 @@ public class WalletSendCoins extends Fragment {
             @Override
             public void run() {
                 receivingAddressView.setText(address.toString());
+                if (isAmountValid(amount)) {
+                    sendAmountView.setText(amount.toPlainString());
+                    sendAmount = amount;
+                }
                 requestFocusFirst();
                 updateView();
             }
@@ -269,6 +251,7 @@ public class WalletSendCoins extends Fragment {
     }
 
     private boolean isAmountValid(Coin amount) {
+        // TODO, check if we have the available amount in the wallet
         return amount != null && amount.signum() > 0;
     }
 
