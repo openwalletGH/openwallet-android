@@ -269,7 +269,7 @@ public class WalletPocketProtobufSerializer {
             for (Protos.AddressStatus sp : walletProto.getAddressStatusList()) {
                 Address addr = new Address(coinType, sp.getAddress());
                 AddressStatus status = new AddressStatus(addr, sp.getStatus());
-                wallet.updateAddressStatus(status);
+                wallet.commitAddressStatus(status);
             }
         } catch (AddressFormatException e) {
             throw new UnreadableWalletException(e.getMessage(), e);
@@ -353,14 +353,6 @@ public class WalletPocketProtobufSerializer {
             case PENDING: pool = WalletTransaction.Pool.PENDING; break;
             case SPENT: pool = WalletTransaction.Pool.SPENT; break;
             case UNSPENT: pool = WalletTransaction.Pool.UNSPENT; break;
-            // Upgrade old wallets: inactive pool has been merged with the pending pool.
-            // Remove this some time after 0.9 is old and everyone has upgraded.
-            // There should not be any spent outputs in this tx as old wallets would not allow them to be spent
-            // in this state.
-            case INACTIVE:
-            case PENDING_INACTIVE:
-                pool = WalletTransaction.Pool.PENDING;
-                break;
             default:
                 throw new UnreadableWalletException("Unknown transaction pool: " + txProto.getPool());
         }

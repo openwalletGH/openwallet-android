@@ -202,10 +202,8 @@ message Transaction {
   enum Pool {
     UNSPENT = 4; // In best chain, not all outputs spent
     SPENT = 5; // In best chain, all outputs spent
-    INACTIVE = 2; // In non-best chain, not our transaction
     DEAD = 10; // Double-spent by a transaction in the best chain
     PENDING = 16; // Our transaction, not in any chain
-    PENDING_INACTIVE = 18; // In non-best chain, our transaction
   }
 
   // See Wallet.java for detailed description of pool semantics

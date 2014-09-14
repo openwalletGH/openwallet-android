@@ -20,8 +20,9 @@ package com.coinomi.core.wallet;
 
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.network.AddressStatus;
-import com.coinomi.core.network.interfaces.BlockchainConnection;
+import com.coinomi.core.network.ServerClient.HistoryTx;
 import com.coinomi.core.network.ServerClient.UnspentTx;
+import com.coinomi.core.network.interfaces.BlockchainConnection;
 import com.coinomi.core.network.interfaces.ConnectionEventListener;
 import com.coinomi.core.network.interfaces.TransactionEventListener;
 import com.coinomi.core.protos.Protos;
@@ -97,13 +98,13 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
 
     // Holds the status of every address we are watching. When connecting to the server, if we get a
     // different status for a particular address this means that there are new transactions for that
-    // address and we have to fetch them.
+    // address and we have to fetch them. The status String could be null when an address is unused.
     @VisibleForTesting final HashMap<Address, String> addressesStatus;
 
-    @VisibleForTesting final transient HashMap<Address, TransactionMap> addressToTransaction;
     @VisibleForTesting final transient ArrayList<Address> addressesSubscribed;
     @VisibleForTesting final transient ArrayList<Address> addressesPendingSubscription;
-    @VisibleForTesting final transient HashMap<AddressStatus, List<UnspentTx>> statusPendingUpdate;
+    @VisibleForTesting final transient HashMap<Address, AddressStatus> statusPendingUpdates;
+    @VisibleForTesting final transient HashSet<Sha256Hash> fetchingTransactions;
 
     // The various pools below give quick access to wallet-relevant transactions by the state they're in:
     //
@@ -150,10 +151,10 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
         this.coinType = checkNotNull(coinType);
         int lookAhead = 2 * SimpleHDKeyChain.LOOKAHEAD;
         addressesStatus = new HashMap<Address, String>(lookAhead);
-        addressToTransaction = new HashMap<Address, TransactionMap>(lookAhead);
         addressesSubscribed = new ArrayList<Address>(lookAhead);
         addressesPendingSubscription = new ArrayList<Address>(lookAhead);
-        statusPendingUpdate = new HashMap<AddressStatus, List<UnspentTx>>(lookAhead);
+        statusPendingUpdates = new HashMap<Address, AddressStatus>(lookAhead);
+        fetchingTransactions = new HashSet<Sha256Hash>();
         unspent = new HashMap<Sha256Hash, Transaction>();
         spent = new HashMap<Sha256Hash, Transaction>();
         pending = new HashMap<Sha256Hash, Transaction>();
@@ -225,9 +226,9 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
     }
 
     /**
-     * Marks outputs available for spending, only for keys that we have
+     * Marks outputs as spent, if we don't have the keys
      */
-    private void markOwnOutputs(Transaction transaction) {
+    private void markSpentOutputs(Transaction transaction) {
         checkState(lock.isHeldByCurrentThread());
         for (TransactionOutput txo : transaction.getOutputs()) {
             if (txo.isAvailableForSpending()) {
@@ -244,12 +245,11 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
      */
     private void addWalletTransaction(Pool pool, Transaction tx) {
         checkState(lock.isHeldByCurrentThread());
-        markOwnOutputs(tx);
+        markSpentOutputs(tx);
         transactions.put(tx.getHash(), tx);
         switch (pool) {
             case UNSPENT:
                 checkState(unspent.put(tx.getHash(), tx) == null);
-                updateAddressTxMapping(tx);
                 break;
             case SPENT:
                 checkState(spent.put(tx.getHash(), tx) == null);
@@ -283,29 +283,22 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
         }
     }
 
-    private void updateAddressTxMapping(Transaction tx) {
-        checkState(lock.isHeldByCurrentThread());
-        for (TransactionOutput txo : tx.getOutputs()) {
-            if (txo.isAvailableForSpending()) {
-                Address address = txoToAddress(txo);
-                if (address == null) { continue; }
-                if (!addressToTransaction.containsKey(address)) {
-                    addressToTransaction.put(address, new TransactionMap());
-                }
-                TransactionMap addressTxs = addressToTransaction.get(address);
-                if (!addressTxs.containsKey(tx)) {
-                    addressTxs.put(tx);
+    /**
+     * Returns transactions that match the hashes, some transactions could be missing.
+     */
+    public HashMap<Sha256Hash, Transaction> getTransactions(HashSet<Sha256Hash> hashes) {
+        lock.lock();
+        try {
+            HashMap<Sha256Hash, Transaction> txs = new HashMap<Sha256Hash, Transaction>();
+            for (Sha256Hash hash : hashes) {
+                if (transactions.containsKey(hash)) {
+                    txs.put(hash, transactions.get(hash));
                 }
             }
+            return txs;
+        } finally {
+            lock.unlock();
         }
-    }
-
-    private Address txoToAddress(TransactionOutput txo) {
-        Address address = txo.getAddressFromP2PKHScript(coinType);
-        if (address == null) {
-            address = txo.getAddressFromP2SH(coinType);
-        }
-        return address;
     }
 
     /**
@@ -323,10 +316,7 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
             dead.clear();
             transactions.clear();
             addressesStatus.clear();
-            addressToTransaction.clear();
-            addressesSubscribed.clear();
-            addressesPendingSubscription.clear();
-            statusPendingUpdate.clear();
+            clearTransientState();
         } finally {
             lock.unlock();
         }
@@ -498,53 +488,20 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
 
         lock.lock();
         try {
-            if (statusPendingUpdate.containsKey(status)) {
-                return false;
-            }
-            else {
-                statusPendingUpdate.put(status, new ArrayList<UnspentTx>());
-                return true;
-            }
-        }
-        finally {
-            lock.unlock();
-        }
-    }
+            // If current address is updating
+            if (statusPendingUpdates.containsKey(status.getAddress())) {
+                AddressStatus updatingStatus = statusPendingUpdates.get(status.getAddress());
 
-    @VisibleForTesting boolean registerTransactionsForUpdate(AddressStatus status, Collection<UnspentTx> txHashes) {
-        checkNotNull(status.getStatus());
-
-        lock.lock();
-        try {
-            if (statusPendingUpdate.containsKey(status)) {
-                checkState(statusPendingUpdate.get(status).size() == 0, "Transactions already registered");
-                statusPendingUpdate.get(status).addAll(txHashes);
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
-        finally {
-            lock.unlock();
-        }
-    }
-
-    /**
-     * Set that the status updated successfully
-     *
-     * Returns true if this status was pending update
-     */
-    @VisibleForTesting void clearPendingStatusUpdate(AddressStatus status, UnspentTx txHash) {
-        lock.lock();
-        try {
-            if (statusPendingUpdate.containsKey(status)) {
-                List<UnspentTx> txHashes = statusPendingUpdate.get(status);
-                txHashes.remove(txHash);
-                if (txHashes.size() == 0) {
-                    statusPendingUpdate.remove(status);
-                    updateAddressStatus(status);
+                // If the same status is updating, don't update again
+                if (updatingStatus.getStatus().equals(status.getStatus())) {
+                    return false;
+                } else { // Status is newer, so replace the updating status
+                    statusPendingUpdates.put(status.getAddress(), status);
+                    return true;
                 }
+            } else { // This status is new
+                statusPendingUpdates.put(status.getAddress(), status);
+                return true;
             }
         }
         finally {
@@ -552,9 +509,13 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
         }
     }
 
-    void updateAddressStatus(AddressStatus newStatus) {
+    void commitAddressStatus(AddressStatus newStatus) {
         lock.lock();
         try {
+            AddressStatus updatingStatus = statusPendingUpdates.get(newStatus.getAddress());
+            if (updatingStatus != null && updatingStatus.equals(newStatus)) {
+                statusPendingUpdates.remove(newStatus.getAddress());
+            }
             addressesStatus.put(newStatus.getAddress(), newStatus.getStatus());
         }
         finally {
@@ -567,14 +528,20 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
         lock.lock();
         try {
             Address address = addressStatus.getAddress();
-            String status = addressStatus.getStatus();
+            String newStatus = addressStatus.getStatus();
             if (addressesStatus.containsKey(address)) {
-                return !addressesStatus.get(address).equals(status);
+                String previousStatus = addressesStatus.get(address);
+                if (previousStatus == null) {
+                    return previousStatus != newStatus;
+                }
+                else {
+                    return !previousStatus.equals(newStatus);
+                }
             }
             else {
                 // Unused address, just mark it that we watch it
-                if (status == null) {
-                    updateAddressStatus(addressStatus);
+                if (newStatus == null) {
+                    commitAddressStatus(addressStatus);
                     return false;
                 }
                 else {
@@ -658,10 +625,11 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
                 if (isAddressStatusChanged(status)) {
                     // Status changed, time to update
                     if (registerStatusForUpdate(status)) {
-                        log.info("Must get UTXOs for address {}, status changes {}", status.getAddress(),
-                                status.getStatus());
+                        log.info("Must get transactions for address {}, status {}",
+                                status.getAddress(), status.getStatus());
 
                         if (blockchainConnection != null) {
+                            blockchainConnection.getHistoryTx(coinType, status, this);
                             blockchainConnection.getUnspentTx(coinType, status, this);
                         }
                     }
@@ -672,7 +640,27 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
             }
             else {
                 // Address not used, just update the status
-                updateAddressStatus(status);
+                commitAddressStatus(status);
+            }
+        }
+        finally {
+            lock.unlock();
+        }
+    }
+
+    @Override
+    public void onTransactionHistory(AddressStatus status, List<HistoryTx> historyTxes) {
+        lock.lock();
+        try {
+            AddressStatus updatingStatus = statusPendingUpdates.get(status.getAddress());
+            // Check if this updating status is valid
+            if (updatingStatus != null && updatingStatus.equals(status)) {
+                updatingStatus.queueHistoryTransactions(historyTxes);
+                fetchTransactions(historyTxes);
+                tryToApplyState(updatingStatus);
+            }
+            else {
+                log.info("Ignoring history tx call because no entry found or newer entry.");
             }
         }
         finally {
@@ -684,95 +672,172 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
     public void onUnspentTransactionUpdate(AddressStatus status, List<UnspentTx> unspentTxes) {
         lock.lock();
         try {
-            if (unspentTxes.size() > 0) {
-                log.info("Got {} unspent transactions for address {}", unspentTxes.size(),
-                        status.getAddress());
-                List<UnspentTx> txToGet = new ArrayList<UnspentTx>();
-                Set<Sha256Hash> unspentTxHashes = new HashSet<Sha256Hash>(unspentTxes.size());
-                for (UnspentTx tx : unspentTxes) {
-                    log.info("- utxo {} worth {}", tx.getTxHash(), tx.getValue());
-                    unspentTxHashes.add(tx.getTxHash());
-                    if (getTransaction(tx.getTxHash()) == null) {
-                        txToGet.add(tx);
-                    } else {
-                        markAsUnspent(tx);
-                    }
-                }
-
-                TransactionMap addressTxs = addressToTransaction.get(status.getAddress());
-                if (addressTxs != null) {
-                    for (Sha256Hash hash : addressTxs.keySet()) {
-                        if (!unspentTxes.contains(hash)) {
-                            Transaction tx = addressTxs.get(hash);
-                            for (TransactionOutput txo : tx.getOutputs()) {
-                                if (!txo.isAvailableForSpending()) { continue; }
-                                Address address = txoToAddress(txo);
-                                if (address == null) { continue; }
-                                if (address.toString().equals(status.getAddress().toString())) {
-                                    txo.markAsSpent(null);
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if (txToGet.size() > 0) {
-                    registerTransactionsForUpdate(status, txToGet);
-                    for (UnspentTx tx : txToGet) {
-                        log.info("Must get raw transaction {}", tx.getTxHash());
-                        if (blockchainConnection != null) {
-                            blockchainConnection.getTx(coinType, status, tx, this);
-                        }
-                    }
-                }
-                else { // If not fetching any transaction, update status now
-                    updateAddressStatus(status);
-                }
+            AddressStatus updatingStatus = statusPendingUpdates.get(status.getAddress());
+            // Check if this updating status is valid
+            if (updatingStatus != null && updatingStatus.equals(status)) {
+                updatingStatus.queueUnspentTransactions(unspentTxes);
+                fetchTransactions(unspentTxes);
+                tryToApplyState(updatingStatus);
             }
             else {
-                log.info("No unspent transactions for address {}", status.getAddress());
-                updateAddressStatus(status);
+                log.info("Ignoring unspent tx call because no entry found or newer entry.");
             }
-
         }
         finally {
             lock.unlock();
+        }
+    }
+
+    /**
+     * Try to apply all address states
+     */
+    private void tryToApplyState() {
+        lock.lock();
+        try {
+            // Make a copy of statusPendingUpdates.values() because we modify it later
+            for (AddressStatus status : Lists.newArrayList(statusPendingUpdates.values())) {
+                tryToApplyState(status);
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Try to apply the status state
+     */
+    private void tryToApplyState(AddressStatus status) {
+        lock.lock();
+        try {
+            if (statusPendingUpdates.containsKey(status.getAddress()) && status.isReady()) {
+                HashSet<Sha256Hash> txHashes = status.getAllTransactionHashes();
+                HashMap<Sha256Hash, Transaction> txs = getTransactions(txHashes);
+                // We have all the transactions, apply state
+                if (txs.size() == txHashes.size()) {
+                    applyState(status, txs);
+                }
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    private void applyState(AddressStatus status, HashMap<Sha256Hash, Transaction> txs) {
+        checkState(lock.isHeldByCurrentThread());
+        HashSet<Transaction> changedTransactions = new HashSet<Transaction>();
+        // Connect inputs to outputs
+        for (HistoryTx historyTx : status.getHistoryTxs()) {
+            Transaction tx = txs.get(historyTx.getTxHash());
+            if (tx != null) {
+                changedTransactions.add(tx);
+                tx.getConfidence().setAppearedAtChainHeight(historyTx.getHeight());
+                // Try to connect
+                for (TransactionInput txi : tx.getInputs()) {
+                    Sha256Hash outputHash = txi.getOutpoint().getHash();
+                    Transaction fromTx = txs.get(outputHash);
+                    if (fromTx != null) {
+                        TransactionInput.ConnectionResult result = txi.connect(fromTx,
+                                TransactionInput.ConnectMode.ABORT_ON_CONFLICT);
+                        if (result != TransactionInput.ConnectionResult.SUCCESS) {
+                            log.warn("Could not connect {} to {}", txi, fromTx);
+                        }
+                    }
+                }
+            }
+        }
+        // Mark unspent outputs
+        for (UnspentTx unspentTx : status.getUnspentTxs()) {
+            Transaction tx = txs.get(unspentTx.getTxHash());
+            if (tx != null) {
+                changedTransactions.add(tx);
+                tx.getOutput(unspentTx.getTxPos()).markAsUnspent();
+            }
+        }
+
+        // Change pools if needed
+        for (Transaction tx : changedTransactions) {
+            maybeMovePool(tx);
+        }
+
+        commitAddressStatus(status);
+        queueOnNewBalance();
+    }
+
+    /**
+     * If the transactions outputs are all marked as spent, and it's in the unspent map, move it.
+     * If the owned transactions outputs are not all marked as spent, and it's in the spent map, move it.
+     */
+    private void maybeMovePool(Transaction tx) {
+        checkState(lock.isHeldByCurrentThread());
+
+        if (tx.getConfidence().getConfidenceType() == TransactionConfidence.ConfidenceType.BUILDING) {
+            // Transaction is confirmed, move it
+            if (pending.remove(tx.getHash()) != null) {
+                log.info("  {} <-pending ->unspent", tx);
+                spent.put(tx.getHash(), tx); // If has unspent outputs, bellow will move to unspent
+            }
+        }
+
+        if (tx.isEveryOutputSpent()) {
+            // There's nothing left I can spend in this transaction.
+            if (unspent.remove(tx.getHash()) != null) {
+                log.info("  {} <-unspent ->spent", tx);
+                spent.put(tx.getHash(), tx);
+            }
+        } else {
+            if (spent.remove(tx.getHash()) != null) {
+                log.info("  {} <-spent ->unspent", tx);
+                unspent.put(tx.getHash(), tx);
+            }
+        }
+    }
+
+
+    private void fetchTransactions(List<? extends HistoryTx> txes) {
+        checkState(lock.isHeldByCurrentThread());
+        for (HistoryTx tx : txes) {
+            fetchTransactionIfNeeded(tx.getTxHash());
+        }
+    }
+
+    private void fetchTransactionIfNeeded(Sha256Hash txHash) {
+        checkState(lock.isHeldByCurrentThread());
+        // Check if need to fetch the transaction
+        if (!isTransactionAvailableOrQueued(txHash)) {
+            fetchingTransactions.add(txHash);
+            if (blockchainConnection != null) {
+                blockchainConnection.getTransaction(coinType, txHash, this);
+            }
+        }
+    }
+
+    private boolean isTransactionAvailableOrQueued(Sha256Hash txHash) {
+        checkState(lock.isHeldByCurrentThread());
+        return getTransaction(txHash) != null || fetchingTransactions.contains(txHash);
+    }
+
+    private void addNewTransactionIfNeeded(Transaction tx) {
+        checkState(lock.isHeldByCurrentThread());
+
+        // If was fetching this tx, remove it
+        fetchingTransactions.remove(tx.getHash());
+
+        // This tx not in wallet, add it
+        if (getTransaction(tx.getHash()) == null) {
+            // Mark outputs as spent because we don't know anything about this tx yet
+            for (TransactionOutput txo : tx.getOutputs()) {
+                txo.markAsSpent(null);
+            }
+            addWalletTransaction(Pool.PENDING, tx);
         }
     }
 
     @Override
-    public void onTransactionUpdate(AddressStatus status, UnspentTx utx, byte[] rawTx) {
+    public void onTransactionUpdate(Transaction tx) {
         lock.lock();
         try {
-            log.info("Get tx from wallet {}", utx.getTxHash());
-            Transaction tx = getTransaction(utx.getTxHash());
-            if (tx == null) {
-                tx = new Transaction(coinType, rawTx);
-                tx.getConfidence().setAppearedAtChainHeight(utx.getHeight());
-                for (TransactionOutput txo : tx.getOutputs()) {
-                    txo.markAsSpent(null);
-                }
-                log.info("Adding unspent transaction {}", tx.getHash());
-                addWalletTransaction(Pool.UNSPENT, tx);
-            }
-            markAsUnspent(utx);
-            queueOnNewBalance();
-            clearPendingStatusUpdate(status, utx);
-            walletSaveLater();
-        }
-        finally {
-            lock.unlock();
-        }
-    }
-
-    private void markAsUnspent(UnspentTx utx) {
-        lock.lock();
-        try {
-            Transaction tx = getTransaction(utx.getTxHash());
-            if (tx != null) {
-                tx.getOutput(utx.getTxPos()).markAsUnspent();
-            }
-            updateAddressTxMapping(tx);
+            addNewTransactionIfNeeded(tx);
+            tryToApplyState();
         }
         finally {
             lock.unlock();
@@ -783,9 +848,8 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
     public void onTransactionBroadcast(Transaction transaction) {
         lock.lock();
         try {
-
             log.info("Transaction sent {}", transaction);
-
+            addWalletTransaction(Pool.PENDING, transaction);
         } finally {
             lock.unlock();
         }
@@ -799,7 +863,7 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
     @Override
     public void onConnection(BlockchainConnection blockchainConnection) {
         this.blockchainConnection = blockchainConnection;
-        this.addressesSubscribed.clear();
+        clearTransientState();
         subscribeIfNeeded();
     }
 
@@ -815,7 +879,6 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
             }
         } catch (Exception e) {
             log.error("Error subscribing to addresses", e);
-            return;
         }
         finally {
             lock.unlock();
@@ -824,8 +887,15 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
 
     @Override
     public void onDisconnect() {
-        this.blockchainConnection = null;
-        this.addressesSubscribed.clear();
+        blockchainConnection = null;
+        clearTransientState();
+    }
+
+    private void clearTransientState() {
+        addressesSubscribed.clear();
+        addressesPendingSubscription.clear();
+        statusPendingUpdates.clear();
+        fetchingTransactions.clear();
     }
 
     public void sendCoins(Address address, Coin amount) throws InsufficientMoneyException, IOException {
@@ -837,9 +907,12 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
 
         Transaction tx = sendCoinsOffline(request);
 
-
         log.info("Created tx {}", Utils.HEX.encode(tx.bitcoinSerialize()));
 
+        broadcastTransaction(tx);
+    }
+
+    @VisibleForTesting void broadcastTransaction(Transaction tx) throws IOException {
         if (blockchainConnection != null) {
             blockchainConnection.broadcastTx(coinType, tx, this);
         } else {

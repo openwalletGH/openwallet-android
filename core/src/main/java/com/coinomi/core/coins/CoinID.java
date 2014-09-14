@@ -36,4 +36,15 @@ public enum CoinID {
         }
         throw new IllegalArgumentException();
     }
+
+    public static CoinID fromUri(String input) {
+        for(CoinID id : values()) {
+            if (input.startsWith(id.getCoinType().getUriScheme()+"://")) {
+                return id;
+            } else if (input.startsWith(id.getCoinType().getUriScheme()+":")) {
+                return id;
+            }
+        }
+        throw new IllegalArgumentException();
+    }
 }

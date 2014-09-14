@@ -2,25 +2,30 @@ package com.coinomi.core.wallet;
 
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.DogecoinTest;
-import com.coinomi.core.crypto.KeyCrypterPin;
 import com.coinomi.core.network.AddressStatus;
+import com.coinomi.core.network.ServerClient.HistoryTx;
+import com.coinomi.core.network.ServerClient.UnspentTx;
 import com.coinomi.core.network.interfaces.BlockchainConnection;
-import com.coinomi.core.network.ServerClient;
 import com.coinomi.core.network.interfaces.TransactionEventListener;
 import com.coinomi.core.protos.Protos;
 import com.google.bitcoin.core.Address;
 import com.google.bitcoin.core.AddressFormatException;
+import com.google.bitcoin.core.ChildMessage;
 import com.google.bitcoin.core.Coin;
 import com.google.bitcoin.core.Sha256Hash;
 import com.google.bitcoin.core.Transaction;
+import com.google.bitcoin.core.TransactionInput;
+import com.google.bitcoin.core.TransactionOutput;
 import com.google.bitcoin.core.Utils;
 import com.google.bitcoin.crypto.DeterministicHierarchy;
 import com.google.bitcoin.crypto.DeterministicKey;
 import com.google.bitcoin.crypto.HDKeyDerivation;
 import com.google.bitcoin.crypto.KeyCrypter;
+import com.google.bitcoin.crypto.KeyCrypterScrypt;
 import com.google.bitcoin.utils.BriefLogFormatter;
 import com.google.bitcoin.wallet.DeterministicSeed;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,12 +34,11 @@ import org.junit.Test;
 import org.spongycastle.crypto.params.KeyParameter;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
@@ -45,6 +49,7 @@ import static org.junit.Assert.assertNotNull;
 public class WalletPocketTest {
     static final List<String> MNEMONIC = ImmutableList.of("citizen", "fever", "scale", "nurse", "brief", "round", "ski", "fiction", "car", "fitness", "pluck", "act");
     static final byte[] aesKeyBytes = {0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7};
+    private static final long AMOUNT_TO_SEND = 2700000000L;
     DeterministicSeed seed = new DeterministicSeed(MNEMONIC, "", 0);
     private DeterministicKey masterKey = HDKeyDerivation.createMasterPrivateKey(seed.getSeedBytes());
     CoinType type = DogecoinTest.get();
@@ -52,7 +57,7 @@ public class WalletPocketTest {
     DeterministicKey rootKey = hierarchy.get(type.getBip44Path(0), false, true);
     WalletPocket pocket;
     KeyParameter aesKey = new KeyParameter(aesKeyBytes);
-    KeyCrypter crypter = new KeyCrypterPin();
+    KeyCrypter crypter = new KeyCrypterScrypt();
 
     @Before
     public void setup() {
@@ -66,8 +71,8 @@ public class WalletPocketTest {
     public void watchingAddresses() {
         List<Address> watchingAddresses = pocket.getAddressesToWatch();
         assertEquals(40, watchingAddresses.size()); // 20 + 20 lookahead size
-        for (int i = 0; i < addresses.length; i++) {
-            assertEquals(addresses[i], watchingAddresses.get(i).toString());
+        for (int i = 0; i < addresses.size(); i++) {
+            assertEquals(addresses.get(i), watchingAddresses.get(i).toString());
         }
     }
 
@@ -78,16 +83,6 @@ public class WalletPocketTest {
         // Issued keys
         assertEquals(18, pocket.keys.getIssuedExternalKeys());
         assertEquals(9, pocket.keys.getIssuedInternalKeys());
-
-        // Transactions
-        assertEquals(13, pocket.addressToTransaction.size());
-
-        Set<Transaction> addressTxs = new HashSet<Transaction>();
-        for (TransactionMap txMap : pocket.addressToTransaction.values()) {
-            addressTxs.addAll(txMap.values());
-        }
-
-        assertEquals(pocket.unspent.size(), addressTxs.size());
 
         // No addresses left to subscribe
         List<Address> addressesToWatch = pocket.getAddressesToWatch();
@@ -108,6 +103,7 @@ public class WalletPocketTest {
         // 18 here is the key index, not issued keys count
         assertEquals(18, key.getChildNumber().num());
 
+        assertEquals(11000000000L, pocket.getBalance().value);
 
         // TODO added more tests to insure it uses the "holes" in the keychain
     }
@@ -197,12 +193,38 @@ public class WalletPocketTest {
 
         Address toAddr = new Address(type, "nUEkQ3LjH9m4ScbP6NGtnAdnnUsdtWv99Q");
 
-        Transaction tx = pocket.sendCoinsOffline(toAddr, Coin.valueOf(2700000000L));
+        long orgBalance = pocket.getBalance().value;
+        Transaction tx = pocket.sendCoinsOffline(toAddr, Coin.valueOf(AMOUNT_TO_SEND));
 
         Transaction txExpected = new Transaction(type, Utils.HEX.decode(expectedTx));
 
-        // FIXME
-        assertEquals(expectedTx, Utils.HEX.encode(tx.bitcoinSerialize()));
+        MessageComparator comparator = new MessageComparator();
+
+//        // Compare inputs
+//        ArrayList<TransactionInput> expectedTxi = Lists.newArrayList(txExpected.getInputs());
+//        Collections.sort(expectedTxi, comparator);
+//
+//        ArrayList<TransactionInput> txi = Lists.newArrayList(tx.getInputs());
+//        Collections.sort(txi, comparator);
+//
+//        for (int i = 0; i < expectedTxi.size(); i++) {
+//            assertArrayEquals(expectedTxi.get(i).bitcoinSerialize(), txi.get(i).bitcoinSerialize());
+//        }
+//
+//        // Compare outputs
+//        ArrayList<TransactionOutput> expectedTxo = Lists.newArrayList(txExpected.getOutputs());
+//        Collections.sort(expectedTxo, comparator);
+//
+//        ArrayList<TransactionOutput> txo = Lists.newArrayList(tx.getOutputs());
+//        Collections.sort(txo, comparator);
+//
+//        for (int i = 0; i < expectedTxo.size(); i++) {
+//            assertArrayEquals(expectedTxo.get(i).bitcoinSerialize(), txo.get(i).bitcoinSerialize());
+//        }
+
+        pocket.broadcastTransaction(tx);
+
+        assertEquals(orgBalance - AMOUNT_TO_SEND, pocket.getBalance());
     }
 
 
@@ -210,25 +232,46 @@ public class WalletPocketTest {
     // Util methods
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
+    public class MessageComparator implements Comparator<ChildMessage> {
+        @Override
+        public int compare(ChildMessage o1, ChildMessage o2) {
+            String s1 = Utils.HEX.encode(o1.bitcoinSerialize());
+            String s2 = Utils.HEX.encode(o2.bitcoinSerialize());
+            return s1.compareTo(s2);
+        }
+    }
+
     HashMap<Address, AddressStatus> getDummyStatuses() throws AddressFormatException {
         HashMap<Address, AddressStatus> status = new HashMap<Address, AddressStatus>(40);
 
-        for (int i = 0; i < addresses.length; i++) {
-            Address address = new Address(type, addresses[i]);
+        for (int i = 0; i < addresses.size(); i++) {
+            Address address = new Address(type, addresses.get(i));
             status.put(address, new AddressStatus(address, statuses[i]));
         }
 
         return status;
     }
 
-    private HashMap<Address,List<ServerClient.UnspentTx>> getDummyUTXs() throws AddressFormatException, JSONException {
-        HashMap<Address, List<ServerClient.UnspentTx>> utxs = new HashMap<Address, List<ServerClient.UnspentTx>>(40);
+    private HashMap<Address, ArrayList<UnspentTx>> getDummyUTXs() throws AddressFormatException, JSONException {
+        HashMap<Address, ArrayList<UnspentTx>> utxs = new HashMap<Address, ArrayList<UnspentTx>>(40);
 
         for (int i = 0; i < statuses.length; i++) {
-            utxs.put(new Address(type, addresses[i]), ServerClient.UnspentTx.fromArray(new JSONArray(unspent[i])));
+            List<UnspentTx> utxList = (List<UnspentTx>) UnspentTx.fromArray(new JSONArray(unspent[i]));
+            utxs.put(new Address(type, addresses.get(i)), Lists.newArrayList(utxList));
         }
 
         return utxs;
+    }
+
+    private HashMap<Address, ArrayList<HistoryTx>> getDummyHistoryTXs() throws AddressFormatException, JSONException {
+        HashMap<Address, ArrayList<HistoryTx>> htxs = new HashMap<Address, ArrayList<HistoryTx>>(40);
+
+        for (int i = 0; i < statuses.length; i++) {
+            List<HistoryTx> utxList = (List<HistoryTx>) HistoryTx.fromArray(new JSONArray(unspent[i]));
+            htxs.put(new Address(type, addresses.get(i)), Lists.newArrayList(utxList));
+        }
+
+        return htxs;
     }
 
     private HashMap<Sha256Hash, byte[]> getDummyRawTXs() throws AddressFormatException, JSONException {
@@ -244,12 +287,14 @@ public class WalletPocketTest {
 
     class MockBlockchainConnection implements BlockchainConnection {
         final HashMap<Address, AddressStatus> statuses;
-        final HashMap<Address, List<ServerClient.UnspentTx>> utxs;
+        final HashMap<Address, ArrayList<UnspentTx>> utxs;
+        final HashMap<Address, ArrayList<HistoryTx>> historyTxs;
         final HashMap<Sha256Hash, byte[]> rawTxs;
 
         MockBlockchainConnection() throws Exception {
             statuses = getDummyStatuses();
             utxs = getDummyUTXs();
+            historyTxs = getDummyHistoryTXs();
             rawTxs = getDummyRawTXs();
         }
 
@@ -266,7 +311,7 @@ public class WalletPocketTest {
 
         @Override
         public void getUnspentTx(CoinType coinType, AddressStatus status, TransactionEventListener listener) {
-            List<ServerClient.UnspentTx> utx = utxs.get(status.getAddress());
+            List<UnspentTx> utx = utxs.get(status.getAddress());
             if (status == null) {
                 utx = ImmutableList.of();
             }
@@ -274,13 +319,69 @@ public class WalletPocketTest {
         }
 
         @Override
-        public void getTx(CoinType coinType, AddressStatus status, ServerClient.UnspentTx utx, TransactionEventListener listener) {
-            listener.onTransactionUpdate(status, utx, rawTxs.get(utx.getTxHash()));
+        public void getHistoryTx(CoinType coinType, AddressStatus status, TransactionEventListener listener) {
+            List<HistoryTx> htx = historyTxs.get(status.getAddress());
+            if (status == null) {
+                htx = ImmutableList.of();
+            }
+            listener.onTransactionHistory(status, htx);
         }
 
         @Override
-        public void broadcastTx(CoinType coinType, Transaction tx, TransactionEventListener listener) {
+        public void getTransaction(CoinType coinType, Sha256Hash txHash, TransactionEventListener listener) {
+            Transaction tx = new Transaction(coinType, rawTxs.get(txHash));
+            listener.onTransactionUpdate(tx);
+        }
 
+//        @Override
+//        public void getTx(CoinType coinType, AddressStatus status, UnspentTx utx, TransactionEventListener listener) {
+//            listener.onTransactionUpdate(status, utx, rawTxs.get(utx.getTxHash()));
+//        }
+
+        @Override
+        public void broadcastTx(CoinType coinType, Transaction tx, TransactionEventListener listener) {
+            List<AddressStatus> newStatuses = new ArrayList<AddressStatus>();
+            // Get spent outputs and modify statuses
+            for (TransactionInput txi : tx.getInputs()) {
+                UnspentTx unspentTx = new UnspentTx(
+                        txi.getOutpoint(), txi.getValue().value, 0);
+
+                for (Map.Entry<Address, ArrayList<UnspentTx>> entry : utxs.entrySet()) {
+                    if (entry.getValue().remove(unspentTx)) {
+                        AddressStatus newStatus = new AddressStatus(entry.getKey(), tx.getHashAsString());
+                        statuses.put(entry.getKey(), newStatus);
+                        newStatuses.add(newStatus);
+                    }
+                }
+            }
+
+            for (TransactionOutput txo : tx.getOutputs()) {
+                if (txo.getAddressFromP2PKHScript(coinType) != null) {
+                    Address address = txo.getAddressFromP2PKHScript(coinType);
+                    if (addresses.contains(address.toString())) {
+                        AddressStatus newStatus = new AddressStatus(address, tx.getHashAsString());
+                        statuses.put(address, newStatus);
+                        newStatuses.add(newStatus);
+                        if (!utxs.containsKey(address)) {
+                            utxs.put(address, new ArrayList<UnspentTx>());
+                        }
+                        ArrayList<UnspentTx> unspentTxs = utxs.get(address);
+                        unspentTxs.add(new UnspentTx(txo.getOutPointFor(),
+                                txo.getValue().value, 0));
+                        if (!historyTxs.containsKey(address)) {
+                            historyTxs.put(address, new ArrayList<HistoryTx>());
+                        }
+                        ArrayList<HistoryTx> historyTxes = historyTxs.get(address);
+                        historyTxes.add(new HistoryTx(txo.getOutPointFor(), 0));
+                    }
+                }
+            }
+
+            rawTxs.put(tx.getHash(), tx.bitcoinSerialize());
+
+            for (AddressStatus newStatus : newStatuses) {
+                listener.onAddressStatusUpdate(newStatus);
+            }
         }
 
         @Override
@@ -292,7 +393,7 @@ public class WalletPocketTest {
     }
 
     // Mock data
-    String[] addresses = {
+    List<String> addresses = ImmutableList.of(
             "nnfP8VuPfZXhNtMDzvX1bKurzcV1k7HNrQ",
             "nf4AUKiaGdx4GTbbh222KvtuCbAuvbcdE2",
             "npGkmbWtdWybFNSZQXUK6zZxbEocMtrTzz",
@@ -333,7 +434,7 @@ public class WalletPocketTest {
             "nXKccwjaUyrQkLrdqKT6aq6cDiFgBBVgNz",
             "nZMSNsXSAL7i1YD6KP5FrhATuZ2CWvnxqR",
             "nUEkQ3LjH9m4ScbP6NGtnAdnnUsdtWv99Q"
-    };
+    );
 
     String[] statuses = {
             "fe7c109d8bd90551a406cf0b3499117db04bc9c4f48e1df27ac1cf3ddcb3d464",
@@ -375,7 +476,7 @@ public class WalletPocketTest {
             null,
             null,
             null,
-            null,
+            null
     };
 
 
@@ -409,6 +510,49 @@ public class WalletPocketTest {
             "[]",
             "[]",
             "[{\"tx_hash\": \"ef74da273e8a77e2d60b707414fb7e0ccb35c7b1b936800a49fe953195b1799f\", \"tx_pos\": 10, \"value\": 1000000000, \"height\": 160267}]",
+            "[]",
+            "[]",
+            "[]",
+            "[]",
+            "[]",
+            "[]",
+            "[]",
+            "[]",
+            "[]",
+            "[]",
+            "[]"
+    };
+
+    String[] history = {
+            "[{\"tx_hash\": \"ef74da273e8a77e2d60b707414fb7e0ccb35c7b1b936800a49fe953195b1799f\", \"height\": 160267}, {\"tx_hash\": \"89a72ba4732505ce9b09c30668db985952701252ce0adbd7c43336396697d6ae\", \"height\": 160267}]",
+            "[{\"tx_hash\": \"ef74da273e8a77e2d60b707414fb7e0ccb35c7b1b936800a49fe953195b1799f\", \"height\": 160267}, {\"tx_hash\": \"edaf445288d8e65cf7963bc8047c90f53681acaadc5ccfc5ecc67aedbd73cddb\", \"height\": 160267}]",
+            "[{\"tx_hash\": \"ef74da273e8a77e2d60b707414fb7e0ccb35c7b1b936800a49fe953195b1799f\", \"height\": 160267}, {\"tx_hash\": \"81a1f0f8242d5e71e65ff9e8ec51e8e85d641b607d7f691c1770d4f25918ebd7\", \"height\": 160267}]",
+            "[{\"tx_hash\": \"ef74da273e8a77e2d60b707414fb7e0ccb35c7b1b936800a49fe953195b1799f\", \"height\": 160267}]",
+            "[{\"tx_hash\": \"ef74da273e8a77e2d60b707414fb7e0ccb35c7b1b936800a49fe953195b1799f\", \"height\": 160267}]",
+            "[]",
+            "[]",
+            "[]",
+            "[{\"tx_hash\": \"ef74da273e8a77e2d60b707414fb7e0ccb35c7b1b936800a49fe953195b1799f\", \"height\": 160267}]",
+            "[]",
+            "[]",
+            "[]",
+            "[{\"tx_hash\": \"ef74da273e8a77e2d60b707414fb7e0ccb35c7b1b936800a49fe953195b1799f\", \"height\": 160267}]",
+            "[]",
+            "[]",
+            "[]",
+            "[]",
+            "[{\"tx_hash\": \"ef74da273e8a77e2d60b707414fb7e0ccb35c7b1b936800a49fe953195b1799f\", \"height\": 160267}]",
+            "[]",
+            "[]",
+            "[{\"tx_hash\": \"ef74da273e8a77e2d60b707414fb7e0ccb35c7b1b936800a49fe953195b1799f\", \"height\": 160267}]",
+            "[{\"tx_hash\": \"ef74da273e8a77e2d60b707414fb7e0ccb35c7b1b936800a49fe953195b1799f\", \"height\": 160267}]",
+            "[{\"tx_hash\": \"ef74da273e8a77e2d60b707414fb7e0ccb35c7b1b936800a49fe953195b1799f\", \"height\": 160267}]",
+            "[]",
+            "[{\"tx_hash\": \"ef74da273e8a77e2d60b707414fb7e0ccb35c7b1b936800a49fe953195b1799f\", \"height\": 160267}]",
+            "[]",
+            "[]",
+            "[]",
+            "[{\"tx_hash\": \"ef74da273e8a77e2d60b707414fb7e0ccb35c7b1b936800a49fe953195b1799f\", \"height\": 160267}]",
             "[]",
             "[]",
             "[]",

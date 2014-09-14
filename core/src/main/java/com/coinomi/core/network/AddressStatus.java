@@ -1,6 +1,14 @@
 package com.coinomi.core.network;
 
 import com.google.bitcoin.core.Address;
+import com.google.bitcoin.core.Sha256Hash;
+import com.google.bitcoin.core.Transaction;
+import com.google.common.collect.Sets;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 
 import javax.annotation.Nullable;
 
@@ -10,6 +18,11 @@ import javax.annotation.Nullable;
 final public class AddressStatus {
     final Address address;
     @Nullable final String status;
+
+    HashSet<ServerClient.HistoryTx> historyTransactions;
+    HashSet<ServerClient.UnspentTx> unspentTransactions;
+    HashSet<Sha256Hash> allTransactions = new HashSet<Sha256Hash>();
+
 
     public AddressStatus(Address address, @Nullable String status) {
         this.address = address;
@@ -22,6 +35,62 @@ final public class AddressStatus {
 
     @Nullable public String getStatus() {
         return status;
+    }
+
+    /**
+     * Queue transactions that are going to be fetched
+     * @param txs
+     */
+    public void queueHistoryTransactions(List<ServerClient.HistoryTx> txs) {
+        if (historyTransactions == null) {
+            historyTransactions = (HashSet<ServerClient.HistoryTx>) fillTransactions(txs);
+        }
+    }
+
+    /**
+     * Queue transactions that are going to be fetched
+     * @param txs
+     */
+    public void queueUnspentTransactions(List<ServerClient.UnspentTx> txs) {
+        if (unspentTransactions == null) {
+            unspentTransactions = (HashSet<ServerClient.UnspentTx>) fillTransactions(txs);
+        }
+    }
+
+    private HashSet<? extends ServerClient.HistoryTx> fillTransactions(List<? extends ServerClient.HistoryTx> txs) {
+        HashSet<? extends ServerClient.HistoryTx> txSet = Sets.newHashSet(txs);
+        for (ServerClient.HistoryTx tx : txs) {
+            allTransactions.add(tx.getTxHash());
+        }
+        return txSet;
+    }
+
+    /**
+     * Return true if history and unspent transactions are queued
+     */
+    public boolean isReady() {
+        return historyTransactions != null && unspentTransactions != null;
+    }
+
+    /**
+     * Get all queued transactions
+     */
+    public HashSet<Sha256Hash> getAllTransactionHashes() {
+        return allTransactions;
+    }
+
+    /**
+     * Get history transactions info
+     */
+    public HashSet<ServerClient.HistoryTx> getHistoryTxs() {
+        return historyTransactions;
+    }
+
+    /**
+     * Get unspent transactions info
+     */
+    public HashSet<ServerClient.UnspentTx> getUnspentTxs() {
+        return unspentTransactions;
     }
 
     @Override

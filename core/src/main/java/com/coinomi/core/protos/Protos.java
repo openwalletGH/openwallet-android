@@ -7474,21 +7474,13 @@ public final class Protos {
        */
       SPENT(1, 5),
       /**
-       * <code>INACTIVE = 2;</code>
-       *
-       * <pre>
-       * In non-best chain, not our transaction
-       * </pre>
-       */
-      INACTIVE(2, 2),
-      /**
        * <code>DEAD = 10;</code>
        *
        * <pre>
        * Double-spent by a transaction in the best chain
        * </pre>
        */
-      DEAD(3, 10),
+      DEAD(2, 10),
       /**
        * <code>PENDING = 16;</code>
        *
@@ -7496,15 +7488,7 @@ public final class Protos {
        * Our transaction, not in any chain
        * </pre>
        */
-      PENDING(4, 16),
-      /**
-       * <code>PENDING_INACTIVE = 18;</code>
-       *
-       * <pre>
-       * In non-best chain, our transaction
-       * </pre>
-       */
-      PENDING_INACTIVE(5, 18),
+      PENDING(3, 16),
       ;
 
       /**
@@ -7524,14 +7508,6 @@ public final class Protos {
        */
       public static final int SPENT_VALUE = 5;
       /**
-       * <code>INACTIVE = 2;</code>
-       *
-       * <pre>
-       * In non-best chain, not our transaction
-       * </pre>
-       */
-      public static final int INACTIVE_VALUE = 2;
-      /**
        * <code>DEAD = 10;</code>
        *
        * <pre>
@@ -7547,14 +7523,6 @@ public final class Protos {
        * </pre>
        */
       public static final int PENDING_VALUE = 16;
-      /**
-       * <code>PENDING_INACTIVE = 18;</code>
-       *
-       * <pre>
-       * In non-best chain, our transaction
-       * </pre>
-       */
-      public static final int PENDING_INACTIVE_VALUE = 18;
 
 
       public final int getNumber() { return value; }
@@ -7563,10 +7531,8 @@ public final class Protos {
         switch (value) {
           case 4: return UNSPENT;
           case 5: return SPENT;
-          case 2: return INACTIVE;
           case 10: return DEAD;
           case 16: return PENDING;
-          case 18: return PENDING_INACTIVE;
           default: return null;
         }
       }
@@ -14752,7 +14718,7 @@ public final class Protos {
       "ence.Source\"8\n\004Type\022\013\n\007UNKNOWN\020\000\022\014\n\010BUIL" +
       "DING\020\001\022\013\n\007PENDING\020\002\022\010\n\004DEAD\020\003\"U\n\006Source\022" +
       "\022\n\016SOURCE_UNKNOWN\020\000\022\022\n\016SOURCE_NETWORK\020\001\022" +
-      "\017\n\013SOURCE_SELF\020\002\022\022\n\016SOURCE_TRUSTED\020\003\"\357\003\n" +
+      "\017\n\013SOURCE_SELF\020\002\022\022\n\016SOURCE_TRUSTED\020\003\"\313\003\n" +
       "\013Transaction\022\017\n\007version\030\001 \002(\005\022\014\n\004hash\030\002 " +
       "\002(\014\0227\n\004pool\030\003 \001(\0162).com.coinomi.core.pro" +
       "tos.Transaction.Pool\022\021\n\tlock_time\030\004 \001(\r\022" +
@@ -14763,31 +14729,30 @@ public final class Protos {
       "t\022\022\n\nblock_hash\030\010 \003(\014\022 \n\030block_relativit" +
       "y_offsets\030\t \003(\005\022B\n\nconfidence\030\n \001(\0132..co" +
       "m.coinomi.core.protos.TransactionConfide" +
-      "nce\"Y\n\004Pool\022\013\n\007UNSPENT\020\004\022\t\n\005SPENT\020\005\022\014\n\010I" +
-      "NACTIVE\020\002\022\010\n\004DEAD\020\n\022\013\n\007PENDING\020\020\022\024\n\020PEND" +
-      "ING_INACTIVE\020\022\"0\n\rAddressStatus\022\017\n\007addre" +
-      "ss\030\001 \002(\t\022\016\n\006status\030\002 \002(\t\"\306\002\n\014WalletPocke" +
-      "t\022\032\n\022network_identifier\030\001 \002(\t\022\023\n\013descrip",
-      "tion\030\002 \001(\t\022)\n\003key\030\003 \003(\0132\034.com.coinomi.co" +
-      "re.protos.Key\022\034\n\024last_seen_block_hash\030\004 " +
-      "\001(\014\022\036\n\026last_seen_block_height\030\005 \001(\r\022!\n\031l" +
-      "ast_seen_block_time_secs\030\006 \001(\003\0229\n\013transa" +
-      "ction\030\007 \003(\0132$.com.coinomi.core.protos.Tr" +
-      "ansaction\022>\n\016address_status\030\010 \003(\0132&.com." +
-      "coinomi.core.protos.AddressStatus\"N\n\020Scr" +
-      "yptParameters\022\014\n\004salt\030\001 \002(\014\022\020\n\001n\030\002 \001(\003:\005" +
-      "16384\022\014\n\001r\030\003 \001(\005:\0018\022\014\n\001p\030\004 \001(\005:\0011\"\366\002\n\006Wa" +
-      "llet\022\022\n\007version\030\001 \001(\005:\0011\0220\n\nmaster_key\030\002",
-      " \002(\0132\034.com.coinomi.core.protos.Key\022T\n\017en" +
-      "cryption_type\030\003 \001(\0162..com.coinomi.core.p" +
-      "rotos.Wallet.EncryptionType:\013UNENCRYPTED" +
-      "\022H\n\025encryption_parameters\030\004 \001(\0132).com.co" +
-      "inomi.core.protos.ScryptParameters\0226\n\007po" +
-      "ckets\030\005 \003(\0132%.com.coinomi.core.protos.Wa" +
-      "lletPocket\"N\n\016EncryptionType\022\017\n\013UNENCRYP" +
-      "TED\020\001\022\030\n\024ENCRYPTED_SCRYPT_AES\020\002\022\021\n\rENCRY" +
-      "PTED_AES\020\003B!\n\027com.coinomi.core.protosB\006P" +
-      "rotos"
+      "nce\"5\n\004Pool\022\013\n\007UNSPENT\020\004\022\t\n\005SPENT\020\005\022\010\n\004D" +
+      "EAD\020\n\022\013\n\007PENDING\020\020\"0\n\rAddressStatus\022\017\n\007a" +
+      "ddress\030\001 \002(\t\022\016\n\006status\030\002 \002(\t\"\306\002\n\014WalletP" +
+      "ocket\022\032\n\022network_identifier\030\001 \002(\t\022\023\n\013des" +
+      "cription\030\002 \001(\t\022)\n\003key\030\003 \003(\0132\034.com.coinom",
+      "i.core.protos.Key\022\034\n\024last_seen_block_has" +
+      "h\030\004 \001(\014\022\036\n\026last_seen_block_height\030\005 \001(\r\022" +
+      "!\n\031last_seen_block_time_secs\030\006 \001(\003\0229\n\013tr" +
+      "ansaction\030\007 \003(\0132$.com.coinomi.core.proto" +
+      "s.Transaction\022>\n\016address_status\030\010 \003(\0132&." +
+      "com.coinomi.core.protos.AddressStatus\"N\n" +
+      "\020ScryptParameters\022\014\n\004salt\030\001 \002(\014\022\020\n\001n\030\002 \001" +
+      "(\003:\00516384\022\014\n\001r\030\003 \001(\005:\0018\022\014\n\001p\030\004 \001(\005:\0011\"\366\002" +
+      "\n\006Wallet\022\022\n\007version\030\001 \001(\005:\0011\0220\n\nmaster_k" +
+      "ey\030\002 \002(\0132\034.com.coinomi.core.protos.Key\022T",
+      "\n\017encryption_type\030\003 \001(\0162..com.coinomi.co" +
+      "re.protos.Wallet.EncryptionType:\013UNENCRY" +
+      "PTED\022H\n\025encryption_parameters\030\004 \001(\0132).co" +
+      "m.coinomi.core.protos.ScryptParameters\0226" +
+      "\n\007pockets\030\005 \003(\0132%.com.coinomi.core.proto" +
+      "s.WalletPocket\"N\n\016EncryptionType\022\017\n\013UNEN" +
+      "CRYPTED\020\001\022\030\n\024ENCRYPTED_SCRYPT_AES\020\002\022\021\n\rE" +
+      "NCRYPTED_AES\020\003B!\n\027com.coinomi.core.proto" +
+      "sB\006Protos"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {

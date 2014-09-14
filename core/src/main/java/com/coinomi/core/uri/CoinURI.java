@@ -18,6 +18,7 @@
 
 package com.coinomi.core.uri;
 
+import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
 import com.google.bitcoin.core.Address;
 import com.google.bitcoin.core.AddressFormatException;
@@ -143,6 +144,15 @@ public class CoinURI {
         // the & (%26) in Tom and Jerry gets interpreted as a separator and the label then gets parsed
         // as 'Tom ' instead of 'Tom & Jerry')
         String schemeSpecificPart;
+
+        if (params == null) {
+            try {
+                params = CoinID.fromUri(input).getCoinType();
+            } catch (IllegalArgumentException e) {
+                throw new CoinURIParseException("Unsupported URI scheme: " + uri.getScheme());
+            }
+        }
+
         if (input.startsWith(params.getUriScheme()+"://")) {
             schemeSpecificPart = input.substring((params.getUriScheme()+"://").length());
         } else if (input.startsWith(params.getUriScheme()+":")) {
