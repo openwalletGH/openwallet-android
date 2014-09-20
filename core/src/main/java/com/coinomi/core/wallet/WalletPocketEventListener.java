@@ -7,6 +7,5 @@ import com.google.bitcoin.core.Coin;
  */
 public interface WalletPocketEventListener {
 
-    public void onNewBalance(Coin newBalance);
-
+    public void onNewBalance(Coin newBalance, Coin pendingAmount);
 }

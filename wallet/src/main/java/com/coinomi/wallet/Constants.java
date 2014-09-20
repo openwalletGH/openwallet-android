@@ -41,7 +41,9 @@ public class Constants {
 //            LitecoinTest.get(), DogecoinTest.get());
 
     public static final List<CoinAddress> COINS_ADDRESSES_TEST = ImmutableList.of(
-            new CoinAddress(DogecoinMain.get(), new ServerAddress("test.coinomi.com", 5003)));
+//            new CoinAddress(DogecoinMain.get(), new ServerAddress("test.coinomi.com", 5003))
+            new CoinAddress(DogecoinMain.get(), new ServerAddress("54.195.124.108", 5003))
+    );
 
     public static final List<CoinType> COINS_TEST = ImmutableList.of((CoinType)DogecoinMain.get());
 

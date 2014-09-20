@@ -112,4 +112,12 @@ final public class AddressStatus {
         result = 31 * result + (status != null ? status.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "address=" + address +
+                ", status='" + status + '\'' +
+                '}';
+    }
 }

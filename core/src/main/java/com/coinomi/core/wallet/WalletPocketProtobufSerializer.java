@@ -34,6 +34,7 @@ import com.google.bitcoin.core.TransactionOutput;
 import com.google.bitcoin.crypto.KeyCrypter;
 import com.google.bitcoin.store.UnreadableWalletException;
 import com.google.bitcoin.wallet.WalletTransaction;
+import com.google.common.collect.Lists;
 import com.google.protobuf.ByteString;
 
 import org.slf4j.Logger;
@@ -42,6 +43,7 @@ import org.slf4j.LoggerFactory;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.ListIterator;
@@ -180,9 +182,6 @@ public class WalletPocketProtobufSerializer {
             if (confidence.getConfidenceType() == TransactionConfidence.ConfidenceType.BUILDING) {
                 confidenceBuilder.setAppearedAtHeight(confidence.getAppearedAtChainHeight());
                 confidenceBuilder.setDepth(confidence.getDepthInBlocks());
-                if (confidence.getWorkDone() != null) {
-                    confidenceBuilder.setWorkDone(confidence.getWorkDone().longValue());
-                }
             }
             if (confidence.getConfidenceType() == TransactionConfidence.ConfidenceType.DEAD) {
                 // Copy in the overriding transaction, if available.
@@ -259,10 +258,12 @@ public class WalletPocketProtobufSerializer {
         }
 
         // Update transaction outputs to point to inputs that spend them
+        ArrayList<WalletTransaction> wtxs = new ArrayList<WalletTransaction>(walletProto.getTransactionList().size());
         for (Protos.Transaction txProto : walletProto.getTransactionList()) {
-            WalletTransaction wtx = connectTransactionOutputs(txProto);
-            wallet.addWalletTransaction(wtx);
+            wtxs.add(connectTransactionOutputs(txProto));
         }
+
+        wallet.restoreWalletTransactions(wtxs);
 
         // Read all the address statuses
         try {
@@ -413,13 +414,6 @@ public class WalletPocketProtobufSerializer {
                 return;
             }
             confidence.setDepthInBlocks(confidenceProto.getDepth());
-        }
-        if (confidenceProto.hasWorkDone()) {
-            if (confidence.getConfidenceType() != ConfidenceType.BUILDING) {
-                log.warn("Have workDone but not BUILDING for tx {}", tx.getHashAsString());
-                return;
-            }
-            confidence.setWorkDone(BigInteger.valueOf(confidenceProto.getWorkDone()));
         }
         if (confidenceProto.hasOverridingTransaction()) {
             if (confidence.getConfidenceType() != ConfidenceType.DEAD) {

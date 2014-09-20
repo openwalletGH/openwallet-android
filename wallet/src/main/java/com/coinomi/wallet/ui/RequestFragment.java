@@ -10,7 +10,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.coinomi.core.coins.CoinType;
-import com.coinomi.core.coins.DogecoinMain;
 import com.coinomi.core.uri.CoinURI;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
@@ -20,12 +19,10 @@ import com.coinomi.wallet.util.Qr;
 import com.google.bitcoin.core.Address;
 import com.google.bitcoin.core.Coin;
 
-import javax.annotation.Nullable;
-
 /**
  *
  */
-public class ReceiveFragment extends Fragment {
+public class RequestFragment extends Fragment {
     private static final String COIN_TYPE = "coin_type";
 
     private CoinType coinType;
@@ -37,14 +34,14 @@ public class ReceiveFragment extends Fragment {
     private Coin amount;
     private String label;
 
-    public static ReceiveFragment newInstance(CoinType coinType) {
-        ReceiveFragment fragment = new ReceiveFragment();
+    public static RequestFragment newInstance(CoinType coinType) {
+        RequestFragment fragment = new RequestFragment();
         Bundle args = new Bundle();
         args.putSerializable(COIN_TYPE, coinType);
         fragment.setArguments(args);
         return fragment;
     }
-    public ReceiveFragment() {
+    public RequestFragment() {
         // Required empty public constructor
     }
 
@@ -60,7 +57,7 @@ public class ReceiveFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_receive, container, false);
+        View view = inflater.inflate(R.layout.fragment_request, container, false);
 
         walletApplication = (WalletApplication) getActivity().getApplication();
         addressView = (TextView) view.findViewById(R.id.receive_address);

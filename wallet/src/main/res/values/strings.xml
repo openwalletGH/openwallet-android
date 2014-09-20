@@ -31,7 +31,7 @@
     <string name="button_dismiss">Dismiss</string>
     <string name="button_next">next</string>
     <string name="button_scan_qr_code">Scan QR code</string>
-    <string name="wallet_title_receive">receive</string>
+    <string name="wallet_title_request">request</string>
     <string name="wallet_title_info">info</string>
     <string name="wallet_title_send">send</string>
     <string name="hello_world">Hello world!</string>
@@ -57,7 +57,7 @@
 
     <!-- Send fragment -->
     <string name="pay_to_label">pay to</string>
-    <string name="amount_to_send_label">amount to send</string>
+    <string name="amount_to_send_label">amount</string>
     <string name="send_coins_label">send</string>
     <string name="history_label">history</string>
 </resources>

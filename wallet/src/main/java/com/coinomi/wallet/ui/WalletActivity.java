@@ -275,9 +275,9 @@ final public class WalletActivity extends ActionBarActivity implements
         public Fragment getItem(int i) {
             switch (i) {
                 case RECEIVE:
-                    return ReceiveFragment.newInstance(type);
+                    return RequestFragment.newInstance(type);
                 case SEND:
-                    return WalletSendCoins.newInstance(type);
+                    return SendFragment.newInstance(type);
                 case INFO:
                 default:
                     return InfoFragment.newInstance(type);
@@ -293,7 +293,7 @@ final public class WalletActivity extends ActionBarActivity implements
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case RECEIVE:
-                    return walletActivity.getString(R.string.wallet_title_receive);
+                    return walletActivity.getString(R.string.wallet_title_request);
                 case SEND:
                     return walletActivity.getString(R.string.wallet_title_send);
                 case INFO:

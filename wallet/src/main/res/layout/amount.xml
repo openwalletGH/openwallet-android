@@ -14,6 +14,17 @@
         android:text="0" />
 
     <TextView
+        android:id="@+id/amount_pending"
+        style="@style/AmountPending"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="+1.337"
+        android:layout_toEndOf="@+id/amount"
+        android:layout_alignBaseline="@+id/amount"
+        android:layout_alignBottom="@+id/amount"
+        android:layout_toRightOf="@+id/amount" />
+
+    <TextView
         android:id="@+id/symbol"
         style="@style/AmountSymbol"
         android:layout_width="wrap_content"
@@ -22,5 +33,15 @@
         android:layout_alignRight="@+id/amount"
         android:layout_alignEnd="@+id/amount"
         android:text="SYMBOL" />
+
+
+    <ProgressBar
+        android:id="@+id/pending_progress"
+        style="@style/Widget.AppCompat.ProgressBar"
+        android:layout_width="@dimen/progress_symbol_size"
+        android:layout_height="@dimen/progress_symbol_size"
+        android:layout_toEndOf="@+id/amount"
+        android:layout_toRightOf="@+id/amount"
+        android:layout_alignParentTop="true" />
 
 </RelativeLayout>

@@ -34,19 +34,29 @@ import com.google.bitcoin.core.NetworkParameters;
 import com.google.bitcoin.core.ScriptException;
 import com.google.bitcoin.core.Sha256Hash;
 import com.google.bitcoin.core.Transaction;
+import com.google.bitcoin.core.TransactionBag;
 import com.google.bitcoin.core.TransactionConfidence;
+import com.google.bitcoin.core.TransactionConfidence.ConfidenceType;
 import com.google.bitcoin.core.TransactionInput;
+import com.google.bitcoin.core.TransactionInput.ConnectionResult;
+import com.google.bitcoin.core.TransactionInput.ConnectMode;
 import com.google.bitcoin.core.TransactionOutput;
 import com.google.bitcoin.core.Utils;
 import com.google.bitcoin.core.VarInt;
 import com.google.bitcoin.crypto.DeterministicKey;
 import com.google.bitcoin.crypto.KeyCrypter;
 import com.google.bitcoin.script.Script;
+import com.google.bitcoin.signers.LocalTransactionSigner;
+import com.google.bitcoin.signers.MissingSigResolutionSigner;
+import com.google.bitcoin.signers.TransactionSigner;
 import com.google.bitcoin.utils.ListenerRegistration;
 import com.google.bitcoin.utils.Threading;
 import com.google.bitcoin.wallet.CoinSelection;
 import com.google.bitcoin.wallet.CoinSelector;
+import com.google.bitcoin.wallet.DecryptingKeyBag;
 import com.google.bitcoin.wallet.DefaultCoinSelector;
+import com.google.bitcoin.wallet.KeyBag;
+import com.google.bitcoin.wallet.RedeemData;
 import com.google.bitcoin.wallet.WalletTransaction;
 import com.google.bitcoin.wallet.WalletTransaction.Pool;
 import com.google.common.annotations.VisibleForTesting;
@@ -61,6 +71,7 @@ import org.spongycastle.crypto.params.KeyParameter;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -84,7 +95,7 @@ import static com.google.common.base.Preconditions.checkState;
  *
  *
  */
-public class WalletPocket implements TransactionEventListener, ConnectionEventListener, Serializable {
+public class WalletPocket implements TransactionBag, TransactionEventListener, ConnectionEventListener, Serializable {
     private static final Logger log = LoggerFactory.getLogger(WalletPocket.class);
     private final ReentrantLock lock = Threading.lock("WalletPocket");
 
@@ -219,7 +230,7 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
     public void addWalletTransaction(WalletTransaction wtx) {
         lock.lock();
         try {
-            addWalletTransaction(wtx.getPool(), wtx.getTransaction());
+            addWalletTransaction(wtx.getPool(), wtx.getTransaction(), true);
         } finally {
             lock.unlock();
         }
@@ -228,7 +239,7 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
     /**
      * Marks outputs as spent, if we don't have the keys
      */
-    private void markSpentOutputs(Transaction transaction) {
+    private void markNotOwnOutputs(Transaction transaction) {
         checkState(lock.isHeldByCurrentThread());
         for (TransactionOutput txo : transaction.getOutputs()) {
             if (txo.isAvailableForSpending()) {
@@ -243,31 +254,51 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
     /**
      * Adds the given transaction to the given pools and registers a confidence change listener on it.
      */
-    private void addWalletTransaction(Pool pool, Transaction tx) {
-        checkState(lock.isHeldByCurrentThread());
-        markSpentOutputs(tx);
-        transactions.put(tx.getHash(), tx);
-        switch (pool) {
-            case UNSPENT:
-                checkState(unspent.put(tx.getHash(), tx) == null);
-                break;
-            case SPENT:
-                checkState(spent.put(tx.getHash(), tx) == null);
-                break;
-            case PENDING:
-                checkState(pending.put(tx.getHash(), tx) == null);
-                break;
-            case DEAD:
-                checkState(dead.put(tx.getHash(), tx) == null);
-                break;
-            default:
-                throw new RuntimeException("Unknown wallet transaction type " + pool);
+    private void addWalletTransaction(Pool pool, Transaction tx, boolean save) {
+        lock.lock();
+        try {
+            if (log.isInfoEnabled()) {
+                log.info("Adding {} tx {} to {}",
+                        tx.isEveryOwnedOutputSpent(this) ? Pool.SPENT : Pool.UNSPENT, tx.getHash(), pool);
+                if (!tx.isEveryOwnedOutputSpent(this)) {
+                    for (TransactionOutput transactionOutput : tx.getOutputs()) {
+                        log.info("{} txo index {}",
+                                transactionOutput.isAvailableForSpending() ? Pool.UNSPENT : Pool.SPENT,
+                                transactionOutput.getIndex());
+                    }
+                }
+            }
+
+            transactions.put(tx.getHash(), tx);
+            switch (pool) {
+                case UNSPENT:
+                    checkState(unspent.put(tx.getHash(), tx) == null);
+                    break;
+                case SPENT:
+                    checkState(spent.put(tx.getHash(), tx) == null);
+                    break;
+                case PENDING:
+                    checkState(pending.put(tx.getHash(), tx) == null);
+                    break;
+                case DEAD:
+                    checkState(dead.put(tx.getHash(), tx) == null);
+                    break;
+                default:
+                    throw new RuntimeException("Unknown wallet transaction type " + pool);
+            }
+
+            markNotOwnOutputs(tx);
+            connectTransaction(tx);
+            queueOnNewBalance();
+        } finally {
+            lock.unlock();
         }
+
         // This is safe even if the listener has been added before, as TransactionConfidence ignores duplicate
         // registration requests. That makes the code in the wallet simpler.
         // TODO add txConfidenceListener
 //        tx.getConfidence().addEventListener(txConfidenceListener, Threading.SAME_THREAD);
-        walletSaveLater();
+        if (save) walletSaveLater();
     }
 
     /**
@@ -446,24 +477,48 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
     public Coin getBalance(boolean includeUnconfirmed) {
         lock.lock();
         try {
+//            log.info("Get balance includeUnconfirmed = {}", includeUnconfirmed);
             if (includeUnconfirmed) {
-                return getTxBalance(Iterables.concat(unspent.values(), pending.values()));
+                return getTxBalance(Iterables.concat(unspent.values(), pending.values()), true);
             }
-            return getTxBalance(unspent.values());
+            return getTxBalance(unspent.values(), true);
         } finally {
             lock.unlock();
         }
     }
 
-    Coin getTxBalance(Iterable<Transaction> txs) {
+
+    public Coin getPendingBalance() {
+        lock.lock();
+        try {
+//            log.info("Get pending balance");
+            return getTxBalance(pending.values(), false);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    Coin getTxBalance(Iterable<Transaction> txs, boolean toMe) {
         lock.lock();
         try {
             Coin value = Coin.ZERO;
             for (Transaction tx : txs) {
-                for (TransactionOutput txo : tx.getOutputs()) {
-                    if (txo.isAvailableForSpending()) {
-                        value = value.add(txo.getValue());
-                    }
+//                log.info("tx {}", tx.getHash());
+//                log.info("tx.getValue {}", tx.getValue(this));
+//                log.info("tx.getValueSentToMe {}", tx.getValueSentToMe(this));
+//                log.info("tx.getValueSentFromMe {}", tx.getValueSentFromMe(this));
+
+//                log.info("Balance for tx {}", tx.getHash());
+//                for (TransactionOutput txo : tx.getOutputs()) {
+//                    log.info("|- {} txo {} value {}",
+//                            txo.isAvailableForSpending() ? Pool.UNSPENT : Pool.SPENT,
+//                            txo.getIndex(), txo.getValue());
+//                }
+
+                if (toMe) {
+                    value = value.add(tx.getValueSentToMe(this));
+                } else {
+                    value = value.add(tx.getValue(this));
                 }
             }
             return value;
@@ -615,6 +670,7 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
 
     @Override
     public void onAddressStatusUpdate(AddressStatus status) {
+        log.info("Got new status {}", status);
         lock.lock();
         try {
             confirmAddressSubscription(status.getAddress());
@@ -724,43 +780,112 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
 
     private void applyState(AddressStatus status, HashMap<Sha256Hash, Transaction> txs) {
         checkState(lock.isHeldByCurrentThread());
-        HashSet<Transaction> changedTransactions = new HashSet<Transaction>();
+        log.info("Applying state {} - {}", status.getAddress(), status.getStatus());
         // Connect inputs to outputs
         for (HistoryTx historyTx : status.getHistoryTxs()) {
             Transaction tx = txs.get(historyTx.getTxHash());
             if (tx != null) {
-                changedTransactions.add(tx);
-                tx.getConfidence().setAppearedAtChainHeight(historyTx.getHeight());
-                // Try to connect
-                for (TransactionInput txi : tx.getInputs()) {
-                    Sha256Hash outputHash = txi.getOutpoint().getHash();
-                    Transaction fromTx = txs.get(outputHash);
-                    if (fromTx != null) {
-                        TransactionInput.ConnectionResult result = txi.connect(fromTx,
-                                TransactionInput.ConnectMode.ABORT_ON_CONFLICT);
-                        if (result != TransactionInput.ConnectionResult.SUCCESS) {
-                            log.warn("Could not connect {} to {}", txi, fromTx);
+                log.info("{} getHeight() = " + historyTx.getHeight(), historyTx.getTxHash());
+                if (historyTx.getHeight() > 0) {
+                    tx.getConfidence().setAppearedAtChainHeight(historyTx.getHeight());
+                }
+            } else {
+                log.error("Could not find {} in the transactions pool. Aborting applying state",
+                        tx.getHash());
+                return;
+            }
+        }
+
+        for (Transaction tx : txs.values()) {
+            connectTransaction(tx);
+        }
+
+        markUnspentTXO(status, txs);
+
+        commitAddressStatus(status);
+        queueOnNewBalance();
+    }
+
+    private void markUnspentTXO(AddressStatus status, Map<Sha256Hash, Transaction> txs) {
+        Set<UnspentTx> utxs = status.getUnspentTxs();
+        ArrayList<TransactionOutput> unspentOutputs = new ArrayList<TransactionOutput>(utxs.size());
+        // Mark unspent outputs
+        for (UnspentTx utx : utxs) {
+            if (txs.containsKey(utx.getTxHash())) {
+                Transaction tx = txs.get(utx.getTxHash());
+                TransactionOutput output = tx.getOutput(utx.getTxPos());
+                if (!output.isAvailableForSpending()) output.markAsUnspent();
+                unspentOutputs.add(output);
+            }
+        }
+
+        for (TransactionOutput output : unspentOutputs) {
+            log.info("- UΤΧO {}:{} - {}", output.getParentTransaction().getHash(),
+                    output.getIndex(), output.getAddressFromP2PKHScript(coinType));
+        }
+
+        // Mark spent outputs and change pools if needed
+        for (Transaction tx : txs.values()) {
+            if (!tx.isEveryOwnedOutputSpent(this)) {
+                log.info("tx {} is {}", tx.getHash(), tx.getConfidence().getConfidenceType());
+                for (TransactionOutput txo : tx.getOutputs()) {
+                    log.info("- ΤΧΟ {}:{}", txo.getParentTransaction().getHash(), txo.getIndex());
+
+                    boolean belongsToAddress = Arrays.equals(txo.getScriptPubKey().getPubKeyHash(),
+                            status.getAddress().getHash160());
+
+                    if (belongsToAddress && !unspentOutputs.contains(txo)) {
+                        // if not pending and has unspent outputs that should be spent
+                        if (!isTxPending(txo.getParentTransaction()) && txo.isAvailableForSpending()) {
+                            log.info("Marking TXO as spent {}:{}", txo.getParentTransaction().getHash(), txo.getIndex());
+                            txo.markAsSpent(null);
                         }
                     }
                 }
             }
-        }
-        // Mark unspent outputs
-        for (UnspentTx unspentTx : status.getUnspentTxs()) {
-            Transaction tx = txs.get(unspentTx.getTxHash());
-            if (tx != null) {
-                changedTransactions.add(tx);
-                tx.getOutput(unspentTx.getTxPos()).markAsUnspent();
-            }
-        }
 
-        // Change pools if needed
-        for (Transaction tx : changedTransactions) {
             maybeMovePool(tx);
         }
+    }
 
-        commitAddressStatus(status);
-        queueOnNewBalance();
+    private boolean isTxPending(Transaction tx) {
+        return tx.getConfidence().getConfidenceType() == ConfidenceType.PENDING;
+    }
+
+    private void connectTransaction(Transaction tx) {
+        checkState(lock.isHeldByCurrentThread());
+        // Skip if not confirmed
+        if (tx.getConfidence().getConfidenceType() != ConfidenceType.BUILDING) return;
+        // Connect to other transactions in the wallet pocket
+        if (log.isInfoEnabled()) log.info("Connecting inputs of tx {}", tx.getHash());
+        for (TransactionInput txi : tx.getInputs()) {
+            if (txi.getConnectedOutput() != null) continue; // skip connected inputs
+            Sha256Hash outputHash = txi.getOutpoint().getHash();
+            Transaction fromTx = transactions.get(outputHash);
+            if (fromTx != null) {
+                // Try to connect and recover if failed once.
+                for (int i = 2; i > 0; i--) {
+                    ConnectionResult result = txi.connect(fromTx, ConnectMode.DISCONNECT_ON_CONFLICT);
+                    if (result == ConnectionResult.NO_SUCH_TX) {
+                        log.error("Could not connect {} to {}", txi.getOutpoint(), fromTx.getHash());
+                    } else if (result == ConnectionResult.ALREADY_SPENT) {
+                        TransactionOutput out = fromTx.getOutput((int) txi.getOutpoint().getIndex());
+                        log.warn("Already spent {}, forcing unspent and retry", out);
+                        out.markAsUnspent();
+                    } else {
+                        log.info("Txi connected to {}:{}", fromTx.getHash(), txi.getOutpoint().getIndex());
+                        break; // No errors, break the loop
+                    }
+                }
+                // Could become spent, maybe change pool
+                maybeMovePool(fromTx);
+            }
+            else {
+                log.warn("No output found for input {}:{}", txi.getParentTransaction().getHash(),
+                        txi.getOutpoint().getIndex());
+            }
+        }
+        maybeMovePool(tx);
     }
 
     /**
@@ -768,25 +893,43 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
      * If the owned transactions outputs are not all marked as spent, and it's in the spent map, move it.
      */
     private void maybeMovePool(Transaction tx) {
-        checkState(lock.isHeldByCurrentThread());
-
-        if (tx.getConfidence().getConfidenceType() == TransactionConfidence.ConfidenceType.BUILDING) {
-            // Transaction is confirmed, move it
-            if (pending.remove(tx.getHash()) != null) {
-                log.info("  {} <-pending ->unspent", tx);
-                spent.put(tx.getHash(), tx); // If has unspent outputs, bellow will move to unspent
+        lock.lock();
+        try {
+            log.info("maybeMovePool {} tx {} {}", tx.isEveryOwnedOutputSpent(this) ? Pool.SPENT : Pool.UNSPENT,
+                    tx.getHash(), tx.getConfidence().getConfidenceType());
+            if (tx.getConfidence().getConfidenceType() == ConfidenceType.BUILDING) {
+                // Transaction is confirmed, move it
+                if (pending.remove(tx.getHash()) != null) {
+                    if (tx.isEveryOwnedOutputSpent(this)) {
+                        if (log.isInfoEnabled()) log.info("  {} <-pending ->spent", tx.getHash());
+                        spent.put(tx.getHash(), tx);
+                    } else {
+                        if (log.isInfoEnabled()) log.info("  {} <-pending ->unspent", tx.getHash());
+                        unspent.put(tx.getHash(), tx);
+                    }
+                } else {
+                    maybeFlipSpentUnspent(tx);
+                }
             }
+        } finally {
+            lock.unlock();
         }
+    }
 
-        if (tx.isEveryOutputSpent()) {
+    /**
+     * Will flip transaction from spent/unspent pool if needed.
+     */
+    private void maybeFlipSpentUnspent(Transaction tx) {
+        checkState(lock.isHeldByCurrentThread());
+        if (tx.isEveryOwnedOutputSpent(this)) {
             // There's nothing left I can spend in this transaction.
             if (unspent.remove(tx.getHash()) != null) {
-                log.info("  {} <-unspent ->spent", tx);
+                if (log.isInfoEnabled()) log.info("  {} <-unspent ->spent", tx.getHash());
                 spent.put(tx.getHash(), tx);
             }
         } else {
             if (spent.remove(tx.getHash()) != null) {
-                log.info("  {} <-spent ->unspent", tx);
+                if (log.isInfoEnabled()) log.info("  {} <-spent ->unspent", tx.getHash());
                 unspent.put(tx.getHash(), tx);
             }
         }
@@ -824,16 +967,14 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
 
         // This tx not in wallet, add it
         if (getTransaction(tx.getHash()) == null) {
-            // Mark outputs as spent because we don't know anything about this tx yet
-            for (TransactionOutput txo : tx.getOutputs()) {
-                txo.markAsSpent(null);
-            }
-            addWalletTransaction(Pool.PENDING, tx);
+            tx.getConfidence().setConfidenceType(ConfidenceType.PENDING);
+            addWalletTransaction(Pool.PENDING, tx, true);
         }
     }
 
     @Override
     public void onTransactionUpdate(Transaction tx) {
+        if (log.isInfoEnabled()) log.info("Got a new transaction {}", tx.getHash());
         lock.lock();
         try {
             addNewTransactionIfNeeded(tx);
@@ -845,11 +986,11 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
     }
 
     @Override
-    public void onTransactionBroadcast(Transaction transaction) {
+    public void onTransactionBroadcast(Transaction tx) {
         lock.lock();
         try {
-            log.info("Transaction sent {}", transaction);
-            addWalletTransaction(Pool.PENDING, transaction);
+            log.info("Transaction sent {}", tx);
+//            addNewTransactionIfNeeded(tx);
         } finally {
             lock.unlock();
         }
@@ -940,12 +1081,13 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
 
     private void queueOnNewBalance() {
         checkState(lock.isHeldByCurrentThread());
-        final Coin newBalance = getBalance();
+        final Coin balance = getBalance();
+        final Coin pendingBalance = getPendingBalance();
         for (final ListenerRegistration<WalletPocketEventListener> registration : listeners) {
             registration.executor.execute(new Runnable() {
                 @Override
                 public void run() {
-                    registration.listener.onNewBalance(newBalance);
+                    registration.listener.onNewBalance(balance, pendingBalance);
                 }
             });
         }
@@ -997,6 +1139,12 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
                     wallet.saveNow();
                 }
             });
+        }
+    }
+
+    public void restoreWalletTransactions(ArrayList<WalletTransaction> wtxs) {
+        for (WalletTransaction wtx : wtxs) {
+            addWalletTransaction(wtx.getPool(), wtx.getTransaction(), false);
         }
     }
 
@@ -1087,6 +1235,49 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
 
     public Wallet getWallet() {
         return wallet;
+    }
+
+    @Override
+    public boolean isPubKeyHashMine(byte[] pubkeyHash) {
+        return findKeyFromPubHash(pubkeyHash) != null;
+    }
+
+    @Override
+    public boolean isWatchedScript(Script script) {
+        // Not supported
+        return false;
+    }
+
+    @Override
+    public boolean isPubKeyMine(byte[] pubkey) {
+        return findKeyFromPubKey(pubkey) != null;
+    }
+
+    @Override
+    public boolean isPayToScriptHashMine(byte[] payToScriptHash) {
+        // Not supported
+        return false;
+    }
+
+    @Override
+    public Map<Sha256Hash, Transaction> getTransactionPool(Pool pool) {
+        lock.lock();
+        try {
+            switch (pool) {
+                case UNSPENT:
+                    return unspent;
+                case SPENT:
+                    return spent;
+                case PENDING:
+                    return pending;
+                case DEAD:
+                    return dead;
+                default:
+                    throw new RuntimeException("Unknown wallet transaction type " + pool);
+            }
+        } finally {
+            lock.unlock();
+        }
     }
 
     private static class FeeCalculation {
@@ -1186,12 +1377,7 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
 
             // Now sign the inputs, thus proving that we are entitled to redeem the connected outputs.
             if (req.signInputs) {
-                if (keys.isEncrypted()) {
-                    req.tx.signInputs(Transaction.SigHash.ALL, true, keys.toDecrypted(req.aesKey));
-                }
-                else {
-                    req.tx.signInputs(Transaction.SigHash.ALL, true, keys);
-                }
+                signTransaction(req);
             }
 
             // Check size.
@@ -1215,6 +1401,61 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
             req.completed = true;
             req.fee = calculatedFee;
             log.info("  completed: {}", req.tx);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * <p>Given a send request containing transaction, attempts to sign it's inputs. This method expects transaction
+     * to have all necessary inputs connected or they will be ignored.</p>
+     * <p>Actual signing is done by pluggable {@link com.google.bitcoin.signers.LocalTransactionSigner}
+     * and it's not guaranteed that transaction will be complete in the end.</p>
+     */
+    public void signTransaction(SendRequest req) {
+        lock.lock();
+        try {
+            Transaction tx = req.tx;
+            List<TransactionInput> inputs = tx.getInputs();
+            List<TransactionOutput> outputs = tx.getOutputs();
+            checkState(inputs.size() > 0);
+            checkState(outputs.size() > 0);
+
+            KeyBag maybeDecryptingKeyBag = new DecryptingKeyBag(keys, req.aesKey);
+
+            int numInputs = tx.getInputs().size();
+            for (int i = 0; i < numInputs; i++) {
+                TransactionInput txIn = tx.getInput(i);
+                if (txIn.getConnectedOutput() == null) {
+                    log.warn("Missing connected output, assuming input {} is already signed.", i);
+                    continue;
+                }
+
+                try {
+                    // We assume if its already signed, its hopefully got a SIGHASH type that will not invalidate when
+                    // we sign missing pieces (to check this would require either assuming any signatures are signing
+                    // standard output types or a way to get processed signatures out of script execution)
+                    txIn.getScriptSig().correctlySpends(tx, i, txIn.getConnectedOutput().getScriptPubKey(), true);
+                    log.warn("Input {} already correctly spends output, assuming SIGHASH type used will be safe and skipping signing.", i);
+                    continue;
+                } catch (ScriptException e) {
+                    // Expected.
+                }
+
+                Script scriptPubKey = txIn.getConnectedOutput().getScriptPubKey();
+                RedeemData redeemData = txIn.getConnectedRedeemData(maybeDecryptingKeyBag);
+                checkNotNull(redeemData, "Transaction exists in wallet that we cannot redeem: %s", txIn.getOutpoint().getHash());
+                txIn.setScriptSig(scriptPubKey.createEmptyInputScript(redeemData.keys.get(0), redeemData.redeemScript));
+            }
+
+            TransactionSigner.ProposedTransaction proposal = new TransactionSigner.ProposedTransaction(tx);
+            TransactionSigner signer = new LocalTransactionSigner();
+            if (!signer.signInputs(proposal, maybeDecryptingKeyBag)) {
+                log.info("{} returned false for the tx", signer.getClass().getName());
+            }
+
+            // resolve missing sigs if any
+            new MissingSigResolutionSigner(req.missingSigsMode).signInputs(proposal, maybeDecryptingKeyBag);
         } finally {
             lock.unlock();
         }
@@ -1452,6 +1693,12 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
                 Script redeemScript = null;
                 if (script.isSentToAddress()) {
                     key = findKeyFromPubHash(script.getPubKeyHash());
+                    if (key == null) {
+                        log.error("output.getIndex {}", output.getIndex());
+                        log.error("output.getAddressFromP2SH {}", output.getAddressFromP2SH(coinType));
+                        log.error("output.getAddressFromP2PKHScript {}", output.getAddressFromP2PKHScript(coinType));
+                        log.error("output.getParentTransaction().getHash() {}", output.getParentTransaction().getHash());
+                    }
                     checkNotNull(key, "Coin selection includes unspendable outputs");
                 } else if (script.isPayToScriptHash()) {
                     throw new ScriptException("Wallet does not currently support PayToScriptHash");
@@ -1468,10 +1715,31 @@ public class WalletPocket implements TransactionEventListener, ConnectionEventLi
         return size;
     }
 
+    /**
+     * Locates a keypair from the basicKeyChain given the hash of the public key. This is needed
+     * when finding out which key we need to use to redeem a transaction output.
+     *
+     * @return ECKey object or null if no such key was found.
+     */
+    @Nullable
     public ECKey findKeyFromPubHash(byte[] pubkeyHash) {
         lock.lock();
         try {
             return keys.findKeyFromPubHash(pubkeyHash);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Locates a keypair from the basicKeyChain given the raw public key bytes.
+     * @return ECKey or null if no such key was found.
+     */
+    @Nullable
+    public ECKey findKeyFromPubKey(byte[] pubkey) {
+        lock.lock();
+        try {
+            return keys.findKeyFromPubKey(pubkey);
         } finally {
             lock.unlock();
         }

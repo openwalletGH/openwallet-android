@@ -169,11 +169,7 @@ message TransactionConfidence {
   // Zero confirmations: depth = 0, one confirmation: depth = 1 etc.
   optional int32 depth = 4;
 
-  // If type == BUILDING then this is the cumulative workDone for the block the transaction appears in, together with
-  // all blocks that bury it.
-  optional int64 work_done = 5;
-
-  repeated PeerAddress broadcast_by = 6;
+  repeated PeerAddress broadcast_by = 5;
 
   // Where did we get this transaction from? Knowing the source may help us to risk analyze pending transactions.
   enum Source {
@@ -182,7 +178,7 @@ message TransactionConfidence {
     SOURCE_SELF = 2;     // We made it ourselves, so we know it should be valid.
     SOURCE_TRUSTED = 3;  // We received it from a trusted source.
   }
-  optional Source source = 7;
+  optional Source source = 6;
 }
 
 /** A bitcoin transaction */

@@ -42,14 +42,14 @@ import javax.annotation.Nullable;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link WalletSendCoins.OnFragmentInteractionListener} interface
+ * {@link SendFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link WalletSendCoins#newInstance} factory method to
+ * Use the {@link SendFragment#newInstance} factory method to
  * create an instance of this fragment.
  *
  */
-public class WalletSendCoins extends Fragment {
-    private static final Logger log = LoggerFactory.getLogger(WalletSendCoins.class);
+public class SendFragment extends Fragment {
+    private static final Logger log = LoggerFactory.getLogger(SendFragment.class);
 
     // the fragment initialization parameters
     private static final String COIN_TYPE = "coin_type";
@@ -108,14 +108,14 @@ public class WalletSendCoins extends Fragment {
      * @param type the type of the coin
      * @return A new instance of fragment WalletSendCoins.
      */
-    public static WalletSendCoins newInstance(CoinType type) {
-        WalletSendCoins fragment = new WalletSendCoins();
+    public static SendFragment newInstance(CoinType type) {
+        SendFragment fragment = new SendFragment();
         Bundle args = new Bundle();
         args.putSerializable(COIN_TYPE, type);
         fragment.setArguments(args);
         return fragment;
     }
-    public WalletSendCoins() {
+    public SendFragment() {
         // Required empty public constructor
     }
 
@@ -131,7 +131,7 @@ public class WalletSendCoins extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_wallet_send_coins, container, false);
+        View view = inflater.inflate(R.layout.fragment_send, container, false);
 
         receivingAddressView = (EditText) view.findViewById(R.id.send_to_address);
         sendAmountView = (EditText) view.findViewById(R.id.send_amount);

@@ -116,6 +116,8 @@ public class WalletPocketTest {
 
         WalletPocket newPocket = new WalletPocketProtobufSerializer().readWallet(walletPocketProto, null);
 
+        assertEquals(pocket.getBalance().value, newPocket.getBalance().value);
+
         assertEquals(pocket.getCoinType(), newPocket.getCoinType());
         assertEquals(pocket.getDescription(), newPocket.getDescription());
         assertEquals(pocket.keys.toProtobuf().toString(), newPocket.keys.toProtobuf().toString());
@@ -123,7 +125,7 @@ public class WalletPocketTest {
         assertEquals(pocket.getLastBlockSeenHeight(), newPocket.getLastBlockSeenHeight());
         assertEquals(pocket.getLastBlockSeenTimeSecs(), newPocket.getLastBlockSeenTimeSecs());
 
-        for (Transaction tx : pocket.getTransactions(true)) {
+        for (Transaction tx : pocket.getTransactions(false)) {
             assertEquals(tx, newPocket.getTransaction(tx.getHash()));
         }
 

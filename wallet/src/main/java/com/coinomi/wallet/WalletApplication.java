@@ -211,10 +211,6 @@ public class WalletApplication extends Application {
 
                 setWallet(WalletProtobufSerializer.readWallet(walletStream));
 
-
-                System.out.println(WalletProtobufSerializer.toProtobuf(wallet).toString());
-
-
                 log.info("wallet loaded from: '" + walletFile + "', took " + (System.currentTimeMillis() - start) + "ms");
             }
             catch (final FileNotFoundException x)

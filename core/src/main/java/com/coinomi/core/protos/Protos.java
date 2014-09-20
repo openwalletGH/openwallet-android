@@ -5455,58 +5455,38 @@ public final class Protos {
      */
     int getDepth();
 
-    // optional int64 work_done = 5;
+    // repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 5;
     /**
-     * <code>optional int64 work_done = 5;</code>
-     *
-     * <pre>
-     * If type == BUILDING then this is the cumulative workDone for the block the transaction appears in, together with
-     * all blocks that bury it.
-     * </pre>
-     */
-    boolean hasWorkDone();
-    /**
-     * <code>optional int64 work_done = 5;</code>
-     *
-     * <pre>
-     * If type == BUILDING then this is the cumulative workDone for the block the transaction appears in, together with
-     * all blocks that bury it.
-     * </pre>
-     */
-    long getWorkDone();
-
-    // repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 6;
-    /**
-     * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 6;</code>
+     * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 5;</code>
      */
     java.util.List<com.coinomi.core.protos.Protos.PeerAddress> 
         getBroadcastByList();
     /**
-     * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 6;</code>
+     * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 5;</code>
      */
     com.coinomi.core.protos.Protos.PeerAddress getBroadcastBy(int index);
     /**
-     * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 6;</code>
+     * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 5;</code>
      */
     int getBroadcastByCount();
     /**
-     * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 6;</code>
+     * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 5;</code>
      */
     java.util.List<? extends com.coinomi.core.protos.Protos.PeerAddressOrBuilder> 
         getBroadcastByOrBuilderList();
     /**
-     * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 6;</code>
+     * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 5;</code>
      */
     com.coinomi.core.protos.Protos.PeerAddressOrBuilder getBroadcastByOrBuilder(
         int index);
 
-    // optional .com.coinomi.core.protos.TransactionConfidence.Source source = 7;
+    // optional .com.coinomi.core.protos.TransactionConfidence.Source source = 6;
     /**
-     * <code>optional .com.coinomi.core.protos.TransactionConfidence.Source source = 7;</code>
+     * <code>optional .com.coinomi.core.protos.TransactionConfidence.Source source = 6;</code>
      */
     boolean hasSource();
     /**
-     * <code>optional .com.coinomi.core.protos.TransactionConfidence.Source source = 7;</code>
+     * <code>optional .com.coinomi.core.protos.TransactionConfidence.Source source = 6;</code>
      */
     com.coinomi.core.protos.Protos.TransactionConfidence.Source getSource();
   }
@@ -5595,26 +5575,21 @@ public final class Protos {
               depth_ = input.readInt32();
               break;
             }
-            case 40: {
-              bitField0_ |= 0x00000010;
-              workDone_ = input.readInt64();
-              break;
-            }
-            case 50: {
-              if (!((mutable_bitField0_ & 0x00000020) == 0x00000020)) {
+            case 42: {
+              if (!((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
                 broadcastBy_ = new java.util.ArrayList<com.coinomi.core.protos.Protos.PeerAddress>();
-                mutable_bitField0_ |= 0x00000020;
+                mutable_bitField0_ |= 0x00000010;
               }
               broadcastBy_.add(input.readMessage(com.coinomi.core.protos.Protos.PeerAddress.PARSER, extensionRegistry));
               break;
             }
-            case 56: {
+            case 48: {
               int rawValue = input.readEnum();
               com.coinomi.core.protos.Protos.TransactionConfidence.Source value = com.coinomi.core.protos.Protos.TransactionConfidence.Source.valueOf(rawValue);
               if (value == null) {
-                unknownFields.mergeVarintField(7, rawValue);
+                unknownFields.mergeVarintField(6, rawValue);
               } else {
-                bitField0_ |= 0x00000020;
+                bitField0_ |= 0x00000010;
                 source_ = value;
               }
               break;
@@ -5627,7 +5602,7 @@ public final class Protos {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e.getMessage()).setUnfinishedMessage(this);
       } finally {
-        if (((mutable_bitField0_ & 0x00000020) == 0x00000020)) {
+        if (((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
           broadcastBy_ = java.util.Collections.unmodifiableList(broadcastBy_);
         }
         this.unknownFields = unknownFields.build();
@@ -6024,79 +5999,53 @@ public final class Protos {
       return depth_;
     }
 
-    // optional int64 work_done = 5;
-    public static final int WORK_DONE_FIELD_NUMBER = 5;
-    private long workDone_;
-    /**
-     * <code>optional int64 work_done = 5;</code>
-     *
-     * <pre>
-     * If type == BUILDING then this is the cumulative workDone for the block the transaction appears in, together with
-     * all blocks that bury it.
-     * </pre>
-     */
-    public boolean hasWorkDone() {
-      return ((bitField0_ & 0x00000010) == 0x00000010);
-    }
-    /**
-     * <code>optional int64 work_done = 5;</code>
-     *
-     * <pre>
-     * If type == BUILDING then this is the cumulative workDone for the block the transaction appears in, together with
-     * all blocks that bury it.
-     * </pre>
-     */
-    public long getWorkDone() {
-      return workDone_;
-    }
-
-    // repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 6;
-    public static final int BROADCAST_BY_FIELD_NUMBER = 6;
+    // repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 5;
+    public static final int BROADCAST_BY_FIELD_NUMBER = 5;
     private java.util.List<com.coinomi.core.protos.Protos.PeerAddress> broadcastBy_;
     /**
-     * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 6;</code>
+     * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 5;</code>
      */
     public java.util.List<com.coinomi.core.protos.Protos.PeerAddress> getBroadcastByList() {
       return broadcastBy_;
     }
     /**
-     * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 6;</code>
+     * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 5;</code>
      */
     public java.util.List<? extends com.coinomi.core.protos.Protos.PeerAddressOrBuilder> 
         getBroadcastByOrBuilderList() {
       return broadcastBy_;
     }
     /**
-     * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 6;</code>
+     * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 5;</code>
      */
     public int getBroadcastByCount() {
       return broadcastBy_.size();
     }
     /**
-     * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 6;</code>
+     * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 5;</code>
      */
     public com.coinomi.core.protos.Protos.PeerAddress getBroadcastBy(int index) {
       return broadcastBy_.get(index);
     }
     /**
-     * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 6;</code>
+     * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 5;</code>
      */
     public com.coinomi.core.protos.Protos.PeerAddressOrBuilder getBroadcastByOrBuilder(
         int index) {
       return broadcastBy_.get(index);
     }
 
-    // optional .com.coinomi.core.protos.TransactionConfidence.Source source = 7;
-    public static final int SOURCE_FIELD_NUMBER = 7;
+    // optional .com.coinomi.core.protos.TransactionConfidence.Source source = 6;
+    public static final int SOURCE_FIELD_NUMBER = 6;
     private com.coinomi.core.protos.Protos.TransactionConfidence.Source source_;
     /**
-     * <code>optional .com.coinomi.core.protos.TransactionConfidence.Source source = 7;</code>
+     * <code>optional .com.coinomi.core.protos.TransactionConfidence.Source source = 6;</code>
      */
     public boolean hasSource() {
-      return ((bitField0_ & 0x00000020) == 0x00000020);
+      return ((bitField0_ & 0x00000010) == 0x00000010);
     }
     /**
-     * <code>optional .com.coinomi.core.protos.TransactionConfidence.Source source = 7;</code>
+     * <code>optional .com.coinomi.core.protos.TransactionConfidence.Source source = 6;</code>
      */
     public com.coinomi.core.protos.Protos.TransactionConfidence.Source getSource() {
       return source_;
@@ -6107,7 +6056,6 @@ public final class Protos {
       appearedAtHeight_ = 0;
       overridingTransaction_ = com.google.protobuf.ByteString.EMPTY;
       depth_ = 0;
-      workDone_ = 0L;
       broadcastBy_ = java.util.Collections.emptyList();
       source_ = com.coinomi.core.protos.Protos.TransactionConfidence.Source.SOURCE_UNKNOWN;
     }
@@ -6141,14 +6089,11 @@ public final class Protos {
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         output.writeInt32(4, depth_);
       }
-      if (((bitField0_ & 0x00000010) == 0x00000010)) {
-        output.writeInt64(5, workDone_);
-      }
       for (int i = 0; i < broadcastBy_.size(); i++) {
-        output.writeMessage(6, broadcastBy_.get(i));
+        output.writeMessage(5, broadcastBy_.get(i));
       }
-      if (((bitField0_ & 0x00000020) == 0x00000020)) {
-        output.writeEnum(7, source_.getNumber());
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        output.writeEnum(6, source_.getNumber());
       }
       getUnknownFields().writeTo(output);
     }
@@ -6175,17 +6120,13 @@ public final class Protos {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(4, depth_);
       }
-      if (((bitField0_ & 0x00000010) == 0x00000010)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt64Size(5, workDone_);
-      }
       for (int i = 0; i < broadcastBy_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(6, broadcastBy_.get(i));
+          .computeMessageSize(5, broadcastBy_.get(i));
       }
-      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(7, source_.getNumber());
+          .computeEnumSize(6, source_.getNumber());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -6320,16 +6261,14 @@ public final class Protos {
         bitField0_ = (bitField0_ & ~0x00000004);
         depth_ = 0;
         bitField0_ = (bitField0_ & ~0x00000008);
-        workDone_ = 0L;
-        bitField0_ = (bitField0_ & ~0x00000010);
         if (broadcastByBuilder_ == null) {
           broadcastBy_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000020);
+          bitField0_ = (bitField0_ & ~0x00000010);
         } else {
           broadcastByBuilder_.clear();
         }
         source_ = com.coinomi.core.protos.Protos.TransactionConfidence.Source.SOURCE_UNKNOWN;
-        bitField0_ = (bitField0_ & ~0x00000040);
+        bitField0_ = (bitField0_ & ~0x00000020);
         return this;
       }
 
@@ -6374,21 +6313,17 @@ public final class Protos {
           to_bitField0_ |= 0x00000008;
         }
         result.depth_ = depth_;
-        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
-          to_bitField0_ |= 0x00000010;
-        }
-        result.workDone_ = workDone_;
         if (broadcastByBuilder_ == null) {
-          if (((bitField0_ & 0x00000020) == 0x00000020)) {
+          if (((bitField0_ & 0x00000010) == 0x00000010)) {
             broadcastBy_ = java.util.Collections.unmodifiableList(broadcastBy_);
-            bitField0_ = (bitField0_ & ~0x00000020);
+            bitField0_ = (bitField0_ & ~0x00000010);
           }
           result.broadcastBy_ = broadcastBy_;
         } else {
           result.broadcastBy_ = broadcastByBuilder_.build();
         }
-        if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
-          to_bitField0_ |= 0x00000020;
+        if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
+          to_bitField0_ |= 0x00000010;
         }
         result.source_ = source_;
         result.bitField0_ = to_bitField0_;
@@ -6419,14 +6354,11 @@ public final class Protos {
         if (other.hasDepth()) {
           setDepth(other.getDepth());
         }
-        if (other.hasWorkDone()) {
-          setWorkDone(other.getWorkDone());
-        }
         if (broadcastByBuilder_ == null) {
           if (!other.broadcastBy_.isEmpty()) {
             if (broadcastBy_.isEmpty()) {
               broadcastBy_ = other.broadcastBy_;
-              bitField0_ = (bitField0_ & ~0x00000020);
+              bitField0_ = (bitField0_ & ~0x00000010);
             } else {
               ensureBroadcastByIsMutable();
               broadcastBy_.addAll(other.broadcastBy_);
@@ -6439,7 +6371,7 @@ public final class Protos {
               broadcastByBuilder_.dispose();
               broadcastByBuilder_ = null;
               broadcastBy_ = other.broadcastBy_;
-              bitField0_ = (bitField0_ & ~0x00000020);
+              bitField0_ = (bitField0_ & ~0x00000010);
               broadcastByBuilder_ = 
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getBroadcastByFieldBuilder() : null;
@@ -6698,66 +6630,13 @@ public final class Protos {
         return this;
       }
 
-      // optional int64 work_done = 5;
-      private long workDone_ ;
-      /**
-       * <code>optional int64 work_done = 5;</code>
-       *
-       * <pre>
-       * If type == BUILDING then this is the cumulative workDone for the block the transaction appears in, together with
-       * all blocks that bury it.
-       * </pre>
-       */
-      public boolean hasWorkDone() {
-        return ((bitField0_ & 0x00000010) == 0x00000010);
-      }
-      /**
-       * <code>optional int64 work_done = 5;</code>
-       *
-       * <pre>
-       * If type == BUILDING then this is the cumulative workDone for the block the transaction appears in, together with
-       * all blocks that bury it.
-       * </pre>
-       */
-      public long getWorkDone() {
-        return workDone_;
-      }
-      /**
-       * <code>optional int64 work_done = 5;</code>
-       *
-       * <pre>
-       * If type == BUILDING then this is the cumulative workDone for the block the transaction appears in, together with
-       * all blocks that bury it.
-       * </pre>
-       */
-      public Builder setWorkDone(long value) {
-        bitField0_ |= 0x00000010;
-        workDone_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional int64 work_done = 5;</code>
-       *
-       * <pre>
-       * If type == BUILDING then this is the cumulative workDone for the block the transaction appears in, together with
-       * all blocks that bury it.
-       * </pre>
-       */
-      public Builder clearWorkDone() {
-        bitField0_ = (bitField0_ & ~0x00000010);
-        workDone_ = 0L;
-        onChanged();
-        return this;
-      }
-
-      // repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 6;
+      // repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 5;
       private java.util.List<com.coinomi.core.protos.Protos.PeerAddress> broadcastBy_ =
         java.util.Collections.emptyList();
       private void ensureBroadcastByIsMutable() {
-        if (!((bitField0_ & 0x00000020) == 0x00000020)) {
+        if (!((bitField0_ & 0x00000010) == 0x00000010)) {
           broadcastBy_ = new java.util.ArrayList<com.coinomi.core.protos.Protos.PeerAddress>(broadcastBy_);
-          bitField0_ |= 0x00000020;
+          bitField0_ |= 0x00000010;
          }
       }
 
@@ -6765,7 +6644,7 @@ public final class Protos {
           com.coinomi.core.protos.Protos.PeerAddress, com.coinomi.core.protos.Protos.PeerAddress.Builder, com.coinomi.core.protos.Protos.PeerAddressOrBuilder> broadcastByBuilder_;
 
       /**
-       * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 6;</code>
+       * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 5;</code>
        */
       public java.util.List<com.coinomi.core.protos.Protos.PeerAddress> getBroadcastByList() {
         if (broadcastByBuilder_ == null) {
@@ -6775,7 +6654,7 @@ public final class Protos {
         }
       }
       /**
-       * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 6;</code>
+       * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 5;</code>
        */
       public int getBroadcastByCount() {
         if (broadcastByBuilder_ == null) {
@@ -6785,7 +6664,7 @@ public final class Protos {
         }
       }
       /**
-       * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 6;</code>
+       * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 5;</code>
        */
       public com.coinomi.core.protos.Protos.PeerAddress getBroadcastBy(int index) {
         if (broadcastByBuilder_ == null) {
@@ -6795,7 +6674,7 @@ public final class Protos {
         }
       }
       /**
-       * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 6;</code>
+       * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 5;</code>
        */
       public Builder setBroadcastBy(
           int index, com.coinomi.core.protos.Protos.PeerAddress value) {
@@ -6812,7 +6691,7 @@ public final class Protos {
         return this;
       }
       /**
-       * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 6;</code>
+       * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 5;</code>
        */
       public Builder setBroadcastBy(
           int index, com.coinomi.core.protos.Protos.PeerAddress.Builder builderForValue) {
@@ -6826,7 +6705,7 @@ public final class Protos {
         return this;
       }
       /**
-       * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 6;</code>
+       * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 5;</code>
        */
       public Builder addBroadcastBy(com.coinomi.core.protos.Protos.PeerAddress value) {
         if (broadcastByBuilder_ == null) {
@@ -6842,7 +6721,7 @@ public final class Protos {
         return this;
       }
       /**
-       * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 6;</code>
+       * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 5;</code>
        */
       public Builder addBroadcastBy(
           int index, com.coinomi.core.protos.Protos.PeerAddress value) {
@@ -6859,7 +6738,7 @@ public final class Protos {
         return this;
       }
       /**
-       * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 6;</code>
+       * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 5;</code>
        */
       public Builder addBroadcastBy(
           com.coinomi.core.protos.Protos.PeerAddress.Builder builderForValue) {
@@ -6873,7 +6752,7 @@ public final class Protos {
         return this;
       }
       /**
-       * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 6;</code>
+       * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 5;</code>
        */
       public Builder addBroadcastBy(
           int index, com.coinomi.core.protos.Protos.PeerAddress.Builder builderForValue) {
@@ -6887,7 +6766,7 @@ public final class Protos {
         return this;
       }
       /**
-       * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 6;</code>
+       * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 5;</code>
        */
       public Builder addAllBroadcastBy(
           java.lang.Iterable<? extends com.coinomi.core.protos.Protos.PeerAddress> values) {
@@ -6901,12 +6780,12 @@ public final class Protos {
         return this;
       }
       /**
-       * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 6;</code>
+       * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 5;</code>
        */
       public Builder clearBroadcastBy() {
         if (broadcastByBuilder_ == null) {
           broadcastBy_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000020);
+          bitField0_ = (bitField0_ & ~0x00000010);
           onChanged();
         } else {
           broadcastByBuilder_.clear();
@@ -6914,7 +6793,7 @@ public final class Protos {
         return this;
       }
       /**
-       * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 6;</code>
+       * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 5;</code>
        */
       public Builder removeBroadcastBy(int index) {
         if (broadcastByBuilder_ == null) {
@@ -6927,14 +6806,14 @@ public final class Protos {
         return this;
       }
       /**
-       * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 6;</code>
+       * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 5;</code>
        */
       public com.coinomi.core.protos.Protos.PeerAddress.Builder getBroadcastByBuilder(
           int index) {
         return getBroadcastByFieldBuilder().getBuilder(index);
       }
       /**
-       * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 6;</code>
+       * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 5;</code>
        */
       public com.coinomi.core.protos.Protos.PeerAddressOrBuilder getBroadcastByOrBuilder(
           int index) {
@@ -6944,7 +6823,7 @@ public final class Protos {
         }
       }
       /**
-       * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 6;</code>
+       * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 5;</code>
        */
       public java.util.List<? extends com.coinomi.core.protos.Protos.PeerAddressOrBuilder> 
            getBroadcastByOrBuilderList() {
@@ -6955,14 +6834,14 @@ public final class Protos {
         }
       }
       /**
-       * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 6;</code>
+       * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 5;</code>
        */
       public com.coinomi.core.protos.Protos.PeerAddress.Builder addBroadcastByBuilder() {
         return getBroadcastByFieldBuilder().addBuilder(
             com.coinomi.core.protos.Protos.PeerAddress.getDefaultInstance());
       }
       /**
-       * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 6;</code>
+       * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 5;</code>
        */
       public com.coinomi.core.protos.Protos.PeerAddress.Builder addBroadcastByBuilder(
           int index) {
@@ -6970,7 +6849,7 @@ public final class Protos {
             index, com.coinomi.core.protos.Protos.PeerAddress.getDefaultInstance());
       }
       /**
-       * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 6;</code>
+       * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 5;</code>
        */
       public java.util.List<com.coinomi.core.protos.Protos.PeerAddress.Builder> 
            getBroadcastByBuilderList() {
@@ -6983,7 +6862,7 @@ public final class Protos {
           broadcastByBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
               com.coinomi.core.protos.Protos.PeerAddress, com.coinomi.core.protos.Protos.PeerAddress.Builder, com.coinomi.core.protos.Protos.PeerAddressOrBuilder>(
                   broadcastBy_,
-                  ((bitField0_ & 0x00000020) == 0x00000020),
+                  ((bitField0_ & 0x00000010) == 0x00000010),
                   getParentForChildren(),
                   isClean());
           broadcastBy_ = null;
@@ -6991,37 +6870,37 @@ public final class Protos {
         return broadcastByBuilder_;
       }
 
-      // optional .com.coinomi.core.protos.TransactionConfidence.Source source = 7;
+      // optional .com.coinomi.core.protos.TransactionConfidence.Source source = 6;
       private com.coinomi.core.protos.Protos.TransactionConfidence.Source source_ = com.coinomi.core.protos.Protos.TransactionConfidence.Source.SOURCE_UNKNOWN;
       /**
-       * <code>optional .com.coinomi.core.protos.TransactionConfidence.Source source = 7;</code>
+       * <code>optional .com.coinomi.core.protos.TransactionConfidence.Source source = 6;</code>
        */
       public boolean hasSource() {
-        return ((bitField0_ & 0x00000040) == 0x00000040);
+        return ((bitField0_ & 0x00000020) == 0x00000020);
       }
       /**
-       * <code>optional .com.coinomi.core.protos.TransactionConfidence.Source source = 7;</code>
+       * <code>optional .com.coinomi.core.protos.TransactionConfidence.Source source = 6;</code>
        */
       public com.coinomi.core.protos.Protos.TransactionConfidence.Source getSource() {
         return source_;
       }
       /**
-       * <code>optional .com.coinomi.core.protos.TransactionConfidence.Source source = 7;</code>
+       * <code>optional .com.coinomi.core.protos.TransactionConfidence.Source source = 6;</code>
        */
       public Builder setSource(com.coinomi.core.protos.Protos.TransactionConfidence.Source value) {
         if (value == null) {
           throw new NullPointerException();
         }
-        bitField0_ |= 0x00000040;
+        bitField0_ |= 0x00000020;
         source_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional .com.coinomi.core.protos.TransactionConfidence.Source source = 7;</code>
+       * <code>optional .com.coinomi.core.protos.TransactionConfidence.Source source = 6;</code>
        */
       public Builder clearSource() {
-        bitField0_ = (bitField0_ & ~0x00000040);
+        bitField0_ = (bitField0_ & ~0x00000020);
         source_ = com.coinomi.core.protos.Protos.TransactionConfidence.Source.SOURCE_UNKNOWN;
         onChanged();
         return this;
@@ -14707,52 +14586,51 @@ public final class Protos {
       " \001(\003\"\177\n\021TransactionOutput\022\r\n\005value\030\001 \002(\003" +
       "\022\024\n\014script_bytes\030\002 \002(\014\022!\n\031spent_by_trans" +
       "action_hash\030\003 \001(\014\022\"\n\032spent_by_transactio" +
-      "n_index\030\004 \001(\005\"\314\003\n\025TransactionConfidence\022" +
+      "n_index\030\004 \001(\005\"\271\003\n\025TransactionConfidence\022" +
       "A\n\004type\030\001 \001(\01623.com.coinomi.core.protos." +
       "TransactionConfidence.Type\022\032\n\022appeared_a" +
       "t_height\030\002 \001(\005\022\036\n\026overriding_transaction" +
-      "\030\003 \001(\014\022\r\n\005depth\030\004 \001(\005\022\021\n\twork_done\030\005 \001(\003" +
-      "\022:\n\014broadcast_by\030\006 \003(\0132$.com.coinomi.cor" +
-      "e.protos.PeerAddress\022E\n\006source\030\007 \001(\01625.c",
-      "om.coinomi.core.protos.TransactionConfid" +
-      "ence.Source\"8\n\004Type\022\013\n\007UNKNOWN\020\000\022\014\n\010BUIL" +
-      "DING\020\001\022\013\n\007PENDING\020\002\022\010\n\004DEAD\020\003\"U\n\006Source\022" +
-      "\022\n\016SOURCE_UNKNOWN\020\000\022\022\n\016SOURCE_NETWORK\020\001\022" +
-      "\017\n\013SOURCE_SELF\020\002\022\022\n\016SOURCE_TRUSTED\020\003\"\313\003\n" +
-      "\013Transaction\022\017\n\007version\030\001 \002(\005\022\014\n\004hash\030\002 " +
-      "\002(\014\0227\n\004pool\030\003 \001(\0162).com.coinomi.core.pro" +
-      "tos.Transaction.Pool\022\021\n\tlock_time\030\004 \001(\r\022" +
-      "\022\n\nupdated_at\030\005 \001(\003\022D\n\021transaction_input" +
-      "\030\006 \003(\0132).com.coinomi.core.protos.Transac",
-      "tionInput\022F\n\022transaction_output\030\007 \003(\0132*." +
-      "com.coinomi.core.protos.TransactionOutpu" +
-      "t\022\022\n\nblock_hash\030\010 \003(\014\022 \n\030block_relativit" +
-      "y_offsets\030\t \003(\005\022B\n\nconfidence\030\n \001(\0132..co" +
-      "m.coinomi.core.protos.TransactionConfide" +
-      "nce\"5\n\004Pool\022\013\n\007UNSPENT\020\004\022\t\n\005SPENT\020\005\022\010\n\004D" +
-      "EAD\020\n\022\013\n\007PENDING\020\020\"0\n\rAddressStatus\022\017\n\007a" +
-      "ddress\030\001 \002(\t\022\016\n\006status\030\002 \002(\t\"\306\002\n\014WalletP" +
-      "ocket\022\032\n\022network_identifier\030\001 \002(\t\022\023\n\013des" +
-      "cription\030\002 \001(\t\022)\n\003key\030\003 \003(\0132\034.com.coinom",
-      "i.core.protos.Key\022\034\n\024last_seen_block_has" +
-      "h\030\004 \001(\014\022\036\n\026last_seen_block_height\030\005 \001(\r\022" +
-      "!\n\031last_seen_block_time_secs\030\006 \001(\003\0229\n\013tr" +
-      "ansaction\030\007 \003(\0132$.com.coinomi.core.proto" +
-      "s.Transaction\022>\n\016address_status\030\010 \003(\0132&." +
-      "com.coinomi.core.protos.AddressStatus\"N\n" +
-      "\020ScryptParameters\022\014\n\004salt\030\001 \002(\014\022\020\n\001n\030\002 \001" +
-      "(\003:\00516384\022\014\n\001r\030\003 \001(\005:\0018\022\014\n\001p\030\004 \001(\005:\0011\"\366\002" +
-      "\n\006Wallet\022\022\n\007version\030\001 \001(\005:\0011\0220\n\nmaster_k" +
-      "ey\030\002 \002(\0132\034.com.coinomi.core.protos.Key\022T",
-      "\n\017encryption_type\030\003 \001(\0162..com.coinomi.co" +
-      "re.protos.Wallet.EncryptionType:\013UNENCRY" +
-      "PTED\022H\n\025encryption_parameters\030\004 \001(\0132).co" +
-      "m.coinomi.core.protos.ScryptParameters\0226" +
-      "\n\007pockets\030\005 \003(\0132%.com.coinomi.core.proto" +
-      "s.WalletPocket\"N\n\016EncryptionType\022\017\n\013UNEN" +
-      "CRYPTED\020\001\022\030\n\024ENCRYPTED_SCRYPT_AES\020\002\022\021\n\rE" +
-      "NCRYPTED_AES\020\003B!\n\027com.coinomi.core.proto" +
-      "sB\006Protos"
+      "\030\003 \001(\014\022\r\n\005depth\030\004 \001(\005\022:\n\014broadcast_by\030\005 " +
+      "\003(\0132$.com.coinomi.core.protos.PeerAddres" +
+      "s\022E\n\006source\030\006 \001(\01625.com.coinomi.core.pro",
+      "tos.TransactionConfidence.Source\"8\n\004Type" +
+      "\022\013\n\007UNKNOWN\020\000\022\014\n\010BUILDING\020\001\022\013\n\007PENDING\020\002" +
+      "\022\010\n\004DEAD\020\003\"U\n\006Source\022\022\n\016SOURCE_UNKNOWN\020\000" +
+      "\022\022\n\016SOURCE_NETWORK\020\001\022\017\n\013SOURCE_SELF\020\002\022\022\n" +
+      "\016SOURCE_TRUSTED\020\003\"\313\003\n\013Transaction\022\017\n\007ver" +
+      "sion\030\001 \002(\005\022\014\n\004hash\030\002 \002(\014\0227\n\004pool\030\003 \001(\0162)" +
+      ".com.coinomi.core.protos.Transaction.Poo" +
+      "l\022\021\n\tlock_time\030\004 \001(\r\022\022\n\nupdated_at\030\005 \001(\003" +
+      "\022D\n\021transaction_input\030\006 \003(\0132).com.coinom" +
+      "i.core.protos.TransactionInput\022F\n\022transa",
+      "ction_output\030\007 \003(\0132*.com.coinomi.core.pr" +
+      "otos.TransactionOutput\022\022\n\nblock_hash\030\010 \003" +
+      "(\014\022 \n\030block_relativity_offsets\030\t \003(\005\022B\n\n" +
+      "confidence\030\n \001(\0132..com.coinomi.core.prot" +
+      "os.TransactionConfidence\"5\n\004Pool\022\013\n\007UNSP" +
+      "ENT\020\004\022\t\n\005SPENT\020\005\022\010\n\004DEAD\020\n\022\013\n\007PENDING\020\020\"" +
+      "0\n\rAddressStatus\022\017\n\007address\030\001 \002(\t\022\016\n\006sta" +
+      "tus\030\002 \002(\t\"\306\002\n\014WalletPocket\022\032\n\022network_id" +
+      "entifier\030\001 \002(\t\022\023\n\013description\030\002 \001(\t\022)\n\003k" +
+      "ey\030\003 \003(\0132\034.com.coinomi.core.protos.Key\022\034",
+      "\n\024last_seen_block_hash\030\004 \001(\014\022\036\n\026last_see" +
+      "n_block_height\030\005 \001(\r\022!\n\031last_seen_block_" +
+      "time_secs\030\006 \001(\003\0229\n\013transaction\030\007 \003(\0132$.c" +
+      "om.coinomi.core.protos.Transaction\022>\n\016ad" +
+      "dress_status\030\010 \003(\0132&.com.coinomi.core.pr" +
+      "otos.AddressStatus\"N\n\020ScryptParameters\022\014" +
+      "\n\004salt\030\001 \002(\014\022\020\n\001n\030\002 \001(\003:\00516384\022\014\n\001r\030\003 \001(" +
+      "\005:\0018\022\014\n\001p\030\004 \001(\005:\0011\"\366\002\n\006Wallet\022\022\n\007version" +
+      "\030\001 \001(\005:\0011\0220\n\nmaster_key\030\002 \002(\0132\034.com.coin" +
+      "omi.core.protos.Key\022T\n\017encryption_type\030\003",
+      " \001(\0162..com.coinomi.core.protos.Wallet.En" +
+      "cryptionType:\013UNENCRYPTED\022H\n\025encryption_" +
+      "parameters\030\004 \001(\0132).com.coinomi.core.prot" +
+      "os.ScryptParameters\0226\n\007pockets\030\005 \003(\0132%.c" +
+      "om.coinomi.core.protos.WalletPocket\"N\n\016E" +
+      "ncryptionType\022\017\n\013UNENCRYPTED\020\001\022\030\n\024ENCRYP" +
+      "TED_SCRYPT_AES\020\002\022\021\n\rENCRYPTED_AES\020\003B!\n\027c" +
+      "om.coinomi.core.protosB\006Protos"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -14800,7 +14678,7 @@ public final class Protos {
           internal_static_com_coinomi_core_protos_TransactionConfidence_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_com_coinomi_core_protos_TransactionConfidence_descriptor,
-              new java.lang.String[] { "Type", "AppearedAtHeight", "OverridingTransaction", "Depth", "WorkDone", "BroadcastBy", "Source", });
+              new java.lang.String[] { "Type", "AppearedAtHeight", "OverridingTransaction", "Depth", "BroadcastBy", "Source", });
           internal_static_com_coinomi_core_protos_Transaction_descriptor =
             getDescriptor().getMessageTypes().get(7);
           internal_static_com_coinomi_core_protos_Transaction_fieldAccessorTable = new

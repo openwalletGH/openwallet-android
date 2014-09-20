@@ -36,6 +36,7 @@ public class InfoFragment extends Fragment implements WalletPocketEventListener 
 
     private static final String COIN_TYPE = "coin_type";
     private static final int NEW_BALANCE = 0;
+    private static final int PENDING = 1;
 
     Handler handler = new Handler() {
         @Override
@@ -43,6 +44,9 @@ public class InfoFragment extends Fragment implements WalletPocketEventListener 
             switch (msg.what) {
                 case NEW_BALANCE:
                     updateBalance((Coin) msg.obj);
+                    break;
+                case PENDING:
+                    setPending((Coin) msg.obj);
             }
         }
     };
@@ -102,8 +106,9 @@ public class InfoFragment extends Fragment implements WalletPocketEventListener 
     }
 
     @Override
-    public void onNewBalance(Coin newBalance) {
+    public void onNewBalance(Coin newBalance, Coin pendingAmount) {
         handler.sendMessage(handler.obtainMessage(NEW_BALANCE, newBalance));
+        handler.sendMessage(handler.obtainMessage(PENDING, pendingAmount));
     }
 
     private void updateBalance(Coin newBalance) {
@@ -131,6 +136,13 @@ public class InfoFragment extends Fragment implements WalletPocketEventListener 
             Amount cnyAmount = (Amount) view.findViewById(R.id.amount_cny);
             cnyAmount.setAmount(Coin.ZERO);
             cnyAmount.setSymbol(Cny.get().getSymbol());
+        }
+    }
+
+    private void setPending(Coin pendingAmount) {
+        if (getView() != null) {
+            Amount mainAmount = (Amount) getView().findViewById(R.id.main_amount);
+            mainAmount.setAmountPending(pendingAmount);
         }
     }
 

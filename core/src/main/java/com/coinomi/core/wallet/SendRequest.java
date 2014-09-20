@@ -22,6 +22,7 @@ import com.google.bitcoin.core.Coin;
 import com.google.bitcoin.core.ECKey;
 import com.google.bitcoin.core.NetworkParameters;
 import com.google.bitcoin.core.Transaction;
+import com.google.bitcoin.core.Wallet.MissingSigsMode;
 import com.google.bitcoin.wallet.CoinSelector;
 
 import org.spongycastle.crypto.params.KeyParameter;
@@ -141,6 +142,14 @@ public class SendRequest {
      * so it can be disabled here.
      */
     public boolean shuffleOutputs = true;
+
+    /**
+     * Specifies what to do with missing signatures left after completing this request. Default strategy is to
+     * throw an exception on missing signature ({@link MissingSigsMode#THROW}).
+     * @see MissingSigsMode
+     */
+    public MissingSigsMode missingSigsMode = MissingSigsMode.THROW;
+
 
     // Tracks if this has been passed to wallet.completeTx already: just a safety check.
     boolean completed;

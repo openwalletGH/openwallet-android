@@ -15,7 +15,11 @@
     <dimen name="amount_margin">32dp</dimen>
     <dimen name="amount_text_size_big">56sp</dimen>
     <dimen name="amount_text_size">32sp</dimen>
+    <dimen name="amount_pending_text_size">24sp</dimen>
     <dimen name="amount_symbol_text_size">24sp</dimen>
+
+    <!-- Amount Widget -->
+    <dimen name="progress_symbol_size">18dp</dimen>
 
     <!-- IntroActivity -->
     <dimen name="intro_logo_and_btn_width">192dp</dimen>
@@ -26,6 +30,7 @@
     <!-- Receive fragment -->
     <dimen name="receive_address">24sp</dimen>
     <dimen name="qr_code">224dp</dimen>
+    <dimen name="qr_code_margin">32dp</dimen>
 
     <!-- Send fragment -->
     <dimen name="history_label">24sp</dimen>
