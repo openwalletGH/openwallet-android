@@ -152,7 +152,6 @@ public class SendFragment extends Fragment {
             public void onClick(View v) {
 
                 validateReceivingAddress(true);
-
                 if (everythingValid())
                     handleSendConfirm();
                 else
@@ -172,17 +171,27 @@ public class SendFragment extends Fragment {
         state = State.PREPARATION;
         updateView();
 
-        Toast.makeText(activity, R.string.send_coins_preparation_msg, Toast.LENGTH_LONG).show();
+        // TODO show the text feedback in the fragment view
 
+        Toast.makeText(activity, R.string.send_coins_preparation_msg, Toast.LENGTH_SHORT).show();
 
         try {
             application.getWallet().sendCoins(validatedAddress, sendAmount);
+            reset();
+            Toast.makeText(activity, R.string.send_coins_success, Toast.LENGTH_SHORT).show();
         } catch (InsufficientMoneyException e) {
-            // TODO handle this case better
             Toast.makeText(activity, R.string.send_coins_error_not_enough_money, Toast.LENGTH_LONG).show();
         } catch (IOException e) {
             Toast.makeText(activity, R.string.send_coins_error_network, Toast.LENGTH_LONG).show();
         }
+    }
+
+    private void reset() {
+        state = State.INPUT;
+        receivingAddressView.setText("");
+        sendAmountView.setText("");
+        validatedAddress = null;
+        sendAmount = null;
     }
 
 

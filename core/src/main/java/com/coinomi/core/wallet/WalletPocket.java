@@ -990,6 +990,7 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
         lock.lock();
         try {
             log.info("Transaction sent {}", tx);
+            //FIXME, when enabled it breaks the transactions connections and we get an incorrect coin balance
 //            addNewTransactionIfNeeded(tx);
         } finally {
             lock.unlock();
@@ -997,8 +998,8 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
     }
 
     @Override
-    public void onTransactionBroadcastError(Transaction transaction, Throwable throwable) {
-
+    public void onTransactionBroadcastError(Transaction tx, Throwable throwable) {
+        log.error("Error broadcasting transaction {}", tx.getHash(), throwable);
     }
 
     @Override
