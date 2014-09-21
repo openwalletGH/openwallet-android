@@ -44,12 +44,12 @@ public class SendRequest {
      * fees) - the wallet will calculate all that for you and update tx later.</p>
      *
      * <p>Be careful when adding outputs that you check the min output value
-     * ({@link TransactionOutput#getMinNonDustValue(Coin)}) to avoid the whole transaction being rejected
+     * ({@link com.google.bitcoin.core.TransactionOutput#getMinNonDustValue(Coin)}) to avoid the whole transaction being rejected
      * because one output is dust.</p>
      *
      * <p>If there are already inputs to the transaction, make sure their out point has a connected output,
      * otherwise their value will be added to fee.  Also ensure they are either signed or are spendable by a wallet
-     * key, otherwise the behavior of {@link Wallet#completeTx(Wallet.SendRequest)} is undefined (likely
+     * key, otherwise the behavior of {@link WalletPocket#completeTx(SendRequest)} is undefined (likely
      * RuntimeException).</p>
      */
     public Transaction tx;
@@ -98,13 +98,7 @@ public class SendRequest {
      *
      * <p>You might also consider using a {@link SendRequest#fee} to set the fee added for the first kb of size.</p>
      */
-    public Coin feePerKb = DEFAULT_FEE_PER_KB;
-
-    /**
-     * If you want to modify the default fee for your entire app without having to change each SendRequest you make,
-     * you can do it here. This is primarily useful for unit tests.
-     */
-    public static Coin DEFAULT_FEE_PER_KB = Transaction.REFERENCE_DEFAULT_MIN_TX_FEE;
+    public Coin feePerKb;
 
     /**
      * <p>Requires that there be enough fee for a default reference client to at least relay the transaction.
@@ -175,7 +169,7 @@ public class SendRequest {
      * <p>Creates a new SendRequest to the given pubkey for the given value.</p>
      *
      * <p>Be careful to check the output's value is reasonable using
-     * {@link TransactionOutput#getMinNonDustValue(Coin)} afterwards or you risk having the transaction
+     * {@link com.google.bitcoin.core.TransactionOutput#getMinNonDustValue(Coin)} afterwards or you risk having the transaction
      * rejected by the network. Note that using {@link SendRequest#to(Address, Coin)} will result
      * in a smaller output, and thus the ability to use a smaller output value without rejection.</p>
      */

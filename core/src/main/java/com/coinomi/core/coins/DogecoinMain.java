@@ -19,6 +19,7 @@ public class DogecoinMain extends CoinType {
         uriScheme = "dogecoin";
         bip44Index = 3;
         feePerKb = Coin.valueOf(100000000L);
+        minNonDust = Coin.SATOSHI; // Dogecoin doesn't have dust detection (src. ref client)
     }
 
     private static DogecoinMain instance;

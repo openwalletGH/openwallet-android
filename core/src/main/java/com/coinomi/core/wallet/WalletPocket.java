@@ -1323,7 +1323,7 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
             if (req.ensureMinRequiredFee && !req.emptyWallet) { // min fee checking is handled later for emptyWallet
                 for (TransactionOutput output : req.tx.getOutputs())
                     if (output.getValue().compareTo(Coin.CENT) < 0) {
-                        if (output.getValue().compareTo(output.getMinNonDustValue()) < 0)
+                        if (output.getValue().compareTo(output.getMinNonDustValue(coinType.getFeePerKb().multiply(3))) < 0)
                             throw new com.google.bitcoin.core.Wallet.DustySendRequested();
                         needAtLeastReferenceFee = true;
                         break;
@@ -1517,8 +1517,8 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
             } else {
                 fees = fees.add(req.feePerKb);  // First time around the loop.
             }
-            if (needAtLeastReferenceFee && fees.compareTo(Transaction.REFERENCE_DEFAULT_MIN_TX_FEE) < 0)
-                fees = Transaction.REFERENCE_DEFAULT_MIN_TX_FEE;
+            if (needAtLeastReferenceFee && fees.compareTo(coinType.getFeePerKb()) < 0)
+                fees = coinType.getFeePerKb();
 
             valueNeeded = value.add(fees);
             if (additionalValueForNextCategory != null)
@@ -1551,12 +1551,12 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
 
             // If change is < 0.01 BTC, we will need to have at least minfee to be accepted by the network
             if (req.ensureMinRequiredFee && !change.equals(Coin.ZERO) &&
-                    change.compareTo(Coin.CENT) < 0 && fees.compareTo(Transaction.REFERENCE_DEFAULT_MIN_TX_FEE) < 0) {
+                    change.compareTo(Coin.CENT) < 0 && fees.compareTo(coinType.getFeePerKb()) < 0) {
                 // This solution may fit into category 2, but it may also be category 3, we'll check that later
                 eitherCategory2Or3 = true;
                 additionalValueForNextCategory = Coin.CENT;
                 // If the change is smaller than the fee we want to add, this will be negative
-                change = change.subtract(Transaction.REFERENCE_DEFAULT_MIN_TX_FEE.subtract(fees));
+                change = change.subtract(coinType.getFeePerKb().subtract(fees));
             }
 
             int size = 0;
@@ -1570,11 +1570,11 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
                     changeAddress = getChangeAddress();
                 changeOutput = new TransactionOutput(coinType, req.tx, change, changeAddress);
                 // If the change output would result in this transaction being rejected as dust, just drop the change and make it a fee
-                if (req.ensureMinRequiredFee && Transaction.MIN_NONDUST_OUTPUT.compareTo(change) >= 0) {
+                if (req.ensureMinRequiredFee && coinType.getMinNonDust().compareTo(change) >= 0) {
                     // This solution definitely fits in category 3
                     isCategory3 = true;
-                    additionalValueForNextCategory = Transaction.REFERENCE_DEFAULT_MIN_TX_FEE.add(
-                            Transaction.MIN_NONDUST_OUTPUT.add(Coin.SATOSHI));
+                    additionalValueForNextCategory = coinType.getFeePerKb().add(
+                            coinType.getMinNonDust().add(Coin.SATOSHI));
                 } else {
                     size += changeOutput.bitcoinSerialize().length + VarInt.sizeOf(req.tx.getOutputs().size()) - VarInt.sizeOf(req.tx.getOutputs().size() - 1);
                     // This solution is either category 1 or 2
@@ -1585,7 +1585,7 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
                 if (eitherCategory2Or3) {
                     // This solution definitely fits in category 3 (we threw away change because it was smaller than MIN_TX_FEE)
                     isCategory3 = true;
-                    additionalValueForNextCategory = Transaction.REFERENCE_DEFAULT_MIN_TX_FEE.add(Coin.SATOSHI);
+                    additionalValueForNextCategory = coinType.getFeePerKb().add(Coin.SATOSHI);
                 }
             }
 
@@ -1680,9 +1680,9 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
         Coin fee = baseFee.add(feePerKb.multiply((size / 1000) + 1));
         output.setValue(output.getValue().subtract(fee));
         // Check if we need additional fee due to the output's value
-        if (output.getValue().compareTo(Coin.CENT) < 0 && fee.compareTo(Transaction.REFERENCE_DEFAULT_MIN_TX_FEE) < 0)
-            output.setValue(output.getValue().subtract(Transaction.REFERENCE_DEFAULT_MIN_TX_FEE.subtract(fee)));
-        return output.getMinNonDustValue().compareTo(output.getValue()) <= 0;
+        if (output.getValue().compareTo(Coin.CENT) < 0 && fee.compareTo(coinType.getFeePerKb()) < 0)
+            output.setValue(output.getValue().subtract(coinType.getFeePerKb().subtract(fee)));
+        return output.getMinNonDustValue(coinType.getFeePerKb().multiply(3)).compareTo(output.getValue()) <= 0;
     }
 
     private int estimateBytesForSigning(CoinSelection selection) {

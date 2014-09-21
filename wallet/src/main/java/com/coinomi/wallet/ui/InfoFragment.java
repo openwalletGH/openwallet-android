@@ -95,6 +95,7 @@ public class InfoFragment extends Fragment implements WalletPocketEventListener 
         // Subscribe and update the amount
         pocket.addEventListener(this);
         updateBalance(pocket.getBalance(), view);
+        setPending(pocket.getPendingBalance(), view);
 
         return view;
     }
@@ -140,8 +141,12 @@ public class InfoFragment extends Fragment implements WalletPocketEventListener 
     }
 
     private void setPending(Coin pendingAmount) {
-        if (getView() != null) {
-            Amount mainAmount = (Amount) getView().findViewById(R.id.main_amount);
+        setPending(pendingAmount, getView());
+    }
+
+    private void setPending(Coin pendingAmount, View view) {
+        if (view != null) {
+            Amount mainAmount = (Amount) view.findViewById(R.id.main_amount);
             mainAmount.setAmountPending(pendingAmount);
         }
     }

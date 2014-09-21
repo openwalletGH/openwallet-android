@@ -11,6 +11,8 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * @author Giannis Dzegoutanis
  */
@@ -24,6 +26,7 @@ abstract public class CoinType extends NetworkParameters implements Serializable
     protected String uriScheme;
     protected int bip44Index;
     protected Coin feePerKb;
+    protected Coin minNonDust;
 
     public String getName() {
         return name;
@@ -42,7 +45,10 @@ abstract public class CoinType extends NetworkParameters implements Serializable
     }
 
     public Coin getFeePerKb() {
-        return feePerKb;
+        return checkNotNull(feePerKb);
+    }
+    public Coin getMinNonDust() {
+        return checkNotNull(minNonDust);
     }
 
     public List<ChildNumber> getBip44Path(int account) {
