@@ -22,6 +22,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.coinomi.core.coins.CoinType;
+import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 
 /**
@@ -107,13 +109,18 @@ public class NavigationDrawerFragment extends Fragment {
                 getActionBar().getThemedContext(),
                 android.R.layout.simple_list_item_1,
                 android.R.id.text1,
-                new String[]{
-                        getString(R.string.title_section1),
-                        getString(R.string.title_section2),
-                        getString(R.string.title_section3),
-                }));
+                getCoinNames()
+        ));
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
         return mDrawerListView;
+    }
+
+    private String[] getCoinNames() {
+        String[] names = new String[Constants.DEFAULT_COINS.size()];
+        for(int i = 0; i < Constants.DEFAULT_COINS.size(); i++) {
+            names[i] = Constants.DEFAULT_COINS.get(i).getName();
+        }
+        return names;
     }
 
     public boolean isDrawerOpen() {

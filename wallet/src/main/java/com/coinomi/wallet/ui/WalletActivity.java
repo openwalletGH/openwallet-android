@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -16,10 +17,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.coinomi.core.coins.BitcoinMain;
 import com.coinomi.core.coins.CoinType;
-import com.coinomi.wallet.Constants;
+import com.coinomi.core.coins.DogecoinMain;
+import com.coinomi.core.coins.LitecoinMain;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Giannis Dzegoutanis
@@ -27,10 +33,14 @@ import com.coinomi.wallet.WalletApplication;
  */
 final public class WalletActivity extends ActionBarActivity implements
         NavigationDrawerFragment.NavigationDrawerCallbacks {
+    private static final Logger log = LoggerFactory.getLogger(WalletActivity.class);
 
     private static final int RECEIVE = 0;
     private static final int INFO = 1;
     private static final int SEND = 2;
+    private static final int MENU_BITCOIN = 0;
+    private static final int MENU_DOGECOIN = 1;
+    private static final int MENU_LITECOIN = 2;
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -48,6 +58,7 @@ final public class WalletActivity extends ActionBarActivity implements
     final String PREFS_NAME = "SharedPrefsFile";
     private ViewPager mViewPager;
     private AsyncTask<Void, Void, Void> refreshTask;
+    private CoinType currentType;
 
 
     @Override
@@ -109,42 +120,37 @@ final public class WalletActivity extends ActionBarActivity implements
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
-//        Fragment fragment;
-//        if (position == 0) {
-//            fragment = InfoFragment.newInstance(DogecoinTest.get());
-//        }
-//        else if (position == 2) {
-//            fragment = WalletSendCoins.newInstance(DogecoinTest.get());
-//        }
-//        else {
-//            fragment = PlaceholderFragment.newInstance(position + 1);
-//        }
-
-
-
-        if (mViewPager != null) {
-            AppSectionsPagerAdapter adapter =
-                    new AppSectionsPagerAdapter(this, Constants.COINS_TEST.get(0));
-            mViewPager.setAdapter(adapter);
-            mViewPager.setCurrentItem(INFO);
+        CoinType selectedType = DogecoinMain.get();
+        if (position == MENU_BITCOIN) {
+            selectedType = BitcoinMain.get();
+        } else if (position == MENU_DOGECOIN) {
+            selectedType = DogecoinMain.get();
+        } else if (position == MENU_LITECOIN) {
+            selectedType = LitecoinMain.get();
         }
 
+        log.info("Coin selected {} {}", position, selectedType);
 
-        // update the main content by replacing fragments
-//        FragmentManager fragmentManager = getSupportFragmentManager();
-//        fragmentManager.beginTransaction().replace(R.id.container, fragment).commit();
+        if (mViewPager != null && !selectedType.equals(currentType)) {
+            AppSectionsPagerAdapter adapter = new AppSectionsPagerAdapter(this, selectedType);
+            mViewPager.setAdapter(adapter);
+            mViewPager.setCurrentItem(INFO);
+            mViewPager.getAdapter().notifyDataSetChanged();
+            currentType = selectedType;
+        }
     }
 
     public void onSectionAttached(int number) {
         switch (number) {
-            case 0:
-                mTitle = getString(R.string.title_section1);
+            case MENU_BITCOIN:
+                mTitle = getString(R.string.bitcoin);
                 break;
-            case 1:
-                mTitle = getString(R.string.title_section2);
+            case MENU_DOGECOIN:
+            default:
+                mTitle = getString(R.string.dogecoin);
                 break;
-            case 2:
-                mTitle = getString(R.string.title_section3);
+            case MENU_LITECOIN:
+                mTitle = getString(R.string.litecoin);
                 break;
         }
     }
@@ -260,7 +266,7 @@ final public class WalletActivity extends ActionBarActivity implements
         }
     }
 
-    private static class AppSectionsPagerAdapter extends FragmentPagerAdapter {
+    private static class AppSectionsPagerAdapter extends FragmentStatePagerAdapter {
 
         private final CoinType type;
         private final WalletActivity walletActivity;

@@ -17,7 +17,7 @@ public class DogecoinMain extends CoinType {
         name = "Dogecoin";
         symbol = "DOGE";
         uriScheme = "dogecoin";
-        bip44Index = 4;
+        bip44Index = 3;
         feePerKb = Coin.valueOf(100000000L);
     }
 

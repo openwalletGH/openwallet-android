@@ -29,27 +29,23 @@ public class Constants {
     // TODO make dynamic
     public static final List<CoinAddress> COINS_ADDRESSES = ImmutableList.of(
             new CoinAddress(BitcoinMain.get(), new ServerAddress("test.coinomi.com", 5001)),
-            new CoinAddress(LitecoinMain.get(), new ServerAddress("test.coinomi.com", 5002)),
-            new CoinAddress(DogecoinMain.get(), new ServerAddress("test.coinomi.com", 5003)));
+            new CoinAddress(DogecoinMain.get(), new ServerAddress("test.coinomi.com", 5003)),
+            new CoinAddress(LitecoinMain.get(), new ServerAddress("test.coinomi.com", 5002)));
 
 //    public static final List<CoinAddress> COINS_ADDRESSES_TEST = ImmutableList.of(
 //            new CoinAddress(BitcoinTest.get(), new ServerAddress("test.coinomi.com", 15001)),
 //            new CoinAddress(LitecoinTest.get(), new ServerAddress("test.coinomi.com", 15002)),
 //            new CoinAddress(DogecoinTest.get(), new ServerAddress("test.coinomi.com", 15003)));
-//
-//    public static final List<CoinType> COINS_TEST = ImmutableList.of( BitcoinTest.get(),
-//            LitecoinTest.get(), DogecoinTest.get());
 
     public static final List<CoinAddress> COINS_ADDRESSES_TEST = ImmutableList.of(
-//            new CoinAddress(DogecoinMain.get(), new ServerAddress("test.coinomi.com", 5003))
-            new CoinAddress(DogecoinMain.get(), new ServerAddress("54.195.124.108", 5003))
+            new CoinAddress(BitcoinMain.get(), new ServerAddress("54.195.124.108", 5001)),
+            new CoinAddress(DogecoinMain.get(), new ServerAddress("54.195.124.108", 5003)),
+            new CoinAddress(LitecoinMain.get(), new ServerAddress("54.195.124.108", 5002))
     );
 
-    public static final List<CoinType> COINS_TEST = ImmutableList.of((CoinType)DogecoinMain.get());
-
     public static final List<CoinType> DEFAULT_COINS = ImmutableList.of(BitcoinMain.get(),
-            LitecoinMain.get(), DogecoinMain.get());
+            DogecoinMain.get(), LitecoinMain.get());
 
-    public static final long WALLET_WRITE_DELAY = 5;
+    public static final long WALLET_WRITE_DELAY = 3;
     public static final TimeUnit WALLET_WRITE_DELAY_UNIT = TimeUnit.SECONDS;
 }
