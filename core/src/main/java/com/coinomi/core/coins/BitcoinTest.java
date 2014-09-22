@@ -1,6 +1,7 @@
 package com.coinomi.core.coins;
 
 import com.coinomi.core.Constants;
+import com.google.bitcoin.core.Coin;
 
 /**
  * @author Giannis Dzegoutanis
@@ -17,6 +18,8 @@ public class BitcoinTest extends CoinType {
         symbol = "BTC";
         uriScheme = "bitcoin";
         bip44Index = 1;
+        feePerKb = Coin.valueOf(10000);
+        minNonDust = Coin.valueOf(5460);
     }
 
     private static BitcoinTest instance;

@@ -13073,65 +13073,79 @@ public final class Protos {
      */
     int getVersion();
 
-    // required .com.coinomi.core.protos.Key master_key = 2;
+    // optional .com.coinomi.core.protos.Key seed = 2;
     /**
-     * <code>required .com.coinomi.core.protos.Key master_key = 2;</code>
+     * <code>optional .com.coinomi.core.protos.Key seed = 2;</code>
+     */
+    boolean hasSeed();
+    /**
+     * <code>optional .com.coinomi.core.protos.Key seed = 2;</code>
+     */
+    com.coinomi.core.protos.Protos.Key getSeed();
+    /**
+     * <code>optional .com.coinomi.core.protos.Key seed = 2;</code>
+     */
+    com.coinomi.core.protos.Protos.KeyOrBuilder getSeedOrBuilder();
+
+    // required .com.coinomi.core.protos.Key master_key = 3;
+    /**
+     * <code>required .com.coinomi.core.protos.Key master_key = 3;</code>
      */
     boolean hasMasterKey();
     /**
-     * <code>required .com.coinomi.core.protos.Key master_key = 2;</code>
+     * <code>required .com.coinomi.core.protos.Key master_key = 3;</code>
      */
     com.coinomi.core.protos.Protos.Key getMasterKey();
     /**
-     * <code>required .com.coinomi.core.protos.Key master_key = 2;</code>
+     * <code>required .com.coinomi.core.protos.Key master_key = 3;</code>
      */
     com.coinomi.core.protos.Protos.KeyOrBuilder getMasterKeyOrBuilder();
 
-    // optional .com.coinomi.core.protos.Wallet.EncryptionType encryption_type = 3 [default = UNENCRYPTED];
+    // optional .com.coinomi.core.protos.Wallet.EncryptionType encryption_type = 4 [default = UNENCRYPTED];
     /**
-     * <code>optional .com.coinomi.core.protos.Wallet.EncryptionType encryption_type = 3 [default = UNENCRYPTED];</code>
+     * <code>optional .com.coinomi.core.protos.Wallet.EncryptionType encryption_type = 4 [default = UNENCRYPTED];</code>
      */
     boolean hasEncryptionType();
     /**
-     * <code>optional .com.coinomi.core.protos.Wallet.EncryptionType encryption_type = 3 [default = UNENCRYPTED];</code>
+     * <code>optional .com.coinomi.core.protos.Wallet.EncryptionType encryption_type = 4 [default = UNENCRYPTED];</code>
      */
     com.coinomi.core.protos.Protos.Wallet.EncryptionType getEncryptionType();
 
-    // optional .com.coinomi.core.protos.ScryptParameters encryption_parameters = 4;
+    // optional .com.coinomi.core.protos.ScryptParameters encryption_parameters = 5;
     /**
-     * <code>optional .com.coinomi.core.protos.ScryptParameters encryption_parameters = 4;</code>
+     * <code>optional .com.coinomi.core.protos.ScryptParameters encryption_parameters = 5;</code>
      */
     boolean hasEncryptionParameters();
     /**
-     * <code>optional .com.coinomi.core.protos.ScryptParameters encryption_parameters = 4;</code>
+     * <code>optional .com.coinomi.core.protos.ScryptParameters encryption_parameters = 5;</code>
      */
     com.coinomi.core.protos.Protos.ScryptParameters getEncryptionParameters();
     /**
-     * <code>optional .com.coinomi.core.protos.ScryptParameters encryption_parameters = 4;</code>
+     * <code>optional .com.coinomi.core.protos.ScryptParameters encryption_parameters = 5;</code>
      */
     com.coinomi.core.protos.Protos.ScryptParametersOrBuilder getEncryptionParametersOrBuilder();
 
-    // repeated .com.coinomi.core.protos.WalletPocket pockets = 5;
+    // repeated .com.coinomi.core.protos.WalletPocket pockets = 6;
     /**
-     * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 5;</code>
+     * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 6;</code>
      */
     java.util.List<com.coinomi.core.protos.Protos.WalletPocket> 
         getPocketsList();
     /**
-     * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 5;</code>
+     * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 6;</code>
      */
     com.coinomi.core.protos.Protos.WalletPocket getPockets(int index);
     /**
-     * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 5;</code>
+     * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 6;</code>
      */
     int getPocketsCount();
     /**
-     * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 5;</code>
+     * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 6;</code>
      */
     java.util.List<? extends com.coinomi.core.protos.Protos.WalletPocketOrBuilder> 
         getPocketsOrBuilderList();
     /**
-     * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 5;</code>
+     * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 6;</code>
      */
     com.coinomi.core.protos.Protos.WalletPocketOrBuilder getPocketsOrBuilder(
         int index);
@@ -13199,6 +13213,19 @@ public final class Protos {
             case 18: {
               com.coinomi.core.protos.Protos.Key.Builder subBuilder = null;
               if (((bitField0_ & 0x00000002) == 0x00000002)) {
+                subBuilder = seed_.toBuilder();
+              }
+              seed_ = input.readMessage(com.coinomi.core.protos.Protos.Key.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(seed_);
+                seed_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000002;
+              break;
+            }
+            case 26: {
+              com.coinomi.core.protos.Protos.Key.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000004) == 0x00000004)) {
                 subBuilder = masterKey_.toBuilder();
               }
               masterKey_ = input.readMessage(com.coinomi.core.protos.Protos.Key.PARSER, extensionRegistry);
@@ -13206,23 +13233,23 @@ public final class Protos {
                 subBuilder.mergeFrom(masterKey_);
                 masterKey_ = subBuilder.buildPartial();
               }
-              bitField0_ |= 0x00000002;
+              bitField0_ |= 0x00000004;
               break;
             }
-            case 24: {
+            case 32: {
               int rawValue = input.readEnum();
               com.coinomi.core.protos.Protos.Wallet.EncryptionType value = com.coinomi.core.protos.Protos.Wallet.EncryptionType.valueOf(rawValue);
               if (value == null) {
-                unknownFields.mergeVarintField(3, rawValue);
+                unknownFields.mergeVarintField(4, rawValue);
               } else {
-                bitField0_ |= 0x00000004;
+                bitField0_ |= 0x00000008;
                 encryptionType_ = value;
               }
               break;
             }
-            case 34: {
+            case 42: {
               com.coinomi.core.protos.Protos.ScryptParameters.Builder subBuilder = null;
-              if (((bitField0_ & 0x00000008) == 0x00000008)) {
+              if (((bitField0_ & 0x00000010) == 0x00000010)) {
                 subBuilder = encryptionParameters_.toBuilder();
               }
               encryptionParameters_ = input.readMessage(com.coinomi.core.protos.Protos.ScryptParameters.PARSER, extensionRegistry);
@@ -13230,13 +13257,13 @@ public final class Protos {
                 subBuilder.mergeFrom(encryptionParameters_);
                 encryptionParameters_ = subBuilder.buildPartial();
               }
-              bitField0_ |= 0x00000008;
+              bitField0_ |= 0x00000010;
               break;
             }
-            case 42: {
-              if (!((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
+            case 50: {
+              if (!((mutable_bitField0_ & 0x00000020) == 0x00000020)) {
                 pockets_ = new java.util.ArrayList<com.coinomi.core.protos.Protos.WalletPocket>();
-                mutable_bitField0_ |= 0x00000010;
+                mutable_bitField0_ |= 0x00000020;
               }
               pockets_.add(input.readMessage(com.coinomi.core.protos.Protos.WalletPocket.PARSER, extensionRegistry));
               break;
@@ -13249,7 +13276,7 @@ public final class Protos {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e.getMessage()).setUnfinishedMessage(this);
       } finally {
-        if (((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
+        if (((mutable_bitField0_ & 0x00000020) == 0x00000020)) {
           pockets_ = java.util.Collections.unmodifiableList(pockets_);
         }
         this.unknownFields = unknownFields.build();
@@ -13434,96 +13461,118 @@ public final class Protos {
       return version_;
     }
 
-    // required .com.coinomi.core.protos.Key master_key = 2;
-    public static final int MASTER_KEY_FIELD_NUMBER = 2;
-    private com.coinomi.core.protos.Protos.Key masterKey_;
+    // optional .com.coinomi.core.protos.Key seed = 2;
+    public static final int SEED_FIELD_NUMBER = 2;
+    private com.coinomi.core.protos.Protos.Key seed_;
     /**
-     * <code>required .com.coinomi.core.protos.Key master_key = 2;</code>
+     * <code>optional .com.coinomi.core.protos.Key seed = 2;</code>
      */
-    public boolean hasMasterKey() {
+    public boolean hasSeed() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>required .com.coinomi.core.protos.Key master_key = 2;</code>
+     * <code>optional .com.coinomi.core.protos.Key seed = 2;</code>
+     */
+    public com.coinomi.core.protos.Protos.Key getSeed() {
+      return seed_;
+    }
+    /**
+     * <code>optional .com.coinomi.core.protos.Key seed = 2;</code>
+     */
+    public com.coinomi.core.protos.Protos.KeyOrBuilder getSeedOrBuilder() {
+      return seed_;
+    }
+
+    // required .com.coinomi.core.protos.Key master_key = 3;
+    public static final int MASTER_KEY_FIELD_NUMBER = 3;
+    private com.coinomi.core.protos.Protos.Key masterKey_;
+    /**
+     * <code>required .com.coinomi.core.protos.Key master_key = 3;</code>
+     */
+    public boolean hasMasterKey() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    /**
+     * <code>required .com.coinomi.core.protos.Key master_key = 3;</code>
      */
     public com.coinomi.core.protos.Protos.Key getMasterKey() {
       return masterKey_;
     }
     /**
-     * <code>required .com.coinomi.core.protos.Key master_key = 2;</code>
+     * <code>required .com.coinomi.core.protos.Key master_key = 3;</code>
      */
     public com.coinomi.core.protos.Protos.KeyOrBuilder getMasterKeyOrBuilder() {
       return masterKey_;
     }
 
-    // optional .com.coinomi.core.protos.Wallet.EncryptionType encryption_type = 3 [default = UNENCRYPTED];
-    public static final int ENCRYPTION_TYPE_FIELD_NUMBER = 3;
+    // optional .com.coinomi.core.protos.Wallet.EncryptionType encryption_type = 4 [default = UNENCRYPTED];
+    public static final int ENCRYPTION_TYPE_FIELD_NUMBER = 4;
     private com.coinomi.core.protos.Protos.Wallet.EncryptionType encryptionType_;
     /**
-     * <code>optional .com.coinomi.core.protos.Wallet.EncryptionType encryption_type = 3 [default = UNENCRYPTED];</code>
+     * <code>optional .com.coinomi.core.protos.Wallet.EncryptionType encryption_type = 4 [default = UNENCRYPTED];</code>
      */
     public boolean hasEncryptionType() {
-      return ((bitField0_ & 0x00000004) == 0x00000004);
+      return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
-     * <code>optional .com.coinomi.core.protos.Wallet.EncryptionType encryption_type = 3 [default = UNENCRYPTED];</code>
+     * <code>optional .com.coinomi.core.protos.Wallet.EncryptionType encryption_type = 4 [default = UNENCRYPTED];</code>
      */
     public com.coinomi.core.protos.Protos.Wallet.EncryptionType getEncryptionType() {
       return encryptionType_;
     }
 
-    // optional .com.coinomi.core.protos.ScryptParameters encryption_parameters = 4;
-    public static final int ENCRYPTION_PARAMETERS_FIELD_NUMBER = 4;
+    // optional .com.coinomi.core.protos.ScryptParameters encryption_parameters = 5;
+    public static final int ENCRYPTION_PARAMETERS_FIELD_NUMBER = 5;
     private com.coinomi.core.protos.Protos.ScryptParameters encryptionParameters_;
     /**
-     * <code>optional .com.coinomi.core.protos.ScryptParameters encryption_parameters = 4;</code>
+     * <code>optional .com.coinomi.core.protos.ScryptParameters encryption_parameters = 5;</code>
      */
     public boolean hasEncryptionParameters() {
-      return ((bitField0_ & 0x00000008) == 0x00000008);
+      return ((bitField0_ & 0x00000010) == 0x00000010);
     }
     /**
-     * <code>optional .com.coinomi.core.protos.ScryptParameters encryption_parameters = 4;</code>
+     * <code>optional .com.coinomi.core.protos.ScryptParameters encryption_parameters = 5;</code>
      */
     public com.coinomi.core.protos.Protos.ScryptParameters getEncryptionParameters() {
       return encryptionParameters_;
     }
     /**
-     * <code>optional .com.coinomi.core.protos.ScryptParameters encryption_parameters = 4;</code>
+     * <code>optional .com.coinomi.core.protos.ScryptParameters encryption_parameters = 5;</code>
      */
     public com.coinomi.core.protos.Protos.ScryptParametersOrBuilder getEncryptionParametersOrBuilder() {
       return encryptionParameters_;
     }
 
-    // repeated .com.coinomi.core.protos.WalletPocket pockets = 5;
-    public static final int POCKETS_FIELD_NUMBER = 5;
+    // repeated .com.coinomi.core.protos.WalletPocket pockets = 6;
+    public static final int POCKETS_FIELD_NUMBER = 6;
     private java.util.List<com.coinomi.core.protos.Protos.WalletPocket> pockets_;
     /**
-     * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 5;</code>
+     * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 6;</code>
      */
     public java.util.List<com.coinomi.core.protos.Protos.WalletPocket> getPocketsList() {
       return pockets_;
     }
     /**
-     * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 5;</code>
+     * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 6;</code>
      */
     public java.util.List<? extends com.coinomi.core.protos.Protos.WalletPocketOrBuilder> 
         getPocketsOrBuilderList() {
       return pockets_;
     }
     /**
-     * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 5;</code>
+     * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 6;</code>
      */
     public int getPocketsCount() {
       return pockets_.size();
     }
     /**
-     * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 5;</code>
+     * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 6;</code>
      */
     public com.coinomi.core.protos.Protos.WalletPocket getPockets(int index) {
       return pockets_.get(index);
     }
     /**
-     * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 5;</code>
+     * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 6;</code>
      */
     public com.coinomi.core.protos.Protos.WalletPocketOrBuilder getPocketsOrBuilder(
         int index) {
@@ -13532,6 +13581,7 @@ public final class Protos {
 
     private void initFields() {
       version_ = 1;
+      seed_ = com.coinomi.core.protos.Protos.Key.getDefaultInstance();
       masterKey_ = com.coinomi.core.protos.Protos.Key.getDefaultInstance();
       encryptionType_ = com.coinomi.core.protos.Protos.Wallet.EncryptionType.UNENCRYPTED;
       encryptionParameters_ = com.coinomi.core.protos.Protos.ScryptParameters.getDefaultInstance();
@@ -13545,6 +13595,12 @@ public final class Protos {
       if (!hasMasterKey()) {
         memoizedIsInitialized = 0;
         return false;
+      }
+      if (hasSeed()) {
+        if (!getSeed().isInitialized()) {
+          memoizedIsInitialized = 0;
+          return false;
+        }
       }
       if (!getMasterKey().isInitialized()) {
         memoizedIsInitialized = 0;
@@ -13573,16 +13629,19 @@ public final class Protos {
         output.writeInt32(1, version_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeMessage(2, masterKey_);
+        output.writeMessage(2, seed_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeEnum(3, encryptionType_.getNumber());
+        output.writeMessage(3, masterKey_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeMessage(4, encryptionParameters_);
+        output.writeEnum(4, encryptionType_.getNumber());
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        output.writeMessage(5, encryptionParameters_);
       }
       for (int i = 0; i < pockets_.size(); i++) {
-        output.writeMessage(5, pockets_.get(i));
+        output.writeMessage(6, pockets_.get(i));
       }
       getUnknownFields().writeTo(output);
     }
@@ -13599,19 +13658,23 @@ public final class Protos {
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, masterKey_);
+          .computeMessageSize(2, seed_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(3, encryptionType_.getNumber());
+          .computeMessageSize(3, masterKey_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(4, encryptionParameters_);
+          .computeEnumSize(4, encryptionType_.getNumber());
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(5, encryptionParameters_);
       }
       for (int i = 0; i < pockets_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(5, pockets_.get(i));
+          .computeMessageSize(6, pockets_.get(i));
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -13725,6 +13788,7 @@ public final class Protos {
       }
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+          getSeedFieldBuilder();
           getMasterKeyFieldBuilder();
           getEncryptionParametersFieldBuilder();
           getPocketsFieldBuilder();
@@ -13738,23 +13802,29 @@ public final class Protos {
         super.clear();
         version_ = 1;
         bitField0_ = (bitField0_ & ~0x00000001);
+        if (seedBuilder_ == null) {
+          seed_ = com.coinomi.core.protos.Protos.Key.getDefaultInstance();
+        } else {
+          seedBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000002);
         if (masterKeyBuilder_ == null) {
           masterKey_ = com.coinomi.core.protos.Protos.Key.getDefaultInstance();
         } else {
           masterKeyBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000002);
-        encryptionType_ = com.coinomi.core.protos.Protos.Wallet.EncryptionType.UNENCRYPTED;
         bitField0_ = (bitField0_ & ~0x00000004);
+        encryptionType_ = com.coinomi.core.protos.Protos.Wallet.EncryptionType.UNENCRYPTED;
+        bitField0_ = (bitField0_ & ~0x00000008);
         if (encryptionParametersBuilder_ == null) {
           encryptionParameters_ = com.coinomi.core.protos.Protos.ScryptParameters.getDefaultInstance();
         } else {
           encryptionParametersBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000008);
+        bitField0_ = (bitField0_ & ~0x00000010);
         if (pocketsBuilder_ == null) {
           pockets_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000010);
+          bitField0_ = (bitField0_ & ~0x00000020);
         } else {
           pocketsBuilder_.clear();
         }
@@ -13793,17 +13863,25 @@ public final class Protos {
         if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
           to_bitField0_ |= 0x00000002;
         }
+        if (seedBuilder_ == null) {
+          result.seed_ = seed_;
+        } else {
+          result.seed_ = seedBuilder_.build();
+        }
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
         if (masterKeyBuilder_ == null) {
           result.masterKey_ = masterKey_;
         } else {
           result.masterKey_ = masterKeyBuilder_.build();
         }
-        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
-          to_bitField0_ |= 0x00000004;
-        }
-        result.encryptionType_ = encryptionType_;
         if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
           to_bitField0_ |= 0x00000008;
+        }
+        result.encryptionType_ = encryptionType_;
+        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+          to_bitField0_ |= 0x00000010;
         }
         if (encryptionParametersBuilder_ == null) {
           result.encryptionParameters_ = encryptionParameters_;
@@ -13811,9 +13889,9 @@ public final class Protos {
           result.encryptionParameters_ = encryptionParametersBuilder_.build();
         }
         if (pocketsBuilder_ == null) {
-          if (((bitField0_ & 0x00000010) == 0x00000010)) {
+          if (((bitField0_ & 0x00000020) == 0x00000020)) {
             pockets_ = java.util.Collections.unmodifiableList(pockets_);
-            bitField0_ = (bitField0_ & ~0x00000010);
+            bitField0_ = (bitField0_ & ~0x00000020);
           }
           result.pockets_ = pockets_;
         } else {
@@ -13838,6 +13916,9 @@ public final class Protos {
         if (other.hasVersion()) {
           setVersion(other.getVersion());
         }
+        if (other.hasSeed()) {
+          mergeSeed(other.getSeed());
+        }
         if (other.hasMasterKey()) {
           mergeMasterKey(other.getMasterKey());
         }
@@ -13851,7 +13932,7 @@ public final class Protos {
           if (!other.pockets_.isEmpty()) {
             if (pockets_.isEmpty()) {
               pockets_ = other.pockets_;
-              bitField0_ = (bitField0_ & ~0x00000010);
+              bitField0_ = (bitField0_ & ~0x00000020);
             } else {
               ensurePocketsIsMutable();
               pockets_.addAll(other.pockets_);
@@ -13864,7 +13945,7 @@ public final class Protos {
               pocketsBuilder_.dispose();
               pocketsBuilder_ = null;
               pockets_ = other.pockets_;
-              bitField0_ = (bitField0_ & ~0x00000010);
+              bitField0_ = (bitField0_ & ~0x00000020);
               pocketsBuilder_ = 
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getPocketsFieldBuilder() : null;
@@ -13881,6 +13962,12 @@ public final class Protos {
         if (!hasMasterKey()) {
           
           return false;
+        }
+        if (hasSeed()) {
+          if (!getSeed().isInitialized()) {
+            
+            return false;
+          }
         }
         if (!getMasterKey().isInitialized()) {
           
@@ -13973,18 +14060,135 @@ public final class Protos {
         return this;
       }
 
-      // required .com.coinomi.core.protos.Key master_key = 2;
+      // optional .com.coinomi.core.protos.Key seed = 2;
+      private com.coinomi.core.protos.Protos.Key seed_ = com.coinomi.core.protos.Protos.Key.getDefaultInstance();
+      private com.google.protobuf.SingleFieldBuilder<
+          com.coinomi.core.protos.Protos.Key, com.coinomi.core.protos.Protos.Key.Builder, com.coinomi.core.protos.Protos.KeyOrBuilder> seedBuilder_;
+      /**
+       * <code>optional .com.coinomi.core.protos.Key seed = 2;</code>
+       */
+      public boolean hasSeed() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      /**
+       * <code>optional .com.coinomi.core.protos.Key seed = 2;</code>
+       */
+      public com.coinomi.core.protos.Protos.Key getSeed() {
+        if (seedBuilder_ == null) {
+          return seed_;
+        } else {
+          return seedBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>optional .com.coinomi.core.protos.Key seed = 2;</code>
+       */
+      public Builder setSeed(com.coinomi.core.protos.Protos.Key value) {
+        if (seedBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          seed_ = value;
+          onChanged();
+        } else {
+          seedBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000002;
+        return this;
+      }
+      /**
+       * <code>optional .com.coinomi.core.protos.Key seed = 2;</code>
+       */
+      public Builder setSeed(
+          com.coinomi.core.protos.Protos.Key.Builder builderForValue) {
+        if (seedBuilder_ == null) {
+          seed_ = builderForValue.build();
+          onChanged();
+        } else {
+          seedBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000002;
+        return this;
+      }
+      /**
+       * <code>optional .com.coinomi.core.protos.Key seed = 2;</code>
+       */
+      public Builder mergeSeed(com.coinomi.core.protos.Protos.Key value) {
+        if (seedBuilder_ == null) {
+          if (((bitField0_ & 0x00000002) == 0x00000002) &&
+              seed_ != com.coinomi.core.protos.Protos.Key.getDefaultInstance()) {
+            seed_ =
+              com.coinomi.core.protos.Protos.Key.newBuilder(seed_).mergeFrom(value).buildPartial();
+          } else {
+            seed_ = value;
+          }
+          onChanged();
+        } else {
+          seedBuilder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00000002;
+        return this;
+      }
+      /**
+       * <code>optional .com.coinomi.core.protos.Key seed = 2;</code>
+       */
+      public Builder clearSeed() {
+        if (seedBuilder_ == null) {
+          seed_ = com.coinomi.core.protos.Protos.Key.getDefaultInstance();
+          onChanged();
+        } else {
+          seedBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000002);
+        return this;
+      }
+      /**
+       * <code>optional .com.coinomi.core.protos.Key seed = 2;</code>
+       */
+      public com.coinomi.core.protos.Protos.Key.Builder getSeedBuilder() {
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return getSeedFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>optional .com.coinomi.core.protos.Key seed = 2;</code>
+       */
+      public com.coinomi.core.protos.Protos.KeyOrBuilder getSeedOrBuilder() {
+        if (seedBuilder_ != null) {
+          return seedBuilder_.getMessageOrBuilder();
+        } else {
+          return seed_;
+        }
+      }
+      /**
+       * <code>optional .com.coinomi.core.protos.Key seed = 2;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilder<
+          com.coinomi.core.protos.Protos.Key, com.coinomi.core.protos.Protos.Key.Builder, com.coinomi.core.protos.Protos.KeyOrBuilder> 
+          getSeedFieldBuilder() {
+        if (seedBuilder_ == null) {
+          seedBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              com.coinomi.core.protos.Protos.Key, com.coinomi.core.protos.Protos.Key.Builder, com.coinomi.core.protos.Protos.KeyOrBuilder>(
+                  seed_,
+                  getParentForChildren(),
+                  isClean());
+          seed_ = null;
+        }
+        return seedBuilder_;
+      }
+
+      // required .com.coinomi.core.protos.Key master_key = 3;
       private com.coinomi.core.protos.Protos.Key masterKey_ = com.coinomi.core.protos.Protos.Key.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           com.coinomi.core.protos.Protos.Key, com.coinomi.core.protos.Protos.Key.Builder, com.coinomi.core.protos.Protos.KeyOrBuilder> masterKeyBuilder_;
       /**
-       * <code>required .com.coinomi.core.protos.Key master_key = 2;</code>
+       * <code>required .com.coinomi.core.protos.Key master_key = 3;</code>
        */
       public boolean hasMasterKey() {
-        return ((bitField0_ & 0x00000002) == 0x00000002);
+        return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       /**
-       * <code>required .com.coinomi.core.protos.Key master_key = 2;</code>
+       * <code>required .com.coinomi.core.protos.Key master_key = 3;</code>
        */
       public com.coinomi.core.protos.Protos.Key getMasterKey() {
         if (masterKeyBuilder_ == null) {
@@ -13994,7 +14198,7 @@ public final class Protos {
         }
       }
       /**
-       * <code>required .com.coinomi.core.protos.Key master_key = 2;</code>
+       * <code>required .com.coinomi.core.protos.Key master_key = 3;</code>
        */
       public Builder setMasterKey(com.coinomi.core.protos.Protos.Key value) {
         if (masterKeyBuilder_ == null) {
@@ -14006,11 +14210,11 @@ public final class Protos {
         } else {
           masterKeyBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000002;
+        bitField0_ |= 0x00000004;
         return this;
       }
       /**
-       * <code>required .com.coinomi.core.protos.Key master_key = 2;</code>
+       * <code>required .com.coinomi.core.protos.Key master_key = 3;</code>
        */
       public Builder setMasterKey(
           com.coinomi.core.protos.Protos.Key.Builder builderForValue) {
@@ -14020,15 +14224,15 @@ public final class Protos {
         } else {
           masterKeyBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000002;
+        bitField0_ |= 0x00000004;
         return this;
       }
       /**
-       * <code>required .com.coinomi.core.protos.Key master_key = 2;</code>
+       * <code>required .com.coinomi.core.protos.Key master_key = 3;</code>
        */
       public Builder mergeMasterKey(com.coinomi.core.protos.Protos.Key value) {
         if (masterKeyBuilder_ == null) {
-          if (((bitField0_ & 0x00000002) == 0x00000002) &&
+          if (((bitField0_ & 0x00000004) == 0x00000004) &&
               masterKey_ != com.coinomi.core.protos.Protos.Key.getDefaultInstance()) {
             masterKey_ =
               com.coinomi.core.protos.Protos.Key.newBuilder(masterKey_).mergeFrom(value).buildPartial();
@@ -14039,11 +14243,11 @@ public final class Protos {
         } else {
           masterKeyBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000002;
+        bitField0_ |= 0x00000004;
         return this;
       }
       /**
-       * <code>required .com.coinomi.core.protos.Key master_key = 2;</code>
+       * <code>required .com.coinomi.core.protos.Key master_key = 3;</code>
        */
       public Builder clearMasterKey() {
         if (masterKeyBuilder_ == null) {
@@ -14052,19 +14256,19 @@ public final class Protos {
         } else {
           masterKeyBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000002);
+        bitField0_ = (bitField0_ & ~0x00000004);
         return this;
       }
       /**
-       * <code>required .com.coinomi.core.protos.Key master_key = 2;</code>
+       * <code>required .com.coinomi.core.protos.Key master_key = 3;</code>
        */
       public com.coinomi.core.protos.Protos.Key.Builder getMasterKeyBuilder() {
-        bitField0_ |= 0x00000002;
+        bitField0_ |= 0x00000004;
         onChanged();
         return getMasterKeyFieldBuilder().getBuilder();
       }
       /**
-       * <code>required .com.coinomi.core.protos.Key master_key = 2;</code>
+       * <code>required .com.coinomi.core.protos.Key master_key = 3;</code>
        */
       public com.coinomi.core.protos.Protos.KeyOrBuilder getMasterKeyOrBuilder() {
         if (masterKeyBuilder_ != null) {
@@ -14074,7 +14278,7 @@ public final class Protos {
         }
       }
       /**
-       * <code>required .com.coinomi.core.protos.Key master_key = 2;</code>
+       * <code>required .com.coinomi.core.protos.Key master_key = 3;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
           com.coinomi.core.protos.Protos.Key, com.coinomi.core.protos.Protos.Key.Builder, com.coinomi.core.protos.Protos.KeyOrBuilder> 
@@ -14090,54 +14294,54 @@ public final class Protos {
         return masterKeyBuilder_;
       }
 
-      // optional .com.coinomi.core.protos.Wallet.EncryptionType encryption_type = 3 [default = UNENCRYPTED];
+      // optional .com.coinomi.core.protos.Wallet.EncryptionType encryption_type = 4 [default = UNENCRYPTED];
       private com.coinomi.core.protos.Protos.Wallet.EncryptionType encryptionType_ = com.coinomi.core.protos.Protos.Wallet.EncryptionType.UNENCRYPTED;
       /**
-       * <code>optional .com.coinomi.core.protos.Wallet.EncryptionType encryption_type = 3 [default = UNENCRYPTED];</code>
+       * <code>optional .com.coinomi.core.protos.Wallet.EncryptionType encryption_type = 4 [default = UNENCRYPTED];</code>
        */
       public boolean hasEncryptionType() {
-        return ((bitField0_ & 0x00000004) == 0x00000004);
+        return ((bitField0_ & 0x00000008) == 0x00000008);
       }
       /**
-       * <code>optional .com.coinomi.core.protos.Wallet.EncryptionType encryption_type = 3 [default = UNENCRYPTED];</code>
+       * <code>optional .com.coinomi.core.protos.Wallet.EncryptionType encryption_type = 4 [default = UNENCRYPTED];</code>
        */
       public com.coinomi.core.protos.Protos.Wallet.EncryptionType getEncryptionType() {
         return encryptionType_;
       }
       /**
-       * <code>optional .com.coinomi.core.protos.Wallet.EncryptionType encryption_type = 3 [default = UNENCRYPTED];</code>
+       * <code>optional .com.coinomi.core.protos.Wallet.EncryptionType encryption_type = 4 [default = UNENCRYPTED];</code>
        */
       public Builder setEncryptionType(com.coinomi.core.protos.Protos.Wallet.EncryptionType value) {
         if (value == null) {
           throw new NullPointerException();
         }
-        bitField0_ |= 0x00000004;
+        bitField0_ |= 0x00000008;
         encryptionType_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional .com.coinomi.core.protos.Wallet.EncryptionType encryption_type = 3 [default = UNENCRYPTED];</code>
+       * <code>optional .com.coinomi.core.protos.Wallet.EncryptionType encryption_type = 4 [default = UNENCRYPTED];</code>
        */
       public Builder clearEncryptionType() {
-        bitField0_ = (bitField0_ & ~0x00000004);
+        bitField0_ = (bitField0_ & ~0x00000008);
         encryptionType_ = com.coinomi.core.protos.Protos.Wallet.EncryptionType.UNENCRYPTED;
         onChanged();
         return this;
       }
 
-      // optional .com.coinomi.core.protos.ScryptParameters encryption_parameters = 4;
+      // optional .com.coinomi.core.protos.ScryptParameters encryption_parameters = 5;
       private com.coinomi.core.protos.Protos.ScryptParameters encryptionParameters_ = com.coinomi.core.protos.Protos.ScryptParameters.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           com.coinomi.core.protos.Protos.ScryptParameters, com.coinomi.core.protos.Protos.ScryptParameters.Builder, com.coinomi.core.protos.Protos.ScryptParametersOrBuilder> encryptionParametersBuilder_;
       /**
-       * <code>optional .com.coinomi.core.protos.ScryptParameters encryption_parameters = 4;</code>
+       * <code>optional .com.coinomi.core.protos.ScryptParameters encryption_parameters = 5;</code>
        */
       public boolean hasEncryptionParameters() {
-        return ((bitField0_ & 0x00000008) == 0x00000008);
+        return ((bitField0_ & 0x00000010) == 0x00000010);
       }
       /**
-       * <code>optional .com.coinomi.core.protos.ScryptParameters encryption_parameters = 4;</code>
+       * <code>optional .com.coinomi.core.protos.ScryptParameters encryption_parameters = 5;</code>
        */
       public com.coinomi.core.protos.Protos.ScryptParameters getEncryptionParameters() {
         if (encryptionParametersBuilder_ == null) {
@@ -14147,7 +14351,7 @@ public final class Protos {
         }
       }
       /**
-       * <code>optional .com.coinomi.core.protos.ScryptParameters encryption_parameters = 4;</code>
+       * <code>optional .com.coinomi.core.protos.ScryptParameters encryption_parameters = 5;</code>
        */
       public Builder setEncryptionParameters(com.coinomi.core.protos.Protos.ScryptParameters value) {
         if (encryptionParametersBuilder_ == null) {
@@ -14159,11 +14363,11 @@ public final class Protos {
         } else {
           encryptionParametersBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000010;
         return this;
       }
       /**
-       * <code>optional .com.coinomi.core.protos.ScryptParameters encryption_parameters = 4;</code>
+       * <code>optional .com.coinomi.core.protos.ScryptParameters encryption_parameters = 5;</code>
        */
       public Builder setEncryptionParameters(
           com.coinomi.core.protos.Protos.ScryptParameters.Builder builderForValue) {
@@ -14173,15 +14377,15 @@ public final class Protos {
         } else {
           encryptionParametersBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000010;
         return this;
       }
       /**
-       * <code>optional .com.coinomi.core.protos.ScryptParameters encryption_parameters = 4;</code>
+       * <code>optional .com.coinomi.core.protos.ScryptParameters encryption_parameters = 5;</code>
        */
       public Builder mergeEncryptionParameters(com.coinomi.core.protos.Protos.ScryptParameters value) {
         if (encryptionParametersBuilder_ == null) {
-          if (((bitField0_ & 0x00000008) == 0x00000008) &&
+          if (((bitField0_ & 0x00000010) == 0x00000010) &&
               encryptionParameters_ != com.coinomi.core.protos.Protos.ScryptParameters.getDefaultInstance()) {
             encryptionParameters_ =
               com.coinomi.core.protos.Protos.ScryptParameters.newBuilder(encryptionParameters_).mergeFrom(value).buildPartial();
@@ -14192,11 +14396,11 @@ public final class Protos {
         } else {
           encryptionParametersBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000010;
         return this;
       }
       /**
-       * <code>optional .com.coinomi.core.protos.ScryptParameters encryption_parameters = 4;</code>
+       * <code>optional .com.coinomi.core.protos.ScryptParameters encryption_parameters = 5;</code>
        */
       public Builder clearEncryptionParameters() {
         if (encryptionParametersBuilder_ == null) {
@@ -14205,19 +14409,19 @@ public final class Protos {
         } else {
           encryptionParametersBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000008);
+        bitField0_ = (bitField0_ & ~0x00000010);
         return this;
       }
       /**
-       * <code>optional .com.coinomi.core.protos.ScryptParameters encryption_parameters = 4;</code>
+       * <code>optional .com.coinomi.core.protos.ScryptParameters encryption_parameters = 5;</code>
        */
       public com.coinomi.core.protos.Protos.ScryptParameters.Builder getEncryptionParametersBuilder() {
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000010;
         onChanged();
         return getEncryptionParametersFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .com.coinomi.core.protos.ScryptParameters encryption_parameters = 4;</code>
+       * <code>optional .com.coinomi.core.protos.ScryptParameters encryption_parameters = 5;</code>
        */
       public com.coinomi.core.protos.Protos.ScryptParametersOrBuilder getEncryptionParametersOrBuilder() {
         if (encryptionParametersBuilder_ != null) {
@@ -14227,7 +14431,7 @@ public final class Protos {
         }
       }
       /**
-       * <code>optional .com.coinomi.core.protos.ScryptParameters encryption_parameters = 4;</code>
+       * <code>optional .com.coinomi.core.protos.ScryptParameters encryption_parameters = 5;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
           com.coinomi.core.protos.Protos.ScryptParameters, com.coinomi.core.protos.Protos.ScryptParameters.Builder, com.coinomi.core.protos.Protos.ScryptParametersOrBuilder> 
@@ -14243,13 +14447,13 @@ public final class Protos {
         return encryptionParametersBuilder_;
       }
 
-      // repeated .com.coinomi.core.protos.WalletPocket pockets = 5;
+      // repeated .com.coinomi.core.protos.WalletPocket pockets = 6;
       private java.util.List<com.coinomi.core.protos.Protos.WalletPocket> pockets_ =
         java.util.Collections.emptyList();
       private void ensurePocketsIsMutable() {
-        if (!((bitField0_ & 0x00000010) == 0x00000010)) {
+        if (!((bitField0_ & 0x00000020) == 0x00000020)) {
           pockets_ = new java.util.ArrayList<com.coinomi.core.protos.Protos.WalletPocket>(pockets_);
-          bitField0_ |= 0x00000010;
+          bitField0_ |= 0x00000020;
          }
       }
 
@@ -14257,7 +14461,7 @@ public final class Protos {
           com.coinomi.core.protos.Protos.WalletPocket, com.coinomi.core.protos.Protos.WalletPocket.Builder, com.coinomi.core.protos.Protos.WalletPocketOrBuilder> pocketsBuilder_;
 
       /**
-       * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 5;</code>
+       * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 6;</code>
        */
       public java.util.List<com.coinomi.core.protos.Protos.WalletPocket> getPocketsList() {
         if (pocketsBuilder_ == null) {
@@ -14267,7 +14471,7 @@ public final class Protos {
         }
       }
       /**
-       * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 5;</code>
+       * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 6;</code>
        */
       public int getPocketsCount() {
         if (pocketsBuilder_ == null) {
@@ -14277,7 +14481,7 @@ public final class Protos {
         }
       }
       /**
-       * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 5;</code>
+       * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 6;</code>
        */
       public com.coinomi.core.protos.Protos.WalletPocket getPockets(int index) {
         if (pocketsBuilder_ == null) {
@@ -14287,7 +14491,7 @@ public final class Protos {
         }
       }
       /**
-       * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 5;</code>
+       * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 6;</code>
        */
       public Builder setPockets(
           int index, com.coinomi.core.protos.Protos.WalletPocket value) {
@@ -14304,7 +14508,7 @@ public final class Protos {
         return this;
       }
       /**
-       * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 5;</code>
+       * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 6;</code>
        */
       public Builder setPockets(
           int index, com.coinomi.core.protos.Protos.WalletPocket.Builder builderForValue) {
@@ -14318,7 +14522,7 @@ public final class Protos {
         return this;
       }
       /**
-       * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 5;</code>
+       * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 6;</code>
        */
       public Builder addPockets(com.coinomi.core.protos.Protos.WalletPocket value) {
         if (pocketsBuilder_ == null) {
@@ -14334,7 +14538,7 @@ public final class Protos {
         return this;
       }
       /**
-       * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 5;</code>
+       * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 6;</code>
        */
       public Builder addPockets(
           int index, com.coinomi.core.protos.Protos.WalletPocket value) {
@@ -14351,7 +14555,7 @@ public final class Protos {
         return this;
       }
       /**
-       * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 5;</code>
+       * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 6;</code>
        */
       public Builder addPockets(
           com.coinomi.core.protos.Protos.WalletPocket.Builder builderForValue) {
@@ -14365,7 +14569,7 @@ public final class Protos {
         return this;
       }
       /**
-       * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 5;</code>
+       * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 6;</code>
        */
       public Builder addPockets(
           int index, com.coinomi.core.protos.Protos.WalletPocket.Builder builderForValue) {
@@ -14379,7 +14583,7 @@ public final class Protos {
         return this;
       }
       /**
-       * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 5;</code>
+       * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 6;</code>
        */
       public Builder addAllPockets(
           java.lang.Iterable<? extends com.coinomi.core.protos.Protos.WalletPocket> values) {
@@ -14393,12 +14597,12 @@ public final class Protos {
         return this;
       }
       /**
-       * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 5;</code>
+       * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 6;</code>
        */
       public Builder clearPockets() {
         if (pocketsBuilder_ == null) {
           pockets_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000010);
+          bitField0_ = (bitField0_ & ~0x00000020);
           onChanged();
         } else {
           pocketsBuilder_.clear();
@@ -14406,7 +14610,7 @@ public final class Protos {
         return this;
       }
       /**
-       * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 5;</code>
+       * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 6;</code>
        */
       public Builder removePockets(int index) {
         if (pocketsBuilder_ == null) {
@@ -14419,14 +14623,14 @@ public final class Protos {
         return this;
       }
       /**
-       * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 5;</code>
+       * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 6;</code>
        */
       public com.coinomi.core.protos.Protos.WalletPocket.Builder getPocketsBuilder(
           int index) {
         return getPocketsFieldBuilder().getBuilder(index);
       }
       /**
-       * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 5;</code>
+       * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 6;</code>
        */
       public com.coinomi.core.protos.Protos.WalletPocketOrBuilder getPocketsOrBuilder(
           int index) {
@@ -14436,7 +14640,7 @@ public final class Protos {
         }
       }
       /**
-       * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 5;</code>
+       * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 6;</code>
        */
       public java.util.List<? extends com.coinomi.core.protos.Protos.WalletPocketOrBuilder> 
            getPocketsOrBuilderList() {
@@ -14447,14 +14651,14 @@ public final class Protos {
         }
       }
       /**
-       * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 5;</code>
+       * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 6;</code>
        */
       public com.coinomi.core.protos.Protos.WalletPocket.Builder addPocketsBuilder() {
         return getPocketsFieldBuilder().addBuilder(
             com.coinomi.core.protos.Protos.WalletPocket.getDefaultInstance());
       }
       /**
-       * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 5;</code>
+       * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 6;</code>
        */
       public com.coinomi.core.protos.Protos.WalletPocket.Builder addPocketsBuilder(
           int index) {
@@ -14462,7 +14666,7 @@ public final class Protos {
             index, com.coinomi.core.protos.Protos.WalletPocket.getDefaultInstance());
       }
       /**
-       * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 5;</code>
+       * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 6;</code>
        */
       public java.util.List<com.coinomi.core.protos.Protos.WalletPocket.Builder> 
            getPocketsBuilderList() {
@@ -14475,7 +14679,7 @@ public final class Protos {
           pocketsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
               com.coinomi.core.protos.Protos.WalletPocket, com.coinomi.core.protos.Protos.WalletPocket.Builder, com.coinomi.core.protos.Protos.WalletPocketOrBuilder>(
                   pockets_,
-                  ((bitField0_ & 0x00000010) == 0x00000010),
+                  ((bitField0_ & 0x00000020) == 0x00000020),
                   getParentForChildren(),
                   isClean());
           pockets_ = null;
@@ -14620,17 +14824,18 @@ public final class Protos {
       "dress_status\030\010 \003(\0132&.com.coinomi.core.pr" +
       "otos.AddressStatus\"N\n\020ScryptParameters\022\014" +
       "\n\004salt\030\001 \002(\014\022\020\n\001n\030\002 \001(\003:\00516384\022\014\n\001r\030\003 \001(" +
-      "\005:\0018\022\014\n\001p\030\004 \001(\005:\0011\"\366\002\n\006Wallet\022\022\n\007version" +
-      "\030\001 \001(\005:\0011\0220\n\nmaster_key\030\002 \002(\0132\034.com.coin" +
-      "omi.core.protos.Key\022T\n\017encryption_type\030\003",
-      " \001(\0162..com.coinomi.core.protos.Wallet.En" +
-      "cryptionType:\013UNENCRYPTED\022H\n\025encryption_" +
-      "parameters\030\004 \001(\0132).com.coinomi.core.prot" +
-      "os.ScryptParameters\0226\n\007pockets\030\005 \003(\0132%.c" +
-      "om.coinomi.core.protos.WalletPocket\"N\n\016E" +
-      "ncryptionType\022\017\n\013UNENCRYPTED\020\001\022\030\n\024ENCRYP" +
-      "TED_SCRYPT_AES\020\002\022\021\n\rENCRYPTED_AES\020\003B!\n\027c" +
-      "om.coinomi.core.protosB\006Protos"
+      "\005:\0018\022\014\n\001p\030\004 \001(\005:\0011\"\242\003\n\006Wallet\022\022\n\007version" +
+      "\030\001 \001(\005:\0011\022*\n\004seed\030\002 \001(\0132\034.com.coinomi.co" +
+      "re.protos.Key\0220\n\nmaster_key\030\003 \002(\0132\034.com.",
+      "coinomi.core.protos.Key\022T\n\017encryption_ty" +
+      "pe\030\004 \001(\0162..com.coinomi.core.protos.Walle" +
+      "t.EncryptionType:\013UNENCRYPTED\022H\n\025encrypt" +
+      "ion_parameters\030\005 \001(\0132).com.coinomi.core." +
+      "protos.ScryptParameters\0226\n\007pockets\030\006 \003(\013" +
+      "2%.com.coinomi.core.protos.WalletPocket\"" +
+      "N\n\016EncryptionType\022\017\n\013UNENCRYPTED\020\001\022\030\n\024EN" +
+      "CRYPTED_SCRYPT_AES\020\002\022\021\n\rENCRYPTED_AES\020\003B" +
+      "!\n\027com.coinomi.core.protosB\006Protos"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -14708,7 +14913,7 @@ public final class Protos {
           internal_static_com_coinomi_core_protos_Wallet_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_com_coinomi_core_protos_Wallet_descriptor,
-              new java.lang.String[] { "Version", "MasterKey", "EncryptionType", "EncryptionParameters", "Pockets", });
+              new java.lang.String[] { "Version", "Seed", "MasterKey", "EncryptionType", "EncryptionParameters", "Pockets", });
           return null;
         }
       };

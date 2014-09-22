@@ -4,16 +4,22 @@ import com.coinomi.core.crypto.KeyCrypterPin;
 import com.coinomi.core.protos.Protos;
 import com.google.bitcoin.crypto.ChildNumber;
 import com.google.bitcoin.crypto.DeterministicKey;
+import com.google.bitcoin.crypto.EncryptedData;
 import com.google.bitcoin.crypto.KeyCrypter;
 import com.google.bitcoin.crypto.KeyCrypterException;
 import com.google.bitcoin.crypto.KeyCrypterScrypt;
 import com.google.bitcoin.store.UnreadableWalletException;
+import com.google.bitcoin.wallet.DeterministicSeed;
+import com.google.common.base.Splitter;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.TextFormat;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
+
+import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkState;
 
@@ -53,6 +59,13 @@ public class WalletProtobufSerializer {
 
         // Populate the wallet version.
         walletBuilder.setVersion(wallet.getVersion());
+
+        // Set the seed if exists
+        if (wallet.getSeed() != null) {
+            Protos.Key.Builder mnemonicEntry = SimpleKeyChain.serializeEncryptableItem(wallet.getSeed());
+            mnemonicEntry.setType(Protos.Key.Type.DETERMINISTIC_MNEMONIC);
+            walletBuilder.setSeed(mnemonicEntry.build());
+        }
 
         // Set the master key
         walletBuilder.setMasterKey(getMasterKeyProto(wallet));
@@ -147,10 +160,27 @@ public class WalletProtobufSerializer {
         // Check if wallet is encrypted
         final KeyCrypter crypter = getKeyCrypter(walletProto);
 
+        DeterministicSeed seed = null;
+        if (walletProto.hasSeed()) {
+            Protos.Key key = walletProto.getSeed();
+
+            if (key.hasSecretBytes()) {
+                List<String> mnemonic = Splitter.on(" ").splitToList(key.getSecretBytes().toStringUtf8());
+                seed = new DeterministicSeed(new byte[16], mnemonic, 0);
+            } else if (key.hasEncryptedData()) {
+                EncryptedData data = new EncryptedData(key.getEncryptedData().getInitialisationVector().toByteArray(),
+                        key.getEncryptedData().getEncryptedPrivateKey().toByteArray());
+                seed = new DeterministicSeed(data, 0);
+            } else {
+                throw new UnreadableWalletException("Malformed key proto: " + key.toString());
+            }
+        }
+
         DeterministicKey masterKey =
                 SimpleHDKeyChain.getDeterministicKey(walletProto.getMasterKey(), null, crypter);
 
-        Wallet wallet = new Wallet(masterKey);
+
+        Wallet wallet = new Wallet(masterKey, seed);
 
         if (walletProto.hasVersion()) {
             wallet.setVersion(walletProto.getVersion());

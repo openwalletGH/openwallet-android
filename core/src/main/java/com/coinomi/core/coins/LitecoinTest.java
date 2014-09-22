@@ -1,6 +1,7 @@
 package com.coinomi.core.coins;
 
 import com.coinomi.core.Constants;
+import com.google.bitcoin.core.Coin;
 
 /**
  * @author Giannis Dzegoutanis
@@ -17,6 +18,8 @@ public class LitecoinTest extends CoinType {
         symbol = "LTC";
         uriScheme = "litecoin";
         bip44Index = 1;
+        feePerKb = Coin.valueOf(100000);
+        minNonDust = Coin.valueOf(1000);
     }
 
     private static LitecoinTest instance;

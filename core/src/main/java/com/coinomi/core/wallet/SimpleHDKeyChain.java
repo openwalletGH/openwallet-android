@@ -17,6 +17,7 @@ import com.google.bitcoin.crypto.KeyCrypterException;
 import com.google.bitcoin.crypto.KeyCrypterScrypt;
 import com.google.bitcoin.store.UnreadableWalletException;
 import com.google.bitcoin.utils.Threading;
+import com.google.bitcoin.wallet.DeterministicSeed;
 import com.google.bitcoin.wallet.EncryptableKeyChain;
 import com.google.bitcoin.wallet.KeyBag;
 import com.google.bitcoin.wallet.KeyChainEventListener;

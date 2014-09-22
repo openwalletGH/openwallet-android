@@ -1780,7 +1780,7 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
      * Used to force keys creation, could take long time to complete so use it in a background
      * thread.
      */
-    @VisibleForTesting void initializeAllKeysIfNeeded() {
+    @VisibleForTesting void maybeInitializeAllKeys() {
         lock.lock();
         try {
             keys.maybeLookAhead();

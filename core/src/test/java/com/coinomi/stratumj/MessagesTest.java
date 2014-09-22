@@ -64,7 +64,7 @@ public class MessagesTest {
         CallMessage call = new CallMessage("blockchain.headers.subscribe", new ArrayList());
 
         Assert.assertEquals(call.getMethod(), "blockchain.headers.subscribe");
-        Assert.assertEquals("{\"id\":0,\"method\":\"blockchain.headers.subscribe\",\"params\":[]}\n",
+        Assert.assertEquals("{\"id\":null,\"method\":\"blockchain.headers.subscribe\",\"params\":[]}\n",
                 call.toString());
     }
 

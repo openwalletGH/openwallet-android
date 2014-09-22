@@ -287,10 +287,12 @@ message Wallet {
     // (i.e the wallet may contain some future format this protobuf/ code does not know about)
     optional int32 version = 1 [default = 1];
 
-    required Key master_key = 2;
+    optional Key seed = 2;
 
-    optional EncryptionType encryption_type = 3 [default = UNENCRYPTED];
-    optional ScryptParameters encryption_parameters = 4;
+    required Key master_key = 3;
 
-    repeated WalletPocket pockets = 5;
+    optional EncryptionType encryption_type = 4 [default = UNENCRYPTED];
+    optional ScryptParameters encryption_parameters = 5;
+
+    repeated WalletPocket pockets = 6;
 }

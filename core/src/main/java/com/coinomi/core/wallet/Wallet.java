@@ -17,6 +17,7 @@ import com.google.bitcoin.store.UnreadableWalletException;
 import com.google.bitcoin.utils.Threading;
 import com.google.bitcoin.wallet.DeterministicSeed;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 
 import org.slf4j.Logger;
@@ -29,6 +30,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.security.SecureRandom;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -47,24 +49,13 @@ import static com.google.common.base.Preconditions.checkState;
 final public class Wallet implements ConnectionEventListener {
     private static final Logger log = LoggerFactory.getLogger(Wallet.class);
     public static int ENTROPY_SIZE_DEBUG = -1;
-    public static final MnemonicCode mnemonicCode;
-
-    static {
-        MnemonicCode mc;
-        try {
-            mc = new MnemonicCode();
-        } catch (IOException e) {
-            mc = null;
-            log.error("Could not initialize wallet: {}", e.getMessage());
-        }
-        mnemonicCode = mc;
-    }
 
     private final ReentrantLock lock = Threading.lock("KeyChain");
 
     @GuardedBy("lock") private final LinkedHashMap<CoinType, WalletPocket> pockets;
 
-    private final DeterministicKey masterKey;
+    @Nullable private DeterministicSeed seed;
+    private DeterministicKey masterKey;
 
     protected volatile WalletFiles vFileManager;
 
@@ -79,15 +70,16 @@ final public class Wallet implements ConnectionEventListener {
     }
 
     public Wallet(List<String> mnemonic, @Nullable String password) throws MnemonicException {
-        mnemonicCode.check(mnemonic);
+        MnemonicCode.INSTANCE.check(mnemonic);
         password = password == null ? "" : password;
-        DeterministicSeed seed = new DeterministicSeed(mnemonic, password, 0);
 
+        seed = new DeterministicSeed(mnemonic, password, 0);
         masterKey = HDKeyDerivation.createMasterPrivateKey(seed.getSeedBytes());
         pockets = new LinkedHashMap<CoinType, WalletPocket>();
     }
 
-    public Wallet(DeterministicKey masterKey) {
+    public Wallet(DeterministicKey masterKey, @Nullable DeterministicSeed seed) {
+        this.seed = seed;
         this.masterKey = masterKey;
         pockets = new LinkedHashMap<CoinType, WalletPocket>();
     }
@@ -105,7 +97,7 @@ final public class Wallet implements ConnectionEventListener {
 
         List<String> mnemonic;
         try {
-            mnemonic = mnemonicCode.toMnemonic(entropy);
+            mnemonic = MnemonicCode.INSTANCE.toMnemonic(entropy);
         } catch (MnemonicException.MnemonicLengthException e) {
             throw new RuntimeException(e); // should not happen, we have 16bytes of entropy
         }
@@ -118,7 +110,7 @@ final public class Wallet implements ConnectionEventListener {
             log.info("Creating coin pocket for {}", coin);
             WalletPocket pocket = getPocket(coin);
             if (generateAllKeys) {
-                pocket.initializeAllKeysIfNeeded();
+                pocket.maybeInitializeAllKeys();
             }
         }
     }
@@ -158,10 +150,42 @@ final public class Wallet implements ConnectionEventListener {
         pocket.setWallet(this);
     }
 
+    /**
+     * Make the wallet generate all the needed lookahead keys if needed
+     */
+    public void maybeInitializeAllPockets() {
+        for (WalletPocket pocket : getPockets()) {
+            pocket.maybeInitializeAllKeys();
+        }
+    }
+
     public DeterministicKey getMasterKey() {
         lock.lock();
         try {
             return masterKey;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /** Returns a list of words that represent the seed or null if this chain is a watching chain. */
+    @Nullable
+    public List<String> getMnemonicCode() {
+        if (seed == null) return null;
+
+        lock.lock();
+        try {
+            return seed.getMnemonicCode();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @Nullable
+    public DeterministicSeed getSeed() {
+        lock.lock();
+        try {
+            return seed;
         } finally {
             lock.unlock();
         }
@@ -410,6 +434,10 @@ final public class Wallet implements ConnectionEventListener {
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    private boolean isEncrypted() {
+        return masterKey.isEncrypted();
+    }
+
     /**
      * Encrypt the keys in the group using the KeyCrypter and the AES key. A good default KeyCrypter to use is
      * {@link com.google.bitcoin.crypto.KeyCrypterScrypt}.
@@ -423,6 +451,9 @@ final public class Wallet implements ConnectionEventListener {
 
         lock.lock();
         try {
+            seed = seed.encrypt(keyCrypter, aesKey);
+            masterKey = masterKey.encrypt(keyCrypter, aesKey, null);
+
             for (WalletPocket pocket : pockets.values()) {
                 pocket.encrypt(keyCrypter, aesKey);
             }
@@ -431,5 +462,39 @@ final public class Wallet implements ConnectionEventListener {
         }
     }
 
-    // Full decryption is not needed as the keys can be decrypted on the fly when signing transactions
+    /* package */ void decrypt(KeyParameter aesKey) {
+        checkNotNull(aesKey);
+
+        lock.lock();
+        try {
+            checkState(isEncrypted());
+
+            if (seed != null) {
+                checkState(seed.isEncrypted());
+                List<String> mnemonic = null;
+                try {
+                    mnemonic = decodeMnemonicCode(getKeyCrypter().decrypt(seed.getEncryptedData(), aesKey));
+                } catch (UnreadableWalletException e) {
+                    throw new RuntimeException(e);
+                }
+                seed = new DeterministicSeed(new byte[16], mnemonic, 0);
+            }
+
+            masterKey = masterKey.decrypt(getKeyCrypter(), aesKey);
+
+            for (WalletPocket pocket : pockets.values()) {
+                pocket.decrypt(aesKey);
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    private static List<String> decodeMnemonicCode(byte[] mnemonicCode) throws UnreadableWalletException {
+        try {
+            return Splitter.on(" ").splitToList(new String(mnemonicCode, "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            throw new UnreadableWalletException(e.toString());
+        }
+    }
 }
