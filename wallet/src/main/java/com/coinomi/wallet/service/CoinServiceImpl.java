@@ -491,8 +491,6 @@ public class CoinServiceImpl extends Service implements CoinService {
 
 //        peerConnectivityListener = new PeerConnectivityListener();
 
-        sendBroadcastPeerState(0);
-
         final IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         intentFilter.addAction(Intent.ACTION_DEVICE_STORAGE_LOW);
@@ -643,7 +641,6 @@ public class CoinServiceImpl extends Service implements CoinService {
 
         unregisterReceiver(connectivityReceiver);
 
-        removeBroadcastPeerState();
         removeBroadcastBlockchainState();
 
         config.setBestChainHeightEver(bestChainHeightEver);
@@ -719,19 +716,6 @@ public class CoinServiceImpl extends Service implements CoinService {
 //        }
 
         return blocks;
-    }
-
-    private void sendBroadcastPeerState(final int numPeers)
-    {
-        final Intent broadcast = new Intent(ACTION_PEER_STATE);
-        broadcast.setPackage(getPackageName());
-        broadcast.putExtra(ACTION_PEER_STATE_NUM_PEERS, numPeers);
-        sendStickyBroadcast(broadcast);
-    }
-
-    private void removeBroadcastPeerState()
-    {
-        removeStickyBroadcast(new Intent(ACTION_PEER_STATE));
     }
 
     private void sendBroadcastBlockchainState(final int download)

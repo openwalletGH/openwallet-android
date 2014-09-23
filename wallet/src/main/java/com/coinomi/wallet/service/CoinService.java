@@ -13,9 +13,6 @@ import javax.annotation.CheckForNull;
  */
 public interface CoinService {
 
-    public static final String ACTION_PEER_STATE = CoinService.class.getPackage().getName() + ".peer_state";
-    public static final String ACTION_PEER_STATE_NUM_PEERS = "num_peers";
-
     public static final String ACTION_BLOCKCHAIN_STATE = CoinService.class.getPackage().getName() + ".blockchain_state";
     public static final String ACTION_BLOCKCHAIN_STATE_BEST_CHAIN_DATE = "best_chain_date";
     public static final String ACTION_BLOCKCHAIN_STATE_BEST_CHAIN_HEIGHT = "best_chain_height";
