@@ -1,21 +1,16 @@
 package com.coinomi.wallet.ui;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 
 import com.coinomi.core.coins.BitcoinMain;
 import com.coinomi.core.coins.CoinType;
@@ -55,7 +50,6 @@ final public class WalletActivity extends ActionBarActivity implements
     /**
      * For SharedPreferences, used to check if first launch ever.
      */
-    final String PREFS_NAME = "SharedPrefsFile";
     private ViewPager mViewPager;
     private AsyncTask<Void, Void, Void> refreshTask;
     private CoinType currentType;
@@ -89,18 +83,6 @@ final public class WalletActivity extends ActionBarActivity implements
 
         // Hack to make the ViewPager select the InfoFragment
         mNavigationDrawerFragment.reselectLastItem();
-
-//        //If app has never been launched, this code will be executed.
-//        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-//        if (settings.getBoolean("firstLaunch", true)) {
-//            Log.d("Comments", "First time");
-//
-//            // First time, run this.
-//            System.out.println("Testing... Testing... Testing...");
-//
-//            //Set the boolean to false to make sure this code never runs again.
-//            settings.edit().putBoolean("firstLaunch", false).commit();
-//        }
     }
 
     @Override
@@ -137,21 +119,6 @@ final public class WalletActivity extends ActionBarActivity implements
             mViewPager.setCurrentItem(INFO);
             mViewPager.getAdapter().notifyDataSetChanged();
             currentType = selectedType;
-        }
-    }
-
-    public void onSectionAttached(int number) {
-        switch (number) {
-            case MENU_BITCOIN:
-                mTitle = getString(R.string.bitcoin);
-                break;
-            case MENU_DOGECOIN:
-            default:
-                mTitle = getString(R.string.dogecoin);
-                break;
-            case MENU_LITECOIN:
-                mTitle = getString(R.string.litecoin);
-                break;
         }
     }
 
@@ -225,45 +192,6 @@ final public class WalletActivity extends ActionBarActivity implements
 
     private void startRestore() {
         startActivity(new Intent(this, IntroActivity.class));
-    }
-
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
-
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        public PlaceholderFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
-            return inflater.inflate(R.layout.fragment_wallet, container, false);
-        }
-
-        @Override
-        public void onAttach(Activity activity) {
-            super.onAttach(activity);
-            ((WalletActivity) activity).onSectionAttached(
-                    getArguments().getInt(ARG_SECTION_NUMBER));
-        }
     }
 
     private static class AppSectionsPagerAdapter extends FragmentStatePagerAdapter {
