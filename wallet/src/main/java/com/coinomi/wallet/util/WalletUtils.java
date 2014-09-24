@@ -48,6 +48,8 @@ import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.text.style.TypefaceSpan;
 
+import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.wallet.WalletPocket;
 import com.coinomi.wallet.Constants;
 import com.google.bitcoin.core.Address;
 import com.google.bitcoin.core.AddressFormatException;
@@ -94,6 +96,54 @@ public class WalletUtils {
         catch (final ScriptException x)
         {
             return false;
+        }
+    }
+
+    @CheckForNull
+    public static Address getSendToAddress(@Nonnull final Transaction tx, @Nonnull final WalletPocket pocket) {
+        return getToAddress(tx, pocket, false);
+    }
+
+
+    @CheckForNull
+    public static Address getReceivedWithAddress(@Nonnull final Transaction tx, @Nonnull final WalletPocket pocket) {
+        return getToAddress(tx, pocket, true);
+    }
+
+    @CheckForNull
+    private static Address getToAddress(@Nonnull final Transaction tx,
+                                       @Nonnull final WalletPocket pocket, boolean toMe) {
+        try {
+            for (final TransactionOutput output : tx.getOutputs()) {
+                if (output.isMine(pocket) == toMe) {
+                    return output.getScriptPubKey().getToAddress(pocket.getCoinType());
+                }
+            }
+
+            throw new IllegalStateException();
+        } catch (final ScriptException x) {
+            return null;
+        }
+    }
+
+    private static final Pattern P_SIGNIFICANT = Pattern.compile("^([-+]" + Constants.CHAR_THIN_SPACE + ")?\\d*(\\.\\d{0,2})?");
+    private static final Object SIGNIFICANT_SPAN = new StyleSpan(Typeface.BOLD);
+    public static final RelativeSizeSpan SMALLER_SPAN = new RelativeSizeSpan(0.85f);
+
+    public static void formatSignificant(@Nonnull final Spannable spannable, @Nullable final RelativeSizeSpan insignificantRelativeSizeSpan)
+    {
+        spannable.removeSpan(SIGNIFICANT_SPAN);
+        if (insignificantRelativeSizeSpan != null)
+            spannable.removeSpan(insignificantRelativeSizeSpan);
+
+        final Matcher m = P_SIGNIFICANT.matcher(spannable);
+        if (m.find())
+        {
+            final int pivot = m.group().length();
+            if (pivot > 0)
+                spannable.setSpan(SIGNIFICANT_SPAN, 0, pivot, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            if (spannable.length() > pivot && insignificantRelativeSizeSpan != null)
+                spannable.setSpan(insignificantRelativeSizeSpan, pivot, spannable.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
     }
 }

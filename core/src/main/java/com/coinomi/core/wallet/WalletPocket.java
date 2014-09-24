@@ -1089,6 +1089,7 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
                 @Override
                 public void run() {
                     registration.listener.onNewBalance(balance, pendingBalance);
+                    registration.listener.onPocketChanged(WalletPocket.this);
                 }
             });
         }

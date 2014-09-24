@@ -18,7 +18,6 @@ package com.coinomi.wallet.ui;
  */
 
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -38,11 +37,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.coinomi.core.wallet.Wallet;
+import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.wallet.WalletPocket;
 import com.coinomi.wallet.R;
+import com.coinomi.wallet.util.Fonts;
 import com.coinomi.wallet.util.WalletUtils;
 import com.google.bitcoin.core.Address;
 import com.google.bitcoin.core.Coin;
@@ -50,277 +51,192 @@ import com.google.bitcoin.core.Transaction;
 import com.google.bitcoin.core.Transaction.Purpose;
 import com.google.bitcoin.core.TransactionConfidence;
 import com.google.bitcoin.core.TransactionConfidence.ConfidenceType;
-import com.google.bitcoin.wallet.DefaultCoinSelector;
 
 /**
  * @author Andreas Schildbach
  */
-//public class TransactionsListAdapter extends BaseAdapter {
-//    private final Context context;
-//    private final LayoutInflater inflater;
-//    private final WalletPocket walletPocket;
-//
-//    private final List<Transaction> transactions = new ArrayList<Transaction>();
-//    private int precision = 0;
-//    private int shift = 0;
-//    private boolean showEmptyText = false;
-//
-//    private final int colorSignificant;
-//    private final int colorInsignificant;
-//    private final int colorError;
-//    private final int colorCircularBuilding = Color.parseColor("#44ff44");
-//    private final String textCoinBase;
-//    private final String textInternal;
-//
-//    private final Map<String, String> labelCache = new HashMap<String, String>();
-//    private final static String CACHE_NULL_MARKER = "";
-//
-//    private static final String CONFIDENCE_SYMBOL_DEAD = "\u271D"; // latin cross
-//    private static final String CONFIDENCE_SYMBOL_UNKNOWN = "?";
-//
-//    private static final int VIEW_TYPE_TRANSACTION = 0;
-//    private static final int VIEW_TYPE_WARNING = 1;
-//
-//    public TransactionsListAdapter(final Context context, @Nonnull final WalletPocket walletPocket) {
-//        this.context = context;
-//        inflater = LayoutInflater.from(context);
-//
-//        this.walletPocket = walletPocket;
-//
-//        final Resources resources = context.getResources();
-//        colorSignificant = resources.getColor(R.color.fg_significant);
-//        colorInsignificant = resources.getColor(R.color.fg_insignificant);
-//        colorError = resources.getColor(R.color.fg_error);
-//        textCoinBase = context.getString(R.string.wallet_transactions_fragment_coinbase);
-//        textInternal = context.getString(R.string.wallet_transactions_fragment_internal);
-//    }
-//
-//    public void setPrecision(final int precision, final int shift) {
-//        this.precision = precision;
-//        this.shift = shift;
-//
-//        notifyDataSetChanged();
-//    }
-//
-//    public void clear()
-//    {
-//        transactions.clear();
-//
-//        notifyDataSetChanged();
-//    }
-//
-//    public void replace(@Nonnull final Transaction tx)
-//    {
-//        transactions.clear();
-//        transactions.add(tx);
-//
-//        notifyDataSetChanged();
-//    }
-//
-//    public void replace(@Nonnull final Collection<Transaction> transactions)
-//    {
-//        this.transactions.clear();
-//        this.transactions.addAll(transactions);
-//
-//        showEmptyText = true;
-//
-//        notifyDataSetChanged();
-//    }
-//
-//    @Override
-//    public boolean isEmpty()
-//    {
-//        return showEmptyText && super.isEmpty();
-//    }
-//
-//    @Override
-//    public int getCount()
-//    {
-//        int count = transactions.size();
-//
-//        if (count == 1)
-//            count++;
-//
-//        return count;
-//    }
-//
-//    @Override
-//    public Transaction getItem(final int position)
-//    {
-//        if (position == transactions.size())
-//            return null;
-//
-//        return transactions.get(position);
-//    }
-//
-//    @Override
-//    public long getItemId(final int position)
-//    {
-//        if (position == transactions.size())
-//            return 0;
-//
-//        return WalletUtils.longHash(transactions.get(position).getHash());
-//    }
-//
-//    @Override
-//    public int getViewTypeCount()
-//    {
-//        return 2;
-//    }
-//
-//    @Override
-//    public int getItemViewType(final int position)
-//    {
-//        if (position == transactions.size())
-//            return VIEW_TYPE_WARNING;
-//        else
-//            return VIEW_TYPE_TRANSACTION;
-//    }
-//
-//    @Override
-//    public boolean hasStableIds()
-//    {
-//        return true;
-//    }
-//
-//    @Override
-//    public View getView(final int position, View row, final ViewGroup parent)
-//    {
-//        final int type = getItemViewType(position);
-//
-//        if (type == VIEW_TYPE_TRANSACTION)
-//        {
-//            if (row == null)
-//                row = inflater.inflate(R.layout.transaction_row_extended, null);
-//
-//            final Transaction tx = getItem(position);
-//            bindView(row, tx);
-//        }
-//        else if (type == VIEW_TYPE_WARNING)
-//        {
-//            if (row == null)
-//                row = inflater.inflate(R.layout.transaction_row_warning, null);
-//
-//            final TextView messageView = (TextView) row.findViewById(R.id.transaction_row_warning_message);
-//            messageView.setText(Html.fromHtml(context.getString(R.string.wallet_transactions_row_warning_backup)));
-//        }
-//        else
-//        {
-//            throw new IllegalStateException("unknown type: " + type);
-//        }
-//
-//        return row;
-//    }
-//
-//    public void bindView(@Nonnull final View row, @Nonnull final Transaction tx)
-//    {
-//        final TransactionConfidence confidence = tx.getConfidence();
-//        final ConfidenceType confidenceType = confidence.getConfidenceType();
-//        final boolean isOwn = confidence.getSource().equals(TransactionConfidence.Source.SELF);
-//        final boolean isCoinBase = tx.isCoinBase();
+public class TransactionsListAdapter extends BaseAdapter {
+    private final Context context;
+    private final LayoutInflater inflater;
+    private final WalletPocket walletPocket;
+
+    private final List<Transaction> transactions = new ArrayList<Transaction>();
+    private int precision = 0;
+    private int shift = 0;
+    private boolean showEmptyText = false;
+
+    private final int colorSignificant;
+    private final int colorInsignificant;
+    private final int colorError;
+    private final int colorCircularBuilding = Color.parseColor("#44ff44");
+    private final String textCoinBase;
+
+    private final Map<String, String> labelCache = new HashMap<String, String>();
+    private final static String CACHE_NULL_MARKER = "";
+
+    private static final String CONFIDENCE_SYMBOL_DEAD = "\u271D"; // latin cross
+    private static final String CONFIDENCE_SYMBOL_UNKNOWN = "?";
+
+    private static final int VIEW_TYPE_TRANSACTION = 0;
+
+    public TransactionsListAdapter(final Context context, @Nonnull final WalletPocket walletPocket) {
+        this.context = context;
+        inflater = LayoutInflater.from(context);
+
+        this.walletPocket = walletPocket;
+
+        final Resources resources = context.getResources();
+        colorSignificant = resources.getColor(R.color.gray_87_text);
+        colorInsignificant = resources.getColor(R.color.gray_26_hint_text);
+        colorError = resources.getColor(R.color.fg_error);
+        textCoinBase = context.getString(R.string.wallet_transactions_coinbase);
+    }
+
+    public void setPrecision(final int precision, final int shift) {
+        this.precision = precision;
+        this.shift = shift;
+
+        notifyDataSetChanged();
+    }
+
+    public void clear()
+    {
+        transactions.clear();
+
+        notifyDataSetChanged();
+    }
+
+    public void replace(@Nonnull final Transaction tx)
+    {
+        transactions.clear();
+        transactions.add(tx);
+
+        notifyDataSetChanged();
+    }
+
+    public void replace(@Nonnull final Collection<Transaction> transactions)
+    {
+        this.transactions.clear();
+        this.transactions.addAll(transactions);
+
+        showEmptyText = true;
+
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public boolean isEmpty()
+    {
+        return showEmptyText && super.isEmpty();
+    }
+
+    @Override
+    public int getCount() {
+        return transactions.size();
+    }
+
+    @Override
+    public Transaction getItem(final int position) {
+        if (position == transactions.size())
+            return null;
+
+        return transactions.get(position);
+    }
+
+    @Override
+    public long getItemId(final int position) {
+        if (position == transactions.size())
+            return 0;
+
+        return WalletUtils.longHash(transactions.get(position).getHash());
+    }
+
+    @Override
+    public boolean hasStableIds() {
+        return true;
+    }
+
+    @Override
+    public View getView(final int position, View row, final ViewGroup parent) {
+        final int type = getItemViewType(position);
+
+        if (type == VIEW_TYPE_TRANSACTION) {
+            if (row == null)
+                row = inflater.inflate(R.layout.transaction_row, null);
+
+            final Transaction tx = getItem(position);
+            bindView(row, tx);
+        } else {
+            throw new IllegalStateException("unknown type: " + type);
+        }
+
+        return row;
+    }
+
+    public void bindView(@Nonnull final View row, @Nonnull final Transaction tx) {
+        final TransactionConfidence confidence = tx.getConfidence();
+        final ConfidenceType confidenceType = confidence.getConfidenceType();
+        final boolean isOwn = confidence.getSource().equals(TransactionConfidence.Source.SELF);
+        final boolean isCoinBase = tx.isCoinBase();
 //        final boolean isInternal = WalletUtils.isInternal(tx);
-//
-//        final Coin value = tx.getValue(walletPocket);
-//        final boolean sent = value.signum() < 0;
-//
-//        final CircularProgressView rowConfidenceCircular = (CircularProgressView) row.findViewById(R.id.transaction_row_confidence_circular);
-//        final TextView rowConfidenceTextual = (TextView) row.findViewById(R.id.transaction_row_confidence_textual);
-//
-//        // confidence
-//        if (confidenceType == ConfidenceType.PENDING)
-//        {
-//            rowConfidenceCircular.setVisibility(View.VISIBLE);
-//            rowConfidenceTextual.setVisibility(View.GONE);
-//
-//            rowConfidenceCircular.setProgress(1);
-//            rowConfidenceCircular.setMaxProgress(1);
-//            rowConfidenceCircular.setSize(confidence.numBroadcastPeers());
-//            rowConfidenceCircular.setMaxSize(maxConnectedPeers / 2); // magic value
-//            rowConfidenceCircular.setColors(colorInsignificant, colorInsignificant);
-//        }
-//        else if (confidenceType == ConfidenceType.BUILDING)
-//        {
-//            rowConfidenceCircular.setVisibility(View.VISIBLE);
-//            rowConfidenceTextual.setVisibility(View.GONE);
-//
-//            rowConfidenceCircular.setProgress(confidence.getDepthInBlocks());
-//            rowConfidenceCircular.setMaxProgress(isCoinBase ? Constants.NETWORK_PARAMETERS.getSpendableCoinbaseDepth()
-//                    : Constants.MAX_NUM_CONFIRMATIONS);
-//            rowConfidenceCircular.setSize(1);
-//            rowConfidenceCircular.setMaxSize(1);
-//            rowConfidenceCircular.setColors(colorCircularBuilding, Color.DKGRAY);
-//        }
-//        else if (confidenceType == ConfidenceType.DEAD)
-//        {
-//            rowConfidenceCircular.setVisibility(View.GONE);
-//            rowConfidenceTextual.setVisibility(View.VISIBLE);
-//
-//            rowConfidenceTextual.setText(CONFIDENCE_SYMBOL_DEAD);
-//            rowConfidenceTextual.setTextColor(Color.RED);
-//        }
-//        else
-//        {
-//            rowConfidenceCircular.setVisibility(View.GONE);
-//            rowConfidenceTextual.setVisibility(View.VISIBLE);
-//
-//            rowConfidenceTextual.setText(CONFIDENCE_SYMBOL_UNKNOWN);
-//            rowConfidenceTextual.setTextColor(colorInsignificant);
-//        }
-//
-//        // spendability
-//        final int textColor;
-//        if (confidenceType == ConfidenceType.DEAD)
-//            textColor = Color.RED;
-//        else
-//            textColor = DefaultCoinSelector.isSelectable(tx) ? colorSignificant : colorInsignificant;
-//
-//        // time
-//        final TextView rowTime = (TextView) row.findViewById(R.id.transaction_row_time);
-//        if (rowTime != null)
-//        {
-//            final Date time = tx.getUpdateTime();
-//            rowTime.setText(time != null ? (DateUtils.getRelativeTimeSpanString(context, time.getTime())) : null);
-//            rowTime.setTextColor(textColor);
-//        }
-//
-//        // receiving or sending
-//        final TextView rowFromTo = (TextView) row.findViewById(R.id.transaction_row_fromto);
-//        if (isInternal)
-//            rowFromTo.setText(R.string.symbol_internal);
-//        else if (sent)
-//            rowFromTo.setText(R.string.symbol_to);
-//        else
-//            rowFromTo.setText(R.string.symbol_from);
-//        rowFromTo.setTextColor(textColor);
-//
-//        // coinbase
+
+        final Coin value = tx.getValue(walletPocket);
+        final boolean sent = value.signum() < 0;
+
+        final CoinType type = walletPocket.getCoinType();
+
+        // TODO implement date
+//        final TextView rowDate = (TextView) row.findViewById(R.id.transaction_row_time);
+        final TextView rowLabel = (TextView) row.findViewById(R.id.transaction_row_label);
+        final CurrencyTextView rowValue = (CurrencyTextView) row.findViewById(R.id.transaction_row_value);
+
+        // confidence
+        if (confidenceType == ConfidenceType.PENDING) {
+            rowLabel.setTextColor(colorInsignificant);
+            rowValue.setTextColor(colorInsignificant);
+        } else if (confidenceType == ConfidenceType.BUILDING) {
+            rowLabel.setTextColor(colorSignificant);
+            rowValue.setTextColor(colorSignificant);
+        } else if (confidenceType == ConfidenceType.DEAD) {
+            rowLabel.setTextColor(colorSignificant);
+            rowValue.setTextColor(colorSignificant);
+            Fonts.strikeThrough(rowLabel);
+            Fonts.strikeThrough(rowValue);
+        } else {
+            rowLabel.setTextColor(colorInsignificant);
+            rowValue.setTextColor(colorInsignificant);
+        }
+
+        // date
+//        final Date time = tx.getUpdateTime();
+//        rowDate.setText(time != null ? (DateUtils.getRelativeTimeSpanString(context, time.getTime())) : null);
+
+        // coinbase TODO
 //        final View rowCoinbase = row.findViewById(R.id.transaction_row_coinbase);
 //        rowCoinbase.setVisibility(isCoinBase ? View.VISIBLE : View.GONE);
-//
-//        // address
-//        final TextView rowAddress = (TextView) row.findViewById(R.id.transaction_row_address);
-//        final Address address = sent ? WalletUtils.getFirstToAddress(tx) : WalletUtils.getFirstFromAddress(tx);
-//        final String label;
-//        if (isCoinBase)
-//            label = textCoinBase;
+
+        // address - label
+        final Address address = sent ?
+                WalletUtils.getSendToAddress(tx, walletPocket) : // we send payment to this address
+                WalletUtils.getReceivedWithAddress(tx, walletPocket); // received with this address
+        final String label;
+        if (isCoinBase)
+            label = textCoinBase;
 //        else if (isInternal)
 //            label = textInternal;
-//        else if (address != null)
-//            label = resolveLabel(address.toString());
-//        else
-//            label = "?";
-//        rowAddress.setTextColor(textColor);
-//        rowAddress.setText(label != null ? label : address.toString());
-//        rowAddress.setTypeface(label != null ? Typeface.DEFAULT : Typeface.MONOSPACE);
-//
-//        // value
-//        final CurrencyTextView rowValue = (CurrencyTextView) row.findViewById(R.id.transaction_row_value);
-//        rowValue.setTextColor(textColor);
-//        rowValue.setAlwaysSigned(true);
-//        rowValue.setPrecision(precision, shift);
-//        rowValue.setAmount(value);
-//
-//        // extended message
+        else if (address != null)
+            label = resolveLabel(address.toString());
+        else
+            label = "?";
+        rowLabel.setText(label != null ? label : address.toString());
+        rowLabel.setTypeface(label != null ? Typeface.DEFAULT : Typeface.MONOSPACE);
+
+        // value
+        rowValue.setAlwaysSigned(true);
+        rowValue.setPrecision(precision, shift);//TODO make configurable
+        rowValue.setAmount(value);
+
+        // extended message
 //        final View rowExtend = row.findViewById(R.id.transaction_row_extend);
 //        if (rowExtend != null)
 //        {
@@ -371,10 +287,10 @@ import com.google.bitcoin.wallet.DefaultCoinSelector;
 //                rowMessage.setTextColor(colorError);
 //            }
 //        }
-//    }
-//
-//    private String resolveLabel(@Nonnull final String address)
-//    {
+    }
+
+    private String resolveLabel(@Nonnull final String address) {
+        return null;
 //        final String cachedLabel = labelCache.get(address);
 //        if (cachedLabel == null)
 //        {
@@ -389,12 +305,12 @@ import com.google.bitcoin.wallet.DefaultCoinSelector;
 //        {
 //            return cachedLabel != CACHE_NULL_MARKER ? cachedLabel : null;
 //        }
-//    }
-//
-//    public void clearLabelCache()
-//    {
-//        labelCache.clear();
-//
-//        notifyDataSetChanged();
-//    }
-//}
+    }
+
+    public void clearLabelCache()
+    {
+        labelCache.clear();
+
+        notifyDataSetChanged();
+    }
+}

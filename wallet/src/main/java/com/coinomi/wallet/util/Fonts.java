@@ -1,6 +1,7 @@
 package com.coinomi.wallet.util;
 
 import android.content.res.AssetManager;
+import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.view.View;
 import android.widget.TextView;
@@ -40,5 +41,9 @@ public class Fonts {
         if (typefaces.containsKey(font) && textView instanceof TextView) {
             ((TextView)textView).setTypeface(typefaces.get(font));
         }
+    }
+
+    public static void strikeThrough(TextView textView) {
+        textView.setPaintFlags(textView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
     }
 }

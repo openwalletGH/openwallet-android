@@ -35,8 +35,6 @@
     <string name="wallet_title_request">request</string>
     <string name="wallet_title_info">info</string>
     <string name="wallet_title_send">send</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="title_activity_test">TestActivity</string>
 
     <!-- Welcome fragment -->
     <string name="welcome_text">Welcome to Coinomi wallet</string>
@@ -51,6 +49,9 @@
     <string name="restore_verifying">Please wait while your passphrase is being verified</string>
     <string name="restore_error">Could not restore wallet</string>
     <string name="extra_security">extra security</string>
+
+    <!-- Info fragment -->
+    <string name="wallet_transactions_coinbase">mined</string>
 
     <!-- Receive fragment -->
     <string name="sample_address_format">XXXX XXXX XXXX XXXXX\nXXXX XXXX XXXX XXXXX</string>

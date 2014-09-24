@@ -14,9 +14,16 @@
         <item name="android:windowNoTitle">true</item>
     </style>
 
-    <style name="Amount" parent="@android:style/TextAppearance">
-        <item name="android:textSize">@dimen/amount_text_size</item>
+    <style name="NormalText" parent="@android:style/TextAppearance">
         <item name="android:textColor">@color/gray_87_text</item>
+    </style>
+
+    <style name="SecondaryText" parent="@android:style/TextAppearance">
+        <item name="android:textColor">@color/gray_54_sec_text_icons</item>
+    </style>
+
+    <style name="Amount" parent="NormalText">
+        <item name="android:textSize">@dimen/amount_text_size</item>
         <item name="android:singleLine">true</item>
     </style>
     <style name="AmountBig" parent="Amount">
@@ -26,10 +33,21 @@
         <item name="android:textSize">@dimen/amount_pending_text_size</item>
         <item name="android:textColor">@color/gray_26_hint_text</item>
     </style>
-    <style name="AmountSymbol" parent="@android:style/TextAppearance">
+    <style name="AmountSymbol" parent="SecondaryText">
         <item name="android:textSize">@dimen/amount_symbol_text_size</item>
-        <item name="android:textColor">@color/gray_54_sec_text_icons</item>
         <item name="android:singleLine">true</item>
+    </style>
+
+    <!-- Transaction row -->
+    <style name="TxRowDate" parent="NormalText">
+        <item name="android:textSize">@dimen/transaction_entry</item>
+    </style>
+    <style name="TxRowLabel" parent="NormalText">
+        <item name="android:textSize">@dimen/transaction_entry</item>
+        <item name="android:singleLine">true</item>
+    </style>
+    <style name="TxRowAmount" parent="NormalText">
+        <item name="android:textSize">@dimen/transaction_entry</item>
     </style>
 
 </resources>

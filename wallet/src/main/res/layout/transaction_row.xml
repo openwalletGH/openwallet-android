@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <!-- TODO enable date -->
+    <!--<TextView-->
+        <!--android:id="@+id/transaction_row_time"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--style="@style/TxRowDate"-->
+        <!--android:gravity="start"-->
+        <!--android:text="Sep 15" />-->
+
+    <TextView
+        android:id="@+id/transaction_row_label"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        style="@style/TxRowLabel"
+        android:layout_weight="1"
+        android:text="Beer with a friend" />
+
+    <com.coinomi.wallet.ui.CurrencyTextView
+        android:id="@+id/transaction_row_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        style="@style/TxRowAmount"
+        android:layout_gravity="end" />
+</LinearLayout>

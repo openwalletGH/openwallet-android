@@ -26,6 +26,13 @@ public class Constants {
     public static final Charset UTF_8 = Charset.forName("UTF-8");
     public static final Charset US_ASCII = Charset.forName("US-ASCII");
 
+    public static final char CHAR_HAIR_SPACE = '\u200a';
+    public static final char CHAR_THIN_SPACE = '\u2009';
+    public static final char CHAR_ALMOST_EQUAL_TO = '\u2248';
+    public static final char CHAR_CHECKMARK = '\u2713';
+    public static final String CURRENCY_PLUS_SIGN = "+" + CHAR_THIN_SPACE;
+    public static final String CURRENCY_MINUS_SIGN = "-" + CHAR_THIN_SPACE;
+
     // TODO make dynamic
     public static final List<CoinAddress> COINS_ADDRESSES = ImmutableList.of(
             new CoinAddress(BitcoinMain.get(), new ServerAddress("test.coinomi.com", 5001)),

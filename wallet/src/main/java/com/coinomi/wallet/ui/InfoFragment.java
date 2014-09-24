@@ -1,28 +1,46 @@
 package com.coinomi.wallet.ui;
 
 import android.app.Activity;
+import android.content.ContentResolver;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 
-import com.coinomi.core.coins.other.Cny;
 import com.coinomi.core.wallet.WalletPocket;
 import com.coinomi.core.wallet.WalletPocketEventListener;
 import com.coinomi.core.coins.BitcoinMain;
 import com.coinomi.core.coins.CoinType;
-import com.coinomi.core.coins.other.Eur;
-import com.coinomi.core.coins.other.Usd;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.ui.widget.Amount;
+import com.coinomi.wallet.util.ThrottlingWalletChangeListener;
 import com.google.bitcoin.core.Coin;
+import com.google.bitcoin.core.Transaction;
+import com.google.bitcoin.core.TransactionConfidence;
+import com.google.bitcoin.utils.Threading;
+import com.google.common.collect.Lists;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.RejectedExecutionException;
+
+import javax.annotation.Nonnull;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -31,7 +49,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * create an instance of this fragment.
  *
  */
-public class InfoFragment extends Fragment implements WalletPocketEventListener {
+public class InfoFragment extends Fragment implements WalletPocketEventListener, LoaderManager.LoaderCallbacks<List<Transaction>> {
     private static final Logger log = LoggerFactory.getLogger(InfoFragment.class);
 
     private static final String COIN_TYPE = "coin_type";
@@ -54,6 +72,9 @@ public class InfoFragment extends Fragment implements WalletPocketEventListener 
     private WalletApplication application;
     private WalletPocket pocket;
     private CoinType type;
+    private TransactionsListAdapter adapter;
+
+    private LoaderManager loaderManager;
 
     /**
      * Use this factory method to create a new instance of
@@ -92,6 +113,31 @@ public class InfoFragment extends Fragment implements WalletPocketEventListener 
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_info, container, false);
 
+        ListView transactionRows = (ListView) view.findViewById(R.id.transaction_rows);
+
+        View header = inflater.inflate(R.layout.fragment_info_header, null);
+        // Initialize your header here.
+        transactionRows.addHeaderView(header, null, false);
+
+        // Init list adapter
+        adapter = new TransactionsListAdapter(inflater.getContext(), pocket);
+        adapter.setPrecision(6, 0);
+        transactionRows.setAdapter(adapter);
+
+//// Just as a bonus - if you want to do something with your list items:
+//        view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                // You can just use listView instead of parent casted to ListView.
+//                if (position >= ((ListView) parent).getHeaderViewsCount()) {
+//                    // Note the usage of getItemAtPosition() instead of adapter's getItem() because
+//                    // the latter does not take into account the header (which has position 0).
+//                    Object obj = parent.getItemAtPosition(position);
+//                    // Do something with your object.
+//                }
+//            }
+//        });
+
         // Subscribe and update the amount
         pocket.addEventListener(this);
         updateBalance(pocket.getBalance(), view);
@@ -112,6 +158,11 @@ public class InfoFragment extends Fragment implements WalletPocketEventListener 
         handler.sendMessage(handler.obtainMessage(PENDING, pendingAmount));
     }
 
+    @Override
+    public void onTransactionConfidenceChanged(WalletPocket pocket, Transaction tx) { }
+    @Override
+    public void onPocketChanged(WalletPocket pocket) { }
+
     private void updateBalance(Coin newBalance) {
         updateBalance(newBalance, getView());
     }
@@ -122,21 +173,21 @@ public class InfoFragment extends Fragment implements WalletPocketEventListener 
             mainAmount.setAmount(newBalance);
             mainAmount.setSymbol(type.getSymbol());
 
-            Amount btcAmount = (Amount) view.findViewById(R.id.amount_btc);
-            btcAmount.setAmount(Coin.ZERO);
-            btcAmount.setSymbol(BitcoinMain.get().getSymbol());
-
-            Amount usdAmount = (Amount) view.findViewById(R.id.amount_usd);
-            usdAmount.setAmount(Coin.ZERO);
-            usdAmount.setSymbol(Usd.get().getSymbol());
-
-            Amount eurAmount = (Amount) view.findViewById(R.id.amount_eur);
-            eurAmount.setAmount(Coin.ZERO);
-            eurAmount.setSymbol(Eur.get().getSymbol());
-
-            Amount cnyAmount = (Amount) view.findViewById(R.id.amount_cny);
-            cnyAmount.setAmount(Coin.ZERO);
-            cnyAmount.setSymbol(Cny.get().getSymbol());
+//            Amount btcAmount = (Amount) view.findViewById(R.id.amount_btc);
+//            btcAmount.setAmount(Coin.ZERO);
+//            btcAmount.setSymbol(BitcoinMain.get().getSymbol());
+//
+//            Amount usdAmount = (Amount) view.findViewById(R.id.amount_usd);
+//            usdAmount.setAmount(Coin.ZERO);
+//            usdAmount.setSymbol(Usd.get().getSymbol());
+//
+//            Amount eurAmount = (Amount) view.findViewById(R.id.amount_eur);
+//            eurAmount.setAmount(Coin.ZERO);
+//            eurAmount.setSymbol(Eur.get().getSymbol());
+//
+//            Amount cnyAmount = (Amount) view.findViewById(R.id.amount_cny);
+//            cnyAmount.setAmount(Coin.ZERO);
+//            cnyAmount.setSymbol(Cny.get().getSymbol());
         }
     }
 
@@ -151,11 +202,18 @@ public class InfoFragment extends Fragment implements WalletPocketEventListener 
         }
     }
 
+    private final ThrottlingWalletChangeListener transactionChangeListener = new ThrottlingWalletChangeListener() {
+        @Override
+        public void onThrottledWalletChanged() {
+            adapter.notifyDataSetChanged();
+        }
+    };
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         application = (WalletApplication) activity.getApplication();
+        loaderManager = getLoaderManager();
     }
 
     @Override
@@ -163,5 +221,113 @@ public class InfoFragment extends Fragment implements WalletPocketEventListener 
         super.onDetach();
         application = null;
         pocket = null;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        loaderManager.initLoader(0, null, this);
+
+        pocket.addEventListener(transactionChangeListener, Threading.SAME_THREAD);
+    }
+
+    @Override
+    public void onPause() {
+        pocket.removeEventListener(transactionChangeListener);
+        transactionChangeListener.removeCallbacks();
+
+        loaderManager.destroyLoader(0);
+
+        super.onPause();
+    }
+
+    @Override
+    public Loader<List<Transaction>> onCreateLoader(int id, Bundle args) {
+        return new TransactionsLoader(getActivity(), pocket);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<List<Transaction>> loader, List<Transaction> transactions) {
+        adapter.replace(transactions);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<List<Transaction>> loader) { /* ignore */ }
+
+    private static class TransactionsLoader extends AsyncTaskLoader<List<Transaction>> {
+        private final WalletPocket walletPocket;
+
+        private TransactionsLoader(final Context context, @Nonnull final WalletPocket walletPocket) {
+            super(context);
+
+            this.walletPocket = walletPocket;
+        }
+
+        @Override
+        protected void onStartLoading()
+        {
+            super.onStartLoading();
+
+            walletPocket.addEventListener(transactionAddRemoveListener, Threading.SAME_THREAD);
+            transactionAddRemoveListener.onPocketChanged(null); // trigger at least one reload
+
+            forceLoad();
+        }
+
+        @Override
+        protected void onStopLoading() {
+            walletPocket.removeEventListener(transactionAddRemoveListener);
+            transactionAddRemoveListener.removeCallbacks();
+
+            super.onStopLoading();
+        }
+
+        @Override
+        public List<Transaction> loadInBackground() {
+            final List<Transaction> filteredTransactions = Lists.newArrayList(walletPocket.getTransactions(true));
+
+            Collections.sort(filteredTransactions, TRANSACTION_COMPARATOR);
+
+            return filteredTransactions;
+        }
+
+        private final ThrottlingWalletChangeListener transactionAddRemoveListener = new ThrottlingWalletChangeListener() {
+            @Override
+            public void onThrottledWalletChanged() {
+                try {
+                    forceLoad();
+                } catch (final RejectedExecutionException x) {
+                    log.info("rejected execution: " + TransactionsLoader.this.toString());
+                }
+            }
+        };
+
+        private static final Comparator<Transaction> TRANSACTION_COMPARATOR = new Comparator<Transaction>() {
+            @Override
+            public int compare(final Transaction tx1, final Transaction tx2) {
+                final boolean pending1 = tx1.getConfidence().getConfidenceType() == TransactionConfidence.ConfidenceType.PENDING;
+                final boolean pending2 = tx2.getConfidence().getConfidenceType() == TransactionConfidence.ConfidenceType.PENDING;
+
+                if (pending1 != pending2)
+                    return pending1 ? -1 : 1;
+
+                // TODO use dates once implemented
+//                final Date updateTime1 = tx1.getUpdateTime();
+//                final long time1 = updateTime1 != null ? updateTime1.getTime() : 0;
+//                final Date updateTime2 = tx2.getUpdateTime();
+//                final long time2 = updateTime2 != null ? updateTime2.getTime() : 0;
+
+                // If both not pending
+                if (!pending1 && !pending2) {
+                    final int time1 = tx1.getConfidence().getAppearedAtChainHeight();
+                    final int time2 = tx2.getConfidence().getAppearedAtChainHeight();
+                    if (time1 != time2)
+                        return time1 > time2 ? -1 : 1;
+                }
+
+                return tx1.getHash().compareTo(tx2.getHash());
+            }
+        };
     }
 }
