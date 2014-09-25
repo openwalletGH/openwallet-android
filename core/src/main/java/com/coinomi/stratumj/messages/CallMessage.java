@@ -9,6 +9,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 /**
  * @author Giannis Dzegoutanis
  */
@@ -18,7 +20,7 @@ public class CallMessage extends BaseMessage {
         super(source);
     }
 
-    public CallMessage(String method, List params) {
+    public CallMessage(String method, @Nullable List params) {
         super();
         setMethod(method);
         setParams(params);
@@ -82,7 +84,8 @@ public class CallMessage extends BaseMessage {
         setParams(Arrays.asList(param));
     }
 
-    public void setParams(Collection params) {
+    public void setParams(@Nullable Collection params) {
+        if (params == null) return;
         try {
             put("params", params);
         } catch (JSONException e) {

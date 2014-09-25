@@ -6,6 +6,8 @@ import org.json.JSONObject;
 
 import java.util.Collection;
 
+import javax.annotation.Nullable;
+
 /**
  * @author Giannis Dzegoutanis
  */
@@ -64,8 +66,10 @@ public class BaseMessage extends JSONObject {
         return optString("request");
     }
 
-    public JSONObject put(String key, Collection value) throws JSONException {
-        this.put(key, new JSONArray(value));
+    public JSONObject put(String key, @Nullable Collection value) throws JSONException {
+        if (value != null) {
+            this.put(key, new JSONArray(value));
+        }
         return this;
     }
 

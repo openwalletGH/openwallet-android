@@ -17,7 +17,7 @@
     <string name="send_coins_fragment_amount_label">Amount to pay</string>
     <string name="send_coins_fragment_button_send">Send</string>
     <string name="send_coins_fragment_button_back">Back</string>
-    <string name="send_coins_preparation_msg">Signing…</string>
+    <string name="send_coins_preparation_msg">Preparing…</string>
     <string name="send_coins_success">Success!</string>
     <string name="send_coins_sending_msg">Sending…</string>
     <string name="send_coins_sent_msg">Sent!</string>
