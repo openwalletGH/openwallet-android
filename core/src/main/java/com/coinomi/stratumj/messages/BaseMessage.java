@@ -67,9 +67,7 @@ public class BaseMessage extends JSONObject {
     }
 
     public JSONObject put(String key, @Nullable Collection value) throws JSONException {
-        if (value != null) {
-            this.put(key, new JSONArray(value));
-        }
+        this.put(key, value != null ? new JSONArray(value) : new JSONArray());
         return this;
     }
 
