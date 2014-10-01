@@ -17,6 +17,10 @@ import java.util.concurrent.TimeUnit;
  * @author Andreas Schildbach
  */
 public class Constants {
+
+    public static final String ARG_SEED = "seed";
+    public static final String ARG_PASSWORD = "password";
+
     public static final boolean TEST = true;
 
     private static final String FILENAME_NETWORK_SUFFIX = TEST ? "" : "-test";

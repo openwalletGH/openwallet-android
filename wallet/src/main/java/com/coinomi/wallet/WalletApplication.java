@@ -20,6 +20,7 @@ import com.coinomi.wallet.service.CoinServiceImpl;
 import com.coinomi.wallet.util.CrashReporter;
 import com.coinomi.wallet.util.Fonts;
 import com.coinomi.wallet.util.LinuxSecureRandom;
+import com.google.bitcoin.crypto.MnemonicCode;
 import com.google.bitcoin.store.UnreadableWalletException;
 import com.google.bitcoin.utils.Threading;
 
@@ -98,6 +99,14 @@ public class WalletApplication extends Application {
         coinServiceResetBlockchainIntent = new Intent(CoinService.ACTION_RESET_BLOCKCHAIN,
                 null, this, CoinServiceImpl.class);
 
+        // Set MnemonicCode.INSTANCE if needed
+        if (MnemonicCode.INSTANCE == null) {
+            try {
+                MnemonicCode.INSTANCE = new MnemonicCode();
+            } catch (Exception e) {
+                log.error("Could not set MnemonicCode.INSTANCE", e);
+            }
+        }
 
         walletFile = getFileStreamPath(Constants.WALLET_FILENAME_PROTOBUF);
 

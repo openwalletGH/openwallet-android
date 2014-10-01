@@ -1,0 +1,92 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.coinomi.wallet.ui.SeedFragment">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/button_next"
+            android:id="@+id/scrollView">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/activity_margin"
+                    android:text="@string/seed_info"
+                    android:id="@+id/seed_info"
+                    android:textSize="@dimen/intro_description"
+                    android:layout_alignParentTop="true"
+                    android:layout_centerHorizontal="true" />
+
+                <CheckBox
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/extra_security"
+                    android:id="@+id/extra_entropy"
+                    android:layout_below="@+id/seed_info"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:visibility="gone"/>
+
+                <TextView
+                    android:id="@+id/seed"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/extra_entropy"
+                    android:gravity="center"
+                    android:layout_centerHorizontal="true"
+                    android:textSize="@dimen/seed_text_size"
+                    android:paddingTop="@dimen/seed_padding"
+                    android:paddingBottom="@dimen/seed_smaller_padding"
+                    android:textColor="@color/primary_700"
+                    android:text="deliver broken make enrich core vendor ski help sock spy purse roast"/>
+
+                <TextView
+                    android:id="@+id/seed_regenerate_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/seed"
+                    android:gravity="end"
+                    android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:paddingStart="@dimen/activity_horizontal_margin"
+                    android:paddingRight="@dimen/activity_horizontal_margin"
+                    android:paddingEnd="@dimen/activity_horizontal_margin"
+                    android:paddingBottom="@dimen/seed_padding"
+                    android:text="@string/seed_regenerate_title"
+                    style="@style/SmallHelpText"/>
+
+            </RelativeLayout>
+        </ScrollView>
+
+        <CheckBox
+            android:id="@+id/backed_up_seed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/backed_up_seed"
+            android:layout_toLeftOf="@id/button_next"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+        <Button
+            android:id="@+id/button_next"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/button_next"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:enabled="false" />
+
+    </RelativeLayout>
+
+</FrameLayout>

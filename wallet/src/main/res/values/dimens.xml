@@ -10,22 +10,26 @@
          https://developer.android.com/design/patterns/navigation-drawer.html -->
     <dimen name="navigation_drawer_width">240dp</dimen>
 
+    <!-- Generic sizes taken from
+         http://www.google.com/design/spec/style/typography.html#typography-standard-styles -->
+    <dimen name="caption">12sp</dimen>
 
+    <!-- Amount Widget -->
     <dimen name="amount_min_size">32dp</dimen>
     <dimen name="amount_margin">32dp</dimen>
     <dimen name="amount_text_size_big">56sp</dimen>
     <dimen name="amount_text_size">32sp</dimen>
     <dimen name="amount_pending_text_size">24sp</dimen>
     <dimen name="amount_symbol_text_size">24sp</dimen>
-
-    <!-- Amount Widget -->
     <dimen name="progress_symbol_size">18dp</dimen>
 
     <!-- IntroActivity -->
     <dimen name="intro_logo_and_btn_width">192dp</dimen>
     <dimen name="intro_description">16sp</dimen>
-    <dimen name="mnemonic">30sp</dimen>
-    <dimen name="passphrase_padding">16dp</dimen>
+    <dimen name="seed_regenerate_title">12sp</dimen>
+    <dimen name="seed_text_size">30sp</dimen>
+    <dimen name="seed_padding">16dp</dimen>
+    <dimen name="seed_smaller_padding">8dp</dimen>
 
     <!-- Receive fragment -->
     <dimen name="receive_address">24sp</dimen>

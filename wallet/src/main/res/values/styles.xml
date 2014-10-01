@@ -14,6 +14,16 @@
         <item name="android:windowNoTitle">true</item>
     </style>
 
+
+    <!-- Special Button styles -->
+    <style name="LinkButton" parent="@android:style/TextAppearance">
+        <item name="android:textColor">@color/primary_500</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:paddingBottom">8dp</item>
+    </style>
+
+
+    <!-- Generic text styles -->
     <style name="NormalText" parent="@android:style/TextAppearance">
         <item name="android:textColor">@color/gray_87_text</item>
     </style>
@@ -22,6 +32,15 @@
         <item name="android:textColor">@color/gray_54_sec_text_icons</item>
     </style>
 
+    <style name="SmallHelpText" parent="SecondaryText">
+        <item name="android:textSize">@dimen/caption</item>
+    </style>
+
+    <style name="ErrorText" parent="">
+        <item name="android:textColor">@color/fg_error</item>
+    </style>
+
+    <!-- Widget amount style -->
     <style name="Amount" parent="NormalText">
         <item name="android:textSize">@dimen/amount_text_size</item>
         <item name="android:singleLine">true</item>

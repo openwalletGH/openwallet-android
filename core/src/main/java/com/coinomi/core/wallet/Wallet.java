@@ -73,7 +73,7 @@ final public class Wallet implements ConnectionEventListener {
         MnemonicCode.INSTANCE.check(mnemonic);
         password = password == null ? "" : password;
 
-        seed = new DeterministicSeed(mnemonic, password, 0);
+        seed = new DeterministicSeed(mnemonic, null, password, 0);
         masterKey = HDKeyDerivation.createMasterPrivateKey(seed.getSeedBytes());
         pockets = new LinkedHashMap<CoinType, WalletPocket>();
     }
@@ -84,12 +84,12 @@ final public class Wallet implements ConnectionEventListener {
         pockets = new LinkedHashMap<CoinType, WalletPocket>();
     }
 
-    public static List<String> generateMnemonic(int entropyBits) throws IOException {
+    public static List<String> generateMnemonic(int entropyBitsSize) {
         byte[] entropy;
         if (ENTROPY_SIZE_DEBUG > 0) {
             entropy = new byte[ENTROPY_SIZE_DEBUG];
         } else {
-            entropy = new byte[entropyBits / 8];
+            entropy = new byte[entropyBitsSize / 8];
         }
 
         SecureRandom sr = new SecureRandom();

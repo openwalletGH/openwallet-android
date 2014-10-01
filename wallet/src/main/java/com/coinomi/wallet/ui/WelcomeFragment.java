@@ -13,13 +13,15 @@ import com.coinomi.wallet.util.Fonts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
+
 /**
  *
  */
 public class WelcomeFragment extends Fragment {
     private static final Logger log = LoggerFactory.getLogger(WelcomeFragment.class);
 
-    private OnFragmentInteractionListener mListener;
+    private Listener mListener;
 
     public WelcomeFragment() { }
 
@@ -68,7 +70,7 @@ public class WelcomeFragment extends Fragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (OnFragmentInteractionListener) activity;
+            mListener = (Listener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -81,9 +83,12 @@ public class WelcomeFragment extends Fragment {
         mListener = null;
     }
 
-    public interface OnFragmentInteractionListener {
+    public interface Listener {
         public void onCreateNewWallet();
         public void onRestoreWallet();
+        public void onRestoreWallet(String seed);
+        public void onSetPassword(String seed);
+        public void onConfirmPassword(String seedText);
     }
 
 }

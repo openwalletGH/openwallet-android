@@ -30,7 +30,12 @@
 
     <!-- Generic buttons -->
     <string name="button_dismiss">Dismiss</string>
+    <string name="button_ok">OK</string>
     <string name="button_next">next</string>
+    <string name="button_finish">finish</string>
+    <string name="button_confirm">confirm</string>
+    <string name="button_cancel">cancel</string>
+    <string name="button_skip">skip</string>
     <string name="button_scan_qr_code">Scan QR code</string>
     <string name="wallet_title_request">request</string>
     <string name="wallet_title_info">info</string>
@@ -41,13 +46,20 @@
     <string name="create_wallet">Create a new wallet</string>
     <string name="restore_wallet">Restore a wallet</string>
 
-    <!-- Passphrase fragment -->
-    <string name="passphrase_info">This is your secret passphrase to access your wallet. Please write it down on a paper and keep it in a secret place, as anyone with access to it has access to your funds. If you lose your passphrase, we cannot do anything to recover your wallet.</string>
+    <!-- Seed fragment -->
+    <string name="seed_info">This is your <i>recovery seed</i> phrase to access your wallet. Please write it down on a paper and keep it in a secret place, as anyone with access to it has access to your funds. If you lose your seed, we cannot do anything to recover your wallet.</string>
+    <string name="seed_regenerate_title">touch to generate a new seed</string>
+    <string name="backed_up_seed">I have copied and stored the recovery seed in a secure place.</string>
 
     <!-- Restore fragment -->
-    <string name="restore_info">Please enter your secret passphrase:</string>
-    <string name="restore_verifying">Please wait while your passphrase is being verified</string>
-    <string name="restore_error">Could not restore wallet</string>
+    <string name="restore_info">Please enter your recovery seed:</string>
+    <string name="restore_skip_title">Skipping seed verification</string>
+    <string name="restore_skip_info">Please make sure that your seed matches the following:</string>
+    <string name="restore_skip_info2">It is still recommended <i>not</i> to skip verification, so that misspellings could be detected.</string>
+    <string name="restore_error_checksum">The seed is not valid. Check if some words are misspelled.</string>
+    <string name="restore_error_words">The seed contains unrecognized words.</string>
+    <string name="restore_error_mismatch">The seed entered does not match your seed.</string>
+    <string name="restore_error">Could not verify your seed. %1$s</string>
     <string name="extra_security">extra security</string>
 
     <!-- Info fragment -->
@@ -62,4 +74,23 @@
     <string name="amount_to_send_label">amount</string>
     <string name="send_coins_label">send</string>
     <string name="history_label">history</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!-- Set Password fragment -->
+    <string name="set_password_info">Set a password to protect your wallet in everyday use. Do not lose or forget your password as it will be impossible to restore your wallet.</string>
+    <string name="set_password1">Type your password</string>
+    <string name="set_password2">Re-type your password</string>
+    <string name="password_too_common_error">Password \"%1$s\" is to common to be safely used.</string>
+    <string name="password_too_short_error">Password is too short, minimum length is %1$d.</string>
+    <string name="passwords_mismatch">Passwords don\'t match</string>
+    <string name="password_error">Could not proceed, password errors detected.</string>
+    <string name="password_skip_warn">By not setting a password, your seed and wallet are unprotected and your funds could be stolen.</string>
+
+    <!-- FinalizeWalletRestorationFragment -->
+    <string name="wallet_restoration">Please wait while your wallet is being restored</string>
+    <string name="wallet_restoration_error">Could not restore your wallet. %1$s</string>
+
+    <!-- PasswordConfirmationFragment -->
+    <string name="enter_password">Enter your password</string>
+
 </resources>

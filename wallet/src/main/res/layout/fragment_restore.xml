@@ -9,14 +9,13 @@
         android:layout_height="match_parent">
 
         <TextView
+            android:id="@+id/restore_info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="@dimen/activity_horizontal_margin"
+            android:padding="@dimen/activity_margin"
             android:text="@string/restore_info"
-            android:id="@+id/restore_info"
             android:textSize="@dimen/intro_description"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true" />
+            android:layout_alignParentTop="true" />
 
         <com.coinomi.wallet.ui.widget.QrCodeButton
             android:layout_width="wrap_content"
@@ -32,7 +31,7 @@
         <MultiAutoCompleteTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/mnemonic"
+            android:id="@+id/seed"
             android:layout_below="@+id/restore_info"
             android:layout_toLeftOf="@id/scan_qr_code"
             android:layout_toStartOf="@id/scan_qr_code"
@@ -40,11 +39,31 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true" />
 
+        <TextView
+            android:id="@+id/restore_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/seed"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            style="@style/ErrorText"
+            android:text="Seed verification error" />
+
+        <TextView
+            android:id="@+id/seed_entry_skip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/LinkButton"
+            android:text="@string/button_skip"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
         <Button
+            android:id="@+id/button_next"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/button_next"
-            android:id="@+id/button_next"
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true" />

@@ -1,5 +1,6 @@
 package com.coinomi.wallet.ui;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -11,13 +12,18 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.coinomi.core.coins.BitcoinMain;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.DogecoinMain;
 import com.coinomi.core.coins.LitecoinMain;
+import com.coinomi.core.uri.CoinURI;
+import com.coinomi.core.uri.CoinURIParseException;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
+import com.google.bitcoin.core.Address;
+import com.google.bitcoin.core.Coin;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +42,8 @@ final public class WalletActivity extends ActionBarActivity implements
     private static final int MENU_BITCOIN = 0;
     private static final int MENU_DOGECOIN = 1;
     private static final int MENU_LITECOIN = 2;
+
+    private static final int REQUEST_CODE_SCAN = 0;
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -155,6 +163,9 @@ final public class WalletActivity extends ActionBarActivity implements
             startRestore();
             finish();
             return true;
+        } else if (id == R.id.scan_qr_code_menu) {
+            startActivityForResult(new Intent(this, ScanActivity.class), REQUEST_CODE_SCAN);
+            return true;
         } else if (id == R.id.action_refresh_wallet) {
             refreshWallet();
             return true;
@@ -162,6 +173,31 @@ final public class WalletActivity extends ActionBarActivity implements
 
         return super.onOptionsItemSelected(item);
     }
+
+//    @Override
+//    public void onActivityResult(final int requestCode, final int resultCode, final Intent intent) {
+//        if (requestCode == REQUEST_CODE_SCAN) {
+//            if (resultCode == Activity.RESULT_OK) {
+//                final String input = intent.getStringExtra(ScanActivity.INTENT_EXTRA_RESULT);
+//
+//                try {
+//                    final CoinURI coinUri = new CoinURI(input);
+//
+//                    Address address = coinUri.getAddress();
+//                    if (address == null) {
+//                        throw new CoinURIParseException("missing address");
+//                    }
+//                    Coin amount = coinUri.getAmount();
+//                    String label = coinUri.getLabel();
+//
+//                    // TODO start the correct fragment
+//                    Toast.makeText(this, "Amount "+amount.toPlainString()+", addr "+address, Toast.LENGTH_LONG).show();
+//                } catch (final CoinURIParseException x) {
+//                    log.info("got invalid uri: '" + input + "'", x);
+//                }
+//            }
+//        }
+//    }
 
     private void refreshWallet() {
         if (refreshTask == null) {

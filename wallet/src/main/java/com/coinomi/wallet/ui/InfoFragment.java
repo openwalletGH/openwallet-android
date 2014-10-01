@@ -83,7 +83,6 @@ public class InfoFragment extends Fragment implements WalletPocketEventListener,
      * @param type of the coin
      * @return A new instance of fragment InfoFragment.
      */
-
     public static InfoFragment newInstance(CoinType type) {
         InfoFragment fragment = new InfoFragment();
         Bundle args = new Bundle();
