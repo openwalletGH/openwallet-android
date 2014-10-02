@@ -37,9 +37,10 @@
     <dimen name="qr_code_margin">32dp</dimen>
 
     <!-- Send fragment -->
-    <dimen name="history_label">24sp</dimen>
 
     <!-- Info fragment -->
+    <dimen name="history_label">24sp</dimen>
+    <dimen name="history_empty">20sp</dimen>
     <dimen name="transaction_entry">18sp</dimen>
     <dimen name="transaction_pending">18sp</dimen>
 

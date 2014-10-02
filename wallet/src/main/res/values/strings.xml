@@ -70,6 +70,7 @@
     <string name="amount_to_send_label">amount</string>
     <string name="send_coins_label">send</string>
     <string name="history_label">history</string>
+    <string name="history_empty">No coins received so far!\n\nYou can get some by trading for traditional money, selling goods or services or earning by working.</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="uri_error">There was a problem decoding URI: %1$s</string>
 

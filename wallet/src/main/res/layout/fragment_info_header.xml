@@ -63,4 +63,18 @@
         android:layout_marginTop="32dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
+
+    <TextView
+        android:id="@+id/history_empty"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/history_empty"
+        android:textSize="@dimen/history_empty"
+        android:textColor="@color/gray_26_hint_text"
+        android:layout_below="@id/history_label"
+        android:layout_marginTop="32dp"
+        android:gravity="center"
+        android:layout_centerHorizontal="true" />
+
+
 </RelativeLayout>

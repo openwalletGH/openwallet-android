@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.coinomi.core.wallet.WalletPocket;
 import com.coinomi.core.wallet.WalletPocketEventListener;
@@ -117,6 +118,11 @@ public class InfoFragment extends Fragment implements WalletPocketEventListener,
         View header = inflater.inflate(R.layout.fragment_info_header, null);
         // Initialize your header here.
         transactionRows.addHeaderView(header, null, false);
+
+        // Hide empty message if have some transaction history
+        if (pocket.getTransactions(false).size() > 0) {
+            header.findViewById(R.id.history_empty).setVisibility(View.GONE);
+        }
 
         // Init list adapter
         adapter = new TransactionsListAdapter(inflater.getContext(), pocket);
