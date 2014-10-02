@@ -1,6 +1,5 @@
 package com.coinomi.core.coins;
 
-import com.coinomi.core.Constants;
 import com.google.bitcoin.core.Coin;
 
 /**

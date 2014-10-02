@@ -1,7 +1,5 @@
 package com.coinomi.core.coins;
 
-import com.coinomi.core.Constants;
-
 /**
  * @author Giannis Dzegoutanis
  */
