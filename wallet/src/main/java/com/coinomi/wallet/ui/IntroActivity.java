@@ -57,7 +57,8 @@ public class IntroActivity extends android.support.v4.app.FragmentActivity imple
 
     @Override
     public void onConfirmPassword(String seedText) {
-        replaceFragment(PasswordConfirmationFragment.newWalletRestoration(seedText));
+        replaceFragment(PasswordConfirmationFragment.newWalletRestoration(seedText,
+                getResources().getString(R.string.password_wallet_recovery)));
     }
 
     @Override

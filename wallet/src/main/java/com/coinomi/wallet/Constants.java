@@ -64,4 +64,5 @@ public class Constants {
 
     public static final long WALLET_WRITE_DELAY = 3;
     public static final TimeUnit WALLET_WRITE_DELAY_UNIT = TimeUnit.SECONDS;
+    public static final String ARG_MESSAGE = "message";
 }

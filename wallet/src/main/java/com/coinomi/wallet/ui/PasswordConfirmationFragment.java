@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
@@ -26,20 +27,21 @@ import javax.annotation.Nullable;
  *
  */
 public class PasswordConfirmationFragment extends Fragment {
+    @Nullable private String message;
     @Nullable private String seed;
-
     private Listener mListener;
 
-    static PasswordConfirmationFragment newInstance() {
+    static PasswordConfirmationFragment newInstance(String message) {
         PasswordConfirmationFragment fragment = new PasswordConfirmationFragment();
         fragment.setArguments(new Bundle());
+        fragment.getArguments().putString(Constants.ARG_MESSAGE, message);
         return fragment;
     }
 
-
-    public static Fragment newWalletRestoration(String seed) {
+    public static Fragment newWalletRestoration(String seed, String message) {
         Fragment fragment = new PasswordConfirmationFragment();
         fragment.getArguments().putString(Constants.ARG_SEED, seed);
+        fragment.getArguments().putString(Constants.ARG_MESSAGE, message);
         return fragment;
     }
     public PasswordConfirmationFragment() {
@@ -51,6 +53,7 @@ public class PasswordConfirmationFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             seed = getArguments().getString(Constants.ARG_SEED);
+            message = getArguments().getString(Constants.ARG_MESSAGE);
         }
     }
 
@@ -58,6 +61,13 @@ public class PasswordConfirmationFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_password_confirmation, container, false);
+
+        TextView messageView = (TextView) view.findViewById(R.id.message);
+        if (message != null) {
+            messageView.setText(message);
+        } else {
+            messageView.setVisibility(View.GONE);
+        }
 
         final EditText password = (EditText) view.findViewById(R.id.password);
         Keyboard.focusAndShowKeyboard(password, getActivity());

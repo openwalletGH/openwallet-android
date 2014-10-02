@@ -61,10 +61,11 @@ public class SignTransactionFragment extends Fragment {
             request = (SendRequest) getArguments().getSerializable(Constants.ARG_SEND_REQUEST);
         }
 
-        if (wallet != null) {
+        if (wallet != null && request != null) {
             if (wallet.isEncrypted()) {
-                startActivityForResult(new Intent(getActivity(), PasswordConfirmationActivity.class),
-                        PASSWORD_CONFIRMATION);
+                Intent intent = new Intent(getActivity(), PasswordConfirmationActivity.class);
+//                intent.putExtra(Constants.ARG_MESSAGE, getResources().getString(R.string.));
+                startActivityForResult(intent, PASSWORD_CONFIRMATION);
             } else {
                 maybeStartTask();
             }

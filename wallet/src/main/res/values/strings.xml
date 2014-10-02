@@ -82,6 +82,7 @@
     <string name="passwords_mismatch">Passwords don\'t match</string>
     <string name="password_error">Could not proceed, password errors detected.</string>
     <string name="password_skip_warn">By not setting a password, your seed and wallet are unprotected and your funds could be stolen.</string>
+    <string name="password_wallet_recovery">To recover your wallet, please provide the same password you used when created the wallet. If you didn\'t originally set a password, don\'t type any password.</string>
 
     <!-- FinalizeWalletRestorationFragment -->
     <string name="wallet_restoration">Please wait while your wallet is being restored</string>
@@ -95,6 +96,5 @@
     <string name="no_such_pocket_error">Error occurred while accessing this pocket. If problem persists, try to restore the wallet from seed.</string>
     <string name="password_failed">The password entered is not valid.</string>
     <string name="sent">Sent!</string>
-
 
 </resources>
