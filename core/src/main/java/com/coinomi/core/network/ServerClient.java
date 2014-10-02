@@ -331,7 +331,8 @@ public class ServerClient implements BlockchainConnection {
     }
 
     @Override
-    public void broadcastTx(CoinType coinType, final Transaction tx, final TransactionEventListener listener) {
+    public void broadcastTx(CoinType coinType, final Transaction tx,
+                            @Nullable final TransactionEventListener listener) {
         StratumClient client = checkNotNull(connections.get(coinType));
 
         CallMessage message = new CallMessage("blockchain.transaction.broadcast",
@@ -349,7 +350,7 @@ public class ServerClient implements BlockchainConnection {
                     log.info("got tx {} =?= {}", txId, tx.getHash());
                     checkState(tx.getHash().toString().equals(txId));
 
-                    listener.onTransactionBroadcast(tx);
+                    if (listener != null) listener.onTransactionBroadcast(tx);
                 } catch (JSONException e) {
                     onFailure(e);
                     return;
@@ -359,7 +360,7 @@ public class ServerClient implements BlockchainConnection {
             @Override
             public void onFailure(Throwable t) {
                 log.error("Could not get reply for blockchain.transaction.broadcast", t);
-                listener.onTransactionBroadcastError(tx, t);
+                if (listener != null) listener.onTransactionBroadcastError(tx, t);
             }
         }, Threading.USER_THREAD);
     }
