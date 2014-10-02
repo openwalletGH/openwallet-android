@@ -17,6 +17,7 @@
 package com.coinomi.core.wallet;
 
 
+import com.coinomi.core.coins.CoinType;
 import com.google.bitcoin.core.Address;
 import com.google.bitcoin.core.Coin;
 import com.google.bitcoin.core.ECKey;
@@ -29,6 +30,9 @@ import org.spongycastle.crypto.params.KeyParameter;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Objects.ToStringHelper;
+
+import java.io.Serializable;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -37,7 +41,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * just simplify the most common use cases. You may wish to customize a SendRequest if you want to attach a fee or
  * modify the change address.
  */
-public class SendRequest {
+public class SendRequest implements Serializable{
+
+    /**
+     * The blockchain network (Bitcoin, Dogecoin,..) that this request is going to transact
+     */
+    public CoinType type;
+
     /**
      * <p>A transaction, probably incomplete, that describes the outline of what you want to do. This typically will
      * mean it has some outputs to the intended destinations, but no inputs or change address (and therefore no
@@ -121,14 +131,14 @@ public class SendRequest {
      * If null then no decryption will be performed and if decryption is required an exception will be thrown.
      * You can get this from a password by doing wallet.getKeyCrypter().deriveKey(password).
      */
-    public KeyParameter aesKey = null;
+    transient public KeyParameter aesKey = null;
 
     /**
      * If not null, the {@link com.google.bitcoin.wallet.CoinSelector} to use instead of the wallets default. Coin selectors are
      * responsible for choosing which transaction outputs (coins) in a wallet to use given the desired send value
      * amount.
      */
-    public CoinSelector coinSelector = null;
+    transient public CoinSelector coinSelector = null;
 
     /**
      * If true (the default), the outputs will be shuffled during completion to randomize the location of the change
@@ -142,7 +152,7 @@ public class SendRequest {
      * throw an exception on missing signature ({@link MissingSigsMode#THROW}).
      * @see MissingSigsMode
      */
-    public MissingSigsMode missingSigsMode = MissingSigsMode.THROW;
+    transient public MissingSigsMode missingSigsMode = MissingSigsMode.THROW;
 
 
     // Tracks if this has been passed to wallet.completeTx already: just a safety check.
@@ -158,9 +168,9 @@ public class SendRequest {
      */
     public static SendRequest to(Address destination, Coin value) {
         SendRequest req = new SendRequest();
-        final NetworkParameters parameters = destination.getParameters();
-        checkNotNull(parameters, "Address is for an unknown network");
-        req.tx = new Transaction(parameters);
+        checkNotNull(destination.getParameters(), "Address is for an unknown network");
+        req.type = (CoinType) destination.getParameters();
+        req.tx = new Transaction(req.type);
         req.tx.addOutput(value, destination);
         return req;
     }
@@ -175,6 +185,7 @@ public class SendRequest {
      */
     public static SendRequest to(NetworkParameters params, ECKey destination, Coin value) {
         SendRequest req = new SendRequest();
+        req.type = (CoinType) params;
         req.tx = new Transaction(params);
         req.tx.addOutput(value, destination);
         return req;
@@ -189,9 +200,9 @@ public class SendRequest {
 
     public static SendRequest emptyWallet(Address destination) {
         SendRequest req = new SendRequest();
-        final NetworkParameters parameters = destination.getParameters();
-        checkNotNull(parameters, "Address is for an unknown network");
-        req.tx = new Transaction(parameters);
+        checkNotNull(destination.getParameters(), "Address is for an unknown network");
+        req.type = (CoinType) destination.getParameters();
+        req.tx = new Transaction(req.type);
         req.tx.addOutput(Coin.ZERO, destination);
         req.emptyWallet = true;
         return req;

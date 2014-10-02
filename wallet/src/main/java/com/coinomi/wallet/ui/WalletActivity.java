@@ -1,6 +1,5 @@
 package com.coinomi.wallet.ui;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -14,19 +13,28 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.coinomi.core.Preconditions;
 import com.coinomi.core.coins.BitcoinMain;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.DogecoinMain;
 import com.coinomi.core.coins.LitecoinMain;
-import com.coinomi.core.uri.CoinURI;
-import com.coinomi.core.uri.CoinURIParseException;
+import com.coinomi.core.wallet.SendRequest;
+import com.coinomi.core.wallet.Wallet;
+import com.coinomi.core.wallet.exceptions.NoSuchPocketException;
+import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
 import com.google.bitcoin.core.Address;
 import com.google.bitcoin.core.Coin;
+import com.google.bitcoin.core.InsufficientMoneyException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.annotation.Nullable;
+
+import static com.coinomi.core.Preconditions.checkNotNull;
+import static com.coinomi.core.Preconditions.checkState;
 
 /**
  * @author Giannis Dzegoutanis
@@ -44,6 +52,7 @@ final public class WalletActivity extends ActionBarActivity implements
     private static final int MENU_LITECOIN = 2;
 
     private static final int REQUEST_CODE_SCAN = 0;
+    private static final int SIGN_TRANSACTION = 1;
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -61,6 +70,7 @@ final public class WalletActivity extends ActionBarActivity implements
     private ViewPager mViewPager;
     private AsyncTask<Void, Void, Void> refreshTask;
     private CoinType currentType;
+    @Nullable private Wallet wallet;
 
 
     @Override
@@ -91,6 +101,8 @@ final public class WalletActivity extends ActionBarActivity implements
 
         // Hack to make the ViewPager select the InfoFragment
         mNavigationDrawerFragment.reselectLastItem();
+
+        wallet = getWalletApplication().getWallet();
     }
 
     @Override
@@ -174,30 +186,7 @@ final public class WalletActivity extends ActionBarActivity implements
         return super.onOptionsItemSelected(item);
     }
 
-//    @Override
-//    public void onActivityResult(final int requestCode, final int resultCode, final Intent intent) {
-//        if (requestCode == REQUEST_CODE_SCAN) {
-//            if (resultCode == Activity.RESULT_OK) {
-//                final String input = intent.getStringExtra(ScanActivity.INTENT_EXTRA_RESULT);
-//
-//                try {
-//                    final CoinURI coinUri = new CoinURI(input);
-//
-//                    Address address = coinUri.getAddress();
-//                    if (address == null) {
-//                        throw new CoinURIParseException("missing address");
-//                    }
-//                    Coin amount = coinUri.getAmount();
-//                    String label = coinUri.getLabel();
-//
-//                    // TODO start the correct fragment
-//                    Toast.makeText(this, "Amount "+amount.toPlainString()+", addr "+address, Toast.LENGTH_LONG).show();
-//                } catch (final CoinURIParseException x) {
-//                    log.info("got invalid uri: '" + input + "'", x);
-//                }
-//            }
-//        }
-//    }
+
 
     private void refreshWallet() {
         if (refreshTask == null) {
@@ -272,5 +261,4 @@ final public class WalletActivity extends ActionBarActivity implements
             }
         }
     }
-
 }

@@ -20,6 +20,11 @@ public class Constants {
 
     public static final String ARG_SEED = "seed";
     public static final String ARG_PASSWORD = "password";
+    public static final String ARG_SEND_TO_ADDRESS = "to_address";
+    public static final String ARG_COIN = "coin";
+    public static final String ARG_TRANSACTION = "transaction";
+    public static final String ARG_SEND_REQUEST = "send_request";
+    public static final String ARG_ERROR = "error";
 
     public static final boolean TEST = true;
 

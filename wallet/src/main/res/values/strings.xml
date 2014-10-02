@@ -17,10 +17,6 @@
     <string name="send_coins_fragment_amount_label">Amount to pay</string>
     <string name="send_coins_fragment_button_send">Send</string>
     <string name="send_coins_fragment_button_back">Back</string>
-    <string name="send_coins_preparation_msg">Preparing…</string>
-    <string name="send_coins_success">Success!</string>
-    <string name="send_coins_sending_msg">Sending…</string>
-    <string name="send_coins_sent_msg">Sent!</string>
     <string name="send_coins_failed_msg">Failed!</string>
     <string name="send_coins_error_not_enough_money">Not enough money</string>
     <string name="send_coins_error_network">No internet connection</string>
@@ -75,6 +71,7 @@
     <string name="send_coins_label">send</string>
     <string name="history_label">history</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="uri_error">There was a problem decoding URI: %1$s</string>
 
     <!-- Set Password fragment -->
     <string name="set_password_info">Set a password to protect your wallet in everyday use. Do not lose or forget your password as it will be impossible to restore your wallet.</string>
@@ -92,5 +89,12 @@
 
     <!-- PasswordConfirmationFragment -->
     <string name="enter_password">Enter your password</string>
+
+    <!-- SignTransactionFragment -->
+    <string name="preparing_transaction">Please wait while your transaction is being prepared and sent.</string>
+    <string name="no_such_pocket_error">Error occurred while accessing this pocket. If problem persists, try to restore the wallet from seed.</string>
+    <string name="password_failed">The password entered is not valid.</string>
+    <string name="sent">Sent!</string>
+
 
 </resources>

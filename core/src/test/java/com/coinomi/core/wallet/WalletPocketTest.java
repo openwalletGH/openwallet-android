@@ -12,6 +12,7 @@ import com.google.bitcoin.core.Address;
 import com.google.bitcoin.core.AddressFormatException;
 import com.google.bitcoin.core.ChildMessage;
 import com.google.bitcoin.core.Coin;
+import com.google.bitcoin.core.ECKey;
 import com.google.bitcoin.core.Sha256Hash;
 import com.google.bitcoin.core.Transaction;
 import com.google.bitcoin.core.TransactionInput;
@@ -40,8 +41,10 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Giannis Dzegoutanis
@@ -50,7 +53,7 @@ public class WalletPocketTest {
     static final List<String> MNEMONIC = ImmutableList.of("citizen", "fever", "scale", "nurse", "brief", "round", "ski", "fiction", "car", "fitness", "pluck", "act");
     static final byte[] aesKeyBytes = {0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7};
     private static final long AMOUNT_TO_SEND = 2700000000L;
-    DeterministicSeed seed = new DeterministicSeed(MNEMONIC, "", 0);
+    DeterministicSeed seed = new DeterministicSeed(MNEMONIC, null, "", 0);
     private DeterministicKey masterKey = HDKeyDerivation.createMasterPrivateKey(seed.getSeedBytes());
     CoinType type = DogecoinTest.get();
     DeterministicHierarchy hierarchy = new DeterministicHierarchy(masterKey);
@@ -187,6 +190,46 @@ public class WalletPocketTest {
         newPocket.decrypt(aesKey);
 
         assertEquals(pocket.toProtobuf().toString(), newPocket.toProtobuf().toString());
+    }
+
+
+    @Test
+    public void serializeEncryptedNormal() throws Exception {
+        pocket.maybeInitializeAllKeys();
+        pocket.encrypt(crypter, aesKey);
+        pocket.onConnection(getBlockchainConnection());
+
+        assertEquals(Coin.valueOf(11000000000l), pocket.getBalance(true));
+
+        assertAllKeysEncrypted(pocket);
+
+        WalletPocket newPocket = new WalletPocketProtobufSerializer().readWallet(pocket.toProtobuf(), crypter);
+
+        assertAllKeysEncrypted(newPocket);
+
+        pocket.decrypt(aesKey);
+        newPocket.decrypt(aesKey);
+
+        assertAllKeysDecrypted(pocket);
+        assertAllKeysDecrypted(newPocket);
+    }
+
+    private void assertAllKeysDecrypted(WalletPocket pocket) {
+        List<ECKey> keys = pocket.keys.getKeys(false);
+        for (ECKey k : keys) {
+            DeterministicKey key = (DeterministicKey) k;
+
+            assertFalse(key.isEncrypted());
+        }
+    }
+
+    private void assertAllKeysEncrypted(WalletPocket pocket) {
+        List<ECKey> keys = pocket.keys.getKeys(false);
+        for (ECKey k : keys) {
+            DeterministicKey key = (DeterministicKey) k;
+
+            assertTrue(key.isEncrypted());
+        }
     }
 
     /**

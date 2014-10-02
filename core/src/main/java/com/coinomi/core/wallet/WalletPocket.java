@@ -86,9 +86,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import javax.annotation.Nullable;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
+import static com.coinomi.core.Preconditions.checkNotNull;
+import static com.coinomi.core.Preconditions.checkArgument;
+import static com.coinomi.core.Preconditions.checkState;
 
 /**
  * @author Giannis Dzegoutanis
@@ -144,7 +144,7 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
     // All transactions together.
     protected final Map<Sha256Hash, Transaction> transactions;
 
-    @VisibleForTesting SimpleHDKeyChain keys;
+    public @VisibleForTesting SimpleHDKeyChain keys;
 
     @Nullable private transient BlockchainConnection blockchainConnection;
 
@@ -153,8 +153,9 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
     private final transient CopyOnWriteArrayList<ListenerRegistration<WalletPocketEventListener>> listeners;
     @Nullable private transient Wallet wallet = null;
 
-    public WalletPocket(DeterministicKey rootKey, CoinType coinType, @Nullable KeyCrypter keyCrypter) {
-        this(new SimpleHDKeyChain(rootKey, keyCrypter), coinType);
+    public WalletPocket(DeterministicKey rootKey, CoinType coinType,
+                        @Nullable KeyCrypter keyCrypter, @Nullable KeyParameter key) {
+        this(new SimpleHDKeyChain(rootKey, keyCrypter, key), coinType);
     }
 
     WalletPocket(SimpleHDKeyChain keys, CoinType coinType) {
@@ -1040,20 +1041,6 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
         fetchingTransactions.clear();
     }
 
-    public void sendCoins(Address address, Coin amount) throws InsufficientMoneyException, IOException {
-        if (blockchainConnection == null) {
-            throw new IOException("No connection available");
-        }
-        SendRequest request = SendRequest.to(address, amount);
-        request.feePerKb = coinType.getFeePerKb();
-
-        Transaction tx = sendCoinsOffline(request);
-
-        log.info("Created tx {}", Utils.HEX.encode(tx.bitcoinSerialize()));
-
-        broadcastTransaction(tx);
-    }
-
     @VisibleForTesting void broadcastTransaction(Transaction tx) throws IOException {
         if (blockchainConnection != null) {
             blockchainConnection.broadcastTx(coinType, tx, this);
@@ -1156,6 +1143,10 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    boolean isEncrypted() {
+        return keys.isEncrypted();
+    }
+
     /**
      * Encrypt the keys in the group using the KeyCrypter and the AES key. A good default KeyCrypter to use is
      * {@link com.google.bitcoin.crypto.KeyCrypterScrypt}.
@@ -1201,34 +1192,35 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
     /**
      * Sends coins to the given address but does not broadcast the resulting pending transaction.
      */
-    public Transaction sendCoinsOffline(Address address, Coin amount) throws InsufficientMoneyException {
-        return sendCoinsOffline(address, amount, null);
+    public SendRequest sendCoinsOffline(Address address, Coin amount) throws InsufficientMoneyException {
+        return sendCoinsOffline(address, amount, (KeyParameter) null);
     }
 
     /**
-     * Sends coins to the given address but does not broadcast the resulting pending transaction.
+     * {@link #sendCoinsOffline(Address, Coin)}
      */
-    public Transaction sendCoinsOffline(Address address, Coin amount, @Nullable KeyParameter aesKey)
+    public SendRequest sendCoinsOffline(Address address, Coin amount, @Nullable String password)
+            throws InsufficientMoneyException {
+        KeyParameter key = null;
+        if (password != null) {
+            checkState(isEncrypted());
+            key = checkNotNull(getKeyCrypter()).deriveKey(password);
+        }
+        return sendCoinsOffline(address, amount, key);
+    }
+
+
+    /**
+     * {@link #sendCoinsOffline(Address, Coin)}
+     */
+    public SendRequest sendCoinsOffline(Address address, Coin amount, @Nullable KeyParameter aesKey)
             throws InsufficientMoneyException {
         checkState(address.getParameters() instanceof CoinType);
         SendRequest request = SendRequest.to(address, amount);
+        request.aesKey = aesKey;
         request.feePerKb = ((CoinType)address.getParameters()).getFeePerKb();
 
-        return sendCoinsOffline(request);
-    }
-
-    /**
-     * Sends coins to the given address but does not broadcast the resulting pending transaction.
-     */
-    public Transaction sendCoinsOffline(SendRequest request) throws InsufficientMoneyException {
-        lock.lock();
-        try {
-            completeTx(request);
-//            commitTx(request.tx);
-            return request.tx;
-        } finally {
-            lock.unlock();
-        }
+        return request;
     }
 
     public void setWallet(Wallet wallet) {

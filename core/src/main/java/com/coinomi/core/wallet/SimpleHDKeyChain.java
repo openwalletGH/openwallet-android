@@ -1,8 +1,6 @@
 package com.coinomi.core.wallet;
 
 
-import com.coinomi.core.Constants;
-import com.coinomi.core.coins.DogecoinTest;
 import com.coinomi.core.protos.Protos;
 import com.google.bitcoin.core.BloomFilter;
 import com.google.bitcoin.core.ECKey;
@@ -17,7 +15,6 @@ import com.google.bitcoin.crypto.KeyCrypterException;
 import com.google.bitcoin.crypto.KeyCrypterScrypt;
 import com.google.bitcoin.store.UnreadableWalletException;
 import com.google.bitcoin.utils.Threading;
-import com.google.bitcoin.wallet.DeterministicSeed;
 import com.google.bitcoin.wallet.EncryptableKeyChain;
 import com.google.bitcoin.wallet.KeyBag;
 import com.google.bitcoin.wallet.KeyChainEventListener;
@@ -114,6 +111,18 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
         // Else...
         // We can't initialize ourselves with just an encrypted seed, so we expected deserialization code to do the
         // rest of the setup (loading the root key).
+    }
+
+    SimpleHDKeyChain(DeterministicKey rootkey, @Nullable KeyCrypter crypter,
+                     @Nullable KeyParameter key) {
+        simpleKeyChain = new SimpleKeyChain(crypter);
+        if (crypter != null && !rootkey.isEncrypted()) {
+            this.rootKey = rootkey.encrypt(crypter, key, null);
+        } else {
+            this.rootKey = rootkey;
+        }
+
+        initializeHierarchyUnencrypted(rootKey);
     }
 
     // For use in encryption.

@@ -11,14 +11,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.coins.DogecoinMain;
+import com.coinomi.core.wallet.SimpleHDKeyChain;
 import com.coinomi.core.wallet.Wallet;
+import com.coinomi.core.wallet.WalletPocket;
 import com.coinomi.wallet.Configuration;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
+import com.google.bitcoin.crypto.DeterministicKey;
+import com.google.bitcoin.crypto.KeyCrypterScrypt;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.spongycastle.crypto.params.KeyParameter;
 
 import java.util.ArrayList;
 
@@ -38,14 +45,12 @@ public class FinalizeWalletRestorationFragment extends Fragment {
     /**
      * Get a fragment instance.
      */
-    public static FinalizeWalletRestorationFragment newInstance(String seed, @Nullable String password) {
+    public static Fragment newInstance(Bundle args) {
         FinalizeWalletRestorationFragment fragment = new FinalizeWalletRestorationFragment();
-        Bundle args = new Bundle();
-        args.putString(Constants.ARG_SEED, seed);
-        args.putString(Constants.ARG_PASSWORD, password);
         fragment.setArguments(args);
         return fragment;
     }
+
     public FinalizeWalletRestorationFragment() {
         // Required empty public constructor
     }
@@ -99,7 +104,10 @@ public class FinalizeWalletRestorationFragment extends Fragment {
             Wallet wallet = null;
             try {
                 wallet = new Wallet(seed, password);
-                wallet.createCoinPockets(Constants.DEFAULT_COINS, true);
+                KeyCrypterScrypt crypter = new KeyCrypterScrypt();
+                KeyParameter aesKey = crypter.deriveKey(password);
+                wallet.encrypt(crypter, aesKey);
+                wallet.createCoinPockets(Constants.DEFAULT_COINS, true, aesKey);
                 getWalletApplication().setWallet(wallet);
                 getWalletApplication().saveWalletNow();
             } catch (Exception e) {

@@ -12,6 +12,7 @@ import android.widget.EditText;
 
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
+import com.coinomi.wallet.util.Keyboard;
 
 import javax.annotation.Nullable;
 
@@ -59,10 +60,12 @@ public class PasswordConfirmationFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_password_confirmation, container, false);
 
         final EditText password = (EditText) view.findViewById(R.id.password);
+        Keyboard.focusAndShowKeyboard(password, getActivity());
 
         view.findViewById(R.id.button_confirm).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Keyboard.hideKeyboard(getActivity());
                 if (mListener != null) {
                     getArguments().putString(Constants.ARG_PASSWORD, password.getText().toString());
                     mListener.onPasswordConfirmed(getArguments());

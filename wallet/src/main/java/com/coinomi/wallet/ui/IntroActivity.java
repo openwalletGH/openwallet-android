@@ -71,7 +71,6 @@ public class IntroActivity extends android.support.v4.app.FragmentActivity imple
     }
 
     private void finalizeWalletRestoration(Bundle args) {
-        replaceFragment(FinalizeWalletRestorationFragment.newInstance(
-                args.getString(Constants.ARG_SEED), args.getString(Constants.ARG_PASSWORD)));
+        replaceFragment(FinalizeWalletRestorationFragment.newInstance(args));
     }
 }

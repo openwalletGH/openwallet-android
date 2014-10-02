@@ -3,10 +3,13 @@ package com.coinomi.core.wallet;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.network.interfaces.BlockchainConnection;
 import com.coinomi.core.network.interfaces.ConnectionEventListener;
+import com.coinomi.core.network.interfaces.TransactionEventListener;
 import com.coinomi.core.protos.Protos;
+import com.coinomi.core.wallet.exceptions.NoSuchPocketException;
 import com.google.bitcoin.core.Address;
 import com.google.bitcoin.core.Coin;
 import com.google.bitcoin.core.InsufficientMoneyException;
+import com.google.bitcoin.core.Transaction;
 import com.google.bitcoin.crypto.DeterministicHierarchy;
 import com.google.bitcoin.crypto.DeterministicKey;
 import com.google.bitcoin.crypto.HDKeyDerivation;
@@ -105,23 +108,31 @@ final public class Wallet implements ConnectionEventListener {
         return mnemonic;
     }
 
-    public void createCoinPockets(List<CoinType> coins, boolean generateAllKeys) {
-        for (CoinType coin : coins) {
-            log.info("Creating coin pocket for {}", coin);
-            WalletPocket pocket = getPocket(coin);
-            if (generateAllKeys) {
-                pocket.maybeInitializeAllKeys();
+    public void createCoinPockets(List<CoinType> coins, boolean generateAllKeys,
+                                  @Nullable KeyParameter key) {
+        lock.lock();
+        try {
+            for (CoinType coin : coins) {
+                log.info("Creating coin pocket for {}", coin);
+                maybeCreatePocket(coin, key);
+                WalletPocket pocket = getPocket(coin);
+                if (generateAllKeys && pocket != null) {
+                    pocket.maybeInitializeAllKeys();
+                }
             }
+        } finally {
+            lock.unlock();
         }
     }
 
+    /**
+     * Get a pocket for a coin type. Returns null if no pocket exists
+     */
+    @Nullable
     public WalletPocket getPocket(CoinType coinType) {
         lock.lock();
         try {
-            if (!pockets.containsKey(coinType)) {
-                createPocket(coinType);
-            }
-            return pockets.get(coinType);
+            return checkNotNull(pockets.get(coinType));
         } finally {
             lock.unlock();
         }
@@ -136,26 +147,55 @@ final public class Wallet implements ConnectionEventListener {
         }
     }
 
-    private void createPocket(CoinType coinType) {
-        DeterministicHierarchy hierarchy = new DeterministicHierarchy(masterKey);
+    private void maybeCreatePocket(CoinType coinType, @Nullable KeyParameter key) {
+        checkState(lock.isHeldByCurrentThread());
+        if (!pockets.containsKey(coinType)) {
+            createPocket(coinType, key);
+        }
+    }
+
+
+    private void createPocket(CoinType coinType, @Nullable KeyParameter key) {
+        checkState(lock.isHeldByCurrentThread());
+        checkState(!pockets.containsKey(coinType));
+        DeterministicHierarchy hierarchy;
+        if (isEncrypted()) {
+            hierarchy = new DeterministicHierarchy(masterKey.decrypt(getKeyCrypter(), key));
+        } else {
+            hierarchy= new DeterministicHierarchy(masterKey);
+        }
         DeterministicKey rootKey = hierarchy.get(coinType.getBip44Path(ACCOUNT_ZERO), false, true);
-        addPocket(new WalletPocket(rootKey, coinType, masterKey.getKeyCrypter()));
+        WalletPocket newPocket = new WalletPocket(rootKey, coinType, getKeyCrypter(), key);
+        if (isEncrypted() && !newPocket.isEncrypted()) {
+            newPocket.encrypt(getKeyCrypter(), key);
+        }
+        addPocket(newPocket);
     }
 
 
     public void addPocket(WalletPocket pocket) {
-        checkState(!pockets.containsKey(pocket.getCoinType()), "Cannot replace an existing wallet pocket");
-        //TODO check if key crypter is the same
-        pockets.put(pocket.getCoinType(), pocket);
-        pocket.setWallet(this);
+        lock.lock();
+        try {
+            checkState(!pockets.containsKey(pocket.getCoinType()), "Cannot replace an existing wallet pocket");
+            //TODO check if key crypter is the same
+            pockets.put(pocket.getCoinType(), pocket);
+            pocket.setWallet(this);
+        } finally {
+            lock.unlock();
+        }
     }
 
     /**
      * Make the wallet generate all the needed lookahead keys if needed
      */
     public void maybeInitializeAllPockets() {
-        for (WalletPocket pocket : getPockets()) {
-            pocket.maybeInitializeAllKeys();
+        lock.lock();
+        try {
+            for (WalletPocket pocket : getPockets()) {
+                pocket.maybeInitializeAllKeys();
+            }
+        } finally {
+            lock.unlock();
         }
     }
 
@@ -191,7 +231,7 @@ final public class Wallet implements ConnectionEventListener {
         }
     }
 
-    List<CoinType> getCoinTypes() {
+    public List<CoinType> getCoinTypes() {
         lock.lock();
         try {
             return ImmutableList.copyOf(pockets.keySet());
@@ -227,11 +267,40 @@ final public class Wallet implements ConnectionEventListener {
         this.blockchainConnection = null;
     }
 
+    public boolean isConnected() {
+        return blockchainConnection != null;
+    }
 
-    public void sendCoins(Address address, Coin amount) throws InsufficientMoneyException, IOException {
-        WalletPocket pocket = getPocket((CoinType) address.getParameters());
+    public SendRequest sendCoinsOffline(Address address, Coin amount)
+            throws InsufficientMoneyException, NoSuchPocketException {
+        return sendCoinsOffline(address, amount, null);
+    }
 
-        pocket.sendCoins(address, amount);
+    public SendRequest sendCoinsOffline(Address address, Coin amount, @Nullable String password)
+            throws InsufficientMoneyException, NoSuchPocketException {
+        CoinType type = (CoinType) address.getParameters();
+        WalletPocket pocket = getPocket(type);
+        SendRequest request = null;
+        if (pocket != null) {
+            request = pocket.sendCoinsOffline(address, amount, password);
+        } else {
+            throwNoSuchPocket(type);
+        }
+        return request;
+    }
+
+    public void signRequest(SendRequest request) throws InsufficientMoneyException, NoSuchPocketException {
+        WalletPocket pocket = getPocket(request.type);
+        if (pocket != null) {
+            pocket.completeTx(request);
+        } else {
+            throwNoSuchPocket(request.type);
+        }
+    }
+
+    private SendRequest throwNoSuchPocket(CoinType type) throws NoSuchPocketException {
+        throw new NoSuchPocketException("Tried to send from pocket " + type.getName() +
+                " but no such pocket in wallet.");
     }
 
     public void setVersion(int version) {
@@ -434,7 +503,7 @@ final public class Wallet implements ConnectionEventListener {
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private boolean isEncrypted() {
+    public boolean isEncrypted() {
         return masterKey.isEncrypted();
     }
 
@@ -495,6 +564,19 @@ final public class Wallet implements ConnectionEventListener {
             return Splitter.on(" ").splitToList(new String(mnemonicCode, "UTF-8"));
         } catch (UnsupportedEncodingException e) {
             throw new UnreadableWalletException(e.toString());
+        }
+    }
+
+    public void broadcastTx(SendRequest request) throws IOException{
+        broadcastTx(request.type, request.tx, null);
+    }
+
+    private void broadcastTx(CoinType type, Transaction tx, TransactionEventListener listener) throws IOException{
+
+        if (isConnected()) {
+            blockchainConnection.broadcastTx(type, tx, listener);
+        } else {
+            throw new IOException("No connection available");
         }
     }
 }

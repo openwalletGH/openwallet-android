@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.DialogFragment;
@@ -23,6 +22,10 @@ import android.widget.Toast;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.uri.CoinURI;
 import com.coinomi.core.uri.CoinURIParseException;
+import com.coinomi.core.wallet.SendRequest;
+import com.coinomi.core.wallet.Wallet;
+import com.coinomi.core.wallet.exceptions.NoSuchPocketException;
+import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.ui.widget.QrCodeButton;
@@ -30,6 +33,7 @@ import com.coinomi.wallet.util.Keyboard;
 import com.google.bitcoin.core.Address;
 import com.google.bitcoin.core.Coin;
 import com.google.bitcoin.core.InsufficientMoneyException;
+import com.google.bitcoin.crypto.KeyCrypterException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,14 +43,10 @@ import java.io.IOException;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import static com.coinomi.core.Preconditions.checkNotNull;
+
 /**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link SendFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link SendFragment#newInstance} factory method to
- * create an instance of this fragment.
- *
+ *  Fragment that prepares a transaction
  */
 public class SendFragment extends Fragment {
     private static final Logger log = LoggerFactory.getLogger(SendFragment.class);
@@ -54,6 +54,7 @@ public class SendFragment extends Fragment {
     // the fragment initialization parameters
     private static final String COIN_TYPE = "coin_type";
     private static final int REQUEST_CODE_SCAN = 0;
+    private static final int SIGN_TRANSACTION = 1;
 
     private CoinType coinType;
     private WalletApplication application;
@@ -64,14 +65,13 @@ public class SendFragment extends Fragment {
     private QrCodeButton scanQrCodeButton;
     private Button sendConfirmButton;
 
-
     private State state = State.INPUT;
     private Address validatedAddress;
     private Coin sendAmount;
     private DialogFragment popupWindow;
     private Activity activity;
+    @Nullable private WalletActivity mListener;
 
-//    private Transaction sentTransaction = null;
 
     private enum State {
         INPUT, PREPARATION, SENDING, SENT, FAILED
@@ -96,10 +96,7 @@ public class SendFragment extends Fragment {
         @Override
         public void onTextChanged(final CharSequence s, final int start, final int before, final int count) { }
     }
-
     private final SendAmountListener sendAmountListener = new SendAmountListener();
-
-//    private OnFragmentInteractionListener mListener;
 
     /**
      * Use this factory method to create a new instance of
@@ -162,7 +159,6 @@ public class SendFragment extends Fragment {
         return view;
     }
 
-
     private void handleScan() {
         startActivityForResult(new Intent(getActivity(), ScanActivity.class), REQUEST_CODE_SCAN);
     }
@@ -170,19 +166,23 @@ public class SendFragment extends Fragment {
     private void handleSendConfirm() {
         state = State.PREPARATION;
         updateView();
+        if (mListener != null && mListener.getWalletApplication().getWallet() != null) {
+            onMakeTransaction(mListener.getWalletApplication().getWallet(),
+                    validatedAddress, sendAmount);
+        }
+        reset();
+    }
 
-        // TODO show the text feedback in the fragment view
-
-        Toast.makeText(activity, R.string.send_coins_preparation_msg, Toast.LENGTH_SHORT).show();
-
+    public void onMakeTransaction(Wallet wallet, Address toAddress, Coin amount) {
+        Intent intent = new Intent(getActivity(), SignTransactionActivity.class);
         try {
-            application.getWallet().sendCoins(validatedAddress, sendAmount);
-            reset();
-            Toast.makeText(activity, R.string.send_coins_success, Toast.LENGTH_SHORT).show();
+            SendRequest request = checkNotNull(wallet).sendCoinsOffline(toAddress, amount);
+            intent.putExtra(Constants.ARG_SEND_REQUEST, request);
+            startActivityForResult(intent, SIGN_TRANSACTION);
         } catch (InsufficientMoneyException e) {
-            Toast.makeText(activity, R.string.send_coins_error_not_enough_money, Toast.LENGTH_LONG).show();
-        } catch (IOException e) {
-            Toast.makeText(activity, R.string.send_coins_error_network, Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), R.string.send_coins_error_not_enough_money, Toast.LENGTH_LONG).show();
+        } catch (NoSuchPocketException e) {
+            Toast.makeText(getActivity(), R.string.no_such_pocket_error, Toast.LENGTH_LONG).show();
         }
     }
 
@@ -192,8 +192,8 @@ public class SendFragment extends Fragment {
         sendAmountView.setText("");
         validatedAddress = null;
         sendAmount = null;
+        updateView();
     }
-
 
     @Override
     public void onActivityResult(final int requestCode, final int resultCode, final Intent intent) {
@@ -204,31 +204,53 @@ public class SendFragment extends Fragment {
                 try {
                     final CoinURI coinUri = new CoinURI(coinType, input);
 
-                    validatedAddress = coinUri.getAddress();
-                    if (validatedAddress == null) {
-                        throw new CoinURIParseException("missing address");
-                    }
+                    Address address = coinUri.getAddress();
                     Coin amount = coinUri.getAmount();
                     String label = coinUri.getLabel();
 
-                    updateStateFrom(validatedAddress, amount, label);
+                    updateStateFrom(address, amount, label);
                 } catch (final CoinURIParseException x) {
-                    log.info("got invalid bitcoin uri: '" + input + "'", x);
+                    String error = getResources().getString(R.string.uri_error, x.getMessage());
+                    Toast.makeText(getActivity(), error, Toast.LENGTH_LONG).show();
+                }
+            }
+        } else if (requestCode == SIGN_TRANSACTION) {
+            if (resultCode == Activity.RESULT_OK) {
+                Exception error = (Exception) intent.getSerializableExtra(Constants.ARG_ERROR);
+
+                if (error == null) {
+                    Toast.makeText(getActivity(), R.string.sent, Toast.LENGTH_SHORT).show();
+                } else {
+                    if (error instanceof InsufficientMoneyException) {
+                        Toast.makeText(getActivity(), R.string.send_coins_error_not_enough_money, Toast.LENGTH_LONG).show();
+                    } else if (error instanceof NoSuchPocketException) {
+                        Toast.makeText(getActivity(), R.string.no_such_pocket_error, Toast.LENGTH_LONG).show();
+                    } else if (error instanceof KeyCrypterException) {
+                        Toast.makeText(getActivity(), R.string.password_failed, Toast.LENGTH_LONG).show();
+                    } else if (error instanceof IOException) {
+                        Toast.makeText(getActivity(), R.string.send_coins_error_network, Toast.LENGTH_LONG).show();
+                    } else {
+                        throw new RuntimeException(error);
+                    }
                 }
             }
         }
     }
 
 
-    private void updateStateFrom(final @Nonnull Address address, final @Nullable Coin amount,
-                                 final @Nullable String label) {
+    private void updateStateFrom(final Address address, final @Nullable Coin amount,
+                                 final @Nullable String label) throws CoinURIParseException {
         log.info("got {}", address);
+        if (address == null) {
+            throw new CoinURIParseException("missing address");
+        }
 
         // delay these actions until fragment is resumed
         handler.post(new Runnable()
         {
             @Override
             public void run() {
+                validatedAddress = address;
                 receivingAddressView.setText(address.toString());
                 if (isAmountValid(amount)) {
                     sendAmountView.setText(amount.toPlainString());
@@ -401,34 +423,19 @@ public class SendFragment extends Fragment {
         this.activity = activity;
         application = (WalletApplication) activity.getApplication();
         fragmentManager = getFragmentManager();
-//        try {
-//            mListener = (OnFragmentInteractionListener) activity;
-//        } catch (ClassCastException e) {
-//            throw new ClassCastException(activity.toString()
-//                    + " must implement OnFragmentInteractionListener");
-//        }
+        try {
+            mListener = (WalletActivity) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement " + WalletActivity.class);
+        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-//        mListener = null;
+        mListener = null;
         application = null;
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        public void onFragmentInteraction(Uri uri);
     }
 
 }
