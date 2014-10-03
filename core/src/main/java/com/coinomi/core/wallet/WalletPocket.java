@@ -180,6 +180,10 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
 
     //region Vending transactions and other internal state
 
+    public boolean isNew() {
+        return unspent.size() + spent.size() + pending.size() == 0;
+    }
+
     /**
      * Returns a set of all transactions in the wallet.
      * @param includeDead     If true, transactions that were overridden by a double spend are included.
@@ -1039,14 +1043,6 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
         addressesPendingSubscription.clear();
         statusPendingUpdates.clear();
         fetchingTransactions.clear();
-    }
-
-    @VisibleForTesting void broadcastTransaction(Transaction tx) throws IOException {
-        if (blockchainConnection != null) {
-            blockchainConnection.broadcastTx(coinType, tx, this);
-        } else {
-            throw new IOException("No connection available");
-        }
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////

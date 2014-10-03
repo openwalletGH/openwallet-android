@@ -1,7 +1,6 @@
 package com.coinomi.wallet.ui;
 
 import android.app.Activity;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,12 +13,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.TextView;
 
+import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.wallet.WalletPocket;
 import com.coinomi.core.wallet.WalletPocketEventListener;
-import com.coinomi.core.coins.BitcoinMain;
-import com.coinomi.core.coins.CoinType;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.ui.widget.Amount;
@@ -33,12 +30,9 @@ import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.RejectedExecutionException;
 
 import javax.annotation.Nonnull;
@@ -76,6 +70,7 @@ public class InfoFragment extends Fragment implements WalletPocketEventListener,
     private TransactionsListAdapter adapter;
 
     private LoaderManager loaderManager;
+    private View emptyPocketMessage;
 
     /**
      * Use this factory method to create a new instance of
@@ -119,9 +114,10 @@ public class InfoFragment extends Fragment implements WalletPocketEventListener,
         // Initialize your header here.
         transactionRows.addHeaderView(header, null, false);
 
+        emptyPocketMessage =  header.findViewById(R.id.history_empty);
         // Hide empty message if have some transaction history
         if (pocket.getTransactions(false).size() > 0) {
-            header.findViewById(R.id.history_empty).setVisibility(View.GONE);
+            emptyPocketMessage.setVisibility(View.GONE);
         }
 
         // Init list adapter
@@ -165,8 +161,15 @@ public class InfoFragment extends Fragment implements WalletPocketEventListener,
 
     @Override
     public void onTransactionConfidenceChanged(WalletPocket pocket, Transaction tx) { }
+
     @Override
-    public void onPocketChanged(WalletPocket pocket) { }
+    public void onPocketChanged(WalletPocket pocket) {
+        if (emptyPocketMessage.isShown()) {
+            if (!pocket.isNew()) {
+                emptyPocketMessage.setVisibility(View.GONE);
+            }
+        }
+    }
 
     private void updateBalance(Coin newBalance) {
         updateBalance(newBalance, getView());
