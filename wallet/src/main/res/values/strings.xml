@@ -60,6 +60,8 @@
 
     <!-- Info fragment -->
     <string name="wallet_transactions_coinbase">mined</string>
+    <string name="history_label">history</string>
+    <string name="history_empty">No coins received so far!\n\nYou can get some by trading for traditional money, selling goods or services or earning by working.</string>
 
     <!-- Receive fragment -->
     <string name="sample_address_format">XXXX XXXX XXXX XXXXX\nXXXX XXXX XXXX XXXXX</string>
@@ -69,10 +71,9 @@
     <string name="pay_to_label">pay to</string>
     <string name="amount_to_send_label">amount</string>
     <string name="send_coins_label">send</string>
-    <string name="history_label">history</string>
-    <string name="history_empty">No coins received so far!\n\nYou can get some by trading for traditional money, selling goods or services or earning by working.</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="uri_error">There was a problem decoding URI: %1$s</string>
+    <string name="address_error">Provided address is not valid.</string>
+    <string name="amount_error">Provided amount is not valid.</string>
 
     <!-- Set Password fragment -->
     <string name="set_password_info">Set a password to protect your wallet in everyday use. Do not lose or forget your password as it will be impossible to restore your wallet.</string>
@@ -94,7 +95,7 @@
 
     <!-- SignTransactionFragment -->
     <string name="preparing_transaction">Please wait while your transaction is being prepared and sent.</string>
-    <string name="no_such_pocket_error">Error occurred while accessing this pocket. If problem persists, try to restore the wallet from seed.</string>
+    <string name="no_such_pocket_error">Error occurred while accessing this wallet pocket. If problem persists, try to restore the wallet from seed.</string>
     <string name="password_failed">The password entered is not valid.</string>
     <string name="sent">Sent!</string>
 

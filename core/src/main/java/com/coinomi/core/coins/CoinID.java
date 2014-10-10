@@ -8,12 +8,12 @@ public enum CoinID {
     BITCOIN_TEST(BitcoinTest.get()),
     LITECOIN_MAIN(LitecoinMain.get()),
     LITECOIN_TEST(LitecoinTest.get()),
-    PEERCOIN_MAIN(PeercoinMain.get()),
-    PEERCOIN_TEST(PeercoinTest.get()),
     DOGECOIN_MAIN(DogecoinMain.get()),
-    DOGECOIN_TEST(DogecoinTest.get()),
-    DARKCOIN_MAIN(DarkcoinMain.get()),
-    DARKCOIN_TEST(DarkcoinTest.get());
+    DOGECOIN_TEST(DogecoinTest.get());
+//    PEERCOIN_MAIN(PeercoinMain.get()),
+//    PEERCOIN_TEST(PeercoinTest.get()),
+//    DARKCOIN_MAIN(DarkcoinMain.get()),
+//    DARKCOIN_TEST(DarkcoinTest.get());
 
     private final CoinType type;
 

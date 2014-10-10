@@ -14,7 +14,8 @@ public class DarkcoinMain extends CoinType {
         name = "Darkcoin";
         symbol = "DRK";
         uriScheme = "darkcoin";
-        bip44Index = 5;
+        bip44Index = 10;
+        throw new RuntimeException(name+" bip44Index " + bip44Index + "is not standardized");
     }
 
     private static DarkcoinMain instance;

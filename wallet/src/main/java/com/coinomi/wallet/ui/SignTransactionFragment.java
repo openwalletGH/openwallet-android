@@ -129,6 +129,8 @@ public class SignTransactionFragment extends Fragment {
             if (resultCode == Activity.RESULT_OK) {
                 password = intent.getStringExtra(Constants.ARG_PASSWORD);
                 maybeStartTask();
+            } else {
+                getActivity().finish();
             }
         }
     }

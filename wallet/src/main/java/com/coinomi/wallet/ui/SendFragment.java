@@ -1,9 +1,6 @@
 package com.coinomi.wallet.ui;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -17,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.coinomi.core.coins.CoinType;
@@ -31,6 +29,7 @@ import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.ui.widget.QrCodeButton;
 import com.coinomi.wallet.util.Keyboard;
 import com.google.bitcoin.core.Address;
+import com.google.bitcoin.core.AddressFormatException;
 import com.google.bitcoin.core.Coin;
 import com.google.bitcoin.core.InsufficientMoneyException;
 import com.google.bitcoin.crypto.KeyCrypterException;
@@ -40,7 +39,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import static com.coinomi.core.Preconditions.checkNotNull;
@@ -61,12 +59,14 @@ public class SendFragment extends Fragment {
     private FragmentManager fragmentManager;
     private Handler handler = new Handler();
     private EditText receivingAddressView;
+    private TextView addressError;
     private EditText sendAmountView;
+    private TextView amountError;
     private QrCodeButton scanQrCodeButton;
     private Button sendConfirmButton;
 
     private State state = State.INPUT;
-    private Address validatedAddress;
+    private Address address;
     private Coin sendAmount;
     private DialogFragment popupWindow;
     private Activity activity;
@@ -81,13 +81,13 @@ public class SendFragment extends Fragment {
         @Override
         public void onFocusChange(final View v, final boolean hasFocus) {
             if (!hasFocus) {
-                validateAmount(true);
+                validateAmount();
             }
         }
 
         @Override
         public void afterTextChanged(final Editable s) {
-            validateAmount(false);
+            validateAmount();
         }
 
         @Override
@@ -97,6 +97,25 @@ public class SendFragment extends Fragment {
         public void onTextChanged(final CharSequence s, final int start, final int before, final int count) { }
     }
     private final SendAmountListener sendAmountListener = new SendAmountListener();
+
+
+    private final class ReceivingAddressListener implements View.OnFocusChangeListener, TextWatcher {
+        @Override
+        public void onFocusChange(final View v, final boolean hasFocus) {
+            if (!hasFocus) {
+                validateAddress();
+            }
+        }
+
+        @Override
+        public void afterTextChanged(final Editable s) {
+            validateAddress(true);
+        }
+
+        @Override public void beforeTextChanged(final CharSequence s, final int start, final int count, final int after) { }
+        @Override public void onTextChanged(final CharSequence s, final int start, final int before, final int count) { }
+    }
+    private final ReceivingAddressListener receivingAddressListener = new ReceivingAddressListener();
 
     /**
      * Use this factory method to create a new instance of
@@ -131,9 +150,17 @@ public class SendFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_send, container, false);
 
         receivingAddressView = (EditText) view.findViewById(R.id.send_to_address);
+        receivingAddressView.setOnFocusChangeListener(receivingAddressListener);
+        receivingAddressView.addTextChangedListener(receivingAddressListener);
+
         sendAmountView = (EditText) view.findViewById(R.id.send_amount);
         sendAmountView.setOnFocusChangeListener(sendAmountListener);
         sendAmountView.addTextChangedListener(sendAmountListener);
+
+        addressError = (TextView) view.findViewById(R.id.address_error_message);
+        addressError.setVisibility(View.INVISIBLE);
+        amountError = (TextView) view.findViewById(R.id.amount_error_message);
+        amountError.setVisibility(View.INVISIBLE);
 
         scanQrCodeButton = (QrCodeButton) view.findViewById(R.id.scan_qr_code);
         scanQrCodeButton.setOnClickListener(new View.OnClickListener() {
@@ -147,8 +174,8 @@ public class SendFragment extends Fragment {
         sendConfirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                validateReceivingAddress(true);
+                validateAddress();
+                validateAmount();
                 if (everythingValid())
                     handleSendConfirm();
                 else
@@ -168,7 +195,7 @@ public class SendFragment extends Fragment {
         updateView();
         if (mListener != null && mListener.getWalletApplication().getWallet() != null) {
             onMakeTransaction(mListener.getWalletApplication().getWallet(),
-                    validatedAddress, sendAmount);
+                    address, sendAmount);
         }
         reset();
     }
@@ -187,11 +214,11 @@ public class SendFragment extends Fragment {
     }
 
     private void reset() {
-        state = State.INPUT;
         receivingAddressView.setText("");
         sendAmountView.setText("");
-        validatedAddress = null;
+        address = null;
         sendAmount = null;
+        state = State.INPUT;
         updateView();
     }
 
@@ -250,7 +277,7 @@ public class SendFragment extends Fragment {
         {
             @Override
             public void run() {
-                validatedAddress = address;
+                SendFragment.this.address = address;
                 receivingAddressView.setText(address.toString());
                 if (isAmountValid(amount)) {
                     sendAmountView.setText(amount.toPlainString());
@@ -274,7 +301,7 @@ public class SendFragment extends Fragment {
     }
 
     private boolean isOutputsValid() {
-        return validatedAddress != null;
+        return address != null;
     }
 
     private boolean isAmountValid() {
@@ -282,7 +309,6 @@ public class SendFragment extends Fragment {
     }
 
     private boolean isAmountValid(Coin amount) {
-        // TODO, check if we have the available amount in the wallet
         return amount != null && amount.signum() > 0;
     }
 
@@ -302,118 +328,54 @@ public class SendFragment extends Fragment {
             log.warn("unclear focus");
     }
 
-    private void validateAmount(final boolean popups) {
+    private void validateAmount() {
         try {
-            Coin amount = Coin.parseCoin(String.valueOf(sendAmountView.getText()));
-            if (isAmountValid(amount)) {
-                sendAmount = amount;
-            }
-            else {
+            final String amountStr = sendAmountView.getText().toString().trim();
+            if (!amountStr.isEmpty()) {
+                Coin amount = Coin.parseCoin(amountStr);
+                if (isAmountValid(amount)) {
+                    // TODO, check if we have the available amount in the wallet
+                    sendAmount = amount;
+                } else {
+                    throw new IllegalArgumentException("Amount " + amountStr + " is invalid");
+                }
+            } else {
                 sendAmount = null;
+                amountError.setVisibility(View.INVISIBLE);
             }
         } catch (IllegalArgumentException ignore) {
             sendAmount = null;
+            amountError.setText(R.string.address_error);
+            amountError.setVisibility(View.VISIBLE);
         }
         updateView();
     }
 
-    private void validateReceivingAddress(final boolean popups)
-    {
-        // TODO implement validation
-//        try
-//        {
-//            final String addressStr = receivingAddressView.getText().toString().trim();
-//            if (!addressStr.isEmpty())
-//            {
-//                final NetworkParameters addressParams = Address.getParametersFromAddress(addressStr);
-//                if (addressParams != null && !addressParams.equals(Constants.NETWORK_PARAMETERS))
-//                {
-//                    // address is valid, but from different known network
-//                    if (popups)
-//                        popupMessage(receivingAddressView,
-//                                getString(R.string.send_coins_fragment_receiving_address_error_cross_network, addressParams.getId()));
-//                }
-//                else if (addressParams == null)
-//                {
-//                    // address is valid, but from different unknown network
-//                    if (popups)
-//                        popupMessage(receivingAddressView, getString(R.string.send_coins_fragment_receiving_address_error_cross_network_unknown));
-//                }
-//                else
-//                {
-//                    // valid address
-//                    final String label = AddressBookProvider.resolveLabel(activity, addressStr);
-//                    validatedAddress = new AddressAndLabel(Constants.NETWORK_PARAMETERS, addressStr, label);
-//                    receivingAddressView.setText(null);
-//                }
-//            }
-//            else
-//            {
-//                // empty field should not raise error message
-//            }
-//        }
-//        catch (final AddressFormatException x)
-//        {
-//            // could not decode address at all
-//            if (popups)
-//                popupMessage(receivingAddressView, getString(R.string.send_coins_fragment_receiving_address_error));
-//        }
-//
-//        updateView();
+    private void validateAddress() {
+        validateAddress(false);
     }
 
-    //    // TODO: Rename method, update argument and hook method into UI event
-//    public void onButtonPressed(Uri uri) {
-//        if (mListener != null) {
-//            mListener.onFragmentInteraction(uri);
-//        }
-//    }
-
-    private void popupMessage(@Nonnull final View anchorNotUsed, @Nonnull final String message) {
-        dismissPopup();
-
-        Bundle bundle = new Bundle();
-        bundle.putString(ErrorDialogFragment.MESSAGE, message);
-        popupWindow = new ErrorDialogFragment();
-        popupWindow.setArguments(bundle);
-        popupWindow.show(fragmentManager, ErrorDialogFragment.TAG);
-    }
-
-    private void dismissPopup() {
-        if (popupWindow != null) {
-            popupWindow.dismiss();
-            popupWindow = null;
+    private void validateAddress(boolean isTyping) {
+        try {
+            final String addressStr = receivingAddressView.getText().toString().trim();
+            if (!addressStr.isEmpty()) {
+                address = new Address(coinType, addressStr);
+            } else {
+                // empty field should not raise error message
+                address = null;
+            }
+            addressError.setVisibility(View.INVISIBLE);
         }
-    }
-
-    public static class ErrorDialogFragment extends DialogFragment {
-        public static final String TAG = "error_dialog_fragment";
-        public static final String MESSAGE = "message";
-        private String message;
-
-        public ErrorDialogFragment() {}
-
-        @Override
-        public void setArguments(Bundle args) {
-            super.setArguments(args);
-            message = args.getString(MESSAGE);
+        catch (final AddressFormatException x) {
+            // could not decode address at all
+            if (!isTyping) {
+                address = null;
+                addressError.setText(R.string.address_error);
+                addressError.setVisibility(View.VISIBLE);
+            }
         }
 
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Use the Builder class for convenient dialog construction
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setMessage(message)
-                    .setNeutralButton(R.string.button_dismiss, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-//                            dismissPopup();
-                            dismiss();
-                        }
-                    });
-            // Create the AlertDialog object and return it
-            return builder.create();
-        }
+        updateView();
     }
 
     @Override

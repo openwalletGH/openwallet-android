@@ -37,7 +37,8 @@
             android:layout_toStartOf="@id/scan_qr_code"
             android:layout_alignTop="@id/scan_qr_code"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
+            android:layout_alignParentStart="true"
+            android:inputType="textMultiLine|textNoSuggestions" />
 
         <TextView
             android:id="@+id/restore_message"

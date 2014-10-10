@@ -11,30 +11,16 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
-import com.coinomi.core.Preconditions;
 import com.coinomi.core.coins.BitcoinMain;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.DogecoinMain;
 import com.coinomi.core.coins.LitecoinMain;
-import com.coinomi.core.wallet.SendRequest;
-import com.coinomi.core.wallet.Wallet;
-import com.coinomi.core.wallet.exceptions.NoSuchPocketException;
-import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
-import com.google.bitcoin.core.Address;
-import com.google.bitcoin.core.Coin;
-import com.google.bitcoin.core.InsufficientMoneyException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nullable;
-
-import static com.coinomi.core.Preconditions.checkNotNull;
-import static com.coinomi.core.Preconditions.checkState;
 
 /**
  * @author Giannis Dzegoutanis
@@ -52,7 +38,6 @@ final public class WalletActivity extends ActionBarActivity implements
     private static final int MENU_LITECOIN = 2;
 
     private static final int REQUEST_CODE_SCAN = 0;
-    private static final int SIGN_TRANSACTION = 1;
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -70,8 +55,6 @@ final public class WalletActivity extends ActionBarActivity implements
     private ViewPager mViewPager;
     private AsyncTask<Void, Void, Void> refreshTask;
     private CoinType currentType;
-    @Nullable private Wallet wallet;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,8 +84,6 @@ final public class WalletActivity extends ActionBarActivity implements
 
         // Hack to make the ViewPager select the InfoFragment
         mNavigationDrawerFragment.reselectLastItem();
-
-        wallet = getWalletApplication().getWallet();
     }
 
     @Override

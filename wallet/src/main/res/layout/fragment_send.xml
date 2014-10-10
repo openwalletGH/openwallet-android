@@ -31,8 +31,18 @@
             android:layout_toLeftOf="@id/scan_qr_code"
             android:layout_below="@+id/pay_to_label"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
+            android:layout_alignParentStart="true"
+            android:inputType="textMultiLine|textNoSuggestions" />
 
+        <TextView
+            android:id="@+id/address_error_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/send_to_address"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            style="@style/ErrorText"
+            android:text="Address error" />
 
         <com.coinomi.wallet.ui.widget.QrCodeButton
             android:id="@+id/scan_qr_code"
@@ -43,8 +53,6 @@
             android:layout_alignTop="@+id/send_to_address"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true" />
-
-
 
         <TextView
             android:id="@+id/amount_to_send_label"
@@ -61,11 +69,21 @@
             android:id="@+id/send_amount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:inputType="numberDecimal"
+            android:inputType="numberDecimal|textNoSuggestions"
             android:ems="10"
             android:layout_below="@+id/amount_to_send_label"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true" />
+
+        <TextView
+            android:id="@+id/amount_error_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/send_amount"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            style="@style/ErrorText"
+            android:text="Amount error" />
 
         <Button
             android:layout_width="wrap_content"
