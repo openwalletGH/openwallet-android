@@ -579,7 +579,10 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
         finally {
             lock.unlock();
         }
-        walletSaveLater();
+        // Skip saving null statuses
+        if (newStatus.getStatus() != null) {
+            walletSaveLater();
+        }
     }
 
     private boolean isAddressStatusChanged(AddressStatus addressStatus) {

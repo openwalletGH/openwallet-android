@@ -246,10 +246,10 @@ public class WalletPocketProtobufSerializer {
         } else {
             chain = SimpleHDKeyChain.fromProtobuf(walletProto.getKeyList());
         }
-        WalletPocket wallet = new WalletPocket(chain, coinType);
+        WalletPocket pocket = new WalletPocket(chain, coinType);
 
         if (walletProto.hasDescription()) {
-            wallet.setDescription(walletProto.getDescription());
+            pocket.setDescription(walletProto.getDescription());
         }
 
         // Read all transactions and insert into the txMap.
@@ -263,14 +263,14 @@ public class WalletPocketProtobufSerializer {
             wtxs.add(connectTransactionOutputs(txProto));
         }
 
-        wallet.restoreWalletTransactions(wtxs);
+        pocket.restoreWalletTransactions(wtxs);
 
         // Read all the address statuses
         try {
             for (Protos.AddressStatus sp : walletProto.getAddressStatusList()) {
                 Address addr = new Address(coinType, sp.getAddress());
                 AddressStatus status = new AddressStatus(addr, sp.getStatus());
-                wallet.commitAddressStatus(status);
+                pocket.commitAddressStatus(status);
             }
         } catch (AddressFormatException e) {
             throw new UnreadableWalletException(e.getMessage(), e);
@@ -278,22 +278,22 @@ public class WalletPocketProtobufSerializer {
 
         // Update the lastBlockSeenHash.
         if (!walletProto.hasLastSeenBlockHash()) {
-            wallet.setLastBlockSeenHash(null);
+            pocket.setLastBlockSeenHash(null);
         } else {
-            wallet.setLastBlockSeenHash(byteStringToHash(walletProto.getLastSeenBlockHash()));
+            pocket.setLastBlockSeenHash(byteStringToHash(walletProto.getLastSeenBlockHash()));
         }
         if (!walletProto.hasLastSeenBlockHeight()) {
-            wallet.setLastBlockSeenHeight(-1);
+            pocket.setLastBlockSeenHeight(-1);
         } else {
-            wallet.setLastBlockSeenHeight(walletProto.getLastSeenBlockHeight());
+            pocket.setLastBlockSeenHeight(walletProto.getLastSeenBlockHeight());
         }
         // Will default to zero if not present.
-        wallet.setLastBlockSeenTimeSecs(walletProto.getLastSeenBlockTimeSecs());
+        pocket.setLastBlockSeenTimeSecs(walletProto.getLastSeenBlockTimeSecs());
 
         // Make sure the object can be re-used to read another wallet without corruption.
         txMap.clear();
 
-        return wallet;
+        return pocket;
     }
 
     private void readTransaction(Protos.Transaction txProto, CoinType params) throws UnreadableWalletException {
