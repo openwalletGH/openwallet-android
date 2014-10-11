@@ -72,7 +72,6 @@ public class CoinServiceImpl extends Service implements CoinService {
     private BigInteger notificationAccumulatedAmount = BigInteger.ZERO;
     private final List<Address> notificationAddresses = new LinkedList<Address>();
     private AtomicInteger transactionsReceived = new AtomicInteger();
-    private int bestChainHeightEver;
     private long serviceCreatedAt;
     private boolean resetBlockchainOnShutdown = false;
 
@@ -642,8 +641,6 @@ public class CoinServiceImpl extends Service implements CoinService {
         unregisterReceiver(connectivityReceiver);
 
         removeBroadcastBlockchainState();
-
-        config.setBestChainHeightEver(bestChainHeightEver);
 
         delayHandler.removeCallbacksAndMessages(null);
 

@@ -25,6 +25,7 @@ import android.widget.Toast;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
+import com.coinomi.wallet.WalletApplication;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
@@ -80,12 +81,9 @@ public class NavigationDrawerFragment extends Fragment {
         }
 
         // Select either the default item (0) or the last selected item.
-        reselectLastItem();
-    }
-
-    void reselectLastItem() {
         selectItem(mCurrentSelectedPosition);
     }
+
 
     @Override
     public void onActivityCreated (Bundle savedInstanceState) {
@@ -203,7 +201,7 @@ public class NavigationDrawerFragment extends Fragment {
 
 
 
-    private void selectItem(int position) {
+    void selectItem(int position) {
         mCurrentSelectedPosition = position;
         if (mDrawerListView != null) {
             mDrawerListView.setItemChecked(position, true);

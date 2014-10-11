@@ -68,6 +68,7 @@ public class Constants {
         COINS_ICONS.put(LitecoinMain.get(), R.drawable.litecoin);
     }
 
+    public static final CoinType DEFAULT_COIN = BitcoinMain.get();
     public static final List<CoinType> DEFAULT_COINS = ImmutableList.of(BitcoinMain.get(),
             DogecoinMain.get(), LitecoinMain.get());
 

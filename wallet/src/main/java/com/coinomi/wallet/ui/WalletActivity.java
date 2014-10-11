@@ -34,9 +34,6 @@ final public class WalletActivity extends ActionBarActivity implements
     private static final int RECEIVE = 0;
     private static final int INFO = 1;
     private static final int SEND = 2;
-    private static final int MENU_BITCOIN = 0;
-    private static final int MENU_DOGECOIN = 1;
-    private static final int MENU_LITECOIN = 2;
 
     private static final int REQUEST_CODE_SCAN = 0;
 
@@ -68,11 +65,10 @@ final public class WalletActivity extends ActionBarActivity implements
             startIntro();
             finish();
         }
+        mTitle = getTitle();
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
-        mTitle = getTitle();
-
         // Set up the drawer.
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
@@ -85,13 +81,16 @@ final public class WalletActivity extends ActionBarActivity implements
         // want to re-render that if we go to the SendFragment and back
         mViewPager.setOffscreenPageLimit(2);
 
+        // Get the last used wallet pocket
+        CoinType lastPocket = getWalletApplication().getConfiguration().getLastPocket();
+        int lastPocketIndex = Constants.DEFAULT_COINS.indexOf(lastPocket);
+
         // Hack to make the ViewPager select the InfoFragment
-        mNavigationDrawerFragment.reselectLastItem();
+        mNavigationDrawerFragment.selectItem(lastPocketIndex);
     }
 
     @Override
-    protected void onResume()
-    {
+    protected void onResume() {
         super.onResume();
 
         getWalletApplication().startBlockchainService(true);
@@ -106,26 +105,23 @@ final public class WalletActivity extends ActionBarActivity implements
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
-        CoinType selectedType = DogecoinMain.get();
-        if (position == MENU_BITCOIN) {
-            selectedType = BitcoinMain.get();
-        } else if (position == MENU_DOGECOIN) {
-            selectedType = DogecoinMain.get();
-        } else if (position == MENU_LITECOIN) {
-            selectedType = LitecoinMain.get();
-        }
+        CoinType selectedType = Constants.DEFAULT_COINS.get(position);
 
         log.info("Coin selected {} {}", position, selectedType);
 
-        if (mViewPager != null && !selectedType.equals(currentType)) {
-            AppSectionsPagerAdapter adapter = new AppSectionsPagerAdapter(this, selectedType);
+        openPocket(selectedType);
+    }
+
+    private void openPocket(CoinType coinType) {
+        if (mViewPager != null && !coinType.equals(currentType)) {
+            currentType = coinType;
+            mTitle = coinType.getName();
+            coinIconRes = Constants.COINS_ICONS.get(coinType);
+            AppSectionsPagerAdapter adapter = new AppSectionsPagerAdapter(this, coinType);
             mViewPager.setAdapter(adapter);
             mViewPager.setCurrentItem(INFO);
             mViewPager.getAdapter().notifyDataSetChanged();
-            currentType = selectedType;
-
-            mTitle = selectedType.getName();
-            coinIconRes = Constants.COINS_ICONS.get(selectedType);
+            getWalletApplication().getConfiguration().touchLastPocket(coinType);
         }
     }
 
@@ -173,8 +169,6 @@ final public class WalletActivity extends ActionBarActivity implements
 
         return super.onOptionsItemSelected(item);
     }
-
-
 
     private void refreshWallet() {
         if (refreshTask == null) {
