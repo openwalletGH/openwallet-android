@@ -9,6 +9,7 @@ import com.coinomi.stratumj.ServerAddress;
 import com.google.common.collect.ImmutableList;
 
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -25,6 +26,7 @@ public class Constants {
     public static final String ARG_TRANSACTION = "transaction";
     public static final String ARG_SEND_REQUEST = "send_request";
     public static final String ARG_ERROR = "error";
+    public static final String ARG_MESSAGE = "message";
 
     public static final boolean TEST = true;
 
@@ -59,10 +61,17 @@ public class Constants {
             new CoinAddress(LitecoinMain.get(), new ServerAddress("54.195.124.108", 5002))
     );
 
+    public static final HashMap<CoinType, Integer> COINS_ICONS = new HashMap();
+    static {
+        COINS_ICONS.put(BitcoinMain.get(), R.drawable.bitcoin);
+        COINS_ICONS.put(DogecoinMain.get(), R.drawable.dogecoin);
+        COINS_ICONS.put(LitecoinMain.get(), R.drawable.litecoin);
+    }
+
     public static final List<CoinType> DEFAULT_COINS = ImmutableList.of(BitcoinMain.get(),
             DogecoinMain.get(), LitecoinMain.get());
 
     public static final long WALLET_WRITE_DELAY = 3;
     public static final TimeUnit WALLET_WRITE_DELAY_UNIT = TimeUnit.SECONDS;
-    public static final String ARG_MESSAGE = "message";
+
 }

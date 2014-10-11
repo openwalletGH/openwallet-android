@@ -16,6 +16,7 @@ import com.coinomi.core.coins.BitcoinMain;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.DogecoinMain;
 import com.coinomi.core.coins.LitecoinMain;
+import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
 
@@ -48,6 +49,8 @@ final public class WalletActivity extends ActionBarActivity implements
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
     private CharSequence mTitle;
+
+    private int coinIconRes;
 
     /**
      * For SharedPreferences, used to check if first launch ever.
@@ -112,6 +115,9 @@ final public class WalletActivity extends ActionBarActivity implements
             selectedType = LitecoinMain.get();
         }
 
+        mTitle = selectedType.getName();
+        coinIconRes = Constants.COINS_ICONS.get(selectedType);
+
         log.info("Coin selected {} {}", position, selectedType);
 
         if (mViewPager != null && !selectedType.equals(currentType)) {
@@ -127,6 +133,7 @@ final public class WalletActivity extends ActionBarActivity implements
         ActionBar actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         actionBar.setDisplayShowTitleEnabled(true);
+        actionBar.setIcon(coinIconRes);
         actionBar.setTitle(mTitle);
     }
 
