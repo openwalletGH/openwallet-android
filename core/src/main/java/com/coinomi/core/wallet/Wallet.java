@@ -128,7 +128,6 @@ final public class Wallet implements ConnectionEventListener {
     /**
      * Get a pocket for a coin type. Returns null if no pocket exists
      */
-    @Nullable
     public WalletPocket getPocket(CoinType coinType) {
         lock.lock();
         try {
@@ -520,7 +519,7 @@ final public class Wallet implements ConnectionEventListener {
 
         lock.lock();
         try {
-            seed = seed.encrypt(keyCrypter, aesKey);
+            if (seed != null) seed = seed.encrypt(keyCrypter, aesKey);
             masterKey = masterKey.encrypt(keyCrypter, aesKey, null);
 
             for (WalletPocket pocket : pockets.values()) {
@@ -572,7 +571,6 @@ final public class Wallet implements ConnectionEventListener {
     }
 
     private void broadcastTx(CoinType type, Transaction tx, TransactionEventListener listener) throws IOException{
-
         if (isConnected()) {
             blockchainConnection.broadcastTx(type, tx, listener);
         } else {

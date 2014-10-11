@@ -38,10 +38,9 @@ import com.google.bitcoin.core.TransactionBag;
 import com.google.bitcoin.core.TransactionConfidence;
 import com.google.bitcoin.core.TransactionConfidence.ConfidenceType;
 import com.google.bitcoin.core.TransactionInput;
-import com.google.bitcoin.core.TransactionInput.ConnectionResult;
 import com.google.bitcoin.core.TransactionInput.ConnectMode;
+import com.google.bitcoin.core.TransactionInput.ConnectionResult;
 import com.google.bitcoin.core.TransactionOutput;
-import com.google.bitcoin.core.Utils;
 import com.google.bitcoin.core.VarInt;
 import com.google.bitcoin.crypto.DeterministicKey;
 import com.google.bitcoin.crypto.KeyCrypter;
@@ -68,7 +67,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.crypto.params.KeyParameter;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -86,8 +84,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import javax.annotation.Nullable;
 
-import static com.coinomi.core.Preconditions.checkNotNull;
 import static com.coinomi.core.Preconditions.checkArgument;
+import static com.coinomi.core.Preconditions.checkNotNull;
 import static com.coinomi.core.Preconditions.checkState;
 
 /**
@@ -592,9 +590,8 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
             if (addressesStatus.containsKey(address)) {
                 String previousStatus = addressesStatus.get(address);
                 if (previousStatus == null) {
-                    return previousStatus != newStatus;
-                }
-                else {
+                    return newStatus != null; // Status changed if newStatus is not null
+                } else {
                     return !previousStatus.equals(newStatus);
                 }
             }
@@ -796,7 +793,7 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
                 }
             } else {
                 log.error("Could not find {} in the transactions pool. Aborting applying state",
-                        tx.getHash());
+                        historyTx.getTxHash());
                 return;
             }
         }
@@ -1214,7 +1211,6 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
         checkState(address.getParameters() instanceof CoinType);
         SendRequest request = SendRequest.to(address, amount);
         request.aesKey = aesKey;
-        request.feePerKb = ((CoinType)address.getParameters()).getFeePerKb();
 
         return request;
     }

@@ -20,16 +20,13 @@ package com.coinomi.core.wallet;
 import com.coinomi.core.coins.CoinType;
 import com.google.bitcoin.core.Address;
 import com.google.bitcoin.core.Coin;
-import com.google.bitcoin.core.ECKey;
-import com.google.bitcoin.core.NetworkParameters;
 import com.google.bitcoin.core.Transaction;
 import com.google.bitcoin.core.Wallet.MissingSigsMode;
 import com.google.bitcoin.wallet.CoinSelector;
-
-import org.spongycastle.crypto.params.KeyParameter;
-
 import com.google.common.base.Objects;
 import com.google.common.base.Objects.ToStringHelper;
+
+import org.spongycastle.crypto.params.KeyParameter;
 
 import java.io.Serializable;
 
@@ -170,31 +167,9 @@ public class SendRequest implements Serializable{
         SendRequest req = new SendRequest();
         checkNotNull(destination.getParameters(), "Address is for an unknown network");
         req.type = (CoinType) destination.getParameters();
+        req.feePerKb = req.type.getFeePerKb();
         req.tx = new Transaction(req.type);
         req.tx.addOutput(value, destination);
-        return req;
-    }
-
-    /**
-     * <p>Creates a new SendRequest to the given pubkey for the given value.</p>
-     *
-     * <p>Be careful to check the output's value is reasonable using
-     * {@link com.google.bitcoin.core.TransactionOutput#getMinNonDustValue(Coin)} afterwards or you risk having the transaction
-     * rejected by the network. Note that using {@link SendRequest#to(Address, Coin)} will result
-     * in a smaller output, and thus the ability to use a smaller output value without rejection.</p>
-     */
-    public static SendRequest to(NetworkParameters params, ECKey destination, Coin value) {
-        SendRequest req = new SendRequest();
-        req.type = (CoinType) params;
-        req.tx = new Transaction(params);
-        req.tx.addOutput(value, destination);
-        return req;
-    }
-
-    /** Simply wraps a pre-built incomplete transaction provided by you. */
-    public static SendRequest forTx(Transaction tx) {
-        SendRequest req = new SendRequest();
-        req.tx = tx;
         return req;
     }
 
@@ -202,6 +177,7 @@ public class SendRequest implements Serializable{
         SendRequest req = new SendRequest();
         checkNotNull(destination.getParameters(), "Address is for an unknown network");
         req.type = (CoinType) destination.getParameters();
+        req.feePerKb = req.type.getFeePerKb();
         req.tx = new Transaction(req.type);
         req.tx.addOutput(Coin.ZERO, destination);
         req.emptyWallet = true;

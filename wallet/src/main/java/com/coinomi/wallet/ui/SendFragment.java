@@ -4,12 +4,13 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -22,10 +23,10 @@ import com.coinomi.core.uri.CoinURI;
 import com.coinomi.core.uri.CoinURIParseException;
 import com.coinomi.core.wallet.SendRequest;
 import com.coinomi.core.wallet.Wallet;
+import com.coinomi.core.wallet.WalletPocket;
 import com.coinomi.core.wallet.exceptions.NoSuchPocketException;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
-import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.ui.widget.QrCodeButton;
 import com.coinomi.wallet.util.Keyboard;
 import com.google.bitcoin.core.Address;
@@ -42,6 +43,7 @@ import java.io.IOException;
 import javax.annotation.Nullable;
 
 import static com.coinomi.core.Preconditions.checkNotNull;
+import static com.coinomi.core.Preconditions.checkState;
 
 /**
  *  Fragment that prepares a transaction
@@ -55,8 +57,6 @@ public class SendFragment extends Fragment {
     private static final int SIGN_TRANSACTION = 1;
 
     private CoinType coinType;
-    private WalletApplication application;
-    private FragmentManager fragmentManager;
     private Handler handler = new Handler();
     private EditText receivingAddressView;
     private TextView addressError;
@@ -68,53 +68,16 @@ public class SendFragment extends Fragment {
     private State state = State.INPUT;
     private Address address;
     private Coin sendAmount;
-    private DialogFragment popupWindow;
-    private Activity activity;
     @Nullable private WalletActivity mListener;
+    @Nullable private WalletPocket pocket;
+    private NavigationDrawerFragment mNavigationDrawerFragment;
 
 
     private enum State {
         INPUT, PREPARATION, SENDING, SENT, FAILED
     }
 
-    private final class SendAmountListener implements View.OnFocusChangeListener, TextWatcher {
-        @Override
-        public void onFocusChange(final View v, final boolean hasFocus) {
-            if (!hasFocus) {
-                validateAmount();
-            }
-        }
-
-        @Override
-        public void afterTextChanged(final Editable s) {
-            validateAmount();
-        }
-
-        @Override
-        public void beforeTextChanged(final CharSequence s, final int start, final int count, final int after) { }
-
-        @Override
-        public void onTextChanged(final CharSequence s, final int start, final int before, final int count) { }
-    }
     private final SendAmountListener sendAmountListener = new SendAmountListener();
-
-
-    private final class ReceivingAddressListener implements View.OnFocusChangeListener, TextWatcher {
-        @Override
-        public void onFocusChange(final View v, final boolean hasFocus) {
-            if (!hasFocus) {
-                validateAddress();
-            }
-        }
-
-        @Override
-        public void afterTextChanged(final Editable s) {
-            validateAddress(true);
-        }
-
-        @Override public void beforeTextChanged(final CharSequence s, final int start, final int count, final int after) { }
-        @Override public void onTextChanged(final CharSequence s, final int start, final int before, final int count) { }
-    }
     private final ReceivingAddressListener receivingAddressListener = new ReceivingAddressListener();
 
     /**
@@ -139,8 +102,15 @@ public class SendFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            coinType = (CoinType) getArguments().getSerializable(COIN_TYPE);
+            coinType = (CoinType) checkNotNull(getArguments().getSerializable(COIN_TYPE));
         }
+        if (mListener != null) {
+            checkNotNull(mListener.getWalletApplication().getWallet());
+            pocket = checkNotNull(mListener.getWalletApplication().getWallet().getPocket(coinType));
+        }
+        setHasOptionsMenu(true);
+        mNavigationDrawerFragment = (NavigationDrawerFragment)
+                getFragmentManager().findFragmentById(R.id.navigation_drawer);
     }
 
     @Override
@@ -182,7 +152,7 @@ public class SendFragment extends Fragment {
                     requestFocusFirst();
             }
         });
-        
+
         return view;
     }
 
@@ -263,7 +233,6 @@ public class SendFragment extends Fragment {
             }
         }
     }
-
 
     private void updateStateFrom(final Address address, final @Nullable Coin amount,
                                  final @Nullable String label) throws CoinURIParseException {
@@ -378,13 +347,46 @@ public class SendFragment extends Fragment {
         updateView();
     }
 
+    private void setAmountForEmptyWallet() {
+        if (state != State.INPUT || pocket == null) return;
+
+        try {
+            Address dummy = pocket.getReceiveAddress(); // won't be used, tx is never committed
+            SendRequest req = SendRequest.emptyWallet(dummy);
+            req.signInputs = false;
+            pocket.completeTx(req);
+            checkState(req.tx.getOutputs().size() == 1);
+            //TODO if using different units, don't use toPlainString
+            sendAmountView.setText(req.tx.getOutput(0).getValue().toPlainString());
+            validateAmount();
+        } catch (InsufficientMoneyException ignore) { }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        if (!mNavigationDrawerFragment.isDrawerOpen()) {
+            // Only show items in the action bar relevant to this screen
+            // if the drawer is not showing. Otherwise, let the drawer
+            // decide what to show in the action bar.
+            inflater.inflate(R.menu.send, menu);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_empty_wallet:
+                setAmountForEmptyWallet();
+                return true;
+            default:
+                // Not one of ours. Perform default menu processing
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-
-        this.activity = activity;
-        application = (WalletApplication) activity.getApplication();
-        fragmentManager = getFragmentManager();
         try {
             mListener = (WalletActivity) activity;
         } catch (ClassCastException e) {
@@ -397,7 +399,41 @@ public class SendFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
-        application = null;
     }
 
+    private abstract class EditViewListener implements View.OnFocusChangeListener, TextWatcher {
+        @Override
+        public void beforeTextChanged(final CharSequence s, final int start, final int count, final int after) { }
+        @Override
+        public void onTextChanged(final CharSequence s, final int start, final int before, final int count) { }
+    }
+
+    private final class SendAmountListener extends EditViewListener {
+        @Override
+        public void onFocusChange(final View v, final boolean hasFocus) {
+            if (!hasFocus) {
+                validateAmount();
+            }
+        }
+
+        @Override
+        public void afterTextChanged(final Editable s) {
+            validateAmount();
+        }
+    }
+
+    private final class ReceivingAddressListener extends EditViewListener {
+        @Override
+        public void onFocusChange(final View v, final boolean hasFocus) {
+            if (!hasFocus) {
+                validateAddress();
+            }
+        }
+
+        @Override
+        public void afterTextChanged(final Editable s) {
+            validateAddress(true);
+        }
+
+    }
 }

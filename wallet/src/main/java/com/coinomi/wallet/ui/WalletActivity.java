@@ -115,9 +115,6 @@ final public class WalletActivity extends ActionBarActivity implements
             selectedType = LitecoinMain.get();
         }
 
-        mTitle = selectedType.getName();
-        coinIconRes = Constants.COINS_ICONS.get(selectedType);
-
         log.info("Coin selected {} {}", position, selectedType);
 
         if (mViewPager != null && !selectedType.equals(currentType)) {
@@ -126,6 +123,9 @@ final public class WalletActivity extends ActionBarActivity implements
             mViewPager.setCurrentItem(INFO);
             mViewPager.getAdapter().notifyDataSetChanged();
             currentType = selectedType;
+
+            mTitle = selectedType.getName();
+            coinIconRes = Constants.COINS_ICONS.get(selectedType);
         }
     }
 

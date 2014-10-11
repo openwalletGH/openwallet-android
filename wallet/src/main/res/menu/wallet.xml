@@ -12,7 +12,8 @@
         android:title="@string/action_settings"
         android:enabled="false"
         android:orderInCategory="100"
-        app:showAsAction="never" />
+        app:showAsAction="never"
+        android:visible="false"/>
     <item android:id="@+id/action_restore_wallet"
         android:title="@string/action_restore_wallet"
         android:orderInCategory="101"
