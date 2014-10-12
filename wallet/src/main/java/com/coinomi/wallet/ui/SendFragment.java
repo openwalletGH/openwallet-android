@@ -128,9 +128,9 @@ public class SendFragment extends Fragment {
         sendAmountView.addTextChangedListener(sendAmountListener);
 
         addressError = (TextView) view.findViewById(R.id.address_error_message);
-        addressError.setVisibility(View.INVISIBLE);
+        addressError.setVisibility(View.GONE);
         amountError = (TextView) view.findViewById(R.id.amount_error_message);
-        amountError.setVisibility(View.INVISIBLE);
+        amountError.setVisibility(View.GONE);
 
         scanQrCodeButton = (QrCodeButton) view.findViewById(R.id.scan_qr_code);
         scanQrCodeButton.setOnClickListener(new View.OnClickListener() {
@@ -310,7 +310,7 @@ public class SendFragment extends Fragment {
                 }
             } else {
                 sendAmount = null;
-                amountError.setVisibility(View.INVISIBLE);
+                amountError.setVisibility(View.GONE);
             }
         } catch (IllegalArgumentException ignore) {
             sendAmount = null;
@@ -333,7 +333,7 @@ public class SendFragment extends Fragment {
                 // empty field should not raise error message
                 address = null;
             }
-            addressError.setVisibility(View.INVISIBLE);
+            addressError.setVisibility(View.GONE);
         }
         catch (final AddressFormatException x) {
             // could not decode address at all

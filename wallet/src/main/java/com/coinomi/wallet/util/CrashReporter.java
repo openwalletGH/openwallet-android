@@ -195,7 +195,6 @@ public class CrashReporter
 
 		report.append("Version: " + pi.versionName + " (" + pi.versionCode + ")\n");
 		report.append("Package: " + pi.packageName + "\n");
-		report.append("Test/Prod: " + (Constants.TEST ? "test" : "prod") + "\n");
 		report.append("Time: " + String.format("%tF %tT %tz", now, now, now) + "\n");
 		report.append("Time of launch: " + String.format("%tF %tT %tz", TIME_CREATE_APPLICATION, TIME_CREATE_APPLICATION, TIME_CREATE_APPLICATION)
 				+ "\n");

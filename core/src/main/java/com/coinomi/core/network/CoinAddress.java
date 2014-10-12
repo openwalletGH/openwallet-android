@@ -4,6 +4,7 @@ import com.coinomi.core.coins.CoinType;
 import com.coinomi.stratumj.ServerAddress;
 import com.google.common.collect.ImmutableList;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -16,6 +17,11 @@ final public class CoinAddress {
     public CoinAddress(CoinType parameters, ServerAddress address) {
         this.parameters = parameters;
         this.addresses = ImmutableList.of(address);
+    }
+
+    public CoinAddress(CoinType parameters, ServerAddress... addresses) {
+        this.parameters = parameters;
+        this.addresses = ImmutableList.copyOf(addresses);
     }
 
     public CoinAddress(CoinType parameters, List<ServerAddress> addresses) {

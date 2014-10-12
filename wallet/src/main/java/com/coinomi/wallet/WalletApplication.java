@@ -70,8 +70,6 @@ public class WalletApplication extends Application {
 
         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectAll().permitDiskReads().permitDiskWrites().penaltyLog().build());
 
-        log.info("configuration: " + (Constants.TEST ? "test" : "prod"));
-
         super.onCreate();
 
         packageInfo = packageInfoFromContext(this);
@@ -88,7 +86,6 @@ public class WalletApplication extends Application {
                 CrashReporter.saveBackgroundTrace(throwable, packageInfo);
             }
         };
-
 
         config = new Configuration(PreferenceManager.getDefaultSharedPreferences(this));
         activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);

@@ -28,11 +28,7 @@ public class Constants {
     public static final String ARG_ERROR = "error";
     public static final String ARG_MESSAGE = "message";
 
-    public static final boolean TEST = true;
-
-    private static final String FILENAME_NETWORK_SUFFIX = TEST ? "" : "-test";
-
-    public static final String WALLET_FILENAME_PROTOBUF = "wallet" + FILENAME_NETWORK_SUFFIX;
+    public static final String WALLET_FILENAME_PROTOBUF = "wallet";
 
     public static final Charset UTF_8 = Charset.forName("UTF-8");
     public static final Charset US_ASCII = Charset.forName("US-ASCII");
@@ -45,20 +41,16 @@ public class Constants {
     public static final String CURRENCY_MINUS_SIGN = "-" + CHAR_THIN_SPACE;
 
     // TODO make dynamic
-    public static final List<CoinAddress> COINS_ADDRESSES = ImmutableList.of(
-            new CoinAddress(BitcoinMain.get(), new ServerAddress("test.coinomi.com", 5001)),
-            new CoinAddress(DogecoinMain.get(), new ServerAddress("test.coinomi.com", 5003)),
-            new CoinAddress(LitecoinMain.get(), new ServerAddress("test.coinomi.com", 5002)));
-
 //    public static final List<CoinAddress> COINS_ADDRESSES_TEST = ImmutableList.of(
-//            new CoinAddress(BitcoinTest.get(), new ServerAddress("test.coinomi.com", 15001)),
-//            new CoinAddress(LitecoinTest.get(), new ServerAddress("test.coinomi.com", 15002)),
-//            new CoinAddress(DogecoinTest.get(), new ServerAddress("test.coinomi.com", 15003)));
+//            new CoinAddress(BitcoinMain.get(), new ServerAddress("btc-cce-1.coinomi.net", 5001), new ServerAddress("btc-cce-2.coinomi.net", 5001)),
+//            new CoinAddress(DogecoinMain.get(), new ServerAddress("doge-cce-1.coinomi.net", 5003), new ServerAddress("doge-cce-2.coinomi.net", 5003)),
+//            new CoinAddress(LitecoinMain.get(), new ServerAddress("ltc-cce-1.coinomi.net", 5002), new ServerAddress("ltc-cce-2.coinomi.net", 5002))
+//    );
 
     public static final List<CoinAddress> COINS_ADDRESSES_TEST = ImmutableList.of(
-            new CoinAddress(BitcoinMain.get(), new ServerAddress("54.195.124.108", 5001)),
-            new CoinAddress(DogecoinMain.get(), new ServerAddress("54.195.124.108", 5003)),
-            new CoinAddress(LitecoinMain.get(), new ServerAddress("54.195.124.108", 5002))
+            new CoinAddress(BitcoinMain.get(), new ServerAddress("btc-cce-1.coinomi.net", 5001), new ServerAddress("btc-cce-2.coinomi.net", 5001)),
+            new CoinAddress(DogecoinMain.get(), new ServerAddress("doge-cce-1.coinomi.net", 5003), new ServerAddress("doge-cce-2.coinomi.net", 5003)),
+            new CoinAddress(LitecoinMain.get(), new ServerAddress("ltc-cce-1.coinomi.net", 5002), new ServerAddress("ltc-cce-2.coinomi.net", 5002))
     );
 
     public static final HashMap<CoinType, Integer> COINS_ICONS = new HashMap();
