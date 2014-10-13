@@ -35,11 +35,9 @@ public class PasswordConfirmationActivity extends android.support.v4.app.Fragmen
         setResult(RESULT_OK, result);
 
         // delayed finish
-        new Handler().post(new Runnable()
-        {
+        new Handler().post(new Runnable() {
             @Override
-            public void run()
-            {
+            public void run() {
                 finish();
             }
         });

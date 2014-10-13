@@ -3,23 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".WalletActivity" >
 
-    <item android:id="@+id/scan_qr_code_menu"
-        android:title="@string/scan_qr_code_menu"
-        android:icon="@drawable/qr_code_menu"
-        app:showAsAction="withText|ifRoom"
-        android:visible="false"/>
     <item android:id="@+id/action_settings"
         android:title="@string/action_settings"
         android:enabled="false"
         android:orderInCategory="100"
         app:showAsAction="never"
         android:visible="false"/>
-    <item android:id="@+id/action_restore_wallet"
-        android:title="@string/action_restore_wallet"
-        android:orderInCategory="101"
-        app:showAsAction="never" />
-    <item android:id="@+id/action_refresh_wallet"
-        android:title="@string/action_refresh_wallet"
-        android:orderInCategory="102"
-        app:showAsAction="never" />
 </menu>

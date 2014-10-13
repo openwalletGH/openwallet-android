@@ -93,10 +93,11 @@ public class CoinURI {
     public static final String FIELD_ADDRESS = "address";
     public static final String FIELD_PAYMENT_REQUEST_URL = "r";
 
-//    public static final String BITCOIN_SCHEME = "bitcoin";
     private static final String ENCODED_SPACE_CHARACTER = "%20";
     private static final String AMPERSAND_SEPARATOR = "&";
     private static final String QUESTION_MARK_SEPARATOR = "?";
+
+    private final CoinType type;
 
     /**
      * Contains all the parameters in the order in which they were processed
@@ -153,6 +154,8 @@ public class CoinURI {
             }
         }
 
+        type = params;
+
         if (input.startsWith(params.getUriScheme()+"://")) {
             schemeSpecificPart = input.substring((params.getUriScheme()+"://").length());
         } else if (input.startsWith(params.getUriScheme()+":")) {
@@ -181,7 +184,7 @@ public class CoinURI {
         }
 
         // Attempt to parse the rest of the URI parameters.
-        parseParameters(params, addressToken, nameValuePairTokens);
+        parseParameters(addressToken, nameValuePairTokens);
 
         if (!addressToken.isEmpty()) {
             // Attempt to parse the addressToken as a Bitcoin address for this network
@@ -199,11 +202,10 @@ public class CoinURI {
     }
 
     /**
-     * @param params The network parameters or null
      * @param nameValuePairTokens The tokens representing the name value pairs (assumed to be
      *                            separated by '=' e.g. 'amount=0.2')
      */
-    private void parseParameters(@Nullable NetworkParameters params, String addressToken, String[] nameValuePairTokens) throws CoinURIParseException {
+    private void parseParameters(String addressToken, String[] nameValuePairTokens) throws CoinURIParseException {
         // Attempt to decode the rest of the tokens into a parameter map.
         for (String nameValuePairToken : nameValuePairTokens) {
             final int sepIndex = nameValuePairToken.indexOf('=');
@@ -262,6 +264,13 @@ public class CoinURI {
         } else {
             parameterMap.put(key, value);
         }
+    }
+
+    /**
+     * @return The {@link com.coinomi.core.coins.CoinType} of this URI
+     */
+    public CoinType getType() {
+        return type;
     }
 
     /**

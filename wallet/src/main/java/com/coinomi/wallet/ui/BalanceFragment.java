@@ -2,6 +2,7 @@ package com.coinomi.wallet.ui;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -10,26 +11,38 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.uri.CoinURI;
+import com.coinomi.core.uri.CoinURIParseException;
 import com.coinomi.core.wallet.WalletPocket;
 import com.coinomi.core.wallet.WalletPocketEventListener;
+import com.coinomi.core.wallet.exceptions.NoSuchPocketException;
+import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.ui.widget.Amount;
 import com.coinomi.wallet.util.ThrottlingWalletChangeListener;
+import com.google.bitcoin.core.Address;
 import com.google.bitcoin.core.Coin;
+import com.google.bitcoin.core.InsufficientMoneyException;
 import com.google.bitcoin.core.Transaction;
 import com.google.bitcoin.core.TransactionConfidence;
+import com.google.bitcoin.crypto.KeyCrypterException;
 import com.google.bitcoin.utils.Threading;
 import com.google.common.collect.Lists;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -40,12 +53,12 @@ import javax.annotation.Nonnull;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Use the {@link InfoFragment#newInstance} factory method to
+ * Use the {@link BalanceFragment#newInstance} factory method to
  * create an instance of this fragment.
  *
  */
-public class InfoFragment extends Fragment implements WalletPocketEventListener, LoaderManager.LoaderCallbacks<List<Transaction>> {
-    private static final Logger log = LoggerFactory.getLogger(InfoFragment.class);
+public class BalanceFragment extends Fragment implements WalletPocketEventListener, LoaderManager.LoaderCallbacks<List<Transaction>> {
+    private static final Logger log = LoggerFactory.getLogger(BalanceFragment.class);
 
     private static final String COIN_TYPE = "coin_type";
     private static final int NEW_BALANCE = 0;
@@ -71,6 +84,7 @@ public class InfoFragment extends Fragment implements WalletPocketEventListener,
 
     private LoaderManager loaderManager;
     private View emptyPocketMessage;
+    private NavigationDrawerFragment mNavigationDrawerFragment;
 
     /**
      * Use this factory method to create a new instance of
@@ -79,15 +93,15 @@ public class InfoFragment extends Fragment implements WalletPocketEventListener,
      * @param type of the coin
      * @return A new instance of fragment InfoFragment.
      */
-    public static InfoFragment newInstance(CoinType type) {
-        InfoFragment fragment = new InfoFragment();
+    public static BalanceFragment newInstance(CoinType type) {
+        BalanceFragment fragment = new BalanceFragment();
         Bundle args = new Bundle();
         args.putSerializable(COIN_TYPE, type);
         fragment.setArguments(args);
         return fragment;
     }
 
-    public InfoFragment() {
+    public BalanceFragment() {
         // Required empty public constructor
     }
 
@@ -100,17 +114,20 @@ public class InfoFragment extends Fragment implements WalletPocketEventListener,
 
         checkNotNull(type);
         pocket = application.getWalletPocket(type);
+        setHasOptionsMenu(true);
+        mNavigationDrawerFragment = (NavigationDrawerFragment)
+                getFragmentManager().findFragmentById(R.id.navigation_drawer);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_info, container, false);
+        View view = inflater.inflate(R.layout.fragment_balance, container, false);
 
         ListView transactionRows = (ListView) view.findViewById(R.id.transaction_rows);
 
-        View header = inflater.inflate(R.layout.fragment_info_header, null);
+        View header = inflater.inflate(R.layout.fragment_balance_header, null);
         // Initialize your header here.
         transactionRows.addHeaderView(header, null, false);
 
@@ -166,7 +183,12 @@ public class InfoFragment extends Fragment implements WalletPocketEventListener,
     public void onPocketChanged(WalletPocket pocket) {
         if (emptyPocketMessage.isShown()) {
             if (!pocket.isNew()) {
-                emptyPocketMessage.setVisibility(View.GONE);
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        emptyPocketMessage.setVisibility(View.GONE);
+                    }
+                });
             }
         }
     }
@@ -216,6 +238,16 @@ public class InfoFragment extends Fragment implements WalletPocketEventListener,
             adapter.notifyDataSetChanged();
         }
     };
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        if (!mNavigationDrawerFragment.isDrawerOpen()) {
+            // Only show items in the action bar relevant to this screen
+            // if the drawer is not showing. Otherwise, let the drawer
+            // decide what to show in the action bar.
+            inflater.inflate(R.menu.balance, menu);
+        }
+    }
 
     @Override
     public void onAttach(Activity activity) {

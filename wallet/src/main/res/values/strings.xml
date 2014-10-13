@@ -35,7 +35,7 @@
     <string name="button_skip">skip</string>
     <string name="button_scan_qr_code">Scan QR code</string>
     <string name="wallet_title_request">request</string>
-    <string name="wallet_title_info">info</string>
+    <string name="wallet_title_balance">balance</string>
     <string name="wallet_title_send">send</string>
 
     <!-- Welcome fragment -->

@@ -22,10 +22,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.coinomi.core.coins.CoinType;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
-import com.coinomi.wallet.WalletApplication;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
@@ -260,7 +258,7 @@ public class NavigationDrawerFragment extends Fragment {
             return true;
         }
 
-        if (item.getItemId() == R.id.scan_qr_code_menu) {
+        if (item.getItemId() == R.id.action_scan_qr_code) {
             Toast.makeText(getActivity(), "Example action.", Toast.LENGTH_SHORT).show();
             return true;
         }

@@ -105,8 +105,7 @@ public class SendFragment extends Fragment {
             coinType = (CoinType) checkNotNull(getArguments().getSerializable(COIN_TYPE));
         }
         if (mListener != null) {
-            checkNotNull(mListener.getWalletApplication().getWallet());
-            pocket = checkNotNull(mListener.getWalletApplication().getWallet().getPocket(coinType));
+            pocket = checkNotNull(mListener.getWalletApplication().getWalletPocket(coinType));
         }
         setHasOptionsMenu(true);
         mNavigationDrawerFragment = (NavigationDrawerFragment)
@@ -234,8 +233,8 @@ public class SendFragment extends Fragment {
         }
     }
 
-    private void updateStateFrom(final Address address, final @Nullable Coin amount,
-                                 final @Nullable String label) throws CoinURIParseException {
+    void updateStateFrom(final Address address, final @Nullable Coin amount,
+                         final @Nullable String label) throws CoinURIParseException {
         log.info("got {}", address);
         if (address == null) {
             throw new CoinURIParseException("missing address");
