@@ -4,6 +4,6 @@
     tools:context=".SendFragment" >
 
     <item android:id="@+id/action_empty_wallet"
-        android:title="@string/empty_wallet_menu"
+        android:title="@string/action_empty_wallet"
         app:showAsAction="never" />
 </menu>

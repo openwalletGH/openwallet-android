@@ -1,6 +1,5 @@
 package com.coinomi.core.wallet;
 
-import com.coinomi.core.crypto.KeyCrypterPin;
 import com.coinomi.core.protos.Protos;
 import com.google.bitcoin.crypto.ChildNumber;
 import com.google.bitcoin.crypto.DeterministicKey;
@@ -89,10 +88,6 @@ public class WalletProtobufSerializer {
                 encParamBuilder.setN(keyCrypterScrypt.getScryptParameters().getN());
 
                 walletBuilder.setEncryptionParameters(encParamBuilder);
-            }
-            else if (keyCrypter instanceof KeyCrypterPin) {
-                walletBuilder.setEncryptionType(Protos.Wallet.EncryptionType.ENCRYPTED_AES);
-
             } else {
                 // Some other form of encryption has been specified that we do not know how to persist.
                 throw new RuntimeException("The wallet has encryption of type '" +
@@ -198,10 +193,7 @@ public class WalletProtobufSerializer {
     private static KeyCrypter getKeyCrypter(Protos.Wallet walletProto) {
         KeyCrypter crypter;
         if (walletProto.hasEncryptionType()) {
-            if (walletProto.getEncryptionType() == Protos.Wallet.EncryptionType.ENCRYPTED_AES) {
-                crypter = new KeyCrypterPin();
-            }
-            else if (walletProto.getEncryptionType() == Protos.Wallet.EncryptionType.ENCRYPTED_SCRYPT_AES) {
+            if (walletProto.getEncryptionType() == Protos.Wallet.EncryptionType.ENCRYPTED_SCRYPT_AES) {
                 checkState(walletProto.hasEncryptionParameters(), "Encryption parameters are missing");
 
                 Protos.ScryptParameters encryptionParameters = walletProto.getEncryptionParameters();

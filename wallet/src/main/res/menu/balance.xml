@@ -7,12 +7,5 @@
         android:title="@string/scan_qr_code_menu"
         android:icon="@drawable/qr_code_menu"
         app:showAsAction="ifRoom" />
-    <item android:id="@+id/action_restore_wallet"
-        android:title="@string/action_restore_wallet"
-        android:orderInCategory="101"
-        app:showAsAction="never" />
-    <item android:id="@+id/action_refresh_wallet"
-        android:title="@string/action_refresh_wallet"
-        android:orderInCategory="102"
-        app:showAsAction="never" />
+
 </menu>

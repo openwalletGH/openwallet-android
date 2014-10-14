@@ -174,7 +174,7 @@ final public class WalletActivity extends ActionBarActivity implements
             // Only show items in the action bar relevant to this screen
             // if the drawer is not showing. Otherwise, let the drawer
             // decide what to show in the action bar.
-            getMenuInflater().inflate(R.menu.wallet, menu);
+            getMenuInflater().inflate(R.menu.global, menu);
             restoreActionBar();
             return true;
         }
@@ -188,6 +188,7 @@ final public class WalletActivity extends ActionBarActivity implements
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
+            // TODO launch settings here
             return true;
         } else if (id == R.id.action_restore_wallet) {
             startRestore();
