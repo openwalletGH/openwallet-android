@@ -21,7 +21,7 @@
     <string name="send_coins_fragment_button_back">Back</string>
     <string name="send_coins_failed_msg">Failed!</string>
     <string name="send_coins_error_not_enough_money">Not enough money</string>
-    <string name="send_coins_error_network">No internet connection</string>
+    <string name="send_coins_error_network">Could not connect to the coin network</string>
 
     <!-- Errors -->
     <string name="error_could_not_read_wallet">Could not read wallet</string>

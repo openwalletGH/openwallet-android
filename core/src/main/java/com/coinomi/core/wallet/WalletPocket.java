@@ -67,6 +67,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.crypto.params.KeyParameter;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -530,6 +531,28 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
         }
     }
 
+
+    public void setWallet(Wallet wallet) {
+        this.wallet = wallet;
+    }
+
+    public Wallet getWallet() {
+        return wallet;
+    }
+
+
+    public void broadcastTx(Transaction tx, TransactionEventListener listener) throws IOException {
+        if (isConnected()) {
+            blockchainConnection.broadcastTx(tx, listener);
+        } else {
+            throw new IOException("No connection available");
+        }
+    }
+
+    public boolean isConnected() {
+        return blockchainConnection != null;
+    }
+
     //endregion
 
     /**
@@ -690,8 +713,8 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
                                 status.getAddress(), status.getStatus());
 
                         if (blockchainConnection != null) {
-                            blockchainConnection.getHistoryTx(coinType, status, this);
-                            blockchainConnection.getUnspentTx(coinType, status, this);
+                            blockchainConnection.getHistoryTx(status, this);
+                            blockchainConnection.getUnspentTx(status, this);
                         }
                     }
                     else {
@@ -954,7 +977,7 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
         if (!isTransactionAvailableOrQueued(txHash)) {
             fetchingTransactions.add(txHash);
             if (blockchainConnection != null) {
-                blockchainConnection.getTransaction(coinType, txHash, this);
+                blockchainConnection.getTransaction(txHash, this);
             }
         }
     }
@@ -1014,6 +1037,12 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
         subscribeIfNeeded();
     }
 
+    @Override
+    public void onDisconnect() {
+        blockchainConnection = null;
+        clearTransientState();
+    }
+
     private void subscribeIfNeeded() {
         lock.lock();
         try {
@@ -1021,7 +1050,7 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
                 List<Address> addressesToWatch = getAddressesToWatch();
                 if (addressesToWatch.size() > 0) {
                     addressesPendingSubscription.addAll(addressesToWatch);
-                    blockchainConnection.subscribeToAddresses(coinType, addressesToWatch, this);
+                    blockchainConnection.subscribeToAddresses(addressesToWatch, this);
                 }
             }
         } catch (Exception e) {
@@ -1030,12 +1059,6 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
         finally {
             lock.unlock();
         }
-    }
-
-    @Override
-    public void onDisconnect() {
-        blockchainConnection = null;
-        clearTransientState();
     }
 
     private void clearTransientState() {
@@ -1216,14 +1239,6 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
         request.aesKey = aesKey;
 
         return request;
-    }
-
-    public void setWallet(Wallet wallet) {
-        this.wallet = wallet;
-    }
-
-    public Wallet getWallet() {
-        return wallet;
     }
 
     @Override

@@ -54,7 +54,6 @@ public class WalletApplication extends Application {
 
     private Intent coinServiceIntent;
     private Intent coinServiceCancelCoinsReceivedIntent;
-    private Intent coinServiceResetBlockchainIntent;
 
     private File walletFile;
     @Nullable private Wallet wallet;
@@ -93,8 +92,6 @@ public class WalletApplication extends Application {
         coinServiceIntent = new Intent(this, CoinServiceImpl.class);
         coinServiceCancelCoinsReceivedIntent = new Intent(CoinService.ACTION_CANCEL_COINS_RECEIVED,
                 null, this, CoinServiceImpl.class);
-        coinServiceResetBlockchainIntent = new Intent(CoinService.ACTION_RESET_BLOCKCHAIN,
-                null, this, CoinServiceImpl.class);
 
         // Set MnemonicCode.INSTANCE if needed
         if (MnemonicCode.INSTANCE == null) {
@@ -115,9 +112,6 @@ public class WalletApplication extends Application {
 
         Fonts.initFonts(this.getAssets());
     }
-
-
-
 
     private void afterLoadWallet()
     {

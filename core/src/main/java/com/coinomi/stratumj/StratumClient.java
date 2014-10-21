@@ -19,6 +19,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -38,7 +39,7 @@ public class StratumClient extends AbstractExecutionThreadService {
     private final int NUM_OF_WORKERS = 1;
 
     private AtomicLong idCounter = new AtomicLong();
-    private ImmutableList<ServerAddress> serverAddresses;
+    private ServerAddress serverAddress;
     private Socket socket;
     @VisibleForTesting DataOutputStream toServer;
     BufferedReader fromServer;
@@ -116,17 +117,12 @@ public class StratumClient extends AbstractExecutionThreadService {
         }
     }
 
-
-    public StratumClient(List<ServerAddress> address) {
-        serverAddresses = ImmutableList.copyOf(address);
-    }
-
     public StratumClient(ServerAddress address) {
-        serverAddresses = ImmutableList.of(address);
+        serverAddress = address;
     }
 
     public StratumClient(String host, int port) {
-        serverAddresses = ImmutableList.of(new ServerAddress(host, port));
+        serverAddress = new ServerAddress(host, port);
     }
 
     public long getCurrentId() {
@@ -134,29 +130,34 @@ public class StratumClient extends AbstractExecutionThreadService {
     }
 
     protected Socket createSocket() throws IOException {
-        // TODO use random, exponentially backoff from failed connections
-        ServerAddress address = serverAddresses.get(0);
+        ServerAddress address = serverAddress;
         log.debug("Opening a socket to " + address.getHost() + ":" + address.getPort());
+
         return new Socket(address.getHost(), address.getPort());
     }
 
     @Override
-    protected void startUp() throws Exception {
+    protected void startUp() {
         for (int i = 0; i < NUM_OF_WORKERS; i++) {
             pool.submit(new MessageHandler());
         }
-        socket = createSocket();
-        log.debug("Creating I/O streams to socket: " + socket);
-        toServer = new DataOutputStream(socket.getOutputStream());
-        fromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        try {
+            socket = createSocket();
+            log.debug("Creating I/O streams to socket: {}", socket);
+            toServer = new DataOutputStream(socket.getOutputStream());
+            fromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        } catch (Exception e) {
+            log.info("Could not create socket for {}", serverAddress);
+            triggerShutdown();
+        }
     }
 
     @Override
     protected void triggerShutdown() {
+        super.triggerShutdown();
         try {
-            toServer.close();
-            fromServer.close();
-            socket.close();
+            log.info("Shutting down {}", serverAddress);
+            if (isConnected()) socket.close();
         } catch (IOException e) {
             log.error("Failed to close socket", e);
         }
@@ -168,7 +169,7 @@ public class StratumClient extends AbstractExecutionThreadService {
         log.debug("Start listening to server replies");
 
         String serverMessage;
-        while (true) {
+        while (isRunning() && isConnected()) {
             try {
                 serverMessage = fromServer.readLine();
             } catch (IOException e) {
@@ -177,9 +178,8 @@ public class StratumClient extends AbstractExecutionThreadService {
                 break;
             }
 
-
             if (serverMessage == null) {
-                log.debug("Server closed communications. Shutting down");
+                log.info("Server closed communications. Shutting down");
                 triggerShutdown();
                 break;
             }
@@ -233,6 +233,10 @@ public class StratumClient extends AbstractExecutionThreadService {
         log.debug("Finished listening for server replies");
     }
 
+    public boolean isConnected() {
+        return socket != null && socket.isConnected() && isRunning();
+    }
+
     public ListenableFuture<ResultMessage> call(CallMessage message) {
         SettableFuture<ResultMessage> future = SettableFuture.create();
 
@@ -243,6 +247,8 @@ public class StratumClient extends AbstractExecutionThreadService {
             callers.put(message.getId(), future);
         } catch (Exception e) {
             future.setException(e);
+            log.error("Error making a call to the server: {}", e.getMessage());
+            triggerShutdown();
         }
 
         return future;

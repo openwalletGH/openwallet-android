@@ -4,33 +4,32 @@ import com.coinomi.core.coins.CoinType;
 import com.coinomi.stratumj.ServerAddress;
 import com.google.common.collect.ImmutableList;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
  * @author Giannis Dzegoutanis
  */
 final public class CoinAddress {
-    final private CoinType parameters;
+    final private CoinType type;
     final private List<ServerAddress> addresses;
 
-    public CoinAddress(CoinType parameters, ServerAddress address) {
-        this.parameters = parameters;
+    public CoinAddress(CoinType type, ServerAddress address) {
+        this.type = type;
         this.addresses = ImmutableList.of(address);
     }
 
-    public CoinAddress(CoinType parameters, ServerAddress... addresses) {
-        this.parameters = parameters;
+    public CoinAddress(CoinType type, ServerAddress... addresses) {
+        this.type = type;
         this.addresses = ImmutableList.copyOf(addresses);
     }
 
-    public CoinAddress(CoinType parameters, List<ServerAddress> addresses) {
-        this.parameters = parameters;
+    public CoinAddress(CoinType type, List<ServerAddress> addresses) {
+        this.type = type;
         this.addresses = ImmutableList.copyOf(addresses);
     }
 
-    public CoinType getParameters() {
-        return parameters;
+    public CoinType getType() {
+        return type;
     }
 
     public List<ServerAddress> getAddresses() {

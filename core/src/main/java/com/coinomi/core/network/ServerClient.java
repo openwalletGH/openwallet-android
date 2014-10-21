@@ -1,7 +1,6 @@
 package com.coinomi.core.network;
 
 import com.coinomi.core.network.interfaces.BlockchainConnection;
-import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.network.interfaces.ConnectionEventListener;
 import com.coinomi.core.network.interfaces.TransactionEventListener;
@@ -17,13 +16,11 @@ import com.google.bitcoin.core.TransactionOutPoint;
 import com.google.bitcoin.core.Utils;
 import com.google.bitcoin.utils.ListenerRegistration;
 import com.google.bitcoin.utils.Threading;
-import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.Service;
-import com.google.common.util.concurrent.ServiceManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,16 +29,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import javax.annotation.Nullable;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
+import static com.coinomi.core.Preconditions.checkNotNull;
+import static com.coinomi.core.Preconditions.checkState;
+import static com.google.common.util.concurrent.Service.State.NEW;
 
 /**
  * @author Giannis Dzegoutanis
@@ -49,66 +49,126 @@ import static com.google.common.base.Preconditions.checkState;
 public class ServerClient implements BlockchainConnection {
     private static final Logger log = LoggerFactory.getLogger(ServerClient.class);
 
-    private HashBiMap<CoinType, StratumClient> connections;
+    private static final ScheduledThreadPoolExecutor connectionExec;
+    static {
+        connectionExec = new ScheduledThreadPoolExecutor(1);
+        connectionExec.setRemoveOnCancelPolicy(true);
+    }
+    private static final Random RANDOM = new Random();
 
-    final ServiceManager manager;
-    private Wallet wallet;
+    private static final long MAX_WAIT = 16;
+
+    private CoinType type;
+    private final ImmutableList<ServerAddress> addresses;
+    private final HashSet<ServerAddress> failedAddresses;
+    private ServerAddress lastServerAddress;
+    private StratumClient stratumClient;
+    private long retrySeconds = 1;
+    private boolean stopped = false;
 
     private transient CopyOnWriteArrayList<ListenerRegistration<ConnectionEventListener>> eventListeners;
 
-    public ServerClient(List<CoinAddress> coins) {
-        eventListeners = new CopyOnWriteArrayList<ListenerRegistration<ConnectionEventListener>>();
-        connections = HashBiMap.create(coins.size());
+    private Runnable reconnectTask = new Runnable() {
+        @Override
+        public void run() {
+            if (!stopped) {
+                createStratumClient().startAsync();
+            } else { log.info("{} client stopped, aborting reconnect.", type.getName()); }
+        }
+    };
 
-
-        for (CoinAddress coinAddress : coins) {
-            List<ServerAddress> addresses = coinAddress.getAddresses();
-            StratumClient client = new StratumClient(addresses);
-            connections.put(coinAddress.getParameters(), client);
+    private Service.Listener serviceListener = new Service.Listener() {
+        @Override
+        public void running() {
+            // Check if connection is up as this event is fired even if there is no connection
+            if (stratumClient != null && stratumClient.isConnected()) {
+                log.info("{} client connected to {}", type.getName(), lastServerAddress);
+                broadcastOnConnection();
+                retrySeconds = 1;
+            }
         }
 
-        manager = new ServiceManager(connections.values());
-        ServiceManager.Listener managerListener = new ServiceManager.Listener() {
-            public void stopped() {
-                log.info("All coin clients stopped");
-                broadcastOnDisconnect();
+        @Override
+        public void terminated(Service.State from) {
+            log.info("{} client stopped", type.getName());
+            broadcastOnDisconnect();
+            failedAddresses.add(lastServerAddress);
+            lastServerAddress = null;
+            stratumClient = null;
+            // Try to restart
+            if (!stopped) {
+                retrySeconds = Math.min(retrySeconds * 2, MAX_WAIT);
+                log.info("Reconnecting {} in {} seconds", type.getName(), retrySeconds);
+                connectionExec.remove(reconnectTask);
+                connectionExec.schedule(reconnectTask, retrySeconds, TimeUnit.SECONDS);
             }
+        }
+    };
 
-            public void healthy() {
-                log.info("All coin clients are running");
-                broadcastOnConnection();
-            }
+    public ServerClient(CoinAddress coinAddress) {
+        eventListeners = new CopyOnWriteArrayList<ListenerRegistration<ConnectionEventListener>>();
+        failedAddresses = new HashSet<ServerAddress>();
+        type = coinAddress.getType();
+        addresses = ImmutableList.copyOf(coinAddress.getAddresses());
 
-            public void failure(Service service) {
-                StratumClient client = (StratumClient) service;
-
-                log.error("Client failed: " + connections.inverse().get(client));
-
-                // TODO try to reconnect
-            }
-        };
-
-        manager.addListener(managerListener, Threading.SAME_THREAD);
+        createStratumClient();
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
-                // Give the services 5 seconds to stop to ensure that we are responsive to shutdown
-                // requests.
-                try {
-                    manager.stopAsync().awaitStopped(5, TimeUnit.SECONDS);
-                } catch (TimeoutException timeout) {
-                    // stopping timed out
-                }
+                stopAsync();
             }
         });
     }
 
-    /**
-     * Returns true if all services are currently in running.
-     */
-    public boolean isHealthy() {
-        return manager.isHealthy();
+    private StratumClient createStratumClient() {
+        checkState(stratumClient == null);
+        lastServerAddress = getServerAddress();
+        stratumClient = new StratumClient(lastServerAddress);
+        stratumClient.addListener(serviceListener, Threading.USER_THREAD);
+        return stratumClient;
     }
+
+    private ServerAddress getServerAddress() {
+        // If we blacklisted all servers, try to reset
+        if (failedAddresses.size() == addresses.size()) failedAddresses.clear();
+
+        ServerAddress address;
+        // Not the most efficient, but does the job
+        while (true) {
+            address = addresses.get(RANDOM.nextInt(addresses.size()));
+            if (!failedAddresses.contains(address)) break;
+        }
+        return address;
+    }
+
+    public void startAsync() {
+        Service.State state = stratumClient.state();
+        checkState(state == NEW, "Service %s is %s, cannot start it.", type.getName(), state);
+        checkState(!stopped, "Service %s is stopped.", type.getName());
+        try {
+            stratumClient.startAsync();
+        } catch (IllegalStateException e) {
+            // This can happen if the service has already been started or stopped (e.g. by another
+            // service or listener). Our contract says it is safe to call this method if
+            // all services were NEW when it was called, and this has already been verified above, so we
+            // don't propagate the exception.
+            log.warn("Unable to start Service " + type.getName(), e);
+        }
+    }
+
+    public void stopAsync() {
+        stopped = true;
+        connectionExec.remove(reconnectTask);
+        if (stratumClient != null) {
+            stratumClient.stopAsync();
+            stratumClient = null;
+        }
+    }
+
+    public boolean isConnected() {
+        return stratumClient != null && stratumClient.isConnected();
+    }
+
 
     /**
      * Adds an event listener object. Methods on this object are called when something interesting happens,
@@ -156,25 +216,9 @@ public class ServerClient implements BlockchainConnection {
         }
     }
 
-    public void addWallet(Wallet wallet) {
-        this.wallet = wallet;
-        addEventListener(wallet);
-    }
-
-    public void startAsync() {
-        manager.startAsync();
-    }
-
-    public void stopAsync() {
-        manager.stopAsync();
-    }
-
-
     @Override
-    public void subscribeToAddresses(final CoinType coin, List<Address> addresses,
-                                     final TransactionEventListener listener) {
-
-        StratumClient client = checkNotNull(connections.get(coin));
+    public void subscribeToAddresses(List<Address> addresses, final TransactionEventListener listener) {
+        checkNotNull(stratumClient);
 
         CallMessage callMessage = new CallMessage("blockchain.address.subscribe", (List)null);
 
@@ -183,7 +227,7 @@ public class ServerClient implements BlockchainConnection {
             @Override
             public void handle(CallMessage message) {
                 try {
-                    Address address = new Address(coin, message.getParams().getString(0));
+                    Address address = new Address(type, message.getParams().getString(0));
                     AddressStatus status;
                     if (message.getParams().isNull(1)) {
                         status = new AddressStatus(address, null);
@@ -204,7 +248,7 @@ public class ServerClient implements BlockchainConnection {
             log.info("Going to subscribe to {}", address);
             callMessage.setParam(address.toString());
 
-            ListenableFuture<ResultMessage> reply = client.subscribe(callMessage, addressHandler);
+            ListenableFuture<ResultMessage> reply = stratumClient.subscribe(callMessage, addressHandler);
 
             Futures.addCallback(reply, new FutureCallback<ResultMessage>() {
 
@@ -233,14 +277,12 @@ public class ServerClient implements BlockchainConnection {
     }
 
     @Override
-    public void getUnspentTx(final CoinType coinType, final AddressStatus status,
-                             final TransactionEventListener listener) {
-
-        StratumClient client = checkNotNull(connections.get(coinType));
+    public void getUnspentTx(final AddressStatus status, final TransactionEventListener listener) {
+        checkNotNull(stratumClient);
 
         CallMessage message = new CallMessage("blockchain.address.listunspent",
                 Arrays.asList(status.getAddress().toString()));
-        final ListenableFuture<ResultMessage> result = client.call(message);
+        final ListenableFuture<ResultMessage> result = stratumClient.call(message);
 
         Futures.addCallback(result, new FutureCallback<ResultMessage>() {
 
@@ -267,13 +309,12 @@ public class ServerClient implements BlockchainConnection {
     }
 
     @Override
-    public void getHistoryTx(final CoinType coinType, final AddressStatus status,
-                             final TransactionEventListener listener) {
-        StratumClient client = checkNotNull(connections.get(coinType));
+    public void getHistoryTx(final AddressStatus status, final TransactionEventListener listener) {
+        checkNotNull(stratumClient);
 
         CallMessage message = new CallMessage("blockchain.address.get_history",
                 Arrays.asList(status.getAddress().toString()));
-        final ListenableFuture<ResultMessage> result = client.call(message);
+        final ListenableFuture<ResultMessage> result = stratumClient.call(message);
 
         Futures.addCallback(result, new FutureCallback<ResultMessage>() {
 
@@ -300,14 +341,12 @@ public class ServerClient implements BlockchainConnection {
     }
 
     @Override
-    public void getTransaction(final CoinType coinType, final Sha256Hash txHash, final TransactionEventListener listener) {
-        // {"params": ["a52418acead4fbc25252cba18f26de88166ef065e7237200253d27ef7ca53505"], "id": 27, "method": "blockchain.transaction.get"}
-
-        StratumClient client = checkNotNull(connections.get(coinType));
+    public void getTransaction(final Sha256Hash txHash, final TransactionEventListener listener) {
+        checkNotNull(stratumClient);
 
         CallMessage message = new CallMessage("blockchain.transaction.get",
                 Arrays.asList(txHash.toString()));
-        final ListenableFuture<ResultMessage> result = client.call(message);
+        final ListenableFuture<ResultMessage> result = stratumClient.call(message);
 
         Futures.addCallback(result, new FutureCallback<ResultMessage>() {
 
@@ -315,7 +354,7 @@ public class ServerClient implements BlockchainConnection {
             public void onSuccess(ResultMessage result) {
                 try {
                     String rawTx = result.getResult().getString(0);
-                    Transaction tx = new Transaction(coinType, Utils.HEX.decode(rawTx));
+                    Transaction tx = new Transaction(type, Utils.HEX.decode(rawTx));
                     listener.onTransactionUpdate(tx);
                 } catch (Exception e) {
                     onFailure(e);
@@ -331,13 +370,12 @@ public class ServerClient implements BlockchainConnection {
     }
 
     @Override
-    public void broadcastTx(CoinType coinType, final Transaction tx,
-                            @Nullable final TransactionEventListener listener) {
-        StratumClient client = checkNotNull(connections.get(coinType));
+    public void broadcastTx(final Transaction tx, @Nullable final TransactionEventListener listener) {
+        checkNotNull(stratumClient);
 
         CallMessage message = new CallMessage("blockchain.transaction.broadcast",
                 Arrays.asList(Utils.HEX.encode(tx.bitcoinSerialize())));
-        final ListenableFuture<ResultMessage> result = client.call(message);
+        final ListenableFuture<ResultMessage> result = stratumClient.call(message);
 
         Futures.addCallback(result, new FutureCallback<ResultMessage>() {
 
@@ -367,24 +405,27 @@ public class ServerClient implements BlockchainConnection {
 
     @Override
     public void ping() {
-        for (final CoinType type : connections.keySet()) {
-            CallMessage pingMsg = new CallMessage("server.version", ImmutableList.of());
-            ListenableFuture<ResultMessage> pong = connections.get(type).call(pingMsg);
-            Futures.addCallback(pong, new FutureCallback<ResultMessage>() {
-                @Override
-                public void onSuccess(@Nullable ResultMessage result) {
-                    try {
-                        log.info("Server {} version {} OK", type.getName(),
-                                result.getResult().get(0));
-                    } catch (JSONException ignore) { }
-                }
-
-                @Override
-                public void onFailure(Throwable t) {
-                    log.error("Server {} ping failed", type.getName());
-                }
-            }, Threading.USER_THREAD);
+        checkNotNull(stratumClient);
+        if (!stratumClient.isConnected()) {
+            log.warn("There is no connection with {} server, skipping ping.", type.getName());
+            return;
         }
+        CallMessage pingMsg = new CallMessage("server.version", ImmutableList.of());
+        ListenableFuture<ResultMessage> pong = stratumClient.call(pingMsg);
+        Futures.addCallback(pong, new FutureCallback<ResultMessage>() {
+            @Override
+            public void onSuccess(@Nullable ResultMessage result) {
+                try {
+                    log.info("Server {} version {} OK", type.getName(),
+                            result.getResult().get(0));
+                } catch (JSONException ignore) { }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                log.error("Server {} ping failed", type.getName());
+            }
+        }, Threading.USER_THREAD);
     }
 
     public static class HistoryTx {

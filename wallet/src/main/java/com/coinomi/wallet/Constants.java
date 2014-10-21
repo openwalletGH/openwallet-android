@@ -41,12 +41,6 @@ public class Constants {
     public static final String CURRENCY_MINUS_SIGN = "-" + CHAR_THIN_SPACE;
 
     // TODO make dynamic
-//    public static final List<CoinAddress> COINS_ADDRESSES_TEST = ImmutableList.of(
-//            new CoinAddress(BitcoinMain.get(), new ServerAddress("btc-cce-1.coinomi.net", 5001), new ServerAddress("btc-cce-2.coinomi.net", 5001)),
-//            new CoinAddress(DogecoinMain.get(), new ServerAddress("doge-cce-1.coinomi.net", 5003), new ServerAddress("doge-cce-2.coinomi.net", 5003)),
-//            new CoinAddress(LitecoinMain.get(), new ServerAddress("ltc-cce-1.coinomi.net", 5002), new ServerAddress("ltc-cce-2.coinomi.net", 5002))
-//    );
-
     public static final List<CoinAddress> COINS_ADDRESSES_TEST = ImmutableList.of(
             new CoinAddress(BitcoinMain.get(), new ServerAddress("btc-cce-1.coinomi.net", 5001), new ServerAddress("btc-cce-2.coinomi.net", 5001)),
             new CoinAddress(DogecoinMain.get(), new ServerAddress("doge-cce-1.coinomi.net", 5003), new ServerAddress("doge-cce-2.coinomi.net", 5003)),

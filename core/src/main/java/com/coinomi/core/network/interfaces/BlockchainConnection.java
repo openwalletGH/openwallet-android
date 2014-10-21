@@ -15,16 +15,16 @@ import java.util.List;
  * @author Giannis Dzegoutanis
  */
 public interface BlockchainConnection {
-    void subscribeToAddresses(CoinType coin, List<Address> addresses,
+    void subscribeToAddresses(List<Address> addresses,
                               TransactionEventListener listener);
 
-    void getUnspentTx(CoinType coinType, AddressStatus status, TransactionEventListener listener);
+    void getUnspentTx(AddressStatus status, TransactionEventListener listener);
 
-    void getHistoryTx(CoinType coinType, AddressStatus status, TransactionEventListener listener);
+    void getHistoryTx(AddressStatus status, TransactionEventListener listener);
 
-    void getTransaction(CoinType coinType, Sha256Hash txHash, TransactionEventListener listener);
+    void getTransaction(Sha256Hash txHash, TransactionEventListener listener);
 
-    void broadcastTx(CoinType coinType, final Transaction tx, final TransactionEventListener listener);
+    void broadcastTx(final Transaction tx, final TransactionEventListener listener);
 
     void ping();
 

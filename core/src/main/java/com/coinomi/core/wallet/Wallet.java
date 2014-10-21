@@ -49,7 +49,7 @@ import static com.google.common.base.Preconditions.checkState;
 /**
  * @author Giannis Dzegoutanis
  */
-final public class Wallet implements ConnectionEventListener {
+final public class Wallet {
     private static final Logger log = LoggerFactory.getLogger(Wallet.class);
     public static int ENTROPY_SIZE_DEBUG = -1;
 
@@ -65,7 +65,6 @@ final public class Wallet implements ConnectionEventListener {
     // FIXME, make multi account capable
     private final static int ACCOUNT_ZERO = 0;
 
-    @Nullable transient BlockchainConnection blockchainConnection;
     private int version;
 
     public Wallet(List<String> mnemonic) throws MnemonicException {
@@ -248,26 +247,6 @@ final public class Wallet implements ConnectionEventListener {
         } finally {
             lock.unlock();
         }
-    }
-
-    @Override
-    public void onConnection(BlockchainConnection blockchainConnection) {
-        this.blockchainConnection = blockchainConnection;
-        for (CoinType coin : getCoinTypes()) {
-            WalletPocket pocket = getPocket(coin);
-            if (blockchainConnection != null) {
-                pocket.onConnection(blockchainConnection);
-            }
-        }
-    }
-
-    @Override
-    public void onDisconnect() {
-        this.blockchainConnection = null;
-    }
-
-    public boolean isConnected() {
-        return blockchainConnection != null;
     }
 
     public SendRequest sendCoinsOffline(Address address, Coin amount)
@@ -570,11 +549,7 @@ final public class Wallet implements ConnectionEventListener {
         broadcastTx(request.type, request.tx, null);
     }
 
-    private void broadcastTx(CoinType type, Transaction tx, TransactionEventListener listener) throws IOException{
-        if (isConnected()) {
-            blockchainConnection.broadcastTx(type, tx, listener);
-        } else {
-            throw new IOException("No connection available");
-        }
+    private void broadcastTx(CoinType type, Transaction tx, TransactionEventListener listener) throws IOException {
+        getPocket(type).broadcastTx(tx, listener);
     }
 }
