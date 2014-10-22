@@ -4,6 +4,7 @@ import com.coinomi.core.network.interfaces.BlockchainConnection;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.network.interfaces.ConnectionEventListener;
 import com.coinomi.core.network.interfaces.TransactionEventListener;
+import com.coinomi.core.wallet.WalletPocket;
 import com.coinomi.stratumj.ServerAddress;
 import com.coinomi.stratumj.StratumClient;
 import com.coinomi.stratumj.messages.CallMessage;
@@ -81,7 +82,7 @@ public class ServerClient implements BlockchainConnection {
         @Override
         public void running() {
             // Check if connection is up as this event is fired even if there is no connection
-            if (stratumClient != null && stratumClient.isConnected()) {
+            if (isConnected()) {
                 log.info("{} client connected to {}", type.getName(), lastServerAddress);
                 broadcastOnConnection();
                 retrySeconds = 1;
@@ -169,12 +170,18 @@ public class ServerClient implements BlockchainConnection {
         return stratumClient != null && stratumClient.isConnected();
     }
 
+    public void setWalletPocket(WalletPocket pocket) {
+        if (isConnected()) broadcastOnDisconnect();
+        eventListeners.clear();
+        addEventListener(pocket);
+        if (isConnected()) broadcastOnConnection();
+    }
 
     /**
      * Adds an event listener object. Methods on this object are called when something interesting happens,
-     * like new connection to a server. The listener is executed by the given executor.
+     * like new connection to a server. The listener is executed by {@link com.google.bitcoin.utils.Threading#USER_THREAD}.
      */
-    public void addEventListener(ConnectionEventListener listener) {
+    private void addEventListener(ConnectionEventListener listener) {
         addEventListener(listener, Threading.USER_THREAD);
     }
 
@@ -182,7 +189,7 @@ public class ServerClient implements BlockchainConnection {
      * Adds an event listener object. Methods on this object are called when something interesting happens,
      * like new connection to a server. The listener is executed by the given executor.
      */
-    public void addEventListener(ConnectionEventListener listener, Executor executor) {
+    private void addEventListener(ConnectionEventListener listener, Executor executor) {
         eventListeners.add(new ListenerRegistration<ConnectionEventListener>(listener, executor));
     }
 
@@ -190,7 +197,7 @@ public class ServerClient implements BlockchainConnection {
      * Removes the given event listener object. Returns true if the listener was removed, false if that listener
      * was never added.
      */
-    public boolean removeEventListener(ConnectionEventListener listener) {
+    private boolean removeEventListener(ConnectionEventListener listener) {
         return ListenerRegistration.removeFromList(listener, eventListeners);
     }
 

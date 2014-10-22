@@ -20,6 +20,7 @@ import com.coinomi.wallet.Configuration;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
+import com.coinomi.wallet.service.CoinService;
 import com.google.bitcoin.crypto.DeterministicKey;
 import com.google.bitcoin.crypto.KeyCrypterScrypt;
 
@@ -110,6 +111,7 @@ public class FinalizeWalletRestorationFragment extends Fragment {
                 wallet.createCoinPockets(Constants.DEFAULT_COINS, true, aesKey);
                 getWalletApplication().setWallet(wallet);
                 getWalletApplication().saveWalletNow();
+                getWalletApplication().startBlockchainService(CoinService.ServiceMode.RESET_WALLET);
             } catch (Exception e) {
                 log.error("Error creating a wallet", e);
                 errorMessage = e.getMessage();

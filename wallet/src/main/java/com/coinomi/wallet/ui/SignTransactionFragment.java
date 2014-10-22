@@ -17,6 +17,7 @@ import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.wallet.exceptions.NoSuchPocketException;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
+import com.coinomi.wallet.WalletApplication;
 import com.google.bitcoin.core.Address;
 import com.google.bitcoin.core.Coin;
 import com.google.bitcoin.core.InsufficientMoneyException;
@@ -36,12 +37,12 @@ import static com.coinomi.core.Preconditions.checkNotNull;
 public class SignTransactionFragment extends Fragment {
     private static final int PASSWORD_CONFIRMATION = 1;
 
-    private Wallet wallet;
     private SendRequest request;
 
     @Nullable private String password;
     private SignTransactionActivity mListener;
     private MakeTransactionTask makeTransactionTask;
+    private WalletApplication application;
 
     public static SignTransactionFragment newInstance(Bundle args) {
         SignTransactionFragment fragment = new SignTransactionFragment();
@@ -55,14 +56,14 @@ public class SignTransactionFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        wallet = mListener.getWalletApplication().getWallet();
+        application = mListener.getWalletApplication();
         makeTransactionTask = null;
         if (getArguments() != null) {
             request = (SendRequest) getArguments().getSerializable(Constants.ARG_SEND_REQUEST);
         }
 
-        if (wallet != null && request != null) {
-            if (wallet.isEncrypted()) {
+        if (application.getWallet() != null && request != null) {
+            if (application.getWallet().isEncrypted()) {
                 Intent intent = new Intent(getActivity(), PasswordConfirmationActivity.class);
 //                intent.putExtra(Constants.ARG_MESSAGE, getResources().getString(R.string.));
                 startActivityForResult(intent, PASSWORD_CONFIRMATION);
@@ -100,6 +101,7 @@ public class SignTransactionFragment extends Fragment {
         protected Exception doInBackground(Void... params) {
             Exception error = null;
             try {
+                Wallet wallet = application.getWallet();
                 if (wallet.isEncrypted()) {
                     KeyCrypter crypter = checkNotNull(wallet.getKeyCrypter());
                     request.aesKey = crypter.deriveKey(password);

@@ -203,7 +203,7 @@ public class CrashReporter
 
         // TODO
 //		report.append("Network: " + Constants.NETWORK_PARAMETERS.getId() + "\n");
-		final Wallet wallet = application.getWallet();
+//		final Wallet wallet = application.getWallet();
 //		report.append("Keychain size: " + wallet.getKeychainSize() + "\n");
 //
 //		final Set<Transaction> transactions = wallet.getTransactions(true);

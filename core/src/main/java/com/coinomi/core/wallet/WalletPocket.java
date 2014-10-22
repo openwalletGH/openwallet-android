@@ -266,7 +266,7 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
                         tx.isEveryOwnedOutputSpent(this) ? Pool.SPENT : Pool.UNSPENT, tx.getHash(), pool);
                 if (!tx.isEveryOwnedOutputSpent(this)) {
                     for (TransactionOutput transactionOutput : tx.getOutputs()) {
-                        log.info("{} txo index {}",
+                        log.info("|- {} txo index {}",
                                 transactionOutput.isAvailableForSpending() ? Pool.UNSPENT : Pool.SPENT,
                                 transactionOutput.getIndex());
                     }
@@ -698,7 +698,7 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
 
     @Override
     public void onAddressStatusUpdate(AddressStatus status) {
-        log.info("Got new status {}", status);
+        log.info("Got a status {}", status);
         lock.lock();
         try {
             confirmAddressSubscription(status.getAddress());
@@ -909,7 +909,7 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
                 maybeMovePool(fromTx);
             }
             else {
-                log.warn("No output found for input {}:{}", txi.getParentTransaction().getHash(),
+                log.info("No output found for input {}:{}", txi.getParentTransaction().getHash(),
                         txi.getOutpoint().getIndex());
             }
         }

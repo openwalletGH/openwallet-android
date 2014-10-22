@@ -5,6 +5,7 @@ import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.network.interfaces.ConnectionEventListener;
 import com.coinomi.core.network.interfaces.TransactionEventListener;
+import com.coinomi.core.wallet.WalletPocket;
 import com.coinomi.stratumj.ServerAddress;
 import com.coinomi.stratumj.StratumClient;
 import com.coinomi.stratumj.messages.CallMessage;
@@ -57,8 +58,16 @@ public class ServerClients {
 
         for (CoinAddress coinAddress : coins) {
             ServerClient client = new ServerClient(coinAddress);
-            client.addEventListener(wallet.getPocket(coinAddress.getType()));
             connections.put(coinAddress.getType(), client);
+        }
+
+        setWallet(wallet);
+    }
+
+    public void setWallet(Wallet wallet) {
+        for (CoinType type : connections.keySet()) {
+            WalletPocket pocket = wallet.getPocket(type);
+            connections.get(type).setWalletPocket(pocket);
         }
     }
 

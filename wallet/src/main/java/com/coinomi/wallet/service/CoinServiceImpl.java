@@ -30,6 +30,7 @@ import com.google.bitcoin.core.StoredBlock;
 import com.google.bitcoin.core.Transaction;
 import com.google.bitcoin.store.BlockStore;
 import com.google.bitcoin.store.BlockStoreException;
+import com.google.bitcoin.utils.Threading;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -306,9 +307,8 @@ public class CoinServiceImpl extends Service implements CoinService {
         }
 
         @SuppressLint("Wakelock")
-        private void check()
-        {
-            final Wallet wallet = application.getWallet();
+        private void check() {
+            Wallet wallet = application.getWallet();
             final boolean hasEverything = hasConnectivity && hasStorage && (wallet != null);
 
             if (hasEverything && client == null) {
@@ -317,21 +317,9 @@ public class CoinServiceImpl extends Service implements CoinService {
 
                 log.info("Starting coins client");
                 client = new ServerClients(Constants.COINS_ADDRESSES_TEST, wallet);
-//                client.addEventListener(new ConnectionEventListener() {
-//                    @Override
-//                    public void onConnection(CoinType coin, BlockchainConnection ignored) { }
-//
-//                    @Override
-//                    public void onDisconnect(CoinType coin) {
-//                        log.info("stratum client disconnected");
-//                        client.stopAsync();
-//                        client = null;
-//                    }
-//                });
                 client.startAsync();
             }
-            else if (!hasEverything && client != null)
-            {
+            else if (!hasEverything && client != null) {
                 log.info("stopping stratum client");
                 client.stopAsync();
                 client = null;
@@ -553,6 +541,16 @@ public class CoinServiceImpl extends Service implements CoinService {
             notificationAddresses.clear();
 
             nm.cancel(NOTIFICATION_ID_COINS_RECEIVED);
+        }
+        else if (CoinService.ACTION_RESET_WALLET.equals(action)) {
+            if (application.getWallet() != null) {
+                application.getWallet().refresh();
+                if (client != null) {
+                    client.setWallet(application.getWallet());
+                }
+            } else {
+                log.error("Got wallet reset intent, but no wallet is available");
+            }
         }
         else if (CoinService.ACTION_BROADCAST_TRANSACTION.equals(action)) {
             final Sha256Hash hash = new Sha256Hash(intent.getByteArrayExtra(CoinService.ACTION_BROADCAST_TRANSACTION_HASH));

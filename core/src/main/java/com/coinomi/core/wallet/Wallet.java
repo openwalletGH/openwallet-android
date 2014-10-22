@@ -295,7 +295,7 @@ final public class Wallet {
             for (WalletPocket pocket : getPockets()) {
                 pocket.refresh();
             }
-            saveNow();
+            saveLater();
         } finally {
             lock.unlock();
         }

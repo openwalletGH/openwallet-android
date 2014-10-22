@@ -54,6 +54,7 @@ public class WalletApplication extends Application {
 
     private Intent coinServiceIntent;
     private Intent coinServiceCancelCoinsReceivedIntent;
+    private Intent coinServiceResetWalletIntent;
 
     private File walletFile;
     @Nullable private Wallet wallet;
@@ -91,6 +92,8 @@ public class WalletApplication extends Application {
 
         coinServiceIntent = new Intent(this, CoinServiceImpl.class);
         coinServiceCancelCoinsReceivedIntent = new Intent(CoinService.ACTION_CANCEL_COINS_RECEIVED,
+                null, this, CoinServiceImpl.class);
+        coinServiceResetWalletIntent = new Intent(CoinService.ACTION_RESET_WALLET,
                 null, this, CoinServiceImpl.class);
 
         // Set MnemonicCode.INSTANCE if needed
@@ -179,6 +182,9 @@ public class WalletApplication extends Application {
         return config;
     }
 
+    /**
+     * Get the current wallet.
+     */
     @Nullable
     public Wallet getWallet() {
         return wallet;
@@ -286,12 +292,19 @@ public class WalletApplication extends Application {
         }
     }
 
-    public void startBlockchainService(final boolean cancelCoinsReceived)
-    {
-        if (cancelCoinsReceived)
-            startService(coinServiceCancelCoinsReceivedIntent);
-        else
-            startService(coinServiceIntent);
+    public void startBlockchainService(CoinService.ServiceMode mode) {
+        switch (mode) {
+            case CANCEL_COINS_RECEIVED:
+                startService(coinServiceCancelCoinsReceivedIntent);
+                break;
+            case RESET_WALLET:
+                startService(coinServiceResetWalletIntent);
+                break;
+            case NORMAL:
+            default:
+                startService(coinServiceIntent);
+                break;
+        }
     }
 
     public void stopBlockchainService()

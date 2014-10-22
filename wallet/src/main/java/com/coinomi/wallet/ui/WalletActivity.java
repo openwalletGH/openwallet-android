@@ -20,6 +20,7 @@ import com.coinomi.core.uri.CoinURIParseException;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
+import com.coinomi.wallet.service.CoinService;
 import com.google.bitcoin.core.Address;
 import com.google.bitcoin.core.Coin;
 
@@ -94,7 +95,7 @@ final public class WalletActivity extends ActionBarActivity implements
     protected void onResume() {
         super.onResume();
 
-        getWalletApplication().startBlockchainService(true);
+        getWalletApplication().startBlockchainService(CoinService.ServiceMode.CANCEL_COINS_RECEIVED);
 
         //TODO
 //        checkLowStorageAlert();
@@ -207,24 +208,13 @@ final public class WalletActivity extends ActionBarActivity implements
     }
 
     private void refreshWallet() {
-        if (refreshTask == null) {
-            refreshTask = new AsyncTask<Void, Void, Void>() {
-                @Override
-                protected Void doInBackground(Void... params) {
-                    if (getWalletApplication().getWallet() != null) {
-                        getWalletApplication().getWallet().refresh();
-                    }
-                    return null;
-                }
-                @Override
-                protected void onPostExecute(Void aVoid) {
-                    refreshTask = null;
-                    Intent introIntent = new Intent(WalletActivity.this, WalletActivity.class);
-                    startActivity(introIntent);
-                    finish();
-                }
-            };
-            refreshTask.execute();
+        if (getWalletApplication().getWallet() != null) {
+            getWalletApplication().getWallet().refresh();
+            getWalletApplication().startBlockchainService(CoinService.ServiceMode.RESET_WALLET);
+            // FIXME, we get a crash if the activity is not restarted
+            Intent introIntent = new Intent(WalletActivity.this, WalletActivity.class);
+            startActivity(introIntent);
+            finish();
         }
     }
 

@@ -29,6 +29,8 @@ public class Constants {
     public static final String ARG_MESSAGE = "message";
 
     public static final String WALLET_FILENAME_PROTOBUF = "wallet";
+    public static final long WALLET_WRITE_DELAY = 3;
+    public static final TimeUnit WALLET_WRITE_DELAY_UNIT = TimeUnit.SECONDS;
 
     public static final Charset UTF_8 = Charset.forName("UTF-8");
     public static final Charset US_ASCII = Charset.forName("US-ASCII");
@@ -57,8 +59,4 @@ public class Constants {
     public static final CoinType DEFAULT_COIN = BitcoinMain.get();
     public static final List<CoinType> DEFAULT_COINS = ImmutableList.of(BitcoinMain.get(),
             DogecoinMain.get(), LitecoinMain.get());
-
-    public static final long WALLET_WRITE_DELAY = 3;
-    public static final TimeUnit WALLET_WRITE_DELAY_UNIT = TimeUnit.SECONDS;
-
 }
