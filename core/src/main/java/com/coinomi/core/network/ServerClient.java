@@ -391,7 +391,7 @@ public class ServerClient implements BlockchainConnection {
                 try {
                     String txId = result.getResult().getString(0);
 
-                    // FIXME could crash due to transaction malleability
+                    // FIXME could return {u'message': u'', u'code': -25}
                     log.info("got tx {} =?= {}", txId, tx.getHash());
                     checkState(tx.getHash().toString().equals(txId));
 

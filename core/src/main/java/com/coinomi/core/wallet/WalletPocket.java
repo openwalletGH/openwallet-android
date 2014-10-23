@@ -1479,8 +1479,16 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
                 if (excludeImmatureCoinbases && !tx.isMature()) continue;
                 for (TransactionOutput output : tx.getOutputs()) {
                     if (!output.isAvailableForSpending()) continue;
-//                    if (!output.isMine(this)) continue;
                     candidates.add(output);
+                }
+            }
+
+            // If we have pending transactions, remove from candidates any future spent outputs
+            for (Transaction pendingTx : pending.values()) {
+                for (TransactionInput input : pendingTx.getInputs()) {
+                    Transaction tx = transactions.get(input.getOutpoint().getHash());
+                    TransactionOutput pendingSpentOutput = tx.getOutput((int) input.getOutpoint().getIndex());
+                    candidates.remove(pendingSpentOutput);
                 }
             }
             return candidates;
