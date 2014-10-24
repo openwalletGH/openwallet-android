@@ -30,8 +30,7 @@ public class PasswordConfirmationActivity extends android.support.v4.app.Fragmen
     @Override
     public void onPasswordConfirmed(Bundle args) {
         final Intent result = new Intent();
-        result.putExtra(Constants.ARG_PASSWORD, args.getString(Constants.ARG_PASSWORD));
-        result.putExtra(Constants.ARG_MESSAGE, args.getString(Constants.ARG_MESSAGE));
+        result.putExtras(args);
         setResult(RESULT_OK, result);
 
         // delayed finish

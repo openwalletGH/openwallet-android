@@ -39,6 +39,9 @@
     <string name="wallet_title_balance">balance</string>
     <string name="wallet_title_send">send</string>
 
+    <!-- SendOutput widget -->
+    <string name="fee">Fee</string>
+
     <!-- Welcome fragment -->
     <string name="welcome_text">Welcome to Coinomi wallet</string>
     <string name="create_wallet">Create a new wallet</string>
@@ -99,6 +102,7 @@
     <string name="preparing_transaction">Please wait while your transaction is being prepared and sent.</string>
     <string name="no_such_pocket_error">Error occurred while accessing this wallet pocket. If problem persists, try to restore the wallet from seed.</string>
     <string name="password_failed">The password entered is not valid.</string>
+    <string name="internal_transfer">Internal transfer</string>
     <string name="sent">Sent!</string>
 
 </resources>

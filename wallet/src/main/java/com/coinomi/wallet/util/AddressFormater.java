@@ -1,9 +1,5 @@
 package com.coinomi.wallet.util;
 
-import com.google.bitcoin.core.Address;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
  * @author Giannis Dzegoutanis
  */

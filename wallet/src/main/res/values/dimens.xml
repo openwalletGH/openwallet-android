@@ -23,6 +23,10 @@
     <dimen name="amount_symbol_text_size">24sp</dimen>
     <dimen name="progress_symbol_size">18dp</dimen>
 
+    <!-- SendOutput Widget -->
+    <dimen name="send_output_amount_text_size">24sp</dimen>
+    <dimen name="send_output_type_text_size">24sp</dimen>
+
     <!-- IntroActivity -->
     <dimen name="intro_logo_and_btn_width">192dp</dimen>
     <dimen name="intro_description">16sp</dimen>

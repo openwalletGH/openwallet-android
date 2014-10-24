@@ -1,8 +1,6 @@
 package com.coinomi.core.wallet;
 
 import com.coinomi.core.coins.CoinType;
-import com.coinomi.core.network.interfaces.BlockchainConnection;
-import com.coinomi.core.network.interfaces.ConnectionEventListener;
 import com.coinomi.core.network.interfaces.TransactionEventListener;
 import com.coinomi.core.protos.Protos;
 import com.coinomi.core.wallet.exceptions.NoSuchPocketException;
@@ -267,16 +265,20 @@ final public class Wallet {
         return request;
     }
 
-    public void signRequest(SendRequest request) throws InsufficientMoneyException, NoSuchPocketException {
+    public void completeAndSignTx(SendRequest request) throws InsufficientMoneyException, NoSuchPocketException {
         WalletPocket pocket = getPocket(request.type);
         if (pocket != null) {
-            pocket.completeTx(request);
+            if (request.completed) {
+                pocket.signTransaction(request);
+            } else {
+                pocket.completeTx(request);
+            }
         } else {
             throwNoSuchPocket(request.type);
         }
     }
 
-    private SendRequest throwNoSuchPocket(CoinType type) throws NoSuchPocketException {
+    private void throwNoSuchPocket(CoinType type) throws NoSuchPocketException {
         throw new NoSuchPocketException("Tried to send from pocket " + type.getName() +
                 " but no such pocket in wallet.");
     }

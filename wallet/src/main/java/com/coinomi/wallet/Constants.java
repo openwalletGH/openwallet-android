@@ -39,6 +39,7 @@ public class Constants {
     public static final char CHAR_THIN_SPACE = '\u2009';
     public static final char CHAR_ALMOST_EQUAL_TO = '\u2248';
     public static final char CHAR_CHECKMARK = '\u2713';
+    public static final char CHAR_FONT_AWESOME_SEND = '\uf08b';
     public static final String CURRENCY_PLUS_SIGN = "+" + CHAR_THIN_SPACE;
     public static final String CURRENCY_MINUS_SIGN = "-" + CHAR_THIN_SPACE;
 

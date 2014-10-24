@@ -105,7 +105,7 @@ public class SendFragment extends Fragment {
             coinType = (CoinType) checkNotNull(getArguments().getSerializable(COIN_TYPE));
         }
         if (mListener != null) {
-            pocket = checkNotNull(mListener.getWalletApplication().getWalletPocket(coinType));
+            pocket = mListener.getWalletApplication().getWalletPocket(coinType);
         }
         setHasOptionsMenu(true);
         mNavigationDrawerFragment = (NavigationDrawerFragment)
@@ -152,6 +152,8 @@ public class SendFragment extends Fragment {
             }
         });
 
+        ((TextView)view.findViewById(R.id.symbol)).setText(coinType.getSymbol());
+
         return view;
     }
 
@@ -160,19 +162,27 @@ public class SendFragment extends Fragment {
     }
 
     private void handleSendConfirm() {
+        if (!everythingValid()) { // Sanity check
+            log.error("Unexpected validity failure.");
+            validateAmount();
+            validateAddress();
+            return;
+        }
         state = State.PREPARATION;
         updateView();
         if (mListener != null && mListener.getWalletApplication().getWallet() != null) {
-            onMakeTransaction(mListener.getWalletApplication().getWallet(),
-                    address, sendAmount);
+            onMakeTransaction(address, sendAmount);
         }
         reset();
     }
 
-    public void onMakeTransaction(Wallet wallet, Address toAddress, Coin amount) {
+    public void onMakeTransaction(Address toAddress, Coin amount) {
         Intent intent = new Intent(getActivity(), SignTransactionActivity.class);
         try {
-            SendRequest request = checkNotNull(wallet).sendCoinsOffline(toAddress, amount);
+            if (pocket == null) {
+                throw new NoSuchPocketException("No pocket found for " + coinType.getName());
+            }
+            SendRequest request = pocket.sendCoinsOffline(toAddress, amount);
             intent.putExtra(Constants.ARG_SEND_REQUEST, request);
             startActivityForResult(intent, SIGN_TRANSACTION);
         } catch (InsufficientMoneyException e) {
@@ -215,6 +225,7 @@ public class SendFragment extends Fragment {
                 Exception error = (Exception) intent.getSerializableExtra(Constants.ARG_ERROR);
 
                 if (error == null) {
+                    // TODO check for transaction broadcast in wallet pocket
                     Toast.makeText(getActivity(), R.string.sent, Toast.LENGTH_SHORT).show();
                 } else {
                     if (error instanceof InsufficientMoneyException) {
@@ -284,8 +295,7 @@ public class SendFragment extends Fragment {
         return state == State.INPUT && isOutputsValid() && isAmountValid();
     }
 
-    private void requestFocusFirst()
-    {
+    private void requestFocusFirst() {
         if (!isOutputsValid())
             receivingAddressView.requestFocus();
         else if (!isAmountValid())
@@ -297,6 +307,10 @@ public class SendFragment extends Fragment {
     }
 
     private void validateAmount() {
+        validateAmount(false);
+    }
+
+    private void validateAmount(boolean isTyping) {
         try {
             final String amountStr = sendAmountView.getText().toString().trim();
             if (!amountStr.isEmpty()) {
@@ -309,12 +323,22 @@ public class SendFragment extends Fragment {
                 }
             } else {
                 sendAmount = null;
-                amountError.setVisibility(View.GONE);
             }
+            amountError.setVisibility(View.GONE);
+// TODO, remove when https://github.com/bitcoinj/bitcoinj/pull/254 is merged
+        } catch (ArithmeticException e) {
+            if (!isTyping) {
+                sendAmount = null;
+                amountError.setText(R.string.amount_error);
+                amountError.setVisibility(View.VISIBLE);
+            }
+// TODO, remove when https://github.com/bitcoinj/bitcoinj/pull/254 is merged
         } catch (IllegalArgumentException ignore) {
-            sendAmount = null;
-            amountError.setText(R.string.address_error);
-            amountError.setVisibility(View.VISIBLE);
+            if (!isTyping) {
+                sendAmount = null;
+                amountError.setText(R.string.amount_error);
+                amountError.setVisibility(View.VISIBLE);
+            }
         }
         updateView();
     }
@@ -417,7 +441,7 @@ public class SendFragment extends Fragment {
 
         @Override
         public void afterTextChanged(final Editable s) {
-            validateAmount();
+            validateAmount(true);
         }
     }
 

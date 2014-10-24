@@ -3,4 +3,7 @@
     <declare-styleable name="Amount">
         <attr name="show_big" format="boolean" />
     </declare-styleable>
+    <declare-styleable name="SendOutput">
+        <attr name="is_fee" format="boolean" />
+    </declare-styleable>
 </resources>

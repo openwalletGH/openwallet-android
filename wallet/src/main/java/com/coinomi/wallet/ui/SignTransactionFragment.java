@@ -1,34 +1,31 @@
 package com.coinomi.wallet.ui;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.security.KeyChainException;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+import android.widget.EditText;
 
 import com.coinomi.core.wallet.SendRequest;
 import com.coinomi.core.wallet.Wallet;
+import com.coinomi.core.wallet.WalletPocket;
 import com.coinomi.core.wallet.exceptions.NoSuchPocketException;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
-import com.google.bitcoin.core.Address;
-import com.google.bitcoin.core.Coin;
+import com.coinomi.wallet.ui.widget.SendOutput;
+import com.coinomi.wallet.util.Keyboard;
 import com.google.bitcoin.core.InsufficientMoneyException;
+import com.google.bitcoin.core.TransactionOutput;
 import com.google.bitcoin.crypto.KeyCrypter;
-import com.google.bitcoin.crypto.KeyCrypterException;
-
-import java.io.IOException;
 
 import javax.annotation.Nullable;
 
 import static com.coinomi.core.Preconditions.checkNotNull;
+import static com.coinomi.core.Preconditions.checkState;
 
 /**
  * This fragment displays a busy message and makes the transaction in the background
@@ -61,22 +58,60 @@ public class SignTransactionFragment extends Fragment {
         if (getArguments() != null) {
             request = (SendRequest) getArguments().getSerializable(Constants.ARG_SEND_REQUEST);
         }
-
-        if (application.getWallet() != null && request != null) {
-            if (application.getWallet().isEncrypted()) {
-                Intent intent = new Intent(getActivity(), PasswordConfirmationActivity.class);
-//                intent.putExtra(Constants.ARG_MESSAGE, getResources().getString(R.string.));
-                startActivityForResult(intent, PASSWORD_CONFIRMATION);
-            } else {
-                maybeStartTask();
-            }
-        }
+        checkState(request != null, "Must provide a " + SendRequest.class);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_make_transaction, container, false);
+        View view = inflater.inflate(R.layout.fragment_make_transaction, container, false);
+
+        final EditText passwordView = (EditText) view.findViewById(R.id.password);
+        if (application.getWallet() != null && application.getWallet().isEncrypted()) {
+            Keyboard.focusAndShowKeyboard(passwordView, getActivity());
+        } else {
+            passwordView.setVisibility(View.GONE);
+        }
+
+        SendOutput output = (SendOutput) view.findViewById(R.id.transaction_output);
+        SendOutput fee = (SendOutput) view.findViewById(R.id.transaction_fee);
+        fee.setVisibility(View.GONE);
+
+        WalletPocket pocket = application.getWalletPocket(request.type);
+        String symbol = request.type.getSymbol();
+        checkState(request.tx.getOutputs().size() == 1, "Only one output is supported at the moment.");
+        for (TransactionOutput txo : request.tx.getOutputs()) {
+            output.setAmount(txo.getValue());
+            output.setSymbol(symbol);
+            output.setAddress(txo.getScriptPubKey().getToAddress(request.type));
+        }
+        // TODO handle in a task onCreate
+        request.signInputs = false;
+        try {
+            pocket.completeTx(request);
+        } catch (InsufficientMoneyException e) {
+            if (mListener != null) {
+                mListener.onSignResult(e);
+            }
+            return view;
+        }
+
+        fee.setVisibility(View.VISIBLE);
+        fee.setAmount(request.tx.getFee());
+        fee.setSymbol(symbol);
+
+        view.findViewById(R.id.button_confirm).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (passwordView.isShown()) {
+                    Keyboard.hideKeyboard(getActivity());
+                    password = passwordView.getText().toString();
+                }
+                maybeStartTask();
+            }
+        });
+
+        return view;
     }
 
     private void maybeStartTask() {
@@ -99,20 +134,19 @@ public class SignTransactionFragment extends Fragment {
 
         @Override
         protected Exception doInBackground(Void... params) {
+            Wallet wallet = application.getWallet();
+            if (wallet == null) return new NoSuchPocketException("No wallet found.");
             Exception error = null;
             try {
-                Wallet wallet = application.getWallet();
                 if (wallet.isEncrypted()) {
                     KeyCrypter crypter = checkNotNull(wallet.getKeyCrypter());
                     request.aesKey = crypter.deriveKey(password);
                 }
-                wallet.signRequest(request);
+                request.signInputs = true;
+                wallet.completeAndSignTx(request);
                 wallet.broadcastTx(request);
             }
-            catch (InsufficientMoneyException e) { error = e; }
-            catch (NoSuchPocketException e) { error = e; }
-            catch (KeyCrypterException e) { error = e; }
-            catch (IOException e) { error = e; }
+            catch (Exception e) { error = e; }
 
             return error;
         }
@@ -124,19 +158,6 @@ public class SignTransactionFragment extends Fragment {
             }
         }
     }
-
-    @Override
-    public void onActivityResult(final int requestCode, final int resultCode, final Intent intent) {
-        if (requestCode == PASSWORD_CONFIRMATION) {
-            if (resultCode == Activity.RESULT_OK) {
-                password = intent.getStringExtra(Constants.ARG_PASSWORD);
-                maybeStartTask();
-            } else {
-                getActivity().finish();
-            }
-        }
-    }
-
 
     @Override
     public void onAttach(Activity activity) {

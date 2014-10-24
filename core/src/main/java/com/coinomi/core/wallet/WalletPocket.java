@@ -1391,7 +1391,7 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
 
             final Coin calculatedFee = req.tx.getFee();
             if (calculatedFee != null) {
-                log.info("  with a fee of {} BTC", calculatedFee.toFriendlyString());
+                log.info("  with a fee of {} {}", calculatedFee.toFriendlyString(), coinType.getSymbol());
             }
 
             // Label the transaction as being self created. We can use this later to spend its change output even before
