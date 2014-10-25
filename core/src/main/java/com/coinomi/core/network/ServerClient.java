@@ -53,7 +53,8 @@ public class ServerClient implements BlockchainConnection {
     private static final ScheduledThreadPoolExecutor connectionExec;
     static {
         connectionExec = new ScheduledThreadPoolExecutor(1);
-        connectionExec.setRemoveOnCancelPolicy(true);
+        // FIXME, causing a crash in old Androids
+//        connectionExec.setRemoveOnCancelPolicy(true);
     }
     private static final Random RANDOM = new Random();
 
