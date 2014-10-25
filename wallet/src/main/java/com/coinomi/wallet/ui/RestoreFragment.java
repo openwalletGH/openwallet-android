@@ -91,7 +91,7 @@ public class RestoreFragment extends Fragment {
 
         // Setup auto complete the mnemonic words
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(),
-                android.R.layout.simple_dropdown_item_1line, MnemonicCode.INSTANCE.getWordList());
+                R.layout.item_simple, MnemonicCode.INSTANCE.getWordList());
         mnemonicTextView = (MultiAutoCompleteTextView) view.findViewById(R.id.seed);
         mnemonicTextView.setAdapter(adapter);
         mnemonicTextView.setTokenizer(new SpaceTokenizer() {
@@ -101,8 +101,9 @@ public class RestoreFragment extends Fragment {
             }
         });
 
+        // FIXME causes problems in older Androids
         // Show keyboard
-        Keyboard.focusAndShowKeyboard(mnemonicTextView, getActivity());
+//        Keyboard.focusAndShowKeyboard(mnemonicTextView, getActivity());
 
         // Restore message
         restoreΜessage = (TextView) view.findViewById(R.id.restore_message);
@@ -122,7 +123,6 @@ public class RestoreFragment extends Fragment {
 
         return view;
     }
-
 
     @Override
     public void onAttach(Activity activity) {
@@ -178,13 +178,13 @@ public class RestoreFragment extends Fragment {
             clearRestorationMessage();
             isValid = true;
         } catch (MnemonicException.MnemonicChecksumException e) {
-            log.error("Checksum error in seed", e);
+            log.info("Checksum error in seed: {}", e.getMessage());
             setVerificationError(R.string.restore_error_checksum);
         } catch (MnemonicException.MnemonicWordException e) {
-            log.error("Unknown words in seed", e);
+            log.info("Unknown words in seed: {}", e.getMessage());
             setVerificationError(R.string.restore_error_words);
         } catch (MnemonicException e) {
-            log.error("Error verifying seed", e);
+            log.info("Error verifying seed: {}", e.getMessage());
             setVerificationError(R.string.restore_error, e.getMessage());
         }
 
@@ -230,13 +230,18 @@ public class RestoreFragment extends Fragment {
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             final String seed = getArguments().getString(Constants.ARG_SEED);
-            View dialogView = getActivity().getLayoutInflater().inflate(R.layout.skip_seed_dialog, null);
-            TextView seedView = (TextView) dialogView.findViewById(R.id.seed);
-            seedView.setText(seed);
+            // FIXME does not look good with custom dialogs in older Samsungs
+//            View dialogView = getActivity().getLayoutInflater().inflate(R.layout.skip_seed_dialog, null);
+//            TextView seedView = (TextView) dialogView.findViewById(R.id.seed);
+//            seedView.setText(seed);
+
+            String dialogMessage = getResources().getString(R.string.restore_skip_info1) + "\n\n" +
+                    seed + "\n\n" + getResources().getString(R.string.restore_skip_info2);
             // Use the Builder class for convenient dialog construction
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setTitle(R.string.restore_skip_title)
-                   .setView(dialogView)
+//                   .setView(dialogView) FIXME
+                   .setMessage(dialogMessage)
                    .setPositiveButton(R.string.button_skip, new DialogInterface.OnClickListener() {
                        @Override
                        public void onClick(DialogInterface dialog, int which) {

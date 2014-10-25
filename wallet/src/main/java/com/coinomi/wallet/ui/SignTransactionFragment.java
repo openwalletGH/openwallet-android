@@ -68,7 +68,9 @@ public class SignTransactionFragment extends Fragment {
 
         final EditText passwordView = (EditText) view.findViewById(R.id.password);
         if (application.getWallet() != null && application.getWallet().isEncrypted()) {
-            Keyboard.focusAndShowKeyboard(passwordView, getActivity());
+            passwordView.requestFocus();
+            // FIXME causes problems in older Androids
+//            Keyboard.focusAndShowKeyboard(passwordView, getActivity());
         } else {
             passwordView.setVisibility(View.GONE);
         }

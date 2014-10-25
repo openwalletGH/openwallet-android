@@ -49,14 +49,15 @@
 
     <!-- Seed fragment -->
     <string name="seed_info">This is your <i>recovery seed</i> phrase to access your wallet. Please write it down on a paper and keep it in a secret place, as anyone with access to it has access to your funds. If you lose your seed, we cannot do anything to recover your wallet.</string>
+    <string name="sample_seed">deliver broken make enrich core vendor ski help sock spy purse roast token jewel female</string>
     <string name="seed_regenerate_title">touch to generate a new seed</string>
     <string name="backed_up_seed">I have copied and stored the recovery seed in a secure place.</string>
 
     <!-- Restore fragment -->
     <string name="restore_info">Please enter your recovery seed:</string>
-    <string name="restore_skip_title">Skipping seed verification</string>
-    <string name="restore_skip_info">Please make sure that your seed matches the following:</string>
-    <string name="restore_skip_info2">It is still recommended <i>not</i> to skip verification, so that misspellings could be detected.</string>
+    <string name="restore_skip_title">Skipping verification</string>
+    <string name="restore_skip_info1">Please make sure that your seed matches the following:</string>
+    <string name="restore_skip_info2">It is recommended not to skip verification, so that any misspellings could be detected.</string>
     <string name="restore_error_checksum">The seed is not valid. Check if some words are misspelled.</string>
     <string name="restore_error_words">The seed contains unrecognized words.</string>
     <string name="restore_error_mismatch">The seed entered does not match your seed.</string>
@@ -69,7 +70,7 @@
     <string name="history_empty">No coins received so far!\n\nYou can get some by trading for traditional money, selling goods or services or earning by working.</string>
 
     <!-- Receive fragment -->
-    <string name="sample_address_format">XXXX XXXX XXXX XXXXX\nXXXX XXXX XXXX XXXXX</string>
+    <string name="sample_address_format">nUdH XBSB YQPJ REXZM\nBUdu 8ARn WM2m z3XQp</string>
     <string name="receive_address_label">my address</string>
 
     <!-- Send fragment -->

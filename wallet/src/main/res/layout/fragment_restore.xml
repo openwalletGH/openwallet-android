@@ -4,71 +4,87 @@
     android:layout_height="match_parent"
     tools:context="com.coinomi.wallet.ui.RestoreFragment">
 
-    <RelativeLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
-        <TextView
-            android:id="@+id/restore_info"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="@dimen/activity_margin"
-            android:text="@string/restore_info"
-            android:textSize="@dimen/intro_description"
-            android:layout_alignParentTop="true" />
-
-        <com.coinomi.wallet.ui.widget.QrCodeButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/scan_qr_code"
-            android:src="@drawable/qr_code"
-            android:layout_below="@+id/restore_info"
-            android:layout_marginTop="@dimen/activity_vertical_margin"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:contentDescription="@string/button_scan_qr_code" />
-
-        <MultiAutoCompleteTextView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/seed"
-            android:layout_below="@+id/restore_info"
-            android:layout_toLeftOf="@id/scan_qr_code"
-            android:layout_toStartOf="@id/scan_qr_code"
-            android:layout_alignTop="@id/scan_qr_code"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:inputType="textMultiLine|textNoSuggestions" />
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/activity_vertical_margin"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:paddingTop="@dimen/activity_vertical_margin">
 
-        <TextView
-            android:id="@+id/restore_message"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/seed"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            style="@style/ErrorText"
-            android:text="Seed verification error" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/seed_entry_skip"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="@style/LinkButton"
-            android:text="@string/button_skip"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
+                <TextView
+                    android:id="@+id/restore_info"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/restore_info"
+                    style="@style/NormalText" />
 
-        <Button
-            android:id="@+id/button_next"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/button_next"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
-    </RelativeLayout>
+                    <MultiAutoCompleteTextView
+                        android:id="@+id/seed"
+                        style="@style/NormalText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:inputType="textMultiLine|textNoSuggestions" />
 
+                    <com.coinomi.wallet.ui.widget.QrCodeButton
+                        android:id="@+id/scan_qr_code"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@string/button_scan_qr_code"
+                        android:src="@drawable/qr_code" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/restore_message"
+                    style="@style/ErrorText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/restore_error_checksum" />
+            </LinearLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/seed_entry_skip"
+                    style="@style/LinkButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/button_skip"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true" />
+
+                <Button
+                    android:id="@+id/button_next"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/button_next"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true" />
+            </RelativeLayout>
+        </LinearLayout>
+    </ScrollView>
 </FrameLayout>

@@ -296,14 +296,17 @@ public class SendFragment extends Fragment {
     }
 
     private void requestFocusFirst() {
-        if (!isOutputsValid())
+        if (!isOutputsValid()) {
             receivingAddressView.requestFocus();
-        else if (!isAmountValid())
-            Keyboard.focusAndShowKeyboard(sendAmountView, getActivity());
-        else if (everythingValid())
+        } else if (!isAmountValid()) {
+            sendAmountView.requestFocus();
+            // FIXME causes problems in older Androids
+//            Keyboard.focusAndShowKeyboard(sendAmountView, getActivity());
+        } else if (everythingValid()) {
             sendConfirmButton.requestFocus();
-        else
+        } else {
             log.warn("unclear focus");
+        }
     }
 
     private void validateAmount() {

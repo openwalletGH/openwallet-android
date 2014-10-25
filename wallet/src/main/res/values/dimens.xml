@@ -28,10 +28,9 @@
     <dimen name="send_output_type_text_size">24sp</dimen>
 
     <!-- IntroActivity -->
-    <dimen name="intro_logo_and_btn_width">192dp</dimen>
+    <dimen name="intro_button_width">224dp</dimen>
     <dimen name="intro_description">16sp</dimen>
-    <dimen name="seed_regenerate_title">12sp</dimen>
-    <dimen name="seed_text_size">30sp</dimen>
+    <dimen name="seed_text_size">26sp</dimen>
     <dimen name="seed_padding">16dp</dimen>
     <dimen name="seed_smaller_padding">8dp</dimen>
 

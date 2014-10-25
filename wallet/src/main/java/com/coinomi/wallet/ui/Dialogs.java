@@ -16,9 +16,11 @@ public class Dialogs {
     public static final String MESSAGE = "message";
 
     public static DialogFragment setMessage(DialogFragment newDialog, String message) {
-        Bundle args = new Bundle();
-        args.putString(MESSAGE, message);
-        newDialog.setArguments(args);
+        Bundle args = newDialog.getArguments();
+        if (args == null) {
+            newDialog.setArguments(new Bundle());
+        }
+        newDialog.getArguments().putString(MESSAGE, message);
         return newDialog;
     }
 

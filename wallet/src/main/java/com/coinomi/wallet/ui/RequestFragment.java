@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v7.widget.ShareActionProvider;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,6 +22,7 @@ import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.util.AddressFormater;
 import com.coinomi.wallet.util.Fonts;
 import com.coinomi.wallet.util.Qr;
+import com.coinomi.wallet.util.ShareActionProvider;
 import com.google.bitcoin.core.Address;
 import com.google.bitcoin.core.Coin;
 
@@ -78,7 +78,6 @@ public class RequestFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_request, container, false);
 
         addressView = (TextView) view.findViewById(R.id.receive_address);
-        Fonts.setTypeface(addressView, Fonts.Font.UBUNTU_MONO_REGULAR);
         qrView = (ImageView) view.findViewById(R.id.qr_code);
 
         updateView();
@@ -98,7 +97,6 @@ public class RequestFragment extends Fragment {
             MenuItem shareItem = menu.findItem(R.id.action_share);
             mShareActionProvider = (ShareActionProvider)
                     MenuItemCompat.getActionProvider(shareItem);
-            mShareActionProvider.setShareHistoryFileName(null);
 
             setShareIntent(receiveAddress);
         }

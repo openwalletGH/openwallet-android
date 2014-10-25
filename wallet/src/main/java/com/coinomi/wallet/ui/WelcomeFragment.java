@@ -34,7 +34,7 @@ public class WelcomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_welcome, container, false);
-        Fonts.setTypeface(view.findViewById(R.id.welcome_text), Fonts.Font.ROBOTO_LIGHT);
+//        Fonts.setTypeface(view.findViewById(R.id.welcome_text), Fonts.Font.ROBOTO_REGULAR);
 
         view.findViewById(R.id.create_wallet).setOnClickListener(getOnCreateListener());
         view.findViewById(R.id.restore_wallet).setOnClickListener(getOnRestoreListener());
@@ -88,7 +88,7 @@ public class WelcomeFragment extends Fragment {
         public void onRestoreWallet();
         public void onRestoreWallet(String seed);
         public void onSetPassword(String seed);
-        public void onConfirmPassword(String seedText);
+        public void onConfirmPassword(String seed);
     }
 
 }

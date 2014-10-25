@@ -1,13 +1,12 @@
 package com.coinomi.wallet.ui;
 
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 
-import javax.annotation.Nullable;
 
 public class IntroActivity extends android.support.v4.app.FragmentActivity implements WelcomeFragment.Listener, PasswordConfirmationFragment.Listener, SetPasswordFragment.Listener {
 
@@ -56,9 +55,11 @@ public class IntroActivity extends android.support.v4.app.FragmentActivity imple
     }
 
     @Override
-    public void onConfirmPassword(String seedText) {
-        replaceFragment(PasswordConfirmationFragment.newWalletRestoration(seedText,
-                getResources().getString(R.string.password_wallet_recovery)));
+    public void onConfirmPassword(String seed) {
+        Bundle args = new Bundle();
+        args.putString(Constants.ARG_SEED, seed);
+        replaceFragment(PasswordConfirmationFragment.newInstance(
+                getResources().getString(R.string.password_wallet_recovery), args));
     }
 
     @Override

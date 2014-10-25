@@ -41,9 +41,10 @@
 
     <TextView
         android:id="@+id/send_to_address"
-        style="@style/SendOutputAddress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        style="@style/Address"
+        android:singleLine="true"
         android:paddingTop="4dp"
         android:text="nUdHXBSBYQPJREXZMBUdu8ARnWM2mz3XQp" />
 

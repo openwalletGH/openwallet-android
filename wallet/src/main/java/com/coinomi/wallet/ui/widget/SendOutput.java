@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -23,7 +24,7 @@ public class SendOutput extends LinearLayout {
     private final TextView symbol;
     private final TextView address;
 
-    private boolean isFee;
+    private boolean isAddressExpanded = false;
 
     public SendOutput(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -43,9 +44,18 @@ public class SendOutput extends LinearLayout {
             a.recycle();
         }
 
-        Fonts.setTypeface(amount, Fonts.Font.ROBOTO_REGULAR);
-        Fonts.setTypeface(symbol, Fonts.Font.ROBOTO_LIGHT);
-        Fonts.setTypeface(address, Fonts.Font.UBUNTU_MONO_REGULAR);
+        getRootView().setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isAddressExpanded) {
+                    address.setSingleLine(true);
+                    isAddressExpanded = false;
+                } else {
+                    address.setSingleLine(false);
+                    isAddressExpanded = true;
+                }
+            }
+        });
     }
 
     public void setAmount(Coin amount) {
@@ -65,10 +75,7 @@ public class SendOutput extends LinearLayout {
     }
 
     public void setFee(boolean isFee) {
-        this.isFee = isFee;
-
-        if (this.isFee) {
-            Fonts.setTypeface(sendType, Fonts.Font.ROBOTO_REGULAR);
+        if (isFee) {
             sendType.setText(R.string.fee);
             address.setVisibility(GONE);
         } else {

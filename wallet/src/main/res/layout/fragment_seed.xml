@@ -4,89 +4,89 @@
     android:layout_height="match_parent"
     tools:context="com.coinomi.wallet.ui.SeedFragment">
 
-    <RelativeLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
-        <ScrollView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_above="@+id/button_next"
-            android:id="@+id/scrollView">
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/activity_vertical_margin"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:paddingTop="@dimen/activity_vertical_margin">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="@dimen/activity_margin"
-                    android:text="@string/seed_info"
-                    android:id="@+id/seed_info"
-                    android:textSize="@dimen/intro_description"
-                    android:layout_alignParentTop="true"
-                    android:layout_centerHorizontal="true" />
+            <TextView
+                android:id="@+id/seed_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/seed_info"
+                style="@style/NormalText" />
 
-                <CheckBox
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/extra_security"
-                    android:id="@+id/extra_entropy"
-                    android:layout_below="@+id/seed_info"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"
-                    android:visibility="gone"/>
+            <CheckBox
+                android:id="@+id/extra_entropy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/extra_security"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:orientation="vertical"
+                android:layout_gravity="center_horizontal">
 
                 <TextView
                     android:id="@+id/seed"
+                    style="@style/SeedText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/extra_entropy"
                     android:gravity="center"
-                    android:layout_centerHorizontal="true"
-                    android:textSize="@dimen/seed_text_size"
-                    android:paddingTop="@dimen/seed_padding"
                     android:paddingBottom="@dimen/seed_smaller_padding"
-                    android:textColor="@color/primary_700"
-                    android:text="deliver broken make enrich core vendor ski help sock spy purse roast"/>
+                    android:paddingTop="@dimen/seed_padding"
+                    android:text="@string/sample_seed" />
 
                 <TextView
                     android:id="@+id/seed_regenerate_title"
+                    style="@style/SmallHelpText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/seed"
                     android:gravity="end"
-                    android:paddingLeft="@dimen/activity_horizontal_margin"
-                    android:paddingStart="@dimen/activity_horizontal_margin"
-                    android:paddingRight="@dimen/activity_horizontal_margin"
-                    android:paddingEnd="@dimen/activity_horizontal_margin"
                     android:paddingBottom="@dimen/seed_padding"
-                    android:text="@string/seed_regenerate_title"
-                    style="@style/SmallHelpText"/>
+                    android:paddingEnd="@dimen/activity_horizontal_margin"
+                    android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:paddingRight="@dimen/activity_horizontal_margin"
+                    android:paddingStart="@dimen/activity_horizontal_margin"
+                    android:text="@string/seed_regenerate_title" />
+            </LinearLayout>
 
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <CheckBox
+                    android:id="@+id/backed_up_seed"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_toLeftOf="@id/button_next"
+                    android:layout_toStartOf="@id/button_next"
+                    android:text="@string/backed_up_seed" />
+
+                <Button
+                    android:id="@+id/button_next"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
+                    android:text="@string/button_next" />
             </RelativeLayout>
-        </ScrollView>
-
-        <CheckBox
-            android:id="@+id/backed_up_seed"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/backed_up_seed"
-            android:layout_toLeftOf="@id/button_next"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
-
-        <Button
-            android:id="@+id/button_next"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/button_next"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:enabled="false" />
-
-    </RelativeLayout>
-
+        </LinearLayout>
+    </ScrollView>
 </FrameLayout>

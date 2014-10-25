@@ -3,6 +3,7 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light">
         <item name="actionBarStyle">@style/CustomActionBar</item>
+        <item name="android:textStyle"></item>
     </style>
 
     <style name="CustomActionBar" parent="Widget.AppCompat.Light.ActionBar">
@@ -19,7 +20,6 @@
     <style name="LinkButton" parent="@android:style/TextAppearance">
         <item name="android:textColor">@color/primary_500</item>
         <item name="android:textSize">20sp</item>
-        <item name="android:paddingBottom">8dp</item>
     </style>
 
 
@@ -40,13 +40,22 @@
         <item name="android:textColor">@color/fg_error</item>
     </style>
 
-    <style name="AmountSymbol" parent="SecondaryText">
-        <item name="android:singleLine">true</item>
+    <style name="SeedText" parent="">
+        <item name="android:textColor">@color/primary_700</item>
+        <item name="android:textSize">@dimen/seed_text_size</item>
     </style>
+
+    <style name="Address" parent="NormalText">
+        <item name="android:typeface">monospace</item>
+    </style>
+
 
     <!-- Widget amount style -->
     <style name="Amount" parent="NormalText">
         <item name="android:textSize">@dimen/amount_text_size</item>
+        <item name="android:singleLine">true</item>
+    </style>
+    <style name="AmountSymbol" parent="SecondaryText">
         <item name="android:singleLine">true</item>
     </style>
     <style name="AmountBig" parent="Amount">
@@ -56,7 +65,7 @@
         <item name="android:textSize">@dimen/amount_pending_text_size</item>
         <item name="android:textColor">@color/gray_26_hint_text</item>
     </style>
-    <style name="AmountSymbolBig" parent="SecondaryText">
+    <style name="AmountSymbolBig" parent="AmountSymbol">
         <item name="android:textSize">@dimen/amount_symbol_text_size</item>
         <item name="android:singleLine">true</item>
     </style>
@@ -68,9 +77,6 @@
     </style>
     <style name="SendOutputAmount" parent="NormalText">
         <item name="android:textSize">@dimen/send_output_amount_text_size</item>
-        <item name="android:singleLine">true</item>
-    </style>
-    <style name="SendOutputAddress" parent="NormalText">
         <item name="android:singleLine">true</item>
     </style>
 

@@ -25,13 +25,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Fragment that sets a password for a seed
+ * Fragment that sets a password
  */
 public class SetPasswordFragment extends Fragment {
     private static final Logger log = LoggerFactory.getLogger(SetPasswordFragment.class);
 
     private Listener mListener;
-    private String seed;
     private boolean isPasswordGood;
     private boolean isPasswordsMatch;
     private PasswordQualityChecker passwordQualityChecker;
@@ -62,9 +61,6 @@ public class SetPasswordFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            seed = getArguments().getString(Constants.ARG_SEED);
-        }
         passwordQualityChecker = new PasswordQualityChecker(getActivity());
         isPasswordGood = false;
         isPasswordsMatch = false;
@@ -106,8 +102,9 @@ public class SetPasswordFragment extends Fragment {
             }
         });
 
+        // FIXME causes problems in older Androids
         // Show keyboard
-        Keyboard.focusAndShowKeyboard(password1, getActivity());
+//        Keyboard.focusAndShowKeyboard(password1, getActivity());
 
         // Next button
         Button finishButton = (Button) view.findViewById(R.id.button_finish);
@@ -118,8 +115,7 @@ public class SetPasswordFragment extends Fragment {
         view.findViewById(R.id.password_skip).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DialogFragment dialog = SkipPasswordDialogFragment.newInstance(
-                        getResources().getString(R.string.password_skip_warn), seed);
+                DialogFragment dialog = SkipPasswordDialogFragment.newInstance(getArguments());
                 dialog.show(getFragmentManager(), null);
             }
         });
@@ -161,8 +157,7 @@ public class SetPasswordFragment extends Fragment {
                 checkPasswordQuality();
                 checkPasswordsMatch();
                 if (isPasswordGood && isPasswordsMatch) {
-                    Bundle args = new Bundle();
-                    args.putString(Constants.ARG_SEED, seed);
+                    Bundle args = getArguments();
                     args.putString(Constants.ARG_PASSWORD, password1.getText().toString());
                     mListener.onPasswordSet(args);
                 } else {
@@ -176,10 +171,10 @@ public class SetPasswordFragment extends Fragment {
     public static class SkipPasswordDialogFragment extends DialogFragment {
         private Listener mListener;
 
-        public static SkipPasswordDialogFragment newInstance(String message, String seed) {
-            DialogFragment dialog = Dialogs.setMessage(new SkipPasswordDialogFragment(), message);
-            dialog.getArguments().putString(Constants.ARG_SEED, seed);
-            return (SkipPasswordDialogFragment) dialog;
+        public static SkipPasswordDialogFragment newInstance(Bundle args) {
+            SkipPasswordDialogFragment dialog = new SkipPasswordDialogFragment();
+            dialog.setArguments(args);
+            return dialog;
         }
 
         @Override
@@ -195,12 +190,13 @@ public class SetPasswordFragment extends Fragment {
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
-                    .setMessage(getArguments().getString(Dialogs.MESSAGE))
+                    .setMessage(getResources().getString(R.string.password_skip_warn))
                     .setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             dismiss();
                             Keyboard.hideKeyboard(getActivity());
+                            getArguments().putString(Constants.ARG_PASSWORD, "");
                             mListener.onPasswordSet(getArguments());
                         }
                     })

@@ -1,80 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:coinomi="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="@dimen/activity_margin">
+    android:orientation="vertical"
+    android:padding="@dimen/activity_margin">
+
 
     <com.coinomi.wallet.ui.widget.Amount
         android:id="@+id/main_amount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/amount_margin"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_gravity="center_horizontal|top"
-        coinomi:show_big="true" />
+        android:layout_marginBottom="@dimen/amount_margin"
+        coinomi:show_big="true"
+        android:gravity="center_horizontal" />
 
-    <!--<com.coinomi.wallet.ui.widget.Amount-->
-        <!--android:id="@+id/amount_btc"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_marginBottom="@dimen/activity_vertical_margin"-->
-        <!--android:layout_alignEnd="@id/main_amount"-->
-        <!--android:layout_alignRight="@id/main_amount"-->
-        <!--android:layout_below="@+id/main_amount" />-->
-
-    <!--<com.coinomi.wallet.ui.widget.Amount-->
-    <!--android:id="@+id/amount_usd"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_marginBottom="@dimen/activity_vertical_margin"-->
-    <!--android:layout_alignLeft="@id/main_amount"-->
-    <!--android:layout_alignStart="@id/main_amount"-->
-    <!--android:layout_below="@+id/amount_btc" />-->
-    <!---->
-    <!--<com.coinomi.wallet.ui.widget.Amount-->
-    <!--android:id="@+id/amount_eur"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_marginBottom="@dimen/activity_vertical_margin"-->
-    <!--android:layout_alignEnd="@id/main_amount"-->
-    <!--android:layout_alignRight="@id/main_amount"-->
-    <!--android:layout_below="@+id/amount_btc"-->
-    <!--android:layout_toLeftOf="@+id/amount_usd"-->
-    <!--android:layout_toStartOf="@+id/amount_usd" />-->
-    <!---->
-    <!--<com.coinomi.wallet.ui.widget.Amount-->
-    <!--android:id="@+id/amount_cny"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_marginBottom="@dimen/activity_vertical_margin"-->
-    <!--android:layout_alignEnd="@id/amount_usd"-->
-    <!--android:layout_alignRight="@id/amount_usd"-->
-    <!--android:layout_below="@+id/amount_usd" />-->
     <TextView
         android:id="@+id/history_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/history_label"
-        android:textSize="@dimen/history_label"
-        android:textColor="@color/gray_87_text"
-        android:layout_below="@id/main_amount"
         android:layout_marginTop="32dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:text="@string/history_label"
+        android:textColor="@color/gray_87_text"
+        android:textSize="@dimen/history_label" />
 
     <TextView
         android:id="@+id/history_empty"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/history_empty"
-        android:textSize="@dimen/history_empty"
-        android:textColor="@color/gray_26_hint_text"
-        android:layout_below="@id/history_label"
         android:layout_marginTop="32dp"
         android:gravity="center"
-        android:layout_centerHorizontal="true" />
+        android:text="@string/history_empty"
+        android:textColor="@color/gray_26_hint_text"
+        android:textSize="@dimen/history_empty" />
 
-
-</RelativeLayout>
+</LinearLayout>

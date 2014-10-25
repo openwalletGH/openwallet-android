@@ -11,6 +11,8 @@ import android.widget.TextView;
  */
 public class Keyboard {
 
+    // FIXME causes problems in older Androids
+    @Deprecated
     public static void focusAndShowKeyboard(final TextView textView, final Activity activity) {
         textView.requestFocus();
         // Show keyboard
@@ -25,26 +27,12 @@ public class Keyboard {
         }, 100);
     }
 
-//    public static void hideKeyboard(final TextView textView, final Activity activity) {
-//        if (!textView.hasFocus()) return;
-//
-//        textView.clearFocus();
-//        // Hide keyboard
-//        textView.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                InputMethodManager mgr = (InputMethodManager) activity.
-//                        getSystemService(Context.INPUT_METHOD_SERVICE);
-//                mgr.hideSoftInputFromWindow(textView.getWindowToken(),
-//                        InputMethodManager.HIDE_IMPLICIT_ONLY);
-//            }
-//        }, 100);
-//    }
-
     public static void hideKeyboard(Activity activity) {
         InputMethodManager mgr = (InputMethodManager) activity
                 .getSystemService(Activity.INPUT_METHOD_SERVICE);
-        mgr.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
+        if (activity.getCurrentFocus() != null) {
+            mgr.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
+        }
     }
 
 }

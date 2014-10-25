@@ -16,11 +16,7 @@ public class Fonts {
     private final static HashMap<Font, Typeface> typefaces = new HashMap<Font, Typeface>();
 
     public enum Font {
-        UBUNTU_MONO_REGULAR("fonts/UbuntuMono-R.ttf"),
-        FONT_AWESOME("fonts/fontawesome-webfont.ttf"),
-        ROBOTO_REGULAR("fonts/Roboto-Regular.ttf"),
-        ROBOTO_LIGHT("fonts/Roboto-Light.ttf"),
-        ROBOTO_THIN("fonts/Roboto-Thin.ttf");
+        FONT_AWESOME("fonts/fontawesome-webfont.ttf");
 
         private final String fontPath;
 

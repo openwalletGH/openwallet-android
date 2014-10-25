@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AmountBig">
+        <item name="android:textSize">@dimen/amount_text_size_big</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+</resources>

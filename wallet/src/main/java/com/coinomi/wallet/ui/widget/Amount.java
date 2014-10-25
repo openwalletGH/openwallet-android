@@ -9,7 +9,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.coinomi.wallet.R;
-import com.coinomi.wallet.util.Fonts;
 import com.google.bitcoin.core.Coin;
 
 /**
@@ -18,7 +17,7 @@ import com.google.bitcoin.core.Coin;
 public class Amount extends RelativeLayout{
     private final TextView amount;
     private final TextView symbol;
-    private final ProgressBar pending;
+    private final ProgressBar pendingProgress;
     private final TextView amountPending;
 
     boolean isBig = false;
@@ -30,8 +29,8 @@ public class Amount extends RelativeLayout{
 
         amount = (TextView) findViewById(R.id.amount);
         symbol = (TextView) findViewById(R.id.symbol);
-        pending = (ProgressBar) findViewById(R.id.pending_progress);
-        pending.setVisibility(INVISIBLE);
+        pendingProgress = (ProgressBar) findViewById(R.id.pending_progress);
+        pendingProgress.setVisibility(GONE);
         amountPending = (TextView) findViewById(R.id.amount_pending);
         amountPending.setVisibility(GONE);
 
@@ -47,10 +46,12 @@ public class Amount extends RelativeLayout{
             if (isBig) {
                 amount.setTextAppearance(context, R.style.AmountBig);
             }
-            Fonts.setTypeface(amount, isBig ? Fonts.Font.ROBOTO_LIGHT : Fonts.Font.ROBOTO_REGULAR);
-            Fonts.setTypeface(symbol, Fonts.Font.ROBOTO_LIGHT);
         } catch (RuntimeException ignore) { }
 
+        if (getRootView().isInEditMode()) {
+            setAmount(Coin.valueOf(4200000010L));
+            setAmountPending(Coin.valueOf(133700000L));
+        }
     }
 
     public void setAmount(Coin amount) {
@@ -63,11 +64,11 @@ public class Amount extends RelativeLayout{
 
     public void setAmountPending(Coin newPending) {
         if (newPending.equals(Coin.ZERO)) {
-            pending.setVisibility(INVISIBLE);
+            pendingProgress.setVisibility(GONE);
             amountPending.setVisibility(GONE);
             amountPending.setText("");
         } else {
-            pending.setVisibility(VISIBLE);
+            pendingProgress.setVisibility(VISIBLE);
             String text = (newPending.isPositive() ? " +" : " ") + newPending.toPlainString();
             amountPending.setText(text);
             amountPending.setVisibility(VISIBLE);

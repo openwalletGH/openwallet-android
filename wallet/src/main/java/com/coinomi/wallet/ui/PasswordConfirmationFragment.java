@@ -28,31 +28,21 @@ import javax.annotation.Nullable;
  */
 public class PasswordConfirmationFragment extends Fragment {
     @Nullable private String message;
-    @Nullable private String seed;
     private Listener mListener;
 
-    static PasswordConfirmationFragment newInstance(String message) {
+    static PasswordConfirmationFragment newInstance(String message, @Nullable Bundle args) {
         PasswordConfirmationFragment fragment = new PasswordConfirmationFragment();
-        fragment.setArguments(new Bundle());
+        fragment.setArguments(args != null ? args : new Bundle());
         fragment.getArguments().putString(Constants.ARG_MESSAGE, message);
         return fragment;
     }
 
-    public static Fragment newWalletRestoration(String seed, String message) {
-        Fragment fragment = new PasswordConfirmationFragment();
-        fragment.getArguments().putString(Constants.ARG_SEED, seed);
-        fragment.getArguments().putString(Constants.ARG_MESSAGE, message);
-        return fragment;
-    }
-    public PasswordConfirmationFragment() {
-        setArguments(new Bundle());
-    }
+    public PasswordConfirmationFragment() { }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            seed = getArguments().getString(Constants.ARG_SEED);
             message = getArguments().getString(Constants.ARG_MESSAGE);
         }
     }
@@ -70,13 +60,15 @@ public class PasswordConfirmationFragment extends Fragment {
         }
 
         final EditText password = (EditText) view.findViewById(R.id.password);
-        Keyboard.focusAndShowKeyboard(password, getActivity());
+        // FIXME causes problems in older Androids
+//        Keyboard.focusAndShowKeyboard(password, getActivity());
 
         view.findViewById(R.id.button_confirm).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Keyboard.hideKeyboard(getActivity());
                 if (mListener != null) {
+                    getArguments().remove(Constants.ARG_MESSAGE);
                     getArguments().putString(Constants.ARG_PASSWORD, password.getText().toString());
                     mListener.onPasswordConfirmed(getArguments());
                 }
@@ -106,5 +98,4 @@ public class PasswordConfirmationFragment extends Fragment {
     public interface Listener {
         public void onPasswordConfirmed(Bundle args);
     }
-
 }

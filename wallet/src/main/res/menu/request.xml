@@ -7,6 +7,6 @@
         android:title="@string/action_share"
         android:icon="@drawable/abc_ic_menu_share_holo_light"
         app:showAsAction="ifRoom"
-        app:actionProviderClass="android.support.v7.widget.ShareActionProvider"
+        app:actionProviderClass="com.coinomi.wallet.util.ShareActionProvider"
         />
 </menu>

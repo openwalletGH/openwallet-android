@@ -1,47 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
 
+
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content" android:layout_height="wrap_content">
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/amount"
-        style="@style/Amount"
+    <LinearLayout
+        android:id="@+id/amountLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:gravity="end"
-        android:minWidth="@android:dimen/thumbnail_width"
-        android:text="0" />
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/amount_pending"
-        style="@style/AmountPending"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="+1.337"
-        android:layout_toEndOf="@+id/amount"
-        android:layout_alignBaseline="@+id/amount"
-        android:layout_alignBottom="@+id/amount"
-        android:layout_toRightOf="@+id/amount" />
 
-    <TextView
-        android:id="@+id/symbol"
-        style="@style/AmountSymbolBig"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/amount"
-        android:layout_alignRight="@+id/amount"
-        android:layout_alignEnd="@+id/amount"
-        android:text="SYMBOL" />
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:layout_gravity="center_horizontal">
+            <TextView
+                android:id="@+id/amount"
+                style="@style/Amount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="42" />
 
+            <TextView
+                android:id="@+id/amount_pending"
+                style="@style/AmountPending"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="+1.337"
+                android:layout_gravity="end" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/symbol"
+            style="@style/AmountSymbolBig"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:text="SYMBOL" />
+
+    </LinearLayout>
 
     <ProgressBar
         android:id="@+id/pending_progress"
         style="@style/Widget.AppCompat.ProgressBar"
         android:layout_width="@dimen/progress_symbol_size"
         android:layout_height="@dimen/progress_symbol_size"
-        android:layout_toEndOf="@+id/amount"
-        android:layout_toRightOf="@+id/amount"
-        android:layout_alignParentTop="true" />
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/amountLayout"
+        android:layout_toRightOf="@+id/amountLayout" />
 
 </RelativeLayout>

@@ -42,9 +42,6 @@ public class SeedFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_seed, container, false);
 
-        Fonts.setTypeface(view.findViewById(R.id.seed_info), Fonts.Font.ROBOTO_REGULAR);
-        Fonts.setTypeface(view.findViewById(R.id.seed), Fonts.Font.ROBOTO_LIGHT);
-
         final Button buttonNext = (Button) view.findViewById(R.id.button_next);
         buttonNext.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,7 +54,6 @@ public class SeedFragment extends Fragment {
         });
 
         final TextView mnemonicView = (TextView) view.findViewById(R.id.seed);
-        Fonts.setTypeface(mnemonicView, Fonts.Font.ROBOTO_LIGHT);
         setMnemonic(mnemonicView);
 
         final CheckBox extraEntropy = (CheckBox) view.findViewById(R.id.extra_entropy);

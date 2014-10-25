@@ -21,8 +21,6 @@ import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.service.CoinService;
-import com.google.bitcoin.core.Address;
-import com.google.bitcoin.core.Coin;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +49,7 @@ final public class WalletActivity extends ActionBarActivity implements
      */
     private CharSequence mTitle;
 
-    private int coinIconRes;
+    private int coinIconRes = R.drawable.ic_launcher;
 
     /**
      * For SharedPreferences, used to check if first launch ever.
@@ -68,6 +66,7 @@ final public class WalletActivity extends ActionBarActivity implements
         if (getWalletApplication().getWallet() == null) {
             startIntro();
             finish();
+            return;
         }
         mTitle = getTitle();
 
@@ -172,7 +171,7 @@ final public class WalletActivity extends ActionBarActivity implements
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (!mNavigationDrawerFragment.isDrawerOpen()) {
+        if (mNavigationDrawerFragment != null && !mNavigationDrawerFragment.isDrawerOpen()) {
             // Only show items in the action bar relevant to this screen
             // if the drawer is not showing. Otherwise, let the drawer
             // decide what to show in the action bar.
