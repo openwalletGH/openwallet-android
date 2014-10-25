@@ -43,7 +43,7 @@ import com.google.zxing.PlanarYUVLuminanceSource;
  */
 public final class CameraManager
 {
-    private static final int MIN_FRAME_SIZE = 240;
+    private static final int MIN_FRAME_SIZE = 180; // FIXME, was 240 but was failing in low-res screens
     private static final int MAX_FRAME_SIZE = 600;
     private static final int MIN_PREVIEW_PIXELS = 470 * 320; // normal screen
     private static final int MAX_PREVIEW_PIXELS = 1280 * 720;
