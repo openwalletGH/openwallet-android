@@ -35,7 +35,7 @@
     <dimen name="seed_smaller_padding">8dp</dimen>
 
     <!-- Receive fragment -->
-    <dimen name="receive_address">24sp</dimen>
+    <dimen name="receive_address">20sp</dimen>
     <dimen name="qr_code">224dp</dimen>
     <dimen name="qr_code_margin">32dp</dimen>
 
