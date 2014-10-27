@@ -26,6 +26,7 @@
     <!-- Generic text styles -->
     <style name="NormalText" parent="@android:style/TextAppearance">
         <item name="android:textColor">@color/gray_87_text</item>
+        <item name="android:textColorLink">@color/gray_87_text</item>
     </style>
 
     <style name="SecondaryText" parent="@android:style/TextAppearance">
@@ -90,6 +91,11 @@
     </style>
     <style name="TxRowAmount" parent="NormalText">
         <item name="android:textSize">@dimen/transaction_entry</item>
+    </style>
+
+    <!-- About Activity -->
+    <style name="AppNameLong">
+        <item name="android:textSize">@dimen/app_name_long</item>
     </style>
 
 </resources>

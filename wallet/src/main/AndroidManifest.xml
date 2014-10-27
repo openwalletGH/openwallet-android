@@ -92,6 +92,14 @@
         <service
             android:name=".service.CoinServiceImpl"
             android:exported="false" />
+
+        <activity
+            android:name=".ui.AboutActivity"
+            android:label="@string/title_activity_about" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.coinomi.wallet.ui.WalletActivity" />
+        </activity>
     </application>
 
 </manifest>

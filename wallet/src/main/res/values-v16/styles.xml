@@ -4,4 +4,8 @@
         <item name="android:textSize">@dimen/amount_text_size_big</item>
         <item name="android:fontFamily">sans-serif-light</item>
     </style>
+    <style name="AppNameLong">
+        <item name="android:textSize">@dimen/app_name_long</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
 </resources>

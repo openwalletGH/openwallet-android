@@ -201,6 +201,9 @@ final public class WalletActivity extends ActionBarActivity implements
         } else if (id == R.id.action_refresh_wallet) {
             refreshWallet();
             return true;
+        } else if (id == R.id.action_about) {
+            startActivity(new Intent(WalletActivity.this, AboutActivity.class));
+            return true;
         }
 
         return super.onOptionsItemSelected(item);

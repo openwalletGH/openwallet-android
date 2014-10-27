@@ -106,4 +106,12 @@
     <string name="internal_transfer">Internal transfer</string>
     <string name="sent">Sent!</string>
 
+    <!-- About Activity -->
+    <string name="title_activity_about">About Coinomi</string>
+    <string name="app_name_long">Coinomi for Android</string>
+    <string name="about_licence">An open source project\nhttps://github.com/Coinomi/coinomi-android\nSource code licenced under GNU General Public License 3</string>
+    <string name="about_credits1">Uses Bitcoinj library\nhttp://bitcoinj.github.io/</string>
+    <string name="about_credits2">QR-code functionality by ZXing\nhttps://github.com/zxing/zxing</string>
+    <string name="about_credits3">Icons by Chris Shepherd\nhttps://github.com/shphrd/crypto-icons</string>
+
 </resources>

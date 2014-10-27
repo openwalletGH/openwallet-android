@@ -4,56 +4,54 @@
     android:layout_height="match_parent"
     tools:context="com.coinomi.wallet.ui.WelcomeFragment">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="3"
+            android:padding="@dimen/activity_margin"
+            android:src="@drawable/intro_logo" />
+
+        <TextView
+            android:id="@+id/welcome_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="0"
+            android:gravity="center_vertical|center_horizontal"
+            android:text="@string/welcome_text"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
         <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center">
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight=".5"
+            android:gravity="center"
+            android:orientation="vertical">
 
-            <ImageView
-                android:id="@+id/imageView"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_weight="3"
-                android:layout_gravity="center_horizontal"
-                android:src="@drawable/intro_logo"
-                android:padding="@dimen/activity_margin" />
-
-            <TextView
-                android:id="@+id/welcome_text"
-                android:layout_width="wrap_content"
+            <Button
+                android:id="@+id/create_wallet"
+                android:layout_width="@dimen/intro_button_width"
                 android:layout_height="wrap_content"
-                android:layout_weight="0"
-                android:text="@string/welcome_text"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:gravity="center_vertical|center_horizontal"
-                android:layout_gravity="center_horizontal" />
+                android:layout_gravity="center"
+                android:text="@string/create_wallet" />
 
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="wrap_content"
+            <Button
+                android:id="@+id/restore_wallet"
+                android:layout_width="@dimen/intro_button_width"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_weight=".5"
-                android:gravity="center">
-
-                <Button
-                    android:id="@+id/create_wallet"
-                    android:layout_width="@dimen/intro_button_width"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="@string/create_wallet" />
-
-                <Button
-                    android:id="@+id/restore_wallet"
-                    android:layout_width="@dimen/intro_button_width"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="@string/restore_wallet" />
-            </LinearLayout>
-
-
+                android:layout_gravity="center"
+                android:text="@string/restore_wallet" />
         </LinearLayout>
+    </LinearLayout>
 </FrameLayout>
 
 

@@ -47,4 +47,7 @@
     <dimen name="transaction_entry">18sp</dimen>
     <dimen name="transaction_pending">18sp</dimen>
 
+    <!-- About Activity -->
+    <dimen name="app_name_long">32sp</dimen>
+
 </resources>
