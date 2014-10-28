@@ -7,14 +7,6 @@
     android:layout_height="match_parent"
     tools:context=".WalletActivity">
 
-    <!-- As the main content view, the view below consumes the entire
-         space available using match_parent in both dimensions. -->
-    <!--<FrameLayout-->
-        <!--android:id="@+id/container"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent" />-->
-
-
     <android.support.v4.view.ViewPager xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/pager"
         android:layout_width="match_parent"
@@ -28,8 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="top"
-            android:background="@color/bg_tabs"
-            android:textColor="@color/fg_tabs"
+            style="@style/PagerTabStrip"
             android:paddingTop="4dp"
             android:paddingBottom="4dp" />
 

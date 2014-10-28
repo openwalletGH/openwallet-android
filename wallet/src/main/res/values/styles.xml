@@ -2,26 +2,26 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light">
-        <item name="actionBarStyle">@style/CustomActionBar</item>
-        <item name="android:textStyle"></item>
     </style>
 
-    <style name="CustomActionBar" parent="Widget.AppCompat.Light.ActionBar">
-        <!-- TODO add foreground colors -->
-        <!--<item name="android:background">#ffff8900</item>-->
+    <style name="AppThemeCustomActionBar" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="actionBarStyle">@style/CustomActionBar</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
+
+    <style name="CustomActionBar" parent="Widget.AppCompat.Light.ActionBar.Solid.Inverse">
+        <item name="android:background">@color/actionbar_bg</item>
     </style>
 
     <style name="NoTitleBar" parent="AppTheme">
         <item name="android:windowNoTitle">true</item>
     </style>
 
-
     <!-- Special Button styles -->
     <style name="LinkButton" parent="@android:style/TextAppearance">
-        <item name="android:textColor">@color/primary_500</item>
+        <item name="android:textColor">@color/primary_700</item>
         <item name="android:textSize">20sp</item>
     </style>
-
 
     <!-- Generic text styles -->
     <style name="NormalText" parent="@android:style/TextAppearance">
@@ -50,6 +50,11 @@
         <item name="android:typeface">monospace</item>
     </style>
 
+    <!-- PagerTabStrip style -->
+    <style name="PagerTabStrip" parent="NormalText">
+        <item name="android:background">@color/actionbar_bg</item>
+        <item name="android:textColor">@color/actionbar_fg</item>
+    </style>
 
     <!-- Widget amount style -->
     <style name="Amount" parent="NormalText">

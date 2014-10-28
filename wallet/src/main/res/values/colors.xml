@@ -13,15 +13,14 @@
     <color name="gray_26_hint_text">#42000000</color>
     <color name="gray_12_dividers">#1e000000</color>
 
-    <color name="fg_tabs">#fefefe</color>
-    <color name="bg_tabs">@color/primary_500</color>
+    <color name="actionbar_fg">#F3F3F3</color>
+    <color name="actionbar_bg">@color/primary_500</color>
 
     <!-- foreground -->
     <color name="fg_significant">#ff000000</color>
     <color name="fg_less_significant">#ff666666</color>
     <color name="fg_insignificant">#ffcccccc</color>
     <color name="fg_error">#ffff0000</color>
-
 
     <!-- background -->
     <color name="bg_bright">#ffffffff</color>
