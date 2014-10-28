@@ -86,8 +86,7 @@ final public class WalletActivity extends ActionBarActivity implements
 
         // Get the last used wallet pocket and select it
         CoinType lastPocket = getWalletApplication().getConfiguration().getLastPocket();
-        int lastPocketIndex = Constants.DEFAULT_COINS.indexOf(lastPocket);
-        mNavigationDrawerFragment.selectItem(lastPocketIndex);
+        mNavigationDrawerFragment.selectItem(lastPocket);
     }
 
     @Override
@@ -105,12 +104,10 @@ final public class WalletActivity extends ActionBarActivity implements
     }
 
     @Override
-    public void onNavigationDrawerItemSelected(int position) {
-        CoinType selectedType = Constants.DEFAULT_COINS.get(position);
+    public void onNavigationDrawerCoinSelected(CoinType coinType) {
+        log.info("Coin selected {}", coinType);
 
-        log.info("Coin selected {} {}", position, selectedType);
-
-        openPocket(selectedType);
+        openPocket(coinType);
     }
 
     private void openPocket(CoinType coinType) {
@@ -144,7 +141,7 @@ final public class WalletActivity extends ActionBarActivity implements
                 try {
                     final CoinURI coinUri = new CoinURI(input);
 
-                    if (!Constants.DEFAULT_COINS.contains(coinUri.getType())) { // This should not happen
+                    if (!Constants.SUPPORTED_COINS.contains(coinUri.getType())) {
                         throw new CoinURIParseException("Unsupported coin " + coinUri.getType().getName());
                     }
 
@@ -158,8 +155,8 @@ final public class WalletActivity extends ActionBarActivity implements
     }
 
     private void setSendFromCoin(CoinURI coinUri) throws CoinURIParseException {
-        int pocketIndex = Constants.DEFAULT_COINS.indexOf(coinUri.getType());
-        mNavigationDrawerFragment.selectItem(pocketIndex);
+//        int pocketIndex = Constants.DEFAULT_COINS.indexOf(coinUri.getType());
+        mNavigationDrawerFragment.selectItem(coinUri.getType());
         if (mViewPager != null) {
             mViewPager.setCurrentItem(SEND);
             AppSectionsPagerAdapter adapter = (AppSectionsPagerAdapter) mViewPager.getAdapter();

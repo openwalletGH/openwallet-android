@@ -18,12 +18,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
-import com.coinomi.wallet.Constants;
+import com.coinomi.core.coins.CoinType;
 import com.coinomi.wallet.R;
+import com.coinomi.wallet.WalletApplication;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
@@ -60,6 +59,7 @@ public class NavigationDrawerFragment extends Fragment {
     private int mCurrentSelectedPosition = 0;
     private boolean mFromSavedInstanceState;
     private boolean mUserLearnedDrawer;
+    private WalletApplication application;
 
     public NavigationDrawerFragment() {
     }
@@ -101,22 +101,9 @@ public class NavigationDrawerFragment extends Fragment {
                 selectItem(position);
             }
         });
-        mDrawerListView.setAdapter(new ArrayAdapter<String>(
-                getActionBar().getThemedContext(),
-                android.R.layout.simple_list_item_1,
-                android.R.id.text1,
-                getCoinNames()
-        ));
+        mDrawerListView.setAdapter(new NavDrawerListAdapter(getActivity(), application));
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
         return mDrawerListView;
-    }
-
-    private String[] getCoinNames() {
-        String[] names = new String[Constants.DEFAULT_COINS.size()];
-        for(int i = 0; i < Constants.DEFAULT_COINS.size(); i++) {
-            names[i] = Constants.DEFAULT_COINS.get(i).getName();
-        }
-        return names;
     }
 
     public boolean isDrawerOpen() {
@@ -199,7 +186,14 @@ public class NavigationDrawerFragment extends Fragment {
 
 
 
-    void selectItem(int position) {
+    void selectItem(CoinType coinType) {
+        if (application.getWallet() != null) {
+            int position = application.getWallet().getCoinTypes().indexOf(coinType);
+            selectItem(position);
+        }
+    }
+
+    private void selectItem(int position) {
         mCurrentSelectedPosition = position;
         if (mDrawerListView != null) {
             mDrawerListView.setItemChecked(position, true);
@@ -207,8 +201,8 @@ public class NavigationDrawerFragment extends Fragment {
         if (mDrawerLayout != null) {
             mDrawerLayout.closeDrawer(mFragmentContainerView);
         }
-        if (mCallbacks != null) {
-            mCallbacks.onNavigationDrawerItemSelected(position);
+        if (mCallbacks != null && application.getWallet() != null) {
+            mCallbacks.onNavigationDrawerCoinSelected(application.getWallet().getCoinTypes().get(position));
         }
     }
 
@@ -220,6 +214,7 @@ public class NavigationDrawerFragment extends Fragment {
         } catch (ClassCastException e) {
             throw new ClassCastException("Activity must implement NavigationDrawerCallbacks.");
         }
+        application = (WalletApplication) getActivity().getApplication();
     }
 
     @Override
@@ -284,6 +279,6 @@ public class NavigationDrawerFragment extends Fragment {
         /**
          * Called when an item in the navigation drawer is selected.
          */
-        void onNavigationDrawerItemSelected(int position);
+        void onNavigationDrawerCoinSelected(CoinType coinType);
     }
 }

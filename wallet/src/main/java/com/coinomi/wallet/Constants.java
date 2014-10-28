@@ -50,8 +50,9 @@ public class Constants {
             new CoinAddress(LitecoinMain.get(), new ServerAddress("ltc-cce-1.coinomi.net", 5002), new ServerAddress("ltc-cce-2.coinomi.net", 5002))
     );
 
-    public static final HashMap<CoinType, Integer> COINS_ICONS = new HashMap();
+    public static final HashMap<CoinType, Integer> COINS_ICONS;
     static {
+        COINS_ICONS = new HashMap<CoinType, Integer>();
         COINS_ICONS.put(BitcoinMain.get(), R.drawable.bitcoin);
         COINS_ICONS.put(DogecoinMain.get(), R.drawable.dogecoin);
         COINS_ICONS.put(LitecoinMain.get(), R.drawable.litecoin);
@@ -59,5 +60,7 @@ public class Constants {
 
     public static final CoinType DEFAULT_COIN = BitcoinMain.get();
     public static final List<CoinType> DEFAULT_COINS = ImmutableList.of(BitcoinMain.get(),
+            DogecoinMain.get(), LitecoinMain.get());
+    public static final List<CoinType> SUPPORTED_COINS = ImmutableList.of(BitcoinMain.get(),
             DogecoinMain.get(), LitecoinMain.get());
 }
