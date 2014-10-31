@@ -61,13 +61,12 @@ public class ServerClients {
             connections.put(coinAddress.getType(), client);
         }
 
-        setWallet(wallet);
+        setPockets(wallet.getPockets(), false);
     }
 
-    public void setWallet(Wallet wallet) {
-        for (CoinType type : connections.keySet()) {
-            WalletPocket pocket = wallet.getPocket(type);
-            connections.get(type).setWalletPocket(pocket);
+    public void setPockets(List<WalletPocket> pockets, boolean reconnect) {
+        for (WalletPocket pocket : pockets) {
+            connections.get(pocket.getCoinType()).setWalletPocket(pocket, reconnect);
         }
     }
 

@@ -134,6 +134,19 @@ final public class Wallet {
         }
     }
 
+    public List<WalletPocket> getPockets(List<CoinType> types) {
+        lock.lock();
+        try {
+            ImmutableList.Builder<WalletPocket> builder = ImmutableList.builder();
+            for (CoinType type : types) {
+                builder.add(pockets.get(type));
+            }
+            return builder.build();
+        } finally {
+            lock.unlock();
+        }
+    }
+
     public List<WalletPocket> getPockets() {
         lock.lock();
         try {
@@ -291,13 +304,15 @@ final public class Wallet {
         return version;
     }
 
-    public void refresh() {
+    public List<WalletPocket> refresh(List<CoinType> coinTypesToReset) {
         lock.lock();
         try {
-            for (WalletPocket pocket : getPockets()) {
+            List<WalletPocket> refreshPockets = getPockets(coinTypesToReset);
+            for (WalletPocket pocket : refreshPockets) {
                 pocket.refresh();
             }
             saveLater();
+            return refreshPockets;
         } finally {
             lock.unlock();
         }

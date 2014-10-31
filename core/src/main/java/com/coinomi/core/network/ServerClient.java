@@ -171,11 +171,16 @@ public class ServerClient implements BlockchainConnection {
         return stratumClient != null && stratumClient.isConnected();
     }
 
-    public void setWalletPocket(WalletPocket pocket) {
+    public void setWalletPocket(WalletPocket pocket, boolean reconnect) {
         if (isConnected()) broadcastOnDisconnect();
         eventListeners.clear();
         addEventListener(pocket);
-        if (isConnected()) broadcastOnConnection();
+        if (reconnect) {
+            stratumClient.disconnect();
+            // will broadcast event on reconnect
+        } else {
+            if (isConnected()) broadcastOnConnection();
+        }
     }
 
     /**

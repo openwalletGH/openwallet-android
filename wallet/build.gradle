@@ -15,8 +15,8 @@ android {
         applicationId "com.coinomi.wallet"
         minSdkVersion 10
         targetSdkVersion 19
-        versionCode 12
-        versionName "1.2.6"
+        versionCode 13
+        versionName "1.2.7"
     }
     buildTypes {
         release {

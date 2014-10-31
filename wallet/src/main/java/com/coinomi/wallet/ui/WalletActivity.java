@@ -21,6 +21,7 @@ import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.service.CoinService;
+import com.coinomi.wallet.service.CoinServiceImpl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -208,8 +209,10 @@ final public class WalletActivity extends ActionBarActivity implements
 
     private void refreshWallet() {
         if (getWalletApplication().getWallet() != null) {
-            getWalletApplication().getWallet().refresh();
-            getWalletApplication().startBlockchainService(CoinService.ServiceMode.RESET_WALLET);
+            Intent intent = new Intent(CoinService.ACTION_RESET_WALLET, null,
+                    getWalletApplication(), CoinServiceImpl.class);
+            intent.putExtra(CoinService.ACTION_RESET_WALLET_POCKET_ID, currentType.getId());
+            getWalletApplication().startService(intent);
             // FIXME, we get a crash if the activity is not restarted
             Intent introIntent = new Intent(WalletActivity.this, WalletActivity.class);
             startActivity(introIntent);

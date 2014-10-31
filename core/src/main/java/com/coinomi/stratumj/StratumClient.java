@@ -237,6 +237,15 @@ public class StratumClient extends AbstractExecutionThreadService {
         return socket != null && socket.isConnected() && isRunning();
     }
 
+
+    public void disconnect() {
+        if (isConnected()) {
+            try {
+                socket.close();
+            } catch (IOException ignore) { }
+        }
+    }
+
     public ListenableFuture<ResultMessage> call(CallMessage message) {
         SettableFuture<ResultMessage> future = SettableFuture.create();
 

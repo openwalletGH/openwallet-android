@@ -15,10 +15,12 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.text.format.DateUtils;
 
+import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.network.ServerClients;
 import com.coinomi.core.network.interfaces.BlockchainConnection;
 import com.coinomi.core.network.interfaces.ConnectionEventListener;
+import com.coinomi.core.wallet.WalletPocket;
 import com.coinomi.wallet.Configuration;
 import com.coinomi.wallet.Constants;
 import com.coinomi.core.wallet.Wallet;
@@ -31,6 +33,8 @@ import com.google.bitcoin.core.Transaction;
 import com.google.bitcoin.store.BlockStore;
 import com.google.bitcoin.store.BlockStoreException;
 import com.google.bitcoin.utils.Threading;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -544,9 +548,19 @@ public class CoinServiceImpl extends Service implements CoinService {
         }
         else if (CoinService.ACTION_RESET_WALLET.equals(action)) {
             if (application.getWallet() != null) {
-                application.getWallet().refresh();
+
+                List<CoinType> coinTypesToReset;
+                if (intent.hasExtra(CoinService.ACTION_RESET_WALLET_POCKET_ID)) {
+                    String idToReset = intent.getStringExtra(
+                            CoinService.ACTION_RESET_WALLET_POCKET_ID);
+                    coinTypesToReset = ImmutableList.of(CoinType.fromID(idToReset));
+                } else {
+                    coinTypesToReset = application.getWallet().getCoinTypes();
+                }
+
+                List<WalletPocket> pockets = application.getWallet().refresh(coinTypesToReset);
                 if (client != null) {
-                    client.setWallet(application.getWallet());
+                    client.setPockets(pockets, true);
                 }
             } else {
                 log.error("Got wallet reset intent, but no wallet is available");
