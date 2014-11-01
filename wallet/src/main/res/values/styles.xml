@@ -10,7 +10,7 @@
     </style>
 
     <style name="CustomActionBar" parent="Widget.AppCompat.Light.ActionBar.Solid.Inverse">
-        <item name="android:background">@color/actionbar_bg</item>
+        <item name="background">@color/actionbar_bg</item>
     </style>
 
     <style name="NoTitleBar" parent="AppTheme">
