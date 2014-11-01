@@ -385,7 +385,12 @@ public class SendFragment extends Fragment {
             //TODO if using different units, don't use toPlainString
             sendAmountView.setText(req.tx.getOutput(0).getValue().toPlainString());
             validateAmount();
-        } catch (InsufficientMoneyException ignore) { }
+        } catch (InsufficientMoneyException ignore) {
+        } catch (com.google.bitcoin.core.Wallet.CouldNotAdjustDownwards ignore) {
+            // This happens when there are no money and the user wants to empty the wallet
+            Toast.makeText(getActivity(), R.string.send_coins_error_not_enough_money,
+                    Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
