@@ -60,7 +60,7 @@ public class GenericUtils
         return fixed;
     }
 
-    public static String eightGroups(final String address) {
+    public static String addressSplitToGroupsMultiline(final String address) {
         StringBuilder sb = new StringBuilder();
         sb.append(address.substring(0, 4));
         sb.append(" ");
@@ -70,6 +70,27 @@ public class GenericUtils
         sb.append(" ");
         sb.append(address.substring(12, 17));
         sb.append("\n");
+        sb.append(address.substring(17, 21));
+        sb.append(" ");
+        sb.append(address.substring(21, 25));
+        sb.append(" ");
+        sb.append(address.substring(25, 29));
+        sb.append(" ");
+        sb.append(address.substring(29));
+
+        return sb.toString();
+    }
+
+    public static String addressSplitToGroups(final String address) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(address.substring(0, 5));
+        sb.append(" ");
+        sb.append(address.substring(5, 9));
+        sb.append(" ");
+        sb.append(address.substring(9, 13));
+        sb.append(" ");
+        sb.append(address.substring(13, 17));
+        sb.append(" ");
         sb.append(address.substring(17, 21));
         sb.append(" ");
         sb.append(address.substring(21, 25));

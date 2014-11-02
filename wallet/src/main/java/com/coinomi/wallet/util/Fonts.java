@@ -16,7 +16,7 @@ public class Fonts {
     private final static HashMap<Font, Typeface> typefaces = new HashMap<Font, Typeface>();
 
     public enum Font {
-        FONT_AWESOME("fonts/fontawesome-webfont.ttf");
+        ENTYPO("fonts/Entypo.ttf");
 
         private final String fontPath;
 

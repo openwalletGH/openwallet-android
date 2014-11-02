@@ -26,7 +26,7 @@
             android:gravity="center"
             android:text="@string/sample_seed"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="@color/primary_700" />
+            android:textColor="@color/primary_900" />
 
         <TextView
             android:layout_width="wrap_content"

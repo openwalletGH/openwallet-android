@@ -13,7 +13,6 @@ import com.coinomi.wallet.R;
 import com.coinomi.wallet.util.Fonts;
 import com.google.bitcoin.core.Address;
 import com.google.bitcoin.core.Coin;
-import com.google.bitcoin.core.TransactionOutput;
 
 /**
  * @author Giannis Dzegoutanis
@@ -29,7 +28,7 @@ public class SendOutput extends LinearLayout {
     public SendOutput(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        LayoutInflater.from(context).inflate(R.layout.sent_output, this, true);
+        LayoutInflater.from(context).inflate(R.layout.transaction_output, this, true);
 
         sendType = (TextView) findViewById(R.id.send_output_type);
         amount = (TextView) findViewById(R.id.amount);
@@ -82,8 +81,8 @@ public class SendOutput extends LinearLayout {
             address.setVisibility(GONE);
         } else {
             if (!sendType.isInEditMode()) { // If not displayed within a developer tool
-                Fonts.setTypeface(sendType, Fonts.Font.FONT_AWESOME);
-                sendType.setText(String.valueOf(Constants.CHAR_FONT_AWESOME_SEND));
+                Fonts.setTypeface(sendType, Fonts.Font.ENTYPO);
+                sendType.setText(String.valueOf(Constants.FONT_ICON_SEND_TO));
             }
         }
     }

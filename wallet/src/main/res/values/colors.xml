@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- http://www.google.com/design/spec/style/color.html#color-ui-color-application -->
-    <color name="primary_500">#03a9f4</color>
-    <color name="primary_100">#b3e5fc</color>
-    <color name="primary_700">#0288d1</color>
-    <color name="accent_A200">#ffff00</color>
+    <color name="primary_500">#00bcd4</color>
+    <color name="primary_100">#b2ebf2</color>
+    <color name="primary_900">#006064</color>
+    <color name="accent_100">#f0f4c3</color>
+    <color name="accent_900">#827717</color>
+    <color name="accent_A200">#eeff41</color>
 
     <color name="white">#FFFFFF</color>
 
@@ -12,6 +14,11 @@
     <color name="gray_54_sec_text_icons">#89000000</color>
     <color name="gray_26_hint_text">#42000000</color>
     <color name="gray_12_dividers">#1e000000</color>
+
+    <color name="send_color_fg">@color/primary_900</color>
+    <color name="receive_color_fg">@color/accent_900</color>
+    <color name="send_color_bg">@color/primary_100</color>
+    <color name="receive_color_bg">@color/accent_100</color>
 
     <color name="actionbar_fg">#F3F3F3</color>
     <color name="actionbar_bg">@color/primary_500</color>

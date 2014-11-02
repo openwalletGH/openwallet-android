@@ -20,7 +20,6 @@ package com.coinomi.wallet.ui;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,24 +30,23 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.text.Html;
-import android.text.format.DateUtils;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.wallet.WalletPocket;
+import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.util.Fonts;
+import com.coinomi.wallet.util.GenericUtils;
 import com.coinomi.wallet.util.WalletUtils;
 import com.google.bitcoin.core.Address;
 import com.google.bitcoin.core.Coin;
 import com.google.bitcoin.core.Transaction;
-import com.google.bitcoin.core.Transaction.Purpose;
 import com.google.bitcoin.core.TransactionConfidence;
 import com.google.bitcoin.core.TransactionConfidence.ConfidenceType;
 
@@ -185,6 +183,10 @@ public class TransactionsListAdapter extends BaseAdapter {
 
         final CoinType type = walletPocket.getCoinType();
 
+
+        final TextView rowDirectionText = (TextView) row.findViewById(R.id.transaction_row_direction_text);
+        final TextView rowDirectionFontIcon = (TextView) row.findViewById(R.id.transaction_row_direction_font_icon);
+        Fonts.setTypeface(rowDirectionFontIcon, Fonts.Font.ENTYPO);
         // TODO implement date
 //        final TextView rowDate = (TextView) row.findViewById(R.id.transaction_row_time);
         final TextView rowLabel = (TextView) row.findViewById(R.id.transaction_row_label);
@@ -232,13 +234,18 @@ public class TransactionsListAdapter extends BaseAdapter {
         if (label != null) {
             rowLabel.setText(label);
         } else {
-            String addressLabel = address.toString();
-//            if (value.isNegative()) {
-//                addressLabel = context.getResources().getString(R.string.sent_to, address);
-//            } else {
-//                addressLabel = context.getResources().getString(R.string.received_with, address);
-//            }
-            rowLabel.setText(addressLabel);
+            if (value.isNegative()) {
+                rowDirectionText.setText(context.getResources().getString(R.string.sent_to));
+                rowDirectionFontIcon.setBackgroundResource(R.drawable.transaction_row_cyrcle_bg_send);
+                rowDirectionFontIcon.setText(String.valueOf(Constants.FONT_ICON_SEND_TO));
+                rowValue.setTextColor(context.getResources().getColor(R.color.send_color_fg));
+            } else {
+                rowDirectionText.setText(context.getResources().getString(R.string.received_with));
+                rowDirectionFontIcon.setBackgroundResource(R.drawable.transaction_row_cyrcle_bg_receive);
+                rowDirectionFontIcon.setText(String.valueOf(Constants.FONT_ICON_RECEIVE_FROM));
+                rowValue.setTextColor(context.getResources().getColor(R.color.receive_color_fg));
+            }
+            rowLabel.setText(GenericUtils.addressSplitToGroups(address.toString()));
         }
         rowLabel.setTypeface(label != null ? Typeface.DEFAULT : Typeface.MONOSPACE);
 
@@ -246,58 +253,6 @@ public class TransactionsListAdapter extends BaseAdapter {
         rowValue.setAlwaysSigned(true);
         rowValue.setPrecision(precision, shift);//TODO make configurable
         rowValue.setAmount(value);
-
-        // extended message
-//        final View rowExtend = row.findViewById(R.id.transaction_row_extend);
-//        if (rowExtend != null)
-//        {
-//            final TextView rowMessage = (TextView) row.findViewById(R.id.transaction_row_message);
-//            final boolean isTimeLocked = tx.isTimeLocked();
-//            rowExtend.setVisibility(View.GONE);
-//
-//            if (tx.getPurpose() == Purpose.KEY_ROTATION)
-//            {
-//                rowExtend.setVisibility(View.VISIBLE);
-//                rowMessage.setText(Html.fromHtml(context.getString(R.string.transaction_row_message_purpose_key_rotation)));
-//                rowMessage.setTextColor(colorSignificant);
-//            }
-//            else if (isOwn && confidenceType == ConfidenceType.PENDING && confidence.numBroadcastPeers() == 0)
-//            {
-//                rowExtend.setVisibility(View.VISIBLE);
-//                rowMessage.setText(R.string.transaction_row_message_own_unbroadcasted);
-//                rowMessage.setTextColor(colorInsignificant);
-//            }
-//            else if (!isOwn && confidenceType == ConfidenceType.PENDING && confidence.numBroadcastPeers() == 0)
-//            {
-//                rowExtend.setVisibility(View.VISIBLE);
-//                rowMessage.setText(R.string.transaction_row_message_received_direct);
-//                rowMessage.setTextColor(colorInsignificant);
-//            }
-//            else if (!sent && value.compareTo(Transaction.MIN_NONDUST_OUTPUT) < 0)
-//            {
-//                rowExtend.setVisibility(View.VISIBLE);
-//                rowMessage.setText(R.string.transaction_row_message_received_dust);
-//                rowMessage.setTextColor(colorInsignificant);
-//            }
-//            else if (!sent && confidenceType == ConfidenceType.PENDING && isTimeLocked)
-//            {
-//                rowExtend.setVisibility(View.VISIBLE);
-//                rowMessage.setText(R.string.transaction_row_message_received_unconfirmed_locked);
-//                rowMessage.setTextColor(colorError);
-//            }
-//            else if (!sent && confidenceType == ConfidenceType.PENDING && !isTimeLocked)
-//            {
-//                rowExtend.setVisibility(View.VISIBLE);
-//                rowMessage.setText(R.string.transaction_row_message_received_unconfirmed_unlocked);
-//                rowMessage.setTextColor(colorInsignificant);
-//            }
-//            else if (!sent && confidenceType == ConfidenceType.DEAD)
-//            {
-//                rowExtend.setVisibility(View.VISIBLE);
-//                rowMessage.setText(R.string.transaction_row_message_received_dead);
-//                rowMessage.setTextColor(colorError);
-//            }
-//        }
     }
 
     private String resolveLabel(@Nonnull final String address) {

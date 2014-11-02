@@ -68,8 +68,8 @@
     <string name="wallet_transactions_coinbase">mined</string>
     <string name="history_label">history</string>
     <string name="history_empty">No coins received so far!\n\nYou can get some by trading for traditional money, selling goods or services or earning by working.</string>
-    <string name="sent_to">Sent to %1$s</string>
-    <string name="received_with">Received with %1$s</string>
+    <string name="sent_to">sent to</string>
+    <string name="received_with">received with</string>
 
     <!-- Receive fragment -->
     <string name="receive_address_label">my address</string>
@@ -113,6 +113,7 @@
     <string name="about_licence">An open source project\nhttps://github.com/Coinomi/coinomi-android\nSource code licenced under GNU General Public License 3</string>
     <string name="about_credits1">Uses Bitcoinj library\nhttp://bitcoinj.github.io/</string>
     <string name="about_credits2">QR-code functionality by ZXing\nhttps://github.com/zxing/zxing</string>
-    <string name="about_credits3">Icons by Chris Shepherd\nhttps://github.com/shphrd/crypto-icons</string>
+    <string name="about_credits3">Crypto-icons by Chris Shepherd\nhttps://github.com/shphrd/crypto-icons</string>
+    <string name="about_credits4">Font-icons by Daniel Bruce\nhttp://www.entypo.com</string>
 
 </resources>

@@ -19,13 +19,13 @@
         coinomi:show_big="true"
         android:gravity="center_horizontal" />
 
-    <TextView
-        android:id="@+id/history_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/history_label"
-        android:textColor="@color/gray_87_text"
-        android:textSize="@dimen/history_label" />
+    <!--<TextView-->
+        <!--android:id="@+id/history_label"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="@string/history_label"-->
+        <!--android:textColor="@color/gray_87_text"-->
+        <!--android:textSize="@dimen/history_label" />-->
 
     <TextView
         android:id="@+id/history_empty"

@@ -19,7 +19,7 @@
 
     <!-- Special Button styles -->
     <style name="LinkButton" parent="@android:style/TextAppearance">
-        <item name="android:textColor">@color/primary_700</item>
+        <item name="android:textColor">@color/primary_900</item>
         <item name="android:textSize">20sp</item>
     </style>
 
@@ -42,7 +42,7 @@
     </style>
 
     <style name="SeedText" parent="">
-        <item name="android:textColor">@color/primary_700</item>
+        <item name="android:textColor">@color/primary_900</item>
         <item name="android:textSize">@dimen/seed_text_size</item>
     </style>
 
@@ -87,15 +87,21 @@
     </style>
 
     <!-- Transaction row -->
-    <style name="TxRowDate" parent="NormalText">
-        <item name="android:textSize">@dimen/transaction_entry</item>
+    <style name="TransactionRowDirectionFontIcon" parent="NormalText">
+        <item name="android:textSize">@dimen/transaction_row_text_size_direction_font_icon</item>
     </style>
-    <style name="TxRowLabel" parent="NormalText">
-        <item name="android:textSize">@dimen/transaction_entry</item>
-        <item name="android:singleLine">true</item>
+    <style name="TransactionRowDirectionText" parent="SecondaryText">
+        <item name="android:textSize">@dimen/transaction_row_text_size_direction_text</item>
     </style>
-    <style name="TxRowAmount" parent="NormalText">
-        <item name="android:textSize">@dimen/transaction_entry</item>
+    <style name="TransactionRowDate" parent="SecondaryText">
+        <item name="android:textSize">@dimen/transaction_row_text_size_date</item>
+    </style>
+    <style name="TransactionRowLabel" parent="NormalText">
+        <item name="android:textSize">@dimen/transaction_row_text_size_label</item>
+    </style>
+    <style name="TransactionRowAmount" parent="NormalText">
+        <item name="android:textSize">@dimen/transaction_row_text_size_amount</item>
+        <item name="android:textStyle">bold</item>
     </style>
 
     <!-- About Activity -->

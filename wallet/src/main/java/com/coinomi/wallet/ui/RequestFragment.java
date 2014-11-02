@@ -113,7 +113,7 @@ public class RequestFragment extends Fragment {
 
         // TODO, get amount and description, update QR if needed
 
-        addressView.setText(GenericUtils.eightGroups(receiveAddress.toString()));
+        addressView.setText(GenericUtils.addressSplitToGroupsMultiline(receiveAddress.toString()));
         // update qr-code
         final String qrContent = CoinURI.convertToCoinURI(receiveAddress, amount, label, null);
         Bitmap qrCodeBitmap = Qr.bitmap(qrContent, maxQrSize);

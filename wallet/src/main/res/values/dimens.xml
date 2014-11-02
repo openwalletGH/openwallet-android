@@ -46,6 +46,18 @@
     <dimen name="transaction_entry">18sp</dimen>
     <dimen name="transaction_pending">18sp</dimen>
 
+    <!-- Transaction Row -->
+
+    <dimen name="transaction_row_margin_direction">8dp</dimen>
+    <dimen name="transaction_row_text_size_direction_font_icon">42sp</dimen>
+    <dimen name="transaction_row_direction_bg_size">50dp</dimen>
+    <dimen name="transaction_row_text_size_direction_text">14sp</dimen>
+    <dimen name="transaction_row_text_size_amount">22sp</dimen>
+    <dimen name="transaction_row_text_size_label">16sp</dimen>
+    <dimen name="transaction_row_text_size_date">14sp</dimen>
+    <dimen name="transaction_row_padding_vertical">12dp</dimen>
+    <dimen name="transaction_row_padding_horizontal">@dimen/activity_horizontal_margin</dimen>
+
     <!-- About Activity -->
     <dimen name="app_name_long">32sp</dimen>
 
