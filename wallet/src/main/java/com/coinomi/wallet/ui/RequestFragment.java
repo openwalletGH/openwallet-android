@@ -19,7 +19,7 @@ import com.coinomi.core.uri.CoinURI;
 import com.coinomi.core.wallet.WalletPocket;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
-import com.coinomi.wallet.util.AddressFormater;
+import com.coinomi.wallet.util.GenericUtils;
 import com.coinomi.wallet.util.Qr;
 import com.coinomi.wallet.util.ShareActionProvider;
 import com.google.bitcoin.core.Address;
@@ -113,7 +113,7 @@ public class RequestFragment extends Fragment {
 
         // TODO, get amount and description, update QR if needed
 
-        addressView.setText(AddressFormater.eightGroups(receiveAddress.toString()));
+        addressView.setText(GenericUtils.eightGroups(receiveAddress.toString()));
         // update qr-code
         final String qrContent = CoinURI.convertToCoinURI(receiveAddress, amount, label, null);
         Bitmap qrCodeBitmap = Qr.bitmap(qrContent, maxQrSize);

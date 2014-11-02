@@ -23,9 +23,11 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Currency;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 import javax.annotation.Nonnull;
 
+import android.text.Editable;
 import android.view.View;
 import android.widget.TextView;
 
@@ -34,6 +36,7 @@ import com.google.bitcoin.core.NetworkParameters;
 
 /**
  * @author Andreas Schildbach
+ * @author Giannis Dzegoutanis
  */
 public class GenericUtils
 {
@@ -44,6 +47,39 @@ public class GenericUtils
     private static final int ONE_BTC_INT = ONE_BTC.intValue();
     private static final int ONE_MBTC_INT = ONE_MBTC.intValue();
     private static final int ONE_UBTC_INT = ONE_UBTC.intValue();
+
+    private static final Pattern charactersO0 = Pattern.compile("[0O]");
+    private static final Pattern characterIl = Pattern.compile("[Il]");
+    private static final Pattern notBase58 = Pattern.compile("[^123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]");
+
+
+    public static String fixAddress(final String input) {
+        String fixed = charactersO0.matcher(input).replaceAll("o");
+        fixed = characterIl.matcher(fixed).replaceAll("1");
+        fixed = notBase58.matcher(fixed).replaceAll("");
+        return fixed;
+    }
+
+    public static String eightGroups(final String address) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(address.substring(0, 4));
+        sb.append(" ");
+        sb.append(address.substring(4, 8));
+        sb.append(" ");
+        sb.append(address.substring(8, 12));
+        sb.append(" ");
+        sb.append(address.substring(12, 17));
+        sb.append("\n");
+        sb.append(address.substring(17, 21));
+        sb.append(" ");
+        sb.append(address.substring(21, 25));
+        sb.append(" ");
+        sb.append(address.substring(25, 29));
+        sb.append(" ");
+        sb.append(address.substring(29));
+
+        return sb.toString();
+    }
 
     public static String formatValue(@Nonnull final BigInteger value, final int precision, final int shift)
     {

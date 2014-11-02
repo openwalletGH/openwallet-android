@@ -22,13 +22,12 @@ import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.uri.CoinURI;
 import com.coinomi.core.uri.CoinURIParseException;
 import com.coinomi.core.wallet.SendRequest;
-import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.wallet.WalletPocket;
 import com.coinomi.core.wallet.exceptions.NoSuchPocketException;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.ui.widget.QrCodeButton;
-import com.coinomi.wallet.util.Keyboard;
+import com.coinomi.wallet.util.GenericUtils;
 import com.google.bitcoin.core.Address;
 import com.google.bitcoin.core.AddressFormatException;
 import com.google.bitcoin.core.Coin;
@@ -58,7 +57,7 @@ public class SendFragment extends Fragment {
 
     private CoinType coinType;
     private Handler handler = new Handler();
-    private EditText receivingAddressView;
+    private EditText sendToAddressView;
     private TextView addressError;
     private EditText sendAmountView;
     private TextView amountError;
@@ -118,9 +117,9 @@ public class SendFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_send, container, false);
 
-        receivingAddressView = (EditText) view.findViewById(R.id.send_to_address);
-        receivingAddressView.setOnFocusChangeListener(receivingAddressListener);
-        receivingAddressView.addTextChangedListener(receivingAddressListener);
+        sendToAddressView = (EditText) view.findViewById(R.id.send_to_address);
+        sendToAddressView.setOnFocusChangeListener(receivingAddressListener);
+        sendToAddressView.addTextChangedListener(receivingAddressListener);
 
         sendAmountView = (EditText) view.findViewById(R.id.send_amount);
         sendAmountView.setOnFocusChangeListener(sendAmountListener);
@@ -193,8 +192,8 @@ public class SendFragment extends Fragment {
     }
 
     private void reset() {
-        receivingAddressView.setText("");
-        sendAmountView.setText("");
+        sendToAddressView.setText(null);
+        sendAmountView.setText(null);
         address = null;
         sendAmount = null;
         state = State.INPUT;
@@ -257,7 +256,7 @@ public class SendFragment extends Fragment {
             @Override
             public void run() {
                 SendFragment.this.address = address;
-                receivingAddressView.setText(address.toString());
+                sendToAddressView.setText(address.toString());
                 if (isAmountValid(amount)) {
                     sendAmountView.setText(amount.toPlainString());
                     sendAmount = amount;
@@ -269,8 +268,6 @@ public class SendFragment extends Fragment {
     }
 
     private void updateView() {
-
-//        viewCancel.setEnabled(state != State.PREPARATION);
         sendConfirmButton.setEnabled(everythingValid());
 
         // enable actions
@@ -297,7 +294,7 @@ public class SendFragment extends Fragment {
 
     private void requestFocusFirst() {
         if (!isOutputsValid()) {
-            receivingAddressView.requestFocus();
+            sendToAddressView.requestFocus();
         } else if (!isAmountValid()) {
             sendAmountView.requestFocus();
             // FIXME causes problems in older Androids
@@ -328,14 +325,14 @@ public class SendFragment extends Fragment {
                 sendAmount = null;
             }
             amountError.setVisibility(View.GONE);
-// TODO, remove when https://github.com/bitcoinj/bitcoinj/pull/254 is merged
+//  TODO, remove when https://github.com/bitcoinj/bitcoinj/pull/254 is merged
         } catch (ArithmeticException e) {
             if (!isTyping) {
                 sendAmount = null;
                 amountError.setText(R.string.amount_error);
                 amountError.setVisibility(View.VISIBLE);
             }
-// TODO, remove when https://github.com/bitcoinj/bitcoinj/pull/254 is merged
+//  TODO, remove when https://github.com/bitcoinj/bitcoinj/pull/254 is merged
         } catch (IllegalArgumentException ignore) {
             if (!isTyping) {
                 sendAmount = null;
@@ -351,8 +348,18 @@ public class SendFragment extends Fragment {
     }
 
     private void validateAddress(boolean isTyping) {
+        String addressStr = sendToAddressView.getText().toString().trim();
+
+        // If not typing, try to fix address if needed
+        if (!isTyping) {
+            addressStr = GenericUtils.fixAddress(addressStr);
+            // Remove listener before changing input, then add it again. Hack to avoid stack overflow
+            sendToAddressView.removeTextChangedListener(receivingAddressListener);
+            sendToAddressView.setText(addressStr);
+            sendToAddressView.addTextChangedListener(receivingAddressListener);
+        }
+
         try {
-            final String addressStr = receivingAddressView.getText().toString().trim();
             if (!addressStr.isEmpty()) {
                 address = new Address(coinType, addressStr);
             } else {
