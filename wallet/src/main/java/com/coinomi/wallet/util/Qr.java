@@ -38,7 +38,9 @@ import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
+import com.google.zxing.qrcode.encoder.Encoder;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+import com.google.zxing.qrcode.encoder.QRCode;
 
 /**
  * @author Andreas Schildbach
@@ -48,14 +50,23 @@ public class Qr
     private final static QRCodeWriter QR_CODE_WRITER = new QRCodeWriter();
 
     private static final Logger log = LoggerFactory.getLogger(Qr.class);
+    private static final ErrorCorrectionLevel ERROR_CORRECTION_LV = ErrorCorrectionLevel.H;
 
-    public static Bitmap bitmap(@Nonnull final String content, final int size)
+    private static final int darkColor = 0xdd000000;
+    private static final int lightColor = 0;
+
+    public static Bitmap bitmap(@Nonnull final String content, final int maxSize)
     {
         try
         {
+            QRCode code = Encoder.encode(content, ERROR_CORRECTION_LV, null);
+            int baseSize = code.getMatrix().getWidth();
+            // Make qr-code size multiples of baseSize
+            int size = (int) (Math.max(Math.floor(maxSize / baseSize), 1) * baseSize);
+
             final Hashtable<EncodeHintType, Object> hints = new Hashtable<EncodeHintType, Object>();
             hints.put(EncodeHintType.MARGIN, 0);
-            hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);
+            hints.put(EncodeHintType.ERROR_CORRECTION, ERROR_CORRECTION_LV);
             final BitMatrix result = QR_CODE_WRITER.encode(content, BarcodeFormat.QR_CODE, size, size, hints);
 
             final int width = result.getWidth();
@@ -67,7 +78,7 @@ public class Qr
                 final int offset = y * width;
                 for (int x = 0; x < width; x++)
                 {
-                    pixels[offset + x] = result.get(x, y) ? Color.BLACK : Color.TRANSPARENT;
+                    pixels[offset + x] = result.get(x, y) ? darkColor : lightColor;
                 }
             }
 

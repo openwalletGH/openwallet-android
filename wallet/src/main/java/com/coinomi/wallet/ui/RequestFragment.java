@@ -20,7 +20,6 @@ import com.coinomi.core.wallet.WalletPocket;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.util.AddressFormater;
-import com.coinomi.wallet.util.Fonts;
 import com.coinomi.wallet.util.Qr;
 import com.coinomi.wallet.util.ShareActionProvider;
 import com.google.bitcoin.core.Address;
@@ -46,6 +45,7 @@ public class RequestFragment extends Fragment {
     private NavigationDrawerFragment mNavigationDrawerFragment;
     @Nullable private ShareActionProvider mShareActionProvider;
     private WalletPocket pocket;
+    private int maxQrSize;
 
     public static RequestFragment newInstance(CoinType coinType) {
         RequestFragment fragment = new RequestFragment();
@@ -69,6 +69,10 @@ public class RequestFragment extends Fragment {
         setHasOptionsMenu(true);
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
+        // Qr-code size calculation
+        int qrPadding = getResources().getDimensionPixelSize(R.dimen.qr_code_padding);
+        int qrCodeViewSize = getResources().getDimensionPixelSize(R.dimen.qr_code_size);
+        maxQrSize = qrCodeViewSize - 2 * qrPadding;
     }
 
     @Override
@@ -111,9 +115,8 @@ public class RequestFragment extends Fragment {
 
         addressView.setText(AddressFormater.eightGroups(receiveAddress.toString()));
         // update qr-code
-        final int size = (int) (256 * getResources().getDisplayMetrics().density);
         final String qrContent = CoinURI.convertToCoinURI(receiveAddress, amount, label, null);
-        Bitmap qrCodeBitmap = Qr.bitmap(qrContent, size);
+        Bitmap qrCodeBitmap = Qr.bitmap(qrContent, maxQrSize);
         qrView.setImageBitmap(qrCodeBitmap);
     }
 

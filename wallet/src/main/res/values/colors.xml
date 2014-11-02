@@ -19,9 +19,9 @@
     <color name="navigation_drawer_bg">#ddFFFFFF</color>
 
     <!-- foreground -->
-    <color name="fg_significant">#ff000000</color>
-    <color name="fg_less_significant">#ff666666</color>
-    <color name="fg_insignificant">#ffcccccc</color>
+    <color name="fg_significant">@color/gray_87_text</color>
+    <color name="fg_less_significant">@color/gray_54_sec_text_icons</color>
+    <color name="fg_insignificant">@color/gray_26_hint_text</color>
     <color name="fg_error">#ffff0000</color>
 
     <!-- background -->

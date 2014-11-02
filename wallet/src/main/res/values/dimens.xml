@@ -36,8 +36,8 @@
 
     <!-- Receive fragment -->
     <dimen name="receive_address">20sp</dimen>
-    <dimen name="qr_code">224dp</dimen>
-    <dimen name="qr_code_margin">32dp</dimen>
+    <dimen name="qr_code_size">224dp</dimen>
+    <dimen name="qr_code_padding">16dp</dimen>
 
     <!-- Send fragment -->
 

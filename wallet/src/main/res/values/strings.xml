@@ -70,7 +70,6 @@
     <string name="history_empty">No coins received so far!\n\nYou can get some by trading for traditional money, selling goods or services or earning by working.</string>
 
     <!-- Receive fragment -->
-    <string name="sample_address_format">nUdH XBSB YQPJ REXZM\nBUdu 8ARn WM2m z3XQp</string>
     <string name="receive_address_label">my address</string>
 
     <!-- Send fragment -->
