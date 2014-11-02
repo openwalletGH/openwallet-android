@@ -18,7 +18,7 @@ public class Amount extends RelativeLayout{
     private final TextView amount;
     private final TextView symbol;
     private final ProgressBar pendingProgress;
-    private final TextView amountPending;
+//    private final TextView amountPending;
 
     boolean isBig = false;
 
@@ -30,9 +30,9 @@ public class Amount extends RelativeLayout{
         amount = (TextView) findViewById(R.id.amount);
         symbol = (TextView) findViewById(R.id.symbol);
         pendingProgress = (ProgressBar) findViewById(R.id.pending_progress);
-        pendingProgress.setVisibility(GONE);
-        amountPending = (TextView) findViewById(R.id.amount_pending);
-        amountPending.setVisibility(GONE);
+        pendingProgress.setVisibility(INVISIBLE);
+//        amountPending = (TextView) findViewById(R.id.amount_pending);
+//        amountPending.setVisibility(GONE);
 
         TypedArray a = context.obtainStyledAttributes(attrs,
                 R.styleable.Amount, 0, 0);
@@ -64,14 +64,14 @@ public class Amount extends RelativeLayout{
 
     public void setAmountPending(Coin newPending) {
         if (newPending.equals(Coin.ZERO)) {
-            pendingProgress.setVisibility(GONE);
-            amountPending.setVisibility(GONE);
-            amountPending.setText("");
+            pendingProgress.setVisibility(INVISIBLE);
+//            amountPending.setVisibility(GONE);
+//            amountPending.setText("");
         } else {
             pendingProgress.setVisibility(VISIBLE);
             String text = (newPending.isPositive() ? " +" : " ") + newPending.toPlainString();
-            amountPending.setText(text);
-            amountPending.setVisibility(VISIBLE);
+//            amountPending.setText(text);
+//            amountPending.setVisibility(VISIBLE);
         }
     }
 }

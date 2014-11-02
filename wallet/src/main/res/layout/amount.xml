@@ -5,19 +5,28 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
+    <View
+        android:id="@+id/pending_progress_counter_balance"
+        android:layout_width="@dimen/progress_symbol_size"
+        android:layout_height="@dimen/progress_symbol_size"
+        android:layout_alignParentTop="true"
+        android:visibility="invisible" />
+
     <LinearLayout
         android:id="@+id/amountLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_toEndOf="@+id/pending_progress_counter_balance"
+        android:layout_toRightOf="@+id/pending_progress_counter_balance"
         android:orientation="vertical">
 
-
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
             android:gravity="center_horizontal"
-            android:layout_gravity="center_horizontal">
+            android:orientation="vertical">
+
             <TextView
                 android:id="@+id/amount"
                 style="@style/Amount"
@@ -25,13 +34,13 @@
                 android:layout_height="wrap_content"
                 android:text="42" />
 
-            <TextView
-                android:id="@+id/amount_pending"
-                style="@style/AmountPending"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="+1.337"
-                android:layout_gravity="end" />
+            <!--<TextView-->
+            <!--android:id="@+id/amount_pending"-->
+            <!--style="@style/AmountPending"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="+1.337"-->
+            <!--android:layout_gravity="end" />-->
         </LinearLayout>
 
         <TextView
