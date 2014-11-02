@@ -1,0 +1,19 @@
+<resources>
+    <!-- Amount Widget -->
+    <dimen name="amount_margin">24dp</dimen>
+    <dimen name="amount_text_size_big">48sp</dimen>
+    <dimen name="amount_text_size">28sp</dimen>
+    <dimen name="amount_symbol_text_size">20sp</dimen>
+    <dimen name="progress_symbol_size">16dp</dimen>
+
+    <!-- SendOutput Widget -->
+    <dimen name="send_output_amount_text_size">24sp</dimen>
+    <dimen name="send_output_type_text_size">24sp</dimen>
+
+    <!-- IntroActivity -->
+    <dimen name="seed_text_size">22sp</dimen>
+    <dimen name="seed_smaller_padding">4dp</dimen>
+
+    <!-- About Activity -->
+    <dimen name="app_name_long">26sp</dimen>
+</resources>

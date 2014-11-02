@@ -49,9 +49,11 @@ public class SendOutput extends LinearLayout {
             public void onClick(View v) {
                 if (isAddressExpanded) {
                     address.setSingleLine(true);
+                    address.setMaxLines(1);
                     isAddressExpanded = false;
                 } else {
                     address.setSingleLine(false);
+                    address.setMaxLines(5);
                     isAddressExpanded = true;
                 }
             }

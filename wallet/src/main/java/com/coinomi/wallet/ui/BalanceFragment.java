@@ -16,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -130,6 +131,11 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
         View header = inflater.inflate(R.layout.fragment_balance_header, null);
         // Initialize your header here.
         transactionRows.addHeaderView(header, null, false);
+
+        // Set a space in the end of the list
+        View listFooter = new View(getActivity());
+        listFooter.setMinimumHeight(getResources().getDimensionPixelSize(R.dimen.activity_vertical_margin));
+        transactionRows.addFooterView(listFooter);
 
         emptyPocketMessage =  header.findViewById(R.id.history_empty);
         // Hide empty message if have some transaction history

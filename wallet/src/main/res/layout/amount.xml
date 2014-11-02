@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
@@ -32,7 +32,9 @@
                 style="@style/Amount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="42" />
+                android:includeFontPadding="false"
+                android:lineSpacingMultiplier="0.9"
+                tools:text="42" />
 
             <!--<TextView-->
             <!--android:id="@+id/amount_pending"-->
@@ -49,7 +51,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:text="SYMBOL" />
+            android:includeFontPadding="false"
+            tools:text="SYMBOL" />
 
     </LinearLayout>
 

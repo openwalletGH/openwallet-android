@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content" android:layout_height="wrap_content"
     android:orientation="vertical">
 
@@ -17,7 +18,7 @@
             android:layout_gravity="center_vertical"
             android:layout_marginEnd="4dp"
             android:layout_marginRight="4dp"
-            android:text="[->" />
+            tools:text="[->" />
 
         <TextView
             android:id="@+id/amount"
@@ -27,7 +28,7 @@
             android:layout_gravity="center_vertical"
             android:layout_marginRight="2dp"
             android:layout_marginEnd="2dp"
-            android:text="10" />
+            tools:text="10" />
 
         <TextView
             android:id="@+id/symbol"
@@ -35,7 +36,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:text="SYMBOL"
+            tools:text="SYMBOL"
             android:paddingBottom="2dp"/>
     </LinearLayout>
 
@@ -45,7 +46,9 @@
         android:layout_height="wrap_content"
         style="@style/Address"
         android:singleLine="true"
+        android:maxLines="1"
+        android:ellipsize="end"
         android:paddingTop="4dp"
-        android:text="nUdHXBSBYQPJREXZMBUdu8ARnWM2mz3XQp" />
+        tools:text="nUdHXBSBYQPJREXZMBUdu8ARnWM2mz3XQp" />
 
 </LinearLayout>
