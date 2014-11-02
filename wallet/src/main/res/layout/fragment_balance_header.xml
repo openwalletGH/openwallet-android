@@ -32,6 +32,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
+        android:layout_marginBottom="32dp"
         android:gravity="center"
         android:text="@string/history_empty"
         android:textColor="@color/gray_26_hint_text"

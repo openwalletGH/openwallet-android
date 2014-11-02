@@ -68,6 +68,8 @@
     <string name="wallet_transactions_coinbase">mined</string>
     <string name="history_label">history</string>
     <string name="history_empty">No coins received so far!\n\nYou can get some by trading for traditional money, selling goods or services or earning by working.</string>
+    <string name="sent_to">Sent to %1$s</string>
+    <string name="received_with">Received with %1$s</string>
 
     <!-- Receive fragment -->
     <string name="receive_address_label">my address</string>

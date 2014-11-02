@@ -228,7 +228,18 @@ public class TransactionsListAdapter extends BaseAdapter {
             label = resolveLabel(address.toString());
         else
             label = "?";
-        rowLabel.setText(label != null ? label : address.toString());
+
+        if (label != null) {
+            rowLabel.setText(label);
+        } else {
+            String addressLabel = address.toString();
+//            if (value.isNegative()) {
+//                addressLabel = context.getResources().getString(R.string.sent_to, address);
+//            } else {
+//                addressLabel = context.getResources().getString(R.string.received_with, address);
+//            }
+            rowLabel.setText(addressLabel);
+        }
         rowLabel.setTypeface(label != null ? Typeface.DEFAULT : Typeface.MONOSPACE);
 
         // value
