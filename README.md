@@ -36,6 +36,7 @@ To release the app follow the steps.
 * in strings.xml app_name string from "Coinomi (dev)" to "Coinomi"
 * in build.gradle the package from "com.coinomi.wallet.dev" to "com.coinomi.wallet"
 * in AndroidManifest.xml the android:icon from "ic_launcher_dev" to "ic_launcher"
+* remove all ic_launcher_dev icons with `rm wallet/src/main/res/drawable*/ic_launcher_dev.png`
 
 2) Then in the Android Studio go to:
 
@@ -44,7 +45,7 @@ To release the app follow the steps.
 
 3) Test this APK (TODO: with instrumentation tests).
 
-For now test it manually by installing it `adb install wallet/wallet-release.apk`
+For now test it manually by installing it `adb install -r wallet/wallet-release.apk`
 
 > This one is in the TODOs and must be automated
 > because it will be here that you take a break ;)
