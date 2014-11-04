@@ -7,6 +7,7 @@ TODOs:
 
 * Create instrumentation tests to test a signed APK
 
+
 ## Building the app
 
 Install [Android Studio](https://developer.android.com/sdk/installing/studio.html). Once it is
@@ -26,6 +27,7 @@ bottom. Select Developer options and enable USB Debugging.
 Then plug in your phone into your computer and hit the large green play button at the top of
 Android Studio. It will load for a moment before prompting you to select which device to install
 it on. Select your device from the list, and hit continue.
+
 
 ## Releasing the app
 
@@ -59,7 +61,22 @@ For now test it manually by installing it `adb install -r wallet/wallet-release.
 * Checkout the release branch and run `git merge <throwaway-branch-name>`
 * Create a tag with the version of the released APK
 
-Enjoy!
 
+## Version history
 
+New in version 1.4.1
+- Re-design of the create wallet tutorial and set more sane defaults
+- Fix crash when refreshing a non connected wallet
+- Small UI tweaks
 
+New in version 1.4.0
+- New balance screen design
+- Optimization for old 2.3.x Androids with very small screens
+- Fix crash when emptying an already empty wallet
+- When refreshing, do it only for the current coin
+- General UI and usability tweaks
+- Optimize layouts for small screens
+- Fixed crash in older Androids due to a missing API
+- Fixed camera crash in low resolution screens
+- Able to install app in external storage
+- ... and many fixes and optimizations
