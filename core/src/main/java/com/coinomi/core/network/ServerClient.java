@@ -175,7 +175,7 @@ public class ServerClient implements BlockchainConnection {
         if (isConnected()) broadcastOnDisconnect();
         eventListeners.clear();
         addEventListener(pocket);
-        if (reconnect) {
+        if (reconnect && isConnected()) {
             stratumClient.disconnect();
             // will broadcast event on reconnect
         } else {
