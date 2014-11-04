@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.util.Fonts;
+import com.coinomi.wallet.util.GenericUtils;
 import com.google.bitcoin.core.Address;
 import com.google.bitcoin.core.Coin;
 
@@ -68,11 +69,11 @@ public class SendOutput extends LinearLayout {
     }
 
     public void setAddress(Address address) {
-        this.address.setText(address.toString());
+        setAddress(address.toString());
     }
 
     public void setAddress(String address) {
-        this.address.setText(address);
+        this.address.setText(GenericUtils.addressSplitToGroups(address));
     }
 
     public void setFee(boolean isFee) {
