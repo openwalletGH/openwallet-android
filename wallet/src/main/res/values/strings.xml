@@ -39,40 +39,7 @@
     <string name="wallet_title_balance">balance</string>
     <string name="wallet_title_send">send</string>
 
-    <!-- Font icons -->
-    <string name="font_icon_check">&#59419;</string>
-    <string name="font_icon_cancel">&#59420;</string>
-    <string name="font_icon_help_circled">&#59421;</string>
-    <string name="font_icon_info_circled">&#59422;</string>
-    <string name="font_icon_lock">&#59392;</string>
-    <string name="font_icon_lock_open">&#59393;</string>
-    <string name="font_icon_sign">&#59396;</string>
-    <string name="font_icon_attention">&#59394;</string>
-    <string name="font_icon_alert">&#59395;</string>
-    <string name="font_icon_cog">&#59397;</string>
-    <string name="font_icon_tools">&#59398;</string>
-    <string name="font_icon_share">&#59399;</string>
-    <string name="font_icon_receive">&#59400;</string>
-    <string name="font_icon_send">&#59401;</string>
-    <string name="font_icon_clock">&#59402;</string>
-    <string name="font_icon_block">&#59417;</string>
-    <string name="font_icon_arrows_ccw">&#59418;</string>
-    <string name="font_icon_shuffle">&#59403;</string>
-    <string name="font_icon_coin">&#59404;</string>
-    <string name="font_icon_confirmation_0">&#59405;</string>
-    <string name="font_icon_confirmation_1">&#59406;</string>
-    <string name="font_icon_confirmation_2">&#59407;</string>
-    <string name="font_icon_confirmation_3">&#59408;</string>
-    <string name="font_icon_network">&#59409;</string>
-    <string name="font_icon_globe">&#59410;</string>
-    <string name="font_icon_cloud">&#59411;</string>
-    <string name="font_icon_cloud_thunder">&#59412;</string>
-    <string name="font_icon_paper_plane">&#59413;</string>
-    <string name="font_icon_lifebuoy">&#59423;</string>
-    <string name="font_icon_credit_card">&#59424;</string>
-    <string name="font_icon_key">&#59415;</string>
-    <string name="font_icon_seed">&#59414;</string>
-    <string name="font_icon_rocket">&#59416;</string>
+
 
     <!-- SendOutput widget -->
     <string name="fee">Fee</string>
@@ -83,7 +50,7 @@
     <string name="restore_wallet">Restore a wallet</string>
 
     <!-- Seed fragment -->
-    <string name="seed_info">This is your <i>recovery seed phrase</i>, it gives you full access your wallet. Please write it down on a paper and keep it in a secret place, as anyone with access to it has access to your funds. If you lose your seed, we cannot do anything to recover your wallet.</string>
+    <string name="seed_info">This is your <i>recovery seed phrase</i>, from it your wallet is generated. Please write it down on a paper and keep it in a secure place, as you would do with paper money. Anyone with access to it has access to the wallet\'s funds.\nIf you lose your seed, we cannot do anything to recover your wallet.</string>
     <string name="seed_title">your seed</string>
     <string name="sample_seed">deliver broken make enrich core vendor ski help sock spy purse roast token jewel female</string>
     <string name="seed_regenerate_title">touch to generate a new seed</string>
@@ -150,7 +117,7 @@
     <string name="app_name_long">Coinomi for Android</string>
     <string name="about_licence">An open source project\nhttps://github.com/Coinomi/coinomi-android\nSource code licenced under GNU General Public License 3</string>
     <string name="about_credits_bitcoinj">Uses Bitcoinj library\nhttp://bitcoinj.github.io/</string>
-    <string name="about_credits_electrum">Uses Electrum server\nhttps://electrum.org/</string>
+    <string name="about_credits_electrum">Uses Electrum server software\nhttps://electrum.org/</string>
     <string name="about_credits_zxing">QR-code functionality by ZXing\nhttps://github.com/zxing/zxing</string>
     <string name="about_credits_crypto_icons">Crypto-icons by Chris Shepherd\nhttps://github.com/shphrd/crypto-icons</string>
     <string name="about_credits_font_icons">Font-icons by Daniel Bruce\nhttp://www.entypo.com</string>
