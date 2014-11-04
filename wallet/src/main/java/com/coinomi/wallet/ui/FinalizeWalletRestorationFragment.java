@@ -40,6 +40,7 @@ public class FinalizeWalletRestorationFragment extends Fragment {
 
     private String seed;
     private String password;
+    private boolean seedProtect;
 
     private WalletFromSeedTask walletFromSeedTask;
 
@@ -62,12 +63,10 @@ public class FinalizeWalletRestorationFragment extends Fragment {
         if (getArguments() != null) {
             seed = getArguments().getString(Constants.ARG_SEED);
             password = getArguments().getString(Constants.ARG_PASSWORD);
-        }
-        walletFromSeedTask = null;
+            seedProtect = getArguments().getBoolean(Constants.ARG_SEED_PROTECT);
 
-        if (walletFromSeedTask == null || walletFromSeedTask.getStatus() == AsyncTask.Status.FINISHED) {
             walletFromSeedTask = new WalletFromSeedTask();
-            walletFromSeedTask.execute(seed, password);
+            walletFromSeedTask.execute();
         }
     }
 
@@ -82,7 +81,7 @@ public class FinalizeWalletRestorationFragment extends Fragment {
         return (WalletApplication) getActivity().getApplication();
     }
 
-    private class WalletFromSeedTask extends AsyncTask<String, Void, Wallet> {
+    private class WalletFromSeedTask extends AsyncTask<Bundle, Void, Wallet> {
         private Dialogs.ProgressDialogFragment verifyDialog;
         private String errorMessage = "";
 
@@ -94,17 +93,20 @@ public class FinalizeWalletRestorationFragment extends Fragment {
             verifyDialog.show(getFragmentManager(), null);
         }
 
-        protected Wallet doInBackground(String... passphraseText) {
-            ArrayList<String> seed = new ArrayList<String>();
-            for (String word : passphraseText[0].trim().split(" ")) {
+        protected Wallet doInBackground(Bundle... params) {
+            ArrayList<String> seedWords = new ArrayList<String>();
+            for (String word : seed.trim().split(" ")) {
                 if (word.isEmpty()) continue;
-                seed.add(word);
+                seedWords.add(word);
             }
-            String password = passphraseText[1];
 
             Wallet wallet = null;
             try {
-                wallet = new Wallet(seed, password);
+                if (seedProtect) {
+                    wallet = new Wallet(seedWords, password);
+                } else {
+                    wallet = new Wallet(seedWords);
+                }
                 KeyCrypterScrypt crypter = new KeyCrypterScrypt();
                 KeyParameter aesKey = crypter.deriveKey(password);
                 wallet.encrypt(crypter, aesKey);

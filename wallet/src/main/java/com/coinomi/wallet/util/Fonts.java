@@ -16,7 +16,7 @@ public class Fonts {
     private final static HashMap<Font, Typeface> typefaces = new HashMap<Font, Typeface>();
 
     public enum Font {
-        ENTYPO("fonts/Entypo.ttf");
+        ENTYPO_COINOMI("fonts/entypo-coinomi.ttf");
 
         private final String fontPath;
 

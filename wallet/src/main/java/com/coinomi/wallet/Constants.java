@@ -20,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 public class Constants {
 
     public static final String ARG_SEED = "seed";
+    public static final String ARG_SEED_PROTECT = "seed_protect";
     public static final String ARG_PASSWORD = "password";
     public static final String ARG_SEND_TO_ADDRESS = "to_address";
     public static final String ARG_COIN = "coin";
@@ -39,8 +40,6 @@ public class Constants {
     public static final char CHAR_THIN_SPACE = '\u2009';
     public static final char CHAR_ALMOST_EQUAL_TO = '\u2248';
     public static final char CHAR_CHECKMARK = '\u2713';
-    public static final char FONT_ICON_SEND_TO = '\uE741';
-    public static final char FONT_ICON_RECEIVE_FROM = '\uE740';
     public static final String CURRENCY_PLUS_SIGN = "+" + CHAR_THIN_SPACE;
     public static final String CURRENCY_MINUS_SIGN = "-" + CHAR_THIN_SPACE;
 

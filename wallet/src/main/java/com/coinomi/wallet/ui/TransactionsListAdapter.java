@@ -30,7 +30,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -183,10 +182,9 @@ public class TransactionsListAdapter extends BaseAdapter {
 
         final CoinType type = walletPocket.getCoinType();
 
-
         final TextView rowDirectionText = (TextView) row.findViewById(R.id.transaction_row_direction_text);
         final TextView rowDirectionFontIcon = (TextView) row.findViewById(R.id.transaction_row_direction_font_icon);
-        Fonts.setTypeface(rowDirectionFontIcon, Fonts.Font.ENTYPO);
+        Fonts.setTypeface(rowDirectionFontIcon, Fonts.Font.ENTYPO_COINOMI);
         // TODO implement date
 //        final TextView rowDate = (TextView) row.findViewById(R.id.transaction_row_time);
         final TextView rowLabel = (TextView) row.findViewById(R.id.transaction_row_label);
@@ -196,17 +194,41 @@ public class TransactionsListAdapter extends BaseAdapter {
         if (confidenceType == ConfidenceType.PENDING) {
             rowLabel.setTextColor(colorInsignificant);
             rowValue.setTextColor(colorInsignificant);
+            rowDirectionText.setTextColor(colorInsignificant);
+            rowDirectionFontIcon.setTextColor(colorInsignificant);
+            rowDirectionFontIcon.setBackgroundResource(R.drawable.transaction_row_cyrcle_bg_pending);
         } else if (confidenceType == ConfidenceType.BUILDING) {
             rowLabel.setTextColor(colorSignificant);
             rowValue.setTextColor(colorSignificant);
+            rowDirectionText.setTextColor(colorSignificant);
+            rowDirectionFontIcon.setTextColor(colorSignificant);
+            if (value.isNegative()) {
+                rowDirectionFontIcon.setBackgroundResource(R.drawable.transaction_row_cyrcle_bg_send);
+                rowValue.setTextColor(context.getResources().getColor(R.color.send_color_fg));
+            } else {
+                rowDirectionFontIcon.setBackgroundResource(R.drawable.transaction_row_cyrcle_bg_receive);
+                rowValue.setTextColor(context.getResources().getColor(R.color.receive_color_fg));
+            }
         } else if (confidenceType == ConfidenceType.DEAD) {
             rowLabel.setTextColor(colorSignificant);
             rowValue.setTextColor(colorSignificant);
             Fonts.strikeThrough(rowLabel);
             Fonts.strikeThrough(rowValue);
         } else {
+            rowDirectionText.setTextColor(colorError);
             rowLabel.setTextColor(colorInsignificant);
             rowValue.setTextColor(colorInsignificant);
+            rowDirectionFontIcon.setTextColor(colorInsignificant);
+            rowDirectionFontIcon.setBackgroundResource(R.drawable.transaction_row_cyrcle_bg_pending);
+        }
+
+        // Money direction
+        if (value.isNegative()) {
+            rowDirectionText.setText(context.getResources().getString(R.string.sent_to));
+            rowDirectionFontIcon.setText(context.getResources().getString(R.string.font_icon_send));
+        } else {
+            rowDirectionText.setText(context.getResources().getString(R.string.received_with));
+            rowDirectionFontIcon.setText(context.getResources().getString(R.string.font_icon_receive));
         }
 
         // date
@@ -234,17 +256,6 @@ public class TransactionsListAdapter extends BaseAdapter {
         if (label != null) {
             rowLabel.setText(label);
         } else {
-            if (value.isNegative()) {
-                rowDirectionText.setText(context.getResources().getString(R.string.sent_to));
-                rowDirectionFontIcon.setBackgroundResource(R.drawable.transaction_row_cyrcle_bg_send);
-                rowDirectionFontIcon.setText(String.valueOf(Constants.FONT_ICON_SEND_TO));
-                rowValue.setTextColor(context.getResources().getColor(R.color.send_color_fg));
-            } else {
-                rowDirectionText.setText(context.getResources().getString(R.string.received_with));
-                rowDirectionFontIcon.setBackgroundResource(R.drawable.transaction_row_cyrcle_bg_receive);
-                rowDirectionFontIcon.setText(String.valueOf(Constants.FONT_ICON_RECEIVE_FROM));
-                rowValue.setTextColor(context.getResources().getColor(R.color.receive_color_fg));
-            }
             rowLabel.setText(GenericUtils.addressSplitToGroups(address.toString()));
         }
         rowLabel.setTypeface(label != null ? Typeface.DEFAULT : Typeface.MONOSPACE);

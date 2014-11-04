@@ -42,6 +42,9 @@ public class SeedFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_seed, container, false);
 
+        TextView seedFontIcon = (TextView) view.findViewById(R.id.seed_icon);
+        Fonts.setTypeface(seedFontIcon, Fonts.Font.ENTYPO_COINOMI);
+
         final Button buttonNext = (Button) view.findViewById(R.id.button_next);
         buttonNext.setOnClickListener(new View.OnClickListener() {
             @Override

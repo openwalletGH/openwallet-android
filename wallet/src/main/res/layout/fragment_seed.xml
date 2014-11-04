@@ -19,6 +19,17 @@
             android:paddingTop="@dimen/activity_vertical_margin">
 
             <TextView
+                android:id="@+id/seed_icon"
+                style="@style/FontIconBig"
+                android:layout_width="@dimen/font_icon_bg_size"
+                android:layout_height="@dimen/font_icon_bg_size"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center"
+                android:text="@string/font_icon_seed"
+                tools:text="Ψ"/>
+
+            <TextView
                 android:id="@+id/seed_info"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -32,37 +43,43 @@
                 android:text="@string/extra_security"
                 android:visibility="gone" />
 
-            <LinearLayout
+            <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:gravity="center_vertical"
-                android:orientation="vertical"
-                android:layout_gravity="center_horizontal">
+                android:padding="@dimen/seed_padding" >
+
+                <TextView
+                    android:id="@+id/seed_title"
+                    style="@style/SecondaryText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:text="@string/seed_title"
+                    android:layout_above="@+id/seed"
+                    android:layout_alignLeft="@+id/seed"
+                    android:layout_alignStart="@+id/seed" />
 
                 <TextView
                     android:id="@+id/seed"
                     style="@style/SeedText"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:paddingBottom="@dimen/seed_smaller_padding"
-                    android:paddingTop="@dimen/seed_padding"
-                    android:text="@string/sample_seed" />
+                    android:text="@string/sample_seed"
+                    android:layout_centerVertical="true"
+                    android:layout_centerHorizontal="true" />
 
                 <TextView
                     android:id="@+id/seed_regenerate_title"
                     style="@style/SmallHelpText"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="end"
-                    android:paddingBottom="@dimen/seed_padding"
-                    android:paddingEnd="@dimen/activity_horizontal_margin"
-                    android:paddingLeft="@dimen/activity_horizontal_margin"
-                    android:paddingRight="@dimen/activity_horizontal_margin"
-                    android:paddingStart="@dimen/activity_horizontal_margin"
-                    android:text="@string/seed_regenerate_title" />
-            </LinearLayout>
+                    android:text="@string/seed_regenerate_title"
+                    android:layout_below="@+id/seed"
+                    android:layout_alignRight="@+id/seed"
+                    android:layout_alignEnd="@+id/seed" />
+
+            </RelativeLayout>
 
             <RelativeLayout
                 android:layout_width="match_parent"

@@ -26,18 +26,53 @@
     <!-- Errors -->
     <string name="error_could_not_read_wallet">Could not read wallet</string>
 
-    <!-- Generic buttons -->
-    <string name="button_dismiss">Dismiss</string>
+    <!-- Generic items -->
     <string name="button_ok">OK</string>
-    <string name="button_next">next</string>
-    <string name="button_finish">finish</string>
-    <string name="button_confirm">confirm</string>
-    <string name="button_cancel">cancel</string>
-    <string name="button_skip">skip</string>
-    <string name="button_scan_qr_code">Scan QR code</string>
+    <string name="button_next">NEXT</string>
+    <string name="button_finish">FINISH</string>
+    <string name="button_confirm">CONFIRM</string>
+    <string name="button_cancel">CANCEL</string>
+    <string name="button_send">SEND</string>
+    <string name="button_skip">SKIP</string>
+    <string name="scan_qr_code">Scan QR code</string>
     <string name="wallet_title_request">request</string>
     <string name="wallet_title_balance">balance</string>
     <string name="wallet_title_send">send</string>
+
+    <!-- Font icons -->
+    <string name="font_icon_check">&#59419;</string>
+    <string name="font_icon_cancel">&#59420;</string>
+    <string name="font_icon_help_circled">&#59421;</string>
+    <string name="font_icon_info_circled">&#59422;</string>
+    <string name="font_icon_lock">&#59392;</string>
+    <string name="font_icon_lock_open">&#59393;</string>
+    <string name="font_icon_sign">&#59396;</string>
+    <string name="font_icon_attention">&#59394;</string>
+    <string name="font_icon_alert">&#59395;</string>
+    <string name="font_icon_cog">&#59397;</string>
+    <string name="font_icon_tools">&#59398;</string>
+    <string name="font_icon_share">&#59399;</string>
+    <string name="font_icon_receive">&#59400;</string>
+    <string name="font_icon_send">&#59401;</string>
+    <string name="font_icon_clock">&#59402;</string>
+    <string name="font_icon_block">&#59417;</string>
+    <string name="font_icon_arrows_ccw">&#59418;</string>
+    <string name="font_icon_shuffle">&#59403;</string>
+    <string name="font_icon_coin">&#59404;</string>
+    <string name="font_icon_confirmation_0">&#59405;</string>
+    <string name="font_icon_confirmation_1">&#59406;</string>
+    <string name="font_icon_confirmation_2">&#59407;</string>
+    <string name="font_icon_confirmation_3">&#59408;</string>
+    <string name="font_icon_network">&#59409;</string>
+    <string name="font_icon_globe">&#59410;</string>
+    <string name="font_icon_cloud">&#59411;</string>
+    <string name="font_icon_cloud_thunder">&#59412;</string>
+    <string name="font_icon_paper_plane">&#59413;</string>
+    <string name="font_icon_lifebuoy">&#59423;</string>
+    <string name="font_icon_credit_card">&#59424;</string>
+    <string name="font_icon_key">&#59415;</string>
+    <string name="font_icon_seed">&#59414;</string>
+    <string name="font_icon_rocket">&#59416;</string>
 
     <!-- SendOutput widget -->
     <string name="fee">Fee</string>
@@ -48,13 +83,15 @@
     <string name="restore_wallet">Restore a wallet</string>
 
     <!-- Seed fragment -->
-    <string name="seed_info">This is your <i>recovery seed</i> phrase to access your wallet. Please write it down on a paper and keep it in a secret place, as anyone with access to it has access to your funds. If you lose your seed, we cannot do anything to recover your wallet.</string>
+    <string name="seed_info">This is your <i>recovery seed phrase</i>, it gives you full access your wallet. Please write it down on a paper and keep it in a secret place, as anyone with access to it has access to your funds. If you lose your seed, we cannot do anything to recover your wallet.</string>
+    <string name="seed_title">your seed</string>
     <string name="sample_seed">deliver broken make enrich core vendor ski help sock spy purse roast token jewel female</string>
     <string name="seed_regenerate_title">touch to generate a new seed</string>
-    <string name="backed_up_seed">I have copied and stored the recovery seed in a secure place.</string>
+    <string name="backed_up_seed">I have copied and stored my seed in a secure place.</string>
 
     <!-- Restore fragment -->
     <string name="restore_info">Please enter your recovery seed:</string>
+    <string name="restore_seed_protected">My seed is password protected</string>
     <string name="restore_skip_title">Skipping verification</string>
     <string name="restore_skip_info1">Please make sure that your seed matches the following:</string>
     <string name="restore_skip_info2">It is recommended not to skip verification, so that any misspellings could be detected.</string>
@@ -77,21 +114,22 @@
     <!-- Send fragment -->
     <string name="pay_to_label">pay to</string>
     <string name="amount_to_send_label">amount</string>
-    <string name="send_coins_label">send</string>
     <string name="uri_error">There was a problem decoding URI: %1$s</string>
     <string name="address_error">Provided address is not valid.</string>
     <string name="amount_error">Provided amount is not valid.</string>
 
     <!-- Set Password fragment -->
-    <string name="set_password_info">Set a password to protect your wallet in everyday use. Do not lose or forget your password as it will be impossible to restore your wallet.</string>
+    <string name="set_password_info">Set a password to protect your wallet in everyday use.</string>
+    <string name="set_password_seed_protect">Also protect my seed</string>
+    <string name="set_password_seed_protect_info">The password becomes permanent and it is needed when restoring your wallet with the seed.\nWARNING: If you forget your password it will be impossible to restore your wallet!</string>
     <string name="set_password1">Type your password</string>
     <string name="set_password2">Re-type your password</string>
     <string name="password_too_common_error">Password \"%1$s\" is to common to be safely used.</string>
-    <string name="password_too_short_error">Password is too short, minimum length is %1$d.</string>
+    <string name="password_too_short_error">Password is too short, minimum %1$d characters.</string>
     <string name="passwords_mismatch">Passwords don\'t match</string>
     <string name="password_error">Could not proceed, password errors detected.</string>
-    <string name="password_skip_warn">By not setting a password, your seed and wallet are unprotected and your funds could be stolen.</string>
-    <string name="password_wallet_recovery">To recover your wallet, please provide the same password you used when created the wallet. If you didn\'t originally set a password, don\'t type any password.</string>
+    <string name="password_skip_warn">By not setting a password, your wallet can be accessed without authorization.</string>
+    <string name="password_wallet_recovery">To restore your wallet, please provide the same password you used when created the protected seed.\nIf you enter a different password a new empty wallet will be created.</string>
 
     <!-- FinalizeWalletRestorationFragment -->
     <string name="wallet_restoration">Please wait while your wallet is being restored</string>
@@ -111,9 +149,10 @@
     <string name="title_activity_about">About Coinomi</string>
     <string name="app_name_long">Coinomi for Android</string>
     <string name="about_licence">An open source project\nhttps://github.com/Coinomi/coinomi-android\nSource code licenced under GNU General Public License 3</string>
-    <string name="about_credits1">Uses Bitcoinj library\nhttp://bitcoinj.github.io/</string>
-    <string name="about_credits2">QR-code functionality by ZXing\nhttps://github.com/zxing/zxing</string>
-    <string name="about_credits3">Crypto-icons by Chris Shepherd\nhttps://github.com/shphrd/crypto-icons</string>
-    <string name="about_credits4">Font-icons by Daniel Bruce\nhttp://www.entypo.com</string>
+    <string name="about_credits_bitcoinj">Uses Bitcoinj library\nhttp://bitcoinj.github.io/</string>
+    <string name="about_credits_electrum">Uses Electrum server\nhttps://electrum.org/</string>
+    <string name="about_credits_zxing">QR-code functionality by ZXing\nhttps://github.com/zxing/zxing</string>
+    <string name="about_credits_crypto_icons">Crypto-icons by Chris Shepherd\nhttps://github.com/shphrd/crypto-icons</string>
+    <string name="about_credits_font_icons">Font-icons by Daniel Bruce\nhttp://www.entypo.com</string>
 
 </resources>

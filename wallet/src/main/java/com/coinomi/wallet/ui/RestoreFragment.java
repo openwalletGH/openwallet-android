@@ -13,13 +13,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.MultiAutoCompleteTextView;
 import android.widget.TextView;
 
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.ui.widget.QrCodeButton;
-import com.coinomi.wallet.util.Keyboard;
+import com.coinomi.wallet.util.Fonts;
 import com.google.bitcoin.crypto.MnemonicCode;
 import com.google.bitcoin.crypto.MnemonicException;
 
@@ -41,11 +43,12 @@ public class RestoreFragment extends Fragment {
     private MultiAutoCompleteTextView mnemonicTextView;
     @Nullable private String seed;
     private boolean isNewSeed;
-    private TextView restoreΜessage;
+    private TextView errorΜessage;
     private int colorSignificant;
     private int colorInsignificant;
     private int colorError;
     private WelcomeFragment.Listener mListener;
+    private boolean isSeedProtected = false;
 
     public static RestoreFragment newInstance() {
         return newInstance(null);
@@ -81,6 +84,8 @@ public class RestoreFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_restore, container, false);
 
+        Fonts.setTypeface(view.findViewById(R.id.seed_icon), Fonts.Font.ENTYPO_COINOMI);
+
         QrCodeButton scanQrButton = (QrCodeButton) view.findViewById(R.id.scan_qr_code);
         scanQrButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,17 +102,26 @@ public class RestoreFragment extends Fragment {
         mnemonicTextView.setTokenizer(new SpaceTokenizer() {
             @Override
             public void onToken() {
-                clearRestorationMessage();
+                clearError();
             }
         });
 
-        // FIXME causes problems in older Androids
-        // Show keyboard
-//        Keyboard.focusAndShowKeyboard(mnemonicTextView, getActivity());
-
         // Restore message
-        restoreΜessage = (TextView) view.findViewById(R.id.restore_message);
-        restoreΜessage.setVisibility(View.GONE);
+        errorΜessage = (TextView) view.findViewById(R.id.restore_message);
+        errorΜessage.setVisibility(View.GONE);
+
+        // Password protected seed
+        CheckBox seedProtected = (CheckBox) view.findViewById(R.id.restore_seed_protected);
+        if (seed != null) {
+            seedProtected.setVisibility(View.GONE);
+        } else {
+            seedProtected.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    isSeedProtected = isChecked;
+                }
+            });
+        }
 
         // Skip link
         View skip = view.findViewById(R.id.seed_entry_skip);
@@ -175,22 +189,22 @@ public class RestoreFragment extends Fragment {
         boolean isValid = false;
         try {
             MnemonicCode.INSTANCE.check(seedWords);
-            clearRestorationMessage();
+            clearError();
             isValid = true;
         } catch (MnemonicException.MnemonicChecksumException e) {
             log.info("Checksum error in seed: {}", e.getMessage());
-            setVerificationError(R.string.restore_error_checksum);
+            setError(R.string.restore_error_checksum);
         } catch (MnemonicException.MnemonicWordException e) {
             log.info("Unknown words in seed: {}", e.getMessage());
-            setVerificationError(R.string.restore_error_words);
+            setError(R.string.restore_error_words);
         } catch (MnemonicException e) {
             log.info("Error verifying seed: {}", e.getMessage());
-            setVerificationError(R.string.restore_error, e.getMessage());
+            setError(R.string.restore_error, e.getMessage());
         }
 
         if (seed != null && !seedText.trim().equals(seed.trim())) {
             log.info("Typed seed does not match the generated one.");
-            setVerificationError(R.string.restore_error_mismatch);
+            setError(R.string.restore_error_mismatch);
             isValid = false;
         }
 
@@ -200,7 +214,7 @@ public class RestoreFragment extends Fragment {
         } else if (isValid && isNewSeed) {
             if (mListener != null) mListener.onSetPassword(seedText);
         } else if (isValid) {
-            if (mListener != null) mListener.onConfirmPassword(seedText);
+            if (mListener != null) mListener.onConfirmPassword(seedText, isSeedProtected);
         }
     }
 
@@ -259,17 +273,17 @@ public class RestoreFragment extends Fragment {
         }
     }
 
-    private void setVerificationError(int messageId, Object... formatArgs) {
-        setVerificationError(getResources().getString(messageId, formatArgs));
+    private void setError(int messageId, Object... formatArgs) {
+        setError(getResources().getString(messageId, formatArgs));
     }
 
-    private void setVerificationError(String message) {
-        restoreΜessage.setText(message);
-        restoreΜessage.setVisibility(View.VISIBLE);
+    private void setError(String message) {
+        errorΜessage.setText(message);
+        errorΜessage.setVisibility(View.VISIBLE);
     }
 
-    private void clearRestorationMessage() {
-        if (restoreΜessage.isShown()) restoreΜessage.setVisibility(View.GONE);
+    private void clearError() {
+        if (errorΜessage.isShown()) errorΜessage.setVisibility(View.GONE);
     }
 
     private void handleScan() {
@@ -281,7 +295,6 @@ public class RestoreFragment extends Fragment {
         if (requestCode == REQUEST_CODE_SCAN) {
             if (resultCode == Activity.RESULT_OK) {
                 mnemonicTextView.setText(intent.getStringExtra(ScanActivity.INTENT_EXTRA_RESULT));
-                verifyMnemonic();
             }
         }
     }

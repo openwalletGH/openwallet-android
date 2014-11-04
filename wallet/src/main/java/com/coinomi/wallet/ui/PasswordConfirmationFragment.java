@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
+import com.coinomi.wallet.util.Fonts;
 import com.coinomi.wallet.util.Keyboard;
 
 import javax.annotation.Nullable;
@@ -52,6 +53,8 @@ public class PasswordConfirmationFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_password_confirmation, container, false);
 
+        Fonts.setTypeface(view.findViewById(R.id.key_icon), Fonts.Font.ENTYPO_COINOMI);
+
         TextView messageView = (TextView) view.findViewById(R.id.message);
         if (message != null) {
             messageView.setText(message);
@@ -60,8 +63,6 @@ public class PasswordConfirmationFragment extends Fragment {
         }
 
         final EditText password = (EditText) view.findViewById(R.id.password);
-        // FIXME causes problems in older Androids
-//        Keyboard.focusAndShowKeyboard(password, getActivity());
 
         view.findViewById(R.id.button_confirm).setOnClickListener(new View.OnClickListener() {
             @Override

@@ -38,7 +38,7 @@
             style="@style/NormalText"
             android:autoLink="web"
             android:paddingTop="16dp"
-            android:text="@string/about_credits1" />
+            android:text="@string/about_credits_bitcoinj" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -46,7 +46,7 @@
             style="@style/NormalText"
             android:autoLink="web"
             android:paddingTop="16dp"
-            android:text="@string/about_credits2" />
+            android:text="@string/about_credits_electrum" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -54,7 +54,7 @@
             style="@style/NormalText"
             android:autoLink="web"
             android:paddingTop="16dp"
-            android:text="@string/about_credits3" />
+            android:text="@string/about_credits_zxing" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -62,7 +62,15 @@
             style="@style/NormalText"
             android:autoLink="web"
             android:paddingTop="16dp"
-            android:text="@string/about_credits4" />
+            android:text="@string/about_credits_crypto_icons" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/NormalText"
+            android:autoLink="web"
+            android:paddingTop="16dp"
+            android:text="@string/about_credits_font_icons" />
 
         <ImageView
             android:layout_width="wrap_content"

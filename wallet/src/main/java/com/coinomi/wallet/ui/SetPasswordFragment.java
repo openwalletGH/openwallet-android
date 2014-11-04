@@ -12,12 +12,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
+import com.coinomi.wallet.util.Fonts;
 import com.coinomi.wallet.util.Keyboard;
 import com.coinomi.wallet.util.PasswordQualityChecker;
 
@@ -31,6 +34,7 @@ public class SetPasswordFragment extends Fragment {
     private static final Logger log = LoggerFactory.getLogger(SetPasswordFragment.class);
 
     private Listener mListener;
+    private boolean isSeedProtected = false;
     private boolean isPasswordGood;
     private boolean isPasswordsMatch;
     private PasswordQualityChecker passwordQualityChecker;
@@ -71,6 +75,8 @@ public class SetPasswordFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_set_password, container, false);
 
+        Fonts.setTypeface(view.findViewById(R.id.key_icon), Fonts.Font.ENTYPO_COINOMI);
+
         errorPassword = (TextView) view.findViewById(R.id.password_error);
         errorPasswordsMismatch = (TextView) view.findViewById(R.id.passwords_mismatch);
 
@@ -102,9 +108,26 @@ public class SetPasswordFragment extends Fragment {
             }
         });
 
-        // FIXME causes problems in older Androids
-        // Show keyboard
-//        Keyboard.focusAndShowKeyboard(password1, getActivity());
+        // Seed protect option
+        final TextView seedProtectInfo = (TextView) view.findViewById(R.id.seed_protect_info);
+        seedProtectInfo.setVisibility(View.GONE);
+        final View password2Layout = view.findViewById(R.id.password2_layout);
+        password2Layout.setVisibility(View.GONE);
+
+        final CheckBox seedProtect = (CheckBox) view.findViewById(R.id.seed_protect);
+        seedProtect.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                isSeedProtected = isChecked;
+                if (isChecked) {
+                    seedProtectInfo.setVisibility(View.VISIBLE);
+                    password2Layout.setVisibility(View.VISIBLE);
+                } else {
+                    seedProtectInfo.setVisibility(View.GONE);
+                    password2Layout.setVisibility(View.GONE);
+                }
+            }
+        });
 
         // Next button
         Button finishButton = (Button) view.findViewById(R.id.button_finish);
@@ -142,6 +165,10 @@ public class SetPasswordFragment extends Fragment {
     }
 
     private void checkPasswordsMatch() {
+        if (!isSeedProtected) {
+            isPasswordsMatch = true;
+            return;
+        }
         String pass1 = password1.getText().toString();
         String pass2 = password2.getText().toString();
         isPasswordsMatch = pass1.equals(pass2);
@@ -159,6 +186,7 @@ public class SetPasswordFragment extends Fragment {
                 if (isPasswordGood && isPasswordsMatch) {
                     Bundle args = getArguments();
                     args.putString(Constants.ARG_PASSWORD, password1.getText().toString());
+                    args.putBoolean(Constants.ARG_SEED_PROTECT, isSeedProtected);
                     mListener.onPasswordSet(args);
                 } else {
                     Toast.makeText(SetPasswordFragment.this.getActivity(),

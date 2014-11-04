@@ -88,7 +88,7 @@ public class WelcomeFragment extends Fragment {
         public void onRestoreWallet();
         public void onRestoreWallet(String seed);
         public void onSetPassword(String seed);
-        public void onConfirmPassword(String seed);
+        public void onConfirmPassword(String seed, boolean isSeedProtected);
     }
 
 }

@@ -63,7 +63,7 @@
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentRight="true"
                     android:layout_alignTop="@+id/send_to_address"
-                    android:contentDescription="@string/button_scan_qr_code"
+                    android:contentDescription="@string/scan_qr_code"
                     android:src="@drawable/qr_code" />
 
                 <TextView
@@ -121,7 +121,7 @@
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentRight="true"
                     android:enabled="false"
-                    android:text="@string/send_coins_label" />
+                    android:text="@string/button_send" />
             </RelativeLayout>
 
         </LinearLayout>

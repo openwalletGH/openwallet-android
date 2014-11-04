@@ -18,6 +18,17 @@
             android:paddingRight="@dimen/activity_horizontal_margin"
             android:paddingTop="@dimen/activity_vertical_margin">
 
+            <TextView
+                android:id="@+id/seed_icon"
+                style="@style/FontIconBig"
+                android:layout_width="@dimen/font_icon_bg_size"
+                android:layout_height="@dimen/font_icon_bg_size"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center"
+                android:text="@string/font_icon_seed"
+                tools:text="Ψ"/>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
@@ -50,7 +61,7 @@
                         android:id="@+id/scan_qr_code"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:contentDescription="@string/button_scan_qr_code"
+                        android:contentDescription="@string/scan_qr_code"
                         android:src="@drawable/qr_code" />
 
                 </LinearLayout>
@@ -61,6 +72,12 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/restore_error_checksum" />
+
+                <CheckBox
+                    android:id="@+id/restore_seed_protected"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/restore_seed_protected" />
             </LinearLayout>
 
             <RelativeLayout

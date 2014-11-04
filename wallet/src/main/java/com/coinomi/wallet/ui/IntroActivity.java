@@ -55,11 +55,17 @@ public class IntroActivity extends android.support.v4.app.FragmentActivity imple
     }
 
     @Override
-    public void onConfirmPassword(String seed) {
+    public void onConfirmPassword(String seed, boolean isSeedProtected) {
         Bundle args = new Bundle();
         args.putString(Constants.ARG_SEED, seed);
-        replaceFragment(PasswordConfirmationFragment.newInstance(
-                getResources().getString(R.string.password_wallet_recovery), args));
+        args.putBoolean(Constants.ARG_SEED_PROTECT, isSeedProtected);
+        if (isSeedProtected) {
+            replaceFragment(PasswordConfirmationFragment.newInstance(
+                    getResources().getString(R.string.password_wallet_recovery), args));
+        } else {
+            replaceFragment(PasswordConfirmationFragment.newInstance(
+                    getResources().getString(R.string.set_password_info), args));
+        }
     }
 
     @Override

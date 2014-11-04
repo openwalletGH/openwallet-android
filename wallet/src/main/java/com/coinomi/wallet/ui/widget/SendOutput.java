@@ -81,8 +81,8 @@ public class SendOutput extends LinearLayout {
             address.setVisibility(GONE);
         } else {
             if (!sendType.isInEditMode()) { // If not displayed within a developer tool
-                Fonts.setTypeface(sendType, Fonts.Font.ENTYPO);
-                sendType.setText(String.valueOf(Constants.FONT_ICON_SEND_TO));
+                Fonts.setTypeface(sendType, Fonts.Font.ENTYPO_COINOMI);
+                sendType.setText(getResources().getString(R.string.font_icon_send));
             }
         }
     }
