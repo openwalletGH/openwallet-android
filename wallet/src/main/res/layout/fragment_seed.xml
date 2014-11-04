@@ -36,13 +36,6 @@
                 android:text="@string/seed_info"
                 style="@style/NormalText" />
 
-            <CheckBox
-                android:id="@+id/extra_entropy"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/extra_security"
-                android:visibility="gone" />
-
             <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"

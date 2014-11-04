@@ -66,7 +66,7 @@
     <string name="restore_error_words">The seed contains unrecognized words.</string>
     <string name="restore_error_mismatch">The seed entered does not match your seed.</string>
     <string name="restore_error">Could not verify your seed. %1$s</string>
-    <string name="extra_security">extra security</string>
+    <string name="extra_entropy">Extra entropy</string>
 
     <!-- Info fragment -->
     <string name="wallet_transactions_coinbase">mined</string>

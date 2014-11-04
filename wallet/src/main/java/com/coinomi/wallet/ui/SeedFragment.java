@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.coinomi.core.wallet.Wallet;
 import com.coinomi.wallet.R;
@@ -31,6 +32,7 @@ public class SeedFragment extends Fragment {
 
     private WelcomeFragment.Listener mListener;
     private String seed;
+    private boolean hasExtraEntropy = false;
 
     public SeedFragment() {
     }
@@ -57,16 +59,16 @@ public class SeedFragment extends Fragment {
         });
 
         final TextView mnemonicView = (TextView) view.findViewById(R.id.seed);
-        setMnemonic(mnemonicView);
+        setSeed(mnemonicView);
 
-        final CheckBox extraEntropy = (CheckBox) view.findViewById(R.id.extra_entropy);
-        extraEntropy.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        // Touch the seed icon to generate extra long seed
+        seedFontIcon.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    generateMnemonic(mnemonicView, ENTROPY_EXTRA);
-                } else {
-                    generateMnemonic(mnemonicView, ENTROPY_DEFAULT);
+            public void onClick(View v) {
+                hasExtraEntropy = !hasExtraEntropy; // toggle
+                generateNewSeed(mnemonicView);
+                if (hasExtraEntropy) {
+                    Toast.makeText(getActivity(), R.string.extra_entropy, Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -82,12 +84,7 @@ public class SeedFragment extends Fragment {
         View.OnClickListener generateNewSeedListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                log.info("Clicked generate a new seed");
-                if (extraEntropy.isChecked()) {
-                    generateMnemonic(mnemonicView, ENTROPY_EXTRA);
-                } else {
-                    generateMnemonic(mnemonicView, ENTROPY_DEFAULT);
-                }
+                generateNewSeed(mnemonicView);
             }
         };
 
@@ -97,6 +94,14 @@ public class SeedFragment extends Fragment {
         return view;
     }
 
+    private void generateNewSeed(TextView mnemonicView) {
+        log.info("Clicked generate a new seed");
+        if (hasExtraEntropy) {
+            generateMnemonic(mnemonicView, ENTROPY_EXTRA);
+        } else {
+            generateMnemonic(mnemonicView, ENTROPY_DEFAULT);
+        }
+    }
 
     @Override
     public void onAttach(Activity activity) {
@@ -126,11 +131,11 @@ public class SeedFragment extends Fragment {
         return sb.toString();
     }
 
-    private void setMnemonic(TextView textView) {
+    private void setSeed(TextView textView) {
         if (seed != null) {
             textView.setText(seed);
         } else {
-            generateMnemonic(textView, ENTROPY_DEFAULT);
+            generateNewSeed(textView);
         }
     }
 
