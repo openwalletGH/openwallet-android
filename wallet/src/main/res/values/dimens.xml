@@ -51,7 +51,6 @@
     <dimen name="transaction_pending">18sp</dimen>
 
     <!-- Transaction Row -->
-
     <dimen name="transaction_row_margin_direction">8dp</dimen>
     <dimen name="transaction_row_text_size_direction_font_icon">@dimen/font_icon_text_size</dimen>
     <dimen name="transaction_row_direction_bg_size">@dimen/font_icon_bg_size</dimen>

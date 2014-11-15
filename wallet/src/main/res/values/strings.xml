@@ -34,12 +34,11 @@
     <string name="button_cancel">CANCEL</string>
     <string name="button_send">SEND</string>
     <string name="button_skip">SKIP</string>
+    <string name="button_add_coins">+COINS</string>
     <string name="scan_qr_code">Scan QR code</string>
     <string name="wallet_title_request">request</string>
     <string name="wallet_title_balance">balance</string>
     <string name="wallet_title_send">send</string>
-
-
 
     <!-- SendOutput widget -->
     <string name="fee">Fee</string>
@@ -121,5 +120,11 @@
     <string name="about_credits_zxing">QR-code functionality by ZXing\nhttps://github.com/zxing/zxing</string>
     <string name="about_credits_crypto_icons">Crypto-icons by Chris Shepherd\nhttps://github.com/shphrd/crypto-icons</string>
     <string name="about_credits_font_icons">Font-icons by Daniel Bruce\nhttp://www.entypo.com</string>
+
+
+    <!-- Add Coins -->
+    <string name="title_activity_add_coins">Add coins</string>
+    <string name="password_add_coin">You are about to create a %1$s pocket in your wallet.</string>
+    <string name="adding_coin">Please wait while creating a new pocket for %1$s</string>
 
 </resources>

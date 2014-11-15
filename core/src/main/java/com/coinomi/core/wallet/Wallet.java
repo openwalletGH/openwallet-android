@@ -20,6 +20,7 @@ import com.google.bitcoin.wallet.DeterministicSeed;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,6 +106,12 @@ final public class Wallet {
         return mnemonic;
     }
 
+
+    public void createCoinPocket(CoinType coin, boolean generateAllKeys,
+                                  @Nullable KeyParameter key) {
+        createCoinPockets(Lists.newArrayList(coin), generateAllKeys, key);
+    }
+
     public void createCoinPockets(List<CoinType> coins, boolean generateAllKeys,
                                   @Nullable KeyParameter key) {
         lock.lock();
@@ -182,7 +189,7 @@ final public class Wallet {
     }
 
 
-    public void addPocket(WalletPocket pocket) {
+    /* package */ void addPocket(WalletPocket pocket) {
         lock.lock();
         try {
             checkState(!pockets.containsKey(pocket.getCoinType()), "Cannot replace an existing wallet pocket");

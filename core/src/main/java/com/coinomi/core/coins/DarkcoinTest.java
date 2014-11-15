@@ -6,6 +6,7 @@ package com.coinomi.core.coins;
 public class DarkcoinTest extends CoinType {
     public DarkcoinTest() {
         id = "darkcoin.test";
+        uid = 52;
 
         addressHeader = 111;
         p2shHeader = 196;

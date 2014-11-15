@@ -31,6 +31,10 @@ public class PasswordConfirmationFragment extends Fragment {
     @Nullable private String message;
     private Listener mListener;
 
+    static PasswordConfirmationFragment newInstance(String message) {
+        return newInstance(message, null);
+    }
+
     static PasswordConfirmationFragment newInstance(String message, @Nullable Bundle args) {
         PasswordConfirmationFragment fragment = new PasswordConfirmationFragment();
         fragment.setArguments(args != null ? args : new Bundle());

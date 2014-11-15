@@ -1,9 +1,14 @@
 package com.coinomi.wallet;
 
 import com.coinomi.core.coins.BitcoinMain;
+import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.coins.DarkcoinMain;
 import com.coinomi.core.coins.DogecoinMain;
 import com.coinomi.core.coins.LitecoinMain;
+import com.coinomi.core.coins.NuBitsMain;
+import com.coinomi.core.coins.NuSharesMain;
+import com.coinomi.core.coins.PeercoinMain;
 import com.coinomi.core.network.CoinAddress;
 import com.coinomi.stratumj.ServerAddress;
 import com.google.common.collect.ImmutableList;
@@ -47,20 +52,25 @@ public class Constants {
     public static final List<CoinAddress> COINS_ADDRESSES_TEST = ImmutableList.of(
             new CoinAddress(BitcoinMain.get(), new ServerAddress("btc-cce-1.coinomi.net", 5001), new ServerAddress("btc-cce-2.coinomi.net", 5001)),
             new CoinAddress(DogecoinMain.get(), new ServerAddress("doge-cce-1.coinomi.net", 5003), new ServerAddress("doge-cce-2.coinomi.net", 5003)),
-            new CoinAddress(LitecoinMain.get(), new ServerAddress("ltc-cce-1.coinomi.net", 5002), new ServerAddress("ltc-cce-2.coinomi.net", 5002))
+            new CoinAddress(LitecoinMain.get(), new ServerAddress("ltc-cce-1.coinomi.net", 5002), new ServerAddress("ltc-cce-2.coinomi.net", 5002)),
+            new CoinAddress(PeercoinMain.get(), new ServerAddress("54.176.197.116", 5004)),
+            new CoinAddress(DarkcoinMain.get(), new ServerAddress("54.176.197.116", 5013))
     );
 
     public static final HashMap<CoinType, Integer> COINS_ICONS;
     static {
         COINS_ICONS = new HashMap<CoinType, Integer>();
-        COINS_ICONS.put(BitcoinMain.get(), R.drawable.bitcoin);
-        COINS_ICONS.put(DogecoinMain.get(), R.drawable.dogecoin);
-        COINS_ICONS.put(LitecoinMain.get(), R.drawable.litecoin);
+        COINS_ICONS.put(CoinID.BITCOIN_MAIN.getCoinType(), R.drawable.bitcoin);
+        COINS_ICONS.put(CoinID.DOGECOIN_MAIN.getCoinType(), R.drawable.dogecoin);
+        COINS_ICONS.put(CoinID.LITECOIN_MAIN.getCoinType(), R.drawable.litecoin);
+        COINS_ICONS.put(CoinID.PEERCOIN_MAIN.getCoinType(), R.drawable.peercoin);
+        COINS_ICONS.put(CoinID.DARKCOIN_MAIN.getCoinType(), R.drawable.darkcoin);
+        COINS_ICONS.put(CoinID.NUSHARES_MAIN.getCoinType(), R.drawable.nushares);
+        COINS_ICONS.put(CoinID.NUBITS_MAIN.getCoinType(), R.drawable.nubits);
     }
 
     public static final CoinType DEFAULT_COIN = BitcoinMain.get();
     public static final List<CoinType> DEFAULT_COINS = ImmutableList.of(BitcoinMain.get(),
             DogecoinMain.get(), LitecoinMain.get());
-    public static final List<CoinType> SUPPORTED_COINS = ImmutableList.of(BitcoinMain.get(),
-            DogecoinMain.get(), LitecoinMain.get());
+    public static final List<CoinType> SUPPORTED_COINS = CoinID.getSupportedCoins();
 }

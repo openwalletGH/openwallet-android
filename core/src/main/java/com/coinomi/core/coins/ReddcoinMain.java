@@ -8,6 +8,7 @@ import com.google.bitcoin.core.Coin;
 public class ReddcoinMain extends CoinType {
     public ReddcoinMain() {
         id = "reddcoin.main";
+        uid = -1; // FIXME
 
         addressHeader = 61;
         p2shHeader = 5;

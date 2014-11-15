@@ -8,6 +8,7 @@ import com.google.bitcoin.core.Coin;
 public class MonacoinMain extends CoinType {
     public MonacoinMain() {
         id = "monacoin.main";
+        uid = -1; // FIXME
 
         addressHeader = 50;
         p2shHeader = 5;

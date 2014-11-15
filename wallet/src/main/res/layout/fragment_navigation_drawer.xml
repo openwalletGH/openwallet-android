@@ -1,11 +1,30 @@
-<ListView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="8dp"
+    android:orientation="vertical"
     android:paddingBottom="8dp"
-    android:choiceMode="singleChoice"
-    android:divider="@android:color/transparent"
-    android:dividerHeight="0dp"
+    android:paddingTop="8dp"
     android:background="@color/navigation_drawer_bg"
-    tools:context=".NavigationDrawerFragment" />
+    tools:context=".NavigationDrawerFragment">
+
+    <ListView
+        android:id="@+id/coins_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:choiceMode="singleChoice"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="0dp" />
+
+    <TextView
+        android:id="@+id/add_coins"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/LinkButton"
+        android:padding="8dp"
+        android:text="@string/button_add_coins"
+        android:layout_gravity="center_horizontal" />
+
+</LinearLayout>
+

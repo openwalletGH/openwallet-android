@@ -60,6 +60,7 @@ public class NavigationDrawerFragment extends Fragment {
     private boolean mFromSavedInstanceState;
     private boolean mUserLearnedDrawer;
     private WalletApplication application;
+    private View addCoinsButton;
 
     public NavigationDrawerFragment() {
     }
@@ -93,8 +94,9 @@ public class NavigationDrawerFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        mDrawerListView = (ListView) inflater.inflate(
-                R.layout.fragment_navigation_drawer, container, false);
+        View view = inflater.inflate(R.layout.fragment_navigation_drawer, container, false);
+
+        mDrawerListView = (ListView) view.findViewById(R.id.coins_list);
         mDrawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -103,7 +105,16 @@ public class NavigationDrawerFragment extends Fragment {
         });
         mDrawerListView.setAdapter(new NavDrawerListAdapter(getActivity(), application));
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
-        return mDrawerListView;
+
+        addCoinsButton = view.findViewById(R.id.add_coins);
+        addCoinsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addCoins();
+            }
+        });
+
+        return view;
     }
 
     public boolean isDrawerOpen() {
@@ -206,6 +217,15 @@ public class NavigationDrawerFragment extends Fragment {
         }
     }
 
+    private void addCoins() {
+        if (mDrawerLayout != null) {
+            mDrawerLayout.closeDrawer(mFragmentContainerView);
+        }
+        if (mCallbacks != null && application.getWallet() != null) {
+            mCallbacks.onNavigationDrawerAddCoinsSelected();
+        }
+    }
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -280,5 +300,7 @@ public class NavigationDrawerFragment extends Fragment {
          * Called when an item in the navigation drawer is selected.
          */
         void onNavigationDrawerCoinSelected(CoinType coinType);
+
+        void onNavigationDrawerAddCoinsSelected();
     }
 }

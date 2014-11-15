@@ -8,6 +8,7 @@ import com.google.bitcoin.core.Coin;
 public class LitecoinTest extends CoinType {
     public LitecoinTest() {
         id = "litecoin.test";
+        uid = 22;
 
         addressHeader = 111;
         p2shHeader = 196;

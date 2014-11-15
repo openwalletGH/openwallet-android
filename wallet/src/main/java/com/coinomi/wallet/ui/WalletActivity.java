@@ -111,6 +111,11 @@ final public class WalletActivity extends ActionBarActivity implements
         openPocket(coinType);
     }
 
+    @Override
+    public void onNavigationDrawerAddCoinsSelected() {
+        addCoins();
+    }
+
     private void openPocket(CoinType coinType) {
         if (mViewPager != null && !coinType.equals(currentType)) {
             currentType = coinType;
@@ -122,6 +127,10 @@ final public class WalletActivity extends ActionBarActivity implements
             mViewPager.getAdapter().notifyDataSetChanged();
             getWalletApplication().getConfiguration().touchLastPocket(coinType);
         }
+    }
+
+    private void addCoins() {
+        startActivity(new Intent(WalletActivity.this, AddCoinsActivity.class));
     }
 
     public void restoreActionBar() {
@@ -156,7 +165,6 @@ final public class WalletActivity extends ActionBarActivity implements
     }
 
     private void setSendFromCoin(CoinURI coinUri) throws CoinURIParseException {
-//        int pocketIndex = Constants.DEFAULT_COINS.indexOf(coinUri.getType());
         mNavigationDrawerFragment.selectItem(coinUri.getType());
         if (mViewPager != null) {
             mViewPager.setCurrentItem(SEND);

@@ -8,6 +8,7 @@ import com.google.bitcoin.core.Coin;
 public class BitcoinTest extends CoinType {
     public BitcoinTest() {
         id = "bitcoin.test";
+        uid = 12;
 
         addressHeader = 111;
         p2shHeader = 196;

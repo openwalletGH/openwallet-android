@@ -8,6 +8,7 @@ import com.google.bitcoin.core.Coin;
 public class DogecoinMain extends CoinType {
     public DogecoinMain() {
         id = "dogecoin.main";
+        uid = 31;
 
         addressHeader = 30;
         p2shHeader = 22;

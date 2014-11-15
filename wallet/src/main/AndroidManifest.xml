@@ -60,6 +60,7 @@
             android:windowSoftInputMode="adjustResize" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -96,6 +97,15 @@
         <activity
             android:name=".ui.AboutActivity"
             android:label="@string/title_activity_about" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.coinomi.wallet.ui.WalletActivity" />
+        </activity>
+        <activity
+            android:name=".ui.AddCoinsActivity"
+            android:label="@string/title_activity_add_coins"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppThemeCustomActionBar" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.coinomi.wallet.ui.WalletActivity" />

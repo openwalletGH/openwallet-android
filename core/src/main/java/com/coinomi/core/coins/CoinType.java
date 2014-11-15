@@ -21,12 +21,17 @@ abstract public class CoinType extends NetworkParameters implements Serializable
 
     private static final String BIP_44_KEY_PATH = "44'/%d'/%d'";
 
+    protected long uid = -1;
     protected String name;
     protected String symbol;
     protected String uriScheme;
     protected int bip44Index;
     protected Coin feePerKb;
     protected Coin minNonDust;
+
+    public long getUid() {
+        return uid;
+    }
 
     public String getName() {
         return name;
