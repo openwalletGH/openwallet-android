@@ -1,6 +1,6 @@
 package com.coinomi.core.coins;
 
-import com.google.bitcoin.core.Coin;
+import org.bitcoinj.core.Coin;
 
 /**
  * @author Giannis Dzegoutanis
@@ -18,8 +18,9 @@ public class PeercoinMain extends CoinType {
         symbol = "PPC";
         uriScheme = "peercoin"; // TODO verify, could be ppcoin?
         bip44Index = 4;
-        feePerKb = Coin.valueOf(1000000); // 0.01PPC
+        feePerKb = Coin.valueOf(10000); // 0.01PPC, careful Peercoin has 1000000 units per coin
         minNonDust = Coin.valueOf(1); //TODO verify
+        unitExponent = 6;
     }
 
     private static PeercoinMain instance;

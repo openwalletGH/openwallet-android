@@ -1,6 +1,6 @@
 package com.coinomi.core.coins;
 
-import com.google.bitcoin.core.Coin;
+import org.bitcoinj.core.Coin;
 
 /**
  * @author Giannis Dzegoutanis
@@ -21,6 +21,7 @@ public class MonacoinMain extends CoinType {
         // TODO set correct values
         feePerKb = Coin.valueOf(1);
         minNonDust = Coin.valueOf(1);
+        unitExponent = 8;
         throw new RuntimeException(name+" bip44Index " + bip44Index + "is not standardized");
     }
 

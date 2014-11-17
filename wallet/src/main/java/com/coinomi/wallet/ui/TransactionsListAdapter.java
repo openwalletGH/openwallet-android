@@ -37,17 +37,17 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.WalletPocket;
-import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
+import com.coinomi.wallet.ui.widget.CurrencyTextView;
 import com.coinomi.wallet.util.Fonts;
-import com.coinomi.wallet.util.GenericUtils;
 import com.coinomi.wallet.util.WalletUtils;
-import com.google.bitcoin.core.Address;
-import com.google.bitcoin.core.Coin;
-import com.google.bitcoin.core.Transaction;
-import com.google.bitcoin.core.TransactionConfidence;
-import com.google.bitcoin.core.TransactionConfidence.ConfidenceType;
+import org.bitcoinj.core.Address;
+import org.bitcoinj.core.Coin;
+import org.bitcoinj.core.Transaction;
+import org.bitcoinj.core.TransactionConfidence;
+import org.bitcoinj.core.TransactionConfidence.ConfidenceType;
 
 /**
  * @author Andreas Schildbach
@@ -263,7 +263,7 @@ public class TransactionsListAdapter extends BaseAdapter {
         // value
         rowValue.setAlwaysSigned(true);
         rowValue.setPrecision(precision, shift);//TODO make configurable
-        rowValue.setAmount(value);
+        rowValue.setAmount(type, value);
     }
 
     private String resolveLabel(@Nonnull final String address) {

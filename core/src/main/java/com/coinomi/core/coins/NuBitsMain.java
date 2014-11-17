@@ -1,6 +1,6 @@
 package com.coinomi.core.coins;
 
-import com.google.bitcoin.core.Coin;
+import org.bitcoinj.core.Coin;
 
 /**
  * @author Giannis Dzegoutanis
@@ -18,8 +18,9 @@ public class NuBitsMain extends CoinType {
         symbol = "NBT";
         uriScheme = "nubits";
         bip44Index = 12;
-        feePerKb = Coin.valueOf(1000000);
-        minNonDust = Coin.valueOf(1000000);
+        feePerKb = Coin.valueOf(100); // 0.01NBT, careful NuBit has 10000 units per coin
+        minNonDust = Coin.valueOf(100);
+        unitExponent = 4;
     }
 
     private static NuBitsMain instance;

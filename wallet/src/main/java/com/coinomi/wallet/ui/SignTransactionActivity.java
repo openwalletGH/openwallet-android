@@ -9,8 +9,8 @@ import com.coinomi.core.wallet.exceptions.NoSuchPocketException;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
-import com.google.bitcoin.core.InsufficientMoneyException;
-import com.google.bitcoin.crypto.KeyCrypterException;
+import org.bitcoinj.core.InsufficientMoneyException;
+import org.bitcoinj.crypto.KeyCrypterException;
 
 import java.io.IOException;
 

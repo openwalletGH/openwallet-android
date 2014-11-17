@@ -1,24 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
     <View
         android:id="@+id/pending_progress_counter_balance"
-        android:layout_width="@dimen/progress_symbol_size"
-        android:layout_height="@dimen/progress_symbol_size"
-        android:layout_alignParentTop="true"
+        android:layout_width="@dimen/connectivity_symbol_size"
+        android:layout_height="@dimen/connectivity_symbol_size"
         android:visibility="invisible" />
 
     <LinearLayout
         android:id="@+id/amountLayout"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_toEndOf="@+id/pending_progress_counter_balance"
-        android:layout_toRightOf="@+id/pending_progress_counter_balance"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_weight="1">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -34,7 +33,7 @@
                 android:layout_height="wrap_content"
                 android:includeFontPadding="false"
                 android:lineSpacingMultiplier="0.9"
-                tools:text="42" />
+                tools:text="4200.30937785" />
 
             <!--<TextView-->
             <!--android:id="@+id/amount_pending"-->
@@ -56,13 +55,12 @@
 
     </LinearLayout>
 
-    <ProgressBar
-        android:id="@+id/pending_progress"
-        style="@style/Widget.AppCompat.ProgressBar"
-        android:layout_width="@dimen/progress_symbol_size"
-        android:layout_height="@dimen/progress_symbol_size"
-        android:layout_alignParentTop="true"
-        android:layout_toEndOf="@+id/amountLayout"
-        android:layout_toRightOf="@+id/amountLayout" />
+    <TextView
+        android:id="@+id/connection_status"
+        android:layout_width="@dimen/connectivity_symbol_size"
+        android:layout_height="@dimen/connectivity_symbol_size"
+        android:textSize="@dimen/connectivity_symbol_size"
+        android:gravity="center_horizontal"
+        tools:text="*" />
 
-</RelativeLayout>
+</LinearLayout>

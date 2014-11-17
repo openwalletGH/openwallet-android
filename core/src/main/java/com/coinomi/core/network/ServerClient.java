@@ -9,14 +9,14 @@ import com.coinomi.stratumj.ServerAddress;
 import com.coinomi.stratumj.StratumClient;
 import com.coinomi.stratumj.messages.CallMessage;
 import com.coinomi.stratumj.messages.ResultMessage;
-import com.google.bitcoin.core.Address;
-import com.google.bitcoin.core.AddressFormatException;
-import com.google.bitcoin.core.Sha256Hash;
-import com.google.bitcoin.core.Transaction;
-import com.google.bitcoin.core.TransactionOutPoint;
-import com.google.bitcoin.core.Utils;
-import com.google.bitcoin.utils.ListenerRegistration;
-import com.google.bitcoin.utils.Threading;
+import org.bitcoinj.core.Address;
+import org.bitcoinj.core.AddressFormatException;
+import org.bitcoinj.core.Sha256Hash;
+import org.bitcoinj.core.Transaction;
+import org.bitcoinj.core.TransactionOutPoint;
+import org.bitcoinj.core.Utils;
+import org.bitcoinj.utils.ListenerRegistration;
+import org.bitcoinj.utils.Threading;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -159,6 +159,7 @@ public class ServerClient implements BlockchainConnection {
     }
 
     public void stopAsync() {
+        if (isConnected()) broadcastOnDisconnect();
         stopped = true;
         connectionExec.remove(reconnectTask);
         if (stratumClient != null) {
@@ -185,7 +186,7 @@ public class ServerClient implements BlockchainConnection {
 
     /**
      * Adds an event listener object. Methods on this object are called when something interesting happens,
-     * like new connection to a server. The listener is executed by {@link com.google.bitcoin.utils.Threading#USER_THREAD}.
+     * like new connection to a server. The listener is executed by {@link org.bitcoinj.utils.Threading#USER_THREAD}.
      */
     private void addEventListener(ConnectionEventListener listener) {
         addEventListener(listener, Threading.USER_THREAD);

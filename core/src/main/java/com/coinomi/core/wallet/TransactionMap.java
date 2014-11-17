@@ -1,7 +1,7 @@
 package com.coinomi.core.wallet;
 
-import com.google.bitcoin.core.Sha256Hash;
-import com.google.bitcoin.core.Transaction;
+import org.bitcoinj.core.Sha256Hash;
+import org.bitcoinj.core.Transaction;
 
 import java.util.HashMap;
 

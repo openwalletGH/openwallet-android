@@ -18,11 +18,11 @@ package com.coinomi.core.wallet;
 
 
 import com.coinomi.core.coins.CoinType;
-import com.google.bitcoin.core.Address;
-import com.google.bitcoin.core.Coin;
-import com.google.bitcoin.core.Transaction;
-import com.google.bitcoin.core.Wallet.MissingSigsMode;
-import com.google.bitcoin.wallet.CoinSelector;
+import org.bitcoinj.core.Address;
+import org.bitcoinj.core.Coin;
+import org.bitcoinj.core.Transaction;
+import org.bitcoinj.core.Wallet.MissingSigsMode;
+import org.bitcoinj.wallet.CoinSelector;
 import com.google.common.base.Objects;
 import com.google.common.base.Objects.ToStringHelper;
 
@@ -51,7 +51,7 @@ public class SendRequest implements Serializable{
      * fees) - the wallet will calculate all that for you and update tx later.</p>
      *
      * <p>Be careful when adding outputs that you check the min output value
-     * ({@link com.google.bitcoin.core.TransactionOutput#getMinNonDustValue(Coin)}) to avoid the whole transaction being rejected
+     * ({@link org.bitcoinj.core.TransactionOutput#getMinNonDustValue(Coin)}) to avoid the whole transaction being rejected
      * because one output is dust.</p>
      *
      * <p>If there are already inputs to the transaction, make sure their out point has a connected output,
@@ -63,7 +63,7 @@ public class SendRequest implements Serializable{
 
     /**
      * When emptyWallet is set, all coins selected by the coin selector are sent to the first output in tx
-     * (its value is ignored and set to {@link com.google.bitcoin.core.Wallet#getBalance()} - the fees required
+     * (its value is ignored and set to {@link org.bitcoinj.core.Wallet#getBalance()} - the fees required
      * for the transaction). Any additional outputs are removed.
      */
     public boolean emptyWallet = false;
@@ -131,7 +131,7 @@ public class SendRequest implements Serializable{
     transient public KeyParameter aesKey = null;
 
     /**
-     * If not null, the {@link com.google.bitcoin.wallet.CoinSelector} to use instead of the wallets default. Coin selectors are
+     * If not null, the {@link org.bitcoinj.wallet.CoinSelector} to use instead of the wallets default. Coin selectors are
      * responsible for choosing which transaction outputs (coins) in a wallet to use given the desired send value
      * amount.
      */

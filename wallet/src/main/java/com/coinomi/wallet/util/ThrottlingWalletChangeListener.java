@@ -26,12 +26,13 @@ import java.util.concurrent.atomic.AtomicLong;
 import android.os.Handler;
 
 import com.coinomi.core.wallet.WalletPocket;
+import com.coinomi.core.wallet.WalletPocketConnectivity;
 import com.coinomi.core.wallet.WalletPocketEventListener;
-import com.google.bitcoin.core.Coin;
-import com.google.bitcoin.core.ECKey;
-import com.google.bitcoin.core.Transaction;
-import com.google.bitcoin.core.Wallet;
-import com.google.bitcoin.script.Script;
+import org.bitcoinj.core.Coin;
+import org.bitcoinj.core.ECKey;
+import org.bitcoinj.core.Transaction;
+import org.bitcoinj.core.Wallet;
+import org.bitcoinj.script.Script;
 
 /**
  * @author Andreas Schildbach
@@ -117,4 +118,8 @@ public abstract class ThrottlingWalletChangeListener implements WalletPocketEven
         if (confidenceRelevant)
             relevant.set(true);
     }
+
+
+    @Override
+    public void onConnectivityStatus(WalletPocketConnectivity pocketConnectivity) { /* ignore */ }
 }

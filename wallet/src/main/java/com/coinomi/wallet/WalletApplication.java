@@ -20,9 +20,9 @@ import com.coinomi.wallet.service.CoinServiceImpl;
 import com.coinomi.wallet.util.CrashReporter;
 import com.coinomi.wallet.util.Fonts;
 import com.coinomi.wallet.util.LinuxSecureRandom;
-import com.google.bitcoin.crypto.MnemonicCode;
-import com.google.bitcoin.store.UnreadableWalletException;
-import com.google.bitcoin.utils.Threading;
+import org.bitcoinj.crypto.MnemonicCode;
+import org.bitcoinj.store.UnreadableWalletException;
+import org.bitcoinj.utils.Threading;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -192,10 +192,21 @@ public class WalletApplication extends Application {
 
     @Nullable
     public WalletPocket getWalletPocket(CoinType type) {
-        if (wallet != null) {
+        if (wallet != null && wallet.isPocketExists(type)) {
             return wallet.getPocket(type);
         }
         else { return null; }
+    }
+
+    /**
+     * Check if pocket exists
+     */
+    public boolean isPocketExists(CoinType type) {
+        if (wallet != null) {
+            return wallet.isPocketExists(type);
+        } else {
+            return false;
+        }
     }
 
     public void setWallet(Wallet wallet) {

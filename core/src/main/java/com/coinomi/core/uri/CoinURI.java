@@ -20,11 +20,15 @@ package com.coinomi.core.uri;
 
 import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
-import com.google.bitcoin.core.Address;
-import com.google.bitcoin.core.AddressFormatException;
-import com.google.bitcoin.core.Coin;
-import com.google.bitcoin.core.NetworkParameters;
+import com.coinomi.core.util.GenericUtils;
 
+import org.bitcoinj.core.Address;
+import org.bitcoinj.core.AddressFormatException;
+import org.bitcoinj.core.Base58;
+import org.bitcoinj.core.Coin;
+import org.bitcoinj.core.NetworkParameters;
+
+import org.bitcoinj.core.VersionedChecksummedBytes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -147,10 +151,27 @@ public class CoinURI {
         String schemeSpecificPart;
 
         if (params == null) {
-            try {
-                params = CoinID.fromUri(input).getCoinType();
-            } catch (IllegalArgumentException e) {
-                throw new CoinURIParseException("Unsupported URI scheme: " + uri.getScheme());
+            if (uri.getScheme() != null) {
+                try {
+                    params = CoinID.fromUri(input).getCoinType();
+                } catch (IllegalArgumentException e) {
+                    throw new CoinURIParseException("Unsupported URI scheme: " + uri.getScheme());
+                }
+            } else {
+                // Check if address
+                try {
+                    Base58.decodeChecked(input);
+                } catch (AddressFormatException e) {
+                    throw new CoinURIParseException("Unsupported format: " + input);
+                }
+                // Try to parse this address
+                try {
+                    params = (CoinType) new Address(null, input).getParameters();
+                    // make input appear as a URI
+                    input = params.getUriScheme() + ":" + input;
+                } catch (AddressFormatException e) {
+                    throw new CoinURIParseException("Unsupported address type: " + input);
+                }
             }
         }
 
@@ -222,9 +243,10 @@ public class CoinURI {
             if (FIELD_AMOUNT.equals(nameToken)) {
                 // Decode the amount (contains an optional decimal component to 8dp).
                 try {
-                    Coin amount = Coin.parseCoin(valueToken);
-                    if (amount.signum() < 0)
-                        throw new ArithmeticException("Negative coins specified");
+                    Coin amount = GenericUtils.parseCoin(type, valueToken);
+                    if (amount.signum() < 0) {
+                        throw new OptionalFieldValidationException(String.format("'%s' Negative coins specified", valueToken));
+                    }
                     putWithValidation(FIELD_AMOUNT, amount);
                 } catch (IllegalArgumentException e) {
                     throw new OptionalFieldValidationException(String.format("'%s' is not a valid amount", valueToken), e);
@@ -371,7 +393,7 @@ public class CoinURI {
         
         if (amount != null) {
             builder.append(QUESTION_MARK_SEPARATOR).append(FIELD_AMOUNT).append("=");
-            builder.append(amount.toPlainString());
+            builder.append(GenericUtils.formatValue(type, amount));
             questionMarkHasBeenOutput = true;
         }
         

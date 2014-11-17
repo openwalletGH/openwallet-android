@@ -16,14 +16,14 @@ import android.widget.TextView;
 
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.uri.CoinURI;
+import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.WalletPocket;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
-import com.coinomi.wallet.util.GenericUtils;
 import com.coinomi.wallet.util.Qr;
 import com.coinomi.wallet.util.ShareActionProvider;
-import com.google.bitcoin.core.Address;
-import com.google.bitcoin.core.Coin;
+import org.bitcoinj.core.Address;
+import org.bitcoinj.core.Coin;
 
 import javax.annotation.Nullable;
 

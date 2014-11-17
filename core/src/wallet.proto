@@ -205,6 +205,7 @@ message Transaction {
 
     // See Wallet.java for detailed description of pool semantics
     required int32 version = 1;
+    optional int32 time = 11; // Used by Peercoin family
     required bytes hash = 2;
 
     // If pool is not present, that means either:
@@ -227,7 +228,7 @@ message Transaction {
     // Data describing where the transaction is in the chain.
     optional TransactionConfidence confidence = 10;
 
-    // Next tag: 11
+    // Next tag: 12
 }
 
 message AddressStatus {

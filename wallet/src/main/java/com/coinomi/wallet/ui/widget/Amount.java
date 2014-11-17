@@ -8,16 +8,19 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.coinomi.core.wallet.WalletPocketConnectivity;
 import com.coinomi.wallet.R;
-import com.google.bitcoin.core.Coin;
+import com.coinomi.wallet.util.Fonts;
+
+import javax.annotation.Nullable;
 
 /**
  * @author Giannis Dzegoutanis
  */
-public class Amount extends RelativeLayout{
+public class Amount extends RelativeLayout {
     private final TextView amount;
     private final TextView symbol;
-    private final ProgressBar pendingProgress;
+    private final TextView connectionStatus;
 //    private final TextView amountPending;
 
     boolean isBig = false;
@@ -29,10 +32,10 @@ public class Amount extends RelativeLayout{
 
         amount = (TextView) findViewById(R.id.amount);
         symbol = (TextView) findViewById(R.id.symbol);
-        pendingProgress = (ProgressBar) findViewById(R.id.pending_progress);
-        pendingProgress.setVisibility(INVISIBLE);
 //        amountPending = (TextView) findViewById(R.id.amount_pending);
 //        amountPending.setVisibility(GONE);
+        connectionStatus = (TextView) findViewById(R.id.connection_status);
+//        Fonts.setTypeface(connectionStatus, Fonts.Font.ENTYPO_COINOMI);
 
         TypedArray a = context.obtainStyledAttributes(attrs,
                 R.styleable.Amount, 0, 0);
@@ -42,36 +45,45 @@ public class Amount extends RelativeLayout{
             a.recycle();
         }
 
-        try {
-            if (isBig) {
-                amount.setTextAppearance(context, R.style.AmountBig);
-            }
-        } catch (RuntimeException ignore) { }
+        if (isBig) {
+            amount.setTextAppearance(context, R.style.AmountBig);
+        }
 
         if (getRootView().isInEditMode()) {
-            setAmount(Coin.valueOf(4200000010L));
-            setAmountPending(Coin.valueOf(133700000L));
+            setAmount("3.14159265");
         }
     }
 
-    public void setAmount(Coin amount) {
-        this.amount.setText(amount.toPlainString());
+    public void setAmount(String amount) {
+        this.amount.setText(amount);
     }
 
     public void setSymbol(String symbol) {
         this.symbol.setText(symbol);
     }
 
-    public void setAmountPending(Coin newPending) {
-        if (newPending.equals(Coin.ZERO)) {
-            pendingProgress.setVisibility(INVISIBLE);
+    public void setAmountPending(@Nullable String pendingAmount) {
+//        if (pendingAmount == null) {
 //            amountPending.setVisibility(GONE);
-//            amountPending.setText("");
-        } else {
-            pendingProgress.setVisibility(VISIBLE);
-            String text = (newPending.isPositive() ? " +" : " ") + newPending.toPlainString();
-//            amountPending.setText(text);
+//            amountPending.setText(null);
+//        } else {
+//            amountPending.setText(pendingAmount);
 //            amountPending.setVisibility(VISIBLE);
+//        }
+    }
+
+    public void setConnectivity(WalletPocketConnectivity connectivity) {
+        switch (connectivity) {
+            case WORKING:
+                // TODO support WORKING state
+            case CONNECTED:
+                connectionStatus.setVisibility(VISIBLE);
+                connectionStatus.setText("C");
+                break;
+            default:
+            case DISCONNECTED:
+                connectionStatus.setVisibility(VISIBLE);
+                connectionStatus.setText("D");
         }
     }
 }

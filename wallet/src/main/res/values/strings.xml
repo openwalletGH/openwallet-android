@@ -81,6 +81,8 @@
     <string name="pay_to_label">pay to</string>
     <string name="amount_to_send_label">amount</string>
     <string name="uri_error">There was a problem decoding URI: %1$s</string>
+    <string name="unsupported_coin">coin is not supported: %1$s</string>
+    <string name="coin_not_added">coin is supported but is not added: %1$s</string>
     <string name="address_error">Provided address is not valid.</string>
     <string name="amount_error">Provided amount is not valid.</string>
 

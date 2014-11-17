@@ -21,8 +21,8 @@ import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.service.CoinService;
-import com.google.bitcoin.crypto.DeterministicKey;
-import com.google.bitcoin.crypto.KeyCrypterScrypt;
+import org.bitcoinj.crypto.DeterministicKey;
+import org.bitcoinj.crypto.KeyCrypterScrypt;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

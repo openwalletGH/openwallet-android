@@ -4,19 +4,19 @@ import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.network.interfaces.TransactionEventListener;
 import com.coinomi.core.protos.Protos;
 import com.coinomi.core.wallet.exceptions.NoSuchPocketException;
-import com.google.bitcoin.core.Address;
-import com.google.bitcoin.core.Coin;
-import com.google.bitcoin.core.InsufficientMoneyException;
-import com.google.bitcoin.core.Transaction;
-import com.google.bitcoin.crypto.DeterministicHierarchy;
-import com.google.bitcoin.crypto.DeterministicKey;
-import com.google.bitcoin.crypto.HDKeyDerivation;
-import com.google.bitcoin.crypto.KeyCrypter;
-import com.google.bitcoin.crypto.MnemonicCode;
-import com.google.bitcoin.crypto.MnemonicException;
-import com.google.bitcoin.store.UnreadableWalletException;
-import com.google.bitcoin.utils.Threading;
-import com.google.bitcoin.wallet.DeterministicSeed;
+import org.bitcoinj.core.Address;
+import org.bitcoinj.core.Coin;
+import org.bitcoinj.core.InsufficientMoneyException;
+import org.bitcoinj.core.Transaction;
+import org.bitcoinj.crypto.DeterministicHierarchy;
+import org.bitcoinj.crypto.DeterministicKey;
+import org.bitcoinj.crypto.HDKeyDerivation;
+import org.bitcoinj.crypto.KeyCrypter;
+import org.bitcoinj.crypto.MnemonicCode;
+import org.bitcoinj.crypto.MnemonicException;
+import org.bitcoinj.store.UnreadableWalletException;
+import org.bitcoinj.utils.Threading;
+import org.bitcoinj.wallet.DeterministicSeed;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
@@ -124,6 +124,18 @@ final public class Wallet {
                     pocket.maybeInitializeAllKeys();
                 }
             }
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Check if pocket exists
+     */
+    public boolean isPocketExists(CoinType coinType) {
+        lock.lock();
+        try {
+            return pockets.containsKey(coinType);
         } finally {
             lock.unlock();
         }
@@ -511,9 +523,9 @@ final public class Wallet {
 
     /**
      * Encrypt the keys in the group using the KeyCrypter and the AES key. A good default KeyCrypter to use is
-     * {@link com.google.bitcoin.crypto.KeyCrypterScrypt}.
+     * {@link org.bitcoinj.crypto.KeyCrypterScrypt}.
      *
-     * @throws com.google.bitcoin.crypto.KeyCrypterException Thrown if the wallet encryption fails for some reason,
+     * @throws org.bitcoinj.crypto.KeyCrypterException Thrown if the wallet encryption fails for some reason,
      *         leaving the group unchanged.
      */
     public void encrypt(KeyCrypter keyCrypter, KeyParameter aesKey) {

@@ -8,12 +8,12 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.coinomi.wallet.Constants;
+import com.coinomi.core.util.GenericUtils;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.util.Fonts;
-import com.coinomi.wallet.util.GenericUtils;
-import com.google.bitcoin.core.Address;
-import com.google.bitcoin.core.Coin;
+
+import org.bitcoinj.core.Address;
+import org.bitcoinj.core.Coin;
 
 /**
  * @author Giannis Dzegoutanis
@@ -60,16 +60,12 @@ public class SendOutput extends LinearLayout {
         });
     }
 
-    public void setAmount(Coin amount) {
-        this.amount.setText(amount.toPlainString());
+    public void setAmount(String amount) {
+        this.amount.setText(amount);
     }
 
     public void setSymbol(String symbol) {
         this.symbol.setText(symbol);
-    }
-
-    public void setAddress(Address address) {
-        setAddress(address.toString());
     }
 
     public void setAddress(String address) {

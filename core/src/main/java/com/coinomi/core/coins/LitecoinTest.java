@@ -1,6 +1,6 @@
 package com.coinomi.core.coins;
 
-import com.google.bitcoin.core.Coin;
+import org.bitcoinj.core.Coin;
 
 /**
  * @author Giannis Dzegoutanis
@@ -20,6 +20,7 @@ public class LitecoinTest extends CoinType {
         bip44Index = 1;
         feePerKb = Coin.valueOf(100000);
         minNonDust = Coin.valueOf(1000);
+        unitExponent = 8;
     }
 
     private static LitecoinTest instance;

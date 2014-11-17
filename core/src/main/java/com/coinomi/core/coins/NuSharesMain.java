@@ -1,6 +1,6 @@
 package com.coinomi.core.coins;
 
-import com.google.bitcoin.core.Coin;
+import org.bitcoinj.core.Coin;
 
 /**
  * @author Giannis Dzegoutanis
@@ -18,8 +18,9 @@ public class NuSharesMain extends CoinType {
         symbol = "NSR";
         uriScheme = "nushares";
         bip44Index = 11;
-        feePerKb = Coin.valueOf(100000000);
-        minNonDust = Coin.valueOf(100000000);
+        feePerKb = Coin.valueOf(10000);
+        minNonDust = Coin.valueOf(10000);
+        unitExponent = 4;
     }
 
     private static NuSharesMain instance;

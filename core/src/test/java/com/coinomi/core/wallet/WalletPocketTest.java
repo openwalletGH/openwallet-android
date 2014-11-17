@@ -8,23 +8,23 @@ import com.coinomi.core.network.ServerClient.UnspentTx;
 import com.coinomi.core.network.interfaces.BlockchainConnection;
 import com.coinomi.core.network.interfaces.TransactionEventListener;
 import com.coinomi.core.protos.Protos;
-import com.google.bitcoin.core.Address;
-import com.google.bitcoin.core.AddressFormatException;
-import com.google.bitcoin.core.ChildMessage;
-import com.google.bitcoin.core.Coin;
-import com.google.bitcoin.core.ECKey;
-import com.google.bitcoin.core.Sha256Hash;
-import com.google.bitcoin.core.Transaction;
-import com.google.bitcoin.core.TransactionInput;
-import com.google.bitcoin.core.TransactionOutput;
-import com.google.bitcoin.core.Utils;
-import com.google.bitcoin.crypto.DeterministicHierarchy;
-import com.google.bitcoin.crypto.DeterministicKey;
-import com.google.bitcoin.crypto.HDKeyDerivation;
-import com.google.bitcoin.crypto.KeyCrypter;
-import com.google.bitcoin.crypto.KeyCrypterScrypt;
-import com.google.bitcoin.utils.BriefLogFormatter;
-import com.google.bitcoin.wallet.DeterministicSeed;
+import org.bitcoinj.core.Address;
+import org.bitcoinj.core.AddressFormatException;
+import org.bitcoinj.core.ChildMessage;
+import org.bitcoinj.core.Coin;
+import org.bitcoinj.core.ECKey;
+import org.bitcoinj.core.Sha256Hash;
+import org.bitcoinj.core.Transaction;
+import org.bitcoinj.core.TransactionInput;
+import org.bitcoinj.core.TransactionOutput;
+import org.bitcoinj.core.Utils;
+import org.bitcoinj.crypto.DeterministicHierarchy;
+import org.bitcoinj.crypto.DeterministicKey;
+import org.bitcoinj.crypto.HDKeyDerivation;
+import org.bitcoinj.crypto.KeyCrypter;
+import org.bitcoinj.crypto.KeyCrypterScrypt;
+import org.bitcoinj.utils.BriefLogFormatter;
+import org.bitcoinj.wallet.DeterministicSeed;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
@@ -66,7 +66,7 @@ public class WalletPocketTest {
     public void setup() {
         BriefLogFormatter.init();
 
-        pocket = new WalletPocket(rootKey, type, null);
+        pocket = new WalletPocket(rootKey, type, null, null);
         pocket.keys.setLookaheadSize(20);
     }
 
@@ -81,7 +81,7 @@ public class WalletPocketTest {
 
     @Test
     public void fillTransactions() throws Exception {
-        pocket.onConnection(getBlockchainConnection());
+        pocket.onConnection(getBlockchainConnection(type));
 
         // Issued keys
         assertEquals(18, pocket.keys.getIssuedExternalKeys());
@@ -113,7 +113,7 @@ public class WalletPocketTest {
 
     @Test
     public void serializeUnencryptedNormal() throws Exception {
-        pocket.onConnection(getBlockchainConnection());
+        pocket.onConnection(getBlockchainConnection(type));
 
         Protos.WalletPocket walletPocketProto = pocket.toProtobuf();
 
@@ -142,7 +142,7 @@ public class WalletPocketTest {
         assertEquals(18, newPocket.keys.getIssuedExternalKeys());
         assertEquals(9, newPocket.keys.getIssuedInternalKeys());
 
-        newPocket.onConnection(getBlockchainConnection());
+        newPocket.onConnection(getBlockchainConnection(type));
 
         // No addresses left to subscribe
         List<Address> addressesToWatch = newPocket.getAddressesToWatch();
@@ -197,7 +197,7 @@ public class WalletPocketTest {
     public void serializeEncryptedNormal() throws Exception {
         pocket.maybeInitializeAllKeys();
         pocket.encrypt(crypter, aesKey);
-        pocket.onConnection(getBlockchainConnection());
+        pocket.onConnection(getBlockchainConnection(type));
 
         assertEquals(Coin.valueOf(11000000000l), pocket.getBalance(true));
 
@@ -237,12 +237,14 @@ public class WalletPocketTest {
      */
     @Test
     public void createTransaction() throws Exception {
-        pocket.onConnection(getBlockchainConnection());
+        pocket.onConnection(getBlockchainConnection(type));
 
         Address toAddr = new Address(type, "nUEkQ3LjH9m4ScbP6NGtnAdnnUsdtWv99Q");
 
         long orgBalance = pocket.getBalance().value;
-        Transaction tx = pocket.sendCoinsOffline(toAddr, Coin.valueOf(AMOUNT_TO_SEND));
+        SendRequest sendRequest = pocket.sendCoinsOffline(toAddr, Coin.valueOf(AMOUNT_TO_SEND));
+        pocket.completeTx(sendRequest);
+        Transaction tx = sendRequest.tx;
 
         Transaction txExpected = new Transaction(type, Utils.HEX.decode(expectedTx));
 
@@ -338,8 +340,10 @@ public class WalletPocketTest {
         final HashMap<Address, ArrayList<UnspentTx>> utxs;
         final HashMap<Address, ArrayList<HistoryTx>> historyTxs;
         final HashMap<Sha256Hash, byte[]> rawTxs;
+        private CoinType coinType;
 
-        MockBlockchainConnection() throws Exception {
+        MockBlockchainConnection(CoinType coinType) throws Exception {
+            this.coinType = coinType;
             statuses = getDummyStatuses();
             utxs = getDummyUTXs();
             historyTxs = getDummyHistoryTXs();
@@ -347,7 +351,7 @@ public class WalletPocketTest {
         }
 
         @Override
-        public void subscribeToAddresses(CoinType coin, List<Address> addresses, TransactionEventListener listener) {
+        public void subscribeToAddresses(List<Address> addresses, TransactionEventListener listener) {
             for (Address a : addresses) {
                 AddressStatus status = statuses.get(a);
                 if (status == null) {
@@ -358,7 +362,7 @@ public class WalletPocketTest {
         }
 
         @Override
-        public void getUnspentTx(CoinType coinType, AddressStatus status, TransactionEventListener listener) {
+        public void getUnspentTx(AddressStatus status, TransactionEventListener listener) {
             List<UnspentTx> utx = utxs.get(status.getAddress());
             if (status == null) {
                 utx = ImmutableList.of();
@@ -367,7 +371,7 @@ public class WalletPocketTest {
         }
 
         @Override
-        public void getHistoryTx(CoinType coinType, AddressStatus status, TransactionEventListener listener) {
+        public void getHistoryTx(AddressStatus status, TransactionEventListener listener) {
             List<HistoryTx> htx = historyTxs.get(status.getAddress());
             if (status == null) {
                 htx = ImmutableList.of();
@@ -376,7 +380,7 @@ public class WalletPocketTest {
         }
 
         @Override
-        public void getTransaction(CoinType coinType, Sha256Hash txHash, TransactionEventListener listener) {
+        public void getTransaction(Sha256Hash txHash, TransactionEventListener listener) {
             Transaction tx = new Transaction(coinType, rawTxs.get(txHash));
             listener.onTransactionUpdate(tx);
         }
@@ -387,7 +391,7 @@ public class WalletPocketTest {
 //        }
 
         @Override
-        public void broadcastTx(CoinType coinType, Transaction tx, TransactionEventListener listener) {
+        public void broadcastTx(Transaction tx, TransactionEventListener listener) {
             List<AddressStatus> newStatuses = new ArrayList<AddressStatus>();
             // Get spent outputs and modify statuses
             for (TransactionInput txi : tx.getInputs()) {
@@ -436,8 +440,8 @@ public class WalletPocketTest {
         public void ping() {}
     }
 
-    private MockBlockchainConnection getBlockchainConnection() throws Exception {
-        return new MockBlockchainConnection();
+    private MockBlockchainConnection getBlockchainConnection(CoinType coinType) throws Exception {
+        return new MockBlockchainConnection(coinType);
     }
 
     // Mock data

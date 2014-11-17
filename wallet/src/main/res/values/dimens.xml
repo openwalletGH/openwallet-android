@@ -24,7 +24,7 @@
     <dimen name="amount_text_size">32sp</dimen>
     <dimen name="amount_pending_text_size">24sp</dimen>
     <dimen name="amount_symbol_text_size">24sp</dimen>
-    <dimen name="progress_symbol_size">18dp</dimen>
+    <dimen name="connectivity_symbol_size">18dp</dimen>
 
     <!-- SendOutput Widget -->
     <dimen name="send_output_amount_text_size">24sp</dimen>

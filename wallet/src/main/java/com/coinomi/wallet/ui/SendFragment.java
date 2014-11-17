@@ -21,18 +21,18 @@ import android.widget.Toast;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.uri.CoinURI;
 import com.coinomi.core.uri.CoinURIParseException;
+import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.SendRequest;
 import com.coinomi.core.wallet.WalletPocket;
 import com.coinomi.core.wallet.exceptions.NoSuchPocketException;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.ui.widget.QrCodeButton;
-import com.coinomi.wallet.util.GenericUtils;
-import com.google.bitcoin.core.Address;
-import com.google.bitcoin.core.AddressFormatException;
-import com.google.bitcoin.core.Coin;
-import com.google.bitcoin.core.InsufficientMoneyException;
-import com.google.bitcoin.crypto.KeyCrypterException;
+import org.bitcoinj.core.Address;
+import org.bitcoinj.core.AddressFormatException;
+import org.bitcoinj.core.Coin;
+import org.bitcoinj.core.InsufficientMoneyException;
+import org.bitcoinj.crypto.KeyCrypterException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -258,7 +258,7 @@ public class SendFragment extends Fragment {
                 SendFragment.this.address = address;
                 sendToAddressView.setText(address.toString());
                 if (isAmountValid(amount)) {
-                    sendAmountView.setText(amount.toPlainString());
+                    sendAmountView.setText(GenericUtils.formatValue(coinType, amount));
                     sendAmount = amount;
                 }
                 requestFocusFirst();
@@ -285,7 +285,7 @@ public class SendFragment extends Fragment {
     }
 
     private boolean isAmountValid(Coin amount) {
-        return amount != null && amount.signum() > 0;
+        return amount != null && amount.isPositive();
     }
 
     private boolean everythingValid() {
@@ -314,7 +314,7 @@ public class SendFragment extends Fragment {
         try {
             final String amountStr = sendAmountView.getText().toString().trim();
             if (!amountStr.isEmpty()) {
-                Coin amount = Coin.parseCoin(amountStr);
+                Coin amount = GenericUtils.parseCoin(coinType, amountStr);
                 if (isAmountValid(amount)) {
                     // TODO, check if we have the available amount in the wallet
                     sendAmount = amount;
@@ -325,14 +325,6 @@ public class SendFragment extends Fragment {
                 sendAmount = null;
             }
             amountError.setVisibility(View.GONE);
-//  TODO, remove when https://github.com/bitcoinj/bitcoinj/pull/254 is merged
-        } catch (ArithmeticException e) {
-            if (!isTyping) {
-                sendAmount = null;
-                amountError.setText(R.string.amount_error);
-                amountError.setVisibility(View.VISIBLE);
-            }
-//  TODO, remove when https://github.com/bitcoinj/bitcoinj/pull/254 is merged
         } catch (IllegalArgumentException ignore) {
             if (!isTyping) {
                 sendAmount = null;
@@ -390,10 +382,11 @@ public class SendFragment extends Fragment {
             pocket.completeTx(req);
             checkState(req.tx.getOutputs().size() == 1);
             //TODO if using different units, don't use toPlainString
-            sendAmountView.setText(req.tx.getOutput(0).getValue().toPlainString());
+            Coin value = req.tx.getOutput(0).getValue();
+            sendAmountView.setText(GenericUtils.formatValue(coinType, value));
             validateAmount();
         } catch (InsufficientMoneyException ignore) {
-        } catch (com.google.bitcoin.core.Wallet.CouldNotAdjustDownwards ignore) {
+        } catch (org.bitcoinj.core.Wallet.CouldNotAdjustDownwards ignore) {
             // This happens when there are no money and the user wants to empty the wallet
             Toast.makeText(getActivity(), R.string.send_coins_error_not_enough_money,
                     Toast.LENGTH_LONG).show();

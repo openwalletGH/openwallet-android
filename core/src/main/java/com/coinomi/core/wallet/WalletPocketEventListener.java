@@ -1,7 +1,7 @@
 package com.coinomi.core.wallet;
 
-import com.google.bitcoin.core.*;
-import com.google.bitcoin.core.Wallet;
+import org.bitcoinj.core.*;
+import org.bitcoinj.core.Wallet;
 
 /**
  * @author Giannis Dzegoutanis
@@ -13,4 +13,6 @@ public interface WalletPocketEventListener {
     void onTransactionConfidenceChanged(WalletPocket pocket, Transaction tx);
 
     void onPocketChanged(final WalletPocket pocket);
+
+    void onConnectivityStatus(final WalletPocketConnectivity pocketConnectivity);
 }

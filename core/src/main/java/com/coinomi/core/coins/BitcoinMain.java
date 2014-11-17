@@ -1,6 +1,6 @@
 package com.coinomi.core.coins;
 
-import com.google.bitcoin.core.Coin;
+import org.bitcoinj.core.Coin;
 
 /**
  * @author Giannis Dzegoutanis
@@ -20,6 +20,7 @@ public class BitcoinMain extends CoinType {
         bip44Index = 0;
         feePerKb = Coin.valueOf(10000);
         minNonDust = Coin.valueOf(5460);
+        unitExponent = 8;
     }
 
     private static BitcoinMain instance;

@@ -150,14 +150,19 @@ final public class WalletActivity extends ActionBarActivity implements
 
                 try {
                     final CoinURI coinUri = new CoinURI(input);
+                    CoinType scannedType = coinUri.getType();
 
-                    if (!Constants.SUPPORTED_COINS.contains(coinUri.getType())) {
-                        throw new CoinURIParseException("Unsupported coin " + coinUri.getType().getName());
+                    if (!Constants.SUPPORTED_COINS.contains(scannedType)) {
+                        String error = getResources().getString(R.string.unsupported_coin, scannedType.getName());
+                        throw new CoinURIParseException(error);
+                    } else if (!getWalletApplication().isPocketExists(scannedType)) {
+                        String error = getResources().getString(R.string.coin_not_added, scannedType.getName());
+                        throw new CoinURIParseException(error);
                     }
 
                     setSendFromCoin(coinUri);
-                } catch (final CoinURIParseException x) {
-                    String error = getResources().getString(R.string.uri_error, x.getMessage());
+                } catch (final CoinURIParseException e) {
+                    String error = getResources().getString(R.string.uri_error, e.getMessage());
                     Toast.makeText(this, error, Toast.LENGTH_LONG).show();
                 }
             }

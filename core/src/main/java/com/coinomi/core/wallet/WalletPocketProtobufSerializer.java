@@ -20,20 +20,21 @@ package com.coinomi.core.wallet;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.network.AddressStatus;
 import com.coinomi.core.protos.Protos;
-import com.google.bitcoin.core.Address;
-import com.google.bitcoin.core.AddressFormatException;
-import com.google.bitcoin.core.Coin;
-import com.google.bitcoin.core.PeerAddress;
-import com.google.bitcoin.core.Sha256Hash;
-import com.google.bitcoin.core.Transaction;
-import com.google.bitcoin.core.TransactionConfidence;
-import com.google.bitcoin.core.TransactionConfidence.ConfidenceType;
-import com.google.bitcoin.core.TransactionInput;
-import com.google.bitcoin.core.TransactionOutPoint;
-import com.google.bitcoin.core.TransactionOutput;
-import com.google.bitcoin.crypto.KeyCrypter;
-import com.google.bitcoin.store.UnreadableWalletException;
-import com.google.bitcoin.wallet.WalletTransaction;
+import org.bitcoinj.core.Address;
+import org.bitcoinj.core.AddressFormatException;
+import org.bitcoinj.core.Coin;
+import org.bitcoinj.core.PeerAddress;
+import org.bitcoinj.core.Sha256Hash;
+import org.bitcoinj.core.Transaction;
+import org.bitcoinj.core.TransactionConfidence;
+import org.bitcoinj.core.TransactionConfidence.ConfidenceType;
+import org.bitcoinj.core.TransactionInput;
+import org.bitcoinj.core.TransactionOutPoint;
+import org.bitcoinj.core.TransactionOutput;
+import org.bitcoinj.crypto.KeyCrypter;
+import org.bitcoinj.params.Networks;
+import org.bitcoinj.store.UnreadableWalletException;
+import org.bitcoinj.wallet.WalletTransaction;
 import com.google.common.collect.Lists;
 import com.google.protobuf.ByteString;
 
@@ -108,6 +109,10 @@ public class WalletPocketProtobufSerializer {
         txBuilder.setPool(getProtoPool(wtx))
                 .setHash(hashToByteString(tx.getHash()))
                 .setVersion((int) tx.getVersion());
+
+        if (Networks.getFamily(tx.getParams()) == Networks.Family.PEERCOIN) {
+            txBuilder.setTime((int) tx.getTime());
+        }
 
         if (tx.getUpdateTime() != null) {
             txBuilder.setUpdatedAt(tx.getUpdateTime().getTime());
@@ -298,6 +303,11 @@ public class WalletPocketProtobufSerializer {
 
     private void readTransaction(Protos.Transaction txProto, CoinType params) throws UnreadableWalletException {
         Transaction tx = new Transaction(params);
+
+        if (Networks.getFamily(params) == Networks.Family.PEERCOIN) {
+            tx.setTime(txProto.getTime());
+        }
+
         if (txProto.hasUpdatedAt()) {
             tx.setUpdateTime(new Date(txProto.getUpdatedAt()));
         }

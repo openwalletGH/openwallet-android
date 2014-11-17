@@ -1,6 +1,6 @@
 package com.coinomi.core.coins;
 
-import com.google.bitcoin.core.Coin;
+import org.bitcoinj.core.Coin;
 
 /**
  * @author Giannis Dzegoutanis
@@ -20,6 +20,7 @@ public class DogecoinTest extends CoinType {
         bip44Index = 1;
         feePerKb = Coin.valueOf(100000000L);
         minNonDust = Coin.SATOSHI; // Dogecoin doesn't have dust detection (src. ref client)
+        unitExponent = 8;
     }
 
     private static DogecoinTest instance;

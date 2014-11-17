@@ -17,7 +17,7 @@ package com.coinomi.core.wallet;
  * limitations under the License.
  */
 
-import com.google.bitcoin.utils.Threading;
+import org.bitcoinj.utils.Threading;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

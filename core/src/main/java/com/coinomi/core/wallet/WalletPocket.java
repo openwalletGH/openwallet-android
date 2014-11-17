@@ -26,38 +26,39 @@ import com.coinomi.core.network.interfaces.BlockchainConnection;
 import com.coinomi.core.network.interfaces.ConnectionEventListener;
 import com.coinomi.core.network.interfaces.TransactionEventListener;
 import com.coinomi.core.protos.Protos;
-import com.google.bitcoin.core.Address;
-import com.google.bitcoin.core.Coin;
-import com.google.bitcoin.core.ECKey;
-import com.google.bitcoin.core.InsufficientMoneyException;
-import com.google.bitcoin.core.NetworkParameters;
-import com.google.bitcoin.core.ScriptException;
-import com.google.bitcoin.core.Sha256Hash;
-import com.google.bitcoin.core.Transaction;
-import com.google.bitcoin.core.TransactionBag;
-import com.google.bitcoin.core.TransactionConfidence;
-import com.google.bitcoin.core.TransactionConfidence.ConfidenceType;
-import com.google.bitcoin.core.TransactionInput;
-import com.google.bitcoin.core.TransactionInput.ConnectMode;
-import com.google.bitcoin.core.TransactionInput.ConnectionResult;
-import com.google.bitcoin.core.TransactionOutput;
-import com.google.bitcoin.core.VarInt;
-import com.google.bitcoin.crypto.DeterministicKey;
-import com.google.bitcoin.crypto.KeyCrypter;
-import com.google.bitcoin.script.Script;
-import com.google.bitcoin.signers.LocalTransactionSigner;
-import com.google.bitcoin.signers.MissingSigResolutionSigner;
-import com.google.bitcoin.signers.TransactionSigner;
-import com.google.bitcoin.utils.ListenerRegistration;
-import com.google.bitcoin.utils.Threading;
-import com.google.bitcoin.wallet.CoinSelection;
-import com.google.bitcoin.wallet.CoinSelector;
-import com.google.bitcoin.wallet.DecryptingKeyBag;
-import com.google.bitcoin.wallet.DefaultCoinSelector;
-import com.google.bitcoin.wallet.KeyBag;
-import com.google.bitcoin.wallet.RedeemData;
-import com.google.bitcoin.wallet.WalletTransaction;
-import com.google.bitcoin.wallet.WalletTransaction.Pool;
+import org.bitcoinj.core.Address;
+import org.bitcoinj.core.Coin;
+import org.bitcoinj.core.ECKey;
+import org.bitcoinj.core.InsufficientMoneyException;
+import org.bitcoinj.core.NetworkParameters;
+import org.bitcoinj.core.ScriptException;
+import org.bitcoinj.core.Sha256Hash;
+import org.bitcoinj.core.Transaction;
+import org.bitcoinj.core.TransactionBag;
+import org.bitcoinj.core.TransactionConfidence;
+import org.bitcoinj.core.TransactionConfidence.ConfidenceType;
+import org.bitcoinj.core.TransactionInput;
+import org.bitcoinj.core.TransactionInput.ConnectMode;
+import org.bitcoinj.core.TransactionInput.ConnectionResult;
+import org.bitcoinj.core.TransactionOutput;
+import org.bitcoinj.core.Utils;
+import org.bitcoinj.core.VarInt;
+import org.bitcoinj.crypto.DeterministicKey;
+import org.bitcoinj.crypto.KeyCrypter;
+import org.bitcoinj.script.Script;
+import org.bitcoinj.signers.LocalTransactionSigner;
+import org.bitcoinj.signers.MissingSigResolutionSigner;
+import org.bitcoinj.signers.TransactionSigner;
+import org.bitcoinj.utils.ListenerRegistration;
+import org.bitcoinj.utils.Threading;
+import org.bitcoinj.wallet.CoinSelection;
+import org.bitcoinj.wallet.CoinSelector;
+import org.bitcoinj.wallet.DecryptingKeyBag;
+import org.bitcoinj.wallet.DefaultCoinSelector;
+import org.bitcoinj.wallet.KeyBag;
+import org.bitcoinj.wallet.RedeemData;
+import org.bitcoinj.wallet.WalletTransaction;
+import org.bitcoinj.wallet.WalletTransaction.Pool;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -552,6 +553,19 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
     public boolean isConnected() {
         return blockchainConnection != null;
     }
+    public WalletPocketConnectivity getConnectivityStatus() {
+        if (!isConnected()) {
+            return WalletPocketConnectivity.DISCONNECTED;
+        } else {
+            // If nothing pending, we are just CONNECTED
+            if (addressesPendingSubscription.isEmpty() && statusPendingUpdates.isEmpty() && fetchingTransactions.isEmpty()) {
+                return WalletPocketConnectivity.CONNECTED;
+            } else {
+                // TODO support WORKING state, for now is just CONNECTED
+                return WalletPocketConnectivity.CONNECTED;
+            }
+        }
+    }
 
     //endregion
 
@@ -1035,12 +1049,14 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
         this.blockchainConnection = blockchainConnection;
         clearTransientState();
         subscribeIfNeeded();
+        queueOnConnectivity();
     }
 
     @Override
     public void onDisconnect() {
         blockchainConnection = null;
         clearTransientState();
+        queueOnConnectivity();
     }
 
     private void subscribeIfNeeded() {
@@ -1096,6 +1112,18 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
                 public void run() {
                     registration.listener.onNewBalance(balance, pendingBalance);
                     registration.listener.onPocketChanged(WalletPocket.this);
+                }
+            });
+        }
+    }
+
+    private void queueOnConnectivity() {
+        final WalletPocketConnectivity connectivity = getConnectivityStatus();
+        for (final ListenerRegistration<WalletPocketEventListener> registration : listeners) {
+            registration.executor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    registration.listener.onConnectivityStatus(connectivity);
                 }
             });
         }
@@ -1168,9 +1196,9 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
 
     /**
      * Encrypt the keys in the group using the KeyCrypter and the AES key. A good default KeyCrypter to use is
-     * {@link com.google.bitcoin.crypto.KeyCrypterScrypt}.
+     * {@link org.bitcoinj.crypto.KeyCrypterScrypt}.
      *
-     * @throws com.google.bitcoin.crypto.KeyCrypterException Thrown if the wallet encryption fails for some reason,
+     * @throws org.bitcoinj.crypto.KeyCrypterException Thrown if the wallet encryption fails for some reason,
      *         leaving the group unchanged.
      */
     public void encrypt(KeyCrypter keyCrypter, KeyParameter aesKey) {
@@ -1187,9 +1215,9 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
 
     /**
      * Decrypt the keys in the group using the previously given key crypter and the AES key. A good default
-     * KeyCrypter to use is {@link com.google.bitcoin.crypto.KeyCrypterScrypt}.
+     * KeyCrypter to use is {@link org.bitcoinj.crypto.KeyCrypterScrypt}.
      *
-     * @throws com.google.bitcoin.crypto.KeyCrypterException Thrown if the wallet decryption fails for some reason, leaving the group unchanged.
+     * @throws org.bitcoinj.crypto.KeyCrypterException Thrown if the wallet decryption fails for some reason, leaving the group unchanged.
      */
     /* package */ void decrypt(KeyParameter aesKey) {
         checkNotNull(aesKey);
@@ -1327,7 +1355,7 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
                 for (TransactionOutput output : req.tx.getOutputs())
                     if (output.getValue().compareTo(Coin.CENT) < 0) {
                         if (output.getValue().compareTo(output.getMinNonDustValue(coinType.getFeePerKb().multiply(3))) < 0)
-                            throw new com.google.bitcoin.core.Wallet.DustySendRequested();
+                            throw new org.bitcoinj.core.Wallet.DustySendRequested();
                         needAtLeastReferenceFee = true;
                         break;
                     }
@@ -1367,7 +1395,7 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
                 final Coin feePerKb = req.feePerKb == null ? Coin.ZERO : req.feePerKb;
                 Transaction tx = req.tx;
                 if (!adjustOutputDownwardsForFee(tx, bestCoinSelection, baseFee, feePerKb))
-                    throw new com.google.bitcoin.core.Wallet.CouldNotAdjustDownwards();
+                    throw new org.bitcoinj.core.Wallet.CouldNotAdjustDownwards();
             }
 
             if (bestChangeOutput != null) {
@@ -1387,7 +1415,7 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
             // Check size.
             int size = req.tx.bitcoinSerialize().length;
             if (size > Transaction.MAX_STANDARD_TX_SIZE)
-                throw new com.google.bitcoin.core.Wallet.ExceededMaxTransactionSize();
+                throw new org.bitcoinj.core.Wallet.ExceededMaxTransactionSize();
 
             final Coin calculatedFee = req.tx.getFee();
             if (calculatedFee != null) {
@@ -1413,7 +1441,7 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
     /**
      * <p>Given a send request containing transaction, attempts to sign it's inputs. This method expects transaction
      * to have all necessary inputs connected or they will be ignored.</p>
-     * <p>Actual signing is done by pluggable {@link com.google.bitcoin.signers.LocalTransactionSigner}
+     * <p>Actual signing is done by pluggable {@link org.bitcoinj.signers.LocalTransactionSigner}
      * and it's not guaranteed that transaction will be complete in the end.</p>
      */
     public void signTransaction(SendRequest req) {
@@ -1474,7 +1502,7 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
         lock.lock();
         try {
             LinkedList<TransactionOutput> candidates = Lists.newLinkedList();
-            for (Transaction tx : Iterables.concat(unspent.values(), pending.values())) {
+            for (Transaction tx : unspent.values()) {
                 // Do not try and spend coinbases that were mined too recently, the protocol forbids it.
                 if (excludeImmatureCoinbases && !tx.isMature()) continue;
                 for (TransactionOutput output : tx.getOutputs()) {
@@ -1487,6 +1515,7 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
             for (Transaction pendingTx : pending.values()) {
                 for (TransactionInput input : pendingTx.getInputs()) {
                     Transaction tx = transactions.get(input.getOutpoint().getHash());
+                    if (tx ==  null) continue;
                     TransactionOutput pendingSpentOutput = tx.getOutput((int) input.getOutpoint().getIndex());
                     candidates.remove(pendingSpentOutput);
                 }

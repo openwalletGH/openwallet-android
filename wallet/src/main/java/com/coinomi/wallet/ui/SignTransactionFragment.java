@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
+import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.SendRequest;
 import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.wallet.WalletPocket;
@@ -18,9 +19,9 @@ import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.ui.widget.SendOutput;
 import com.coinomi.wallet.util.Keyboard;
-import com.google.bitcoin.core.InsufficientMoneyException;
-import com.google.bitcoin.core.TransactionOutput;
-import com.google.bitcoin.crypto.KeyCrypter;
+import org.bitcoinj.core.InsufficientMoneyException;
+import org.bitcoinj.core.TransactionOutput;
+import org.bitcoinj.crypto.KeyCrypter;
 
 import javax.annotation.Nullable;
 
@@ -69,8 +70,6 @@ public class SignTransactionFragment extends Fragment {
         final EditText passwordView = (EditText) view.findViewById(R.id.password);
         if (application.getWallet() != null && application.getWallet().isEncrypted()) {
             passwordView.requestFocus();
-            // FIXME causes problems in older Androids
-//            Keyboard.focusAndShowKeyboard(passwordView, getActivity());
         } else {
             passwordView.setVisibility(View.GONE);
         }
@@ -83,9 +82,9 @@ public class SignTransactionFragment extends Fragment {
         String symbol = request.type.getSymbol();
         checkState(request.tx.getOutputs().size() == 1, "Only one output is supported at the moment.");
         for (TransactionOutput txo : request.tx.getOutputs()) {
-            output.setAmount(txo.getValue());
+            output.setAmount(GenericUtils.formatValue(request.type, txo.getValue()));
             output.setSymbol(symbol);
-            output.setAddress(txo.getScriptPubKey().getToAddress(request.type));
+            output.setAddress(txo.getScriptPubKey().getToAddress(request.type).toString());
         }
         // TODO handle in a task onCreate
         request.signInputs = false;
@@ -99,7 +98,7 @@ public class SignTransactionFragment extends Fragment {
         }
 
         fee.setVisibility(View.VISIBLE);
-        fee.setAmount(request.tx.getFee());
+        fee.setAmount(GenericUtils.formatValue(request.type, request.tx.getFee()));
         fee.setSymbol(symbol);
 
         view.findViewById(R.id.button_confirm).setOnClickListener(new View.OnClickListener() {

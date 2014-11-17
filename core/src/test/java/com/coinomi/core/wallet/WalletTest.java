@@ -6,10 +6,10 @@ import com.coinomi.core.coins.DogecoinMain;
 import com.coinomi.core.coins.DogecoinTest;
 import com.coinomi.core.coins.LitecoinMain;
 import com.coinomi.core.protos.Protos;
-import com.google.bitcoin.crypto.KeyCrypter;
-import com.google.bitcoin.crypto.KeyCrypterScrypt;
-import com.google.bitcoin.crypto.MnemonicException;
-import com.google.bitcoin.utils.BriefLogFormatter;
+import org.bitcoinj.crypto.KeyCrypter;
+import org.bitcoinj.crypto.KeyCrypterScrypt;
+import org.bitcoinj.crypto.MnemonicException;
+import org.bitcoinj.utils.BriefLogFormatter;
 import com.google.common.collect.ImmutableList;
 
 import org.junit.Before;

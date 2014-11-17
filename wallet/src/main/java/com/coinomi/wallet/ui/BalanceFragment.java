@@ -23,7 +23,9 @@ import android.widget.Toast;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.uri.CoinURI;
 import com.coinomi.core.uri.CoinURIParseException;
+import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.WalletPocket;
+import com.coinomi.core.wallet.WalletPocketConnectivity;
 import com.coinomi.core.wallet.WalletPocketEventListener;
 import com.coinomi.core.wallet.exceptions.NoSuchPocketException;
 import com.coinomi.wallet.Constants;
@@ -31,13 +33,13 @@ import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.ui.widget.Amount;
 import com.coinomi.wallet.util.ThrottlingWalletChangeListener;
-import com.google.bitcoin.core.Address;
-import com.google.bitcoin.core.Coin;
-import com.google.bitcoin.core.InsufficientMoneyException;
-import com.google.bitcoin.core.Transaction;
-import com.google.bitcoin.core.TransactionConfidence;
-import com.google.bitcoin.crypto.KeyCrypterException;
-import com.google.bitcoin.utils.Threading;
+import org.bitcoinj.core.Address;
+import org.bitcoinj.core.Coin;
+import org.bitcoinj.core.InsufficientMoneyException;
+import org.bitcoinj.core.Transaction;
+import org.bitcoinj.core.TransactionConfidence;
+import org.bitcoinj.crypto.KeyCrypterException;
+import org.bitcoinj.utils.Threading;
 import com.google.common.collect.Lists;
 
 import org.slf4j.Logger;
@@ -64,6 +66,9 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
     private static final String COIN_TYPE = "coin_type";
     private static final int NEW_BALANCE = 0;
     private static final int PENDING = 1;
+    private static final int CONNECTIVITY = 2;
+    private static final int AMOUNT_PRECISION = 8;
+    private static final int AMOUNT_SHIFT = 0;
 
     Handler handler = new Handler() {
         @Override
@@ -74,6 +79,10 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
                     break;
                 case PENDING:
                     setPending((Coin) msg.obj);
+                    break;
+                case CONNECTIVITY:
+                    setConnectivityStatus((WalletPocketConnectivity) msg.obj);
+                    break;
             }
         }
     };
@@ -86,6 +95,7 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
     private LoaderManager loaderManager;
     private View emptyPocketMessage;
     private NavigationDrawerFragment mNavigationDrawerFragment;
+    private Amount mainAmount;
 
     /**
      * Use this factory method to create a new instance of
@@ -162,10 +172,13 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
 //            }
 //        });
 
+        mainAmount = (Amount) view.findViewById(R.id.main_amount);
+
         // Subscribe and update the amount
         pocket.addEventListener(this);
-        updateBalance(pocket.getBalance(), view);
-        setPending(pocket.getPendingBalance(), view);
+        updateBalance(pocket.getBalance());
+        setPending(pocket.getPendingBalance());
+        setConnectivityStatus(pocket.getConnectivityStatus());
 
         return view;
     }
@@ -199,15 +212,16 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
         }
     }
 
-    private void updateBalance(Coin newBalance) {
-        updateBalance(newBalance, getView());
+    @Override
+    public void onConnectivityStatus(WalletPocketConnectivity pocketConnectivity) {
+        handler.sendMessage(handler.obtainMessage(CONNECTIVITY, pocketConnectivity));
     }
 
-    private void updateBalance(Coin newBalance, View view) {
-        if (view != null) {
-            Amount mainAmount = (Amount) view.findViewById(R.id.main_amount);
-            mainAmount.setAmount(newBalance);
-            mainAmount.setSymbol(type.getSymbol());
+    private void updateBalance(Coin newBalance) {
+        String newBalanceStr = GenericUtils.formatValue(type, newBalance,
+                AMOUNT_PRECISION, AMOUNT_SHIFT);
+        mainAmount.setAmount(newBalanceStr);
+        mainAmount.setSymbol(type.getSymbol());
 
 //            Amount btcAmount = (Amount) view.findViewById(R.id.amount_btc);
 //            btcAmount.setAmount(Coin.ZERO);
@@ -224,18 +238,20 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
 //            Amount cnyAmount = (Amount) view.findViewById(R.id.amount_cny);
 //            cnyAmount.setAmount(Coin.ZERO);
 //            cnyAmount.setSymbol(Cny.get().getSymbol());
-        }
     }
 
     private void setPending(Coin pendingAmount) {
-        setPending(pendingAmount, getView());
+        if (pendingAmount.isZero()) {
+            mainAmount.setAmountPending(null);
+        } else {
+            String pendingAmountStr = GenericUtils.formatValue(type, pendingAmount,
+                    AMOUNT_PRECISION, AMOUNT_SHIFT);
+            mainAmount.setAmountPending(pendingAmountStr);
+        }
     }
 
-    private void setPending(Coin pendingAmount, View view) {
-        if (view != null) {
-            Amount mainAmount = (Amount) view.findViewById(R.id.main_amount);
-            mainAmount.setAmountPending(pendingAmount);
-        }
+    private void setConnectivityStatus(WalletPocketConnectivity connectivity) {
+        mainAmount.setConnectivity(connectivity);
     }
 
     private final ThrottlingWalletChangeListener transactionChangeListener = new ThrottlingWalletChangeListener() {

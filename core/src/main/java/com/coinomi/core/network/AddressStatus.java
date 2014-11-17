@@ -1,8 +1,8 @@
 package com.coinomi.core.network;
 
-import com.google.bitcoin.core.Address;
-import com.google.bitcoin.core.Sha256Hash;
-import com.google.bitcoin.core.Transaction;
+import org.bitcoinj.core.Address;
+import org.bitcoinj.core.Sha256Hash;
+import org.bitcoinj.core.Transaction;
 import com.google.common.collect.Sets;
 
 import java.util.ArrayList;

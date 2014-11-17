@@ -8,10 +8,10 @@ public final class Protos {
   public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistry registry) {
   }
-  public interface PeerAddressOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
+  public interface PeerAddressOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:com.coinomi.core.protos.PeerAddress)
+      com.google.protobuf.MessageOrBuilder {
 
-    // required bytes ip_address = 1;
     /**
      * <code>required bytes ip_address = 1;</code>
      */
@@ -21,7 +21,6 @@ public final class Protos {
      */
     com.google.protobuf.ByteString getIpAddress();
 
-    // required uint32 port = 2;
     /**
      * <code>required uint32 port = 2;</code>
      */
@@ -31,7 +30,6 @@ public final class Protos {
      */
     int getPort();
 
-    // required uint64 services = 3;
     /**
      * <code>required uint64 services = 3;</code>
      */
@@ -45,8 +43,9 @@ public final class Protos {
    * Protobuf type {@code com.coinomi.core.protos.PeerAddress}
    */
   public static final class PeerAddress extends
-      com.google.protobuf.GeneratedMessage
-      implements PeerAddressOrBuilder {
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:com.coinomi.core.protos.PeerAddress)
+      PeerAddressOrBuilder {
     // Use PeerAddress.newBuilder() to construct.
     private PeerAddress(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
@@ -147,7 +146,6 @@ public final class Protos {
     }
 
     private int bitField0_;
-    // required bytes ip_address = 1;
     public static final int IP_ADDRESS_FIELD_NUMBER = 1;
     private com.google.protobuf.ByteString ipAddress_;
     /**
@@ -163,7 +161,6 @@ public final class Protos {
       return ipAddress_;
     }
 
-    // required uint32 port = 2;
     public static final int PORT_FIELD_NUMBER = 2;
     private int port_;
     /**
@@ -179,7 +176,6 @@ public final class Protos {
       return port_;
     }
 
-    // required uint64 services = 3;
     public static final int SERVICES_FIELD_NUMBER = 3;
     private long services_;
     /**
@@ -203,7 +199,8 @@ public final class Protos {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
 
       if (!hasIpAddress()) {
         memoizedIsInitialized = 0;
@@ -336,8 +333,9 @@ public final class Protos {
      * Protobuf type {@code com.coinomi.core.protos.PeerAddress}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements com.coinomi.core.protos.Protos.PeerAddressOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:com.coinomi.core.protos.PeerAddress)
+        com.coinomi.core.protos.Protos.PeerAddressOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return com.coinomi.core.protos.Protos.internal_static_com_coinomi_core_protos_PeerAddress_descriptor;
@@ -480,7 +478,6 @@ public final class Protos {
       }
       private int bitField0_;
 
-      // required bytes ip_address = 1;
       private com.google.protobuf.ByteString ipAddress_ = com.google.protobuf.ByteString.EMPTY;
       /**
        * <code>required bytes ip_address = 1;</code>
@@ -516,7 +513,6 @@ public final class Protos {
         return this;
       }
 
-      // required uint32 port = 2;
       private int port_ ;
       /**
        * <code>required uint32 port = 2;</code>
@@ -549,7 +545,6 @@ public final class Protos {
         return this;
       }
 
-      // required uint64 services = 3;
       private long services_ ;
       /**
        * <code>required uint64 services = 3;</code>
@@ -593,10 +588,10 @@ public final class Protos {
     // @@protoc_insertion_point(class_scope:com.coinomi.core.protos.PeerAddress)
   }
 
-  public interface EncryptedDataOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
+  public interface EncryptedDataOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:com.coinomi.core.protos.EncryptedData)
+      com.google.protobuf.MessageOrBuilder {
 
-    // required bytes initialisation_vector = 1;
     /**
      * <code>required bytes initialisation_vector = 1;</code>
      *
@@ -614,7 +609,6 @@ public final class Protos {
      */
     com.google.protobuf.ByteString getInitialisationVector();
 
-    // required bytes encrypted_private_key = 2;
     /**
      * <code>required bytes encrypted_private_key = 2;</code>
      *
@@ -636,8 +630,9 @@ public final class Protos {
    * Protobuf type {@code com.coinomi.core.protos.EncryptedData}
    */
   public static final class EncryptedData extends
-      com.google.protobuf.GeneratedMessage
-      implements EncryptedDataOrBuilder {
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:com.coinomi.core.protos.EncryptedData)
+      EncryptedDataOrBuilder {
     // Use EncryptedData.newBuilder() to construct.
     private EncryptedData(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
@@ -733,7 +728,6 @@ public final class Protos {
     }
 
     private int bitField0_;
-    // required bytes initialisation_vector = 1;
     public static final int INITIALISATION_VECTOR_FIELD_NUMBER = 1;
     private com.google.protobuf.ByteString initialisationVector_;
     /**
@@ -757,7 +751,6 @@ public final class Protos {
       return initialisationVector_;
     }
 
-    // required bytes encrypted_private_key = 2;
     public static final int ENCRYPTED_PRIVATE_KEY_FIELD_NUMBER = 2;
     private com.google.protobuf.ByteString encryptedPrivateKey_;
     /**
@@ -788,7 +781,8 @@ public final class Protos {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
 
       if (!hasInitialisationVector()) {
         memoizedIsInitialized = 0;
@@ -910,8 +904,9 @@ public final class Protos {
      * Protobuf type {@code com.coinomi.core.protos.EncryptedData}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements com.coinomi.core.protos.Protos.EncryptedDataOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:com.coinomi.core.protos.EncryptedData)
+        com.coinomi.core.protos.Protos.EncryptedDataOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return com.coinomi.core.protos.Protos.internal_static_com_coinomi_core_protos_EncryptedData_descriptor;
@@ -1041,7 +1036,6 @@ public final class Protos {
       }
       private int bitField0_;
 
-      // required bytes initialisation_vector = 1;
       private com.google.protobuf.ByteString initialisationVector_ = com.google.protobuf.ByteString.EMPTY;
       /**
        * <code>required bytes initialisation_vector = 1;</code>
@@ -1093,7 +1087,6 @@ public final class Protos {
         return this;
       }
 
-      // required bytes encrypted_private_key = 2;
       private com.google.protobuf.ByteString encryptedPrivateKey_ = com.google.protobuf.ByteString.EMPTY;
       /**
        * <code>required bytes encrypted_private_key = 2;</code>
@@ -1156,10 +1149,10 @@ public final class Protos {
     // @@protoc_insertion_point(class_scope:com.coinomi.core.protos.EncryptedData)
   }
 
-  public interface DeterministicKeyOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
+  public interface DeterministicKeyOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:com.coinomi.core.protos.DeterministicKey)
+      com.google.protobuf.MessageOrBuilder {
 
-    // required bytes chain_code = 1;
     /**
      * <code>required bytes chain_code = 1;</code>
      *
@@ -1179,7 +1172,6 @@ public final class Protos {
      */
     com.google.protobuf.ByteString getChainCode();
 
-    // repeated uint32 path = 2;
     /**
      * <code>repeated uint32 path = 2;</code>
      *
@@ -1208,7 +1200,6 @@ public final class Protos {
      */
     int getPath(int index);
 
-    // optional uint32 issued_subkeys = 3;
     /**
      * <code>optional uint32 issued_subkeys = 3;</code>
      *
@@ -1217,7 +1208,6 @@ public final class Protos {
      * For the parents of keys being handed out, this is always less than the true number of children: the difference is
      * called the lookahead zone. These keys are put into Bloom filters so we can spot transactions made by clones of
      * this wallet - for instance when restoring from backup or if the seed was shared between devices.
-     *
      * If this field is missing it means we're not issuing subkeys of this key to users.
      * </pre>
      */
@@ -1230,13 +1220,11 @@ public final class Protos {
      * For the parents of keys being handed out, this is always less than the true number of children: the difference is
      * called the lookahead zone. These keys are put into Bloom filters so we can spot transactions made by clones of
      * this wallet - for instance when restoring from backup or if the seed was shared between devices.
-     *
      * If this field is missing it means we're not issuing subkeys of this key to users.
      * </pre>
      */
     int getIssuedSubkeys();
 
-    // optional uint32 lookahead_size = 4;
     /**
      * <code>optional uint32 lookahead_size = 4;</code>
      */
@@ -1246,7 +1234,6 @@ public final class Protos {
      */
     int getLookaheadSize();
 
-    // optional bool isFollowing = 5;
     /**
      * <code>optional bool isFollowing = 5;</code>
      *
@@ -1279,8 +1266,9 @@ public final class Protos {
    * </pre>
    */
   public static final class DeterministicKey extends
-      com.google.protobuf.GeneratedMessage
-      implements DeterministicKeyOrBuilder {
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:com.coinomi.core.protos.DeterministicKey)
+      DeterministicKeyOrBuilder {
     // Use DeterministicKey.newBuilder() to construct.
     private DeterministicKey(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
@@ -1410,7 +1398,6 @@ public final class Protos {
     }
 
     private int bitField0_;
-    // required bytes chain_code = 1;
     public static final int CHAIN_CODE_FIELD_NUMBER = 1;
     private com.google.protobuf.ByteString chainCode_;
     /**
@@ -1436,7 +1423,6 @@ public final class Protos {
       return chainCode_;
     }
 
-    // repeated uint32 path = 2;
     public static final int PATH_FIELD_NUMBER = 2;
     private java.util.List<java.lang.Integer> path_;
     /**
@@ -1474,7 +1460,6 @@ public final class Protos {
       return path_.get(index);
     }
 
-    // optional uint32 issued_subkeys = 3;
     public static final int ISSUED_SUBKEYS_FIELD_NUMBER = 3;
     private int issuedSubkeys_;
     /**
@@ -1485,7 +1470,6 @@ public final class Protos {
      * For the parents of keys being handed out, this is always less than the true number of children: the difference is
      * called the lookahead zone. These keys are put into Bloom filters so we can spot transactions made by clones of
      * this wallet - for instance when restoring from backup or if the seed was shared between devices.
-     *
      * If this field is missing it means we're not issuing subkeys of this key to users.
      * </pre>
      */
@@ -1500,7 +1484,6 @@ public final class Protos {
      * For the parents of keys being handed out, this is always less than the true number of children: the difference is
      * called the lookahead zone. These keys are put into Bloom filters so we can spot transactions made by clones of
      * this wallet - for instance when restoring from backup or if the seed was shared between devices.
-     *
      * If this field is missing it means we're not issuing subkeys of this key to users.
      * </pre>
      */
@@ -1508,7 +1491,6 @@ public final class Protos {
       return issuedSubkeys_;
     }
 
-    // optional uint32 lookahead_size = 4;
     public static final int LOOKAHEAD_SIZE_FIELD_NUMBER = 4;
     private int lookaheadSize_;
     /**
@@ -1524,7 +1506,6 @@ public final class Protos {
       return lookaheadSize_;
     }
 
-    // optional bool isFollowing = 5;
     public static final int ISFOLLOWING_FIELD_NUMBER = 5;
     private boolean isFollowing_;
     /**
@@ -1564,7 +1545,8 @@ public final class Protos {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
 
       if (!hasChainCode()) {
         memoizedIsInitialized = 0;
@@ -1713,8 +1695,9 @@ public final class Protos {
      * </pre>
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements com.coinomi.core.protos.Protos.DeterministicKeyOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:com.coinomi.core.protos.DeterministicKey)
+        com.coinomi.core.protos.Protos.DeterministicKeyOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return com.coinomi.core.protos.Protos.internal_static_com_coinomi_core_protos_DeterministicKey_descriptor;
@@ -1875,7 +1858,6 @@ public final class Protos {
       }
       private int bitField0_;
 
-      // required bytes chain_code = 1;
       private com.google.protobuf.ByteString chainCode_ = com.google.protobuf.ByteString.EMPTY;
       /**
        * <code>required bytes chain_code = 1;</code>
@@ -1931,7 +1913,6 @@ public final class Protos {
         return this;
       }
 
-      // repeated uint32 path = 2;
       private java.util.List<java.lang.Integer> path_ = java.util.Collections.emptyList();
       private void ensurePathIsMutable() {
         if (!((bitField0_ & 0x00000002) == 0x00000002)) {
@@ -2013,7 +1994,8 @@ public final class Protos {
       public Builder addAllPath(
           java.lang.Iterable<? extends java.lang.Integer> values) {
         ensurePathIsMutable();
-        super.addAll(values, path_);
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, path_);
         onChanged();
         return this;
       }
@@ -2032,7 +2014,6 @@ public final class Protos {
         return this;
       }
 
-      // optional uint32 issued_subkeys = 3;
       private int issuedSubkeys_ ;
       /**
        * <code>optional uint32 issued_subkeys = 3;</code>
@@ -2042,7 +2023,6 @@ public final class Protos {
        * For the parents of keys being handed out, this is always less than the true number of children: the difference is
        * called the lookahead zone. These keys are put into Bloom filters so we can spot transactions made by clones of
        * this wallet - for instance when restoring from backup or if the seed was shared between devices.
-       *
        * If this field is missing it means we're not issuing subkeys of this key to users.
        * </pre>
        */
@@ -2057,7 +2037,6 @@ public final class Protos {
        * For the parents of keys being handed out, this is always less than the true number of children: the difference is
        * called the lookahead zone. These keys are put into Bloom filters so we can spot transactions made by clones of
        * this wallet - for instance when restoring from backup or if the seed was shared between devices.
-       *
        * If this field is missing it means we're not issuing subkeys of this key to users.
        * </pre>
        */
@@ -2072,7 +2051,6 @@ public final class Protos {
        * For the parents of keys being handed out, this is always less than the true number of children: the difference is
        * called the lookahead zone. These keys are put into Bloom filters so we can spot transactions made by clones of
        * this wallet - for instance when restoring from backup or if the seed was shared between devices.
-       *
        * If this field is missing it means we're not issuing subkeys of this key to users.
        * </pre>
        */
@@ -2090,7 +2068,6 @@ public final class Protos {
        * For the parents of keys being handed out, this is always less than the true number of children: the difference is
        * called the lookahead zone. These keys are put into Bloom filters so we can spot transactions made by clones of
        * this wallet - for instance when restoring from backup or if the seed was shared between devices.
-       *
        * If this field is missing it means we're not issuing subkeys of this key to users.
        * </pre>
        */
@@ -2101,7 +2078,6 @@ public final class Protos {
         return this;
       }
 
-      // optional uint32 lookahead_size = 4;
       private int lookaheadSize_ ;
       /**
        * <code>optional uint32 lookahead_size = 4;</code>
@@ -2134,7 +2110,6 @@ public final class Protos {
         return this;
       }
 
-      // optional bool isFollowing = 5;
       private boolean isFollowing_ ;
       /**
        * <code>optional bool isFollowing = 5;</code>
@@ -2206,10 +2181,10 @@ public final class Protos {
     // @@protoc_insertion_point(class_scope:com.coinomi.core.protos.DeterministicKey)
   }
 
-  public interface KeyOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
+  public interface KeyOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:com.coinomi.core.protos.Key)
+      com.google.protobuf.MessageOrBuilder {
 
-    // required .com.coinomi.core.protos.Key.Type type = 1;
     /**
      * <code>required .com.coinomi.core.protos.Key.Type type = 1;</code>
      */
@@ -2219,7 +2194,6 @@ public final class Protos {
      */
     com.coinomi.core.protos.Protos.Key.Type getType();
 
-    // optional bytes secret_bytes = 2;
     /**
      * <code>optional bytes secret_bytes = 2;</code>
      *
@@ -2239,7 +2213,6 @@ public final class Protos {
      */
     com.google.protobuf.ByteString getSecretBytes();
 
-    // optional .com.coinomi.core.protos.EncryptedData encrypted_data = 3;
     /**
      * <code>optional .com.coinomi.core.protos.EncryptedData encrypted_data = 3;</code>
      *
@@ -2265,7 +2238,6 @@ public final class Protos {
      */
     com.coinomi.core.protos.Protos.EncryptedDataOrBuilder getEncryptedDataOrBuilder();
 
-    // optional bytes public_key = 4;
     /**
      * <code>optional bytes public_key = 4;</code>
      *
@@ -2285,7 +2257,6 @@ public final class Protos {
      */
     com.google.protobuf.ByteString getPublicKey();
 
-    // optional string label = 5;
     /**
      * <code>optional string label = 5;</code>
      *
@@ -2312,7 +2283,6 @@ public final class Protos {
     com.google.protobuf.ByteString
         getLabelBytes();
 
-    // optional .com.coinomi.core.protos.DeterministicKey deterministic_key = 6;
     /**
      * <code>optional .com.coinomi.core.protos.DeterministicKey deterministic_key = 6;</code>
      */
@@ -2332,17 +2302,16 @@ public final class Protos {
    * <pre>
    **
    * A key used to control Bitcoin spending.
-   *
    * Either the private key, the public key or both may be present.  It is recommended that
    * if the private key is provided that the public key is provided too because deriving it is slow.
-   *
    * If only the public key is provided, the key can only be used to watch the blockchain and verify
    * transactions, and not for spending.
    * </pre>
    */
   public static final class Key extends
-      com.google.protobuf.GeneratedMessage
-      implements KeyOrBuilder {
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:com.coinomi.core.protos.Key)
+      KeyOrBuilder {
     // Use Key.newBuilder() to construct.
     private Key(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
@@ -2423,8 +2392,9 @@ public final class Protos {
               break;
             }
             case 42: {
+              com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000010;
-              label_ = input.readBytes();
+              label_ = bs;
               break;
             }
             case 50: {
@@ -2626,7 +2596,6 @@ public final class Protos {
     }
 
     private int bitField0_;
-    // required .com.coinomi.core.protos.Key.Type type = 1;
     public static final int TYPE_FIELD_NUMBER = 1;
     private com.coinomi.core.protos.Protos.Key.Type type_;
     /**
@@ -2642,7 +2611,6 @@ public final class Protos {
       return type_;
     }
 
-    // optional bytes secret_bytes = 2;
     public static final int SECRET_BYTES_FIELD_NUMBER = 2;
     private com.google.protobuf.ByteString secretBytes_;
     /**
@@ -2668,7 +2636,6 @@ public final class Protos {
       return secretBytes_;
     }
 
-    // optional .com.coinomi.core.protos.EncryptedData encrypted_data = 3;
     public static final int ENCRYPTED_DATA_FIELD_NUMBER = 3;
     private com.coinomi.core.protos.Protos.EncryptedData encryptedData_;
     /**
@@ -2702,7 +2669,6 @@ public final class Protos {
       return encryptedData_;
     }
 
-    // optional bytes public_key = 4;
     public static final int PUBLIC_KEY_FIELD_NUMBER = 4;
     private com.google.protobuf.ByteString publicKey_;
     /**
@@ -2728,7 +2694,6 @@ public final class Protos {
       return publicKey_;
     }
 
-    // optional string label = 5;
     public static final int LABEL_FIELD_NUMBER = 5;
     private java.lang.Object label_;
     /**
@@ -2783,7 +2748,6 @@ public final class Protos {
       }
     }
 
-    // optional .com.coinomi.core.protos.DeterministicKey deterministic_key = 6;
     public static final int DETERMINISTIC_KEY_FIELD_NUMBER = 6;
     private com.coinomi.core.protos.Protos.DeterministicKey deterministicKey_;
     /**
@@ -2816,7 +2780,8 @@ public final class Protos {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
 
       if (!hasType()) {
         memoizedIsInitialized = 0;
@@ -2976,17 +2941,16 @@ public final class Protos {
      * <pre>
      **
      * A key used to control Bitcoin spending.
-     *
      * Either the private key, the public key or both may be present.  It is recommended that
      * if the private key is provided that the public key is provided too because deriving it is slow.
-     *
      * If only the public key is provided, the key can only be used to watch the blockchain and verify
      * transactions, and not for spending.
      * </pre>
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements com.coinomi.core.protos.Protos.KeyOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:com.coinomi.core.protos.Key)
+        com.coinomi.core.protos.Protos.KeyOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return com.coinomi.core.protos.Protos.internal_static_com_coinomi_core_protos_Key_descriptor;
@@ -3180,7 +3144,6 @@ public final class Protos {
       }
       private int bitField0_;
 
-      // required .com.coinomi.core.protos.Key.Type type = 1;
       private com.coinomi.core.protos.Protos.Key.Type type_ = com.coinomi.core.protos.Protos.Key.Type.ORIGINAL;
       /**
        * <code>required .com.coinomi.core.protos.Key.Type type = 1;</code>
@@ -3216,7 +3179,6 @@ public final class Protos {
         return this;
       }
 
-      // optional bytes secret_bytes = 2;
       private com.google.protobuf.ByteString secretBytes_ = com.google.protobuf.ByteString.EMPTY;
       /**
        * <code>optional bytes secret_bytes = 2;</code>
@@ -3272,7 +3234,6 @@ public final class Protos {
         return this;
       }
 
-      // optional .com.coinomi.core.protos.EncryptedData encrypted_data = 3;
       private com.coinomi.core.protos.Protos.EncryptedData encryptedData_ = com.coinomi.core.protos.Protos.EncryptedData.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           com.coinomi.core.protos.Protos.EncryptedData, com.coinomi.core.protos.Protos.EncryptedData.Builder, com.coinomi.core.protos.Protos.EncryptedDataOrBuilder> encryptedDataBuilder_;
@@ -3417,7 +3378,7 @@ public final class Protos {
         if (encryptedDataBuilder_ == null) {
           encryptedDataBuilder_ = new com.google.protobuf.SingleFieldBuilder<
               com.coinomi.core.protos.Protos.EncryptedData, com.coinomi.core.protos.Protos.EncryptedData.Builder, com.coinomi.core.protos.Protos.EncryptedDataOrBuilder>(
-                  encryptedData_,
+                  getEncryptedData(),
                   getParentForChildren(),
                   isClean());
           encryptedData_ = null;
@@ -3425,7 +3386,6 @@ public final class Protos {
         return encryptedDataBuilder_;
       }
 
-      // optional bytes public_key = 4;
       private com.google.protobuf.ByteString publicKey_ = com.google.protobuf.ByteString.EMPTY;
       /**
        * <code>optional bytes public_key = 4;</code>
@@ -3481,7 +3441,6 @@ public final class Protos {
         return this;
       }
 
-      // optional string label = 5;
       private java.lang.Object label_ = "";
       /**
        * <code>optional string label = 5;</code>
@@ -3503,9 +3462,12 @@ public final class Protos {
       public java.lang.String getLabel() {
         java.lang.Object ref = label_;
         if (!(ref instanceof java.lang.String)) {
-          java.lang.String s = ((com.google.protobuf.ByteString) ref)
-              .toStringUtf8();
-          label_ = s;
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            label_ = s;
+          }
           return s;
         } else {
           return (java.lang.String) ref;
@@ -3579,7 +3541,6 @@ public final class Protos {
         return this;
       }
 
-      // optional .com.coinomi.core.protos.DeterministicKey deterministic_key = 6;
       private com.coinomi.core.protos.Protos.DeterministicKey deterministicKey_ = com.coinomi.core.protos.Protos.DeterministicKey.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           com.coinomi.core.protos.Protos.DeterministicKey, com.coinomi.core.protos.Protos.DeterministicKey.Builder, com.coinomi.core.protos.Protos.DeterministicKeyOrBuilder> deterministicKeyBuilder_;
@@ -3688,7 +3649,7 @@ public final class Protos {
         if (deterministicKeyBuilder_ == null) {
           deterministicKeyBuilder_ = new com.google.protobuf.SingleFieldBuilder<
               com.coinomi.core.protos.Protos.DeterministicKey, com.coinomi.core.protos.Protos.DeterministicKey.Builder, com.coinomi.core.protos.Protos.DeterministicKeyOrBuilder>(
-                  deterministicKey_,
+                  getDeterministicKey(),
                   getParentForChildren(),
                   isClean());
           deterministicKey_ = null;
@@ -3707,10 +3668,10 @@ public final class Protos {
     // @@protoc_insertion_point(class_scope:com.coinomi.core.protos.Key)
   }
 
-  public interface TransactionInputOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
+  public interface TransactionInputOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:com.coinomi.core.protos.TransactionInput)
+      com.google.protobuf.MessageOrBuilder {
 
-    // required bytes transaction_out_point_hash = 1;
     /**
      * <code>required bytes transaction_out_point_hash = 1;</code>
      *
@@ -3728,7 +3689,6 @@ public final class Protos {
      */
     com.google.protobuf.ByteString getTransactionOutPointHash();
 
-    // required uint32 transaction_out_point_index = 2;
     /**
      * <code>required uint32 transaction_out_point_index = 2;</code>
      *
@@ -3746,7 +3706,6 @@ public final class Protos {
      */
     int getTransactionOutPointIndex();
 
-    // required bytes script_bytes = 3;
     /**
      * <code>required bytes script_bytes = 3;</code>
      *
@@ -3764,7 +3723,6 @@ public final class Protos {
      */
     com.google.protobuf.ByteString getScriptBytes();
 
-    // optional uint32 sequence = 4;
     /**
      * <code>optional uint32 sequence = 4;</code>
      *
@@ -3782,7 +3740,6 @@ public final class Protos {
      */
     int getSequence();
 
-    // optional int64 value = 5;
     /**
      * <code>optional int64 value = 5;</code>
      *
@@ -3804,8 +3761,9 @@ public final class Protos {
    * Protobuf type {@code com.coinomi.core.protos.TransactionInput}
    */
   public static final class TransactionInput extends
-      com.google.protobuf.GeneratedMessage
-      implements TransactionInputOrBuilder {
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:com.coinomi.core.protos.TransactionInput)
+      TransactionInputOrBuilder {
     // Use TransactionInput.newBuilder() to construct.
     private TransactionInput(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
@@ -3916,7 +3874,6 @@ public final class Protos {
     }
 
     private int bitField0_;
-    // required bytes transaction_out_point_hash = 1;
     public static final int TRANSACTION_OUT_POINT_HASH_FIELD_NUMBER = 1;
     private com.google.protobuf.ByteString transactionOutPointHash_;
     /**
@@ -3940,7 +3897,6 @@ public final class Protos {
       return transactionOutPointHash_;
     }
 
-    // required uint32 transaction_out_point_index = 2;
     public static final int TRANSACTION_OUT_POINT_INDEX_FIELD_NUMBER = 2;
     private int transactionOutPointIndex_;
     /**
@@ -3964,7 +3920,6 @@ public final class Protos {
       return transactionOutPointIndex_;
     }
 
-    // required bytes script_bytes = 3;
     public static final int SCRIPT_BYTES_FIELD_NUMBER = 3;
     private com.google.protobuf.ByteString scriptBytes_;
     /**
@@ -3988,7 +3943,6 @@ public final class Protos {
       return scriptBytes_;
     }
 
-    // optional uint32 sequence = 4;
     public static final int SEQUENCE_FIELD_NUMBER = 4;
     private int sequence_;
     /**
@@ -4012,7 +3966,6 @@ public final class Protos {
       return sequence_;
     }
 
-    // optional int64 value = 5;
     public static final int VALUE_FIELD_NUMBER = 5;
     private long value_;
     /**
@@ -4046,7 +3999,8 @@ public final class Protos {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
 
       if (!hasTransactionOutPointHash()) {
         memoizedIsInitialized = 0;
@@ -4193,8 +4147,9 @@ public final class Protos {
      * Protobuf type {@code com.coinomi.core.protos.TransactionInput}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements com.coinomi.core.protos.Protos.TransactionInputOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:com.coinomi.core.protos.TransactionInput)
+        com.coinomi.core.protos.Protos.TransactionInputOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return com.coinomi.core.protos.Protos.internal_static_com_coinomi_core_protos_TransactionInput_descriptor;
@@ -4355,7 +4310,6 @@ public final class Protos {
       }
       private int bitField0_;
 
-      // required bytes transaction_out_point_hash = 1;
       private com.google.protobuf.ByteString transactionOutPointHash_ = com.google.protobuf.ByteString.EMPTY;
       /**
        * <code>required bytes transaction_out_point_hash = 1;</code>
@@ -4407,7 +4361,6 @@ public final class Protos {
         return this;
       }
 
-      // required uint32 transaction_out_point_index = 2;
       private int transactionOutPointIndex_ ;
       /**
        * <code>required uint32 transaction_out_point_index = 2;</code>
@@ -4456,7 +4409,6 @@ public final class Protos {
         return this;
       }
 
-      // required bytes script_bytes = 3;
       private com.google.protobuf.ByteString scriptBytes_ = com.google.protobuf.ByteString.EMPTY;
       /**
        * <code>required bytes script_bytes = 3;</code>
@@ -4508,7 +4460,6 @@ public final class Protos {
         return this;
       }
 
-      // optional uint32 sequence = 4;
       private int sequence_ ;
       /**
        * <code>optional uint32 sequence = 4;</code>
@@ -4557,7 +4508,6 @@ public final class Protos {
         return this;
       }
 
-      // optional int64 value = 5;
       private long value_ ;
       /**
        * <code>optional int64 value = 5;</code>
@@ -4617,10 +4567,10 @@ public final class Protos {
     // @@protoc_insertion_point(class_scope:com.coinomi.core.protos.TransactionInput)
   }
 
-  public interface TransactionOutputOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
+  public interface TransactionOutputOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:com.coinomi.core.protos.TransactionOutput)
+      com.google.protobuf.MessageOrBuilder {
 
-    // required int64 value = 1;
     /**
      * <code>required int64 value = 1;</code>
      */
@@ -4630,7 +4580,6 @@ public final class Protos {
      */
     long getValue();
 
-    // required bytes script_bytes = 2;
     /**
      * <code>required bytes script_bytes = 2;</code>
      *
@@ -4648,7 +4597,6 @@ public final class Protos {
      */
     com.google.protobuf.ByteString getScriptBytes();
 
-    // optional bytes spent_by_transaction_hash = 3;
     /**
      * <code>optional bytes spent_by_transaction_hash = 3;</code>
      *
@@ -4666,7 +4614,6 @@ public final class Protos {
      */
     com.google.protobuf.ByteString getSpentByTransactionHash();
 
-    // optional int32 spent_by_transaction_index = 4;
     /**
      * <code>optional int32 spent_by_transaction_index = 4;</code>
      *
@@ -4688,8 +4635,9 @@ public final class Protos {
    * Protobuf type {@code com.coinomi.core.protos.TransactionOutput}
    */
   public static final class TransactionOutput extends
-      com.google.protobuf.GeneratedMessage
-      implements TransactionOutputOrBuilder {
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:com.coinomi.core.protos.TransactionOutput)
+      TransactionOutputOrBuilder {
     // Use TransactionOutput.newBuilder() to construct.
     private TransactionOutput(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
@@ -4795,7 +4743,6 @@ public final class Protos {
     }
 
     private int bitField0_;
-    // required int64 value = 1;
     public static final int VALUE_FIELD_NUMBER = 1;
     private long value_;
     /**
@@ -4811,7 +4758,6 @@ public final class Protos {
       return value_;
     }
 
-    // required bytes script_bytes = 2;
     public static final int SCRIPT_BYTES_FIELD_NUMBER = 2;
     private com.google.protobuf.ByteString scriptBytes_;
     /**
@@ -4835,7 +4781,6 @@ public final class Protos {
       return scriptBytes_;
     }
 
-    // optional bytes spent_by_transaction_hash = 3;
     public static final int SPENT_BY_TRANSACTION_HASH_FIELD_NUMBER = 3;
     private com.google.protobuf.ByteString spentByTransactionHash_;
     /**
@@ -4859,7 +4804,6 @@ public final class Protos {
       return spentByTransactionHash_;
     }
 
-    // optional int32 spent_by_transaction_index = 4;
     public static final int SPENT_BY_TRANSACTION_INDEX_FIELD_NUMBER = 4;
     private int spentByTransactionIndex_;
     /**
@@ -4892,7 +4836,8 @@ public final class Protos {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
 
       if (!hasValue()) {
         memoizedIsInitialized = 0;
@@ -5028,8 +4973,9 @@ public final class Protos {
      * Protobuf type {@code com.coinomi.core.protos.TransactionOutput}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements com.coinomi.core.protos.Protos.TransactionOutputOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:com.coinomi.core.protos.TransactionOutput)
+        com.coinomi.core.protos.Protos.TransactionOutputOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return com.coinomi.core.protos.Protos.internal_static_com_coinomi_core_protos_TransactionOutput_descriptor;
@@ -5177,7 +5123,6 @@ public final class Protos {
       }
       private int bitField0_;
 
-      // required int64 value = 1;
       private long value_ ;
       /**
        * <code>required int64 value = 1;</code>
@@ -5210,7 +5155,6 @@ public final class Protos {
         return this;
       }
 
-      // required bytes script_bytes = 2;
       private com.google.protobuf.ByteString scriptBytes_ = com.google.protobuf.ByteString.EMPTY;
       /**
        * <code>required bytes script_bytes = 2;</code>
@@ -5262,7 +5206,6 @@ public final class Protos {
         return this;
       }
 
-      // optional bytes spent_by_transaction_hash = 3;
       private com.google.protobuf.ByteString spentByTransactionHash_ = com.google.protobuf.ByteString.EMPTY;
       /**
        * <code>optional bytes spent_by_transaction_hash = 3;</code>
@@ -5314,7 +5257,6 @@ public final class Protos {
         return this;
       }
 
-      // optional int32 spent_by_transaction_index = 4;
       private int spentByTransactionIndex_ ;
       /**
        * <code>optional int32 spent_by_transaction_index = 4;</code>
@@ -5374,10 +5316,10 @@ public final class Protos {
     // @@protoc_insertion_point(class_scope:com.coinomi.core.protos.TransactionOutput)
   }
 
-  public interface TransactionConfidenceOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
+  public interface TransactionConfidenceOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:com.coinomi.core.protos.TransactionConfidence)
+      com.google.protobuf.MessageOrBuilder {
 
-    // optional .com.coinomi.core.protos.TransactionConfidence.Type type = 1;
     /**
      * <code>optional .com.coinomi.core.protos.TransactionConfidence.Type type = 1;</code>
      *
@@ -5395,7 +5337,6 @@ public final class Protos {
      */
     com.coinomi.core.protos.Protos.TransactionConfidence.Type getType();
 
-    // optional int32 appeared_at_height = 2;
     /**
      * <code>optional int32 appeared_at_height = 2;</code>
      *
@@ -5413,7 +5354,6 @@ public final class Protos {
      */
     int getAppearedAtHeight();
 
-    // optional bytes overriding_transaction = 3;
     /**
      * <code>optional bytes overriding_transaction = 3;</code>
      *
@@ -5435,7 +5375,6 @@ public final class Protos {
      */
     com.google.protobuf.ByteString getOverridingTransaction();
 
-    // optional int32 depth = 4;
     /**
      * <code>optional int32 depth = 4;</code>
      *
@@ -5455,7 +5394,6 @@ public final class Protos {
      */
     int getDepth();
 
-    // repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 5;
     /**
      * <code>repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 5;</code>
      */
@@ -5480,7 +5418,6 @@ public final class Protos {
     com.coinomi.core.protos.Protos.PeerAddressOrBuilder getBroadcastByOrBuilder(
         int index);
 
-    // optional .com.coinomi.core.protos.TransactionConfidence.Source source = 6;
     /**
      * <code>optional .com.coinomi.core.protos.TransactionConfidence.Source source = 6;</code>
      */
@@ -5496,14 +5433,14 @@ public final class Protos {
    * <pre>
    **
    * A description of the confidence we have that a transaction cannot be reversed in the future.
-   *
    * Parsing should be lenient, since this could change for different applications yet we should
    * maintain backward compatibility.
    * </pre>
    */
   public static final class TransactionConfidence extends
-      com.google.protobuf.GeneratedMessage
-      implements TransactionConfidenceOrBuilder {
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:com.coinomi.core.protos.TransactionConfidence)
+      TransactionConfidenceOrBuilder {
     // Use TransactionConfidence.newBuilder() to construct.
     private TransactionConfidence(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
@@ -5897,7 +5834,6 @@ public final class Protos {
     }
 
     private int bitField0_;
-    // optional .com.coinomi.core.protos.TransactionConfidence.Type type = 1;
     public static final int TYPE_FIELD_NUMBER = 1;
     private com.coinomi.core.protos.Protos.TransactionConfidence.Type type_;
     /**
@@ -5921,7 +5857,6 @@ public final class Protos {
       return type_;
     }
 
-    // optional int32 appeared_at_height = 2;
     public static final int APPEARED_AT_HEIGHT_FIELD_NUMBER = 2;
     private int appearedAtHeight_;
     /**
@@ -5945,7 +5880,6 @@ public final class Protos {
       return appearedAtHeight_;
     }
 
-    // optional bytes overriding_transaction = 3;
     public static final int OVERRIDING_TRANSACTION_FIELD_NUMBER = 3;
     private com.google.protobuf.ByteString overridingTransaction_;
     /**
@@ -5973,7 +5907,6 @@ public final class Protos {
       return overridingTransaction_;
     }
 
-    // optional int32 depth = 4;
     public static final int DEPTH_FIELD_NUMBER = 4;
     private int depth_;
     /**
@@ -5999,7 +5932,6 @@ public final class Protos {
       return depth_;
     }
 
-    // repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 5;
     public static final int BROADCAST_BY_FIELD_NUMBER = 5;
     private java.util.List<com.coinomi.core.protos.Protos.PeerAddress> broadcastBy_;
     /**
@@ -6035,7 +5967,6 @@ public final class Protos {
       return broadcastBy_.get(index);
     }
 
-    // optional .com.coinomi.core.protos.TransactionConfidence.Source source = 6;
     public static final int SOURCE_FIELD_NUMBER = 6;
     private com.coinomi.core.protos.Protos.TransactionConfidence.Source source_;
     /**
@@ -6062,7 +5993,8 @@ public final class Protos {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
 
       for (int i = 0; i < getBroadcastByCount(); i++) {
         if (!getBroadcastBy(i).isInitialized()) {
@@ -6212,14 +6144,14 @@ public final class Protos {
      * <pre>
      **
      * A description of the confidence we have that a transaction cannot be reversed in the future.
-     *
      * Parsing should be lenient, since this could change for different applications yet we should
      * maintain backward compatibility.
      * </pre>
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements com.coinomi.core.protos.Protos.TransactionConfidenceOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:com.coinomi.core.protos.TransactionConfidence)
+        com.coinomi.core.protos.Protos.TransactionConfidenceOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return com.coinomi.core.protos.Protos.internal_static_com_coinomi_core_protos_TransactionConfidence_descriptor;
@@ -6416,7 +6348,6 @@ public final class Protos {
       }
       private int bitField0_;
 
-      // optional .com.coinomi.core.protos.TransactionConfidence.Type type = 1;
       private com.coinomi.core.protos.Protos.TransactionConfidence.Type type_ = com.coinomi.core.protos.Protos.TransactionConfidence.Type.UNKNOWN;
       /**
        * <code>optional .com.coinomi.core.protos.TransactionConfidence.Type type = 1;</code>
@@ -6468,7 +6399,6 @@ public final class Protos {
         return this;
       }
 
-      // optional int32 appeared_at_height = 2;
       private int appearedAtHeight_ ;
       /**
        * <code>optional int32 appeared_at_height = 2;</code>
@@ -6517,7 +6447,6 @@ public final class Protos {
         return this;
       }
 
-      // optional bytes overriding_transaction = 3;
       private com.google.protobuf.ByteString overridingTransaction_ = com.google.protobuf.ByteString.EMPTY;
       /**
        * <code>optional bytes overriding_transaction = 3;</code>
@@ -6577,7 +6506,6 @@ public final class Protos {
         return this;
       }
 
-      // optional int32 depth = 4;
       private int depth_ ;
       /**
        * <code>optional int32 depth = 4;</code>
@@ -6630,7 +6558,6 @@ public final class Protos {
         return this;
       }
 
-      // repeated .com.coinomi.core.protos.PeerAddress broadcast_by = 5;
       private java.util.List<com.coinomi.core.protos.Protos.PeerAddress> broadcastBy_ =
         java.util.Collections.emptyList();
       private void ensureBroadcastByIsMutable() {
@@ -6772,7 +6699,8 @@ public final class Protos {
           java.lang.Iterable<? extends com.coinomi.core.protos.Protos.PeerAddress> values) {
         if (broadcastByBuilder_ == null) {
           ensureBroadcastByIsMutable();
-          super.addAll(values, broadcastBy_);
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, broadcastBy_);
           onChanged();
         } else {
           broadcastByBuilder_.addAllMessages(values);
@@ -6870,7 +6798,6 @@ public final class Protos {
         return broadcastByBuilder_;
       }
 
-      // optional .com.coinomi.core.protos.TransactionConfidence.Source source = 6;
       private com.coinomi.core.protos.Protos.TransactionConfidence.Source source_ = com.coinomi.core.protos.Protos.TransactionConfidence.Source.SOURCE_UNKNOWN;
       /**
        * <code>optional .com.coinomi.core.protos.TransactionConfidence.Source source = 6;</code>
@@ -6917,10 +6844,10 @@ public final class Protos {
     // @@protoc_insertion_point(class_scope:com.coinomi.core.protos.TransactionConfidence)
   }
 
-  public interface TransactionOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
+  public interface TransactionOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:com.coinomi.core.protos.Transaction)
+      com.google.protobuf.MessageOrBuilder {
 
-    // required int32 version = 1;
     /**
      * <code>required int32 version = 1;</code>
      *
@@ -6938,7 +6865,23 @@ public final class Protos {
      */
     int getVersion();
 
-    // required bytes hash = 2;
+    /**
+     * <code>optional int32 time = 11;</code>
+     *
+     * <pre>
+     * Used by Peercoin family
+     * </pre>
+     */
+    boolean hasTime();
+    /**
+     * <code>optional int32 time = 11;</code>
+     *
+     * <pre>
+     * Used by Peercoin family
+     * </pre>
+     */
+    int getTime();
+
     /**
      * <code>required bytes hash = 2;</code>
      */
@@ -6948,7 +6891,6 @@ public final class Protos {
      */
     com.google.protobuf.ByteString getHash();
 
-    // optional .com.coinomi.core.protos.Transaction.Pool pool = 3;
     /**
      * <code>optional .com.coinomi.core.protos.Transaction.Pool pool = 3;</code>
      *
@@ -6972,7 +6914,6 @@ public final class Protos {
      */
     com.coinomi.core.protos.Protos.Transaction.Pool getPool();
 
-    // optional uint32 lock_time = 4;
     /**
      * <code>optional uint32 lock_time = 4;</code>
      *
@@ -6990,7 +6931,6 @@ public final class Protos {
      */
     int getLockTime();
 
-    // optional int64 updated_at = 5;
     /**
      * <code>optional int64 updated_at = 5;</code>
      *
@@ -7008,7 +6948,6 @@ public final class Protos {
      */
     long getUpdatedAt();
 
-    // repeated .com.coinomi.core.protos.TransactionInput transaction_input = 6;
     /**
      * <code>repeated .com.coinomi.core.protos.TransactionInput transaction_input = 6;</code>
      */
@@ -7033,7 +6972,6 @@ public final class Protos {
     com.coinomi.core.protos.Protos.TransactionInputOrBuilder getTransactionInputOrBuilder(
         int index);
 
-    // repeated .com.coinomi.core.protos.TransactionOutput transaction_output = 7;
     /**
      * <code>repeated .com.coinomi.core.protos.TransactionOutput transaction_output = 7;</code>
      */
@@ -7058,7 +6996,6 @@ public final class Protos {
     com.coinomi.core.protos.Protos.TransactionOutputOrBuilder getTransactionOutputOrBuilder(
         int index);
 
-    // repeated bytes block_hash = 8;
     /**
      * <code>repeated bytes block_hash = 8;</code>
      *
@@ -7087,7 +7024,6 @@ public final class Protos {
      */
     com.google.protobuf.ByteString getBlockHash(int index);
 
-    // repeated int32 block_relativity_offsets = 9;
     /**
      * <code>repeated int32 block_relativity_offsets = 9;</code>
      */
@@ -7101,7 +7037,6 @@ public final class Protos {
      */
     int getBlockRelativityOffsets(int index);
 
-    // optional .com.coinomi.core.protos.TransactionConfidence confidence = 10;
     /**
      * <code>optional .com.coinomi.core.protos.TransactionConfidence confidence = 10;</code>
      *
@@ -7131,8 +7066,9 @@ public final class Protos {
    * Protobuf type {@code com.coinomi.core.protos.Transaction}
    */
   public static final class Transaction extends
-      com.google.protobuf.GeneratedMessage
-      implements TransactionOrBuilder {
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:com.coinomi.core.protos.Transaction)
+      TransactionOrBuilder {
     // Use Transaction.newBuilder() to construct.
     private Transaction(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
@@ -7184,7 +7120,7 @@ public final class Protos {
               break;
             }
             case 18: {
-              bitField0_ |= 0x00000002;
+              bitField0_ |= 0x00000004;
               hash_ = input.readBytes();
               break;
             }
@@ -7194,49 +7130,49 @@ public final class Protos {
               if (value == null) {
                 unknownFields.mergeVarintField(3, rawValue);
               } else {
-                bitField0_ |= 0x00000004;
+                bitField0_ |= 0x00000008;
                 pool_ = value;
               }
               break;
             }
             case 32: {
-              bitField0_ |= 0x00000008;
+              bitField0_ |= 0x00000010;
               lockTime_ = input.readUInt32();
               break;
             }
             case 40: {
-              bitField0_ |= 0x00000010;
+              bitField0_ |= 0x00000020;
               updatedAt_ = input.readInt64();
               break;
             }
             case 50: {
-              if (!((mutable_bitField0_ & 0x00000020) == 0x00000020)) {
+              if (!((mutable_bitField0_ & 0x00000040) == 0x00000040)) {
                 transactionInput_ = new java.util.ArrayList<com.coinomi.core.protos.Protos.TransactionInput>();
-                mutable_bitField0_ |= 0x00000020;
+                mutable_bitField0_ |= 0x00000040;
               }
               transactionInput_.add(input.readMessage(com.coinomi.core.protos.Protos.TransactionInput.PARSER, extensionRegistry));
               break;
             }
             case 58: {
-              if (!((mutable_bitField0_ & 0x00000040) == 0x00000040)) {
+              if (!((mutable_bitField0_ & 0x00000080) == 0x00000080)) {
                 transactionOutput_ = new java.util.ArrayList<com.coinomi.core.protos.Protos.TransactionOutput>();
-                mutable_bitField0_ |= 0x00000040;
+                mutable_bitField0_ |= 0x00000080;
               }
               transactionOutput_.add(input.readMessage(com.coinomi.core.protos.Protos.TransactionOutput.PARSER, extensionRegistry));
               break;
             }
             case 66: {
-              if (!((mutable_bitField0_ & 0x00000080) == 0x00000080)) {
+              if (!((mutable_bitField0_ & 0x00000100) == 0x00000100)) {
                 blockHash_ = new java.util.ArrayList<com.google.protobuf.ByteString>();
-                mutable_bitField0_ |= 0x00000080;
+                mutable_bitField0_ |= 0x00000100;
               }
               blockHash_.add(input.readBytes());
               break;
             }
             case 72: {
-              if (!((mutable_bitField0_ & 0x00000100) == 0x00000100)) {
+              if (!((mutable_bitField0_ & 0x00000200) == 0x00000200)) {
                 blockRelativityOffsets_ = new java.util.ArrayList<java.lang.Integer>();
-                mutable_bitField0_ |= 0x00000100;
+                mutable_bitField0_ |= 0x00000200;
               }
               blockRelativityOffsets_.add(input.readInt32());
               break;
@@ -7244,9 +7180,9 @@ public final class Protos {
             case 74: {
               int length = input.readRawVarint32();
               int limit = input.pushLimit(length);
-              if (!((mutable_bitField0_ & 0x00000100) == 0x00000100) && input.getBytesUntilLimit() > 0) {
+              if (!((mutable_bitField0_ & 0x00000200) == 0x00000200) && input.getBytesUntilLimit() > 0) {
                 blockRelativityOffsets_ = new java.util.ArrayList<java.lang.Integer>();
-                mutable_bitField0_ |= 0x00000100;
+                mutable_bitField0_ |= 0x00000200;
               }
               while (input.getBytesUntilLimit() > 0) {
                 blockRelativityOffsets_.add(input.readInt32());
@@ -7256,7 +7192,7 @@ public final class Protos {
             }
             case 82: {
               com.coinomi.core.protos.Protos.TransactionConfidence.Builder subBuilder = null;
-              if (((bitField0_ & 0x00000020) == 0x00000020)) {
+              if (((bitField0_ & 0x00000040) == 0x00000040)) {
                 subBuilder = confidence_.toBuilder();
               }
               confidence_ = input.readMessage(com.coinomi.core.protos.Protos.TransactionConfidence.PARSER, extensionRegistry);
@@ -7264,7 +7200,12 @@ public final class Protos {
                 subBuilder.mergeFrom(confidence_);
                 confidence_ = subBuilder.buildPartial();
               }
-              bitField0_ |= 0x00000020;
+              bitField0_ |= 0x00000040;
+              break;
+            }
+            case 88: {
+              bitField0_ |= 0x00000002;
+              time_ = input.readInt32();
               break;
             }
           }
@@ -7275,16 +7216,16 @@ public final class Protos {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e.getMessage()).setUnfinishedMessage(this);
       } finally {
-        if (((mutable_bitField0_ & 0x00000020) == 0x00000020)) {
+        if (((mutable_bitField0_ & 0x00000040) == 0x00000040)) {
           transactionInput_ = java.util.Collections.unmodifiableList(transactionInput_);
         }
-        if (((mutable_bitField0_ & 0x00000040) == 0x00000040)) {
+        if (((mutable_bitField0_ & 0x00000080) == 0x00000080)) {
           transactionOutput_ = java.util.Collections.unmodifiableList(transactionOutput_);
         }
-        if (((mutable_bitField0_ & 0x00000080) == 0x00000080)) {
+        if (((mutable_bitField0_ & 0x00000100) == 0x00000100)) {
           blockHash_ = java.util.Collections.unmodifiableList(blockHash_);
         }
-        if (((mutable_bitField0_ & 0x00000100) == 0x00000100)) {
+        if (((mutable_bitField0_ & 0x00000200) == 0x00000200)) {
           blockRelativityOffsets_ = java.util.Collections.unmodifiableList(blockRelativityOffsets_);
         }
         this.unknownFields = unknownFields.build();
@@ -7324,13 +7265,11 @@ public final class Protos {
      * <pre>
      **
      * This is a bitfield oriented enum, with the following bits:
-     *
      * bit 0 - spent
      * bit 1 - appears in alt chain
      * bit 2 - appears in best chain
      * bit 3 - double-spent
      * bit 4 - pending (we would like the tx to go into the best chain)
-     *
      * Not all combinations are interesting, just the ones actually used in the enum.
      * </pre>
      */
@@ -7464,7 +7403,6 @@ public final class Protos {
     }
 
     private int bitField0_;
-    // required int32 version = 1;
     public static final int VERSION_FIELD_NUMBER = 1;
     private int version_;
     /**
@@ -7488,14 +7426,36 @@ public final class Protos {
       return version_;
     }
 
-    // required bytes hash = 2;
+    public static final int TIME_FIELD_NUMBER = 11;
+    private int time_;
+    /**
+     * <code>optional int32 time = 11;</code>
+     *
+     * <pre>
+     * Used by Peercoin family
+     * </pre>
+     */
+    public boolean hasTime() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    /**
+     * <code>optional int32 time = 11;</code>
+     *
+     * <pre>
+     * Used by Peercoin family
+     * </pre>
+     */
+    public int getTime() {
+      return time_;
+    }
+
     public static final int HASH_FIELD_NUMBER = 2;
     private com.google.protobuf.ByteString hash_;
     /**
      * <code>required bytes hash = 2;</code>
      */
     public boolean hasHash() {
-      return ((bitField0_ & 0x00000002) == 0x00000002);
+      return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
      * <code>required bytes hash = 2;</code>
@@ -7504,7 +7464,6 @@ public final class Protos {
       return hash_;
     }
 
-    // optional .com.coinomi.core.protos.Transaction.Pool pool = 3;
     public static final int POOL_FIELD_NUMBER = 3;
     private com.coinomi.core.protos.Protos.Transaction.Pool pool_;
     /**
@@ -7518,7 +7477,7 @@ public final class Protos {
      * </pre>
      */
     public boolean hasPool() {
-      return ((bitField0_ & 0x00000004) == 0x00000004);
+      return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
      * <code>optional .com.coinomi.core.protos.Transaction.Pool pool = 3;</code>
@@ -7534,7 +7493,6 @@ public final class Protos {
       return pool_;
     }
 
-    // optional uint32 lock_time = 4;
     public static final int LOCK_TIME_FIELD_NUMBER = 4;
     private int lockTime_;
     /**
@@ -7545,7 +7503,7 @@ public final class Protos {
      * </pre>
      */
     public boolean hasLockTime() {
-      return ((bitField0_ & 0x00000008) == 0x00000008);
+      return ((bitField0_ & 0x00000010) == 0x00000010);
     }
     /**
      * <code>optional uint32 lock_time = 4;</code>
@@ -7558,7 +7516,6 @@ public final class Protos {
       return lockTime_;
     }
 
-    // optional int64 updated_at = 5;
     public static final int UPDATED_AT_FIELD_NUMBER = 5;
     private long updatedAt_;
     /**
@@ -7569,7 +7526,7 @@ public final class Protos {
      * </pre>
      */
     public boolean hasUpdatedAt() {
-      return ((bitField0_ & 0x00000010) == 0x00000010);
+      return ((bitField0_ & 0x00000020) == 0x00000020);
     }
     /**
      * <code>optional int64 updated_at = 5;</code>
@@ -7582,7 +7539,6 @@ public final class Protos {
       return updatedAt_;
     }
 
-    // repeated .com.coinomi.core.protos.TransactionInput transaction_input = 6;
     public static final int TRANSACTION_INPUT_FIELD_NUMBER = 6;
     private java.util.List<com.coinomi.core.protos.Protos.TransactionInput> transactionInput_;
     /**
@@ -7618,7 +7574,6 @@ public final class Protos {
       return transactionInput_.get(index);
     }
 
-    // repeated .com.coinomi.core.protos.TransactionOutput transaction_output = 7;
     public static final int TRANSACTION_OUTPUT_FIELD_NUMBER = 7;
     private java.util.List<com.coinomi.core.protos.Protos.TransactionOutput> transactionOutput_;
     /**
@@ -7654,7 +7609,6 @@ public final class Protos {
       return transactionOutput_.get(index);
     }
 
-    // repeated bytes block_hash = 8;
     public static final int BLOCK_HASH_FIELD_NUMBER = 8;
     private java.util.List<com.google.protobuf.ByteString> blockHash_;
     /**
@@ -7692,7 +7646,6 @@ public final class Protos {
       return blockHash_.get(index);
     }
 
-    // repeated int32 block_relativity_offsets = 9;
     public static final int BLOCK_RELATIVITY_OFFSETS_FIELD_NUMBER = 9;
     private java.util.List<java.lang.Integer> blockRelativityOffsets_;
     /**
@@ -7715,7 +7668,6 @@ public final class Protos {
       return blockRelativityOffsets_.get(index);
     }
 
-    // optional .com.coinomi.core.protos.TransactionConfidence confidence = 10;
     public static final int CONFIDENCE_FIELD_NUMBER = 10;
     private com.coinomi.core.protos.Protos.TransactionConfidence confidence_;
     /**
@@ -7726,7 +7678,7 @@ public final class Protos {
      * </pre>
      */
     public boolean hasConfidence() {
-      return ((bitField0_ & 0x00000020) == 0x00000020);
+      return ((bitField0_ & 0x00000040) == 0x00000040);
     }
     /**
      * <code>optional .com.coinomi.core.protos.TransactionConfidence confidence = 10;</code>
@@ -7751,6 +7703,7 @@ public final class Protos {
 
     private void initFields() {
       version_ = 0;
+      time_ = 0;
       hash_ = com.google.protobuf.ByteString.EMPTY;
       pool_ = com.coinomi.core.protos.Protos.Transaction.Pool.UNSPENT;
       lockTime_ = 0;
@@ -7764,7 +7717,8 @@ public final class Protos {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
 
       if (!hasVersion()) {
         memoizedIsInitialized = 0;
@@ -7802,16 +7756,16 @@ public final class Protos {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeInt32(1, version_);
       }
-      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
         output.writeBytes(2, hash_);
       }
-      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
         output.writeEnum(3, pool_.getNumber());
       }
-      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
         output.writeUInt32(4, lockTime_);
       }
-      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
         output.writeInt64(5, updatedAt_);
       }
       for (int i = 0; i < transactionInput_.size(); i++) {
@@ -7826,8 +7780,11 @@ public final class Protos {
       for (int i = 0; i < blockRelativityOffsets_.size(); i++) {
         output.writeInt32(9, blockRelativityOffsets_.get(i));
       }
-      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
         output.writeMessage(10, confidence_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeInt32(11, time_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -7842,19 +7799,19 @@ public final class Protos {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(1, version_);
       }
-      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(2, hash_);
       }
-      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(3, pool_.getNumber());
       }
-      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
         size += com.google.protobuf.CodedOutputStream
           .computeUInt32Size(4, lockTime_);
       }
-      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt64Size(5, updatedAt_);
       }
@@ -7884,9 +7841,13 @@ public final class Protos {
         size += dataSize;
         size += 1 * getBlockRelativityOffsetsList().size();
       }
-      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(10, confidence_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(11, time_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -7970,8 +7931,9 @@ public final class Protos {
      * Protobuf type {@code com.coinomi.core.protos.Transaction}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements com.coinomi.core.protos.Protos.TransactionOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:com.coinomi.core.protos.Transaction)
+        com.coinomi.core.protos.Protos.TransactionOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return com.coinomi.core.protos.Protos.internal_static_com_coinomi_core_protos_Transaction_descriptor;
@@ -8009,36 +7971,38 @@ public final class Protos {
         super.clear();
         version_ = 0;
         bitField0_ = (bitField0_ & ~0x00000001);
-        hash_ = com.google.protobuf.ByteString.EMPTY;
+        time_ = 0;
         bitField0_ = (bitField0_ & ~0x00000002);
-        pool_ = com.coinomi.core.protos.Protos.Transaction.Pool.UNSPENT;
+        hash_ = com.google.protobuf.ByteString.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000004);
-        lockTime_ = 0;
+        pool_ = com.coinomi.core.protos.Protos.Transaction.Pool.UNSPENT;
         bitField0_ = (bitField0_ & ~0x00000008);
-        updatedAt_ = 0L;
+        lockTime_ = 0;
         bitField0_ = (bitField0_ & ~0x00000010);
+        updatedAt_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00000020);
         if (transactionInputBuilder_ == null) {
           transactionInput_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000020);
+          bitField0_ = (bitField0_ & ~0x00000040);
         } else {
           transactionInputBuilder_.clear();
         }
         if (transactionOutputBuilder_ == null) {
           transactionOutput_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000040);
+          bitField0_ = (bitField0_ & ~0x00000080);
         } else {
           transactionOutputBuilder_.clear();
         }
         blockHash_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000080);
-        blockRelativityOffsets_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00000100);
+        blockRelativityOffsets_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00000200);
         if (confidenceBuilder_ == null) {
           confidence_ = com.coinomi.core.protos.Protos.TransactionConfidence.getDefaultInstance();
         } else {
           confidenceBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000200);
+        bitField0_ = (bitField0_ & ~0x00000400);
         return this;
       }
 
@@ -8074,49 +8038,53 @@ public final class Protos {
         if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
           to_bitField0_ |= 0x00000002;
         }
-        result.hash_ = hash_;
+        result.time_ = time_;
         if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
           to_bitField0_ |= 0x00000004;
         }
-        result.pool_ = pool_;
+        result.hash_ = hash_;
         if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
           to_bitField0_ |= 0x00000008;
         }
-        result.lockTime_ = lockTime_;
+        result.pool_ = pool_;
         if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
           to_bitField0_ |= 0x00000010;
         }
+        result.lockTime_ = lockTime_;
+        if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
+          to_bitField0_ |= 0x00000020;
+        }
         result.updatedAt_ = updatedAt_;
         if (transactionInputBuilder_ == null) {
-          if (((bitField0_ & 0x00000020) == 0x00000020)) {
+          if (((bitField0_ & 0x00000040) == 0x00000040)) {
             transactionInput_ = java.util.Collections.unmodifiableList(transactionInput_);
-            bitField0_ = (bitField0_ & ~0x00000020);
+            bitField0_ = (bitField0_ & ~0x00000040);
           }
           result.transactionInput_ = transactionInput_;
         } else {
           result.transactionInput_ = transactionInputBuilder_.build();
         }
         if (transactionOutputBuilder_ == null) {
-          if (((bitField0_ & 0x00000040) == 0x00000040)) {
+          if (((bitField0_ & 0x00000080) == 0x00000080)) {
             transactionOutput_ = java.util.Collections.unmodifiableList(transactionOutput_);
-            bitField0_ = (bitField0_ & ~0x00000040);
+            bitField0_ = (bitField0_ & ~0x00000080);
           }
           result.transactionOutput_ = transactionOutput_;
         } else {
           result.transactionOutput_ = transactionOutputBuilder_.build();
         }
-        if (((bitField0_ & 0x00000080) == 0x00000080)) {
-          blockHash_ = java.util.Collections.unmodifiableList(blockHash_);
-          bitField0_ = (bitField0_ & ~0x00000080);
-        }
-        result.blockHash_ = blockHash_;
         if (((bitField0_ & 0x00000100) == 0x00000100)) {
-          blockRelativityOffsets_ = java.util.Collections.unmodifiableList(blockRelativityOffsets_);
+          blockHash_ = java.util.Collections.unmodifiableList(blockHash_);
           bitField0_ = (bitField0_ & ~0x00000100);
         }
+        result.blockHash_ = blockHash_;
+        if (((bitField0_ & 0x00000200) == 0x00000200)) {
+          blockRelativityOffsets_ = java.util.Collections.unmodifiableList(blockRelativityOffsets_);
+          bitField0_ = (bitField0_ & ~0x00000200);
+        }
         result.blockRelativityOffsets_ = blockRelativityOffsets_;
-        if (((from_bitField0_ & 0x00000200) == 0x00000200)) {
-          to_bitField0_ |= 0x00000020;
+        if (((from_bitField0_ & 0x00000400) == 0x00000400)) {
+          to_bitField0_ |= 0x00000040;
         }
         if (confidenceBuilder_ == null) {
           result.confidence_ = confidence_;
@@ -8142,6 +8110,9 @@ public final class Protos {
         if (other.hasVersion()) {
           setVersion(other.getVersion());
         }
+        if (other.hasTime()) {
+          setTime(other.getTime());
+        }
         if (other.hasHash()) {
           setHash(other.getHash());
         }
@@ -8158,7 +8129,7 @@ public final class Protos {
           if (!other.transactionInput_.isEmpty()) {
             if (transactionInput_.isEmpty()) {
               transactionInput_ = other.transactionInput_;
-              bitField0_ = (bitField0_ & ~0x00000020);
+              bitField0_ = (bitField0_ & ~0x00000040);
             } else {
               ensureTransactionInputIsMutable();
               transactionInput_.addAll(other.transactionInput_);
@@ -8171,7 +8142,7 @@ public final class Protos {
               transactionInputBuilder_.dispose();
               transactionInputBuilder_ = null;
               transactionInput_ = other.transactionInput_;
-              bitField0_ = (bitField0_ & ~0x00000020);
+              bitField0_ = (bitField0_ & ~0x00000040);
               transactionInputBuilder_ = 
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getTransactionInputFieldBuilder() : null;
@@ -8184,7 +8155,7 @@ public final class Protos {
           if (!other.transactionOutput_.isEmpty()) {
             if (transactionOutput_.isEmpty()) {
               transactionOutput_ = other.transactionOutput_;
-              bitField0_ = (bitField0_ & ~0x00000040);
+              bitField0_ = (bitField0_ & ~0x00000080);
             } else {
               ensureTransactionOutputIsMutable();
               transactionOutput_.addAll(other.transactionOutput_);
@@ -8197,7 +8168,7 @@ public final class Protos {
               transactionOutputBuilder_.dispose();
               transactionOutputBuilder_ = null;
               transactionOutput_ = other.transactionOutput_;
-              bitField0_ = (bitField0_ & ~0x00000040);
+              bitField0_ = (bitField0_ & ~0x00000080);
               transactionOutputBuilder_ = 
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getTransactionOutputFieldBuilder() : null;
@@ -8209,7 +8180,7 @@ public final class Protos {
         if (!other.blockHash_.isEmpty()) {
           if (blockHash_.isEmpty()) {
             blockHash_ = other.blockHash_;
-            bitField0_ = (bitField0_ & ~0x00000080);
+            bitField0_ = (bitField0_ & ~0x00000100);
           } else {
             ensureBlockHashIsMutable();
             blockHash_.addAll(other.blockHash_);
@@ -8219,7 +8190,7 @@ public final class Protos {
         if (!other.blockRelativityOffsets_.isEmpty()) {
           if (blockRelativityOffsets_.isEmpty()) {
             blockRelativityOffsets_ = other.blockRelativityOffsets_;
-            bitField0_ = (bitField0_ & ~0x00000100);
+            bitField0_ = (bitField0_ & ~0x00000200);
           } else {
             ensureBlockRelativityOffsetsIsMutable();
             blockRelativityOffsets_.addAll(other.blockRelativityOffsets_);
@@ -8282,7 +8253,6 @@ public final class Protos {
       }
       private int bitField0_;
 
-      // required int32 version = 1;
       private int version_ ;
       /**
        * <code>required int32 version = 1;</code>
@@ -8331,13 +8301,60 @@ public final class Protos {
         return this;
       }
 
-      // required bytes hash = 2;
+      private int time_ ;
+      /**
+       * <code>optional int32 time = 11;</code>
+       *
+       * <pre>
+       * Used by Peercoin family
+       * </pre>
+       */
+      public boolean hasTime() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      /**
+       * <code>optional int32 time = 11;</code>
+       *
+       * <pre>
+       * Used by Peercoin family
+       * </pre>
+       */
+      public int getTime() {
+        return time_;
+      }
+      /**
+       * <code>optional int32 time = 11;</code>
+       *
+       * <pre>
+       * Used by Peercoin family
+       * </pre>
+       */
+      public Builder setTime(int value) {
+        bitField0_ |= 0x00000002;
+        time_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 time = 11;</code>
+       *
+       * <pre>
+       * Used by Peercoin family
+       * </pre>
+       */
+      public Builder clearTime() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        time_ = 0;
+        onChanged();
+        return this;
+      }
+
       private com.google.protobuf.ByteString hash_ = com.google.protobuf.ByteString.EMPTY;
       /**
        * <code>required bytes hash = 2;</code>
        */
       public boolean hasHash() {
-        return ((bitField0_ & 0x00000002) == 0x00000002);
+        return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       /**
        * <code>required bytes hash = 2;</code>
@@ -8352,7 +8369,7 @@ public final class Protos {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000002;
+  bitField0_ |= 0x00000004;
         hash_ = value;
         onChanged();
         return this;
@@ -8361,13 +8378,12 @@ public final class Protos {
        * <code>required bytes hash = 2;</code>
        */
       public Builder clearHash() {
-        bitField0_ = (bitField0_ & ~0x00000002);
+        bitField0_ = (bitField0_ & ~0x00000004);
         hash_ = getDefaultInstance().getHash();
         onChanged();
         return this;
       }
 
-      // optional .com.coinomi.core.protos.Transaction.Pool pool = 3;
       private com.coinomi.core.protos.Protos.Transaction.Pool pool_ = com.coinomi.core.protos.Protos.Transaction.Pool.UNSPENT;
       /**
        * <code>optional .com.coinomi.core.protos.Transaction.Pool pool = 3;</code>
@@ -8380,7 +8396,7 @@ public final class Protos {
        * </pre>
        */
       public boolean hasPool() {
-        return ((bitField0_ & 0x00000004) == 0x00000004);
+        return ((bitField0_ & 0x00000008) == 0x00000008);
       }
       /**
        * <code>optional .com.coinomi.core.protos.Transaction.Pool pool = 3;</code>
@@ -8409,7 +8425,7 @@ public final class Protos {
         if (value == null) {
           throw new NullPointerException();
         }
-        bitField0_ |= 0x00000004;
+        bitField0_ |= 0x00000008;
         pool_ = value;
         onChanged();
         return this;
@@ -8425,13 +8441,12 @@ public final class Protos {
        * </pre>
        */
       public Builder clearPool() {
-        bitField0_ = (bitField0_ & ~0x00000004);
+        bitField0_ = (bitField0_ & ~0x00000008);
         pool_ = com.coinomi.core.protos.Protos.Transaction.Pool.UNSPENT;
         onChanged();
         return this;
       }
 
-      // optional uint32 lock_time = 4;
       private int lockTime_ ;
       /**
        * <code>optional uint32 lock_time = 4;</code>
@@ -8441,7 +8456,7 @@ public final class Protos {
        * </pre>
        */
       public boolean hasLockTime() {
-        return ((bitField0_ & 0x00000008) == 0x00000008);
+        return ((bitField0_ & 0x00000010) == 0x00000010);
       }
       /**
        * <code>optional uint32 lock_time = 4;</code>
@@ -8461,7 +8476,7 @@ public final class Protos {
        * </pre>
        */
       public Builder setLockTime(int value) {
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000010;
         lockTime_ = value;
         onChanged();
         return this;
@@ -8474,13 +8489,12 @@ public final class Protos {
        * </pre>
        */
       public Builder clearLockTime() {
-        bitField0_ = (bitField0_ & ~0x00000008);
+        bitField0_ = (bitField0_ & ~0x00000010);
         lockTime_ = 0;
         onChanged();
         return this;
       }
 
-      // optional int64 updated_at = 5;
       private long updatedAt_ ;
       /**
        * <code>optional int64 updated_at = 5;</code>
@@ -8490,7 +8504,7 @@ public final class Protos {
        * </pre>
        */
       public boolean hasUpdatedAt() {
-        return ((bitField0_ & 0x00000010) == 0x00000010);
+        return ((bitField0_ & 0x00000020) == 0x00000020);
       }
       /**
        * <code>optional int64 updated_at = 5;</code>
@@ -8510,7 +8524,7 @@ public final class Protos {
        * </pre>
        */
       public Builder setUpdatedAt(long value) {
-        bitField0_ |= 0x00000010;
+        bitField0_ |= 0x00000020;
         updatedAt_ = value;
         onChanged();
         return this;
@@ -8523,19 +8537,18 @@ public final class Protos {
        * </pre>
        */
       public Builder clearUpdatedAt() {
-        bitField0_ = (bitField0_ & ~0x00000010);
+        bitField0_ = (bitField0_ & ~0x00000020);
         updatedAt_ = 0L;
         onChanged();
         return this;
       }
 
-      // repeated .com.coinomi.core.protos.TransactionInput transaction_input = 6;
       private java.util.List<com.coinomi.core.protos.Protos.TransactionInput> transactionInput_ =
         java.util.Collections.emptyList();
       private void ensureTransactionInputIsMutable() {
-        if (!((bitField0_ & 0x00000020) == 0x00000020)) {
+        if (!((bitField0_ & 0x00000040) == 0x00000040)) {
           transactionInput_ = new java.util.ArrayList<com.coinomi.core.protos.Protos.TransactionInput>(transactionInput_);
-          bitField0_ |= 0x00000020;
+          bitField0_ |= 0x00000040;
          }
       }
 
@@ -8671,7 +8684,8 @@ public final class Protos {
           java.lang.Iterable<? extends com.coinomi.core.protos.Protos.TransactionInput> values) {
         if (transactionInputBuilder_ == null) {
           ensureTransactionInputIsMutable();
-          super.addAll(values, transactionInput_);
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, transactionInput_);
           onChanged();
         } else {
           transactionInputBuilder_.addAllMessages(values);
@@ -8684,7 +8698,7 @@ public final class Protos {
       public Builder clearTransactionInput() {
         if (transactionInputBuilder_ == null) {
           transactionInput_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000020);
+          bitField0_ = (bitField0_ & ~0x00000040);
           onChanged();
         } else {
           transactionInputBuilder_.clear();
@@ -8761,7 +8775,7 @@ public final class Protos {
           transactionInputBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
               com.coinomi.core.protos.Protos.TransactionInput, com.coinomi.core.protos.Protos.TransactionInput.Builder, com.coinomi.core.protos.Protos.TransactionInputOrBuilder>(
                   transactionInput_,
-                  ((bitField0_ & 0x00000020) == 0x00000020),
+                  ((bitField0_ & 0x00000040) == 0x00000040),
                   getParentForChildren(),
                   isClean());
           transactionInput_ = null;
@@ -8769,13 +8783,12 @@ public final class Protos {
         return transactionInputBuilder_;
       }
 
-      // repeated .com.coinomi.core.protos.TransactionOutput transaction_output = 7;
       private java.util.List<com.coinomi.core.protos.Protos.TransactionOutput> transactionOutput_ =
         java.util.Collections.emptyList();
       private void ensureTransactionOutputIsMutable() {
-        if (!((bitField0_ & 0x00000040) == 0x00000040)) {
+        if (!((bitField0_ & 0x00000080) == 0x00000080)) {
           transactionOutput_ = new java.util.ArrayList<com.coinomi.core.protos.Protos.TransactionOutput>(transactionOutput_);
-          bitField0_ |= 0x00000040;
+          bitField0_ |= 0x00000080;
          }
       }
 
@@ -8911,7 +8924,8 @@ public final class Protos {
           java.lang.Iterable<? extends com.coinomi.core.protos.Protos.TransactionOutput> values) {
         if (transactionOutputBuilder_ == null) {
           ensureTransactionOutputIsMutable();
-          super.addAll(values, transactionOutput_);
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, transactionOutput_);
           onChanged();
         } else {
           transactionOutputBuilder_.addAllMessages(values);
@@ -8924,7 +8938,7 @@ public final class Protos {
       public Builder clearTransactionOutput() {
         if (transactionOutputBuilder_ == null) {
           transactionOutput_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000040);
+          bitField0_ = (bitField0_ & ~0x00000080);
           onChanged();
         } else {
           transactionOutputBuilder_.clear();
@@ -9001,7 +9015,7 @@ public final class Protos {
           transactionOutputBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
               com.coinomi.core.protos.Protos.TransactionOutput, com.coinomi.core.protos.Protos.TransactionOutput.Builder, com.coinomi.core.protos.Protos.TransactionOutputOrBuilder>(
                   transactionOutput_,
-                  ((bitField0_ & 0x00000040) == 0x00000040),
+                  ((bitField0_ & 0x00000080) == 0x00000080),
                   getParentForChildren(),
                   isClean());
           transactionOutput_ = null;
@@ -9009,12 +9023,11 @@ public final class Protos {
         return transactionOutputBuilder_;
       }
 
-      // repeated bytes block_hash = 8;
       private java.util.List<com.google.protobuf.ByteString> blockHash_ = java.util.Collections.emptyList();
       private void ensureBlockHashIsMutable() {
-        if (!((bitField0_ & 0x00000080) == 0x00000080)) {
+        if (!((bitField0_ & 0x00000100) == 0x00000100)) {
           blockHash_ = new java.util.ArrayList<com.google.protobuf.ByteString>(blockHash_);
-          bitField0_ |= 0x00000080;
+          bitField0_ |= 0x00000100;
          }
       }
       /**
@@ -9097,7 +9110,8 @@ public final class Protos {
       public Builder addAllBlockHash(
           java.lang.Iterable<? extends com.google.protobuf.ByteString> values) {
         ensureBlockHashIsMutable();
-        super.addAll(values, blockHash_);
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, blockHash_);
         onChanged();
         return this;
       }
@@ -9111,17 +9125,16 @@ public final class Protos {
        */
       public Builder clearBlockHash() {
         blockHash_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000080);
+        bitField0_ = (bitField0_ & ~0x00000100);
         onChanged();
         return this;
       }
 
-      // repeated int32 block_relativity_offsets = 9;
       private java.util.List<java.lang.Integer> blockRelativityOffsets_ = java.util.Collections.emptyList();
       private void ensureBlockRelativityOffsetsIsMutable() {
-        if (!((bitField0_ & 0x00000100) == 0x00000100)) {
+        if (!((bitField0_ & 0x00000200) == 0x00000200)) {
           blockRelativityOffsets_ = new java.util.ArrayList<java.lang.Integer>(blockRelativityOffsets_);
-          bitField0_ |= 0x00000100;
+          bitField0_ |= 0x00000200;
          }
       }
       /**
@@ -9168,7 +9181,8 @@ public final class Protos {
       public Builder addAllBlockRelativityOffsets(
           java.lang.Iterable<? extends java.lang.Integer> values) {
         ensureBlockRelativityOffsetsIsMutable();
-        super.addAll(values, blockRelativityOffsets_);
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, blockRelativityOffsets_);
         onChanged();
         return this;
       }
@@ -9177,12 +9191,11 @@ public final class Protos {
        */
       public Builder clearBlockRelativityOffsets() {
         blockRelativityOffsets_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000100);
+        bitField0_ = (bitField0_ & ~0x00000200);
         onChanged();
         return this;
       }
 
-      // optional .com.coinomi.core.protos.TransactionConfidence confidence = 10;
       private com.coinomi.core.protos.Protos.TransactionConfidence confidence_ = com.coinomi.core.protos.Protos.TransactionConfidence.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           com.coinomi.core.protos.Protos.TransactionConfidence, com.coinomi.core.protos.Protos.TransactionConfidence.Builder, com.coinomi.core.protos.Protos.TransactionConfidenceOrBuilder> confidenceBuilder_;
@@ -9194,7 +9207,7 @@ public final class Protos {
        * </pre>
        */
       public boolean hasConfidence() {
-        return ((bitField0_ & 0x00000200) == 0x00000200);
+        return ((bitField0_ & 0x00000400) == 0x00000400);
       }
       /**
        * <code>optional .com.coinomi.core.protos.TransactionConfidence confidence = 10;</code>
@@ -9227,7 +9240,7 @@ public final class Protos {
         } else {
           confidenceBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000200;
+        bitField0_ |= 0x00000400;
         return this;
       }
       /**
@@ -9245,7 +9258,7 @@ public final class Protos {
         } else {
           confidenceBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000200;
+        bitField0_ |= 0x00000400;
         return this;
       }
       /**
@@ -9257,7 +9270,7 @@ public final class Protos {
        */
       public Builder mergeConfidence(com.coinomi.core.protos.Protos.TransactionConfidence value) {
         if (confidenceBuilder_ == null) {
-          if (((bitField0_ & 0x00000200) == 0x00000200) &&
+          if (((bitField0_ & 0x00000400) == 0x00000400) &&
               confidence_ != com.coinomi.core.protos.Protos.TransactionConfidence.getDefaultInstance()) {
             confidence_ =
               com.coinomi.core.protos.Protos.TransactionConfidence.newBuilder(confidence_).mergeFrom(value).buildPartial();
@@ -9268,7 +9281,7 @@ public final class Protos {
         } else {
           confidenceBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000200;
+        bitField0_ |= 0x00000400;
         return this;
       }
       /**
@@ -9285,7 +9298,7 @@ public final class Protos {
         } else {
           confidenceBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000200);
+        bitField0_ = (bitField0_ & ~0x00000400);
         return this;
       }
       /**
@@ -9296,7 +9309,7 @@ public final class Protos {
        * </pre>
        */
       public com.coinomi.core.protos.Protos.TransactionConfidence.Builder getConfidenceBuilder() {
-        bitField0_ |= 0x00000200;
+        bitField0_ |= 0x00000400;
         onChanged();
         return getConfidenceFieldBuilder().getBuilder();
       }
@@ -9327,7 +9340,7 @@ public final class Protos {
         if (confidenceBuilder_ == null) {
           confidenceBuilder_ = new com.google.protobuf.SingleFieldBuilder<
               com.coinomi.core.protos.Protos.TransactionConfidence, com.coinomi.core.protos.Protos.TransactionConfidence.Builder, com.coinomi.core.protos.Protos.TransactionConfidenceOrBuilder>(
-                  confidence_,
+                  getConfidence(),
                   getParentForChildren(),
                   isClean());
           confidence_ = null;
@@ -9346,10 +9359,10 @@ public final class Protos {
     // @@protoc_insertion_point(class_scope:com.coinomi.core.protos.Transaction)
   }
 
-  public interface AddressStatusOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
+  public interface AddressStatusOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:com.coinomi.core.protos.AddressStatus)
+      com.google.protobuf.MessageOrBuilder {
 
-    // required string address = 1;
     /**
      * <code>required string address = 1;</code>
      *
@@ -9376,7 +9389,6 @@ public final class Protos {
     com.google.protobuf.ByteString
         getAddressBytes();
 
-    // required string status = 2;
     /**
      * <code>required string status = 2;</code>
      *
@@ -9407,8 +9419,9 @@ public final class Protos {
    * Protobuf type {@code com.coinomi.core.protos.AddressStatus}
    */
   public static final class AddressStatus extends
-      com.google.protobuf.GeneratedMessage
-      implements AddressStatusOrBuilder {
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:com.coinomi.core.protos.AddressStatus)
+      AddressStatusOrBuilder {
     // Use AddressStatus.newBuilder() to construct.
     private AddressStatus(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
@@ -9455,13 +9468,15 @@ public final class Protos {
               break;
             }
             case 10: {
+              com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000001;
-              address_ = input.readBytes();
+              address_ = bs;
               break;
             }
             case 18: {
+              com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000002;
-              status_ = input.readBytes();
+              status_ = bs;
               break;
             }
           }
@@ -9504,7 +9519,6 @@ public final class Protos {
     }
 
     private int bitField0_;
-    // required string address = 1;
     public static final int ADDRESS_FIELD_NUMBER = 1;
     private java.lang.Object address_;
     /**
@@ -9559,7 +9573,6 @@ public final class Protos {
       }
     }
 
-    // required string status = 2;
     public static final int STATUS_FIELD_NUMBER = 2;
     private java.lang.Object status_;
     /**
@@ -9621,7 +9634,8 @@ public final class Protos {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
 
       if (!hasAddress()) {
         memoizedIsInitialized = 0;
@@ -9743,8 +9757,9 @@ public final class Protos {
      * Protobuf type {@code com.coinomi.core.protos.AddressStatus}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements com.coinomi.core.protos.Protos.AddressStatusOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:com.coinomi.core.protos.AddressStatus)
+        com.coinomi.core.protos.Protos.AddressStatusOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return com.coinomi.core.protos.Protos.internal_static_com_coinomi_core_protos_AddressStatus_descriptor;
@@ -9878,7 +9893,6 @@ public final class Protos {
       }
       private int bitField0_;
 
-      // required string address = 1;
       private java.lang.Object address_ = "";
       /**
        * <code>required string address = 1;</code>
@@ -9900,9 +9914,12 @@ public final class Protos {
       public java.lang.String getAddress() {
         java.lang.Object ref = address_;
         if (!(ref instanceof java.lang.String)) {
-          java.lang.String s = ((com.google.protobuf.ByteString) ref)
-              .toStringUtf8();
-          address_ = s;
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            address_ = s;
+          }
           return s;
         } else {
           return (java.lang.String) ref;
@@ -9976,7 +9993,6 @@ public final class Protos {
         return this;
       }
 
-      // required string status = 2;
       private java.lang.Object status_ = "";
       /**
        * <code>required string status = 2;</code>
@@ -9998,9 +10014,12 @@ public final class Protos {
       public java.lang.String getStatus() {
         java.lang.Object ref = status_;
         if (!(ref instanceof java.lang.String)) {
-          java.lang.String s = ((com.google.protobuf.ByteString) ref)
-              .toStringUtf8();
-          status_ = s;
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            status_ = s;
+          }
           return s;
         } else {
           return (java.lang.String) ref;
@@ -10085,10 +10104,10 @@ public final class Protos {
     // @@protoc_insertion_point(class_scope:com.coinomi.core.protos.AddressStatus)
   }
 
-  public interface WalletPocketOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
+  public interface WalletPocketOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:com.coinomi.core.protos.WalletPocket)
+      com.google.protobuf.MessageOrBuilder {
 
-    // required string network_identifier = 1;
     /**
      * <code>required string network_identifier = 1;</code>
      *
@@ -10115,7 +10134,6 @@ public final class Protos {
     com.google.protobuf.ByteString
         getNetworkIdentifierBytes();
 
-    // optional string description = 2;
     /**
      * <code>optional string description = 2;</code>
      *
@@ -10142,7 +10160,6 @@ public final class Protos {
     com.google.protobuf.ByteString
         getDescriptionBytes();
 
-    // repeated .com.coinomi.core.protos.Key key = 3;
     /**
      * <code>repeated .com.coinomi.core.protos.Key key = 3;</code>
      */
@@ -10167,7 +10184,6 @@ public final class Protos {
     com.coinomi.core.protos.Protos.KeyOrBuilder getKeyOrBuilder(
         int index);
 
-    // optional bytes last_seen_block_hash = 4;
     /**
      * <code>optional bytes last_seen_block_hash = 4;</code>
      *
@@ -10185,7 +10201,6 @@ public final class Protos {
      */
     com.google.protobuf.ByteString getLastSeenBlockHash();
 
-    // optional uint32 last_seen_block_height = 5;
     /**
      * <code>optional uint32 last_seen_block_height = 5;</code>
      *
@@ -10203,7 +10218,6 @@ public final class Protos {
      */
     int getLastSeenBlockHeight();
 
-    // optional int64 last_seen_block_time_secs = 6;
     /**
      * <code>optional int64 last_seen_block_time_secs = 6;</code>
      */
@@ -10213,7 +10227,6 @@ public final class Protos {
      */
     long getLastSeenBlockTimeSecs();
 
-    // repeated .com.coinomi.core.protos.Transaction transaction = 7;
     /**
      * <code>repeated .com.coinomi.core.protos.Transaction transaction = 7;</code>
      */
@@ -10238,7 +10251,6 @@ public final class Protos {
     com.coinomi.core.protos.Protos.TransactionOrBuilder getTransactionOrBuilder(
         int index);
 
-    // repeated .com.coinomi.core.protos.AddressStatus address_status = 8;
     /**
      * <code>repeated .com.coinomi.core.protos.AddressStatus address_status = 8;</code>
      */
@@ -10271,8 +10283,9 @@ public final class Protos {
    * </pre>
    */
   public static final class WalletPocket extends
-      com.google.protobuf.GeneratedMessage
-      implements WalletPocketOrBuilder {
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:com.coinomi.core.protos.WalletPocket)
+      WalletPocketOrBuilder {
     // Use WalletPocket.newBuilder() to construct.
     private WalletPocket(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
@@ -10319,13 +10332,15 @@ public final class Protos {
               break;
             }
             case 10: {
+              com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000001;
-              networkIdentifier_ = input.readBytes();
+              networkIdentifier_ = bs;
               break;
             }
             case 18: {
+              com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000002;
-              description_ = input.readBytes();
+              description_ = bs;
               break;
             }
             case 26: {
@@ -10416,7 +10431,6 @@ public final class Protos {
     }
 
     private int bitField0_;
-    // required string network_identifier = 1;
     public static final int NETWORK_IDENTIFIER_FIELD_NUMBER = 1;
     private java.lang.Object networkIdentifier_;
     /**
@@ -10471,7 +10485,6 @@ public final class Protos {
       }
     }
 
-    // optional string description = 2;
     public static final int DESCRIPTION_FIELD_NUMBER = 2;
     private java.lang.Object description_;
     /**
@@ -10526,7 +10539,6 @@ public final class Protos {
       }
     }
 
-    // repeated .com.coinomi.core.protos.Key key = 3;
     public static final int KEY_FIELD_NUMBER = 3;
     private java.util.List<com.coinomi.core.protos.Protos.Key> key_;
     /**
@@ -10562,7 +10574,6 @@ public final class Protos {
       return key_.get(index);
     }
 
-    // optional bytes last_seen_block_hash = 4;
     public static final int LAST_SEEN_BLOCK_HASH_FIELD_NUMBER = 4;
     private com.google.protobuf.ByteString lastSeenBlockHash_;
     /**
@@ -10586,7 +10597,6 @@ public final class Protos {
       return lastSeenBlockHash_;
     }
 
-    // optional uint32 last_seen_block_height = 5;
     public static final int LAST_SEEN_BLOCK_HEIGHT_FIELD_NUMBER = 5;
     private int lastSeenBlockHeight_;
     /**
@@ -10610,7 +10620,6 @@ public final class Protos {
       return lastSeenBlockHeight_;
     }
 
-    // optional int64 last_seen_block_time_secs = 6;
     public static final int LAST_SEEN_BLOCK_TIME_SECS_FIELD_NUMBER = 6;
     private long lastSeenBlockTimeSecs_;
     /**
@@ -10626,7 +10635,6 @@ public final class Protos {
       return lastSeenBlockTimeSecs_;
     }
 
-    // repeated .com.coinomi.core.protos.Transaction transaction = 7;
     public static final int TRANSACTION_FIELD_NUMBER = 7;
     private java.util.List<com.coinomi.core.protos.Protos.Transaction> transaction_;
     /**
@@ -10662,7 +10670,6 @@ public final class Protos {
       return transaction_.get(index);
     }
 
-    // repeated .com.coinomi.core.protos.AddressStatus address_status = 8;
     public static final int ADDRESS_STATUS_FIELD_NUMBER = 8;
     private java.util.List<com.coinomi.core.protos.Protos.AddressStatus> addressStatus_;
     /**
@@ -10711,7 +10718,8 @@ public final class Protos {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
 
       if (!hasNetworkIdentifier()) {
         memoizedIsInitialized = 0;
@@ -10893,8 +10901,9 @@ public final class Protos {
      * </pre>
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements com.coinomi.core.protos.Protos.WalletPocketOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:com.coinomi.core.protos.WalletPocket)
+        com.coinomi.core.protos.Protos.WalletPocketOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return com.coinomi.core.protos.Protos.internal_static_com_coinomi_core_protos_WalletPocket_descriptor;
@@ -11195,7 +11204,6 @@ public final class Protos {
       }
       private int bitField0_;
 
-      // required string network_identifier = 1;
       private java.lang.Object networkIdentifier_ = "";
       /**
        * <code>required string network_identifier = 1;</code>
@@ -11217,9 +11225,12 @@ public final class Protos {
       public java.lang.String getNetworkIdentifier() {
         java.lang.Object ref = networkIdentifier_;
         if (!(ref instanceof java.lang.String)) {
-          java.lang.String s = ((com.google.protobuf.ByteString) ref)
-              .toStringUtf8();
-          networkIdentifier_ = s;
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            networkIdentifier_ = s;
+          }
           return s;
         } else {
           return (java.lang.String) ref;
@@ -11293,7 +11304,6 @@ public final class Protos {
         return this;
       }
 
-      // optional string description = 2;
       private java.lang.Object description_ = "";
       /**
        * <code>optional string description = 2;</code>
@@ -11315,9 +11325,12 @@ public final class Protos {
       public java.lang.String getDescription() {
         java.lang.Object ref = description_;
         if (!(ref instanceof java.lang.String)) {
-          java.lang.String s = ((com.google.protobuf.ByteString) ref)
-              .toStringUtf8();
-          description_ = s;
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            description_ = s;
+          }
           return s;
         } else {
           return (java.lang.String) ref;
@@ -11391,7 +11404,6 @@ public final class Protos {
         return this;
       }
 
-      // repeated .com.coinomi.core.protos.Key key = 3;
       private java.util.List<com.coinomi.core.protos.Protos.Key> key_ =
         java.util.Collections.emptyList();
       private void ensureKeyIsMutable() {
@@ -11533,7 +11545,8 @@ public final class Protos {
           java.lang.Iterable<? extends com.coinomi.core.protos.Protos.Key> values) {
         if (keyBuilder_ == null) {
           ensureKeyIsMutable();
-          super.addAll(values, key_);
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, key_);
           onChanged();
         } else {
           keyBuilder_.addAllMessages(values);
@@ -11631,7 +11644,6 @@ public final class Protos {
         return keyBuilder_;
       }
 
-      // optional bytes last_seen_block_hash = 4;
       private com.google.protobuf.ByteString lastSeenBlockHash_ = com.google.protobuf.ByteString.EMPTY;
       /**
        * <code>optional bytes last_seen_block_hash = 4;</code>
@@ -11683,7 +11695,6 @@ public final class Protos {
         return this;
       }
 
-      // optional uint32 last_seen_block_height = 5;
       private int lastSeenBlockHeight_ ;
       /**
        * <code>optional uint32 last_seen_block_height = 5;</code>
@@ -11732,7 +11743,6 @@ public final class Protos {
         return this;
       }
 
-      // optional int64 last_seen_block_time_secs = 6;
       private long lastSeenBlockTimeSecs_ ;
       /**
        * <code>optional int64 last_seen_block_time_secs = 6;</code>
@@ -11765,7 +11775,6 @@ public final class Protos {
         return this;
       }
 
-      // repeated .com.coinomi.core.protos.Transaction transaction = 7;
       private java.util.List<com.coinomi.core.protos.Protos.Transaction> transaction_ =
         java.util.Collections.emptyList();
       private void ensureTransactionIsMutable() {
@@ -11907,7 +11916,8 @@ public final class Protos {
           java.lang.Iterable<? extends com.coinomi.core.protos.Protos.Transaction> values) {
         if (transactionBuilder_ == null) {
           ensureTransactionIsMutable();
-          super.addAll(values, transaction_);
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, transaction_);
           onChanged();
         } else {
           transactionBuilder_.addAllMessages(values);
@@ -12005,7 +12015,6 @@ public final class Protos {
         return transactionBuilder_;
       }
 
-      // repeated .com.coinomi.core.protos.AddressStatus address_status = 8;
       private java.util.List<com.coinomi.core.protos.Protos.AddressStatus> addressStatus_ =
         java.util.Collections.emptyList();
       private void ensureAddressStatusIsMutable() {
@@ -12147,7 +12156,8 @@ public final class Protos {
           java.lang.Iterable<? extends com.coinomi.core.protos.Protos.AddressStatus> values) {
         if (addressStatusBuilder_ == null) {
           ensureAddressStatusIsMutable();
-          super.addAll(values, addressStatus_);
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, addressStatus_);
           onChanged();
         } else {
           addressStatusBuilder_.addAllMessages(values);
@@ -12256,10 +12266,10 @@ public final class Protos {
     // @@protoc_insertion_point(class_scope:com.coinomi.core.protos.WalletPocket)
   }
 
-  public interface ScryptParametersOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
+  public interface ScryptParametersOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:com.coinomi.core.protos.ScryptParameters)
+      com.google.protobuf.MessageOrBuilder {
 
-    // required bytes salt = 1;
     /**
      * <code>required bytes salt = 1;</code>
      *
@@ -12277,7 +12287,6 @@ public final class Protos {
      */
     com.google.protobuf.ByteString getSalt();
 
-    // optional int64 n = 2 [default = 16384];
     /**
      * <code>optional int64 n = 2 [default = 16384];</code>
      *
@@ -12295,7 +12304,6 @@ public final class Protos {
      */
     long getN();
 
-    // optional int32 r = 3 [default = 8];
     /**
      * <code>optional int32 r = 3 [default = 8];</code>
      *
@@ -12313,7 +12321,6 @@ public final class Protos {
      */
     int getR();
 
-    // optional int32 p = 4 [default = 1];
     /**
      * <code>optional int32 p = 4 [default = 1];</code>
      *
@@ -12343,8 +12350,9 @@ public final class Protos {
    * </pre>
    */
   public static final class ScryptParameters extends
-      com.google.protobuf.GeneratedMessage
-      implements ScryptParametersOrBuilder {
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:com.coinomi.core.protos.ScryptParameters)
+      ScryptParametersOrBuilder {
     // Use ScryptParameters.newBuilder() to construct.
     private ScryptParameters(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
@@ -12450,7 +12458,6 @@ public final class Protos {
     }
 
     private int bitField0_;
-    // required bytes salt = 1;
     public static final int SALT_FIELD_NUMBER = 1;
     private com.google.protobuf.ByteString salt_;
     /**
@@ -12474,7 +12481,6 @@ public final class Protos {
       return salt_;
     }
 
-    // optional int64 n = 2 [default = 16384];
     public static final int N_FIELD_NUMBER = 2;
     private long n_;
     /**
@@ -12498,7 +12504,6 @@ public final class Protos {
       return n_;
     }
 
-    // optional int32 r = 3 [default = 8];
     public static final int R_FIELD_NUMBER = 3;
     private int r_;
     /**
@@ -12522,7 +12527,6 @@ public final class Protos {
       return r_;
     }
 
-    // optional int32 p = 4 [default = 1];
     public static final int P_FIELD_NUMBER = 4;
     private int p_;
     /**
@@ -12555,7 +12559,8 @@ public final class Protos {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
 
       if (!hasSalt()) {
         memoizedIsInitialized = 0;
@@ -12695,8 +12700,9 @@ public final class Protos {
      * </pre>
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements com.coinomi.core.protos.Protos.ScryptParametersOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:com.coinomi.core.protos.ScryptParameters)
+        com.coinomi.core.protos.Protos.ScryptParametersOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return com.coinomi.core.protos.Protos.internal_static_com_coinomi_core_protos_ScryptParameters_descriptor;
@@ -12840,7 +12846,6 @@ public final class Protos {
       }
       private int bitField0_;
 
-      // required bytes salt = 1;
       private com.google.protobuf.ByteString salt_ = com.google.protobuf.ByteString.EMPTY;
       /**
        * <code>required bytes salt = 1;</code>
@@ -12892,7 +12897,6 @@ public final class Protos {
         return this;
       }
 
-      // optional int64 n = 2 [default = 16384];
       private long n_ = 16384L;
       /**
        * <code>optional int64 n = 2 [default = 16384];</code>
@@ -12941,7 +12945,6 @@ public final class Protos {
         return this;
       }
 
-      // optional int32 r = 3 [default = 8];
       private int r_ = 8;
       /**
        * <code>optional int32 r = 3 [default = 8];</code>
@@ -12990,7 +12993,6 @@ public final class Protos {
         return this;
       }
 
-      // optional int32 p = 4 [default = 1];
       private int p_ = 1;
       /**
        * <code>optional int32 p = 4 [default = 1];</code>
@@ -13050,10 +13052,10 @@ public final class Protos {
     // @@protoc_insertion_point(class_scope:com.coinomi.core.protos.ScryptParameters)
   }
 
-  public interface WalletOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
+  public interface WalletOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:com.coinomi.core.protos.Wallet)
+      com.google.protobuf.MessageOrBuilder {
 
-    // optional int32 version = 1 [default = 1];
     /**
      * <code>optional int32 version = 1 [default = 1];</code>
      *
@@ -13073,7 +13075,6 @@ public final class Protos {
      */
     int getVersion();
 
-    // optional .com.coinomi.core.protos.Key seed = 2;
     /**
      * <code>optional .com.coinomi.core.protos.Key seed = 2;</code>
      */
@@ -13087,7 +13088,6 @@ public final class Protos {
      */
     com.coinomi.core.protos.Protos.KeyOrBuilder getSeedOrBuilder();
 
-    // required .com.coinomi.core.protos.Key master_key = 3;
     /**
      * <code>required .com.coinomi.core.protos.Key master_key = 3;</code>
      */
@@ -13101,7 +13101,6 @@ public final class Protos {
      */
     com.coinomi.core.protos.Protos.KeyOrBuilder getMasterKeyOrBuilder();
 
-    // optional .com.coinomi.core.protos.Wallet.EncryptionType encryption_type = 4 [default = UNENCRYPTED];
     /**
      * <code>optional .com.coinomi.core.protos.Wallet.EncryptionType encryption_type = 4 [default = UNENCRYPTED];</code>
      */
@@ -13111,7 +13110,6 @@ public final class Protos {
      */
     com.coinomi.core.protos.Protos.Wallet.EncryptionType getEncryptionType();
 
-    // optional .com.coinomi.core.protos.ScryptParameters encryption_parameters = 5;
     /**
      * <code>optional .com.coinomi.core.protos.ScryptParameters encryption_parameters = 5;</code>
      */
@@ -13125,7 +13123,6 @@ public final class Protos {
      */
     com.coinomi.core.protos.Protos.ScryptParametersOrBuilder getEncryptionParametersOrBuilder();
 
-    // repeated .com.coinomi.core.protos.WalletPocket pockets = 6;
     /**
      * <code>repeated .com.coinomi.core.protos.WalletPocket pockets = 6;</code>
      */
@@ -13158,8 +13155,9 @@ public final class Protos {
    * </pre>
    */
   public static final class Wallet extends
-      com.google.protobuf.GeneratedMessage
-      implements WalletOrBuilder {
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:com.coinomi.core.protos.Wallet)
+      WalletOrBuilder {
     // Use Wallet.newBuilder() to construct.
     private Wallet(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
@@ -13316,7 +13314,6 @@ public final class Protos {
      * <pre>
      **
      * The encryption type of the wallet.
-     *
      * The encryption type is UNENCRYPTED for wallets where the wallet does not support encryption - wallets prior to
      * encryption support are grandfathered in as this wallet type.
      * When a wallet is ENCRYPTED_SCRYPT_AES the keys are either encrypted with the wallet password or are unencrypted.
@@ -13435,7 +13432,6 @@ public final class Protos {
     }
 
     private int bitField0_;
-    // optional int32 version = 1 [default = 1];
     public static final int VERSION_FIELD_NUMBER = 1;
     private int version_;
     /**
@@ -13461,7 +13457,6 @@ public final class Protos {
       return version_;
     }
 
-    // optional .com.coinomi.core.protos.Key seed = 2;
     public static final int SEED_FIELD_NUMBER = 2;
     private com.coinomi.core.protos.Protos.Key seed_;
     /**
@@ -13483,7 +13478,6 @@ public final class Protos {
       return seed_;
     }
 
-    // required .com.coinomi.core.protos.Key master_key = 3;
     public static final int MASTER_KEY_FIELD_NUMBER = 3;
     private com.coinomi.core.protos.Protos.Key masterKey_;
     /**
@@ -13505,7 +13499,6 @@ public final class Protos {
       return masterKey_;
     }
 
-    // optional .com.coinomi.core.protos.Wallet.EncryptionType encryption_type = 4 [default = UNENCRYPTED];
     public static final int ENCRYPTION_TYPE_FIELD_NUMBER = 4;
     private com.coinomi.core.protos.Protos.Wallet.EncryptionType encryptionType_;
     /**
@@ -13521,7 +13514,6 @@ public final class Protos {
       return encryptionType_;
     }
 
-    // optional .com.coinomi.core.protos.ScryptParameters encryption_parameters = 5;
     public static final int ENCRYPTION_PARAMETERS_FIELD_NUMBER = 5;
     private com.coinomi.core.protos.Protos.ScryptParameters encryptionParameters_;
     /**
@@ -13543,7 +13535,6 @@ public final class Protos {
       return encryptionParameters_;
     }
 
-    // repeated .com.coinomi.core.protos.WalletPocket pockets = 6;
     public static final int POCKETS_FIELD_NUMBER = 6;
     private java.util.List<com.coinomi.core.protos.Protos.WalletPocket> pockets_;
     /**
@@ -13590,7 +13581,8 @@ public final class Protos {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
 
       if (!hasMasterKey()) {
         memoizedIsInitialized = 0;
@@ -13762,8 +13754,9 @@ public final class Protos {
      * </pre>
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements com.coinomi.core.protos.Protos.WalletOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:com.coinomi.core.protos.Wallet)
+        com.coinomi.core.protos.Protos.WalletOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return com.coinomi.core.protos.Protos.internal_static_com_coinomi_core_protos_Wallet_descriptor;
@@ -14007,7 +14000,6 @@ public final class Protos {
       }
       private int bitField0_;
 
-      // optional int32 version = 1 [default = 1];
       private int version_ = 1;
       /**
        * <code>optional int32 version = 1 [default = 1];</code>
@@ -14060,7 +14052,6 @@ public final class Protos {
         return this;
       }
 
-      // optional .com.coinomi.core.protos.Key seed = 2;
       private com.coinomi.core.protos.Protos.Key seed_ = com.coinomi.core.protos.Protos.Key.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           com.coinomi.core.protos.Protos.Key, com.coinomi.core.protos.Protos.Key.Builder, com.coinomi.core.protos.Protos.KeyOrBuilder> seedBuilder_;
@@ -14169,7 +14160,7 @@ public final class Protos {
         if (seedBuilder_ == null) {
           seedBuilder_ = new com.google.protobuf.SingleFieldBuilder<
               com.coinomi.core.protos.Protos.Key, com.coinomi.core.protos.Protos.Key.Builder, com.coinomi.core.protos.Protos.KeyOrBuilder>(
-                  seed_,
+                  getSeed(),
                   getParentForChildren(),
                   isClean());
           seed_ = null;
@@ -14177,7 +14168,6 @@ public final class Protos {
         return seedBuilder_;
       }
 
-      // required .com.coinomi.core.protos.Key master_key = 3;
       private com.coinomi.core.protos.Protos.Key masterKey_ = com.coinomi.core.protos.Protos.Key.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           com.coinomi.core.protos.Protos.Key, com.coinomi.core.protos.Protos.Key.Builder, com.coinomi.core.protos.Protos.KeyOrBuilder> masterKeyBuilder_;
@@ -14286,7 +14276,7 @@ public final class Protos {
         if (masterKeyBuilder_ == null) {
           masterKeyBuilder_ = new com.google.protobuf.SingleFieldBuilder<
               com.coinomi.core.protos.Protos.Key, com.coinomi.core.protos.Protos.Key.Builder, com.coinomi.core.protos.Protos.KeyOrBuilder>(
-                  masterKey_,
+                  getMasterKey(),
                   getParentForChildren(),
                   isClean());
           masterKey_ = null;
@@ -14294,7 +14284,6 @@ public final class Protos {
         return masterKeyBuilder_;
       }
 
-      // optional .com.coinomi.core.protos.Wallet.EncryptionType encryption_type = 4 [default = UNENCRYPTED];
       private com.coinomi.core.protos.Protos.Wallet.EncryptionType encryptionType_ = com.coinomi.core.protos.Protos.Wallet.EncryptionType.UNENCRYPTED;
       /**
        * <code>optional .com.coinomi.core.protos.Wallet.EncryptionType encryption_type = 4 [default = UNENCRYPTED];</code>
@@ -14330,7 +14319,6 @@ public final class Protos {
         return this;
       }
 
-      // optional .com.coinomi.core.protos.ScryptParameters encryption_parameters = 5;
       private com.coinomi.core.protos.Protos.ScryptParameters encryptionParameters_ = com.coinomi.core.protos.Protos.ScryptParameters.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           com.coinomi.core.protos.Protos.ScryptParameters, com.coinomi.core.protos.Protos.ScryptParameters.Builder, com.coinomi.core.protos.Protos.ScryptParametersOrBuilder> encryptionParametersBuilder_;
@@ -14439,7 +14427,7 @@ public final class Protos {
         if (encryptionParametersBuilder_ == null) {
           encryptionParametersBuilder_ = new com.google.protobuf.SingleFieldBuilder<
               com.coinomi.core.protos.Protos.ScryptParameters, com.coinomi.core.protos.Protos.ScryptParameters.Builder, com.coinomi.core.protos.Protos.ScryptParametersOrBuilder>(
-                  encryptionParameters_,
+                  getEncryptionParameters(),
                   getParentForChildren(),
                   isClean());
           encryptionParameters_ = null;
@@ -14447,7 +14435,6 @@ public final class Protos {
         return encryptionParametersBuilder_;
       }
 
-      // repeated .com.coinomi.core.protos.WalletPocket pockets = 6;
       private java.util.List<com.coinomi.core.protos.Protos.WalletPocket> pockets_ =
         java.util.Collections.emptyList();
       private void ensurePocketsIsMutable() {
@@ -14589,7 +14576,8 @@ public final class Protos {
           java.lang.Iterable<? extends com.coinomi.core.protos.Protos.WalletPocket> values) {
         if (pocketsBuilder_ == null) {
           ensurePocketsIsMutable();
-          super.addAll(values, pockets_);
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, pockets_);
           onChanged();
         } else {
           pocketsBuilder_.addAllMessages(values);
@@ -14698,62 +14686,62 @@ public final class Protos {
     // @@protoc_insertion_point(class_scope:com.coinomi.core.protos.Wallet)
   }
 
-  private static com.google.protobuf.Descriptors.Descriptor
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_coinomi_core_protos_PeerAddress_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_coinomi_core_protos_PeerAddress_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.Descriptor
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_coinomi_core_protos_EncryptedData_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_coinomi_core_protos_EncryptedData_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.Descriptor
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_coinomi_core_protos_DeterministicKey_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_coinomi_core_protos_DeterministicKey_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.Descriptor
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_coinomi_core_protos_Key_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_coinomi_core_protos_Key_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.Descriptor
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_coinomi_core_protos_TransactionInput_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_coinomi_core_protos_TransactionInput_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.Descriptor
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_coinomi_core_protos_TransactionOutput_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_coinomi_core_protos_TransactionOutput_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.Descriptor
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_coinomi_core_protos_TransactionConfidence_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_coinomi_core_protos_TransactionConfidence_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.Descriptor
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_coinomi_core_protos_Transaction_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_coinomi_core_protos_Transaction_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.Descriptor
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_coinomi_core_protos_AddressStatus_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_coinomi_core_protos_AddressStatus_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.Descriptor
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_coinomi_core_protos_WalletPocket_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_coinomi_core_protos_WalletPocket_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.Descriptor
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_coinomi_core_protos_ScryptParameters_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_coinomi_core_protos_ScryptParameters_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.Descriptor
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_coinomi_core_protos_Wallet_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -14801,126 +14789,127 @@ public final class Protos {
       "\022\013\n\007UNKNOWN\020\000\022\014\n\010BUILDING\020\001\022\013\n\007PENDING\020\002" +
       "\022\010\n\004DEAD\020\003\"U\n\006Source\022\022\n\016SOURCE_UNKNOWN\020\000" +
       "\022\022\n\016SOURCE_NETWORK\020\001\022\017\n\013SOURCE_SELF\020\002\022\022\n" +
-      "\016SOURCE_TRUSTED\020\003\"\313\003\n\013Transaction\022\017\n\007ver" +
-      "sion\030\001 \002(\005\022\014\n\004hash\030\002 \002(\014\0227\n\004pool\030\003 \001(\0162)" +
-      ".com.coinomi.core.protos.Transaction.Poo" +
-      "l\022\021\n\tlock_time\030\004 \001(\r\022\022\n\nupdated_at\030\005 \001(\003" +
-      "\022D\n\021transaction_input\030\006 \003(\0132).com.coinom" +
-      "i.core.protos.TransactionInput\022F\n\022transa",
-      "ction_output\030\007 \003(\0132*.com.coinomi.core.pr" +
-      "otos.TransactionOutput\022\022\n\nblock_hash\030\010 \003" +
-      "(\014\022 \n\030block_relativity_offsets\030\t \003(\005\022B\n\n" +
-      "confidence\030\n \001(\0132..com.coinomi.core.prot" +
-      "os.TransactionConfidence\"5\n\004Pool\022\013\n\007UNSP" +
-      "ENT\020\004\022\t\n\005SPENT\020\005\022\010\n\004DEAD\020\n\022\013\n\007PENDING\020\020\"" +
-      "0\n\rAddressStatus\022\017\n\007address\030\001 \002(\t\022\016\n\006sta" +
-      "tus\030\002 \002(\t\"\306\002\n\014WalletPocket\022\032\n\022network_id" +
-      "entifier\030\001 \002(\t\022\023\n\013description\030\002 \001(\t\022)\n\003k" +
-      "ey\030\003 \003(\0132\034.com.coinomi.core.protos.Key\022\034",
-      "\n\024last_seen_block_hash\030\004 \001(\014\022\036\n\026last_see" +
-      "n_block_height\030\005 \001(\r\022!\n\031last_seen_block_" +
-      "time_secs\030\006 \001(\003\0229\n\013transaction\030\007 \003(\0132$.c" +
-      "om.coinomi.core.protos.Transaction\022>\n\016ad" +
-      "dress_status\030\010 \003(\0132&.com.coinomi.core.pr" +
-      "otos.AddressStatus\"N\n\020ScryptParameters\022\014" +
-      "\n\004salt\030\001 \002(\014\022\020\n\001n\030\002 \001(\003:\00516384\022\014\n\001r\030\003 \001(" +
-      "\005:\0018\022\014\n\001p\030\004 \001(\005:\0011\"\242\003\n\006Wallet\022\022\n\007version" +
-      "\030\001 \001(\005:\0011\022*\n\004seed\030\002 \001(\0132\034.com.coinomi.co" +
-      "re.protos.Key\0220\n\nmaster_key\030\003 \002(\0132\034.com.",
-      "coinomi.core.protos.Key\022T\n\017encryption_ty" +
-      "pe\030\004 \001(\0162..com.coinomi.core.protos.Walle" +
-      "t.EncryptionType:\013UNENCRYPTED\022H\n\025encrypt" +
-      "ion_parameters\030\005 \001(\0132).com.coinomi.core." +
-      "protos.ScryptParameters\0226\n\007pockets\030\006 \003(\013" +
-      "2%.com.coinomi.core.protos.WalletPocket\"" +
-      "N\n\016EncryptionType\022\017\n\013UNENCRYPTED\020\001\022\030\n\024EN" +
-      "CRYPTED_SCRYPT_AES\020\002\022\021\n\rENCRYPTED_AES\020\003B" +
-      "!\n\027com.coinomi.core.protosB\006Protos"
+      "\016SOURCE_TRUSTED\020\003\"\331\003\n\013Transaction\022\017\n\007ver" +
+      "sion\030\001 \002(\005\022\014\n\004time\030\013 \001(\005\022\014\n\004hash\030\002 \002(\014\0227" +
+      "\n\004pool\030\003 \001(\0162).com.coinomi.core.protos.T" +
+      "ransaction.Pool\022\021\n\tlock_time\030\004 \001(\r\022\022\n\nup" +
+      "dated_at\030\005 \001(\003\022D\n\021transaction_input\030\006 \003(" +
+      "\0132).com.coinomi.core.protos.TransactionI",
+      "nput\022F\n\022transaction_output\030\007 \003(\0132*.com.c" +
+      "oinomi.core.protos.TransactionOutput\022\022\n\n" +
+      "block_hash\030\010 \003(\014\022 \n\030block_relativity_off" +
+      "sets\030\t \003(\005\022B\n\nconfidence\030\n \001(\0132..com.coi" +
+      "nomi.core.protos.TransactionConfidence\"5" +
+      "\n\004Pool\022\013\n\007UNSPENT\020\004\022\t\n\005SPENT\020\005\022\010\n\004DEAD\020\n" +
+      "\022\013\n\007PENDING\020\020\"0\n\rAddressStatus\022\017\n\007addres" +
+      "s\030\001 \002(\t\022\016\n\006status\030\002 \002(\t\"\306\002\n\014WalletPocket" +
+      "\022\032\n\022network_identifier\030\001 \002(\t\022\023\n\013descript" +
+      "ion\030\002 \001(\t\022)\n\003key\030\003 \003(\0132\034.com.coinomi.cor",
+      "e.protos.Key\022\034\n\024last_seen_block_hash\030\004 \001" +
+      "(\014\022\036\n\026last_seen_block_height\030\005 \001(\r\022!\n\031la" +
+      "st_seen_block_time_secs\030\006 \001(\003\0229\n\013transac" +
+      "tion\030\007 \003(\0132$.com.coinomi.core.protos.Tra" +
+      "nsaction\022>\n\016address_status\030\010 \003(\0132&.com.c" +
+      "oinomi.core.protos.AddressStatus\"N\n\020Scry" +
+      "ptParameters\022\014\n\004salt\030\001 \002(\014\022\020\n\001n\030\002 \001(\003:\0051" +
+      "6384\022\014\n\001r\030\003 \001(\005:\0018\022\014\n\001p\030\004 \001(\005:\0011\"\242\003\n\006Wal" +
+      "let\022\022\n\007version\030\001 \001(\005:\0011\022*\n\004seed\030\002 \001(\0132\034." +
+      "com.coinomi.core.protos.Key\0220\n\nmaster_ke",
+      "y\030\003 \002(\0132\034.com.coinomi.core.protos.Key\022T\n" +
+      "\017encryption_type\030\004 \001(\0162..com.coinomi.cor" +
+      "e.protos.Wallet.EncryptionType:\013UNENCRYP" +
+      "TED\022H\n\025encryption_parameters\030\005 \001(\0132).com" +
+      ".coinomi.core.protos.ScryptParameters\0226\n" +
+      "\007pockets\030\006 \003(\0132%.com.coinomi.core.protos" +
+      ".WalletPocket\"N\n\016EncryptionType\022\017\n\013UNENC" +
+      "RYPTED\020\001\022\030\n\024ENCRYPTED_SCRYPT_AES\020\002\022\021\n\rEN" +
+      "CRYPTED_AES\020\003B!\n\027com.coinomi.core.protos" +
+      "B\006Protos"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
-      new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
-        public com.google.protobuf.ExtensionRegistry assignDescriptors(
-            com.google.protobuf.Descriptors.FileDescriptor root) {
-          descriptor = root;
-          internal_static_com_coinomi_core_protos_PeerAddress_descriptor =
-            getDescriptor().getMessageTypes().get(0);
-          internal_static_com_coinomi_core_protos_PeerAddress_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_com_coinomi_core_protos_PeerAddress_descriptor,
-              new java.lang.String[] { "IpAddress", "Port", "Services", });
-          internal_static_com_coinomi_core_protos_EncryptedData_descriptor =
-            getDescriptor().getMessageTypes().get(1);
-          internal_static_com_coinomi_core_protos_EncryptedData_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_com_coinomi_core_protos_EncryptedData_descriptor,
-              new java.lang.String[] { "InitialisationVector", "EncryptedPrivateKey", });
-          internal_static_com_coinomi_core_protos_DeterministicKey_descriptor =
-            getDescriptor().getMessageTypes().get(2);
-          internal_static_com_coinomi_core_protos_DeterministicKey_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_com_coinomi_core_protos_DeterministicKey_descriptor,
-              new java.lang.String[] { "ChainCode", "Path", "IssuedSubkeys", "LookaheadSize", "IsFollowing", });
-          internal_static_com_coinomi_core_protos_Key_descriptor =
-            getDescriptor().getMessageTypes().get(3);
-          internal_static_com_coinomi_core_protos_Key_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_com_coinomi_core_protos_Key_descriptor,
-              new java.lang.String[] { "Type", "SecretBytes", "EncryptedData", "PublicKey", "Label", "DeterministicKey", });
-          internal_static_com_coinomi_core_protos_TransactionInput_descriptor =
-            getDescriptor().getMessageTypes().get(4);
-          internal_static_com_coinomi_core_protos_TransactionInput_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_com_coinomi_core_protos_TransactionInput_descriptor,
-              new java.lang.String[] { "TransactionOutPointHash", "TransactionOutPointIndex", "ScriptBytes", "Sequence", "Value", });
-          internal_static_com_coinomi_core_protos_TransactionOutput_descriptor =
-            getDescriptor().getMessageTypes().get(5);
-          internal_static_com_coinomi_core_protos_TransactionOutput_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_com_coinomi_core_protos_TransactionOutput_descriptor,
-              new java.lang.String[] { "Value", "ScriptBytes", "SpentByTransactionHash", "SpentByTransactionIndex", });
-          internal_static_com_coinomi_core_protos_TransactionConfidence_descriptor =
-            getDescriptor().getMessageTypes().get(6);
-          internal_static_com_coinomi_core_protos_TransactionConfidence_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_com_coinomi_core_protos_TransactionConfidence_descriptor,
-              new java.lang.String[] { "Type", "AppearedAtHeight", "OverridingTransaction", "Depth", "BroadcastBy", "Source", });
-          internal_static_com_coinomi_core_protos_Transaction_descriptor =
-            getDescriptor().getMessageTypes().get(7);
-          internal_static_com_coinomi_core_protos_Transaction_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_com_coinomi_core_protos_Transaction_descriptor,
-              new java.lang.String[] { "Version", "Hash", "Pool", "LockTime", "UpdatedAt", "TransactionInput", "TransactionOutput", "BlockHash", "BlockRelativityOffsets", "Confidence", });
-          internal_static_com_coinomi_core_protos_AddressStatus_descriptor =
-            getDescriptor().getMessageTypes().get(8);
-          internal_static_com_coinomi_core_protos_AddressStatus_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_com_coinomi_core_protos_AddressStatus_descriptor,
-              new java.lang.String[] { "Address", "Status", });
-          internal_static_com_coinomi_core_protos_WalletPocket_descriptor =
-            getDescriptor().getMessageTypes().get(9);
-          internal_static_com_coinomi_core_protos_WalletPocket_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_com_coinomi_core_protos_WalletPocket_descriptor,
-              new java.lang.String[] { "NetworkIdentifier", "Description", "Key", "LastSeenBlockHash", "LastSeenBlockHeight", "LastSeenBlockTimeSecs", "Transaction", "AddressStatus", });
-          internal_static_com_coinomi_core_protos_ScryptParameters_descriptor =
-            getDescriptor().getMessageTypes().get(10);
-          internal_static_com_coinomi_core_protos_ScryptParameters_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_com_coinomi_core_protos_ScryptParameters_descriptor,
-              new java.lang.String[] { "Salt", "N", "R", "P", });
-          internal_static_com_coinomi_core_protos_Wallet_descriptor =
-            getDescriptor().getMessageTypes().get(11);
-          internal_static_com_coinomi_core_protos_Wallet_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_com_coinomi_core_protos_Wallet_descriptor,
-              new java.lang.String[] { "Version", "Seed", "MasterKey", "EncryptionType", "EncryptionParameters", "Pockets", });
-          return null;
-        }
-      };
+        new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
+          public com.google.protobuf.ExtensionRegistry assignDescriptors(
+              com.google.protobuf.Descriptors.FileDescriptor root) {
+            descriptor = root;
+            return null;
+          }
+        };
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
         }, assigner);
+    internal_static_com_coinomi_core_protos_PeerAddress_descriptor =
+      getDescriptor().getMessageTypes().get(0);
+    internal_static_com_coinomi_core_protos_PeerAddress_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_com_coinomi_core_protos_PeerAddress_descriptor,
+        new java.lang.String[] { "IpAddress", "Port", "Services", });
+    internal_static_com_coinomi_core_protos_EncryptedData_descriptor =
+      getDescriptor().getMessageTypes().get(1);
+    internal_static_com_coinomi_core_protos_EncryptedData_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_com_coinomi_core_protos_EncryptedData_descriptor,
+        new java.lang.String[] { "InitialisationVector", "EncryptedPrivateKey", });
+    internal_static_com_coinomi_core_protos_DeterministicKey_descriptor =
+      getDescriptor().getMessageTypes().get(2);
+    internal_static_com_coinomi_core_protos_DeterministicKey_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_com_coinomi_core_protos_DeterministicKey_descriptor,
+        new java.lang.String[] { "ChainCode", "Path", "IssuedSubkeys", "LookaheadSize", "IsFollowing", });
+    internal_static_com_coinomi_core_protos_Key_descriptor =
+      getDescriptor().getMessageTypes().get(3);
+    internal_static_com_coinomi_core_protos_Key_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_com_coinomi_core_protos_Key_descriptor,
+        new java.lang.String[] { "Type", "SecretBytes", "EncryptedData", "PublicKey", "Label", "DeterministicKey", });
+    internal_static_com_coinomi_core_protos_TransactionInput_descriptor =
+      getDescriptor().getMessageTypes().get(4);
+    internal_static_com_coinomi_core_protos_TransactionInput_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_com_coinomi_core_protos_TransactionInput_descriptor,
+        new java.lang.String[] { "TransactionOutPointHash", "TransactionOutPointIndex", "ScriptBytes", "Sequence", "Value", });
+    internal_static_com_coinomi_core_protos_TransactionOutput_descriptor =
+      getDescriptor().getMessageTypes().get(5);
+    internal_static_com_coinomi_core_protos_TransactionOutput_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_com_coinomi_core_protos_TransactionOutput_descriptor,
+        new java.lang.String[] { "Value", "ScriptBytes", "SpentByTransactionHash", "SpentByTransactionIndex", });
+    internal_static_com_coinomi_core_protos_TransactionConfidence_descriptor =
+      getDescriptor().getMessageTypes().get(6);
+    internal_static_com_coinomi_core_protos_TransactionConfidence_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_com_coinomi_core_protos_TransactionConfidence_descriptor,
+        new java.lang.String[] { "Type", "AppearedAtHeight", "OverridingTransaction", "Depth", "BroadcastBy", "Source", });
+    internal_static_com_coinomi_core_protos_Transaction_descriptor =
+      getDescriptor().getMessageTypes().get(7);
+    internal_static_com_coinomi_core_protos_Transaction_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_com_coinomi_core_protos_Transaction_descriptor,
+        new java.lang.String[] { "Version", "Time", "Hash", "Pool", "LockTime", "UpdatedAt", "TransactionInput", "TransactionOutput", "BlockHash", "BlockRelativityOffsets", "Confidence", });
+    internal_static_com_coinomi_core_protos_AddressStatus_descriptor =
+      getDescriptor().getMessageTypes().get(8);
+    internal_static_com_coinomi_core_protos_AddressStatus_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_com_coinomi_core_protos_AddressStatus_descriptor,
+        new java.lang.String[] { "Address", "Status", });
+    internal_static_com_coinomi_core_protos_WalletPocket_descriptor =
+      getDescriptor().getMessageTypes().get(9);
+    internal_static_com_coinomi_core_protos_WalletPocket_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_com_coinomi_core_protos_WalletPocket_descriptor,
+        new java.lang.String[] { "NetworkIdentifier", "Description", "Key", "LastSeenBlockHash", "LastSeenBlockHeight", "LastSeenBlockTimeSecs", "Transaction", "AddressStatus", });
+    internal_static_com_coinomi_core_protos_ScryptParameters_descriptor =
+      getDescriptor().getMessageTypes().get(10);
+    internal_static_com_coinomi_core_protos_ScryptParameters_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_com_coinomi_core_protos_ScryptParameters_descriptor,
+        new java.lang.String[] { "Salt", "N", "R", "P", });
+    internal_static_com_coinomi_core_protos_Wallet_descriptor =
+      getDescriptor().getMessageTypes().get(11);
+    internal_static_com_coinomi_core_protos_Wallet_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_com_coinomi_core_protos_Wallet_descriptor,
+        new java.lang.String[] { "Version", "Seed", "MasterKey", "EncryptionType", "EncryptionParameters", "Pockets", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

@@ -1,4 +1,4 @@
-package com.coinomi.wallet.ui;
+package com.coinomi.wallet.ui.widget;
 
 /*
  * Copyright 2013-2014 the original author or authors.
@@ -32,11 +32,12 @@ import android.text.style.RelativeSizeSpan;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
+import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.util.GenericUtils;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
-import com.coinomi.wallet.util.GenericUtils;
 import com.coinomi.wallet.util.WalletUtils;
-import com.google.bitcoin.core.Coin;
+import org.bitcoinj.core.Coin;
 
 /**
  * @author Andreas Schildbach
@@ -45,7 +46,8 @@ public final class CurrencyTextView extends TextView
 {
     private String prefix = null;
     private ForegroundColorSpan prefixColorSpan = null;
-    private BigInteger amount = null;
+    private CoinType type;
+    private Coin amount = null;
     private int precision = 0;
     private int shift = 0;
     private boolean alwaysSigned = false;
@@ -74,9 +76,10 @@ public final class CurrencyTextView extends TextView
         updateView();
     }
 
-    public void setAmount(@Nonnull final Coin amount)
+    public void setAmount(CoinType type, @Nonnull final Coin amount)
     {
-        this.amount = BigInteger.valueOf(amount.value);
+        this.type = type;
+        this.amount = amount;
         updateView();
     }
 
@@ -129,13 +132,13 @@ public final class CurrencyTextView extends TextView
     {
         final Editable text;
 
-        if (amount != null)
+        if (type != null && amount != null)
         {
             final String s;
             if (alwaysSigned)
-                s = GenericUtils.formatValue(amount, Constants.CURRENCY_PLUS_SIGN, Constants.CURRENCY_MINUS_SIGN, precision, shift);
+                s = GenericUtils.formatValue(type, amount, Constants.CURRENCY_PLUS_SIGN, Constants.CURRENCY_MINUS_SIGN, precision, shift);
             else
-                s = GenericUtils.formatValue(amount, precision, shift);
+                s = GenericUtils.formatValue(type, amount, precision, shift);
 
             text = new SpannableStringBuilder(s);
             WalletUtils.formatSignificant(text, insignificantRelativeSizeSpan);

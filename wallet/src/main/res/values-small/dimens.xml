@@ -4,7 +4,7 @@
     <dimen name="amount_text_size_big">48sp</dimen>
     <dimen name="amount_text_size">28sp</dimen>
     <dimen name="amount_symbol_text_size">20sp</dimen>
-    <dimen name="progress_symbol_size">16dp</dimen>
+    <dimen name="connectivity_symbol_size">16dp</dimen>
 
     <!-- SendOutput Widget -->
     <dimen name="send_output_amount_text_size">24sp</dimen>

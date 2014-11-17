@@ -1,14 +1,14 @@
 package com.coinomi.core.wallet;
 
 import com.coinomi.core.protos.Protos;
-import com.google.bitcoin.crypto.ChildNumber;
-import com.google.bitcoin.crypto.DeterministicKey;
-import com.google.bitcoin.crypto.EncryptedData;
-import com.google.bitcoin.crypto.KeyCrypter;
-import com.google.bitcoin.crypto.KeyCrypterException;
-import com.google.bitcoin.crypto.KeyCrypterScrypt;
-import com.google.bitcoin.store.UnreadableWalletException;
-import com.google.bitcoin.wallet.DeterministicSeed;
+import org.bitcoinj.crypto.ChildNumber;
+import org.bitcoinj.crypto.DeterministicKey;
+import org.bitcoinj.crypto.EncryptedData;
+import org.bitcoinj.crypto.KeyCrypter;
+import org.bitcoinj.crypto.KeyCrypterException;
+import org.bitcoinj.crypto.KeyCrypterScrypt;
+import org.bitcoinj.store.UnreadableWalletException;
+import org.bitcoinj.wallet.DeterministicSeed;
 import com.google.common.base.Splitter;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.TextFormat;
@@ -42,7 +42,7 @@ public class WalletProtobufSerializer {
      * can also be parsed using {@link TextFormat#merge(CharSequence, com.google.protobuf.Message.Builder)},
      * it is designed more for debugging than storage. It is not well specified and wallets are largely binary data
      * structures anyway, consisting as they do of keys (large random numbers) and
-     * {@link com.google.bitcoin.core.Transaction}s which also mostly contain keys and hashes.
+     * {@link org.bitcoinj.core.Transaction}s which also mostly contain keys and hashes.
      */
     public static String walletToText(Wallet wallet) {
         Protos.Wallet walletProto = toProtobuf(wallet);

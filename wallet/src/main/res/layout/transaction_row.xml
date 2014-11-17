@@ -62,7 +62,7 @@
             android:layout_gravity="start"
             tools:text="Beer with a friend" />
 
-        <com.coinomi.wallet.ui.CurrencyTextView
+        <com.coinomi.wallet.ui.widget.CurrencyTextView
             android:id="@+id/transaction_row_value"
             style="@style/TransactionRowAmount"
             android:layout_width="wrap_content"

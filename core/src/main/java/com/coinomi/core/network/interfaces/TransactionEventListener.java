@@ -2,7 +2,7 @@ package com.coinomi.core.network.interfaces;
 
 import com.coinomi.core.network.AddressStatus;
 import com.coinomi.core.network.ServerClient;
-import com.google.bitcoin.core.Transaction;
+import org.bitcoinj.core.Transaction;
 
 import java.util.List;
 

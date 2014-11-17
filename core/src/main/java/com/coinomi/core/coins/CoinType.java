@@ -1,10 +1,10 @@
 package com.coinomi.core.coins;
 
 
-import com.google.bitcoin.core.Coin;
-import com.google.bitcoin.core.NetworkParameters;
-import com.google.bitcoin.crypto.ChildNumber;
-import com.google.bitcoin.crypto.HDUtils;
+import org.bitcoinj.core.Coin;
+import org.bitcoinj.core.NetworkParameters;
+import org.bitcoinj.crypto.ChildNumber;
+import org.bitcoinj.crypto.HDUtils;
 
 import java.io.Serializable;
 import java.util.List;
@@ -12,6 +12,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * @author Giannis Dzegoutanis
@@ -19,41 +20,49 @@ import static com.google.common.base.Preconditions.checkNotNull;
 abstract public class CoinType extends NetworkParameters implements Serializable{
     private static final long serialVersionUID = 1L;
 
-    private static final String BIP_44_KEY_PATH = "44'/%d'/%d'";
+    private static final String BIP_44_KEY_PATH = "44H/%dH/%dH";
 
-    protected long uid = -1;
+    protected long uid = 0;
     protected String name;
     protected String symbol;
     protected String uriScheme;
-    protected int bip44Index;
+    protected Integer bip44Index;
     protected Coin feePerKb;
     protected Coin minNonDust;
+    protected int unitExponent = 0;
 
     public long getUid() {
+        checkState(uid > 0);
         return uid;
     }
 
     public String getName() {
-        return name;
+        return checkNotNull(name);
     }
 
     public String getSymbol() {
-        return symbol;
+        return checkNotNull(symbol);
     }
 
     public String getUriScheme() {
-        return uriScheme;
+        return checkNotNull(uriScheme);
     }
 
     public int getBip44Index() {
-        return bip44Index;
+        return checkNotNull(bip44Index);
     }
 
     public Coin getFeePerKb() {
         return checkNotNull(feePerKb);
     }
+
     public Coin getMinNonDust() {
         return checkNotNull(minNonDust);
+    }
+
+    public int getUnitExponent() {
+        checkState(unitExponent > 0);
+        return unitExponent;
     }
 
     public List<ChildNumber> getBip44Path(int account) {

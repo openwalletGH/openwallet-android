@@ -3,7 +3,7 @@ package com.coinomi.stratumj;
 
 import com.coinomi.stratumj.messages.CallMessage;
 import com.coinomi.stratumj.messages.ResultMessage;
-import com.google.bitcoin.utils.BriefLogFormatter;
+import org.bitcoinj.utils.BriefLogFormatter;
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;

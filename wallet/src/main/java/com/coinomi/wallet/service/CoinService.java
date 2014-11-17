@@ -1,7 +1,7 @@
 package com.coinomi.wallet.service;
 
-import com.google.bitcoin.core.Peer;
-import com.google.bitcoin.core.StoredBlock;
+import org.bitcoinj.core.Peer;
+import org.bitcoinj.core.StoredBlock;
 
 import java.util.List;
 

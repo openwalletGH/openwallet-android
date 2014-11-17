@@ -22,8 +22,8 @@ import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.ui.widget.QrCodeButton;
 import com.coinomi.wallet.util.Fonts;
-import com.google.bitcoin.crypto.MnemonicCode;
-import com.google.bitcoin.crypto.MnemonicException;
+import org.bitcoinj.crypto.MnemonicCode;
+import org.bitcoinj.crypto.MnemonicException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

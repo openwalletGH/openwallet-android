@@ -1,11 +1,11 @@
 package com.coinomi.core.wallet;
 
 import com.coinomi.core.protos.Protos;
-import com.google.bitcoin.core.ECKey;
-import com.google.bitcoin.crypto.EncryptableItem;
-import com.google.bitcoin.crypto.EncryptedData;
-import com.google.bitcoin.crypto.KeyCrypter;
-import com.google.bitcoin.wallet.BasicKeyChain;
+import org.bitcoinj.core.ECKey;
+import org.bitcoinj.crypto.EncryptableItem;
+import org.bitcoinj.crypto.EncryptedData;
+import org.bitcoinj.crypto.KeyCrypter;
+import org.bitcoinj.wallet.BasicKeyChain;
 import com.google.protobuf.ByteString;
 
 import java.util.LinkedHashMap;
