@@ -63,6 +63,7 @@ public class TransactionsListAdapter extends BaseAdapter {
     private boolean showEmptyText = false;
 
     private final int colorSignificant;
+    private final int colorLessSignificant;
     private final int colorInsignificant;
     private final int colorError;
     private final int colorCircularBuilding = Color.parseColor("#44ff44");
@@ -84,6 +85,7 @@ public class TransactionsListAdapter extends BaseAdapter {
 
         final Resources resources = context.getResources();
         colorSignificant = resources.getColor(R.color.gray_87_text);
+        colorLessSignificant = resources.getColor(R.color.gray_54_sec_text_icons);
         colorInsignificant = resources.getColor(R.color.gray_26_hint_text);
         colorError = resources.getColor(R.color.fg_error);
         textCoinBase = context.getString(R.string.wallet_transactions_coinbase);
@@ -182,6 +184,8 @@ public class TransactionsListAdapter extends BaseAdapter {
 
         final CoinType type = walletPocket.getCoinType();
 
+        // TODO set colors as theme, not here in code
+
         final TextView rowDirectionText = (TextView) row.findViewById(R.id.transaction_row_direction_text);
         final TextView rowDirectionFontIcon = (TextView) row.findViewById(R.id.transaction_row_direction_font_icon);
         Fonts.setTypeface(rowDirectionFontIcon, Fonts.Font.ENTYPO_COINOMI);
@@ -200,8 +204,8 @@ public class TransactionsListAdapter extends BaseAdapter {
         } else if (confidenceType == ConfidenceType.BUILDING) {
             rowLabel.setTextColor(colorSignificant);
             rowValue.setTextColor(colorSignificant);
-            rowDirectionText.setTextColor(colorSignificant);
-            rowDirectionFontIcon.setTextColor(colorSignificant);
+            rowDirectionText.setTextColor(colorLessSignificant);
+            rowDirectionFontIcon.setTextColor(colorLessSignificant);
             if (value.isNegative()) {
                 rowDirectionFontIcon.setBackgroundResource(R.drawable.transaction_row_cyrcle_bg_send);
                 rowValue.setTextColor(context.getResources().getColor(R.color.send_color_fg));

@@ -106,7 +106,6 @@ final public class Wallet {
         return mnemonic;
     }
 
-
     public void createCoinPocket(CoinType coin, boolean generateAllKeys,
                                   @Nullable KeyParameter key) {
         createCoinPockets(Lists.newArrayList(coin), generateAllKeys, key);

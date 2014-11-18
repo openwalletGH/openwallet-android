@@ -98,7 +98,7 @@
     </style>
 
     <!-- Transaction row -->
-    <style name="TransactionRowDirectionFontIcon" parent="NormalText">
+    <style name="TransactionRowDirectionFontIcon" parent="SecondaryText">
         <item name="android:textSize">@dimen/transaction_row_text_size_direction_font_icon</item>
     </style>
     <style name="TransactionRowDirectionText" parent="SecondaryText">

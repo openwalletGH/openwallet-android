@@ -34,7 +34,7 @@
     <string name="button_cancel">CANCEL</string>
     <string name="button_send">SEND</string>
     <string name="button_skip">SKIP</string>
-    <string name="button_add_coins">+COINS</string>
+    <string name="button_add_coins">+ COINS</string>
     <string name="scan_qr_code">Scan QR code</string>
     <string name="wallet_title_request">request</string>
     <string name="wallet_title_balance">balance</string>
