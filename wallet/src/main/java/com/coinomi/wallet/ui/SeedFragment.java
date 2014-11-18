@@ -57,6 +57,7 @@ public class SeedFragment extends Fragment {
                 }
             }
         });
+        buttonNext.setEnabled(false);
 
         final TextView mnemonicView = (TextView) view.findViewById(R.id.seed);
         setSeed(mnemonicView);
