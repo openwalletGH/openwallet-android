@@ -55,12 +55,28 @@
 
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/connection_status"
-        android:layout_width="@dimen/connectivity_symbol_size"
-        android:layout_height="@dimen/connectivity_symbol_size"
-        android:textSize="@dimen/connectivity_symbol_size"
-        android:gravity="center_horizontal"
-        tools:text="*" />
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/connection_status"
+            android:layout_width="@dimen/connectivity_symbol_size"
+            android:layout_height="@dimen/connectivity_symbol_size"
+            android:textSize="@dimen/connectivity_symbol_size"
+            android:textColor="@color/fg_insignificant"
+            android:gravity="center_horizontal"
+            android:text="@string/font_icon_globe"
+            tools:text="O" />
+        <TextView
+            android:id="@+id/disconnect_symbol"
+            android:layout_width="@dimen/connectivity_symbol_size"
+            android:layout_height="@dimen/connectivity_symbol_size"
+            android:textSize="@dimen/connectivity_symbol_size"
+            android:textColor="@color/fg_error"
+            android:gravity="center_horizontal"
+            android:text="@string/font_icon_cancel"
+            tools:text="X" />
+    </RelativeLayout>
+
 
 </LinearLayout>

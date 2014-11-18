@@ -21,12 +21,16 @@ public class Amount extends RelativeLayout {
     private final TextView amount;
     private final TextView symbol;
     private final TextView connectionStatus;
+    private final TextView disconnetSymbol;
+    private final Context context;
 //    private final TextView amountPending;
 
     boolean isBig = false;
 
     public Amount(Context context, AttributeSet attrs) {
         super(context, attrs);
+
+        this.context = context;
 
         LayoutInflater.from(context).inflate(R.layout.amount, this, true);
 
@@ -35,7 +39,9 @@ public class Amount extends RelativeLayout {
 //        amountPending = (TextView) findViewById(R.id.amount_pending);
 //        amountPending.setVisibility(GONE);
         connectionStatus = (TextView) findViewById(R.id.connection_status);
-//        Fonts.setTypeface(connectionStatus, Fonts.Font.ENTYPO_COINOMI);
+        Fonts.setTypeface(connectionStatus, Fonts.Font.ENTYPO_COINOMI);
+        disconnetSymbol = (TextView) findViewById(R.id.disconnect_symbol);
+        Fonts.setTypeface(disconnetSymbol, Fonts.Font.ENTYPO_COINOMI);
 
         TypedArray a = context.obtainStyledAttributes(attrs,
                 R.styleable.Amount, 0, 0);
@@ -77,13 +83,13 @@ public class Amount extends RelativeLayout {
             case WORKING:
                 // TODO support WORKING state
             case CONNECTED:
-                connectionStatus.setVisibility(VISIBLE);
-                connectionStatus.setText("C");
+                disconnetSymbol.setVisibility(INVISIBLE);
+                connectionStatus.setTextColor(getResources().getColor(R.color.gray_54_sec_text_icons));
                 break;
             default:
             case DISCONNECTED:
-                connectionStatus.setVisibility(VISIBLE);
-                connectionStatus.setText("D");
+                disconnetSymbol.setVisibility(VISIBLE);
+                connectionStatus.setTextColor(getResources().getColor(R.color.gray_26_hint_text));
         }
     }
 }
