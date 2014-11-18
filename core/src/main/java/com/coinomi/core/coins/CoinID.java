@@ -2,9 +2,13 @@ package com.coinomi.core.coins;
 
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.Coin;
+import org.bitcoinj.core.NetworkParameters;
+import org.bitcoinj.params.Networks;
+
 import com.google.common.collect.ImmutableList;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Giannis Dzegoutanis
@@ -23,6 +27,17 @@ public enum CoinID {
     NUSHARES_MAIN(NuSharesMain.get()),
     NUBITS_MAIN(NuBitsMain.get())
     ;
+
+    static {
+        Set<NetworkParameters> bitcoinjNetworks = Networks.get();
+        for (NetworkParameters network : bitcoinjNetworks) {
+            Networks.unregister(network);
+        }
+
+        for (CoinID id : values()) {
+            Networks.register(id.type);
+        }
+    }
 
     private final CoinType type;
 
