@@ -9,6 +9,10 @@ import android.widget.TextView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Based on
+ * http://stackoverflow.com/questions/2617266/how-to-adjust-text-font-size-to-fit-textview?answertab=votes#tab-top
+ */
 public class FontFitTextView extends TextView {
     private static final Logger log = LoggerFactory.getLogger(FontFitTextView.class);
 
