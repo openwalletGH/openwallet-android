@@ -196,6 +196,10 @@ public class NavigationDrawerFragment extends Fragment {
         mDrawerLayout.setDrawerListener(mDrawerToggle);
     }
 
+    void notifyDataSetChanged() {
+        ((NavDrawerListAdapter)mDrawerListView.getAdapter()).notifyDataSetChanged();
+    }
+
     void selectCoinInit(CoinType coinType) {
         if (application.getWallet() != null) {
             int position = application.getWallet().getCoinTypes().indexOf(coinType);

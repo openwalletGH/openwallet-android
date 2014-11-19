@@ -39,6 +39,7 @@ final public class WalletActivity extends ActionBarActivity implements
     private static final int SEND = 2;
 
     private static final int REQUEST_CODE_SCAN = 0;
+    private static final int ADD_COIN = 1;
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -113,7 +114,7 @@ final public class WalletActivity extends ActionBarActivity implements
 
     @Override
     public void onNavigationDrawerAddCoinsSelected() {
-        addCoins();
+        startActivityForResult(new Intent(WalletActivity.this, AddCoinsActivity.class), ADD_COIN);
     }
 
     private void openPocket(CoinType coinType) {
@@ -127,10 +128,6 @@ final public class WalletActivity extends ActionBarActivity implements
             mViewPager.getAdapter().notifyDataSetChanged();
             getWalletApplication().getConfiguration().touchLastPocket(coinType);
         }
-    }
-
-    private void addCoins() {
-        startActivity(new Intent(WalletActivity.this, AddCoinsActivity.class));
     }
 
     public void restoreActionBar() {
@@ -165,6 +162,12 @@ final public class WalletActivity extends ActionBarActivity implements
                     String error = getResources().getString(R.string.uri_error, e.getMessage());
                     Toast.makeText(this, error, Toast.LENGTH_LONG).show();
                 }
+            }
+        } else if (requestCode == ADD_COIN) {
+            if (resultCode == Activity.RESULT_OK) {
+                mNavigationDrawerFragment.notifyDataSetChanged();
+                CoinType type = (CoinType) intent.getSerializableExtra(Constants.ARG_COIN);
+                mNavigationDrawerFragment.selectItem(type);
             }
         }
     }

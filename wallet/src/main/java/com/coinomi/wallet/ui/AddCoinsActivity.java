@@ -1,6 +1,8 @@
 package com.coinomi.wallet.ui;
 
+import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
@@ -60,6 +62,12 @@ public class AddCoinsActivity extends ActionBarActivity implements SelectCoinsFr
     @Override
     public void onCoinSelected(CoinType type) {
         this.selectedCoin = type;
+
+        if (wallet.isPocketExists(type)) {
+            result(getResources().getString(R.string.add_coin_accounts_error));
+            return;
+        }
+
         if (wallet.isEncrypted()) {
             replaceFragment(PasswordConfirmationFragment.newInstance(
                     getResources().getString(R.string.password_add_coin, type.getName())));
@@ -81,11 +89,10 @@ public class AddCoinsActivity extends ActionBarActivity implements SelectCoinsFr
         }
     }
 
-    private class WalletFromSeedTask extends AsyncTask<Void, Void, Boolean> {
+    private class WalletFromSeedTask extends AsyncTask<Void, Void, Exception> {
         private final CoinType type;
         @Nullable private final String password;
         private Dialogs.ProgressDialogFragment verifyDialog;
-        private String errorMessage = "";
 
         private WalletFromSeedTask(CoinType type, @Nullable String password) {
             this.type = type;
@@ -101,43 +108,40 @@ public class AddCoinsActivity extends ActionBarActivity implements SelectCoinsFr
         }
 
         @Override
-        protected Boolean doInBackground(Void... params) {
+        protected Exception doInBackground(Void... params) {
             KeyParameter key = null;
-            if (wallet.isEncrypted()) {
-                key = wallet.getKeyCrypter().deriveKey(password);
+            Exception exception = null;
+            try {
+                if (wallet.isEncrypted() && wallet.getKeyCrypter() != null) {
+                    key = wallet.getKeyCrypter().deriveKey(password);
+                }
+                wallet.createCoinPocket(type, true, key);
+                wallet.saveNow();
+            } catch (RuntimeException e) {
+                exception = e;
             }
-            wallet.createCoinPocket(type, true, key);
-            getWalletApplication().saveWalletNow();
 
-//            try {
-//                if (seedProtect) {
-//                    wallet = new Wallet(seedWords, password);
-//                } else {
-//                    wallet = new Wallet(seedWords);
-//                }
-//                KeyCrypterScrypt crypter = new KeyCrypterScrypt();
-//                KeyParameter aesKey = crypter.deriveKey(password);
-//                wallet.encrypt(crypter, aesKey);
-//                wallet.createCoinPockets(Constants.DEFAULT_COINS, true, aesKey);
-//                getWalletApplication().setWallet(wallet);
-//                getWalletApplication().saveWalletNow();
-//                getWalletApplication().startBlockchainService(CoinService.ServiceMode.RESET_WALLET);
-//            } catch (Exception e) {
-//                log.error("Error creating a wallet", e);
-//                errorMessage = e.getMessage();
-//            }
-            return true;
+            return exception;
         }
 
-        protected void onPostExecute(Boolean isSuccess) {
+        protected void onPostExecute(Exception e) {
             verifyDialog.dismiss();
-            if (isSuccess) {
-                Toast.makeText(AddCoinsActivity.this, errorMessage, Toast.LENGTH_LONG).show();
-
-            } else {
-                Toast.makeText(AddCoinsActivity.this, errorMessage, Toast.LENGTH_LONG).show();
-            }
-            finish();
+            result(e == null ? null : e.getMessage());
         }
+    }
+
+    public void result(@Nullable String errorMessage) {
+        final Intent result = new Intent();
+        if (errorMessage != null) {
+            String message = getResources().getString(R.string.add_coin_error,
+                    selectedCoin.getName(), errorMessage);
+            Toast.makeText(AddCoinsActivity.this, message, Toast.LENGTH_LONG).show();
+            setResult(RESULT_CANCELED, result);
+        } else {
+            result.putExtra(Constants.ARG_COIN, selectedCoin);
+            setResult(RESULT_OK, result);
+        }
+
+        finish();
     }
 }
