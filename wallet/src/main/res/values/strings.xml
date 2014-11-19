@@ -36,7 +36,7 @@
     <string name="button_skip">SKIP</string>
     <string name="button_add_coins">+ COINS</string>
     <string name="scan_qr_code">Scan QR code</string>
-    <string name="wallet_title_request">request</string>
+    <string name="wallet_title_request">receive</string>
     <string name="wallet_title_balance">balance</string>
     <string name="wallet_title_send">send</string>
 
@@ -111,7 +111,7 @@
     <string name="no_such_pocket_error">Error occurred while accessing this wallet pocket. If problem persists, try to restore the wallet from seed.</string>
     <string name="password_failed">The password entered is not valid.</string>
     <string name="internal_transfer">Internal transfer</string>
-    <string name="sent">Sent!</string>
+    <string name="sent">Sent! Please wait for confirmation.</string>
 
     <!-- About Activity -->
     <string name="title_activity_about">About Coinomi</string>
