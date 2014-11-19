@@ -87,7 +87,7 @@ final public class WalletActivity extends ActionBarActivity implements
 
         // Get the last used wallet pocket and select it
         CoinType lastPocket = getWalletApplication().getConfiguration().getLastPocket();
-        mNavigationDrawerFragment.selectItem(lastPocket);
+        mNavigationDrawerFragment.selectCoinInit(lastPocket);
     }
 
     @Override

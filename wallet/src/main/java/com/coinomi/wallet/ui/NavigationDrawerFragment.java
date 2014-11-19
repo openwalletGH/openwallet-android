@@ -196,16 +196,25 @@ public class NavigationDrawerFragment extends Fragment {
         mDrawerLayout.setDrawerListener(mDrawerToggle);
     }
 
-
+    void selectCoinInit(CoinType coinType) {
+        if (application.getWallet() != null) {
+            int position = application.getWallet().getCoinTypes().indexOf(coinType);
+            selectItem(position, false);
+        }
+    }
 
     void selectItem(CoinType coinType) {
         if (application.getWallet() != null) {
             int position = application.getWallet().getCoinTypes().indexOf(coinType);
-            selectItem(position);
+            selectItem(position, true);
         }
     }
 
     private void selectItem(int position) {
+        selectItem(position, true);
+    }
+
+    private void selectItem(int position, boolean closeDrawer) {
         if (position < 0) {
             position = 0;
         }
@@ -213,7 +222,7 @@ public class NavigationDrawerFragment extends Fragment {
         if (mDrawerListView != null) {
             mDrawerListView.setItemChecked(position, true);
         }
-        if (mDrawerLayout != null) {
+        if (mDrawerLayout != null && closeDrawer) {
             mDrawerLayout.closeDrawer(mFragmentContainerView);
         }
         if (mCallbacks != null && application.getWallet() != null) {
