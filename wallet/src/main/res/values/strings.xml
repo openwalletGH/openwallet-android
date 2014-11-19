@@ -111,7 +111,7 @@
     <string name="no_such_pocket_error">Error occurred while accessing this wallet pocket. If problem persists, try to restore the wallet from seed.</string>
     <string name="password_failed">The password entered is not valid.</string>
     <string name="internal_transfer">Internal transfer</string>
-    <string name="sent">Sent! Please wait for confirmation.</string>
+    <string name="sent_msg">Sent! Please wait for confirmation.</string>
 
     <!-- About Activity -->
     <string name="title_activity_about">About Coinomi</string>

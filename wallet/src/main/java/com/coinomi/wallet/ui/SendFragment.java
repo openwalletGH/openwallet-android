@@ -225,7 +225,7 @@ public class SendFragment extends Fragment {
 
                 if (error == null) {
                     // TODO check for transaction broadcast in wallet pocket
-                    Toast.makeText(getActivity(), R.string.sent, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), R.string.sent_msg, Toast.LENGTH_LONG).show();
                 } else {
                     if (error instanceof InsufficientMoneyException) {
                         Toast.makeText(getActivity(), R.string.send_coins_error_not_enough_money, Toast.LENGTH_LONG).show();
