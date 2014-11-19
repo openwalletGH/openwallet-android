@@ -92,6 +92,8 @@ public class GenericUtils {
 
         final String sign = value.isNegative() ? minusSign : plusSign;
 
+        String formatedValue;
+
         if (shift == 0) {
             long units = (long) Math.pow(10, type.getUnitExponent());
             long precisionUnits = (long) (units / Math.pow(10, precision));
@@ -110,13 +112,13 @@ public class GenericUtils {
             final int satoshis = (int) (absValue % units);
 
             if (satoshis % (units / 100) == 0)
-                return String.format(Locale.US, "%s%d.%02d", sign, coins, satoshis / (units / 100));
+                formatedValue = String.format(Locale.US, "%d.%02d", coins, satoshis / (units / 100));
             else if (satoshis % (units / 10000) == 0)
-                return String.format(Locale.US, "%s%d.%04d", sign, coins, satoshis / (units / 10000));
+                formatedValue = String.format(Locale.US, "%d.%04d", coins, satoshis / (units / 10000));
             else if (satoshis % (units / 1000000) == 0)
-                return String.format(Locale.US, "%s%d.%06d", sign, coins, satoshis / (units / 1000000));
+                formatedValue = String.format(Locale.US, "%d.%06d", coins, satoshis / (units / 1000000));
             else
-                return String.format(Locale.US, "%s%d.%08d", sign, coins, satoshis);
+                formatedValue = String.format(Locale.US, "%d.%08d", coins, satoshis);
 //        } else if (shift == 3) {
 //            if (precision == 2)
 //                longValue = longValue - longValue % 1000 + longValue % 1000 / 500 * 1000;
@@ -132,11 +134,11 @@ public class GenericUtils {
 //            final long satoshis = (int) (absValue % ONE_MBTC_INT);
 //
 //            if (satoshis % 1000 == 0)
-//                return String.format(Locale.US, "%s%d.%02d", sign, coins, satoshis / 1000);
+//                formatedValue = String.format(Locale.US, "%d.%02d", sign, coins, satoshis / 1000);
 //            else if (satoshis % 10 == 0)
-//                return String.format(Locale.US, "%s%d.%04d", sign, coins, satoshis / 10);
+//                formatedValue = String.format(Locale.US, "%d.%04d", sign, coins, satoshis / 10);
 //            else
-//                return String.format(Locale.US, "%s%d.%05d", sign, coins, satoshis);
+//                formatedValue = String.format(Locale.US, "%d.%05d", sign, coins, satoshis);
 //        } else if (shift == 6) {
 //            if (precision == 0)
 //                longValue = longValue - longValue % 100 + longValue % 100 / 50 * 100;
@@ -150,11 +152,21 @@ public class GenericUtils {
 //            final long satoshis = (int) (absValue % ONE_UBTC_INT);
 //
 //            if (satoshis % 100 == 0)
-//                return String.format(Locale.US, "%s%d", sign, coins);
+//                formatedValue = String.format(Locale.US, "%d", sign, coins);
 //            else
-//                return String.format(Locale.US, "%s%d.%02d", sign, coins, satoshis);
+//                formatedValue = String.format(Locale.US, "%d.%02d", sign, coins, satoshis);
         } else {
             throw new IllegalArgumentException("cannot handle shift: " + shift);
         }
+
+        // Relax precision if incorrectly shows value as 0.00
+        if (formatedValue.equals("0.00") && !value.isZero()) {
+            return formatValue(type, value, plusSign, minusSign, precision + 2, shift);
+        }
+
+        // Add the sign if needed
+        formatedValue = String.format(Locale.US, "%s%s", sign, formatedValue);
+
+        return formatedValue;
     }
 }

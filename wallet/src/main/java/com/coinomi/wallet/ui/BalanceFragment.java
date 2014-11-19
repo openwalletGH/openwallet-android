@@ -2,7 +2,6 @@ package com.coinomi.wallet.ui;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -13,39 +12,29 @@ import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.coinomi.core.coins.CoinType;
-import com.coinomi.core.uri.CoinURI;
-import com.coinomi.core.uri.CoinURIParseException;
 import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.WalletPocket;
 import com.coinomi.core.wallet.WalletPocketConnectivity;
 import com.coinomi.core.wallet.WalletPocketEventListener;
-import com.coinomi.core.wallet.exceptions.NoSuchPocketException;
-import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.ui.widget.Amount;
 import com.coinomi.wallet.util.ThrottlingWalletChangeListener;
-import org.bitcoinj.core.Address;
+
 import org.bitcoinj.core.Coin;
-import org.bitcoinj.core.InsufficientMoneyException;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.TransactionConfidence;
-import org.bitcoinj.crypto.KeyCrypterException;
 import org.bitcoinj.utils.Threading;
 import com.google.common.collect.Lists;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -67,7 +56,9 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
     private static final int NEW_BALANCE = 0;
     private static final int PENDING = 1;
     private static final int CONNECTIVITY = 2;
-    private static final int AMOUNT_PRECISION = 8;
+    private static final int AMOUNT_FULL_PRECISION = 8;
+    private static final int AMOUNT_MEDIUM_PRECISION = 6;
+    private static final int AMOUNT_SHORT_PRECISION = 4;
     private static final int AMOUNT_SHIFT = 0;
 
     Handler handler = new Handler() {
@@ -155,7 +146,7 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
 
         // Init list adapter
         adapter = new TransactionsListAdapter(inflater.getContext(), pocket);
-        adapter.setPrecision(6, 0);
+        adapter.setPrecision(AMOUNT_MEDIUM_PRECISION, 0);
         transactionRows.setAdapter(adapter);
 
 //// Just as a bonus - if you want to do something with your list items:
@@ -173,6 +164,7 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
 //        });
 
         mainAmount = (Amount) view.findViewById(R.id.main_amount);
+        mainAmount.setSymbol(type.getSymbol());
 
         // Subscribe and update the amount
         pocket.addEventListener(this);
@@ -219,9 +211,8 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
 
     private void updateBalance(Coin newBalance) {
         String newBalanceStr = GenericUtils.formatValue(type, newBalance,
-                AMOUNT_PRECISION, AMOUNT_SHIFT);
+                AMOUNT_FULL_PRECISION, AMOUNT_SHIFT);
         mainAmount.setAmount(newBalanceStr);
-        mainAmount.setSymbol(type.getSymbol());
 
 //            Amount btcAmount = (Amount) view.findViewById(R.id.amount_btc);
 //            btcAmount.setAmount(Coin.ZERO);
@@ -245,7 +236,7 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
             mainAmount.setAmountPending(null);
         } else {
             String pendingAmountStr = GenericUtils.formatValue(type, pendingAmount,
-                    AMOUNT_PRECISION, AMOUNT_SHIFT);
+                    AMOUNT_FULL_PRECISION, AMOUNT_SHIFT);
             mainAmount.setAmountPending(pendingAmountStr);
         }
     }

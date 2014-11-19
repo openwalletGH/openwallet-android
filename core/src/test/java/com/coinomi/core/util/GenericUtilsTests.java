@@ -44,7 +44,7 @@ public class GenericUtilsTests {
         assertEquals("0.0013", GenericUtils.formatValue(BitcoinMain.get(), Coin.valueOf(133700), 4, 0));
         assertEquals("1.34", GenericUtils.formatValue(BitcoinMain.get(), Coin.valueOf(133700000), 2, 0));
         assertEquals("1.34", GenericUtils.formatValue(BitcoinMain.get(), Coin.valueOf(133700000), 2, 0));
-        assertEquals("0.00", GenericUtils.formatValue(BitcoinMain.get(), Coin.valueOf(133700), 2, 0));
+        assertEquals("0.0013", GenericUtils.formatValue(BitcoinMain.get(), Coin.valueOf(133700), 2, 0));
 
         assertEquals("1.00", GenericUtils.formatValue(BitcoinMain.get(), Coin.valueOf(100000001), 6, 0));
         assertEquals("1.00000001", GenericUtils.formatValue(BitcoinMain.get(), Coin.valueOf(100000001), 8, 0));

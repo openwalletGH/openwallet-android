@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
-import android.widget.ProgressBar;
+import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -18,13 +18,12 @@ import javax.annotation.Nullable;
  * @author Giannis Dzegoutanis
  */
 public class Amount extends RelativeLayout {
-    private final TextView amount;
+    private final FontFitTextView amountText;
     private final TextView symbol;
     private final TextView connectionStatus;
     private final TextView disconnetSymbol;
     private final Context context;
 //    private final TextView amountPending;
-
     boolean isBig = false;
 
     public Amount(Context context, AttributeSet attrs) {
@@ -34,7 +33,6 @@ public class Amount extends RelativeLayout {
 
         LayoutInflater.from(context).inflate(R.layout.amount, this, true);
 
-        amount = (TextView) findViewById(R.id.amount);
         symbol = (TextView) findViewById(R.id.symbol);
 //        amountPending = (TextView) findViewById(R.id.amount_pending);
 //        amountPending.setVisibility(GONE);
@@ -51,17 +49,21 @@ public class Amount extends RelativeLayout {
             a.recycle();
         }
 
-        if (isBig) {
-            amount.setTextAppearance(context, R.style.AmountBig);
+        amountText = (FontFitTextView) findViewById(R.id.amount_text);
+
+        if (isBig && !getRootView().isInEditMode()) {
+            amountText.setTextAppearance(context, R.style.AmountBig);
         }
 
+        amountText.setMaxTextSize(amountText.getTextSize());
+
         if (getRootView().isInEditMode()) {
-            setAmount("3.14159265");
+            amountText.setText("3.14159265");
         }
     }
 
     public void setAmount(String amount) {
-        this.amount.setText(amount);
+        amountText.setText(amount);
     }
 
     public void setSymbol(String symbol) {
