@@ -18,30 +18,22 @@ import android.text.format.DateUtils;
 import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.network.ServerClients;
-import com.coinomi.core.network.interfaces.BlockchainConnection;
-import com.coinomi.core.network.interfaces.ConnectionEventListener;
 import com.coinomi.core.wallet.WalletPocket;
 import com.coinomi.wallet.Configuration;
 import com.coinomi.wallet.Constants;
 import com.coinomi.core.wallet.Wallet;
 import com.coinomi.wallet.WalletApplication;
-import com.coinomi.core.network.ServerClient;
+
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.Sha256Hash;
-import org.bitcoinj.core.StoredBlock;
 import org.bitcoinj.core.Transaction;
-import org.bitcoinj.store.BlockStore;
-import org.bitcoinj.store.BlockStoreException;
-import org.bitcoinj.utils.Threading;
+
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -59,6 +51,8 @@ public class CoinServiceImpl extends Service implements CoinService {
 
     @CheckForNull
     private ServerClients client;
+
+    private CoinType lastCoin;
 
     private final Handler handler = new Handler();
     private final Handler delayHandler = new Handler();
@@ -319,13 +313,13 @@ public class CoinServiceImpl extends Service implements CoinService {
                 log.debug("acquiring wakelock");
                 wakeLock.acquire();
 
-                log.info("Starting coins client");
-                client = new ServerClients(Constants.COINS_ADDRESSES_TEST, wallet);
-                client.startAsync();
+                log.info("Creating coins clients");
+                client = new ServerClients(Constants.DEFAULT_COINS_SERVERS, wallet);
+                if (lastCoin != null) client.startAsync(wallet.getPocket(lastCoin));
             }
             else if (!hasEverything && client != null) {
                 log.info("stopping stratum client");
-                client.stopAsync();
+                client.stopAllAsync();
                 client = null;
 
                 log.debug("releasing wakelock");
@@ -545,15 +539,14 @@ public class CoinServiceImpl extends Service implements CoinService {
             notificationAddresses.clear();
 
             nm.cancel(NOTIFICATION_ID_COINS_RECEIVED);
-        }
-        else if (CoinService.ACTION_RESET_WALLET.equals(action)) {
+
+        } else if (CoinService.ACTION_RESET_WALLET.equals(action)) {
             if (application.getWallet() != null) {
 
                 List<CoinType> coinTypesToReset;
-                if (intent.hasExtra(CoinService.ACTION_RESET_WALLET_POCKET_ID)) {
-                    String idToReset = intent.getStringExtra(
-                            CoinService.ACTION_RESET_WALLET_POCKET_ID);
-                    coinTypesToReset = ImmutableList.of(CoinType.fromID(idToReset));
+                if (intent.hasExtra(Constants.ARG_COIN_ID)) {
+                    CoinType typeToReset = CoinID.typeFromId(intent.getStringExtra(Constants.ARG_COIN_ID));
+                    coinTypesToReset = ImmutableList.of(typeToReset);
                 } else {
                     coinTypesToReset = application.getWallet().getCoinTypes();
                 }
@@ -565,8 +558,16 @@ public class CoinServiceImpl extends Service implements CoinService {
             } else {
                 log.error("Got wallet reset intent, but no wallet is available");
             }
-        }
-        else if (CoinService.ACTION_BROADCAST_TRANSACTION.equals(action)) {
+        } else if (CoinService.ACTION_CONNECT_COIN.equals(action)) {
+            if (intent.hasExtra(Constants.ARG_COIN_ID)) {
+                lastCoin = CoinID.typeFromId(intent.getStringExtra(Constants.ARG_COIN_ID));
+                if (client != null && application.getWalletPocket(lastCoin) != null) {
+                    client.startAsync(application.getWalletPocket(lastCoin));
+                }
+            } else {
+                log.warn("Missing coin id argument, not doing anything");
+            }
+        } else if (CoinService.ACTION_BROADCAST_TRANSACTION.equals(action)) {
             final Sha256Hash hash = new Sha256Hash(intent.getByteArrayExtra(CoinService.ACTION_BROADCAST_TRANSACTION_HASH));
             final Transaction tx = null; // FIXME
 
@@ -598,7 +599,7 @@ public class CoinServiceImpl extends Service implements CoinService {
 //        application.getWallet().removeEventListener(walletEventListener);
 
         if (client != null) {
-            client.stopAsync();
+            client.stopAllAsync();
             client = null;
         }
 

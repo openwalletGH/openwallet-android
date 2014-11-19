@@ -6,7 +6,7 @@ import org.bitcoinj.core.Coin;
  * @author Giannis Dzegoutanis
  */
 public class NuSharesMain extends CoinType {
-    public NuSharesMain() {
+    private NuSharesMain() {
         id = "nushares.main";
         uid = 111;
 
@@ -23,11 +23,8 @@ public class NuSharesMain extends CoinType {
         unitExponent = 4;
     }
 
-    private static NuSharesMain instance;
+    private static NuSharesMain instance = new NuSharesMain();
     public static synchronized NuSharesMain get() {
-        if (instance == null) {
-            instance = new NuSharesMain();
-        }
         return instance;
     }
 }

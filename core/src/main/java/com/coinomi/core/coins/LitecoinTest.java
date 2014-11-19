@@ -6,7 +6,7 @@ import org.bitcoinj.core.Coin;
  * @author Giannis Dzegoutanis
  */
 public class LitecoinTest extends CoinType {
-    public LitecoinTest() {
+    private LitecoinTest() {
         id = "litecoin.test";
         uid = 22;
 
@@ -23,11 +23,8 @@ public class LitecoinTest extends CoinType {
         unitExponent = 8;
     }
 
-    private static LitecoinTest instance;
+    private static LitecoinTest instance = new LitecoinTest();
     public static synchronized LitecoinTest get() {
-        if (instance == null) {
-            instance = new LitecoinTest();
-        }
         return instance;
     }
 }

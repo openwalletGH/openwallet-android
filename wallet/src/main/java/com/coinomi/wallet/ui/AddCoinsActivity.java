@@ -138,7 +138,7 @@ public class AddCoinsActivity extends ActionBarActivity implements SelectCoinsFr
             Toast.makeText(AddCoinsActivity.this, message, Toast.LENGTH_LONG).show();
             setResult(RESULT_CANCELED, result);
         } else {
-            result.putExtra(Constants.ARG_COIN, selectedCoin);
+            result.putExtra(Constants.ARG_COIN_ID, selectedCoin.getId());
             setResult(RESULT_OK, result);
         }
 

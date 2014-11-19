@@ -68,6 +68,7 @@ public class ServerClient implements BlockchainConnection {
     private long retrySeconds = 1;
     private boolean stopped = false;
 
+    // TODO, only one is supported at the moment. Change when accounts are supported.
     private transient CopyOnWriteArrayList<ListenerRegistration<ConnectionEventListener>> eventListeners;
 
     private Runnable reconnectTask = new Runnable() {
@@ -144,9 +145,17 @@ public class ServerClient implements BlockchainConnection {
     }
 
     public void startAsync() {
+        if (stratumClient == null){
+            log.info("Not starting service as it is not ready");
+            return;
+        }
+
         Service.State state = stratumClient.state();
-        checkState(state == NEW, "Service %s is %s, cannot start it.", type.getName(), state);
-        checkState(!stopped, "Service %s is stopped.", type.getName());
+        if (state != NEW || stopped) {
+            log.info("Not starting service as it is already started or explicitly stopped");
+            return;
+        }
+
         try {
             stratumClient.startAsync();
         } catch (IllegalStateException e) {
@@ -172,6 +181,14 @@ public class ServerClient implements BlockchainConnection {
         return stratumClient != null && stratumClient.isConnected();
     }
 
+    // TODO support more than one pocket
+    public void maybeSetWalletPocket(WalletPocket pocket) {
+        if (eventListeners.isEmpty()) {
+            setWalletPocket(pocket, false);
+        }
+    }
+
+    // TODO support more than one pocket
     public void setWalletPocket(WalletPocket pocket, boolean reconnect) {
         if (isConnected()) broadcastOnDisconnect();
         eventListeners.clear();

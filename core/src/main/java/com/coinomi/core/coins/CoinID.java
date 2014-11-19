@@ -63,6 +63,10 @@ public enum CoinID {
         return builder.build();
     }
 
+    public static CoinType typeFromId(String stringId) {
+        return fromId(stringId).type;
+    }
+
     public static CoinID fromId(String stringId) {
         for(CoinID id : values()) {
             if (id.type.getId().equalsIgnoreCase(stringId)) return id;

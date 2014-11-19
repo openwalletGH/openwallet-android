@@ -6,7 +6,7 @@ import org.bitcoinj.core.Coin;
  * @author Giannis Dzegoutanis
  */
 public class DarkcoinMain extends CoinType {
-    public DarkcoinMain() {
+    private DarkcoinMain() {
         id = "darkcoin.main";
         uid = 51;
 
@@ -23,11 +23,8 @@ public class DarkcoinMain extends CoinType {
         unitExponent = 8;
     }
 
-    private static DarkcoinMain instance;
+    private static DarkcoinMain instance = new DarkcoinMain();
     public static synchronized DarkcoinMain get() {
-        if (instance == null) {
-            instance = new DarkcoinMain();
-        }
         return instance;
     }
 }

@@ -6,7 +6,7 @@ import org.bitcoinj.core.Coin;
  * @author Giannis Dzegoutanis
  */
 public class BitcoinTest extends CoinType {
-    public BitcoinTest() {
+    private BitcoinTest() {
         id = "bitcoin.test";
         uid = 12;
 
@@ -23,11 +23,8 @@ public class BitcoinTest extends CoinType {
         unitExponent = 8;
     }
 
-    private static BitcoinTest instance;
+    private static BitcoinTest instance = new BitcoinTest();
     public static synchronized BitcoinTest get() {
-        if (instance == null) {
-            instance = new BitcoinTest();
-        }
         return instance;
     }
 }

@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.uri.CoinURI;
 import com.coinomi.core.uri.CoinURIParseException;
@@ -127,6 +128,12 @@ final public class WalletActivity extends ActionBarActivity implements
             mViewPager.setCurrentItem(INFO);
             mViewPager.getAdapter().notifyDataSetChanged();
             getWalletApplication().getConfiguration().touchLastPocket(coinType);
+
+            // Open connection if needed or possible
+            Intent intent = new Intent(CoinService.ACTION_CONNECT_COIN, null,
+                    getWalletApplication(), CoinServiceImpl.class);
+            intent.putExtra(Constants.ARG_COIN_ID, currentType.getId());
+            getWalletApplication().startService(intent);
         }
     }
 
@@ -166,7 +173,7 @@ final public class WalletActivity extends ActionBarActivity implements
         } else if (requestCode == ADD_COIN) {
             if (resultCode == Activity.RESULT_OK) {
                 mNavigationDrawerFragment.notifyDataSetChanged();
-                CoinType type = (CoinType) intent.getSerializableExtra(Constants.ARG_COIN);
+                CoinType type = CoinID.typeFromId(intent.getStringExtra(Constants.ARG_COIN_ID));
                 mNavigationDrawerFragment.selectItem(type);
             }
         }
@@ -227,7 +234,7 @@ final public class WalletActivity extends ActionBarActivity implements
         if (getWalletApplication().getWallet() != null) {
             Intent intent = new Intent(CoinService.ACTION_RESET_WALLET, null,
                     getWalletApplication(), CoinServiceImpl.class);
-            intent.putExtra(CoinService.ACTION_RESET_WALLET_POCKET_ID, currentType.getId());
+            intent.putExtra(Constants.ARG_COIN_ID, currentType.getId());
             getWalletApplication().startService(intent);
             // FIXME, we get a crash if the activity is not restarted
             Intent introIntent = new Intent(WalletActivity.this, WalletActivity.class);

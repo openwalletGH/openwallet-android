@@ -6,7 +6,7 @@ import org.bitcoinj.core.Coin;
  * @author Giannis Dzegoutanis
  */
 public class DogecoinTest extends CoinType {
-    public DogecoinTest() {
+    private DogecoinTest() {
         id = "dogecoin.test";
         uid = 32;
 
@@ -23,11 +23,8 @@ public class DogecoinTest extends CoinType {
         unitExponent = 8;
     }
 
-    private static DogecoinTest instance;
+    private static DogecoinTest instance = new DogecoinTest();
     public static synchronized DogecoinTest get() {
-        if (instance == null) {
-            instance = new DogecoinTest();
-        }
         return instance;
     }
 }

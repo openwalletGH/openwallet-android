@@ -6,7 +6,7 @@ import org.bitcoinj.core.Coin;
  * @author Giannis Dzegoutanis
  */
 public class PeercoinMain extends CoinType {
-    public PeercoinMain() {
+    private PeercoinMain() {
         id = "peercoin.main";
         uid = 41;
 
@@ -23,11 +23,8 @@ public class PeercoinMain extends CoinType {
         unitExponent = 6;
     }
 
-    private static PeercoinMain instance;
+    private static PeercoinMain instance = new PeercoinMain();
     public static synchronized PeercoinMain get() {
-        if (instance == null) {
-            instance = new PeercoinMain();
-        }
         return instance;
     }
 }

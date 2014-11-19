@@ -6,7 +6,7 @@ import org.bitcoinj.core.Coin;
  * @author Giannis Dzegoutanis
  */
 public class MonacoinMain extends CoinType {
-    public MonacoinMain() {
+    private MonacoinMain() {
         id = "monacoin.main";
         uid = -1; // FIXME
 
@@ -25,11 +25,8 @@ public class MonacoinMain extends CoinType {
         throw new RuntimeException(name+" bip44Index " + bip44Index + "is not standardized");
     }
 
-    private static MonacoinMain instance;
+    private static MonacoinMain instance = new MonacoinMain();
     public static synchronized MonacoinMain get() {
-        if (instance == null) {
-            instance = new MonacoinMain();
-        }
         return instance;
     }
 }

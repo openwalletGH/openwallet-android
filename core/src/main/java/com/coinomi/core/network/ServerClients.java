@@ -66,17 +66,29 @@ public class ServerClients {
 
     public void setPockets(List<WalletPocket> pockets, boolean reconnect) {
         for (WalletPocket pocket : pockets) {
+            if (!connections.containsKey(pocket.getCoinType())) continue;
             connections.get(pocket.getCoinType()).setWalletPocket(pocket, reconnect);
         }
     }
 
-    public void startAsync() {
+    public void startAllAsync() {
         for (ServerClient client : connections.values()) {
             client.startAsync();
         }
     }
 
-    public void stopAsync() {
+    public void startAsync(WalletPocket pocket) {
+        CoinType type = pocket.getCoinType();
+        if (connections.containsKey(type)) {
+            ServerClient c = connections.get(type);
+            c.maybeSetWalletPocket(pocket);
+            c.startAsync();
+        } else {
+            log.warn("No connection found for {}", type.getName());
+        }
+    }
+
+    public void stopAllAsync() {
         for (ServerClient client : connections.values()) {
             client.stopAsync();
         }

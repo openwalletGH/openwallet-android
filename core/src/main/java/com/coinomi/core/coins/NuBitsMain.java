@@ -6,7 +6,7 @@ import org.bitcoinj.core.Coin;
  * @author Giannis Dzegoutanis
  */
 public class NuBitsMain extends CoinType {
-    public NuBitsMain() {
+    private NuBitsMain() {
         id = "nubits.main";
         uid = 121;
 
@@ -23,11 +23,8 @@ public class NuBitsMain extends CoinType {
         unitExponent = 4;
     }
 
-    private static NuBitsMain instance;
+    private static NuBitsMain instance = new NuBitsMain();
     public static synchronized NuBitsMain get() {
-        if (instance == null) {
-            instance = new NuBitsMain();
-        }
         return instance;
     }
 }

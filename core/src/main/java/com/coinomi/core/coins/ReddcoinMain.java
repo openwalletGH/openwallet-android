@@ -6,7 +6,7 @@ import org.bitcoinj.core.Coin;
  * @author Giannis Dzegoutanis
  */
 public class ReddcoinMain extends CoinType {
-    public ReddcoinMain() {
+    private ReddcoinMain() {
         id = "reddcoin.main";
         uid = -1; // FIXME
 
@@ -25,11 +25,8 @@ public class ReddcoinMain extends CoinType {
         throw new RuntimeException(name+" bip44Index " + bip44Index + "is not standardized");
     }
 
-    private static ReddcoinMain instance;
+    private static ReddcoinMain instance = new ReddcoinMain();
     public static synchronized ReddcoinMain get() {
-        if (instance == null) {
-            instance = new ReddcoinMain();
-        }
         return instance;
     }
 }

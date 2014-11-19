@@ -6,7 +6,7 @@ import org.bitcoinj.core.Coin;
  * @author Giannis Dzegoutanis
  */
 public class BitcoinMain extends CoinType {
-    public BitcoinMain() {
+    private BitcoinMain() {
         id = "bitcoin.main";
         uid = 11;
 
@@ -23,11 +23,8 @@ public class BitcoinMain extends CoinType {
         unitExponent = 8;
     }
 
-    private static BitcoinMain instance;
+    private static BitcoinMain instance = new BitcoinMain();
     public static synchronized BitcoinMain get() {
-        if (instance == null) {
-            instance = new BitcoinMain();
-        }
         return instance;
     }
 }

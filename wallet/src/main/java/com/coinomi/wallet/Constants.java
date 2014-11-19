@@ -28,7 +28,7 @@ public class Constants {
     public static final String ARG_SEED_PROTECT = "seed_protect";
     public static final String ARG_PASSWORD = "password";
     public static final String ARG_SEND_TO_ADDRESS = "to_address";
-    public static final String ARG_COIN = "coin";
+    public static final String ARG_COIN_ID = "coin_id";
     public static final String ARG_TRANSACTION = "transaction";
     public static final String ARG_SEND_REQUEST = "send_request";
     public static final String ARG_ERROR = "error";
@@ -48,8 +48,7 @@ public class Constants {
     public static final String CURRENCY_PLUS_SIGN = "+" + CHAR_THIN_SPACE;
     public static final String CURRENCY_MINUS_SIGN = "-" + CHAR_THIN_SPACE;
 
-    // TODO make dynamic
-    public static final List<CoinAddress> COINS_ADDRESSES_TEST = ImmutableList.of(
+    public static final List<CoinAddress> DEFAULT_COINS_SERVERS = ImmutableList.of(
             new CoinAddress(BitcoinMain.get(), new ServerAddress("btc-cce-1.coinomi.net", 5001), new ServerAddress("btc-cce-2.coinomi.net", 5001)),
             new CoinAddress(DogecoinMain.get(), new ServerAddress("doge-cce-1.coinomi.net", 5003), new ServerAddress("doge-cce-2.coinomi.net", 5003)),
             new CoinAddress(LitecoinMain.get(), new ServerAddress("ltc-cce-1.coinomi.net", 5002), new ServerAddress("ltc-cce-2.coinomi.net", 5002)),
