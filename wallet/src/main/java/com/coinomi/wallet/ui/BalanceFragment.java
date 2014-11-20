@@ -187,8 +187,9 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
         handler.sendMessage(handler.obtainMessage(PENDING, pendingAmount));
     }
 
-    @Override
-    public void onTransactionConfidenceChanged(WalletPocket pocket, Transaction tx) { }
+    // Handled by ThrottlingWalletChangeListener
+    @Override public void onNewBlock(WalletPocket pocket) { }
+    @Override public void onTransactionConfidenceChanged(WalletPocket pocket, Transaction tx) { }
 
     @Override
     public void onPocketChanged(WalletPocket pocket) {

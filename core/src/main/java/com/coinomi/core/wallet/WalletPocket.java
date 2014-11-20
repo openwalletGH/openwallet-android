@@ -20,6 +20,7 @@ package com.coinomi.core.wallet;
 
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.network.AddressStatus;
+import com.coinomi.core.network.BlockHeader;
 import com.coinomi.core.network.ServerClient.HistoryTx;
 import com.coinomi.core.network.ServerClient.UnspentTx;
 import com.coinomi.core.network.interfaces.BlockchainConnection;
@@ -41,7 +42,6 @@ import org.bitcoinj.core.TransactionInput;
 import org.bitcoinj.core.TransactionInput.ConnectMode;
 import org.bitcoinj.core.TransactionInput.ConnectionResult;
 import org.bitcoinj.core.TransactionOutput;
-import org.bitcoinj.core.Utils;
 import org.bitcoinj.core.VarInt;
 import org.bitcoinj.crypto.DeterministicKey;
 import org.bitcoinj.crypto.KeyCrypter;
@@ -97,6 +97,7 @@ import static com.coinomi.core.Preconditions.checkState;
  */
 public class WalletPocket implements TransactionBag, TransactionEventListener, ConnectionEventListener, Serializable {
     private static final Logger log = LoggerFactory.getLogger(WalletPocket.class);
+
     private final ReentrantLock lock = Threading.lock("WalletPocket");
 
     private final CoinType coinType;
@@ -711,6 +712,30 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
     }
 
     @Override
+    public void onNewBlock(BlockHeader header) {
+        log.info("Got a block {}", header.getBlockHeight());
+        lock.lock();
+        try {
+            lastBlockSeenTimeSecs = header.getTimestamp();
+            lastBlockSeenHeight = header.getBlockHeight();
+            for (Transaction tx : getTransactions(false)) {
+                maybeUpdateBlockDepth(tx);
+            }
+            queueOnNewBlock();
+        } finally {
+            lock.unlock();
+        }
+        walletSaveLater();
+    }
+
+    private void maybeUpdateBlockDepth(Transaction tx) {
+        TransactionConfidence confidence = tx.getConfidence();
+        if (confidence.getConfidenceType() != ConfidenceType.BUILDING) return;
+        int newDepth = lastBlockSeenHeight - confidence.getAppearedAtChainHeight() + 1;
+        if (newDepth > 1) tx.getConfidence().setDepthInBlocks(newDepth);
+    }
+
+    @Override
     public void onAddressStatusUpdate(AddressStatus status) {
         log.info("Got a status {}", status);
         lock.lock();
@@ -828,8 +853,9 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
             Transaction tx = txs.get(historyTx.getTxHash());
             if (tx != null) {
                 log.info("{} getHeight() = " + historyTx.getHeight(), historyTx.getTxHash());
-                if (historyTx.getHeight() > 0) {
+                if (historyTx.getHeight() > 0 && tx.getConfidence().getDepthInBlocks() == 0) {
                     tx.getConfidence().setAppearedAtChainHeight(historyTx.getHeight());
+                    maybeUpdateBlockDepth(tx);
                 }
             } else {
                 log.error("Could not find {} in the transactions pool. Aborting applying state",
@@ -1048,6 +1074,7 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
     public void onConnection(BlockchainConnection blockchainConnection) {
         this.blockchainConnection = blockchainConnection;
         clearTransientState();
+        subscribeToBlockchain();
         subscribeIfNeeded();
         queueOnConnectivity();
     }
@@ -1057,6 +1084,17 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
         blockchainConnection = null;
         clearTransientState();
         queueOnConnectivity();
+    }
+
+    private void subscribeToBlockchain() {
+        lock.lock();
+        try {
+            if (blockchainConnection != null) {
+                blockchainConnection.subscribeToBlockchain(this);
+            }
+        } finally {
+            lock.unlock();
+        }
     }
 
     private void subscribeIfNeeded() {
@@ -1071,8 +1109,7 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
             }
         } catch (Exception e) {
             log.error("Error subscribing to addresses", e);
-        }
-        finally {
+        } finally {
             lock.unlock();
         }
     }
@@ -1111,6 +1148,19 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
                 @Override
                 public void run() {
                     registration.listener.onNewBalance(balance, pendingBalance);
+                    registration.listener.onPocketChanged(WalletPocket.this);
+                }
+            });
+        }
+    }
+
+    private void queueOnNewBlock() {
+        checkState(lock.isHeldByCurrentThread());
+        for (final ListenerRegistration<WalletPocketEventListener> registration : listeners) {
+            registration.executor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    registration.listener.onNewBlock(WalletPocket.this);
                     registration.listener.onPocketChanged(WalletPocket.this);
                 }
             });

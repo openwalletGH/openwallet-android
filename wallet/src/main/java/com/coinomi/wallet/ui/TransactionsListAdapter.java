@@ -173,6 +173,7 @@ public class TransactionsListAdapter extends BaseAdapter {
     }
 
     public void bindView(@Nonnull final View row, @Nonnull final Transaction tx) {
+        Resources res = context.getResources();
         final TransactionConfidence confidence = tx.getConfidence();
         final ConfidenceType confidenceType = confidence.getConfidenceType();
         final boolean isOwn = confidence.getSource().equals(TransactionConfidence.Source.SELF);
@@ -189,6 +190,8 @@ public class TransactionsListAdapter extends BaseAdapter {
         final TextView rowDirectionText = (TextView) row.findViewById(R.id.transaction_row_direction_text);
         final TextView rowDirectionFontIcon = (TextView) row.findViewById(R.id.transaction_row_direction_font_icon);
         Fonts.setTypeface(rowDirectionFontIcon, Fonts.Font.ENTYPO_COINOMI);
+        final TextView rowConfirmationsFontIcon = (TextView) row.findViewById(R.id.transaction_row_confirmations_font_icon);
+        Fonts.setTypeface(rowConfirmationsFontIcon, Fonts.Font.ENTYPO_COINOMI);
         // TODO implement date
 //        final TextView rowDate = (TextView) row.findViewById(R.id.transaction_row_time);
         final TextView rowLabel = (TextView) row.findViewById(R.id.transaction_row_label);
@@ -208,10 +211,10 @@ public class TransactionsListAdapter extends BaseAdapter {
             rowDirectionFontIcon.setTextColor(colorLessSignificant);
             if (value.isNegative()) {
                 rowDirectionFontIcon.setBackgroundResource(R.drawable.transaction_row_cyrcle_bg_send);
-                rowValue.setTextColor(context.getResources().getColor(R.color.send_color_fg));
+                rowValue.setTextColor(res.getColor(R.color.send_color_fg));
             } else {
                 rowDirectionFontIcon.setBackgroundResource(R.drawable.transaction_row_cyrcle_bg_receive);
-                rowValue.setTextColor(context.getResources().getColor(R.color.receive_color_fg));
+                rowValue.setTextColor(res.getColor(R.color.receive_color_fg));
             }
         } else if (confidenceType == ConfidenceType.DEAD) {
             rowLabel.setTextColor(colorSignificant);
@@ -226,13 +229,36 @@ public class TransactionsListAdapter extends BaseAdapter {
             rowDirectionFontIcon.setBackgroundResource(R.drawable.transaction_row_cyrcle_bg_pending);
         }
 
+        // Confirmations
+        if (confidence.getDepthInBlocks() < 4) {
+            rowConfirmationsFontIcon.setVisibility(View.VISIBLE);
+            rowConfirmationsFontIcon.setTextColor(colorLessSignificant);
+            switch (confidence.getDepthInBlocks()) {
+                case 0:
+                    rowConfirmationsFontIcon.setText(res.getString(R.string.font_icon_confirmation_0));
+                    rowConfirmationsFontIcon.setTextColor(colorInsignificant); // PENDING
+                    break;
+                case 1:
+                    rowConfirmationsFontIcon.setText(res.getString(R.string.font_icon_confirmation_1));
+                    break;
+                case 2:
+                    rowConfirmationsFontIcon.setText(res.getString(R.string.font_icon_confirmation_2));
+                    break;
+                case 3:
+                    rowConfirmationsFontIcon.setText(res.getString(R.string.font_icon_confirmation_3));
+                    break;
+            }
+        } else {
+            rowConfirmationsFontIcon.setVisibility(View.GONE);
+        }
+
         // Money direction
         if (value.isNegative()) {
-            rowDirectionText.setText(context.getResources().getString(R.string.sent_to));
-            rowDirectionFontIcon.setText(context.getResources().getString(R.string.font_icon_send));
+            rowDirectionText.setText(res.getString(R.string.sent_to));
+            rowDirectionFontIcon.setText(res.getString(R.string.font_icon_send));
         } else {
-            rowDirectionText.setText(context.getResources().getString(R.string.received_with));
-            rowDirectionFontIcon.setText(context.getResources().getString(R.string.font_icon_receive));
+            rowDirectionText.setText(res.getString(R.string.received_with));
+            rowDirectionFontIcon.setText(res.getString(R.string.font_icon_receive));
         }
 
         // date

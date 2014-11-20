@@ -11,16 +11,34 @@
     android:paddingStart="@dimen/transaction_row_padding_horizontal"
     android:paddingTop="@dimen/transaction_row_padding_vertical">
 
-    <TextView
-        android:id="@+id/transaction_row_direction_font_icon"
-        style="@style/TransactionRowDirectionFontIcon"
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginRight="@dimen/transaction_row_margin_direction"
-        android:layout_marginEnd="@dimen/transaction_row_margin_direction"
-        android:layout_gravity="center_vertical"
-        android:gravity="center"
-        tools:text="[->" />
+        android:layout_gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/transaction_row_direction_font_icon"
+            style="@style/TransactionRowDirectionFontIcon"
+            android:layout_width="@dimen/transaction_row_direction_bg_size"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="@dimen/transaction_row_margin_direction"
+            android:layout_marginEnd="@dimen/transaction_row_margin_direction"
+            android:background="@drawable/transaction_row_cyrcle_bg_pending"
+            android:gravity="center"
+            tools:text="[->" />
+
+        <TextView
+            android:id="@+id/transaction_row_confirmations_font_icon"
+            style="@style/TransactionRowConfidenceFontIcon"
+            android:layout_width="@dimen/transaction_row_direction_bg_size"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_below="@+id/transaction_row_direction_font_icon"
+            android:gravity="center"
+            tools:text="***" />
+
+    </RelativeLayout>
 
     <LinearLayout
         android:layout_width="match_parent"

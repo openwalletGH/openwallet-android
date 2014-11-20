@@ -15,6 +15,8 @@ import java.util.List;
  * @author Giannis Dzegoutanis
  */
 public interface BlockchainConnection {
+    void subscribeToBlockchain(final TransactionEventListener listener);
+
     void subscribeToAddresses(List<Address> addresses,
                               TransactionEventListener listener);
 

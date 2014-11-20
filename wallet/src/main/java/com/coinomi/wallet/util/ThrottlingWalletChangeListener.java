@@ -119,6 +119,11 @@ public abstract class ThrottlingWalletChangeListener implements WalletPocketEven
             relevant.set(true);
     }
 
+    @Override
+    public void onNewBlock(final WalletPocket pocket) {
+        if (confidenceRelevant)
+            relevant.set(true);
+    }
 
     @Override
     public void onConnectivityStatus(WalletPocketConnectivity pocketConnectivity) { /* ignore */ }

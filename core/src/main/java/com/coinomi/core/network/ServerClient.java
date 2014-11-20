@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -245,6 +246,51 @@ public class ServerClient implements BlockchainConnection {
                 }
             });
         }
+    }
+
+    private BlockHeader parseBlockHeader(CoinType type, JSONObject json) throws JSONException {
+        return new BlockHeader(type, json.getLong("timestamp"), json.getInt("block_height"));
+    }
+
+    @Override
+    public void subscribeToBlockchain(final TransactionEventListener listener) {
+        checkNotNull(stratumClient);
+
+        // TODO use TransactionEventListener directly because the current solution leaks memory
+        StratumClient.SubscribeResult blockchainHeaderHandler = new StratumClient.SubscribeResult() {
+            @Override
+            public void handle(CallMessage message) {
+                try {
+                    BlockHeader header = parseBlockHeader(type, message.getParams().getJSONObject(0));
+                    listener.onNewBlock(header);
+                } catch (JSONException e) {
+                    log.error("Unexpected JSON format", e);
+                }
+            }
+        };
+
+        log.info("Going to subscribe to block chain headers");
+
+        CallMessage callMessage = new CallMessage("blockchain.headers.subscribe", (List)null);
+        ListenableFuture<ResultMessage> reply = stratumClient.subscribe(callMessage, blockchainHeaderHandler);
+
+        Futures.addCallback(reply, new FutureCallback<ResultMessage>() {
+
+            @Override
+            public void onSuccess(ResultMessage result) {
+                try {
+                    BlockHeader header = parseBlockHeader(type, result.getResult().getJSONObject(0));
+                    listener.onNewBlock(header);
+                } catch (JSONException e) {
+                    log.error("Unexpected JSON format", e);
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                log.error("Could not get reply for blockchain headers subscribe", t);
+            }
+        }, Threading.USER_THREAD);
     }
 
     @Override
