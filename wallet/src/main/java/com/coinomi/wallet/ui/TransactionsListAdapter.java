@@ -36,7 +36,12 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.coinomi.core.coins.BitcoinMain;
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.coins.DarkcoinMain;
+import com.coinomi.core.coins.DogecoinMain;
+import com.coinomi.core.coins.LitecoinMain;
+import com.coinomi.core.coins.PeercoinMain;
 import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.WalletPocket;
 import com.coinomi.wallet.R;
@@ -189,9 +194,9 @@ public class TransactionsListAdapter extends BaseAdapter {
 
         final TextView rowDirectionText = (TextView) row.findViewById(R.id.transaction_row_direction_text);
         final TextView rowDirectionFontIcon = (TextView) row.findViewById(R.id.transaction_row_direction_font_icon);
-        Fonts.setTypeface(rowDirectionFontIcon, Fonts.Font.ENTYPO_COINOMI);
+        Fonts.setTypeface(rowDirectionFontIcon, Fonts.Font.COINOMI_FONT_ICONS);
         final TextView rowConfirmationsFontIcon = (TextView) row.findViewById(R.id.transaction_row_confirmations_font_icon);
-        Fonts.setTypeface(rowConfirmationsFontIcon, Fonts.Font.ENTYPO_COINOMI);
+        Fonts.setTypeface(rowConfirmationsFontIcon, Fonts.Font.COINOMI_FONT_ICONS);
         // TODO implement date
 //        final TextView rowDate = (TextView) row.findViewById(R.id.transaction_row_time);
         final TextView rowLabel = (TextView) row.findViewById(R.id.transaction_row_label);
@@ -235,17 +240,17 @@ public class TransactionsListAdapter extends BaseAdapter {
             rowConfirmationsFontIcon.setTextColor(colorLessSignificant);
             switch (confidence.getDepthInBlocks()) {
                 case 0:
-                    rowConfirmationsFontIcon.setText(res.getString(R.string.font_icon_confirmation_0));
+                    rowConfirmationsFontIcon.setText(res.getString(R.string.font_icon_progress_0));
                     rowConfirmationsFontIcon.setTextColor(colorInsignificant); // PENDING
                     break;
                 case 1:
-                    rowConfirmationsFontIcon.setText(res.getString(R.string.font_icon_confirmation_1));
+                    rowConfirmationsFontIcon.setText(res.getString(R.string.font_icon_progress_1));
                     break;
                 case 2:
-                    rowConfirmationsFontIcon.setText(res.getString(R.string.font_icon_confirmation_2));
+                    rowConfirmationsFontIcon.setText(res.getString(R.string.font_icon_progress_2));
                     break;
                 case 3:
-                    rowConfirmationsFontIcon.setText(res.getString(R.string.font_icon_confirmation_3));
+                    rowConfirmationsFontIcon.setText(res.getString(R.string.font_icon_progress_3));
                     break;
             }
         } else {
@@ -255,10 +260,10 @@ public class TransactionsListAdapter extends BaseAdapter {
         // Money direction
         if (value.isNegative()) {
             rowDirectionText.setText(res.getString(R.string.sent_to));
-            rowDirectionFontIcon.setText(res.getString(R.string.font_icon_send));
+            rowDirectionFontIcon.setText(res.getString(R.string.font_icon_send_coins));
         } else {
             rowDirectionText.setText(res.getString(R.string.received_with));
-            rowDirectionFontIcon.setText(res.getString(R.string.font_icon_receive));
+            rowDirectionFontIcon.setText(res.getString(R.string.font_icon_receive_coins));
         }
 
         // date

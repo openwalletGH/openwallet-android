@@ -75,7 +75,7 @@ public class SetPasswordFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_set_password, container, false);
 
-        Fonts.setTypeface(view.findViewById(R.id.key_icon), Fonts.Font.ENTYPO_COINOMI);
+        Fonts.setTypeface(view.findViewById(R.id.key_icon), Fonts.Font.COINOMI_FONT_ICONS);
 
         errorPassword = (TextView) view.findViewById(R.id.password_error);
         errorPasswordsMismatch = (TextView) view.findViewById(R.id.passwords_mismatch);

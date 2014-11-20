@@ -84,7 +84,7 @@ public class RestoreFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_restore, container, false);
 
-        Fonts.setTypeface(view.findViewById(R.id.seed_icon), Fonts.Font.ENTYPO_COINOMI);
+        Fonts.setTypeface(view.findViewById(R.id.seed_icon), Fonts.Font.COINOMI_FONT_ICONS);
 
         QrCodeButton scanQrButton = (QrCodeButton) view.findViewById(R.id.scan_qr_code);
         scanQrButton.setOnClickListener(new View.OnClickListener() {

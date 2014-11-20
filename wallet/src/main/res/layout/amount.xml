@@ -66,7 +66,7 @@
             android:textSize="@dimen/connectivity_symbol_size"
             android:textColor="@color/fg_insignificant"
             android:gravity="center_horizontal"
-            android:text="@string/font_icon_globe"
+            android:text="@string/font_icon_earth"
             tools:text="O" />
         <TextView
             android:id="@+id/disconnect_symbol"
@@ -75,7 +75,7 @@
             android:textSize="@dimen/connectivity_symbol_size"
             android:textColor="@color/fg_error"
             android:gravity="center_horizontal"
-            android:text="@string/font_icon_cancel"
+            android:text="@string/font_icon_cross"
             tools:text="X" />
     </RelativeLayout>
 

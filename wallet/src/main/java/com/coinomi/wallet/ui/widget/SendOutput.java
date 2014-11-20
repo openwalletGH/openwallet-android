@@ -12,9 +12,6 @@ import com.coinomi.core.util.GenericUtils;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.util.Fonts;
 
-import org.bitcoinj.core.Address;
-import org.bitcoinj.core.Coin;
-
 /**
  * @author Giannis Dzegoutanis
  */
@@ -78,8 +75,8 @@ public class SendOutput extends LinearLayout {
             address.setVisibility(GONE);
         } else {
             if (!sendType.isInEditMode()) { // If not displayed within a developer tool
-                Fonts.setTypeface(sendType, Fonts.Font.ENTYPO_COINOMI);
-                sendType.setText(getResources().getString(R.string.font_icon_send));
+                Fonts.setTypeface(sendType, Fonts.Font.COINOMI_FONT_ICONS);
+                sendType.setText(getResources().getString(R.string.font_icon_send_coins));
             }
         }
     }

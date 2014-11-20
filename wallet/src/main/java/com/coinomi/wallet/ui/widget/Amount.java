@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -37,9 +36,9 @@ public class Amount extends RelativeLayout {
 //        amountPending = (TextView) findViewById(R.id.amount_pending);
 //        amountPending.setVisibility(GONE);
         connectionStatus = (TextView) findViewById(R.id.connection_status);
-        Fonts.setTypeface(connectionStatus, Fonts.Font.ENTYPO_COINOMI);
+        Fonts.setTypeface(connectionStatus, Fonts.Font.COINOMI_FONT_ICONS);
         disconnetSymbol = (TextView) findViewById(R.id.disconnect_symbol);
-        Fonts.setTypeface(disconnetSymbol, Fonts.Font.ENTYPO_COINOMI);
+        Fonts.setTypeface(disconnetSymbol, Fonts.Font.COINOMI_FONT_ICONS);
 
         TypedArray a = context.obtainStyledAttributes(attrs,
                 R.styleable.Amount, 0, 0);

@@ -1,13 +1,11 @@
 package com.coinomi.wallet.ui;
 
 import android.app.Activity;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -57,7 +55,7 @@ public class PasswordConfirmationFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_password_confirmation, container, false);
 
-        Fonts.setTypeface(view.findViewById(R.id.key_icon), Fonts.Font.ENTYPO_COINOMI);
+        Fonts.setTypeface(view.findViewById(R.id.key_icon), Fonts.Font.COINOMI_FONT_ICONS);
 
         TextView messageView = (TextView) view.findViewById(R.id.message);
         if (message != null) {

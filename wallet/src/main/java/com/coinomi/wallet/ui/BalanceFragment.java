@@ -25,13 +25,12 @@ import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.ui.widget.Amount;
 import com.coinomi.wallet.util.ThrottlingWalletChangeListener;
+import com.google.common.collect.Lists;
 
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.TransactionConfidence;
 import org.bitcoinj.utils.Threading;
-import com.google.common.collect.Lists;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
