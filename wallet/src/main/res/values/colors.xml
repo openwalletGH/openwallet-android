@@ -16,10 +16,10 @@
     <color name="gray_26_hint_text">#42000000</color>
     <color name="gray_12_dividers">#1e000000</color>
 
-    <color name="send_color_fg">@color/primary_900</color>
-    <color name="receive_color_fg">@color/accent_900</color>
-    <color name="send_color_bg">@color/primary_100</color>
-    <color name="receive_color_bg">@color/accent_100</color>
+    <color name="send_color_fg">@color/accent_900</color>
+    <color name="receive_color_fg">@color/primary_900</color>
+    <color name="send_color_bg">@color/accent_100</color>
+    <color name="receive_color_bg">@color/primary_100</color>
 
     <color name="actionbar_fg">@color/white_almost</color>
     <color name="actionbar_bg">@color/primary_500</color>
