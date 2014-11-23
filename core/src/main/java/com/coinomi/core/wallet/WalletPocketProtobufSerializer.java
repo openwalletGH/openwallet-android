@@ -257,46 +257,52 @@ public class WalletPocketProtobufSerializer {
             pocket.setDescription(walletProto.getDescription());
         }
 
-        // Read all transactions and insert into the txMap.
-        for (Protos.Transaction txProto : walletProto.getTransactionList()) {
-            readTransaction(txProto, coinType);
-        }
-
-        // Update transaction outputs to point to inputs that spend them
-        ArrayList<WalletTransaction> wtxs = new ArrayList<WalletTransaction>(walletProto.getTransactionList().size());
-        for (Protos.Transaction txProto : walletProto.getTransactionList()) {
-            wtxs.add(connectTransactionOutputs(txProto));
-        }
-
-        pocket.restoreWalletTransactions(wtxs);
-
-        // Read all the address statuses
         try {
-            for (Protos.AddressStatus sp : walletProto.getAddressStatusList()) {
-                Address addr = new Address(coinType, sp.getAddress());
-                AddressStatus status = new AddressStatus(addr, sp.getStatus());
-                pocket.commitAddressStatus(status);
+            // Read all transactions and insert into the txMap.
+            for (Protos.Transaction txProto : walletProto.getTransactionList()) {
+                readTransaction(txProto, coinType);
             }
-        } catch (AddressFormatException e) {
-            throw new UnreadableWalletException(e.getMessage(), e);
-        }
 
-        // Update the lastBlockSeenHash.
-        if (!walletProto.hasLastSeenBlockHash()) {
-            pocket.setLastBlockSeenHash(null);
-        } else {
-            pocket.setLastBlockSeenHash(byteStringToHash(walletProto.getLastSeenBlockHash()));
-        }
-        if (!walletProto.hasLastSeenBlockHeight()) {
-            pocket.setLastBlockSeenHeight(-1);
-        } else {
-            pocket.setLastBlockSeenHeight(walletProto.getLastSeenBlockHeight());
-        }
-        // Will default to zero if not present.
-        pocket.setLastBlockSeenTimeSecs(walletProto.getLastSeenBlockTimeSecs());
+            // Update transaction outputs to point to inputs that spend them
+            ArrayList<WalletTransaction> wtxs = new ArrayList<WalletTransaction>(walletProto.getTransactionList().size());
+            for (Protos.Transaction txProto : walletProto.getTransactionList()) {
+                wtxs.add(connectTransactionOutputs(txProto));
+            }
 
-        // Make sure the object can be re-used to read another wallet without corruption.
-        txMap.clear();
+            pocket.restoreWalletTransactions(wtxs);
+
+            // Read all the address statuses
+            try {
+                for (Protos.AddressStatus sp : walletProto.getAddressStatusList()) {
+                    Address addr = new Address(coinType, sp.getAddress());
+                    AddressStatus status = new AddressStatus(addr, sp.getStatus());
+                    pocket.commitAddressStatus(status);
+                }
+            } catch (AddressFormatException e) {
+                throw new UnreadableWalletException(e.getMessage(), e);
+            }
+
+            // Update the lastBlockSeenHash.
+            if (!walletProto.hasLastSeenBlockHash()) {
+                pocket.setLastBlockSeenHash(null);
+            } else {
+                pocket.setLastBlockSeenHash(byteStringToHash(walletProto.getLastSeenBlockHash()));
+            }
+            if (!walletProto.hasLastSeenBlockHeight()) {
+                pocket.setLastBlockSeenHeight(-1);
+            } else {
+                pocket.setLastBlockSeenHeight(walletProto.getLastSeenBlockHeight());
+            }
+            // Will default to zero if not present.
+            pocket.setLastBlockSeenTimeSecs(walletProto.getLastSeenBlockTimeSecs());
+
+        } catch (UnreadableWalletException e) {
+            log.warn("Could not restore transactions. Trying refreshing {} pocket.", coinType.getName());
+            pocket.refresh();
+        } finally {
+            // Make sure the object can be re-used to read another wallet without corruption.
+            txMap.clear();
+        }
 
         return pocket;
     }

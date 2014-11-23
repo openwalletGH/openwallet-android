@@ -347,6 +347,9 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
         lock.lock();
         try {
             log.info("Refreshing wallet pocket {}", coinType);
+            lastBlockSeenHash = null;
+            lastBlockSeenHeight = -1;
+            lastBlockSeenTimeSecs = 0;
             unspent.clear();
             spent.clear();
             pending.clear();
