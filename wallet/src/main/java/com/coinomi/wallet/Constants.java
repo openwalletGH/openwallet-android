@@ -27,10 +27,10 @@ public class Constants {
     public static final String ARG_SEED = "seed";
     public static final String ARG_SEED_PROTECT = "seed_protect";
     public static final String ARG_PASSWORD = "password";
-    public static final String ARG_SEND_TO_ADDRESS = "to_address";
+    public static final String ARG_SEND_TO_ADDRESS = "send_to_address";
+    public static final String ARG_SEND_AMOUNT = "send_amount";
     public static final String ARG_COIN_ID = "coin_id";
-    public static final String ARG_TRANSACTION = "transaction";
-    public static final String ARG_SEND_REQUEST = "send_request";
+    public static final String ARG_TRANSACTION_ID = "transaction_id";
     public static final String ARG_ERROR = "error";
     public static final String ARG_MESSAGE = "message";
 
@@ -48,6 +48,7 @@ public class Constants {
     public static final String CURRENCY_PLUS_SIGN = "+" + CHAR_THIN_SPACE;
     public static final String CURRENCY_MINUS_SIGN = "-" + CHAR_THIN_SPACE;
 
+    // TODO move to resource files
     public static final List<CoinAddress> DEFAULT_COINS_SERVERS = ImmutableList.of(
             new CoinAddress(BitcoinMain.get(), new ServerAddress("btc-cce-1.coinomi.net", 5001), new ServerAddress("btc-cce-2.coinomi.net", 5001)),
             new CoinAddress(DogecoinMain.get(), new ServerAddress("doge-cce-1.coinomi.net", 5003), new ServerAddress("doge-cce-2.coinomi.net", 5003)),
@@ -57,6 +58,7 @@ public class Constants {
     );
 
     public static final HashMap<CoinType, Integer> COINS_ICONS;
+    public static final HashMap<CoinType, String> COINS_BLOCK_EXPLORERS;
     static {
         COINS_ICONS = new HashMap<CoinType, Integer>();
         COINS_ICONS.put(CoinID.BITCOIN_MAIN.getCoinType(), R.drawable.bitcoin);
@@ -66,6 +68,13 @@ public class Constants {
         COINS_ICONS.put(CoinID.DARKCOIN_MAIN.getCoinType(), R.drawable.darkcoin);
         COINS_ICONS.put(CoinID.NUSHARES_MAIN.getCoinType(), R.drawable.nushares);
         COINS_ICONS.put(CoinID.NUBITS_MAIN.getCoinType(), R.drawable.nubits);
+
+        COINS_BLOCK_EXPLORERS = new HashMap<CoinType, String>();
+        COINS_BLOCK_EXPLORERS.put(CoinID.BITCOIN_MAIN.getCoinType(), "https://www.biteasy.com/blockchain/transactions/%s");
+        COINS_BLOCK_EXPLORERS.put(CoinID.LITECOIN_MAIN.getCoinType(), "http://ltc.blockr.io/tx/info/%s");
+        COINS_BLOCK_EXPLORERS.put(CoinID.PEERCOIN_MAIN.getCoinType(), "http://ppc.blockr.io/tx/info/%s");
+        COINS_BLOCK_EXPLORERS.put(CoinID.DOGECOIN_MAIN.getCoinType(), "http://dogechain.info/tx/%s");
+        COINS_BLOCK_EXPLORERS.put(CoinID.DARKCOIN_MAIN.getCoinType(), "https://bitinfocharts.com/darkcoin/tx/%s");
     }
 
     public static final CoinType DEFAULT_COIN = BitcoinMain.get();

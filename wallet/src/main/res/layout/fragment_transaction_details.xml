@@ -1,0 +1,69 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.coinomi.wallet.ui.TransactionDetailsFragment">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/activity_vertical_margin"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:paddingTop="@dimen/activity_vertical_margin">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/status_label"
+                android:textColor="@color/gray_54_sec_text_icons" />
+
+            <TextView
+                android:id="@+id/tx_status"
+                style="@style/NormalText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="47 confirmations" />
+
+            <com.coinomi.wallet.ui.widget.TransactionAmountVisualizer
+                android:id="@+id/transaction_amount_visualizer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/activity_double_margin"
+                android:layout_marginBottom="@dimen/activity_double_margin"
+                android:orientation="vertical"
+                android:gravity="center_vertical" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/transaction_id_label"
+                android:textColor="@color/gray_54_sec_text_icons" />
+
+            <TextView
+                android:id="@+id/tx_id"
+                style="@style/NormalText"
+                android:typeface="monospace"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="d11e6246c976ccf1d565192cd9b5592b0e4c0c6e01c220f0a75e13dfb93fcb83"
+                android:textIsSelectable="true" />
+
+            <TextView
+                android:id="@+id/block_explorer_link"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/LinkButton"
+                android:paddingTop="@dimen/activity_vertical_margin"
+                android:text="@string/view_at_a_blockchain_explorer_link"
+                android:layout_gravity="center_horizontal" />
+
+        </LinearLayout>
+    </ScrollView>
+</FrameLayout>

@@ -133,11 +133,7 @@ public class CoinURI {
 
         // Attempt to form the URI (fail fast syntax checking to official standards).
         URI uri;
-        try {
-            uri = new URI(input);
-        } catch (URISyntaxException e) {
-            throw new CoinURIParseException("Bad URI syntax", e);
-        }
+        uri = getUri(input);
 
         // URI is formed as  bitcoin:<address>?<query parameters>
         // blockchain.info generates URIs of non-BIP compliant form bitcoin://address?....
@@ -167,12 +163,16 @@ public class CoinURI {
                 // Try to parse this address
                 try {
                     params = (CoinType) new Address(null, input).getParameters();
-                    // make input appear as a URI
-                    input = params.getUriScheme() + ":" + input;
                 } catch (AddressFormatException e) {
                     throw new CoinURIParseException("Unsupported address type: " + input);
                 }
             }
+        }
+
+        if (uri.getScheme() == null) {
+            // make input appear as a URI
+            input = params.getUriScheme() + ":" + input;
+            uri = getUri(input);
         }
 
         type = params;
@@ -220,6 +220,16 @@ public class CoinURI {
         if (addressToken.isEmpty() && getPaymentRequestUrl() == null) {
             throw new CoinURIParseException("No address and no r= parameter found");
         }
+    }
+
+    private static URI getUri(String input) throws CoinURIParseException {
+        URI uri;
+        try {
+            uri = new URI(input);
+        } catch (URISyntaxException e) {
+            throw new CoinURIParseException("Bad URI syntax", e);
+        }
+        return uri;
     }
 
     /**

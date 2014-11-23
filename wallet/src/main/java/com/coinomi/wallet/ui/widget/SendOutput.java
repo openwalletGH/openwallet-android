@@ -2,6 +2,7 @@ package com.coinomi.wallet.ui.widget;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,12 +17,16 @@ import com.coinomi.wallet.util.Fonts;
  * @author Giannis Dzegoutanis
  */
 public class SendOutput extends LinearLayout {
+    private static final int MAX_LINES = 5;
     private final TextView sendType;
     private final TextView amount;
     private final TextView symbol;
-    private final TextView address;
+    private final TextView addressOrLabel;
 
-    private boolean isAddressExpanded = false;
+    private boolean isAddressLabelExpanded = false;
+    private String address;
+    private String label;
+    private boolean isSending;
 
     public SendOutput(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -31,30 +36,35 @@ public class SendOutput extends LinearLayout {
         sendType = (TextView) findViewById(R.id.send_output_type);
         amount = (TextView) findViewById(R.id.amount);
         symbol = (TextView) findViewById(R.id.symbol);
-        address = (TextView) findViewById(R.id.send_to_address);
+        addressOrLabel = (TextView) findViewById(R.id.send_to_address);
 
         TypedArray a = context.obtainStyledAttributes(attrs,
                 R.styleable.SendOutput, 0, 0);
         try {
-            setFee(a.getBoolean(R.styleable.SendOutput_is_fee, false));
+            setIsFee(a.getBoolean(R.styleable.SendOutput_is_fee, false));
         } finally {
             a.recycle();
         }
 
-        getRootView().setOnClickListener(new OnClickListener() {
+        getRootView().setOnClickListener(getOnClickListener());
+    }
+
+    private OnClickListener getOnClickListener() {
+        return new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isAddressExpanded) {
-                    address.setSingleLine(true);
-                    address.setMaxLines(1);
-                    isAddressExpanded = false;
+                if (isAddressLabelExpanded) {
+                    addressOrLabel.setSingleLine(true);
+                    addressOrLabel.setMaxLines(1);
+                    isAddressLabelExpanded = false;
                 } else {
-                    address.setSingleLine(false);
-                    address.setMaxLines(5);
-                    isAddressExpanded = true;
+                    addressOrLabel.setSingleLine(false);
+                    addressOrLabel.setMaxLines(MAX_LINES);
+                    isAddressLabelExpanded = true;
                 }
+                updateAddressLabel();
             }
-        });
+        };
     }
 
     public void setAmount(String amount) {
@@ -66,18 +76,53 @@ public class SendOutput extends LinearLayout {
     }
 
     public void setAddress(String address) {
-        this.address.setText(GenericUtils.addressSplitToGroups(address));
+        label = null;
+        this.address = address;
+        updateAddressLabel();
     }
 
-    public void setFee(boolean isFee) {
+    private void updateAddressLabel() {
+        if (address != null) {
+            addressOrLabel.setTypeface(Typeface.MONOSPACE);
+            if (isAddressLabelExpanded) {
+                addressOrLabel.setText(GenericUtils.addressSplitToGroupsMultiline(address));
+            } else {
+                addressOrLabel.setText(GenericUtils.addressSplitToGroups(address));
+            }
+        } else if (label != null) {
+            addressOrLabel.setTypeface(Typeface.DEFAULT);
+            addressOrLabel.setText(label);
+        }
+    }
+
+    public void setLabel(String label) {
+        address = null;
+        this.label = label;
+        updateAddressLabel();
+    }
+
+    public void setIsFee(boolean isFee) {
         if (isFee) {
             sendType.setText(R.string.fee);
-            address.setVisibility(GONE);
+            addressOrLabel.setVisibility(GONE);
         } else {
             if (!sendType.isInEditMode()) { // If not displayed within a developer tool
-                Fonts.setTypeface(sendType, Fonts.Font.COINOMI_FONT_ICONS);
-                sendType.setText(getResources().getString(R.string.font_icon_send_coins));
+                updateIcon();
             }
         }
+    }
+
+    private void updateIcon() {
+        Fonts.setTypeface(sendType, Fonts.Font.COINOMI_FONT_ICONS);
+        if (isSending) {
+            sendType.setText(getResources().getString(R.string.font_icon_send_coins));
+        } else {
+            sendType.setText(getResources().getString(R.string.font_icon_receive_coins));
+        }
+    }
+
+    public void setSending(boolean isSending) {
+        this.isSending = isSending;
+        updateIcon();
     }
 }

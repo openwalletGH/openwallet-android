@@ -67,12 +67,13 @@
     <string name="restore_error">Could not verify your seed. %1$s</string>
     <string name="extra_entropy">Extra entropy</string>
 
-    <!-- Info fragment -->
+    <!-- Balance fragment -->
     <string name="wallet_transactions_coinbase">mined</string>
     <string name="history_label">history</string>
     <string name="history_empty">No coins received so far!\n\nYou can get some by trading for traditional money, selling goods or services or earning by working.</string>
     <string name="sent_to">sent to</string>
     <string name="received_with">received with</string>
+    <string name="get_tx_info_error">Could not get transaction information</string>
 
     <!-- Receive fragment -->
     <string name="receive_address_label">my address</string>
@@ -110,7 +111,6 @@
     <string name="preparing_transaction">Please wait while your transaction is being prepared and sent.</string>
     <string name="no_such_pocket_error">Error occurred while accessing this wallet pocket. If problem persists, try to restore the wallet from seed.</string>
     <string name="password_failed">The password entered is not valid.</string>
-    <string name="internal_transfer">Internal transfer</string>
     <string name="sent_msg">Sent! Please wait for confirmation.</string>
 
     <!-- About Activity -->
@@ -123,12 +123,28 @@
     <string name="about_credits_crypto_icons">Crypto-icons by Chris Shepherd\nhttps://github.com/shphrd/crypto-icons</string>
     <string name="about_credits_font_icons">Font-icons by Daniel Bruce\nhttp://www.entypo.com</string>
 
-
     <!-- Add Coins -->
     <string name="title_activity_add_coins">Add coins</string>
     <string name="password_add_coin">You are about to create a %1$s pocket in your wallet.</string>
     <string name="adding_coin">Please wait while creating a new pocket for %1$s</string>
     <string name="add_coin_error">Error adding %1$s: %2$s</string>
     <string name="add_coin_accounts_error">Accounts are not yet supported.</string>
+    <string name="title_activity_transaction_details">Transaction details</string>
+
+    <!-- Transaction amount visualizer -->
+    <string name="internal_transfer">Internal transfer</string>
+
+    <!-- Transaction Details Fragment -->
+    <string name="status_label">status</string>
+    <string name="date_label">date</string>
+    <string name="transaction_id_label">transaction id</string>
+    <string name="view_at_a_blockchain_explorer_link">View at a blockchain explorer</string>
+    <plurals name="status_building">
+        <item quantity="one">%d confirmation</item>
+        <item quantity="other">%d confirmations</item>
+    </plurals>
+    <string name="status_pending">Waiting for a confirmation</string>
+    <string name="status_unknown">Transaction status unknown</string>
+
 
 </resources>

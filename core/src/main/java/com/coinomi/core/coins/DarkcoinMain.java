@@ -19,7 +19,7 @@ public class DarkcoinMain extends CoinType {
         uriScheme = "darkcoin";
         bip44Index = 5;
         feePerKb = Coin.valueOf(100000);
-        minNonDust = Coin.valueOf(1); //TODO verify
+        minNonDust = Coin.valueOf(1000); // DUST_HARD_LIMIT = 1000;   // 0.00001 DRK mininput
         unitExponent = 8;
     }
 

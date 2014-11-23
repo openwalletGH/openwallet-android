@@ -46,14 +46,14 @@
         android:xlargeScreens="true" />
 
     <application
-        android:name=".WalletApplication"
+        android:name="com.coinomi.wallet.WalletApplication"
         android:allowBackup="false"
         android:hardwareAccelerated="true"
         android:icon="@drawable/ic_launcher_dev"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".ui.WalletActivity"
+            android:name="com.coinomi.wallet.ui.WalletActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/AppThemeCustomActionBar"
@@ -65,25 +65,25 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.IntroActivity"
+            android:name="com.coinomi.wallet.ui.IntroActivity"
             android:screenOrientation="portrait"
             android:theme="@style/NoTitleBar"
             android:windowSoftInputMode="adjustResize" >
         </activity>
         <activity
-            android:name=".ui.PasswordConfirmationActivity"
+            android:name="com.coinomi.wallet.ui.PasswordConfirmationActivity"
             android:screenOrientation="portrait"
             android:theme="@style/NoTitleBar"
             android:windowSoftInputMode="adjustResize" >
         </activity>
         <activity
-            android:name=".ui.SignTransactionActivity"
+            android:name="com.coinomi.wallet.ui.SignTransactionActivity"
             android:screenOrientation="portrait"
             android:theme="@style/NoTitleBar"
             android:windowSoftInputMode="adjustResize" >
         </activity>
         <activity
-            android:name=".ui.ScanActivity"
+            android:name="com.coinomi.wallet.ui.ScanActivity"
             android:configChanges="orientation|keyboard|keyboardHidden"
             android:screenOrientation="landscape"
             android:stateNotNeeded="true"
@@ -91,19 +91,28 @@
             android:windowSoftInputMode="stateAlwaysHidden" />
 
         <service
-            android:name=".service.CoinServiceImpl"
+            android:name="com.coinomi.wallet.service.CoinServiceImpl"
             android:exported="false" />
 
         <activity
-            android:name=".ui.AboutActivity"
+            android:name="com.coinomi.wallet.ui.AboutActivity"
             android:label="@string/title_activity_about" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.coinomi.wallet.ui.WalletActivity" />
         </activity>
         <activity
-            android:name=".ui.AddCoinsActivity"
+            android:name="com.coinomi.wallet.ui.AddCoinsActivity"
             android:label="@string/title_activity_add_coins"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppThemeCustomActionBar" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.coinomi.wallet.ui.WalletActivity" />
+        </activity>
+        <activity
+            android:name="com.coinomi.wallet.ui.TransactionDetailsActivity"
+            android:label="@string/title_activity_transaction_details"
             android:screenOrientation="portrait"
             android:theme="@style/AppThemeCustomActionBar" >
             <meta-data

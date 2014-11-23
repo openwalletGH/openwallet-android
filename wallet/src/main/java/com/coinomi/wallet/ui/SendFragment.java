@@ -93,6 +93,7 @@ public class SendFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
+
     public SendFragment() {
         // Required empty public constructor
     }
@@ -181,8 +182,11 @@ public class SendFragment extends Fragment {
             if (pocket == null) {
                 throw new NoSuchPocketException("No pocket found for " + coinType.getName());
             }
-            SendRequest request = pocket.sendCoinsOffline(toAddress, amount);
-            intent.putExtra(Constants.ARG_SEND_REQUEST, request);
+            // TODO use a different way to detect insufficient money
+            pocket.sendCoinsOffline(toAddress, amount);
+            intent.putExtra(Constants.ARG_COIN_ID, coinType.getId());
+            intent.putExtra(Constants.ARG_SEND_TO_ADDRESS, toAddress.toString());
+            intent.putExtra(Constants.ARG_SEND_AMOUNT, amount.getValue());
             startActivityForResult(intent, SIGN_TRANSACTION);
         } catch (InsufficientMoneyException e) {
             Toast.makeText(getActivity(), R.string.send_coins_error_not_enough_money, Toast.LENGTH_LONG).show();

@@ -2,6 +2,7 @@ package com.coinomi.wallet.ui;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -14,13 +15,16 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.WalletPocket;
 import com.coinomi.core.wallet.WalletPocketConnectivity;
 import com.coinomi.core.wallet.WalletPocketEventListener;
+import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.ui.widget.Amount;
@@ -126,7 +130,7 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_balance, container, false);
 
-        ListView transactionRows = (ListView) view.findViewById(R.id.transaction_rows);
+        final ListView transactionRows = (ListView) view.findViewById(R.id.transaction_rows);
 
         View header = inflater.inflate(R.layout.fragment_balance_header, null);
         // Initialize your header here.
@@ -148,19 +152,26 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
         adapter.setPrecision(AMOUNT_MEDIUM_PRECISION, 0);
         transactionRows.setAdapter(adapter);
 
-//// Just as a bonus - if you want to do something with your list items:
-//        view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                // You can just use listView instead of parent casted to ListView.
-//                if (position >= ((ListView) parent).getHeaderViewsCount()) {
-//                    // Note the usage of getItemAtPosition() instead of adapter's getItem() because
-//                    // the latter does not take into account the header (which has position 0).
-//                    Object obj = parent.getItemAtPosition(position);
-//                    // Do something with your object.
-//                }
-//            }
-//        });
+        // Start TransactionDetailsActivity on click
+        transactionRows.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (position >= transactionRows.getHeaderViewsCount()) {
+                    // Note the usage of getItemAtPosition() instead of adapter's getItem() because
+                    // the latter does not take into account the header (which has position 0).
+                    Object obj = parent.getItemAtPosition(position);
+
+                    if (obj != null && obj instanceof Transaction) {
+                        Intent intent = new Intent(getActivity(), TransactionDetailsActivity.class);
+                        intent.putExtra(Constants.ARG_COIN_ID, type.getId());
+                        intent.putExtra(Constants.ARG_TRANSACTION_ID, ((Transaction) obj).getHashAsString());
+                        startActivity(intent);
+                    } else {
+                        Toast.makeText(getActivity(), getString(R.string.get_tx_info_error), Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+        });
 
         mainAmount = (Amount) view.findViewById(R.id.main_amount);
         mainAmount.setSymbol(type.getSymbol());
