@@ -182,14 +182,10 @@ public class SendFragment extends Fragment {
             if (pocket == null) {
                 throw new NoSuchPocketException("No pocket found for " + coinType.getName());
             }
-            // TODO use a different way to detect insufficient money
-            pocket.sendCoinsOffline(toAddress, amount);
             intent.putExtra(Constants.ARG_COIN_ID, coinType.getId());
             intent.putExtra(Constants.ARG_SEND_TO_ADDRESS, toAddress.toString());
             intent.putExtra(Constants.ARG_SEND_AMOUNT, amount.getValue());
             startActivityForResult(intent, SIGN_TRANSACTION);
-        } catch (InsufficientMoneyException e) {
-            Toast.makeText(getActivity(), R.string.send_coins_error_not_enough_money, Toast.LENGTH_LONG).show();
         } catch (NoSuchPocketException e) {
             Toast.makeText(getActivity(), R.string.no_such_pocket_error, Toast.LENGTH_LONG).show();
         }
@@ -379,21 +375,13 @@ public class SendFragment extends Fragment {
     private void setAmountForEmptyWallet() {
         if (state != State.INPUT || pocket == null) return;
 
-        try {
-            Address dummy = pocket.getReceiveAddress(); // won't be used, tx is never committed
-            SendRequest req = SendRequest.emptyWallet(dummy);
-            req.signInputs = false;
-            pocket.completeTx(req);
-            checkState(req.tx.getOutputs().size() == 1);
-            //TODO if using different units, don't use toPlainString
-            Coin value = req.tx.getOutput(0).getValue();
-            sendAmountView.setText(GenericUtils.formatValue(coinType, value));
-            validateAmount();
-        } catch (InsufficientMoneyException ignore) {
-        } catch (org.bitcoinj.core.Wallet.CouldNotAdjustDownwards ignore) {
-            // This happens when there are no money and the user wants to empty the wallet
+        Coin availableBalance = pocket.getBalance(false);
+        if (availableBalance.isZero()) {
             Toast.makeText(getActivity(), R.string.send_coins_error_not_enough_money,
                     Toast.LENGTH_LONG).show();
+        } else {
+            sendAmountView.setText(GenericUtils.formatValue(coinType, availableBalance));
+            validateAmount();
         }
     }
 

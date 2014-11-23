@@ -95,9 +95,15 @@ public class SignTransactionFragment extends Fragment {
         }
 
         WalletPocket pocket = application.getWalletPocket(type);
+        boolean emptyWallet = sentAmount.equals(pocket.getBalance(false));
+
+        // TODO handle in a task onCreate
         try {
-            // TODO handle in a task onCreate
-            request = pocket.sendCoinsOffline(sendToAddress, sentAmount);
+            if (emptyWallet) {
+                request = SendRequest.emptyWallet(sendToAddress);
+            } else {
+                request = SendRequest.to(sendToAddress, sentAmount);
+            }
             request.signInputs = false;
             pocket.completeTx(request);
         } catch (InsufficientMoneyException e) {

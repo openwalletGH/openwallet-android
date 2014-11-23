@@ -122,7 +122,7 @@ public class FinalizeWalletRestorationFragment extends Fragment {
         }
 
         protected void onPostExecute(Wallet wallet) {
-            verifyDialog.dismiss();
+            verifyDialog.dismiss(); // FIXME crashes when pressing home button before task is over
             if (wallet != null) {
                 startWalletActivity();
             }
