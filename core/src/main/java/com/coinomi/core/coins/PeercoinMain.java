@@ -17,7 +17,7 @@ public class PeercoinMain extends CoinType {
         name = "Peercoin (beta)";
         symbol = "PPC";
         uriScheme = "peercoin"; // TODO verify, could be ppcoin?
-        bip44Index = 4;
+        bip44Index = 6;
         feePerKb = Coin.valueOf(10000); // 0.01PPC, careful Peercoin has 1000000 units per coin
         minNonDust = Coin.valueOf(1); //TODO verify
         unitExponent = 6;
