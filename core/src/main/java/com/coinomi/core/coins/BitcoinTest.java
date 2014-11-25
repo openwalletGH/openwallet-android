@@ -8,18 +8,18 @@ import org.bitcoinj.core.Coin;
 public class BitcoinTest extends CoinType {
     private BitcoinTest() {
         id = "bitcoin.test";
-        uid = 12;
 
         addressHeader = 111;
         p2shHeader = 196;
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
+        spendableCoinbaseDepth = 100;
 
         name = "Bitcoin Test";
         symbol = "BTC";
         uriScheme = "bitcoin";
         bip44Index = 1;
-        feePerKb = Coin.valueOf(10000);
-        minNonDust = Coin.valueOf(5460);
+        feePerKb = Coin.valueOf(1000);
+        minNonDust = Coin.valueOf(546);
         unitExponent = 8;
     }
 

@@ -8,11 +8,11 @@ import org.bitcoinj.core.Coin;
 public class LitecoinTest extends CoinType {
     private LitecoinTest() {
         id = "litecoin.test";
-        uid = 22;
 
         addressHeader = 111;
         p2shHeader = 196;
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
+        spendableCoinbaseDepth = 100;
 
         name = "Litecoin Test";
         symbol = "LTC";

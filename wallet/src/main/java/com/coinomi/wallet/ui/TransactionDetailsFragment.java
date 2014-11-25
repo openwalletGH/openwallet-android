@@ -39,6 +39,7 @@ public class TransactionDetailsFragment extends Fragment {
     private TextView txId;
     private TransactionAmountVisualizer amountVisualizer;
     private TextView blockExplorerLink;
+    private TextView sendDirection;
 
     public TransactionDetailsFragment() {
         // Required empty public constructor
@@ -56,6 +57,7 @@ public class TransactionDetailsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_transaction_details, container, false);
 
         txStatus = (TextView) view.findViewById(R.id.tx_status);
+        sendDirection = (TextView) view.findViewById(R.id.send_direction);
         amountVisualizer = (TransactionAmountVisualizer) view.findViewById(R.id.transaction_amount_visualizer);
         txId = (TextView) view.findViewById(R.id.tx_id);
         blockExplorerLink = (TextView) view.findViewById(R.id.block_explorer_link);
@@ -94,6 +96,8 @@ public class TransactionDetailsFragment extends Fragment {
                 txStatusText = getString(R.string.status_unknown);
         }
         txStatus.setText(txStatusText);
+        boolean isSending = tx.getValue(pocket).signum() < 0;
+        sendDirection.setText(isSending ? R.string.sent_to : R.string.received_with);
         amountVisualizer.setTransaction(pocket, tx);
         txId.setText(tx.getHashAsString());
 

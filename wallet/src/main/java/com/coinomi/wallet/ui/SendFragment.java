@@ -32,6 +32,7 @@ import org.bitcoinj.core.Address;
 import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.InsufficientMoneyException;
+import org.bitcoinj.core.Wallet;
 import org.bitcoinj.crypto.KeyCrypterException;
 
 import org.slf4j.Logger;
@@ -235,8 +236,12 @@ public class SendFragment extends Fragment {
                         Toast.makeText(getActivity(), R.string.password_failed, Toast.LENGTH_LONG).show();
                     } else if (error instanceof IOException) {
                         Toast.makeText(getActivity(), R.string.send_coins_error_network, Toast.LENGTH_LONG).show();
+                    } else if (error instanceof Wallet.DustySendRequested) {
+                        Toast.makeText(getActivity(), R.string.send_coins_error_dust, Toast.LENGTH_LONG).show();
                     } else {
-                        throw new RuntimeException(error);
+                        log.error("An unknown error occurred while sending coins", error);
+                        String errorMessage = getString(R.string.send_coins_error, error.getMessage());
+                        Toast.makeText(getActivity(), errorMessage, Toast.LENGTH_LONG).show();
                     }
                 }
             }

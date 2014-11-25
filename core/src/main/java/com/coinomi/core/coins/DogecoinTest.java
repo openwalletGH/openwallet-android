@@ -8,11 +8,11 @@ import org.bitcoinj.core.Coin;
 public class DogecoinTest extends CoinType {
     private DogecoinTest() {
         id = "dogecoin.test";
-        uid = 32;
 
         addressHeader = 113;
         p2shHeader = 196;
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
+        spendableCoinbaseDepth = 240; // COINBASE_MATURITY_NEW
 
         name = "Dogecoin Test";
         symbol = "DOGE";

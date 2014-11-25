@@ -8,11 +8,11 @@ import org.bitcoinj.core.Coin;
 public class PeercoinTest extends CoinType {
     private PeercoinTest() {
         id = "peercoin.test";
-        uid = 42;
 
         addressHeader = 111;
         p2shHeader = 196;
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
+        spendableCoinbaseDepth = 500;
 
         name = "Peercoin Test";
         symbol = "PPC";

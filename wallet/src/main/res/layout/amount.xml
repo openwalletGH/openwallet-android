@@ -3,81 +3,42 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:coinomi="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="horizontal"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
-
-    <View
-        android:id="@+id/pending_progress_counter_balance"
-        android:layout_width="@dimen/connectivity_symbol_size"
-        android:layout_height="@dimen/connectivity_symbol_size"
-        android:visibility="invisible" />
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
     <LinearLayout
-        android:id="@+id/amountLayout"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_weight="1">
+        android:layout_gravity="center_horizontal"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
 
-        <LinearLayout
+        <com.coinomi.wallet.ui.widget.FontFitTextView
+            android:id="@+id/amount_text"
+            style="@style/Amount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:gravity="center_horizontal"
-            android:orientation="vertical">
-
-            <com.coinomi.wallet.ui.widget.FontFitTextView
-                android:id="@+id/amount_text"
-                style="@style/Amount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:includeFontPadding="false"
-                android:lineSpacingMultiplier="0.9"
-                tools:text="4200.30937785" />
-
-            <!--<TextView-->
-            <!--android:id="@+id/amount_pending"-->
-            <!--style="@style/AmountPending"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:text="+1.337"-->
-            <!--android:layout_gravity="end" />-->
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/symbol"
-            style="@style/AmountSymbolBig"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
             android:includeFontPadding="false"
-            tools:text="SYMBOL" />
+            android:lineSpacingMultiplier="0.9"
+            tools:text="4200.30937785" />
 
+        <!--<TextView-->
+        <!--android:id="@+id/amount_pending"-->
+        <!--style="@style/AmountPending"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="+1.337"-->
+        <!--android:layout_gravity="end" />-->
     </LinearLayout>
 
-    <RelativeLayout
+    <TextView
+        android:id="@+id/symbol"
+        style="@style/AmountSymbolBig"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-        <TextView
-            android:id="@+id/connection_status"
-            android:layout_width="@dimen/connectivity_symbol_size"
-            android:layout_height="@dimen/connectivity_symbol_size"
-            android:textSize="@dimen/connectivity_symbol_size"
-            android:textColor="@color/fg_insignificant"
-            android:gravity="center_horizontal"
-            android:text="@string/font_icon_earth"
-            tools:text="O" />
-        <TextView
-            android:id="@+id/disconnect_symbol"
-            android:layout_width="@dimen/connectivity_symbol_size"
-            android:layout_height="@dimen/connectivity_symbol_size"
-            android:textSize="@dimen/connectivity_symbol_size"
-            android:textColor="@color/fg_error"
-            android:gravity="center_horizontal"
-            android:text="@string/font_icon_cross"
-            tools:text="X" />
-    </RelativeLayout>
-
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:includeFontPadding="false"
+        tools:text="SYMBOL" />
 
 </LinearLayout>

@@ -106,7 +106,7 @@ public class SignTransactionFragment extends Fragment {
             }
             request.signInputs = false;
             pocket.completeTx(request);
-        } catch (InsufficientMoneyException e) {
+        } catch (Exception e) {
             if (mListener != null) {
                 mListener.onSignResult(e);
             }

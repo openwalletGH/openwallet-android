@@ -8,11 +8,11 @@ import org.bitcoinj.core.Coin;
 public class DarkcoinTest extends CoinType {
     private DarkcoinTest() {
         id = "darkcoin.test";
-        uid = 52;
 
         addressHeader = 111;
         p2shHeader = 196;
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
+        spendableCoinbaseDepth = 100;
 
         name = "Darkcoin Test";
         symbol = "DRK";

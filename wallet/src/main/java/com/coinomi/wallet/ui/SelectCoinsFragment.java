@@ -3,6 +3,7 @@ package com.coinomi.wallet.ui;
 
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -21,6 +22,7 @@ import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.ui.widget.CoinGridItem;
 
+import org.bitcoinj.core.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +53,11 @@ public class SelectCoinsFragment extends Fragment {
         coinsGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                selectItem(CoinID.fromUid(id).getCoinType());
+                Object obj = parent.getItemAtPosition(position);
+
+                if (obj != null && obj instanceof CoinType) {
+                    selectItem((CoinType)obj);
+                }
             }
         });
         coinsGridView.setAdapter(new CoinsListAdapter(getActivity(), getWalletApplication()));

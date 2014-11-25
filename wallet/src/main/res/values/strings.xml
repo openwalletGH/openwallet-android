@@ -22,6 +22,8 @@
     <string name="send_coins_failed_msg">Failed!</string>
     <string name="send_coins_error_not_enough_money">Not enough money</string>
     <string name="send_coins_error_network">Could not connect to the coin network</string>
+    <string name="send_coins_error_dust">The sending amount is too small and will be rejected by the network</string>
+    <string name="send_coins_error">Could not send coins: %1$s</string>
 
     <!-- Errors -->
     <string name="error_could_not_read_wallet">Could not read wallet</string>
@@ -69,11 +71,11 @@
 
     <!-- Balance fragment -->
     <string name="wallet_transactions_coinbase">mined</string>
-    <string name="history_label">history</string>
     <string name="history_empty">No coins received so far!\n\nYou can get some by trading for traditional money, selling goods or services or earning by working.</string>
     <string name="sent_to">sent to</string>
     <string name="received_with">received with</string>
     <string name="get_tx_info_error">Could not get transaction information</string>
+    <string name="disconnected_label">No connection</string>
 
     <!-- Receive fragment -->
     <string name="receive_address_label">my address</string>

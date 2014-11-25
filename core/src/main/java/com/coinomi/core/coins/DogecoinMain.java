@@ -8,18 +8,18 @@ import org.bitcoinj.core.Coin;
 public class DogecoinMain extends CoinType {
     private DogecoinMain() {
         id = "dogecoin.main";
-        uid = 31;
 
         addressHeader = 30;
         p2shHeader = 22;
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
+        spendableCoinbaseDepth = 240; // COINBASE_MATURITY_NEW
 
         name = "Dogecoin";
         symbol = "DOGE";
         uriScheme = "dogecoin";
         bip44Index = 3;
         feePerKb = Coin.valueOf(100000000L);
-        minNonDust = Coin.SATOSHI; // Dogecoin doesn't have dust detection (src. ref client)
+        minNonDust = Coin.valueOf(0); // Dogecoin doesn't have dust detection (src. ref client)
         unitExponent = 8;
     }
 

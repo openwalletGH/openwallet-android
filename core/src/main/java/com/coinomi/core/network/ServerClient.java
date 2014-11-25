@@ -432,6 +432,9 @@ public class ServerClient implements BlockchainConnection {
                 try {
                     String rawTx = result.getResult().getString(0);
                     Transaction tx = new Transaction(type, Utils.HEX.decode(rawTx));
+                    if (!tx.getHash().equals(txHash)) {
+                        throw new Exception("Requested TX " + txHash + " but got " + tx.getHashAsString());
+                    }
                     listener.onTransactionUpdate(tx);
                 } catch (Exception e) {
                     onFailure(e);

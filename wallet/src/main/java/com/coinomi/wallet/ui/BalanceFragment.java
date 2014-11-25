@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.coinomi.core.coins.CoinType;
@@ -90,6 +91,7 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
     private View emptyPocketMessage;
     private NavigationDrawerFragment mNavigationDrawerFragment;
     private Amount mainAmount;
+    private TextView connectionLabel;
 
     /**
      * Use this factory method to create a new instance of
@@ -176,11 +178,23 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
         mainAmount = (Amount) view.findViewById(R.id.main_amount);
         mainAmount.setSymbol(type.getSymbol());
 
+        connectionLabel = (TextView) view.findViewById(R.id.connection_label);
+
         // Subscribe and update the amount
         pocket.addEventListener(this);
         updateBalance(pocket.getBalance());
         setPending(pocket.getPendingBalance());
-        setConnectivityStatus(pocket.getConnectivityStatus());
+        // Set connected for now...
+        setConnectivityStatus(WalletPocketConnectivity.CONNECTED);
+        // ... but check the status in some seconds
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (pocket != null) {
+                    setConnectivityStatus(pocket.getConnectivityStatus());
+                }
+            }
+        }, 3000);
 
         return view;
     }
@@ -253,7 +267,16 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
     }
 
     private void setConnectivityStatus(WalletPocketConnectivity connectivity) {
-        mainAmount.setConnectivity(connectivity);
+        switch (connectivity) {
+            case WORKING:
+                // TODO support WORKING state
+            case CONNECTED:
+                connectionLabel.setVisibility(View.INVISIBLE);
+                break;
+            default:
+            case DISCONNECTED:
+                connectionLabel.setVisibility(View.VISIBLE);
+        }
     }
 
     private final ThrottlingWalletChangeListener transactionChangeListener = new ThrottlingWalletChangeListener() {

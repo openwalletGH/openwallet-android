@@ -49,14 +49,13 @@ public class TransactionAmountVisualizer extends LinearLayout {
         CoinType type = pocket.getCoinType();
         String symbol = type.getSymbol();
 
-
         final Coin value = tx.getValue(pocket);
-        final boolean sent = value.signum() < 0;
+        final boolean isSending = value.signum() < 0;
         // if sending and all the outputs point inside the current pocket. If received
-        boolean isInternalTransfer = sent;
+        boolean isInternalTransfer = isSending;
         output.setVisibility(View.VISIBLE);
         for (TransactionOutput txo : tx.getOutputs()) {
-            if (sent) {
+            if (isSending) {
                 if (txo.isMine(pocket)) continue;
                 isInternalTransfer = false;
             } else {
@@ -73,10 +72,10 @@ public class TransactionAmountVisualizer extends LinearLayout {
             output.setLabel(getResources().getString(R.string.internal_transfer));
         }
 
-        output.setSending(sent);
+        output.setSending(isSending);
 
         Coin feeAmount = tx.getFee();
-        if (feeAmount != null && !feeAmount.isZero()) {
+        if (isSending && feeAmount != null && !feeAmount.isZero()) {
             fee.setVisibility(View.VISIBLE);
             fee.setAmount(GenericUtils.formatValue(type, tx.getFee()));
             fee.setSymbol(symbol);

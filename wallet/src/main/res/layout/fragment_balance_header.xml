@@ -2,6 +2,7 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:coinomi="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
@@ -14,10 +15,19 @@
         android:id="@+id/main_amount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/amount_margin"
-        android:layout_marginBottom="@dimen/amount_margin"
+        android:layout_marginTop="@dimen/amount_margin_top"
+        android:layout_marginBottom="@dimen/amount_margin_bottom"
         coinomi:show_big="true"
         android:gravity="center_horizontal" />
+
+    <TextView
+        android:id="@+id/connection_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/ErrorText"
+        android:layout_marginBottom="@dimen/amount_margin_bottom"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/disconnected_label" />
 
     <TextView
         android:id="@+id/history_empty"

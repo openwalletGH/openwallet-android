@@ -8,7 +8,6 @@ import org.bitcoinj.core.Coin;
 public class NuSharesMain extends CoinType {
     private NuSharesMain() {
         id = "nushares.main";
-        uid = 111;
 
         addressHeader = 63;
         p2shHeader = 64;

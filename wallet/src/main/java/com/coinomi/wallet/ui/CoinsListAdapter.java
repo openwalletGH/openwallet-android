@@ -42,7 +42,7 @@ public class CoinsListAdapter extends BaseAdapter {
 
     @Override
     public long getItemId(int position) {
-        return getItem(position).getUid();
+        return position;
     }
 
     @Override

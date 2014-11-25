@@ -3,7 +3,6 @@
 
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_margin">16dp</dimen>
-    <dimen name="activity_double_margin">32dp</dimen>
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 
@@ -20,7 +19,8 @@
     <dimen name="font_icon_text_size">24sp</dimen>
 
     <!-- Amount Widget -->
-    <dimen name="amount_margin">32dp</dimen>
+    <dimen name="amount_margin_top">32dp</dimen>
+    <dimen name="amount_margin_bottom">4dp</dimen>
     <dimen name="amount_text_size_big">56sp</dimen>
     <dimen name="amount_text_size">32sp</dimen>
     <dimen name="amount_pending_text_size">24sp</dimen>

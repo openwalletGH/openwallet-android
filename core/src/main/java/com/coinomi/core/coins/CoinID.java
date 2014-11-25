@@ -20,6 +20,7 @@ public enum CoinID {
     LITECOIN_TEST(LitecoinTest.get()),
     DOGECOIN_MAIN(DogecoinMain.get()),
     DOGECOIN_TEST(DogecoinTest.get()),
+    REDDCOIN_MAIN(ReddcoinMain.get()),
     PEERCOIN_MAIN(PeercoinMain.get()),
     PEERCOIN_TEST(PeercoinTest.get()),
     DARKCOIN_MAIN(DarkcoinMain.get()),
@@ -42,7 +43,6 @@ public enum CoinID {
     private final CoinType type;
 
     private CoinID(final CoinType type) {
-        if (type.getUid() < 0) throw new RuntimeException("No UID defined for " + type.getName());
         this.type = type;
     }
 
@@ -70,13 +70,6 @@ public enum CoinID {
     public static CoinID fromId(String stringId) {
         for(CoinID id : values()) {
             if (id.type.getId().equalsIgnoreCase(stringId)) return id;
-        }
-        throw new IllegalArgumentException();
-    }
-
-    public static CoinID fromUid(long uid) {
-        for(CoinID id : values()) {
-            if (id.type.getUid() == uid) return id;
         }
         throw new IllegalArgumentException();
     }

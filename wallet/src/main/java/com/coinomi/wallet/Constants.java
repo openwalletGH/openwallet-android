@@ -9,6 +9,7 @@ import com.coinomi.core.coins.LitecoinMain;
 import com.coinomi.core.coins.NuBitsMain;
 import com.coinomi.core.coins.NuSharesMain;
 import com.coinomi.core.coins.PeercoinMain;
+import com.coinomi.core.coins.ReddcoinMain;
 import com.coinomi.core.network.CoinAddress;
 import com.coinomi.stratumj.ServerAddress;
 import com.google.common.collect.ImmutableList;
@@ -54,6 +55,7 @@ public class Constants {
             new CoinAddress(DogecoinMain.get(), new ServerAddress("doge-cce-1.coinomi.net", 5003), new ServerAddress("doge-cce-2.coinomi.net", 5003)),
             new CoinAddress(LitecoinMain.get(), new ServerAddress("ltc-cce-1.coinomi.net", 5002), new ServerAddress("ltc-cce-2.coinomi.net", 5002)),
             new CoinAddress(PeercoinMain.get(), new ServerAddress("54.176.197.116", 5004)),
+            new CoinAddress(ReddcoinMain.get(), new ServerAddress("54.176.197.116", 5014)),
             new CoinAddress(DarkcoinMain.get(), new ServerAddress("54.176.197.116", 5013))
     );
 
@@ -66,20 +68,23 @@ public class Constants {
         COINS_ICONS.put(CoinID.LITECOIN_MAIN.getCoinType(), R.drawable.litecoin);
         COINS_ICONS.put(CoinID.PEERCOIN_MAIN.getCoinType(), R.drawable.peercoin);
         COINS_ICONS.put(CoinID.DARKCOIN_MAIN.getCoinType(), R.drawable.darkcoin);
+        COINS_ICONS.put(CoinID.REDDCOIN_MAIN.getCoinType(), R.drawable.reddcoin);
         COINS_ICONS.put(CoinID.NUSHARES_MAIN.getCoinType(), R.drawable.nushares);
         COINS_ICONS.put(CoinID.NUBITS_MAIN.getCoinType(), R.drawable.nubits);
 
         COINS_BLOCK_EXPLORERS = new HashMap<CoinType, String>();
         COINS_BLOCK_EXPLORERS.put(CoinID.BITCOIN_MAIN.getCoinType(), "https://www.biteasy.com/blockchain/transactions/%s");
+        COINS_BLOCK_EXPLORERS.put(CoinID.DOGECOIN_MAIN.getCoinType(), "http://dogechain.info/tx/%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.LITECOIN_MAIN.getCoinType(), "http://ltc.blockr.io/tx/info/%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.PEERCOIN_MAIN.getCoinType(), "http://ppc.blockr.io/tx/info/%s");
-        COINS_BLOCK_EXPLORERS.put(CoinID.DOGECOIN_MAIN.getCoinType(), "http://dogechain.info/tx/%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.DARKCOIN_MAIN.getCoinType(), "https://bitinfocharts.com/darkcoin/tx/%s");
+        COINS_BLOCK_EXPLORERS.put(CoinID.REDDCOIN_MAIN.getCoinType(), "https://bitinfocharts.com/reddcoin/tx/%s");
     }
 
     public static final CoinType DEFAULT_COIN = BitcoinMain.get();
     public static final List<CoinType> DEFAULT_COINS = ImmutableList.of(BitcoinMain.get(),
             DogecoinMain.get(), LitecoinMain.get());
     public static final List<CoinType> SUPPORTED_COINS = ImmutableList.of(BitcoinMain.get(),
-            DogecoinMain.get(), LitecoinMain.get(), PeercoinMain.get(), DarkcoinMain.get());
+            DogecoinMain.get(), LitecoinMain.get(), PeercoinMain.get(), DarkcoinMain.get(),
+            ReddcoinMain.get());
 }

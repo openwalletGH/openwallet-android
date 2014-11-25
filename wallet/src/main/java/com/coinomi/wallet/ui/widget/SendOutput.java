@@ -84,11 +84,7 @@ public class SendOutput extends LinearLayout {
     private void updateAddressLabel() {
         if (address != null) {
             addressOrLabel.setTypeface(Typeface.MONOSPACE);
-            if (isAddressLabelExpanded) {
-                addressOrLabel.setText(GenericUtils.addressSplitToGroupsMultiline(address));
-            } else {
-                addressOrLabel.setText(GenericUtils.addressSplitToGroups(address));
-            }
+            addressOrLabel.setText(GenericUtils.addressSplitToGroups(address));
         } else if (label != null) {
             addressOrLabel.setTypeface(Typeface.DEFAULT);
             addressOrLabel.setText(label);

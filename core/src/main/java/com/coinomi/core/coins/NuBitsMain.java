@@ -8,7 +8,6 @@ import org.bitcoinj.core.Coin;
 public class NuBitsMain extends CoinType {
     private NuBitsMain() {
         id = "nubits.main";
-        uid = 121;
 
         addressHeader = 25;
         p2shHeader = 26;

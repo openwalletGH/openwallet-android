@@ -8,21 +8,21 @@ import org.bitcoinj.core.Coin;
 public class ReddcoinMain extends CoinType {
     private ReddcoinMain() {
         id = "reddcoin.main";
-        uid = -1; // FIXME
 
         addressHeader = 61;
         p2shHeader = 5;
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
+        spendableCoinbaseDepth = 30;
 
-        name = "Reddcoin";
+        name = "Reddcoin (beta)";
         symbol = "RDD";
         uriScheme = "reddcoin";
-        bip44Index = 11;
+        bip44Index = 4;
         // TODO set correct values
-        feePerKb = Coin.valueOf(1);
-        minNonDust = Coin.valueOf(1);
+        feePerKb = Coin.valueOf(100000);
+        minNonDust = Coin.valueOf(1000000); // DUST_HARD_LIMIT = 1000000;   // 0.01 RDD mininput
         unitExponent = 8;
-        throw new RuntimeException(name+" bip44Index " + bip44Index + "is not standardized");
+//        throw new RuntimeException(name+" bip44Index " + bip44Index + "is not standardized");
     }
 
     private static ReddcoinMain instance = new ReddcoinMain();

@@ -1018,6 +1018,7 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
         checkState(lock.isHeldByCurrentThread());
         // Check if need to fetch the transaction
         if (!isTransactionAvailableOrQueued(txHash)) {
+            log.info("Going to fetch transaction with hash {}", txHash);
             fetchingTransactions.add(txHash);
             if (blockchainConnection != null) {
                 blockchainConnection.getTransaction(txHash, this);
@@ -1407,7 +1408,7 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
             if (req.ensureMinRequiredFee && !req.emptyWallet) { // min fee checking is handled later for emptyWallet
                 for (TransactionOutput output : req.tx.getOutputs())
                     if (output.getValue().compareTo(Coin.CENT) < 0) {
-                        if (output.getValue().compareTo(output.getMinNonDustValue(coinType.getFeePerKb().multiply(3))) < 0)
+                        if (output.getValue().compareTo(coinType.getMinNonDust()) < 0)
                             throw new org.bitcoinj.core.Wallet.DustySendRequested();
                         needAtLeastReferenceFee = true;
                         break;
