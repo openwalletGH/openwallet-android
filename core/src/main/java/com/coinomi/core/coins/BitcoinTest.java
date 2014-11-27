@@ -13,6 +13,7 @@ public class BitcoinTest extends CoinType {
         p2shHeader = 196;
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 100;
+        dumpedPrivateKeyHeader = 239;
 
         name = "Bitcoin Test";
         symbol = "BTC";

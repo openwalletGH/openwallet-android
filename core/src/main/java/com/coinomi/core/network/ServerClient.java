@@ -469,7 +469,7 @@ public class ServerClient implements BlockchainConnection {
                     checkState(tx.getHash().toString().equals(txId));
 
                     if (listener != null) listener.onTransactionBroadcast(tx);
-                } catch (JSONException e) {
+                } catch (Exception e) {
                     onFailure(e);
                     return;
                 }

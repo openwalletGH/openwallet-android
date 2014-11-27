@@ -27,6 +27,11 @@ import com.coinomi.core.network.interfaces.BlockchainConnection;
 import com.coinomi.core.network.interfaces.ConnectionEventListener;
 import com.coinomi.core.network.interfaces.TransactionEventListener;
 import com.coinomi.core.protos.Protos;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.ECKey;
@@ -59,11 +64,6 @@ import org.bitcoinj.wallet.KeyBag;
 import org.bitcoinj.wallet.RedeemData;
 import org.bitcoinj.wallet.WalletTransaction;
 import org.bitcoinj.wallet.WalletTransaction.Pool;
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.crypto.params.KeyParameter;
@@ -548,6 +548,9 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
 
     public void broadcastTx(Transaction tx, TransactionEventListener listener) throws IOException {
         if (isConnected()) {
+            if (log.isInfoEnabled()) {
+                log.info("Broadcasting tx {}", tx.bitcoinSerialize());
+            }
             blockchainConnection.broadcastTx(tx, listener);
         } else {
             throw new IOException("No connection available");
@@ -716,7 +719,7 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
 
     @Override
     public void onNewBlock(BlockHeader header) {
-        log.info("Got a block {}", header.getBlockHeight());
+        log.info("Got a {} block: {}", coinType.getName(), header.getBlockHeight());
         lock.lock();
         try {
             lastBlockSeenTimeSecs = header.getTimestamp();

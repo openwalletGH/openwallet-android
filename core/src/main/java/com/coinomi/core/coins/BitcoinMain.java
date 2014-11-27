@@ -13,6 +13,7 @@ public class BitcoinMain extends CoinType {
         p2shHeader = 5;
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 100;
+        dumpedPrivateKeyHeader = 128;
 
         name = "Bitcoin";
         symbol = "BTC";

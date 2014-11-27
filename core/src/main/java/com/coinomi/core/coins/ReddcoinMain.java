@@ -13,6 +13,8 @@ public class ReddcoinMain extends CoinType {
         p2shHeader = 5;
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 30;
+        dumpedPrivateKeyHeader = 189;
+        transactionVersion = 2;
 
         name = "Reddcoin (beta)";
         symbol = "RDD";

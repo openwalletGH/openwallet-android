@@ -28,7 +28,7 @@ abstract public class CoinType extends NetworkParameters implements Serializable
     protected Integer bip44Index;
     protected Coin feePerKb;
     protected Coin minNonDust;
-    protected int unitExponent = 0;
+    protected Integer unitExponent;
 
     public String getName() {
         return checkNotNull(name);
@@ -55,8 +55,7 @@ abstract public class CoinType extends NetworkParameters implements Serializable
     }
 
     public int getUnitExponent() {
-        checkState(unitExponent > 0);
-        return unitExponent;
+        return checkNotNull(unitExponent);
     }
 
     public List<ChildNumber> getBip44Path(int account) {

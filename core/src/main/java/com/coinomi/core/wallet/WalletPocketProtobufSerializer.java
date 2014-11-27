@@ -54,6 +54,9 @@ import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import static org.bitcoinj.params.Networks.Family.PEERCOIN;
+import static org.bitcoinj.params.Networks.Family.REDDCOIN;
+
 /**
  * @author Giannis Dzegoutanis
  */
@@ -110,7 +113,8 @@ public class WalletPocketProtobufSerializer {
                 .setHash(hashToByteString(tx.getHash()))
                 .setVersion((int) tx.getVersion());
 
-        if (Networks.getFamily(tx.getParams()) == Networks.Family.PEERCOIN) {
+        Networks.Family family = Networks.getFamily(tx.getParams());
+        if (family == Networks.Family.PEERCOIN || family == Networks.Family.REDDCOIN) {
             txBuilder.setTime((int) tx.getTime());
         }
 
@@ -310,7 +314,7 @@ public class WalletPocketProtobufSerializer {
     private void readTransaction(Protos.Transaction txProto, CoinType params) throws UnreadableWalletException {
         Transaction tx = new Transaction(params);
 
-        if (Networks.getFamily(params) == Networks.Family.PEERCOIN) {
+        if (Networks.isFamily(params, PEERCOIN, REDDCOIN)) {
             tx.setTime(txProto.getTime());
         }
 
