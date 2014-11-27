@@ -2,9 +2,6 @@
 <resources>
 
     <string name="app_name">Coinomi (dev)</string>
-    <string name="bitcoin">Bitcoin</string>
-    <string name="litecoin">Litecoin</string>
-    <string name="dogecoin">Dogecoin</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="scan_qr_code_menu">Scan</string>
