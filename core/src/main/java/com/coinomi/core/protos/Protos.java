@@ -7061,6 +7061,15 @@ public final class Protos {
      * </pre>
      */
     com.coinomi.core.protos.Protos.TransactionConfidenceOrBuilder getConfidenceOrBuilder();
+
+    /**
+     * <code>optional int32 token_id = 12;</code>
+     */
+    boolean hasTokenId();
+    /**
+     * <code>optional int32 token_id = 12;</code>
+     */
+    int getTokenId();
   }
   /**
    * Protobuf type {@code com.coinomi.core.protos.Transaction}
@@ -7206,6 +7215,11 @@ public final class Protos {
             case 88: {
               bitField0_ |= 0x00000002;
               time_ = input.readInt32();
+              break;
+            }
+            case 96: {
+              bitField0_ |= 0x00000080;
+              tokenId_ = input.readInt32();
               break;
             }
           }
@@ -7701,6 +7715,21 @@ public final class Protos {
       return confidence_;
     }
 
+    public static final int TOKEN_ID_FIELD_NUMBER = 12;
+    private int tokenId_;
+    /**
+     * <code>optional int32 token_id = 12;</code>
+     */
+    public boolean hasTokenId() {
+      return ((bitField0_ & 0x00000080) == 0x00000080);
+    }
+    /**
+     * <code>optional int32 token_id = 12;</code>
+     */
+    public int getTokenId() {
+      return tokenId_;
+    }
+
     private void initFields() {
       version_ = 0;
       time_ = 0;
@@ -7713,6 +7742,7 @@ public final class Protos {
       blockHash_ = java.util.Collections.emptyList();
       blockRelativityOffsets_ = java.util.Collections.emptyList();
       confidence_ = com.coinomi.core.protos.Protos.TransactionConfidence.getDefaultInstance();
+      tokenId_ = 0;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -7786,6 +7816,9 @@ public final class Protos {
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeInt32(11, time_);
       }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        output.writeInt32(12, tokenId_);
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -7848,6 +7881,10 @@ public final class Protos {
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(11, time_);
+      }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(12, tokenId_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -8003,6 +8040,8 @@ public final class Protos {
           confidenceBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000400);
+        tokenId_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000800);
         return this;
       }
 
@@ -8091,6 +8130,10 @@ public final class Protos {
         } else {
           result.confidence_ = confidenceBuilder_.build();
         }
+        if (((from_bitField0_ & 0x00000800) == 0x00000800)) {
+          to_bitField0_ |= 0x00000080;
+        }
+        result.tokenId_ = tokenId_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -8199,6 +8242,9 @@ public final class Protos {
         }
         if (other.hasConfidence()) {
           mergeConfidence(other.getConfidence());
+        }
+        if (other.hasTokenId()) {
+          setTokenId(other.getTokenId());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -9346,6 +9392,38 @@ public final class Protos {
           confidence_ = null;
         }
         return confidenceBuilder_;
+      }
+
+      private int tokenId_ ;
+      /**
+       * <code>optional int32 token_id = 12;</code>
+       */
+      public boolean hasTokenId() {
+        return ((bitField0_ & 0x00000800) == 0x00000800);
+      }
+      /**
+       * <code>optional int32 token_id = 12;</code>
+       */
+      public int getTokenId() {
+        return tokenId_;
+      }
+      /**
+       * <code>optional int32 token_id = 12;</code>
+       */
+      public Builder setTokenId(int value) {
+        bitField0_ |= 0x00000800;
+        tokenId_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 token_id = 12;</code>
+       */
+      public Builder clearTokenId() {
+        bitField0_ = (bitField0_ & ~0x00000800);
+        tokenId_ = 0;
+        onChanged();
+        return this;
       }
 
       // @@protoc_insertion_point(builder_scope:com.coinomi.core.protos.Transaction)
@@ -14789,7 +14867,7 @@ public final class Protos {
       "\022\013\n\007UNKNOWN\020\000\022\014\n\010BUILDING\020\001\022\013\n\007PENDING\020\002" +
       "\022\010\n\004DEAD\020\003\"U\n\006Source\022\022\n\016SOURCE_UNKNOWN\020\000" +
       "\022\022\n\016SOURCE_NETWORK\020\001\022\017\n\013SOURCE_SELF\020\002\022\022\n" +
-      "\016SOURCE_TRUSTED\020\003\"\331\003\n\013Transaction\022\017\n\007ver" +
+      "\016SOURCE_TRUSTED\020\003\"\353\003\n\013Transaction\022\017\n\007ver" +
       "sion\030\001 \002(\005\022\014\n\004time\030\013 \001(\005\022\014\n\004hash\030\002 \002(\014\0227" +
       "\n\004pool\030\003 \001(\0162).com.coinomi.core.protos.T" +
       "ransaction.Pool\022\021\n\tlock_time\030\004 \001(\r\022\022\n\nup" +
@@ -14799,32 +14877,32 @@ public final class Protos {
       "oinomi.core.protos.TransactionOutput\022\022\n\n" +
       "block_hash\030\010 \003(\014\022 \n\030block_relativity_off" +
       "sets\030\t \003(\005\022B\n\nconfidence\030\n \001(\0132..com.coi" +
-      "nomi.core.protos.TransactionConfidence\"5" +
-      "\n\004Pool\022\013\n\007UNSPENT\020\004\022\t\n\005SPENT\020\005\022\010\n\004DEAD\020\n" +
-      "\022\013\n\007PENDING\020\020\"0\n\rAddressStatus\022\017\n\007addres" +
-      "s\030\001 \002(\t\022\016\n\006status\030\002 \002(\t\"\306\002\n\014WalletPocket" +
-      "\022\032\n\022network_identifier\030\001 \002(\t\022\023\n\013descript" +
-      "ion\030\002 \001(\t\022)\n\003key\030\003 \003(\0132\034.com.coinomi.cor",
-      "e.protos.Key\022\034\n\024last_seen_block_hash\030\004 \001" +
-      "(\014\022\036\n\026last_seen_block_height\030\005 \001(\r\022!\n\031la" +
-      "st_seen_block_time_secs\030\006 \001(\003\0229\n\013transac" +
-      "tion\030\007 \003(\0132$.com.coinomi.core.protos.Tra" +
-      "nsaction\022>\n\016address_status\030\010 \003(\0132&.com.c" +
-      "oinomi.core.protos.AddressStatus\"N\n\020Scry" +
-      "ptParameters\022\014\n\004salt\030\001 \002(\014\022\020\n\001n\030\002 \001(\003:\0051" +
-      "6384\022\014\n\001r\030\003 \001(\005:\0018\022\014\n\001p\030\004 \001(\005:\0011\"\242\003\n\006Wal" +
-      "let\022\022\n\007version\030\001 \001(\005:\0011\022*\n\004seed\030\002 \001(\0132\034." +
-      "com.coinomi.core.protos.Key\0220\n\nmaster_ke",
-      "y\030\003 \002(\0132\034.com.coinomi.core.protos.Key\022T\n" +
-      "\017encryption_type\030\004 \001(\0162..com.coinomi.cor" +
-      "e.protos.Wallet.EncryptionType:\013UNENCRYP" +
-      "TED\022H\n\025encryption_parameters\030\005 \001(\0132).com" +
-      ".coinomi.core.protos.ScryptParameters\0226\n" +
-      "\007pockets\030\006 \003(\0132%.com.coinomi.core.protos" +
-      ".WalletPocket\"N\n\016EncryptionType\022\017\n\013UNENC" +
-      "RYPTED\020\001\022\030\n\024ENCRYPTED_SCRYPT_AES\020\002\022\021\n\rEN" +
-      "CRYPTED_AES\020\003B!\n\027com.coinomi.core.protos" +
-      "B\006Protos"
+      "nomi.core.protos.TransactionConfidence\022\020" +
+      "\n\010token_id\030\014 \001(\005\"5\n\004Pool\022\013\n\007UNSPENT\020\004\022\t\n" +
+      "\005SPENT\020\005\022\010\n\004DEAD\020\n\022\013\n\007PENDING\020\020\"0\n\rAddre" +
+      "ssStatus\022\017\n\007address\030\001 \002(\t\022\016\n\006status\030\002 \002(" +
+      "\t\"\306\002\n\014WalletPocket\022\032\n\022network_identifier" +
+      "\030\001 \002(\t\022\023\n\013description\030\002 \001(\t\022)\n\003key\030\003 \003(\013",
+      "2\034.com.coinomi.core.protos.Key\022\034\n\024last_s" +
+      "een_block_hash\030\004 \001(\014\022\036\n\026last_seen_block_" +
+      "height\030\005 \001(\r\022!\n\031last_seen_block_time_sec" +
+      "s\030\006 \001(\003\0229\n\013transaction\030\007 \003(\0132$.com.coino" +
+      "mi.core.protos.Transaction\022>\n\016address_st" +
+      "atus\030\010 \003(\0132&.com.coinomi.core.protos.Add" +
+      "ressStatus\"N\n\020ScryptParameters\022\014\n\004salt\030\001" +
+      " \002(\014\022\020\n\001n\030\002 \001(\003:\00516384\022\014\n\001r\030\003 \001(\005:\0018\022\014\n\001" +
+      "p\030\004 \001(\005:\0011\"\242\003\n\006Wallet\022\022\n\007version\030\001 \001(\005:\001" +
+      "1\022*\n\004seed\030\002 \001(\0132\034.com.coinomi.core.proto",
+      "s.Key\0220\n\nmaster_key\030\003 \002(\0132\034.com.coinomi." +
+      "core.protos.Key\022T\n\017encryption_type\030\004 \001(\016" +
+      "2..com.coinomi.core.protos.Wallet.Encryp" +
+      "tionType:\013UNENCRYPTED\022H\n\025encryption_para" +
+      "meters\030\005 \001(\0132).com.coinomi.core.protos.S" +
+      "cryptParameters\0226\n\007pockets\030\006 \003(\0132%.com.c" +
+      "oinomi.core.protos.WalletPocket\"N\n\016Encry" +
+      "ptionType\022\017\n\013UNENCRYPTED\020\001\022\030\n\024ENCRYPTED_" +
+      "SCRYPT_AES\020\002\022\021\n\rENCRYPTED_AES\020\003B!\n\027com.c" +
+      "oinomi.core.protosB\006Protos"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -14885,7 +14963,7 @@ public final class Protos {
     internal_static_com_coinomi_core_protos_Transaction_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_coinomi_core_protos_Transaction_descriptor,
-        new java.lang.String[] { "Version", "Time", "Hash", "Pool", "LockTime", "UpdatedAt", "TransactionInput", "TransactionOutput", "BlockHash", "BlockRelativityOffsets", "Confidence", });
+        new java.lang.String[] { "Version", "Time", "Hash", "Pool", "LockTime", "UpdatedAt", "TransactionInput", "TransactionOutput", "BlockHash", "BlockRelativityOffsets", "Confidence", "TokenId", });
     internal_static_com_coinomi_core_protos_AddressStatus_descriptor =
       getDescriptor().getMessageTypes().get(8);
     internal_static_com_coinomi_core_protos_AddressStatus_fieldAccessorTable = new

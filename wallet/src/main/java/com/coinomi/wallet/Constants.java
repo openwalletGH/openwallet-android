@@ -56,6 +56,8 @@ public class Constants {
             new CoinAddress(LitecoinMain.get(), new ServerAddress("ltc-cce-1.coinomi.net", 5002), new ServerAddress("ltc-cce-2.coinomi.net", 5002)),
             new CoinAddress(PeercoinMain.get(), new ServerAddress("54.176.197.116", 5004)),
             new CoinAddress(ReddcoinMain.get(), new ServerAddress("54.176.197.116", 5014)),
+            new CoinAddress(NuSharesMain.get(), new ServerAddress("54.176.197.116", 5011)),
+            new CoinAddress(NuBitsMain.get(), new ServerAddress("54.176.197.116", 5012)),
             new CoinAddress(DarkcoinMain.get(), new ServerAddress("54.176.197.116", 5013))
     );
 
@@ -78,6 +80,8 @@ public class Constants {
         COINS_BLOCK_EXPLORERS.put(CoinID.LITECOIN_MAIN.getCoinType(), "http://ltc.blockr.io/tx/info/%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.PEERCOIN_MAIN.getCoinType(), "http://ppc.blockr.io/tx/info/%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.DARKCOIN_MAIN.getCoinType(), "https://bitinfocharts.com/darkcoin/tx/%s");
+        COINS_BLOCK_EXPLORERS.put(CoinID.NUSHARES_MAIN.getCoinType(), "http://blockexplorer.nu/transactions/%s");
+        COINS_BLOCK_EXPLORERS.put(CoinID.NUBITS_MAIN.getCoinType(), "http://blockexplorer.nu/transactions/%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.REDDCOIN_MAIN.getCoinType(), "http://live.reddcoin.com/tx/%s");
     }
 
@@ -86,5 +90,5 @@ public class Constants {
             DogecoinMain.get(), LitecoinMain.get());
     public static final List<CoinType> SUPPORTED_COINS = ImmutableList.of(BitcoinMain.get(),
             DogecoinMain.get(), LitecoinMain.get(), PeercoinMain.get(), DarkcoinMain.get(),
-            ReddcoinMain.get());
+            ReddcoinMain.get(), NuSharesMain.get(), NuBitsMain.get());
 }

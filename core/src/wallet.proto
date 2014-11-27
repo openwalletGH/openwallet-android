@@ -228,7 +228,9 @@ message Transaction {
     // Data describing where the transaction is in the chain.
     optional TransactionConfidence confidence = 10;
 
-    // Next tag: 12
+    optional int32 token_id = 12;
+
+    // Next tag: 13
 }
 
 message AddressStatus {

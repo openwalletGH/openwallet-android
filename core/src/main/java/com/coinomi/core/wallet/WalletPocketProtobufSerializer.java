@@ -55,6 +55,7 @@ import javax.annotation.Nullable;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import static org.bitcoinj.params.Networks.Family.PEERCOIN;
+import static org.bitcoinj.params.Networks.Family.NUBITS;
 import static org.bitcoinj.params.Networks.Family.REDDCOIN;
 
 /**
@@ -114,8 +115,12 @@ public class WalletPocketProtobufSerializer {
                 .setVersion((int) tx.getVersion());
 
         Networks.Family family = Networks.getFamily(tx.getParams());
-        if (family == Networks.Family.PEERCOIN || family == Networks.Family.REDDCOIN) {
+        if (Networks.isFamily(tx.getParams(), PEERCOIN, NUBITS, REDDCOIN)) {
             txBuilder.setTime((int) tx.getTime());
+        }
+
+        if (Networks.isFamily(tx.getParams(), NUBITS)) {
+            txBuilder.setTokenId(tx.getTokenId());
         }
 
         if (tx.getUpdateTime() != null) {
@@ -314,8 +319,14 @@ public class WalletPocketProtobufSerializer {
     private void readTransaction(Protos.Transaction txProto, CoinType params) throws UnreadableWalletException {
         Transaction tx = new Transaction(params);
 
-        if (Networks.isFamily(params, PEERCOIN, REDDCOIN)) {
+        tx.setVersion(txProto.getVersion());
+
+        if (Networks.isFamily(tx.getParams(), PEERCOIN, NUBITS, REDDCOIN)) {
             tx.setTime(txProto.getTime());
+        }
+
+        if (Networks.isFamily(tx.getParams(), NUBITS)) {
+            tx.setTokenId((byte) (0xFF & txProto.getTokenId()));
         }
 
         if (txProto.hasUpdatedAt()) {

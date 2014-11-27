@@ -47,6 +47,7 @@ import org.bitcoinj.core.TransactionInput;
 import org.bitcoinj.core.TransactionInput.ConnectMode;
 import org.bitcoinj.core.TransactionInput.ConnectionResult;
 import org.bitcoinj.core.TransactionOutput;
+import org.bitcoinj.core.Utils;
 import org.bitcoinj.core.VarInt;
 import org.bitcoinj.crypto.DeterministicKey;
 import org.bitcoinj.crypto.KeyCrypter;
@@ -549,7 +550,7 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
     public void broadcastTx(Transaction tx, TransactionEventListener listener) throws IOException {
         if (isConnected()) {
             if (log.isInfoEnabled()) {
-                log.info("Broadcasting tx {}", tx.bitcoinSerialize());
+                log.info("Broadcasting tx {}", Utils.HEX.encode(tx.bitcoinSerialize()));
             }
             blockchainConnection.broadcastTx(tx, listener);
         } else {
