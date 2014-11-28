@@ -1,10 +1,13 @@
 package com.coinomi.core.coins;
 
 import org.bitcoinj.core.Address;
+import org.bitcoinj.core.AddressFormatException;
+import org.bitcoinj.core.Base58;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.params.Networks;
 
+import com.coinomi.core.uri.CoinURIParseException;
 import com.google.common.collect.ImmutableList;
 
 import java.util.List;
@@ -83,5 +86,14 @@ public enum CoinID {
             }
         }
         throw new IllegalArgumentException();
+    }
+
+    public static CoinType typeFromAddress(String address) throws AddressFormatException {
+        NetworkParameters addressParams = new Address(null, address).getParameters();
+        if (addressParams instanceof CoinType) {
+            return (CoinType) addressParams;
+        } else {
+            throw new AddressFormatException("Unsupported address network: " + addressParams.getId());
+        }
     }
 }

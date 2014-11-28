@@ -58,6 +58,7 @@ public class CommunicationsTest {
         PipedInputStream pipedServerOutput = new PipedInputStream(serverOutput);
         when(socket.getOutputStream()).thenReturn(serverInput);
         when(socket.getInputStream()).thenReturn(pipedServerOutput);
+        when(socket.isConnected()).thenReturn(true);
 
 
         client = new StratumClient("not used", 1234) {

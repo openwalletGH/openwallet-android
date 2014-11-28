@@ -154,17 +154,11 @@ public class CoinURI {
                     throw new CoinURIParseException("Unsupported URI scheme: " + uri.getScheme());
                 }
             } else {
-                // Check if address
+                // Try to parse as address
                 try {
-                    Base58.decodeChecked(input);
+                    params = CoinID.typeFromAddress(input);
                 } catch (AddressFormatException e) {
-                    throw new CoinURIParseException("Unsupported format: " + input);
-                }
-                // Try to parse this address
-                try {
-                    params = (CoinType) new Address(null, input).getParameters();
-                } catch (AddressFormatException e) {
-                    throw new CoinURIParseException("Unsupported address type: " + input);
+                    throw new CoinURIParseException("Unrecognisable format: " + input);
                 }
             }
         }

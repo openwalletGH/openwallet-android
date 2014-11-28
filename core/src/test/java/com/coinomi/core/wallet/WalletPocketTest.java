@@ -351,6 +351,11 @@ public class WalletPocketTest {
         }
 
         @Override
+        public void subscribeToBlockchain(TransactionEventListener listener) {
+
+        }
+
+        @Override
         public void subscribeToAddresses(List<Address> addresses, TransactionEventListener listener) {
             for (Address a : addresses) {
                 AddressStatus status = statuses.get(a);

@@ -88,7 +88,9 @@ public class Constants {
     public static final CoinType DEFAULT_COIN = BitcoinMain.get();
     public static final List<CoinType> DEFAULT_COINS = ImmutableList.of(BitcoinMain.get(),
             DogecoinMain.get(), LitecoinMain.get());
-    public static final List<CoinType> SUPPORTED_COINS = ImmutableList.of(BitcoinMain.get(),
-            DogecoinMain.get(), LitecoinMain.get(), PeercoinMain.get(), DarkcoinMain.get(),
-            ReddcoinMain.get(), NuSharesMain.get(), NuBitsMain.get());
+    public static final List<CoinType> SUPPORTED_COINS = ImmutableList.of(
+            BitcoinMain.get(), DogecoinMain.get(),
+            LitecoinMain.get(), PeercoinMain.get(),
+            NuSharesMain.get(), NuBitsMain.get(),
+            DarkcoinMain.get(), ReddcoinMain.get());
 }
