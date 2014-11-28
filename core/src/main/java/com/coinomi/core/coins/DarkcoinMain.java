@@ -18,9 +18,11 @@ public class DarkcoinMain extends CoinType {
         symbol = "DRK";
         uriScheme = "darkcoin";
         bip44Index = 5;
-        feePerKb = Coin.valueOf(100000);
-        minNonDust = Coin.valueOf(1000); // DUST_HARD_LIMIT = 1000;   // 0.00001 DRK mininput
         unitExponent = 8;
+        feePerKb = Coin.valueOf(100000);
+        minNonDust = Coin.valueOf(1000); // 0.00001 DRK mininput
+        softDustLimit = Coin.valueOf(100000); // 0.001 DRK
+        softDustPolicy = SoftDustPolicy.BASE_FEE_FOR_EACH_SOFT_DUST_TXO;
     }
 
     private static DarkcoinMain instance = new DarkcoinMain();

@@ -18,9 +18,11 @@ public class DarkcoinTest extends CoinType {
         symbol = "DRK";
         uriScheme = "darkcoin";
         bip44Index = 1;
-        feePerKb = Coin.valueOf(100000);
-        minNonDust = Coin.valueOf(1); //TODO verify
         unitExponent = 8;
+        feePerKb = Coin.valueOf(100000);
+        minNonDust = Coin.valueOf(1000); // 0.00001 DRK mininput
+        softDustLimit = Coin.valueOf(100000); // 0.001 DRK
+        softDustPolicy = SoftDustPolicy.BASE_FEE_FOR_EACH_SOFT_DUST_TXO;
     }
 
     private static DarkcoinTest instance = new DarkcoinTest();

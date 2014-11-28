@@ -20,11 +20,11 @@ public class ReddcoinMain extends CoinType {
         symbol = "RDD";
         uriScheme = "reddcoin";
         bip44Index = 4;
-        // TODO set correct values
-        feePerKb = Coin.valueOf(100000);
-        minNonDust = Coin.valueOf(1000000); // DUST_HARD_LIMIT = 1000000;   // 0.01 RDD mininput
         unitExponent = 8;
-//        throw new RuntimeException(name+" bip44Index " + bip44Index + "is not standardized");
+        feePerKb = Coin.valueOf(100000);
+        minNonDust = Coin.valueOf(1000000);   // 0.01 RDD mininput
+        softDustLimit = Coin.valueOf(100000000); // 1 RDD
+        softDustPolicy = SoftDustPolicy.BASE_FEE_FOR_EACH_SOFT_DUST_TXO;
     }
 
     private static ReddcoinMain instance = new ReddcoinMain();

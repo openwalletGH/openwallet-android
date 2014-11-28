@@ -18,9 +18,11 @@ public class NuSharesMain extends CoinType {
         symbol = "NSR";
         uriScheme = "nushares";
         bip44Index = 11;
-        feePerKb = Coin.valueOf(10000);
-        minNonDust = Coin.valueOf(10000);
         unitExponent = 4;
+        feePerKb = Coin.valueOf(10000); // 1NSR, careful NuBits has 10000 units per coin
+        minNonDust = Coin.valueOf(1);
+        softDustLimit = Coin.valueOf(10000); // 1NSR, careful NuBits has 10000 units per coin
+        softDustPolicy = SoftDustPolicy.AT_LEAST_BASE_FEE_IF_SOFT_DUST_TXO_PRESENT;
     }
 
     private static NuSharesMain instance = new NuSharesMain();

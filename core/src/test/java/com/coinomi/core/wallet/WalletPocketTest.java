@@ -35,11 +35,14 @@ import org.junit.Test;
 import org.spongycastle.crypto.params.KeyParameter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -232,49 +235,36 @@ public class WalletPocketTest {
         }
     }
 
-    /**
-     * TODO this test does not work
-     */
     @Test
-    public void createTransaction() throws Exception {
+    public void createDustTransactionFee() throws Exception {
+        pocket.onConnection(getBlockchainConnection(type));
+
+        Address toAddr = new Address(type, "nUEkQ3LjH9m4ScbP6NGtnAdnnUsdtWv99Q");
+
+        Coin softDust = type.getSoftDustLimit();
+        assertNotNull(softDust);
+        // Send a soft dust
+        SendRequest sendRequest = pocket.sendCoinsOffline(toAddr, softDust.subtract(Coin.SATOSHI));
+        pocket.completeTx(sendRequest);
+        assertEquals(type.getFeePerKb().multiply(2), sendRequest.tx.getFee());
+    }
+
+    @Test
+    public void createTransactionAndBroadcast() throws Exception {
         pocket.onConnection(getBlockchainConnection(type));
 
         Address toAddr = new Address(type, "nUEkQ3LjH9m4ScbP6NGtnAdnnUsdtWv99Q");
 
         long orgBalance = pocket.getBalance().value;
         SendRequest sendRequest = pocket.sendCoinsOffline(toAddr, Coin.valueOf(AMOUNT_TO_SEND));
+        sendRequest.shuffleOutputs = false;
         pocket.completeTx(sendRequest);
         Transaction tx = sendRequest.tx;
+        assertEquals(expectedTx, Utils.HEX.encode(tx.bitcoinSerialize()));
 
-        Transaction txExpected = new Transaction(type, Utils.HEX.decode(expectedTx));
-
-        MessageComparator comparator = new MessageComparator();
-
-//        // Compare inputs
-//        ArrayList<TransactionInput> expectedTxi = Lists.newArrayList(txExpected.getInputs());
-//        Collections.sort(expectedTxi, comparator);
-//
-//        ArrayList<TransactionInput> txi = Lists.newArrayList(tx.getInputs());
-//        Collections.sort(txi, comparator);
-//
-//        for (int i = 0; i < expectedTxi.size(); i++) {
-//            assertArrayEquals(expectedTxi.get(i).bitcoinSerialize(), txi.get(i).bitcoinSerialize());
-//        }
-//
-//        // Compare outputs
-//        ArrayList<TransactionOutput> expectedTxo = Lists.newArrayList(txExpected.getOutputs());
-//        Collections.sort(expectedTxo, comparator);
-//
-//        ArrayList<TransactionOutput> txo = Lists.newArrayList(tx.getOutputs());
-//        Collections.sort(txo, comparator);
-//
-//        for (int i = 0; i < expectedTxo.size(); i++) {
-//            assertArrayEquals(expectedTxo.get(i).bitcoinSerialize(), txo.get(i).bitcoinSerialize());
-//        }
-
-//        pocket.broadcastTransaction(tx);
-
-//        assertEquals(orgBalance - AMOUNT_TO_SEND, pocket.getBalance());
+        // FIXME, mock does not work here
+//        pocket.broadcastTx(tx);
+//        assertEquals(orgBalance - AMOUNT_TO_SEND, pocket.getBalance().value);
     }
 
 
@@ -390,14 +380,11 @@ public class WalletPocketTest {
             listener.onTransactionUpdate(tx);
         }
 
-//        @Override
-//        public void getTx(CoinType coinType, AddressStatus status, UnspentTx utx, TransactionEventListener listener) {
-//            listener.onTransactionUpdate(status, utx, rawTxs.get(utx.getTxHash()));
-//        }
-
         @Override
         public void broadcastTx(Transaction tx, TransactionEventListener listener) {
             List<AddressStatus> newStatuses = new ArrayList<AddressStatus>();
+            Random rand = new Random();
+            byte[] randBytes = new byte[32];
             // Get spent outputs and modify statuses
             for (TransactionInput txi : tx.getInputs()) {
                 UnspentTx unspentTx = new UnspentTx(
@@ -405,7 +392,8 @@ public class WalletPocketTest {
 
                 for (Map.Entry<Address, ArrayList<UnspentTx>> entry : utxs.entrySet()) {
                     if (entry.getValue().remove(unspentTx)) {
-                        AddressStatus newStatus = new AddressStatus(entry.getKey(), tx.getHashAsString());
+                        rand.nextBytes(randBytes);
+                        AddressStatus newStatus = new AddressStatus(entry.getKey(), Utils.HEX.encode(randBytes));
                         statuses.put(entry.getKey(), newStatus);
                         newStatuses.add(newStatus);
                     }
@@ -630,5 +618,5 @@ public class WalletPocketTest {
             {"81a1f0f8242d5e71e65ff9e8ec51e8e85d641b607d7f691c1770d4f25918ebd7", "010000000141c217dfea3a1d8d6a06e9d3daf75b292581f652256d73a7891e5dc9c7ee3cca000000006a47304402205cce451228f98fece9645052546b82c2b2d425a4889b03999001fababfc7f4690220583b2189faef07d6b0191c788301cfab1b3f47ffe2c403d632b92c6dde27e14f012102d26e423c9da9ff4a7bf6b756b2dafb75cca34fbd34f64c4c3b77c37179c5bba2ffffffff0100ca9a3b000000001976a914dc40fbbc8caa1f7617d275aec9a3a14ce8d8652188ac00000000"}
     };
 
-    String expectedTx = "01000000039f79b1953195fe490a8036b9b1c735cb0c7efb1474700bd6e2778a3e27da74ef010000006b483045022100893b044bf2e1248d6496f41dc37acecb7da3b191df74883efa6a009f96b73ced02204e1e49c9688aff72f27d21d0639acbdff1a06a3ea9cdb2b530d91b7993af38e78121033daee143740ae505dd588be89f659b34ba30f587bcebece11d72ec7a115bc41bffffffff9f79b1953195fe490a8036b9b1c735cb0c7efb1474700bd6e2778a3e27da74ef040000006a47304402202d2197506b54d2007ce7c2b70b78774a52531c1ff85530fffd6f788305ff456e0220165bf803dc734fa6666e1aebf48eda948957fba1b86529dc4df106437f322e56812103c956c491833b8f1ebfde275cd7d5660824c53efe215f9956356b85f6c86031ffffffffffd7eb1859f2d470171c697f7d601b645de8e851ece8f95fe6715e2d24f8f0a181000000006a47304402203b0ee9b2cbfe53a8167f3cf19837832a572ab7d2144b1da38f7f8be09d8c6e5b022014d53f1b7570f6612610d35cd3d2eb58b5f61382ad9011a1d8cfd128b2645c6a81210392ed3b840c8474f8b6b57e71d9a60fbf75adea6fc68d8985330e8d782b80621fffffffff0200bbeea0000000001976a914007d5355731b44e274eb495a26f4c33a734ee3eb88ac00c2eb0b000000001976a914392d52419e94e237f0d5817de1c9e21d09b515a688ac00000000";
+    String expectedTx = "01000000039f79b1953195fe490a8036b9b1c735cb0c7efb1474700bd6e2778a3e27da74ef010000006a473044022006e44424f56393c9f1bdd02c2d9a3d42bda1955ebc1ebdf5067b202df284afe302207e2dc6b5ad99059c58c1c32e540419ad44816f3005d859baaef3a2e9718e0d0e0121033daee143740ae505dd588be89f659b34ba30f587bcebece11d72ec7a115bc41bffffffff9f79b1953195fe490a8036b9b1c735cb0c7efb1474700bd6e2778a3e27da74ef040000006b483045022100a1911352fac69365d0fbd1a2b5a37adc5ed43fbf91133b6c597d92281229703102206756b65b25435b1e8aceffe34693087760cbee45aa8dea010ff94321bbdcc6c7012103c956c491833b8f1ebfde275cd7d5660824c53efe215f9956356b85f6c86031ffffffffffd7eb1859f2d470171c697f7d601b645de8e851ece8f95fe6715e2d24f8f0a181000000006b483045022100b7e64ea240c3d9080801ca90891d54acd4a2ee52e402a8b9513699b38fd81dba0220136627bb760db2eee9f7cd71d6d2a8df9ab5049b336ebf495f07ccf0f324a5bb01210392ed3b840c8474f8b6b57e71d9a60fbf75adea6fc68d8985330e8d782b80621fffffffff0200bbeea0000000001976a914007d5355731b44e274eb495a26f4c33a734ee3eb88ac00c2eb0b000000001976a914392d52419e94e237f0d5817de1c9e21d09b515a688ac00000000";
 }

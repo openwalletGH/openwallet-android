@@ -547,6 +547,10 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
     }
 
 
+    public void broadcastTx(Transaction tx) throws IOException {
+        broadcastTx(tx, this);
+    }
+
     public void broadcastTx(Transaction tx, TransactionEventListener listener) throws IOException {
         if (isConnected()) {
             if (log.isInfoEnabled()) {
@@ -1408,14 +1412,13 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
             List<TransactionInput> originalInputs = new ArrayList<TransactionInput>(req.tx.getInputs());
 
             // We need to know if we need to add an additional fee because one of our values are smaller than 0.01 BTC
-            boolean needAtLeastReferenceFee = false;
+            int numberOfSoftDustOutputs = 0;
             if (req.ensureMinRequiredFee && !req.emptyWallet) { // min fee checking is handled later for emptyWallet
                 for (TransactionOutput output : req.tx.getOutputs())
-                    if (output.getValue().compareTo(Coin.CENT) < 0) {
+                    if (output.getValue().compareTo(coinType.getSoftDustLimit()) < 0) {
                         if (output.getValue().compareTo(coinType.getMinNonDust()) < 0)
                             throw new org.bitcoinj.core.Wallet.DustySendRequested();
-                        needAtLeastReferenceFee = true;
-                        break;
+                        numberOfSoftDustOutputs++;
                     }
             }
 
@@ -1431,7 +1434,7 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
             if (!req.emptyWallet) {
                 // This can throw InsufficientMoneyException.
                 FeeCalculation feeCalculation;
-                feeCalculation = calculateFee(req, value, originalInputs, needAtLeastReferenceFee, candidates);
+                feeCalculation = calculateFee(req, value, originalInputs, numberOfSoftDustOutputs, candidates);
                 bestCoinSelection = feeCalculation.bestCoinSelection;
                 bestChangeOutput = feeCalculation.bestChangeOutput;
             } else {
@@ -1584,8 +1587,8 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
         }
     }
 
-    public FeeCalculation calculateFee(SendRequest req, Coin value, List<TransactionInput> originalInputs,
-                                       boolean needAtLeastReferenceFee, LinkedList<TransactionOutput> candidates) throws InsufficientMoneyException {
+    private FeeCalculation calculateFee(SendRequest req, Coin value, List<TransactionInput> originalInputs,
+                                       int numberOfSoftDustOutputs, LinkedList<TransactionOutput> candidates) throws InsufficientMoneyException {
         checkState(lock.isHeldByCurrentThread());
         FeeCalculation result = new FeeCalculation();
         // There are 3 possibilities for what adding change might do:
@@ -1615,8 +1618,21 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
             } else {
                 fees = fees.add(req.feePerKb);  // First time around the loop.
             }
-            if (needAtLeastReferenceFee && fees.compareTo(coinType.getFeePerKb()) < 0)
-                fees = coinType.getFeePerKb();
+
+            if (numberOfSoftDustOutputs > 0) {
+                switch (coinType.getSoftDustPolicy()) {
+                    case AT_LEAST_BASE_FEE_IF_SOFT_DUST_TXO_PRESENT:
+                        if (fees.compareTo(coinType.getFeePerKb()) < 0) {
+                            fees = coinType.getFeePerKb();
+                        }
+                        break;
+                    case BASE_FEE_FOR_EACH_SOFT_DUST_TXO:
+                        fees = fees.add(coinType.getFeePerKb().multiply(numberOfSoftDustOutputs));
+                        break;
+                    default:
+                        throw new RuntimeException("Unknown soft dust policy: " + coinType.getSoftDustPolicy());
+                }
+            }
 
             valueNeeded = value.add(fees);
             if (additionalValueForNextCategory != null)
@@ -1647,14 +1663,30 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
             if (additionalValueSelected != null)
                 change = change.add(additionalValueSelected);
 
-            // If change is < 0.01 BTC, we will need to have at least minfee to be accepted by the network
+            // If change is a soft dust, we will need to have at least base fee to be accepted by the network
             if (req.ensureMinRequiredFee && !change.equals(Coin.ZERO) &&
-                    change.compareTo(Coin.CENT) < 0 && fees.compareTo(coinType.getFeePerKb()) < 0) {
-                // This solution may fit into category 2, but it may also be category 3, we'll check that later
-                eitherCategory2Or3 = true;
-                additionalValueForNextCategory = Coin.CENT;
-                // If the change is smaller than the fee we want to add, this will be negative
-                change = change.subtract(coinType.getFeePerKb().subtract(fees));
+                    change.compareTo(coinType.getSoftDustLimit()) < 0) {
+
+                switch (coinType.getSoftDustPolicy()) {
+                    case AT_LEAST_BASE_FEE_IF_SOFT_DUST_TXO_PRESENT:
+                        if (fees.compareTo(coinType.getFeePerKb()) < 0) {
+                            // This solution may fit into category 2, but it may also be category 3, we'll check that later
+                            eitherCategory2Or3 = true;
+                            additionalValueForNextCategory = coinType.getSoftDustLimit();
+                            // If the change is smaller than the fee we want to add, this will be negative
+                            change = change.subtract(coinType.getFeePerKb().subtract(fees));
+                        }
+                        break;
+                    case BASE_FEE_FOR_EACH_SOFT_DUST_TXO:
+                        // This solution may fit into category 2, but it may also be category 3, we'll check that later
+                        eitherCategory2Or3 = true;
+                        additionalValueForNextCategory = coinType.getSoftDustLimit();
+                        // If the change is smaller than the fee we want to add, this will be negative
+                        change = change.subtract(coinType.getFeePerKb());
+                        break;
+                    default:
+                        throw new RuntimeException("Unknown soft dust policy: " + coinType.getSoftDustPolicy());
+                }
             }
 
             int size = 0;
@@ -1712,7 +1744,7 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
                 // If we are in selection2, we will require at least CENT additional. If we do that, there is no way
                 // we can end up back here because CENT additional will always get us to 1
                 checkState(selection2 == null);
-                checkState(additionalValueForNextCategory.equals(Coin.CENT));
+                checkState(additionalValueForNextCategory.equals(coinType.getSoftDustLimit()));
                 selection2 = selection;
                 selection2Change = checkNotNull(changeOutput); // If we get no change in category 2, we are actually in category 3
             } else {
@@ -1778,9 +1810,22 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
         Coin fee = baseFee.add(feePerKb.multiply((size / 1000) + 1));
         output.setValue(output.getValue().subtract(fee));
         // Check if we need additional fee due to the output's value
-        if (output.getValue().compareTo(Coin.CENT) < 0 && fee.compareTo(coinType.getFeePerKb()) < 0)
-            output.setValue(output.getValue().subtract(coinType.getFeePerKb().subtract(fee)));
-        return output.getMinNonDustValue(coinType.getFeePerKb().multiply(3)).compareTo(output.getValue()) <= 0;
+        if (output.getValue().compareTo(coinType.getSoftDustLimit()) < 0) {
+            switch (coinType.getSoftDustPolicy()) {
+                case AT_LEAST_BASE_FEE_IF_SOFT_DUST_TXO_PRESENT:
+                    if (fee.compareTo(coinType.getFeePerKb()) < 0) {
+                        output.setValue(output.getValue().subtract(coinType.getFeePerKb().subtract(fee)));
+                    }
+                    break;
+                case BASE_FEE_FOR_EACH_SOFT_DUST_TXO:
+                    output.setValue(output.getValue().subtract(coinType.getFeePerKb()));
+                    break;
+                default:
+                    throw new RuntimeException("Unknown soft dust policy: " + coinType.getSoftDustPolicy());
+            }
+        }
+
+        return coinType.getMinNonDust().compareTo(output.getValue()) <= 0;
     }
 
     private int estimateBytesForSigning(CoinSelection selection) {

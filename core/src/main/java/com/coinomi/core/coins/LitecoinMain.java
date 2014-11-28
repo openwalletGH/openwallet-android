@@ -19,9 +19,11 @@ public class LitecoinMain extends CoinType {
         symbol = "LTC";
         uriScheme = "litecoin";
         bip44Index = 2;
-        feePerKb = Coin.valueOf(100000);
-        minNonDust = Coin.valueOf(1000);
         unitExponent = 8;
+        feePerKb = Coin.valueOf(100000);
+        minNonDust = Coin.valueOf(1000); // 0.00001 LTC mininput
+        softDustLimit = Coin.valueOf(100000); // 0.001 LTC
+        softDustPolicy = SoftDustPolicy.BASE_FEE_FOR_EACH_SOFT_DUST_TXO;
     }
 
     private static LitecoinMain instance = new LitecoinMain();

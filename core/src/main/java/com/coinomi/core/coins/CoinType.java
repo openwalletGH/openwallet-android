@@ -26,9 +26,12 @@ abstract public class CoinType extends NetworkParameters implements Serializable
     protected String symbol;
     protected String uriScheme;
     protected Integer bip44Index;
+    protected Integer unitExponent;
     protected Coin feePerKb;
     protected Coin minNonDust;
-    protected Integer unitExponent;
+    protected Coin softDustLimit;
+    protected SoftDustPolicy softDustPolicy;
+
 
     public String getName() {
         return checkNotNull(name);
@@ -46,6 +49,10 @@ abstract public class CoinType extends NetworkParameters implements Serializable
         return checkNotNull(bip44Index);
     }
 
+    public int getUnitExponent() {
+        return checkNotNull(unitExponent);
+    }
+
     public Coin getFeePerKb() {
         return checkNotNull(feePerKb);
     }
@@ -54,8 +61,12 @@ abstract public class CoinType extends NetworkParameters implements Serializable
         return checkNotNull(minNonDust);
     }
 
-    public int getUnitExponent() {
-        return checkNotNull(unitExponent);
+    public Coin getSoftDustLimit() {
+        return checkNotNull(softDustLimit);
+    }
+
+    public SoftDustPolicy getSoftDustPolicy() {
+        return checkNotNull(softDustPolicy);
     }
 
     public List<ChildNumber> getBip44Path(int account) {

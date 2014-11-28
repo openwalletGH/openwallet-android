@@ -18,9 +18,11 @@ public class DogecoinMain extends CoinType {
         symbol = "DOGE";
         uriScheme = "dogecoin";
         bip44Index = 3;
-        feePerKb = Coin.valueOf(100000000L);
-        minNonDust = Coin.valueOf(0); // Dogecoin doesn't have dust detection (src. ref client)
         unitExponent = 8;
+        feePerKb = Coin.valueOf(100000000L);
+        minNonDust = Coin.valueOf(1);
+        softDustLimit = Coin.valueOf(100000000L); // 1 DOGE
+        softDustPolicy = SoftDustPolicy.BASE_FEE_FOR_EACH_SOFT_DUST_TXO;
     }
 
     private static DogecoinMain instance = new DogecoinMain();
