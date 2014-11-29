@@ -22,19 +22,18 @@ import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.uri.CoinURI;
 import com.coinomi.core.uri.CoinURIParseException;
 import com.coinomi.core.util.GenericUtils;
-import com.coinomi.core.wallet.SendRequest;
 import com.coinomi.core.wallet.WalletPocket;
 import com.coinomi.core.wallet.exceptions.NoSuchPocketException;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.ui.widget.QrCodeButton;
+
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.InsufficientMoneyException;
 import org.bitcoinj.core.Wallet;
 import org.bitcoinj.crypto.KeyCrypterException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +42,6 @@ import java.io.IOException;
 import javax.annotation.Nullable;
 
 import static com.coinomi.core.Preconditions.checkNotNull;
-import static com.coinomi.core.Preconditions.checkState;
 
 /**
  *  Fragment that prepares a transaction
@@ -62,6 +60,7 @@ public class SendFragment extends Fragment {
     private TextView addressError;
     private EditText sendAmountView;
     private TextView amountError;
+    private TextView amountWarning;
     private QrCodeButton scanQrCodeButton;
     private Button sendConfirmButton;
 
@@ -131,6 +130,8 @@ public class SendFragment extends Fragment {
         addressError.setVisibility(View.GONE);
         amountError = (TextView) view.findViewById(R.id.amount_error_message);
         amountError.setVisibility(View.GONE);
+        amountWarning = (TextView) view.findViewById(R.id.amount_warning_message);
+        amountWarning.setVisibility(View.GONE);
 
         scanQrCodeButton = (QrCodeButton) view.findViewById(R.id.scan_qr_code);
         scanQrCodeButton.setOnClickListener(new View.OnClickListener() {
@@ -229,7 +230,7 @@ public class SendFragment extends Fragment {
                     Toast.makeText(getActivity(), R.string.sent_msg, Toast.LENGTH_LONG).show();
                 } else {
                     if (error instanceof InsufficientMoneyException) {
-                        Toast.makeText(getActivity(), R.string.send_coins_error_not_enough_money, Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(), R.string.amount_error_not_enough_money, Toast.LENGTH_LONG).show();
                     } else if (error instanceof NoSuchPocketException) {
                         Toast.makeText(getActivity(), R.string.no_such_pocket_error, Toast.LENGTH_LONG).show();
                     } else if (error instanceof KeyCrypterException) {
@@ -290,7 +291,15 @@ public class SendFragment extends Fragment {
     }
 
     private boolean isAmountValid(Coin amount) {
-        return amount != null && amount.isPositive();
+        boolean isValid = amount != null
+                && amount.isPositive()
+                && amount.compareTo(coinType.getMinNonDust()) >= 0;
+        if (isValid && pocket != null) {
+            // Check if we have the amount
+            // FIXME optimize, pocket.getBalance() is a bit heavy but always up-to-date.
+            isValid = amount.compareTo(pocket.getBalance(false)) <= 0;
+        }
+        return isValid;
     }
 
     private boolean everythingValid() {
@@ -316,13 +325,13 @@ public class SendFragment extends Fragment {
     }
 
     private void validateAmount(boolean isTyping) {
+        final String amountStr = sendAmountView.getText().toString().trim();
+        Coin amountParsed = null;
         try {
-            final String amountStr = sendAmountView.getText().toString().trim();
             if (!amountStr.isEmpty()) {
-                Coin amount = GenericUtils.parseCoin(coinType, amountStr);
-                if (isAmountValid(amount)) {
-                    // TODO, check if we have the available amount in the wallet
-                    sendAmount = amount;
+                amountParsed = GenericUtils.parseCoin(coinType, amountStr);
+                if (isAmountValid(amountParsed)) {
+                    sendAmount = amountParsed;
                 } else {
                     throw new IllegalArgumentException("Amount " + amountStr + " is invalid");
                 }
@@ -330,10 +339,44 @@ public class SendFragment extends Fragment {
                 sendAmount = null;
             }
             amountError.setVisibility(View.GONE);
-        } catch (IllegalArgumentException ignore) {
+
+            // Show warning that fees apply when entered the full amount inside the pocket
+            // FIXME optimize, pocket.getBalance() is a bit heavy but always up-to-date.
+            if (pocket != null && sendAmount != null && sendAmount.compareTo(pocket.getBalance()) == 0) {
+                amountWarning.setText(R.string.amount_warn_fees_apply);
+                amountWarning.setVisibility(View.VISIBLE);
+            } else {
+                amountWarning.setVisibility(View.GONE);
+            }
+        } catch (IllegalArgumentException e) {
+            amountWarning.setVisibility(View.GONE);
             if (!isTyping) {
+                log.info(e.getMessage());
                 sendAmount = null;
-                amountError.setText(R.string.amount_error);
+                if (amountParsed == null) {
+                    amountError.setText(R.string.amount_error);
+                } else if (amountParsed.isNegative()) {
+                    amountError.setText(R.string.amount_error_negative);
+                } else if (amountParsed.compareTo(coinType.getMinNonDust()) < 0) {
+                    String minAmount = GenericUtils.formatValue(coinType, coinType.getMinNonDust());
+                    String message = getResources().getString(R.string.amount_error_too_small,
+                            minAmount, coinType.getSymbol());
+                    amountError.setText(message);
+                } else if (pocket != null && amountParsed.compareTo(pocket.getBalance()) > 0) {
+                    amountError.setText(R.string.amount_error_not_enough_money);
+                } else { // Should not happen, but show a generic error
+                    amountError.setText(R.string.amount_error);
+                }
+                amountError.setVisibility(View.VISIBLE);
+            }
+        } catch (ArithmeticException e) {
+            amountWarning.setVisibility(View.GONE);
+            if (!isTyping) {
+                log.info(e.getMessage());
+                sendAmount = null;
+                String message = getResources().getString(R.string.amount_error_decimal_places,
+                        coinType.getUnitExponent());
+                amountError.setText(message);
                 amountError.setVisibility(View.VISIBLE);
             }
         }
@@ -382,7 +425,7 @@ public class SendFragment extends Fragment {
 
         Coin availableBalance = pocket.getBalance(false);
         if (availableBalance.isZero()) {
-            Toast.makeText(getActivity(), R.string.send_coins_error_not_enough_money,
+            Toast.makeText(getActivity(), R.string.amount_error_not_enough_money,
                     Toast.LENGTH_LONG).show();
         } else {
             sendAmountView.setText(GenericUtils.formatValue(coinType, availableBalance));

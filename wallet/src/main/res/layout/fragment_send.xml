@@ -106,7 +106,17 @@
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"
                     android:layout_below="@+id/symbol"
-                    android:text="@string/amount_error" />
+                    tools:text="@string/amount_error" />
+
+                <TextView
+                    android:id="@+id/amount_warning_message"
+                    style="@style/WarningText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@+id/amount_error_message"
+                    tools:text="@string/amount_warn_fees_apply" />
             </RelativeLayout>
 
 

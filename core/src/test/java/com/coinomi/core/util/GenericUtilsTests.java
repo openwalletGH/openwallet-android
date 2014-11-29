@@ -2,7 +2,6 @@ package com.coinomi.core.util;
 
 import com.coinomi.core.coins.BitcoinMain;
 import com.coinomi.core.coins.PeercoinMain;
-import com.coinomi.core.uri.CoinURIParseException;
 
 import org.bitcoinj.core.Coin;
 import org.junit.Test;

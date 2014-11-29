@@ -11,16 +11,6 @@
     <string name="action_about">About</string>
     <string name="action_restore_wallet">Restore wallet</string>
     <string name="action_refresh_wallet">Refresh</string>
-    <string name="send_coins_fragment_receiving_address_label">Pay to</string>
-    <string name="send_coins_fragment_receiving_address_error">Invalid Bitcoin Address!</string>
-    <string name="send_coins_fragment_amount_label">Amount to pay</string>
-    <string name="send_coins_fragment_button_send">Send</string>
-    <string name="send_coins_fragment_button_back">Back</string>
-    <string name="send_coins_failed_msg">Failed!</string>
-    <string name="send_coins_error_not_enough_money">Not enough money</string>
-    <string name="send_coins_error_network">Could not connect to the coin network</string>
-    <string name="send_coins_error_dust">The sending amount is too small and will be rejected by the network</string>
-    <string name="send_coins_error">Could not send coins: %1$s</string>
 
     <!-- Errors -->
     <string name="error_could_not_read_wallet">Could not read wallet</string>
@@ -78,13 +68,27 @@
     <string name="receive_address_label">my address</string>
 
     <!-- Send fragment -->
+    <string name="send_coins_fragment_receiving_address_label">Pay to</string>
+    <string name="send_coins_fragment_receiving_address_error">Invalid Bitcoin Address!</string>
+    <string name="send_coins_fragment_amount_label">Amount to pay</string>
+    <string name="send_coins_fragment_button_send">Send</string>
+    <string name="send_coins_fragment_button_back">Back</string>
+    <string name="send_coins_failed_msg">Failed!</string>
+    <string name="send_coins_error_network">Could not connect to the coin network</string>
+    <string name="send_coins_error_dust">The sending amount is too small and will be rejected by the network</string>
+    <string name="send_coins_error">Could not send coins: %1$s</string>
     <string name="pay_to_label">pay to</string>
     <string name="amount_to_send_label">amount</string>
     <string name="uri_error">There was a problem decoding URI: %1$s</string>
     <string name="unsupported_coin">coin is not supported: %1$s</string>
     <string name="coin_not_added">coin is supported but is not added: %1$s</string>
-    <string name="address_error">Provided address is not valid.</string>
-    <string name="amount_error">Provided amount is not valid.</string>
+    <string name="address_error">The provided address is not valid.</string>
+    <string name="amount_error">The provided amount is not valid</string>
+    <string name="amount_error_negative">Cannot send a negative amount</string>
+    <string name="amount_error_decimal_places">Too many decimal places, try less than %1$d</string>
+    <string name="amount_error_too_small">The minimum amount is at least %1$s %2$s</string>
+    <string name="amount_error_not_enough_money">Not enough money</string>
+    <string name="amount_warn_fees_apply">Slightly less will be sent because of fees</string>
 
     <!-- Set Password fragment -->
     <string name="set_password_info">Set a password to protect your wallet in everyday use.</string>

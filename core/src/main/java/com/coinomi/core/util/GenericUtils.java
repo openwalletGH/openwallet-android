@@ -6,7 +6,6 @@ import com.coinomi.core.coins.CoinType;
 import org.bitcoinj.core.Coin;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
@@ -71,8 +70,12 @@ public class GenericUtils {
         return sb.toString();
     }
 
-    public static Coin parseCoin(final CoinType type, final String str) throws IllegalArgumentException {
-        long units = new BigDecimal(str).movePointRight(type.getUnitExponent()).toBigIntegerExact().longValue();
+    public static Coin parseCoin(final CoinType type, final String str)
+            throws IllegalArgumentException, ArithmeticException {
+        long units = new BigDecimal(str)
+                .movePointRight(type.getUnitExponent())
+                .toBigIntegerExact()
+                .longValue();
         return Coin.valueOf(units);
     }
 
