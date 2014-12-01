@@ -54,11 +54,11 @@ public class Constants {
             new CoinAddress(BitcoinMain.get(), new ServerAddress("btc-cce-1.coinomi.net", 5001), new ServerAddress("btc-cce-2.coinomi.net", 5001)),
             new CoinAddress(DogecoinMain.get(), new ServerAddress("doge-cce-1.coinomi.net", 5003), new ServerAddress("doge-cce-2.coinomi.net", 5003)),
             new CoinAddress(LitecoinMain.get(), new ServerAddress("ltc-cce-1.coinomi.net", 5002), new ServerAddress("ltc-cce-2.coinomi.net", 5002)),
-            new CoinAddress(PeercoinMain.get(), new ServerAddress("54.176.197.116", 5004)),
-            new CoinAddress(ReddcoinMain.get(), new ServerAddress("54.176.197.116", 5014)),
-            new CoinAddress(NuSharesMain.get(), new ServerAddress("54.176.197.116", 5011)),
-            new CoinAddress(NuBitsMain.get(), new ServerAddress("54.176.197.116", 5012)),
-            new CoinAddress(DarkcoinMain.get(), new ServerAddress("54.176.197.116", 5013))
+            new CoinAddress(PeercoinMain.get(), new ServerAddress("ppc-cce-1.coinomi.net", 5004), new ServerAddress("ppc-cce-2.coinomi.net", 5004)),
+            new CoinAddress(ReddcoinMain.get(), new ServerAddress("rdd-cce-1.coinomi.net", 5014), new ServerAddress("rdd-cce-2.coinomi.net", 5014)),
+            new CoinAddress(NuSharesMain.get(), new ServerAddress("nsr-cce-1.coinomi.net", 5011), new ServerAddress("nsr-cce-2.coinomi.net", 5011)),
+            new CoinAddress(NuBitsMain.get(), new ServerAddress("nbt-cce-1.coinomi.net", 5012), new ServerAddress("nbt-cce-2.coinomi.net", 5012)),
+            new CoinAddress(DarkcoinMain.get(), new ServerAddress("drk-cce-1.coinomi.net", 5013), new ServerAddress("drk-cce-2.coinomi.net", 5013))
     );
 
     public static final HashMap<CoinType, Integer> COINS_ICONS;
