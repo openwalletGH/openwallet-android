@@ -14,7 +14,7 @@ public class NuBitsMain extends CoinType {
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         tokenId = 0x42;
 
-        name = "NuBits (beta)";
+        name = "NuBits";
         symbol = "NBT";
         uriScheme = "nubits";
         bip44Index = 12;

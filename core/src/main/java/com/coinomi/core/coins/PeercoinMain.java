@@ -14,7 +14,7 @@ public class PeercoinMain extends CoinType {
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 500;
 
-        name = "Peercoin (beta)";
+        name = "Peercoin";
         symbol = "PPC";
         uriScheme = "peercoin"; // TODO verify, could be ppcoin?
         bip44Index = 6;

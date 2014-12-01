@@ -14,7 +14,7 @@ public class NuSharesMain extends CoinType {
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         tokenId = 0x53;
 
-        name = "NuShares (beta)";
+        name = "NuShares";
         symbol = "NSR";
         uriScheme = "nushares";
         bip44Index = 11;

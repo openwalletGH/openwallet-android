@@ -14,7 +14,7 @@ public class DarkcoinMain extends CoinType {
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 100;
 
-        name = "Darkcoin (beta)";
+        name = "Darkcoin";
         symbol = "DRK";
         uriScheme = "darkcoin";
         bip44Index = 5;

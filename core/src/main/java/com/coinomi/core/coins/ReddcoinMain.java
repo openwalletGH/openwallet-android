@@ -16,7 +16,7 @@ public class ReddcoinMain extends CoinType {
         dumpedPrivateKeyHeader = 189;
         transactionVersion = 2;
 
-        name = "Reddcoin (beta)";
+        name = "Reddcoin";
         symbol = "RDD";
         uriScheme = "reddcoin";
         bip44Index = 4;
