@@ -64,6 +64,10 @@ For now test it manually by installing it `adb install -r wallet/wallet-release.
 
 ## Version history
 
+New in version 1.5.0
+- The supported coins are now Bitcoin, Litecoin, Dogecoin, Peercoin, Darkcoin, Reddcoin, NuBits and NuShares. All will work without changing your seed!
+- Cleaner interface and bug fixes.
+
 New in version 1.4.1
 - Re-design of the create wallet tutorial and set more sane defaults
 - Fix crash when refreshing a non connected wallet

@@ -45,8 +45,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         style="@style/Address"
-        android:singleLine="true"
-        android:maxLines="1"
         android:ellipsize="end"
         android:paddingTop="4dp"
         tools:text="nUdHXBSBYQPJREXZMBUdu8ARnWM2mz3XQp" />
