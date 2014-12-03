@@ -1,22 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Font icons -->
-    <string name="font_icon_receive_coins">&#58881;</string>
-    <string name="font_icon_send_coins">&#58887;</string>
-    <string name="font_icon_key">&#58892;</string>
-    <string name="font_icon_earth">&#58893;</string>
-    <string name="font_icon_progress_3">&#58894;</string>
-    <string name="font_icon_progress_2">&#58895;</string>
-    <string name="font_icon_progress_1">&#58896;</string>
-    <string name="font_icon_progress_0">&#58897;</string>
+    <string name="font_icon_exchange">&#58880;</string>
+    <string name="font_icon_mining">&#58881;</string>
+    <string name="font_icon_receive_coins">&#58882;</string>
+    <string name="font_icon_send_coins">&#58883;</string>
+    <string name="font_icon_feather">&#58884;</string>
+    <string name="font_icon_vcard">&#58885;</string>
+    <string name="font_icon_house">&#58886;</string>
+    <string name="font_icon_cog">&#58887;</string>
+    <string name="font_icon_language">&#58889;</string>
+    <string name="font_icon_network">&#58890;</string>
+    <string name="font_icon_key">&#58891;</string>
+    <string name="font_icon_earth">&#58892;</string>
+    <string name="font_icon_progress_3">&#58893;</string>
+    <string name="font_icon_progress_2">&#58894;</string>
+    <string name="font_icon_progress_1">&#58895;</string>
+    <string name="font_icon_progress_0">&#58896;</string>
+    <string name="font_icon_creditcard">&#58888;</string>
+    <string name="font_icon_statistics">&#58897;</string>
     <string name="font_icon_lock">&#58898;</string>
     <string name="font_icon_lock_open">&#58899;</string>
     <string name="font_icon_checkmark">&#58900;</string>
     <string name="font_icon_cross">&#58901;</string>
-    <string name="font_icon_info">&#58902;</string>
-    <string name="font_icon_help">&#58903;</string>
-    <string name="font_icon_warning">&#58904;</string>
-    <string name="font_icon_cycle">&#58905;</string>
-    <string name="font_icon_shuffle">&#58906;</string>
-    <string name="font_icon_seed">&#58907;</string>
+    <string name="font_icon_blocked">&#58902;</string>
+    <string name="font_icon_info">&#58903;</string>
+    <string name="font_icon_help">&#58904;</string>
+    <string name="font_icon_warning">&#58905;</string>
+    <string name="font_icon_cycle">&#58906;</string>
+    <string name="font_icon_shuffle">&#58907;</string>
+    <string name="font_icon_seed">&#58908;</string>
 </resources>

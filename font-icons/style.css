@@ -1,10 +1,10 @@
 @font-face {
 	font-family: 'icomoon';
-	src:url('fonts/icomoon.eot?-sp752f');
-	src:url('fonts/icomoon.eot?#iefix-sp752f') format('embedded-opentype'),
-		url('fonts/icomoon.woff?-sp752f') format('woff'),
-		url('fonts/icomoon.ttf?-sp752f') format('truetype'),
-		url('fonts/icomoon.svg?-sp752f#icomoon') format('svg');
+	src:url('fonts/icomoon.eot?-25okah');
+	src:url('fonts/icomoon.eot?#iefix-25okah') format('embedded-opentype'),
+		url('fonts/icomoon.woff?-25okah') format('woff'),
+		url('fonts/icomoon.ttf?-25okah') format('truetype'),
+		url('fonts/icomoon.svg?-25okah#icomoon') format('svg');
 	font-weight: normal;
 	font-style: normal;
 }
@@ -23,58 +23,58 @@
 	-moz-osx-font-smoothing: grayscale;
 }
 
-.icon-receive-btc:before {
+.icon-exchange:before {
 	content: "\e600";
 }
-.icon-receive-coins:before {
+.icon-mining:before {
 	content: "\e601";
 }
-.icon-receive-doge:before {
+.icon-receive-coins:before {
 	content: "\e602";
 }
-.icon-receive-drk:before {
+.icon-send-coins:before {
 	content: "\e603";
 }
-.icon-receive-ltc:before {
+.icon-feather:before {
 	content: "\e604";
 }
-.icon-receive-ppc:before {
+.icon-vcard:before {
 	content: "\e605";
 }
-.icon-send-btc:before {
+.icon-house:before {
 	content: "\e606";
 }
-.icon-send-coins:before {
+.icon-cog:before {
 	content: "\e607";
 }
-.icon-send-doge:before {
-	content: "\e608";
-}
-.icon-send-drk:before {
+.icon-language:before {
 	content: "\e609";
 }
-.icon-send-ltc:before {
+.icon-network:before {
 	content: "\e60a";
 }
-.icon-send-ppc:before {
+.icon-key:before {
 	content: "\e60b";
 }
-.icon-key:before {
+.icon-earth:before {
 	content: "\e60c";
 }
-.icon-earth:before {
+.icon-progress-3:before {
 	content: "\e60d";
 }
-.icon-progress-3:before {
+.icon-progress-2:before {
 	content: "\e60e";
 }
-.icon-progress-2:before {
+.icon-brogress-1:before {
 	content: "\e60f";
 }
-.icon-progress-1:before {
+.icon-progress-0:before {
 	content: "\e610";
 }
-.icon-progress-0:before {
+.icon-creditcard:before {
+	content: "\e608";
+}
+.icon-statistics:before {
 	content: "\e611";
 }
 .icon-lock:before {
@@ -89,21 +89,24 @@
 .icon-cross:before {
 	content: "\e615";
 }
-.icon-info:before {
+.icon-blocked:before {
 	content: "\e616";
 }
-.icon-help:before {
+.icon-info:before {
 	content: "\e617";
 }
-.icon-warning:before {
+.icon-help:before {
 	content: "\e618";
 }
-.icon-cycle:before {
+.icon-warning:before {
 	content: "\e619";
 }
-.icon-shuffle:before {
+.icon-cycle:before {
 	content: "\e61a";
 }
-.icon-seed:before {
+.icon-shuffle:before {
 	content: "\e61b";
+}
+.icon-seed:before {
+	content: "\e61c";
 }
