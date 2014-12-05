@@ -18,19 +18,21 @@ package com.coinomi.wallet.util;
  */
 
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Writer;
-import java.math.BigInteger;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.util.Date;
-import java.util.LinkedList;
+import android.graphics.Typeface;
+import android.text.Spannable;
+import android.text.style.RelativeSizeSpan;
+import android.text.style.StyleSpan;
+
+import com.coinomi.core.wallet.WalletPocket;
+import com.coinomi.wallet.Constants;
+
+import org.bitcoinj.core.Address;
+import org.bitcoinj.core.ScriptException;
+import org.bitcoinj.core.Sha256Hash;
+import org.bitcoinj.core.Transaction;
+import org.bitcoinj.core.TransactionOutput;
+import org.bitcoinj.script.Script;
+
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -38,31 +40,6 @@ import java.util.regex.Pattern;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import android.graphics.Typeface;
-import android.text.Editable;
-import android.text.Spannable;
-import android.text.SpannableStringBuilder;
-import android.text.format.DateUtils;
-import android.text.style.RelativeSizeSpan;
-import android.text.style.StyleSpan;
-import android.text.style.TypefaceSpan;
-
-import com.coinomi.core.coins.CoinType;
-import com.coinomi.core.wallet.WalletPocket;
-import com.coinomi.wallet.Constants;
-import org.bitcoinj.core.Address;
-import org.bitcoinj.core.AddressFormatException;
-import org.bitcoinj.core.DumpedPrivateKey;
-import org.bitcoinj.core.ECKey;
-import org.bitcoinj.core.ScriptException;
-import org.bitcoinj.core.Sha256Hash;
-import org.bitcoinj.core.Transaction;
-import org.bitcoinj.core.TransactionInput;
-import org.bitcoinj.core.TransactionOutput;
-import org.bitcoinj.core.Wallet;
-import org.bitcoinj.script.Script;
-import org.bitcoinj.store.WalletProtobufSerializer;
 
 /**
  * @author Andreas Schildbach

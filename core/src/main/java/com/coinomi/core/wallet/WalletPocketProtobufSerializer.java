@@ -54,6 +54,7 @@ import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import static org.bitcoinj.params.Networks.Family.BLACKCOIN;
 import static org.bitcoinj.params.Networks.Family.PEERCOIN;
 import static org.bitcoinj.params.Networks.Family.NUBITS;
 import static org.bitcoinj.params.Networks.Family.REDDCOIN;
@@ -115,7 +116,7 @@ public class WalletPocketProtobufSerializer {
                 .setVersion((int) tx.getVersion());
 
         Networks.Family family = Networks.getFamily(tx.getParams());
-        if (Networks.isFamily(tx.getParams(), PEERCOIN, NUBITS, REDDCOIN)) {
+        if (Networks.isFamily(tx.getParams(), PEERCOIN, NUBITS, BLACKCOIN, REDDCOIN)) {
             txBuilder.setTime((int) tx.getTime());
         }
 
@@ -321,7 +322,7 @@ public class WalletPocketProtobufSerializer {
 
         tx.setVersion(txProto.getVersion());
 
-        if (Networks.isFamily(tx.getParams(), PEERCOIN, NUBITS, REDDCOIN)) {
+        if (Networks.isFamily(tx.getParams(), PEERCOIN, NUBITS, BLACKCOIN, REDDCOIN)) {
             tx.setTime(txProto.getTime());
         }
 

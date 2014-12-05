@@ -29,7 +29,9 @@ public enum CoinID {
     DARKCOIN_MAIN(DarkcoinMain.get()),
     DARKCOIN_TEST(DarkcoinTest.get()),
     NUSHARES_MAIN(NuSharesMain.get()),
-    NUBITS_MAIN(NuBitsMain.get())
+    NUBITS_MAIN(NuBitsMain.get()),
+    NAMECOIN_MAIN(NamecoinMain.get()),
+    BLACKCOIN(BlackcoinMain.get())
     ;
 
     static {

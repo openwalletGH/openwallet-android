@@ -18,6 +18,7 @@
 
 package com.coinomi.core.wallet;
 
+import com.coinomi.core.coins.BlackcoinMain;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.network.AddressStatus;
 import com.coinomi.core.network.BlockHeader;
@@ -33,6 +34,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 import org.bitcoinj.core.Address;
+import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.InsufficientMoneyException;
@@ -251,7 +253,12 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
         for (TransactionOutput txo : transaction.getOutputs()) {
             if (txo.isAvailableForSpending()) {
                 // We don't have keys for this txo therefore it is not ours
-                if (keys.findKeyFromPubHash(txo.getScriptPubKey().getPubKeyHash()) == null) {
+                try {
+                    if (keys.findKeyFromPubHash(txo.getScriptPubKey().getPubKeyHash()) == null) {
+                        txo.markAsSpent(null);
+                    }
+                } catch (ScriptException ignore) {
+                    // If we don't understand this output, don't use it
                     txo.markAsSpent(null);
                 }
             }
@@ -910,8 +917,15 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
                 for (TransactionOutput txo : tx.getOutputs()) {
                     log.info("- ΤΧΟ {}:{}", txo.getParentTransaction().getHash(), txo.getIndex());
 
-                    boolean belongsToAddress = Arrays.equals(txo.getScriptPubKey().getPubKeyHash(),
-                            status.getAddress().getHash160());
+
+                    boolean belongsToAddress = false;
+                    try {
+                        belongsToAddress = Arrays.equals(txo.getScriptPubKey().getPubKeyHash(),
+                                status.getAddress().getHash160());
+                    } catch (ScriptException ignore) {
+                        // If we cannot understand this output, it doesn't belong to the address
+                    }
+
 
                     if (belongsToAddress && !unspentOutputs.contains(txo)) {
                         // if not pending and has unspent outputs that should be spent

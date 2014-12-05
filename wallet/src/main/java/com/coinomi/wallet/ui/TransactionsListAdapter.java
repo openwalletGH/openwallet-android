@@ -36,12 +36,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.coinomi.core.coins.BitcoinMain;
 import com.coinomi.core.coins.CoinType;
-import com.coinomi.core.coins.DarkcoinMain;
-import com.coinomi.core.coins.DogecoinMain;
-import com.coinomi.core.coins.LitecoinMain;
-import com.coinomi.core.coins.PeercoinMain;
 import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.WalletPocket;
 import com.coinomi.wallet.R;
@@ -72,7 +67,12 @@ public class TransactionsListAdapter extends BaseAdapter {
     private final int colorInsignificant;
     private final int colorError;
     private final int colorCircularBuilding = Color.parseColor("#44ff44");
-    private final String textCoinBase;
+    private final String minedTitle;
+    private final String fontIconMined;
+    private final String sentToTitle;
+    private final String fontIconSentTo;
+    private final String receivedWithTitle;
+    private final String fontIconReceivedWith;
 
     private final Map<String, String> labelCache = new HashMap<String, String>();
     private final static String CACHE_NULL_MARKER = "";
@@ -88,12 +88,17 @@ public class TransactionsListAdapter extends BaseAdapter {
 
         this.walletPocket = walletPocket;
 
-        final Resources resources = context.getResources();
-        colorSignificant = resources.getColor(R.color.gray_87_text);
-        colorLessSignificant = resources.getColor(R.color.gray_54_sec_text_icons);
-        colorInsignificant = resources.getColor(R.color.gray_26_hint_text);
-        colorError = resources.getColor(R.color.fg_error);
-        textCoinBase = context.getString(R.string.wallet_transactions_coinbase);
+        final Resources res = context.getResources();
+        colorSignificant = res.getColor(R.color.gray_87_text);
+        colorLessSignificant = res.getColor(R.color.gray_54_sec_text_icons);
+        colorInsignificant = res.getColor(R.color.gray_26_hint_text);
+        colorError = res.getColor(R.color.fg_error);
+        minedTitle = res.getString(R.string.wallet_transactions_coinbase);
+        fontIconMined = res.getString(R.string.font_icon_mining);
+        sentToTitle = res.getString(R.string.sent_to);
+        fontIconSentTo = res.getString(R.string.font_icon_send_coins);
+        receivedWithTitle = res.getString(R.string.received_with);
+        fontIconReceivedWith = res.getString(R.string.font_icon_receive_coins);
     }
 
     public void setPrecision(final int precision, final int shift) {
@@ -182,7 +187,7 @@ public class TransactionsListAdapter extends BaseAdapter {
         final TransactionConfidence confidence = tx.getConfidence();
         final ConfidenceType confidenceType = confidence.getConfidenceType();
         final boolean isOwn = confidence.getSource().equals(TransactionConfidence.Source.SELF);
-        final boolean isCoinBase = tx.isCoinBase();
+        final boolean isMined = tx.isCoinBase() || tx.isCoinStake();
 //        final boolean isInternal = WalletUtils.isInternal(tx);
 
         final Coin value = tx.getValue(walletPocket);
@@ -257,33 +262,31 @@ public class TransactionsListAdapter extends BaseAdapter {
             rowConfirmationsFontIcon.setVisibility(View.GONE);
         }
 
-        // Money direction
-        if (value.isNegative()) {
-            rowDirectionText.setText(res.getString(R.string.sent_to));
-            rowDirectionFontIcon.setText(res.getString(R.string.font_icon_send_coins));
+        // Money direction and icon
+        if (isMined) {
+            rowDirectionText.setText(minedTitle);
+            rowDirectionFontIcon.setText(fontIconMined);
         } else {
-            rowDirectionText.setText(res.getString(R.string.received_with));
-            rowDirectionFontIcon.setText(res.getString(R.string.font_icon_receive_coins));
+            if (value.isNegative()) {
+                rowDirectionText.setText(sentToTitle);
+                rowDirectionFontIcon.setText(fontIconSentTo);
+            } else {
+                rowDirectionText.setText(receivedWithTitle);
+                rowDirectionFontIcon.setText(fontIconReceivedWith);
+            }
         }
 
         // date
 //        final Date time = tx.getUpdateTime();
 //        rowDate.setText(time != null ? (DateUtils.getRelativeTimeSpanString(context, time.getTime())) : null);
 
-        // coinbase TODO
-//        final View rowCoinbase = row.findViewById(R.id.transaction_row_coinbase);
-//        rowCoinbase.setVisibility(isCoinBase ? View.VISIBLE : View.GONE);
-
         // address - label
         final Address address = sent ?
                 WalletUtils.getSendToAddress(tx, walletPocket) : // we send payment to this address
                 WalletUtils.getReceivedWithAddress(tx, walletPocket); // received with this address
         final String label;
-        if (isCoinBase)
-            label = textCoinBase;
-//        else if (isInternal)
-//            label = textInternal;
-        else if (address != null)
+
+        if (address != null)
             label = resolveLabel(address.toString());
         else
             label = "?";
