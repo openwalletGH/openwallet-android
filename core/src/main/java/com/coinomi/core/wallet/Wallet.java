@@ -468,8 +468,9 @@ final public class Wallet {
         try {
             WalletFiles files = vFileManager;
             vFileManager = null;
-            checkState(files != null, "Auto saving not enabled.");
-            files.shutdownAndWait();
+            if (files != null) {
+                files.shutdownAndWait();
+            }
         } finally {
             lock.unlock();
         }

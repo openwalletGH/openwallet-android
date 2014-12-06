@@ -166,112 +166,6 @@ public class CoinServiceImpl extends Service implements CoinService {
 //        nm.notify(NOTIFICATION_ID_COINS_RECEIVED, notification.getNotification());
 //    }
 //
-//    private final class PeerConnectivityListener extends AbstractPeerEventListener implements SharedPreferences.OnSharedPreferenceChangeListener
-//    {
-//        private int peerCount;
-//        private AtomicBoolean stopped = new AtomicBoolean(false);
-//
-//        public PeerConnectivityListener()
-//        {
-//            config.registerOnSharedPreferenceChangeListener(this);
-//        }
-//
-//        public void stop()
-//        {
-//            stopped.set(true);
-//
-//            config.unregisterOnSharedPreferenceChangeListener(this);
-//
-//            nm.cancel(NOTIFICATION_ID_CONNECTED);
-//        }
-//
-//        @Override
-//        public void onPeerConnected(final Peer peer, final int peerCount)
-//        {
-//            this.peerCount = peerCount;
-//            changed(peerCount);
-//        }
-//
-//        @Override
-//        public void onPeerDisconnected(final Peer peer, final int peerCount)
-//        {
-//            this.peerCount = peerCount;
-//            changed(peerCount);
-//        }
-//
-//        @Override
-//        public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences, final String key)
-//        {
-//            if (Configuration.PREFS_KEY_CONNECTIVITY_NOTIFICATION.equals(key))
-//                changed(peerCount);
-//        }
-//
-//        private void changed(final int numPeers)
-//        {
-//            if (stopped.get())
-//                return;
-//
-//            handler.post(new Runnable()
-//            {
-//                @Override
-//                public void run()
-//                {
-//                    final boolean connectivityNotificationEnabled = config.getConnectivityNotificationEnabled();
-//
-//                    if (!connectivityNotificationEnabled || numPeers == 0)
-//                    {
-//                        nm.cancel(NOTIFICATION_ID_CONNECTED);
-//                    }
-//                    else
-//                    {
-//                        final NotificationCompat.Builder notification = new NotificationCompat.Builder(BlockchainServiceImpl.this);
-//                        notification.setSmallIcon(R.drawable.stat_sys_peers, numPeers > 4 ? 4 : numPeers);
-//                        notification.setContentTitle(getString(R.string.app_name));
-//                        notification.setContentText(getString(R.string.notification_peers_connected_msg, numPeers));
-//                        notification.setContentIntent(PendingIntent.getActivity(BlockchainServiceImpl.this, 0, new Intent(BlockchainServiceImpl.this,
-//                                WalletActivity.class), 0));
-//                        notification.setWhen(System.currentTimeMillis());
-//                        notification.setOngoing(true);
-//                        nm.notify(NOTIFICATION_ID_CONNECTED, notification.getNotification());
-//                    }
-//
-//                    // send broadcast
-//                    sendBroadcastPeerState(numPeers);
-//                }
-//            });
-//        }
-//    }
-//
-//    private final PeerEventListener blockchainDownloadListener = new AbstractPeerEventListener()
-//    {
-//        private final AtomicLong lastMessageTime = new AtomicLong(0);
-//
-//        @Override
-//        public void onBlocksDownloaded(final Peer peer, final Block block, final int blocksLeft)
-//        {
-//            bestChainHeightEver = Math.max(bestChainHeightEver, blockChain.getChainHead().getHeight());
-//
-//            delayHandler.removeCallbacksAndMessages(null);
-//
-//            final long now = System.currentTimeMillis();
-//
-//            if (now - lastMessageTime.get() > Constants.BLOCKCHAIN_STATE_BROADCAST_THROTTLE_MS)
-//                delayHandler.post(runnable);
-//            else
-//                delayHandler.postDelayed(runnable, Constants.BLOCKCHAIN_STATE_BROADCAST_THROTTLE_MS);
-//        }
-//
-//        private final Runnable runnable = new Runnable()
-//        {
-//            @Override
-//            public void run()
-//            {
-//                lastMessageTime.set(System.currentTimeMillis());
-//
-//                sendBroadcastBlockchainState(ACTION_BLOCKCHAIN_STATE_DOWNLOAD_OK);
-//            }
-//        };
-//    };
 
     private final BroadcastReceiver connectivityReceiver = new BroadcastReceiver() {
         private boolean hasConnectivity;
@@ -281,22 +175,17 @@ public class CoinServiceImpl extends Service implements CoinService {
         public void onReceive(final Context context, final Intent intent) {
             final String action = intent.getAction();
 
-            if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action))
-            {
+            if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action)) {
                 hasConnectivity = !intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
                 log.info("network is " + (hasConnectivity ? "up" : "down"));
 
                 check();
-            }
-            else if (Intent.ACTION_DEVICE_STORAGE_LOW.equals(action))
-            {
+            } else if (Intent.ACTION_DEVICE_STORAGE_LOW.equals(action)) {
                 hasStorage = false;
                 log.info("device storage low");
 
                 check();
-            }
-            else if (Intent.ACTION_DEVICE_STORAGE_OK.equals(action))
-            {
+            } else if (Intent.ACTION_DEVICE_STORAGE_OK.equals(action)) {
                 hasStorage = true;
                 log.info("device storage ok");
 
@@ -542,18 +431,26 @@ public class CoinServiceImpl extends Service implements CoinService {
 
         } else if (CoinService.ACTION_RESET_WALLET.equals(action)) {
             if (application.getWallet() != null) {
-
+                Wallet wallet = application.getWallet();
                 List<CoinType> coinTypesToReset;
+                boolean resetWallet = false;
                 if (intent.hasExtra(Constants.ARG_COIN_ID)) {
                     CoinType typeToReset = CoinID.typeFromId(intent.getStringExtra(Constants.ARG_COIN_ID));
                     coinTypesToReset = ImmutableList.of(typeToReset);
                 } else {
-                    coinTypesToReset = application.getWallet().getCoinTypes();
+                    coinTypesToReset = wallet.getCoinTypes();
+                    resetWallet = true;
                 }
 
-                List<WalletPocket> pockets = application.getWallet().refresh(coinTypesToReset);
+                List<WalletPocket> pockets = wallet.refresh(coinTypesToReset);
                 if (client != null) {
-                    client.setPockets(pockets, true);
+                    if (resetWallet) {
+                        client.stopAllAsync();
+                        lastCoin = null;
+                        client = new ServerClients(Constants.DEFAULT_COINS_SERVERS, wallet);
+                    } else {
+                        client.setPockets(pockets, true);
+                    }
                 }
             } else {
                 log.error("Got wallet reset intent, but no wallet is available");

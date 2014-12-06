@@ -210,6 +210,11 @@ public class WalletApplication extends Application {
     }
 
     public void setWallet(Wallet wallet) {
+        // Disable auto-save of the previous wallet if exists, so it doesn't override the new one
+        if (this.wallet != null) {
+            this.wallet.shutdownAutosaveAndWait();
+        }
+
         this.wallet = wallet;
         this.wallet.autosaveToFile(walletFile,
                 Constants.WALLET_WRITE_DELAY, Constants.WALLET_WRITE_DELAY_UNIT, null);
