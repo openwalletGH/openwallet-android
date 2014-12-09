@@ -184,6 +184,11 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
         pocket.addEventListener(this);
         updateBalance(pocket.getBalance());
         setPending(pocket.getPendingBalance());
+
+        return view;
+    }
+
+    private void setupConnectivityStatus() {
         // Set connected for now...
         setConnectivityStatus(WalletPocketConnectivity.CONNECTED);
         // ... but check the status in some seconds
@@ -194,9 +199,13 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
                     setConnectivityStatus(pocket.getConnectivityStatus());
                 }
             }
-        }, 3000);
+        }, 2000);
+    }
 
-        return view;
+    @Override
+    public void onStart() {
+        super.onStart();
+        setupConnectivityStatus();
     }
 
     @Override

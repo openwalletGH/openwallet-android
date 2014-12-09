@@ -13,7 +13,7 @@ import android.os.Build;
 
 import com.coinomi.wallet.R;
 
-public class TransactionDetailsActivity extends ActionBarActivity {
+public class TransactionDetailsActivity extends AbstractWalletActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

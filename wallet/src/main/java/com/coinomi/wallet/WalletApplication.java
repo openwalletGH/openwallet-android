@@ -8,6 +8,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.os.StrictMode;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
@@ -59,6 +60,8 @@ public class WalletApplication extends Application {
     private File walletFile;
     @Nullable private Wallet wallet;
     private PackageInfo packageInfo;
+
+    private long lastStop;
 
     private static final Logger log = LoggerFactory.getLogger(WalletApplication.class);
 
@@ -344,5 +347,17 @@ public class WalletApplication extends Application {
     public PackageInfo packageInfo()
     {
         return packageInfo;
+    }
+
+    public void touchLastResume() {
+        lastStop = -1;
+    }
+
+    public void touchLastStop() {
+        lastStop = SystemClock.elapsedRealtime();
+    }
+
+    public long getLastStop() {
+        return lastStop;
     }
 }

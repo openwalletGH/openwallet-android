@@ -20,8 +20,8 @@ import org.spongycastle.crypto.params.KeyParameter;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 
-public class AddCoinsActivity extends ActionBarActivity implements SelectCoinsFragment.Listener,
-        PasswordConfirmationFragment.Listener{
+public class AddCoinsActivity extends AbstractWalletActionBarActivity
+        implements SelectCoinsFragment.Listener, PasswordConfirmationFragment.Listener{
 
     @CheckForNull private Wallet wallet;
     private WalletFromSeedTask addCoinTask;
@@ -40,11 +40,6 @@ public class AddCoinsActivity extends ActionBarActivity implements SelectCoinsFr
         getSupportActionBar().setDisplayShowHomeEnabled(false);
 
         wallet = getWalletApplication().getWallet();
-    }
-
-
-    protected WalletApplication getWalletApplication() {
-        return (WalletApplication) getApplication();
     }
 
     private void replaceFragment(Fragment fragment) {

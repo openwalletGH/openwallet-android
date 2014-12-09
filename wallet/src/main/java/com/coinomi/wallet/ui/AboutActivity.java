@@ -12,7 +12,7 @@ import android.widget.TextView;
 
 import com.coinomi.wallet.R;
 
-public class AboutActivity extends ActionBarActivity {
+public class AboutActivity extends AbstractWalletActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

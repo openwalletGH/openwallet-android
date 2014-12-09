@@ -30,7 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -60,24 +59,38 @@ public class ServerClient implements BlockchainConnection {
     private static final Random RANDOM = new Random();
 
     private static final long MAX_WAIT = 16;
+    private final ConnectivityHelper connectivityHelper;
 
     private CoinType type;
     private final ImmutableList<ServerAddress> addresses;
     private final HashSet<ServerAddress> failedAddresses;
     private ServerAddress lastServerAddress;
     private StratumClient stratumClient;
-    private long retrySeconds = 1;
+    private long retrySeconds = 0;
     private boolean stopped = false;
 
     // TODO, only one is supported at the moment. Change when accounts are supported.
     private transient CopyOnWriteArrayList<ListenerRegistration<ConnectionEventListener>> eventListeners;
 
     private Runnable reconnectTask = new Runnable() {
+        public boolean isPolling = false;
         @Override
         public void run() {
             if (!stopped) {
-                createStratumClient().startAsync();
-            } else { log.info("{} client stopped, aborting reconnect.", type.getName()); }
+                if (connectivityHelper.isConnected()) {
+                    createStratumClient().startAsync();
+                    isPolling = false;
+                } else {
+                    // Start polling for connection to become available
+                    if (!isPolling) log.info("No connectivity, starting polling.");
+                    connectionExec.remove(reconnectTask);
+                    connectionExec.schedule(reconnectTask, 1, TimeUnit.SECONDS);
+                    isPolling = true;
+                }
+            } else {
+                log.info("{} client stopped, aborting reconnect.", type.getName());
+                isPolling = false;
+            }
         }
     };
 
@@ -88,7 +101,7 @@ public class ServerClient implements BlockchainConnection {
             if (isConnected()) {
                 log.info("{} client connected to {}", type.getName(), lastServerAddress);
                 broadcastOnConnection();
-                retrySeconds = 1;
+                retrySeconds = 0;
             }
         }
 
@@ -101,15 +114,19 @@ public class ServerClient implements BlockchainConnection {
             stratumClient = null;
             // Try to restart
             if (!stopped) {
-                retrySeconds = Math.min(retrySeconds * 2, MAX_WAIT);
                 log.info("Reconnecting {} in {} seconds", type.getName(), retrySeconds);
                 connectionExec.remove(reconnectTask);
-                connectionExec.schedule(reconnectTask, retrySeconds, TimeUnit.SECONDS);
+                if (retrySeconds > 0) {
+                    connectionExec.schedule(reconnectTask, retrySeconds, TimeUnit.SECONDS);
+                } else {
+                    connectionExec.execute(reconnectTask);
+                }
             }
         }
     };
 
-    public ServerClient(CoinAddress coinAddress) {
+    public ServerClient(CoinAddress coinAddress, ConnectivityHelper connectivityHelper) {
+        this.connectivityHelper = connectivityHelper;
         eventListeners = new CopyOnWriteArrayList<ListenerRegistration<ConnectionEventListener>>();
         failedAddresses = new HashSet<ServerAddress>();
         type = coinAddress.getType();
@@ -133,8 +150,11 @@ public class ServerClient implements BlockchainConnection {
     }
 
     private ServerAddress getServerAddress() {
-        // If we blacklisted all servers, try to reset
-        if (failedAddresses.size() == addresses.size()) failedAddresses.clear();
+        // If we blacklisted all servers, reset and increase back-off time
+        if (failedAddresses.size() == addresses.size()) {
+            failedAddresses.clear();
+            retrySeconds = Math.min(Math.max(1, retrySeconds * 2), MAX_WAIT);
+        }
 
         ServerAddress address;
         // Not the most efficient, but does the job
@@ -147,8 +167,9 @@ public class ServerClient implements BlockchainConnection {
 
     public void startAsync() {
         if (stratumClient == null){
-            log.info("Not starting service as it is not ready");
-            return;
+            log.info("Forcing service start");
+            connectionExec.remove(reconnectTask);
+            createStratumClient();
         }
 
         Service.State state = stratumClient.state();
@@ -195,11 +216,18 @@ public class ServerClient implements BlockchainConnection {
         eventListeners.clear();
         addEventListener(pocket);
         if (reconnect && isConnected()) {
-            stratumClient.disconnect();
+            resetConnection();
             // will broadcast event on reconnect
         } else {
             if (isConnected()) broadcastOnConnection();
         }
+    }
+
+    /**
+     * Will disconnect from the server and immediately will try to reconnect
+     */
+    public void resetConnection() {
+        stratumClient.disconnect();
     }
 
     /**

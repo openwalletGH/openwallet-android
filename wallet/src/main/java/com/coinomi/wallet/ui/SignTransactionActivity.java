@@ -16,7 +16,7 @@ import java.io.IOException;
 
 import javax.annotation.Nullable;
 
-public class SignTransactionActivity extends android.support.v4.app.FragmentActivity
+public class SignTransactionActivity extends AbstractWalletFragmentActivity
         implements SignTransactionFragment.Listener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,10 +26,6 @@ public class SignTransactionActivity extends android.support.v4.app.FragmentActi
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.container, SignTransactionFragment.newInstance(getIntent().getExtras()))
                 .commit();
-    }
-
-    protected WalletApplication getWalletApplication() {
-        return (WalletApplication) getApplication();
     }
 
     @Override

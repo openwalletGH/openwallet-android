@@ -41,6 +41,8 @@ public class Constants {
     public static final long WALLET_WRITE_DELAY = 3;
     public static final TimeUnit WALLET_WRITE_DELAY_UNIT = TimeUnit.SECONDS;
 
+    public static final long STOP_SERVICE_AFTER_IDLE_SECS = 30 * 60; // 30 mins
+
     public static final Charset UTF_8 = Charset.forName("UTF-8");
     public static final Charset US_ASCII = Charset.forName("US-ASCII");
 

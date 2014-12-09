@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  * @author Giannis Dzegoutanis
  * @author Andreas Schildbach
  */
-final public class WalletActivity extends ActionBarActivity implements
+final public class WalletActivity extends AbstractWalletActionBarActivity implements
         NavigationDrawerFragment.NavigationDrawerCallbacks {
     private static final Logger log = LoggerFactory.getLogger(WalletActivity.class);
 
@@ -60,6 +60,7 @@ final public class WalletActivity extends ActionBarActivity implements
     private ViewPager mViewPager;
     private AsyncTask<Void, Void, Void> refreshTask;
     private CoinType currentType;
+    private Intent connectCoinIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,13 +98,9 @@ final public class WalletActivity extends ActionBarActivity implements
         super.onResume();
 
         getWalletApplication().startBlockchainService(CoinService.ServiceMode.CANCEL_COINS_RECEIVED);
-
+        connectCoinService();
         //TODO
 //        checkLowStorageAlert();
-    }
-
-    protected WalletApplication getWalletApplication() {
-        return (WalletApplication) getApplication();
     }
 
     @Override
@@ -128,13 +125,18 @@ final public class WalletActivity extends ActionBarActivity implements
             mViewPager.setCurrentItem(INFO);
             mViewPager.getAdapter().notifyDataSetChanged();
             getWalletApplication().getConfiguration().touchLastPocket(coinType);
-
-            // Open connection if needed or possible
-            Intent intent = new Intent(CoinService.ACTION_CONNECT_COIN, null,
-                    getWalletApplication(), CoinServiceImpl.class);
-            intent.putExtra(Constants.ARG_COIN_ID, currentType.getId());
-            getWalletApplication().startService(intent);
+            connectCoinService();
         }
+    }
+
+    private void connectCoinService() {
+        if (connectCoinIntent == null) {
+            connectCoinIntent = new Intent(CoinService.ACTION_CONNECT_COIN, null,
+                    getWalletApplication(), CoinServiceImpl.class);
+        }
+        // Open connection if needed or possible
+        connectCoinIntent.putExtra(Constants.ARG_COIN_ID, currentType.getId());
+        getWalletApplication().startService(connectCoinIntent);
     }
 
     public void restoreActionBar() {

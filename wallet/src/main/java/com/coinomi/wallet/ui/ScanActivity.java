@@ -62,7 +62,7 @@ import com.google.zxing.qrcode.QRCodeReader;
 /**
  * @author Andreas Schildbach
  */
-public final class ScanActivity extends Activity implements SurfaceHolder.Callback
+public final class ScanActivity extends AbstractWalletActivity implements SurfaceHolder.Callback
 {
     public static final String INTENT_EXTRA_RESULT = "result";
 

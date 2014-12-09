@@ -8,7 +8,8 @@ import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 
 
-public class IntroActivity extends android.support.v4.app.FragmentActivity implements WelcomeFragment.Listener, PasswordConfirmationFragment.Listener, SetPasswordFragment.Listener {
+public class IntroActivity extends AbstractWalletFragmentActivity
+        implements WelcomeFragment.Listener, PasswordConfirmationFragment.Listener, SetPasswordFragment.Listener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

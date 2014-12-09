@@ -9,14 +9,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.os.SystemClock;
 import android.text.format.DateUtils;
 
 import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.network.ConnectivityHelper;
 import com.coinomi.core.network.ServerClients;
 import com.coinomi.core.wallet.WalletPocket;
 import com.coinomi.wallet.Configuration;
@@ -48,6 +51,7 @@ import javax.annotation.CheckForNull;
 public class CoinServiceImpl extends Service implements CoinService {
     private WalletApplication application;
     private Configuration config;
+    private ConnectivityManager connMgr;
 
     @CheckForNull
     private ServerClients client;
@@ -56,7 +60,7 @@ public class CoinServiceImpl extends Service implements CoinService {
 
     private final Handler handler = new Handler();
     private final Handler delayHandler = new Handler();
-    private PowerManager.WakeLock wakeLock;
+//    private PowerManager.WakeLock wakeLock;
 
     private NotificationManager nm;
     private static final int NOTIFICATION_ID_CONNECTED = 0;
@@ -167,9 +171,19 @@ public class CoinServiceImpl extends Service implements CoinService {
 //    }
 //
 
+    private ConnectivityHelper connectivityHelper = new ConnectivityHelper() {
+        @Override
+        public boolean isConnected() {
+            NetworkInfo activeInfo = connMgr.getActiveNetworkInfo();
+            return activeInfo != null && activeInfo.isConnected();
+        }
+    };
+
     private final BroadcastReceiver connectivityReceiver = new BroadcastReceiver() {
         private boolean hasConnectivity;
+        private boolean isNetworkChanged;
         private boolean hasStorage = true;
+        private int currentNetworkType = -1;
 
         @Override
         public void onReceive(final Context context, final Intent intent) {
@@ -177,7 +191,17 @@ public class CoinServiceImpl extends Service implements CoinService {
 
             if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action)) {
                 hasConnectivity = !intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
+
+                NetworkInfo activeInfo = connMgr.getActiveNetworkInfo();
+                if (activeInfo != null && activeInfo.isConnected()) {
+                    isNetworkChanged = currentNetworkType != activeInfo.getType();
+                    currentNetworkType = activeInfo.getType();
+                } else {
+                    isNetworkChanged = false;
+                    currentNetworkType = -1;
+                }
                 log.info("network is " + (hasConnectivity ? "up" : "down"));
+                log.info("network type " + (isNetworkChanged ? "changed" : "didn't change"));
 
                 check();
             } else if (Intent.ACTION_DEVICE_STORAGE_LOW.equals(action)) {
@@ -199,47 +223,27 @@ public class CoinServiceImpl extends Service implements CoinService {
             final boolean hasEverything = hasConnectivity && hasStorage && (wallet != null);
 
             if (hasEverything && client == null) {
-                log.debug("acquiring wakelock");
-                wakeLock.acquire();
+//                log.debug("acquiring wakelock");
+//                wakeLock.acquire();
 
                 log.info("Creating coins clients");
-                client = new ServerClients(Constants.DEFAULT_COINS_SERVERS, wallet);
+                client = new ServerClients(Constants.DEFAULT_COINS_SERVERS, wallet, connectivityHelper);
                 if (lastCoin != null) client.startAsync(wallet.getPocket(lastCoin));
-            }
-            else if (!hasEverything && client != null) {
+            } else if (hasEverything && isNetworkChanged) {
+                log.info("Restarting coins clients as network changed");
+                client.resetConnections();
+            } else if (!hasEverything && client != null) {
                 log.info("stopping stratum client");
                 client.stopAllAsync();
                 client = null;
 
-                log.debug("releasing wakelock");
-                wakeLock.release();
+//                log.debug("releasing wakelock");
+//                wakeLock.release();
             }
         }
     };
 
-    private final static class ActivityHistoryEntry
-    {
-        public final int numTransactionsReceived;
-        public final int numBlocksDownloaded;
-
-        public ActivityHistoryEntry(final int numTransactionsReceived, final int numBlocksDownloaded)
-        {
-            this.numTransactionsReceived = numTransactionsReceived;
-            this.numBlocksDownloaded = numBlocksDownloaded;
-        }
-
-        @Override
-        public String toString()
-        {
-            return numTransactionsReceived + "/" + numBlocksDownloaded;
-        }
-    }
-
-    private final BroadcastReceiver tickReceiver = new BroadcastReceiver()
-    {
-        private int lastChainHeight = 0;
-        private final List<ActivityHistoryEntry> activityHistory = new LinkedList<ActivityHistoryEntry>();
-
+    private final BroadcastReceiver tickReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(final Context context, final Intent intent) {
             log.debug("Received a tick {}", intent);
@@ -247,65 +251,21 @@ public class CoinServiceImpl extends Service implements CoinService {
             if (client != null) {
                 client.ping();
             }
-//            final int chainHeight = blockChain.getBestChainHeight();
-//
-//            if (lastChainHeight > 0)
-//            {
-//                final int numBlocksDownloaded = chainHeight - lastChainHeight;
-//                final int numTransactionsReceived = transactionsReceived.getAndSet(0);
-//
-//                // push history
-//                activityHistory.add(0, new ActivityHistoryEntry(numTransactionsReceived, numBlocksDownloaded));
-//
-//                // trim
-//                while (activityHistory.size() > MAX_HISTORY_SIZE)
-//                    activityHistory.remove(activityHistory.size() - 1);
-//
-//                // print
-//                final StringBuilder builder = new StringBuilder();
-//                for (final ActivityHistoryEntry entry : activityHistory)
-//                {
-//                    if (builder.length() > 0)
-//                        builder.append(", ");
-//                    builder.append(entry);
-//                }
-//                log.info("History of transactions/blocks: " + builder);
-//
-//                // determine if block and transaction activity is idling
-//                boolean isIdle = false;
-//                if (activityHistory.size() >= MIN_COLLECT_HISTORY)
-//                {
-//                    isIdle = true;
-//                    for (int i = 0; i < activityHistory.size(); i++)
-//                    {
-//                        final ActivityHistoryEntry entry = activityHistory.get(i);
-//                        final boolean blocksActive = entry.numBlocksDownloaded > 0 && i <= IDLE_BLOCK_TIMEOUT_MIN;
-//                        final boolean transactionsActive = entry.numTransactionsReceived > 0 && i <= IDLE_TRANSACTION_TIMEOUT_MIN;
-//
-//                        if (blocksActive || transactionsActive)
-//                        {
-//                            isIdle = false;
-//                            break;
-//                        }
-//                    }
-//                }
-//
-//                // if idling, shutdown service
-//                if (isIdle)
-//                {
-//                    log.info("idling detected, stopping service");
-//                    stopSelf();
-//                }
-//            }
-//
-//            lastChainHeight = chainHeight;
+
+            long lastStop = application.getLastStop();
+            if (lastStop > 0) {
+                long secondsIdle = (SystemClock.elapsedRealtime() - lastStop) / 1000;
+
+                if (secondsIdle > Constants.STOP_SERVICE_AFTER_IDLE_SECS) {
+                    log.info("Idling detected, stopping service");
+                    stopSelf();
+                }
+            }
         }
     };
 
-    public class LocalBinder extends Binder
-    {
-        public CoinService getService()
-        {
+    public class LocalBinder extends Binder {
+        public CoinService getService() {
             return CoinServiceImpl.this;
         }
     }
@@ -313,16 +273,14 @@ public class CoinServiceImpl extends Service implements CoinService {
     private final IBinder mBinder = new LocalBinder();
 
     @Override
-    public IBinder onBind(final Intent intent)
-    {
+    public IBinder onBind(final Intent intent) {
         log.debug(".onBind()");
 
         return mBinder;
     }
 
     @Override
-    public boolean onUnbind(final Intent intent)
-    {
+    public boolean onUnbind(final Intent intent) {
         log.debug(".onUnbind()");
 
         return super.onUnbind(intent);
@@ -341,76 +299,17 @@ public class CoinServiceImpl extends Service implements CoinService {
         final String lockName = getPackageName() + " blockchain sync";
 
         final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, lockName);
+//        wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, lockName);
 
         application = (WalletApplication) getApplication();
         config = application.getConfiguration();
-//        final Wallet wallet = application.getWallet();
-
-//        bestChainHeightEver = config.getBestChainHeightEver();
-
-//        peerConnectivityListener = new PeerConnectivityListener();
+        connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
         final IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         intentFilter.addAction(Intent.ACTION_DEVICE_STORAGE_LOW);
         intentFilter.addAction(Intent.ACTION_DEVICE_STORAGE_OK);
         registerReceiver(connectivityReceiver, intentFilter);
-
-//        blockChainFile = new File(getDir("blockstore", Context.MODE_PRIVATE), Constants.BLOCKCHAIN_FILENAME);
-//        final boolean blockChainFileExists = blockChainFile.exists();
-//
-//        if (!blockChainFileExists)
-//        {
-//            log.info("blockchain does not exist, resetting wallet");
-//
-//            wallet.clearTransactions(0);
-//            wallet.setLastBlockSeenHeight(-1); // magic value
-//            wallet.setLastBlockSeenHash(null);
-//        }
-//
-//        try
-//        {
-//            blockStore = new SPVBlockStore(Constants.NETWORK_PARAMETERS, blockChainFile);
-//            blockStore.getChainHead(); // detect corruptions as early as possible
-//
-//            final long earliestKeyCreationTime = wallet.getEarliestKeyCreationTime();
-//
-//            if (!blockChainFileExists && earliestKeyCreationTime > 0)
-//            {
-//                try
-//                {
-//                    final InputStream checkpointsInputStream = getAssets().open(Constants.CHECKPOINTS_FILENAME);
-//                    CheckpointManager.checkpoint(Constants.NETWORK_PARAMETERS, checkpointsInputStream, blockStore, earliestKeyCreationTime);
-//                }
-//                catch (final IOException x)
-//                {
-//                    log.error("problem reading checkpoints, continuing without", x);
-//                }
-//            }
-//        }
-//        catch (final BlockStoreException x)
-//        {
-//            blockChainFile.delete();
-//
-//            final String msg = "blockstore cannot be created";
-//            log.error(msg, x);
-//            throw new Error(msg, x);
-//        }
-//
-//        log.info("using " + blockStore.getClass().getName());
-//
-//        try
-//        {
-//            blockChain = new BlockChain(Constants.NETWORK_PARAMETERS, wallet, blockStore);
-//        }
-//        catch (final BlockStoreException x)
-//        {
-//            throw new Error("blockchain cannot be created", x);
-//        }
-
-//        application.getWallet().addEventListener(walletEventListener, Threading.SAME_THREAD);
-//
         registerReceiver(tickReceiver, new IntentFilter(Intent.ACTION_TIME_TICK));
     }
 
@@ -447,7 +346,7 @@ public class CoinServiceImpl extends Service implements CoinService {
                     if (resetWallet) {
                         client.stopAllAsync();
                         lastCoin = null;
-                        client = new ServerClients(Constants.DEFAULT_COINS_SERVERS, wallet);
+                        client = new ServerClients(Constants.DEFAULT_COINS_SERVERS, wallet, connectivityHelper);
                     } else {
                         client.setPockets(pockets, true);
                     }
@@ -495,33 +394,22 @@ public class CoinServiceImpl extends Service implements CoinService {
 
 //        application.getWallet().removeEventListener(walletEventListener);
 
+        unregisterReceiver(connectivityReceiver);
+
         if (client != null) {
             client.stopAllAsync();
             client = null;
         }
 
-//        if (peerGroup != null)
-//        {
-//            peerGroup.removeEventListener(peerConnectivityListener);
-//            peerGroup.removeWallet(application.getWallet());
-//            peerGroup.stopAndWait();
-//
-//            log.info("peergroup stopped");
-//        }
-//
-//        peerConnectivityListener.stop();
-
-        unregisterReceiver(connectivityReceiver);
-
         delayHandler.removeCallbacksAndMessages(null);
 
         application.saveWalletNow();
 
-        if (wakeLock.isHeld())
-        {
-            log.debug("wakelock still held, releasing");
-            wakeLock.release();
-        }
+//        if (wakeLock.isHeld())
+//        {
+//            log.debug("wakelock still held, releasing");
+//            wakeLock.release();
+//        }
 
         super.onDestroy();
 

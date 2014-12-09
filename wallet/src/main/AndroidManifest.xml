@@ -12,6 +12,7 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <uses-feature
         android:name="android.hardware.touchscreen"
@@ -89,11 +90,6 @@
             android:stateNotNeeded="true"
             android:theme="@style/NoTitleBar"
             android:windowSoftInputMode="stateAlwaysHidden" />
-
-        <service
-            android:name="com.coinomi.wallet.service.CoinServiceImpl"
-            android:exported="false" />
-
         <activity
             android:name="com.coinomi.wallet.ui.AboutActivity"
             android:label="@string/title_activity_about" >
@@ -119,6 +115,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.coinomi.wallet.ui.WalletActivity" />
         </activity>
+
+        <service
+            android:name="com.coinomi.wallet.service.CoinServiceImpl"
+            android:exported="false" />
     </application>
 
 </manifest>

@@ -13,7 +13,8 @@ import com.coinomi.wallet.R;
 /**
  * @author Giannis Dzegoutanis
  */
-public class PasswordConfirmationActivity extends android.support.v4.app.FragmentActivity implements PasswordConfirmationFragment.Listener{
+public class PasswordConfirmationActivity extends AbstractWalletFragmentActivity
+        implements PasswordConfirmationFragment.Listener{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
