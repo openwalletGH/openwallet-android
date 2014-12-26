@@ -3,11 +3,13 @@ package com.coinomi.wallet.ui;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
@@ -25,10 +27,13 @@ import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.WalletPocket;
 import com.coinomi.core.wallet.WalletPocketConnectivity;
 import com.coinomi.core.wallet.WalletPocketEventListener;
+import com.coinomi.wallet.Configuration;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.ui.widget.Amount;
+import com.coinomi.wallet.ExchangeRatesProvider;
+import com.coinomi.wallet.ExchangeRatesProvider.ExchangeRate;
 import com.coinomi.wallet.util.ThrottlingWalletChangeListener;
 import com.google.common.collect.Lists;
 
@@ -45,6 +50,7 @@ import java.util.List;
 import java.util.concurrent.RejectedExecutionException;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -53,7 +59,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * create an instance of this fragment.
  *
  */
-public class BalanceFragment extends Fragment implements WalletPocketEventListener, LoaderManager.LoaderCallbacks<List<Transaction>> {
+public class BalanceFragment extends Fragment implements WalletPocketEventListener, LoaderCallbacks<List<Transaction>> {
     private static final Logger log = LoggerFactory.getLogger(BalanceFragment.class);
 
     private static final String COIN_TYPE = "coin_type";
@@ -64,6 +70,9 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
     private static final int AMOUNT_MEDIUM_PRECISION = 6;
     private static final int AMOUNT_SHORT_PRECISION = 4;
     private static final int AMOUNT_SHIFT = 0;
+
+    private static final int ID_TRANSACTION_LOADER = 0;
+    private static final int ID_RATE_LOADER = 1;
 
     Handler handler = new Handler() {
         @Override
@@ -83,6 +92,7 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
     };
 
     private WalletApplication application;
+    private Configuration config;
     private WalletPocket pocket;
     private CoinType type;
     private TransactionsListAdapter adapter;
@@ -91,7 +101,10 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
     private View emptyPocketMessage;
     private NavigationDrawerFragment mNavigationDrawerFragment;
     private Amount mainAmount;
+    private Amount localAmount;
     private TextView connectionLabel;
+    private Coin currentBalance;
+    private Listener listener;
 
     /**
      * Use this factory method to create a new instance of
@@ -177,6 +190,13 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
 
         mainAmount = (Amount) view.findViewById(R.id.main_amount);
         mainAmount.setSymbol(type.getSymbol());
+        localAmount = (Amount) view.findViewById(R.id.amount_local);
+        localAmount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (listener != null) listener.onLocalAmountClick();
+            }
+        });
 
         connectionLabel = (TextView) view.findViewById(R.id.connection_label);
 
@@ -244,32 +264,16 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
     }
 
     private void updateBalance(Coin newBalance) {
-        String newBalanceStr = GenericUtils.formatValue(type, newBalance,
-                AMOUNT_FULL_PRECISION, AMOUNT_SHIFT);
-        mainAmount.setAmount(newBalanceStr);
+        currentBalance = newBalance;
 
-//            Amount btcAmount = (Amount) view.findViewById(R.id.amount_btc);
-//            btcAmount.setAmount(Coin.ZERO);
-//            btcAmount.setSymbol(BitcoinMain.get().getSymbol());
-//
-//            Amount usdAmount = (Amount) view.findViewById(R.id.amount_usd);
-//            usdAmount.setAmount(Coin.ZERO);
-//            usdAmount.setSymbol(Usd.get().getSymbol());
-//
-//            Amount eurAmount = (Amount) view.findViewById(R.id.amount_eur);
-//            eurAmount.setAmount(Coin.ZERO);
-//            eurAmount.setSymbol(Eur.get().getSymbol());
-//
-//            Amount cnyAmount = (Amount) view.findViewById(R.id.amount_cny);
-//            cnyAmount.setAmount(Coin.ZERO);
-//            cnyAmount.setSymbol(Cny.get().getSymbol());
+        updateView();
     }
 
     private void setPending(Coin pendingAmount) {
         if (pendingAmount.isZero()) {
             mainAmount.setAmountPending(null);
         } else {
-            String pendingAmountStr = GenericUtils.formatValue(type, pendingAmount,
+            String pendingAmountStr = GenericUtils.formatCoinValue(type, pendingAmount,
                     AMOUNT_FULL_PRECISION, AMOUNT_SHIFT);
             mainAmount.setAmountPending(pendingAmountStr);
         }
@@ -308,7 +312,14 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+        try {
+            listener = (Listener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement " + Listener.class);
+        }
         application = (WalletApplication) activity.getApplication();
+        config = application.getConfiguration();
         loaderManager = getLoaderManager();
     }
 
@@ -323,7 +334,8 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
     public void onResume() {
         super.onResume();
 
-        loaderManager.initLoader(0, null, this);
+        loaderManager.initLoader(ID_TRANSACTION_LOADER, null, this);
+        loaderManager.initLoader(ID_RATE_LOADER, null, rateLoaderCallbacks);
 
         pocket.addEventListener(transactionChangeListener, Threading.SAME_THREAD);
     }
@@ -333,7 +345,8 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
         pocket.removeEventListener(transactionChangeListener);
         transactionChangeListener.removeCallbacks();
 
-        loaderManager.destroyLoader(0);
+        loaderManager.destroyLoader(ID_TRANSACTION_LOADER);
+        loaderManager.destroyLoader(ID_RATE_LOADER);
 
         super.onPause();
     }
@@ -425,5 +438,58 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
                 return tx1.getHash().compareTo(tx2.getHash());
             }
         };
+    }
+
+    private ExchangeRate exchangeRate;
+    private final LoaderCallbacks<Cursor> rateLoaderCallbacks = new LoaderManager.LoaderCallbacks<Cursor>() {
+        @Override
+        public Loader<Cursor> onCreateLoader(final int id, final Bundle args) {
+            return new ExchangeRateLoader(getActivity(), config, type);
+        }
+
+        @Override
+        public void onLoadFinished(final Loader<Cursor> loader, final Cursor data) {
+            if (data != null && data.getCount() > 0) {
+                data.moveToFirst();
+                exchangeRate = ExchangeRatesProvider.getExchangeRate(data);
+                updateView();
+                if (log.isInfoEnabled()) {
+                    try {
+                        log.info("NEW EXCHANGE RATE: {}",
+                                exchangeRate.rate.coinToFiat(type.getOneCoin()).toFriendlyString());
+                    } catch (Exception e) { log.warn(e.getMessage()); }
+                }
+            }
+        }
+
+        @Override
+        public void onLoaderReset(final Loader<Cursor> loader) {
+        }
+    };
+
+    private void updateView() {
+        if (currentBalance != null) {
+            String newBalanceStr = GenericUtils.formatCoinValue(type, currentBalance,
+                    AMOUNT_FULL_PRECISION, AMOUNT_SHIFT);
+            mainAmount.setAmount(newBalanceStr);
+        }
+
+        if (currentBalance != null && exchangeRate != null && getView() != null) {
+            try {
+                String fiatAmount = GenericUtils.formatFiatValue(
+                        exchangeRate.rate.coinToFiat(currentBalance));
+                localAmount.setAmount(fiatAmount);
+                localAmount.setSymbol(exchangeRate.rate.fiat.currencyCode);
+            } catch (Exception e) {
+                // Should not happen
+                localAmount.setAmount("");
+                localAmount.setSymbol("ERROR");
+            }
+        }
+    }
+
+
+    public interface Listener {
+        public void onLocalAmountClick();
     }
 }

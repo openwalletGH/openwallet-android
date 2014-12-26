@@ -24,11 +24,8 @@ import com.coinomi.core.util.GenericUtils;
 
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.AddressFormatException;
-import org.bitcoinj.core.Base58;
 import org.bitcoinj.core.Coin;
-import org.bitcoinj.core.NetworkParameters;
 
-import org.bitcoinj.core.VersionedChecksummedBytes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -397,7 +394,7 @@ public class CoinURI {
         
         if (amount != null) {
             builder.append(QUESTION_MARK_SEPARATOR).append(FIELD_AMOUNT).append("=");
-            builder.append(GenericUtils.formatValue(type, amount));
+            builder.append(GenericUtils.formatCoinValue(type, amount));
             questionMarkHasBeenOutput = true;
         }
         

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="@dimen/exchange_row_padding_vertical"
+    android:paddingEnd="@dimen/exchange_row_padding_horizontal"
+    android:paddingLeft="@dimen/exchange_row_padding_horizontal"
+    android:paddingRight="@dimen/exchange_row_padding_horizontal"
+    android:paddingStart="@dimen/exchange_row_padding_horizontal"
+    android:paddingTop="@dimen/exchange_row_padding_vertical">
+
+    <TextView
+        android:id="@+id/exchange_rate_row_currency_code"
+        style="@style/ExchangeRowSymbol"
+        android:layout_width="@dimen/exchange_row_symbol_bg_size"
+        android:layout_height="@dimen/exchange_row_symbol_bg_size"
+        android:layout_marginRight="@dimen/exchange_row_margin_symbol"
+        android:layout_marginEnd="@dimen/exchange_row_margin_symbol"
+        android:gravity="center"
+        tools:text="USD" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="end">
+
+        <TextView
+            android:id="@+id/exchange_rate_row_currency_name"
+            style="@style/ExchangeRowLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="US Dollar" />
+
+        <com.coinomi.wallet.ui.widget.CurrencyTextView
+            android:id="@+id/exchange_rate_row_rate"
+            style="@style/ExchangeRowAmount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+</LinearLayout>

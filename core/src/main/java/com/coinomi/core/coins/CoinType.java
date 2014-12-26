@@ -5,8 +5,10 @@ import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.crypto.ChildNumber;
 import org.bitcoinj.crypto.HDUtils;
+import org.bitcoinj.utils.MonetaryFormat;
 
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -74,14 +76,17 @@ abstract public class CoinType extends NetworkParameters implements Serializable
         return HDUtils.parsePath(path);
     }
 
+    /**
+     * Returns a 1 coin of this type with the correct amount of units (satoshis)
+     */
+    public Coin getOneCoin() {
+        BigInteger units = BigInteger.TEN.pow(getUnitExponent());
+        return Coin.valueOf(units.longValue());
+    }
+
     @Override
     public String getPaymentProtocolId() {
         throw new RuntimeException("Method not implemented");
-    }
-
-    @Nullable
-    public static CoinType fromID(String id) {
-        return CoinID.fromId(id).getCoinType();
     }
 
     @Override
@@ -91,5 +96,20 @@ abstract public class CoinType extends NetworkParameters implements Serializable
                 ", symbol='" + symbol + '\'' +
                 ", bip44Index=" + bip44Index +
                 '}';
+    }
+
+    public MonetaryFormat getMonetaryFormat() {
+        MonetaryFormat monetaryFormat = new MonetaryFormat()
+                .shift(0).minDecimals(2).noCode().code(0, symbol).postfixCode();
+        switch (unitExponent) {
+            case 8:
+                return monetaryFormat.optionalDecimals(2, 2, 2);
+            case 6:
+                return monetaryFormat.optionalDecimals(2, 2);
+            case 4:
+                return monetaryFormat.optionalDecimals(2);
+            default:
+                return monetaryFormat.minDecimals(unitExponent);
+        }
     }
 }

@@ -35,7 +35,7 @@ To release the app follow the steps.
 
 1) Change the following:
 
-* in strings.xml app_name string from "Coinomi (dev)" to "Coinomi"
+* in strings.xml app_name string from "Coinomi (dev)" to "Coinomi" and com.coinomi.wallet.dev.exchange_rates to com.coinomi.wallet.exchange_rates
 * in build.gradle the package from "com.coinomi.wallet.dev" to "com.coinomi.wallet"
 * in AndroidManifest.xml the android:icon from "ic_launcher_dev" to "ic_launcher"
 * remove all ic_launcher_dev icons with `rm wallet/src/main/res/drawable*/ic_launcher_dev.png`

@@ -1,6 +1,6 @@
 <resources>
     <!-- Amount Widget -->
-    <dimen name="amount_margin_top">24dp</dimen>
+    <dimen name="amount_margin_top">8dp</dimen>
     <dimen name="amount_margin_bottom">4dp</dimen>
     <dimen name="amount_text_size_big">48sp</dimen>
     <dimen name="amount_text_size">28sp</dimen>

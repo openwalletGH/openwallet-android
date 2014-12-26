@@ -11,14 +11,28 @@
     android:paddingEnd="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin">
 
-    <com.coinomi.wallet.ui.widget.Amount
-        android:id="@+id/main_amount"
-        android:layout_width="match_parent"
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/amount_margin_top"
-        android:layout_marginBottom="@dimen/amount_margin_bottom"
-        coinomi:show_big="true"
-        android:gravity="center_horizontal" />
+        android:layout_gravity="center_horizontal">
+
+        <com.coinomi.wallet.ui.widget.Amount
+            android:id="@+id/amount_local"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/amount_margin_top"
+            coinomi:single_line="true" />
+
+        <com.coinomi.wallet.ui.widget.Amount
+            android:id="@+id/main_amount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/amount_margin_bottom"
+            coinomi:show_big="true"
+            android:gravity="center_horizontal" />
+    </LinearLayout>
+
 
     <TextView
         android:id="@+id/connection_label"

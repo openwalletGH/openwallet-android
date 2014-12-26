@@ -2,6 +2,7 @@
 <resources>
     <declare-styleable name="Amount">
         <attr name="show_big" format="boolean" />
+        <attr name="single_line" format="boolean" />
     </declare-styleable>
     <declare-styleable name="SendOutput">
         <attr name="is_fee" format="boolean" />

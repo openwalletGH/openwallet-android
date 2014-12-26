@@ -19,7 +19,7 @@
     <dimen name="font_icon_text_size">24sp</dimen>
 
     <!-- Amount Widget -->
-    <dimen name="amount_margin_top">32dp</dimen>
+    <dimen name="amount_margin_top">16dp</dimen>
     <dimen name="amount_margin_bottom">4dp</dimen>
     <dimen name="amount_text_size_big">56sp</dimen>
     <dimen name="amount_text_size">32sp</dimen>
@@ -51,19 +51,41 @@
     <dimen name="transaction_entry">18sp</dimen>
     <dimen name="transaction_pending">18sp</dimen>
 
+    <!-- generic rows -->
+    <dimen name="row_font_icon_margin">8dp</dimen>
+    <dimen name="row_font_icon_size">20sp</dimen>
+    <dimen name="row_font_icon_bg_size">40dp</dimen>
+    <dimen name="row_text_size_header_text">14sp</dimen>
+    <dimen name="row_text_size_amount">22sp</dimen>
+    <dimen name="row_text_size_label">16sp</dimen>
+    <dimen name="row_text_size_date">14sp</dimen>
+    <dimen name="row_padding_vertical">12dp</dimen>
+    <dimen name="row_padding_horizontal">@dimen/activity_horizontal_margin</dimen>
+
     <!-- Transaction Row -->
-    <dimen name="transaction_row_margin_direction">8dp</dimen>
-    <dimen name="transaction_row_direction_font_icon_size">20sp</dimen>
-    <dimen name="transaction_row_direction_bg_size">40dp</dimen>
+    <dimen name="transaction_row_margin_direction">@dimen/row_font_icon_margin</dimen>
+    <dimen name="transaction_row_direction_font_icon_size">@dimen/row_font_icon_size</dimen>
+    <dimen name="transaction_row_direction_bg_size">@dimen/row_font_icon_bg_size</dimen>
     <dimen name="transaction_row_confirmations_font_icon_size">18sp</dimen>
-    <dimen name="transaction_row_text_size_direction_text">14sp</dimen>
-    <dimen name="transaction_row_text_size_amount">22sp</dimen>
-    <dimen name="transaction_row_text_size_label">16sp</dimen>
-    <dimen name="transaction_row_text_size_date">14sp</dimen>
-    <dimen name="transaction_row_padding_vertical">12dp</dimen>
-    <dimen name="transaction_row_padding_horizontal">@dimen/activity_horizontal_margin</dimen>
+    <dimen name="transaction_row_text_size_direction_text">@dimen/row_text_size_header_text</dimen>
+    <dimen name="transaction_row_text_size_amount">@dimen/row_text_size_amount</dimen>
+    <dimen name="transaction_row_text_size_label">@dimen/row_text_size_label</dimen>
+    <dimen name="transaction_row_text_size_date">@dimen/row_text_size_date</dimen>
+    <dimen name="transaction_row_padding_vertical">@dimen/row_padding_vertical</dimen>
+    <dimen name="transaction_row_padding_horizontal">@dimen/row_padding_horizontal</dimen>
 
     <!-- About Activity -->
     <dimen name="app_name_long">32sp</dimen>
+
+    <!-- Exchange row -->
+    <dimen name="exchange_row_margin_symbol">@dimen/row_font_icon_margin</dimen>
+    <dimen name="exchange_row_symbol_text_size">16sp</dimen>
+    <dimen name="exchange_row_symbol_bg_size">50dp</dimen>
+    <dimen name="exchange_row_text_size_amount">@dimen/row_text_size_amount</dimen>
+    <dimen name="exchange_row_text_size_label">@dimen/row_text_size_label</dimen>
+    <dimen name="exchange_row_text_size_date">@dimen/row_text_size_date</dimen>
+    <dimen name="exchange_row_padding_vertical">@dimen/row_padding_vertical</dimen>
+    <dimen name="exchange_row_padding_horizontal">@dimen/row_padding_horizontal</dimen>
+
 
 </resources>

@@ -115,6 +115,20 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.coinomi.wallet.ui.WalletActivity" />
         </activity>
+        <activity
+            android:name="com.coinomi.wallet.ui.ExchangeRatesActivity"
+            android:label="@string/title_activity_exchange_rates"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppThemeCustomActionBar" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.coinomi.wallet.ui.WalletActivity" />
+        </activity>
+
+        <provider
+            android:name="com.coinomi.wallet.ExchangeRatesProvider"
+            android:authorities="com.coinomi.wallet.dev.exchange_rates"
+            android:exported="false" />
 
         <service
             android:name="com.coinomi.wallet.service.CoinServiceImpl"

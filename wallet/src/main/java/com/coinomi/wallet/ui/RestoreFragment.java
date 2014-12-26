@@ -15,12 +15,12 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.ImageButton;
 import android.widget.MultiAutoCompleteTextView;
 import android.widget.TextView;
 
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
-import com.coinomi.wallet.ui.widget.QrCodeButton;
 import com.coinomi.wallet.util.Fonts;
 import org.bitcoinj.crypto.MnemonicCode;
 import org.bitcoinj.crypto.MnemonicException;
@@ -86,7 +86,7 @@ public class RestoreFragment extends Fragment {
 
         Fonts.setTypeface(view.findViewById(R.id.seed_icon), Fonts.Font.COINOMI_FONT_ICONS);
 
-        QrCodeButton scanQrButton = (QrCodeButton) view.findViewById(R.id.scan_qr_code);
+        ImageButton scanQrButton = (ImageButton) view.findViewById(R.id.scan_qr_code);
         scanQrButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -1,5 +1,6 @@
 package com.coinomi.wallet.ui;
 
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.ActionBarActivity;
 
 import com.coinomi.wallet.WalletApplication;
@@ -7,7 +8,7 @@ import com.coinomi.wallet.WalletApplication;
 /**
  * @author Giannis Dzegoutanis
  */
-abstract public class AbstractWalletFragmentActivity extends ActionBarActivity {
+abstract public class AbstractWalletFragmentActivity extends FragmentActivity {
 
     protected WalletApplication getWalletApplication() {
         return (WalletApplication) getApplication();

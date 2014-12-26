@@ -12,19 +12,19 @@ import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
+import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.wallet.WalletPocket;
-import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.wallet.WalletProtobufSerializer;
 import com.coinomi.wallet.service.CoinService;
 import com.coinomi.wallet.service.CoinServiceImpl;
 import com.coinomi.wallet.util.CrashReporter;
 import com.coinomi.wallet.util.Fonts;
 import com.coinomi.wallet.util.LinuxSecureRandom;
+
 import org.bitcoinj.crypto.MnemonicCode;
 import org.bitcoinj.store.UnreadableWalletException;
 import org.bitcoinj.utils.Threading;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +50,7 @@ import javax.annotation.Nullable;
  */
 public class WalletApplication extends Application {
     private static HashMap<String, Typeface> typefaces;
+    private static String httpUserAgent;
     private Configuration config;
     private ActivityManager activityManager;
 
@@ -76,6 +77,8 @@ public class WalletApplication extends Application {
         super.onCreate();
 
         packageInfo = packageInfoFromContext(this);
+
+        httpUserAgent = "Coinomi/" + packageInfo.versionName + " (Android)";
 
         CrashReporter.init(getCacheDir());
 
@@ -180,9 +183,12 @@ public class WalletApplication extends Application {
     }
 
 
-    public Configuration getConfiguration()
-    {
+    public Configuration getConfiguration() {
         return config;
+    }
+
+    public static String httpUserAgent() {
+        return httpUserAgent;
     }
 
     /**

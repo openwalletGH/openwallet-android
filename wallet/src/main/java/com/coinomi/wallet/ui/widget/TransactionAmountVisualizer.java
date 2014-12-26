@@ -1,26 +1,19 @@
 package com.coinomi.wallet.ui.widget;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.WalletPocket;
 import com.coinomi.wallet.R;
-import com.coinomi.wallet.util.Fonts;
 
 import org.bitcoinj.core.Coin;
-import org.bitcoinj.core.InsufficientMoneyException;
 import org.bitcoinj.core.Transaction;
-import org.bitcoinj.core.TransactionInput;
 import org.bitcoinj.core.TransactionOutput;
-
-import java.util.List;
 
 import static com.coinomi.core.Preconditions.checkState;
 
@@ -63,7 +56,7 @@ public class TransactionAmountVisualizer extends LinearLayout {
             }
 
             // TODO support more than one output
-            output.setAmount(GenericUtils.formatValue(type, txo.getValue()));
+            output.setAmount(GenericUtils.formatCoinValue(type, txo.getValue()));
             output.setSymbol(symbol);
             output.setAddress(txo.getScriptPubKey().getToAddress(type).toString());
         }
@@ -77,7 +70,7 @@ public class TransactionAmountVisualizer extends LinearLayout {
         Coin feeAmount = tx.getFee();
         if (isSending && feeAmount != null && !feeAmount.isZero()) {
             fee.setVisibility(View.VISIBLE);
-            fee.setAmount(GenericUtils.formatValue(type, tx.getFee()));
+            fee.setAmount(GenericUtils.formatCoinValue(type, tx.getFee()));
             fee.setSymbol(symbol);
         }
     }

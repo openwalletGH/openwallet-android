@@ -17,6 +17,7 @@
  */
 package com.coinomi.core.wallet;
 
+import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.network.AddressStatus;
 import com.coinomi.core.protos.Protos;
@@ -249,10 +250,12 @@ public class WalletPocketProtobufSerializer {
      * @throws UnreadableWalletException thrown in various error conditions (see description).
      */
     public WalletPocket readWallet(Protos.WalletPocket walletProto, @Nullable KeyCrypter keyCrypter) throws UnreadableWalletException {
-        final String paramsID = walletProto.getNetworkIdentifier();
-        CoinType coinType = CoinType.fromID(paramsID);
-        if (coinType == null)
-            throw new UnreadableWalletException("Unknown network parameters ID " + paramsID);
+        CoinType coinType;
+        try {
+            coinType = CoinID.typeFromId(walletProto.getNetworkIdentifier());
+        } catch (IllegalArgumentException e) {
+            throw new UnreadableWalletException("Unknown network parameters ID " + walletProto.getNetworkIdentifier());
+        }
 
         // Read the scrypt parameters that specify how encryption and decryption is performed.
         SimpleHDKeyChain chain;

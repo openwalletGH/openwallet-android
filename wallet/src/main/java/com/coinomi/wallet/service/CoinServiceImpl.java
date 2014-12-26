@@ -139,11 +139,11 @@ public class CoinServiceImpl extends Service implements CoinService {
 //        final String msgSuffix = packageFlavor != null ? " [" + packageFlavor + "]" : "";
 //
 //        final String tickerMsg = getString(R.string.notification_coins_received_msg,
-//                btcPrefix + ' ' + GenericUtils.formatValue(amount, btcPrecision, btcShift))
+//                btcPrefix + ' ' + GenericUtils.formatCoinValue(amount, btcPrecision, btcShift))
 //                + msgSuffix;
 //
 //        final String msg = getString(R.string.notification_coins_received_msg,
-//                btcPrefix + ' ' + GenericUtils.formatValue(notificationAccumulatedAmount, btcPrecision, btcShift))
+//                btcPrefix + ' ' + GenericUtils.formatCoinValue(notificationAccumulatedAmount, btcPrecision, btcShift))
 //                + msgSuffix;
 //
 //        final StringBuilder text = new StringBuilder();

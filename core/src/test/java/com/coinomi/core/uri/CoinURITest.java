@@ -24,21 +24,16 @@ import com.coinomi.core.coins.DarkcoinMain;
 import com.coinomi.core.coins.DogecoinMain;
 import com.coinomi.core.coins.LitecoinMain;
 import com.coinomi.core.coins.PeercoinMain;
-import com.coinomi.core.uri.CoinURI;
-import com.coinomi.core.uri.CoinURIParseException;
+import com.coinomi.core.util.GenericUtils;
+
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.Coin;
-import org.bitcoinj.core.Utils;
-import org.bitcoinj.params.MainNetParams;
-import org.bitcoinj.params.TestNet3Params;
-import org.bitcoinj.uri.BitcoinURI;
 
 import org.junit.Test;
 
 import java.io.UnsupportedEncodingException;
 
 
-import static com.coinomi.core.util.GenericUtils.formatValue;
 import static com.coinomi.core.util.GenericUtils.parseCoin;
 import static org.junit.Assert.*;
 
@@ -121,25 +116,25 @@ public class CoinURITest {
         goodAddress = new Address(LitecoinMain.get(), hash160);
         goodAddressStr = goodAddress.toString();
         testObject = new CoinURI(LitecoinMain.get(), "litecoin:" + goodAddressStr + "?amount=12.34");
-        assertEquals("12.34", formatValue(LitecoinMain.get(), testObject.getAmount()));
+        assertEquals("12.34", GenericUtils.formatCoinValue(LitecoinMain.get(), testObject.getAmount()));
 
         // Dogecoin
         goodAddress = new Address(DogecoinMain.get(), hash160);
         goodAddressStr = goodAddress.toString();
         testObject = new CoinURI(DogecoinMain.get(), "dogecoin:" + goodAddressStr + "?amount=12.34");
-        assertEquals("12.34", formatValue(DogecoinMain.get(), testObject.getAmount()));
+        assertEquals("12.34", GenericUtils.formatCoinValue(DogecoinMain.get(), testObject.getAmount()));
 
         // Peercoin
         goodAddress = new Address(PeercoinMain.get(), hash160);
         goodAddressStr = goodAddress.toString();
         testObject = new CoinURI(PeercoinMain.get(), "peercoin:" + goodAddressStr + "?amount=12.34");
-        assertEquals("12.34", formatValue(PeercoinMain.get(), testObject.getAmount()));
+        assertEquals("12.34", GenericUtils.formatCoinValue(PeercoinMain.get(), testObject.getAmount()));
 
         // Darkcoin
         goodAddress = new Address(DarkcoinMain.get(), hash160);
         goodAddressStr = goodAddress.toString();
         testObject = new CoinURI(DarkcoinMain.get(), "darkcoin:" + goodAddressStr + "?amount=12.34");
-        assertEquals("12.34", formatValue(DarkcoinMain.get(), testObject.getAmount()));
+        assertEquals("12.34", GenericUtils.formatCoinValue(DarkcoinMain.get(), testObject.getAmount()));
     }
 
     @Test

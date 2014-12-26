@@ -21,11 +21,9 @@ public class AboutActivity extends AbstractWalletActionBarActivity {
         setContentView(R.layout.activity_about);
 
         TextView version = (TextView) findViewById(R.id.about_version);
-        try {
-            String versionName = getPackageManager()
-                    .getPackageInfo(getPackageName(), 0).versionName;
-            version.setText(versionName);
-        } catch (PackageManager.NameNotFoundException e) {
+        if (getWalletApplication().packageInfo() != null) {
+            version.setText(getWalletApplication().packageInfo().versionName);
+        } else {
             version.setVisibility(View.INVISIBLE);
         }
     }

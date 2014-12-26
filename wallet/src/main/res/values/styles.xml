@@ -28,6 +28,7 @@
         <item name="android:textSize">@dimen/font_icon_text_size</item>
         <item name="android:textColor">@color/font_icon_fg_color</item>
         <item name="android:background">@drawable/font_icon_bg</item>
+        <item name="android:gravity">center_horizontal|center_vertical</item>
     </style>
 
     <!-- Generic text styles -->
@@ -69,10 +70,6 @@
 
     <!-- Widget amount style -->
     <style name="Amount" parent="NormalText">
-        <item name="android:textSize">@dimen/amount_text_size</item>
-        <item name="android:singleLine">true</item>
-    </style>
-    <style name="AmountSymbol" parent="SecondaryText">
         <item name="android:singleLine">true</item>
     </style>
     <style name="AmountBig" parent="Amount">
@@ -81,6 +78,9 @@
     <style name="AmountPending" parent="Amount">
         <item name="android:textSize">@dimen/amount_pending_text_size</item>
         <item name="android:textColor">@color/gray_26_hint_text</item>
+    </style>
+    <style name="AmountSymbol" parent="SecondaryText">
+        <item name="android:singleLine">true</item>
     </style>
     <style name="AmountSymbolBig" parent="AmountSymbol">
         <item name="android:textSize">@dimen/amount_symbol_text_size</item>
@@ -113,7 +113,7 @@
     <style name="TransactionRowLabel" parent="NormalText">
         <item name="android:textSize">@dimen/transaction_row_text_size_label</item>
     </style>
-    <style name="TransactionRowAmount" parent="NormalText">
+    <style name="TransactionRowAmount" parent="Amount">
         <item name="android:textSize">@dimen/transaction_row_text_size_amount</item>
         <item name="android:textStyle">bold</item>
     </style>
@@ -121,6 +121,19 @@
     <!-- About Activity -->
     <style name="AppNameLong">
         <item name="android:textSize">@dimen/app_name_long</item>
+    </style>
+
+    <!-- Exchange row -->
+    <style name="ExchangeRowSymbol" parent="FontIconBig">
+        <item name="android:textSize">@dimen/exchange_row_symbol_text_size</item>
+        <item name="android:singleLine">true</item>
+    </style>
+    <style name="ExchangeRowLabel" parent="NormalText">
+        <item name="android:textSize">@dimen/exchange_row_text_size_label</item>
+    </style>
+    <style name="ExchangeRowAmount" parent="Amount">
+        <item name="android:textSize">@dimen/exchange_row_text_size_amount</item>
+        <item name="android:textStyle">bold</item>
     </style>
 
 </resources>

@@ -1,5 +1,7 @@
 package com.coinomi.wallet;
 
+import android.text.format.DateUtils;
+
 import com.coinomi.core.coins.BitcoinMain;
 import com.coinomi.core.coins.BlackcoinMain;
 import com.coinomi.core.coins.CoinID;
@@ -16,10 +18,14 @@ import com.coinomi.core.network.CoinAddress;
 import com.coinomi.stratumj.ServerAddress;
 import com.google.common.collect.ImmutableList;
 
+import org.bitcoinj.utils.MonetaryFormat;
+
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 /**
  * @author Giannis Dzegoutanis
@@ -43,6 +49,14 @@ public class Constants {
 
     public static final long STOP_SERVICE_AFTER_IDLE_SECS = 30 * 60; // 30 mins
 
+    public static final int HTTP_TIMEOUT_MS = 15 * (int) DateUtils.SECOND_IN_MILLIS;
+
+    public static final long RATE_UPDATE_FREQ_MS = 10 * DateUtils.MINUTE_IN_MILLIS;
+
+    /** Default currency to use if all default mechanisms fail. */
+    public static final String DEFAULT_EXCHANGE_CURRENCY = "USD";
+    public static final MonetaryFormat LOCAL_CURRENCY_FORMAT = new MonetaryFormat().noCode().minDecimals(2).optionalDecimals(2);
+
     public static final Charset UTF_8 = Charset.forName("UTF-8");
     public static final Charset US_ASCII = Charset.forName("US-ASCII");
 
@@ -50,8 +64,8 @@ public class Constants {
     public static final char CHAR_THIN_SPACE = '\u2009';
     public static final char CHAR_ALMOST_EQUAL_TO = '\u2248';
     public static final char CHAR_CHECKMARK = '\u2713';
-    public static final String CURRENCY_PLUS_SIGN = "+" + CHAR_THIN_SPACE;
-    public static final String CURRENCY_MINUS_SIGN = "-" + CHAR_THIN_SPACE;
+    public static final char CURRENCY_PLUS_SIGN = '+';
+    public static final char CURRENCY_MINUS_SIGN = '-';
 
     // TODO move to resource files
     public static final List<CoinAddress> DEFAULT_COINS_SERVERS = ImmutableList.of(
@@ -63,7 +77,7 @@ public class Constants {
             new CoinAddress(NuSharesMain.get(), new ServerAddress("nsr-cce-1.coinomi.net", 5011), new ServerAddress("nsr-cce-2.coinomi.net", 5011)),
             new CoinAddress(NuBitsMain.get(), new ServerAddress("nbt-cce-1.coinomi.net", 5012), new ServerAddress("nbt-cce-2.coinomi.net", 5012)),
             new CoinAddress(BlackcoinMain.get(), new ServerAddress("bc-cce-1.coinomi.net", 5015), new ServerAddress("bc-cce-2.coinomi.net", 5015)),
-            new CoinAddress(NamecoinMain.get(), new ServerAddress("54.237.39.245", 5016)),
+//            new CoinAddress(NamecoinMain.get(), new ServerAddress("54.237.39.245", 5016)),
             new CoinAddress(DarkcoinMain.get(), new ServerAddress("drk-cce-1.coinomi.net", 5013), new ServerAddress("drk-cce-2.coinomi.net", 5013))
     );
 
@@ -83,7 +97,7 @@ public class Constants {
         COINS_ICONS.put(CoinID.NAMECOIN_MAIN.getCoinType(), R.drawable.namecoin);
 
         COINS_BLOCK_EXPLORERS = new HashMap<CoinType, String>();
-        COINS_BLOCK_EXPLORERS.put(CoinID.BITCOIN_MAIN.getCoinType(), "https://www.biteasy.com/blockchain/transactions/%s");
+        COINS_BLOCK_EXPLORERS.put(CoinID.BITCOIN_MAIN.getCoinType(), "https://blockchain.info/tx/%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.DOGECOIN_MAIN.getCoinType(), "http://dogechain.info/tx/%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.LITECOIN_MAIN.getCoinType(), "http://ltc.blockr.io/tx/info/%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.PEERCOIN_MAIN.getCoinType(), "http://ppc.blockr.io/tx/info/%s");
@@ -96,12 +110,13 @@ public class Constants {
     }
 
     public static final CoinType DEFAULT_COIN = BitcoinMain.get();
+    // TODO, make user selectable
     public static final List<CoinType> DEFAULT_COINS = ImmutableList.of(BitcoinMain.get(),
             DogecoinMain.get(), LitecoinMain.get());
     public static final List<CoinType> SUPPORTED_COINS = ImmutableList.of(
             BitcoinMain.get(), DogecoinMain.get(),
-            LitecoinMain.get(), PeercoinMain.get(),
-            NuSharesMain.get(), NuBitsMain.get(),
+            NuBitsMain.get(), LitecoinMain.get(),
+            NuSharesMain.get(), PeercoinMain.get(),
             DarkcoinMain.get(), ReddcoinMain.get(),
             BlackcoinMain.get());
 }

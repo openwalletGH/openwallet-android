@@ -9,7 +9,6 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -20,10 +19,10 @@ import com.coinomi.core.uri.CoinURI;
 import com.coinomi.core.uri.CoinURIParseException;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
-import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.service.CoinService;
 import com.coinomi.wallet.service.CoinServiceImpl;
 
+import org.bitcoinj.core.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +31,7 @@ import org.slf4j.LoggerFactory;
  * @author Andreas Schildbach
  */
 final public class WalletActivity extends AbstractWalletActionBarActivity implements
-        NavigationDrawerFragment.NavigationDrawerCallbacks {
+        NavigationDrawerFragment.NavigationDrawerCallbacks, BalanceFragment.Listener {
     private static final Logger log = LoggerFactory.getLogger(WalletActivity.class);
 
     private static final int RECEIVE = 0;
@@ -58,7 +57,6 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
      * For SharedPreferences, used to check if first launch ever.
      */
     private ViewPager mViewPager;
-    private AsyncTask<Void, Void, Void> refreshTask;
     private CoinType currentType;
     private Intent connectCoinIntent;
 
@@ -101,6 +99,12 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
         connectCoinService();
         //TODO
 //        checkLowStorageAlert();
+    }
+
+
+    @Override
+    public void onLocalAmountClick() {
+        startExchangeRates();
     }
 
     @Override
@@ -227,9 +231,22 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
         } else if (id == R.id.action_about) {
             startActivity(new Intent(WalletActivity.this, AboutActivity.class));
             return true;
+        } else if (id == R.id.action_exchange_rates) {
+            startExchangeRates();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    void startExchangeRates() {
+        if (currentType != null) {
+            Intent intent = new Intent(this, ExchangeRatesActivity.class);
+            intent.putExtra(Constants.ARG_COIN_ID, currentType.getId());
+            startActivity(intent);
+        } else {
+            Toast.makeText(this, R.string.no_wallet_pocket_selected, Toast.LENGTH_LONG).show();
+        }
     }
 
     private void refreshWallet() {

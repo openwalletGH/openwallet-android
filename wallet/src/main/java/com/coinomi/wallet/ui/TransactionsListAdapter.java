@@ -244,17 +244,17 @@ public class TransactionsListAdapter extends BaseAdapter {
             rowConfirmationsFontIcon.setVisibility(View.VISIBLE);
             rowConfirmationsFontIcon.setTextColor(colorLessSignificant);
             switch (confidence.getDepthInBlocks()) {
-                case 0:
+                case 0: // No confirmations
                     rowConfirmationsFontIcon.setText(res.getString(R.string.font_icon_progress_0));
                     rowConfirmationsFontIcon.setTextColor(colorInsignificant); // PENDING
                     break;
-                case 1:
+                case 1: // 1 out of 3 confirmations
                     rowConfirmationsFontIcon.setText(res.getString(R.string.font_icon_progress_1));
                     break;
-                case 2:
+                case 2: // 2 out of 3 confirmations
                     rowConfirmationsFontIcon.setText(res.getString(R.string.font_icon_progress_2));
                     break;
-                case 3:
+                case 3: // 3 out of 3 confirmations
                     rowConfirmationsFontIcon.setText(res.getString(R.string.font_icon_progress_3));
                     break;
             }
@@ -300,8 +300,8 @@ public class TransactionsListAdapter extends BaseAdapter {
 
         // value
         rowValue.setAlwaysSigned(true);
-        rowValue.setPrecision(precision, shift);//TODO make configurable
-        rowValue.setAmount(type, value);
+        rowValue.setType(type);
+        rowValue.setAmount(value);
     }
 
     private String resolveLabel(@Nonnull final String address) {

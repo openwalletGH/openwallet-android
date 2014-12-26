@@ -98,4 +98,11 @@ public enum CoinID {
             throw new AddressFormatException("Unsupported address network: " + addressParams.getId());
         }
     }
+
+    public static CoinType typeFromSymbol(String symbol) {
+        for(CoinID id : values()) {
+            if (id.type.getSymbol().equalsIgnoreCase(symbol)) return id.type;
+        }
+        throw new IllegalArgumentException();
+    }
 }

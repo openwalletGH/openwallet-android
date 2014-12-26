@@ -4,6 +4,8 @@ package com.coinomi.core.util;
 import com.coinomi.core.coins.CoinType;
 
 import org.bitcoinj.core.Coin;
+import org.bitcoinj.core.Monetary;
+import org.bitcoinj.utils.Fiat;
 
 import java.math.BigDecimal;
 import java.util.Locale;
@@ -79,26 +81,32 @@ public class GenericUtils {
         return Coin.valueOf(units);
     }
 
-    public static String formatValue(@Nonnull final CoinType type, @Nonnull final Coin value) {
-        return formatValue(type, value, "", "-", 8, 0);
+    public static String formatCoinValue(@Nonnull final CoinType type, @Nonnull final Coin value) {
+        return formatCoinValue(type, value, "", "-", 8, 0);
     }
 
-    public static String formatValue(@Nonnull final CoinType type, @Nonnull final Coin value,
-                                     final int precision, final int shift) {
-        return formatValue(type, value, "", "-", precision, shift);
+    public static String formatCoinValue(@Nonnull final CoinType type, @Nonnull final Coin value,
+                                         final int precision, final int shift) {
+        return formatCoinValue(type, value, "", "-", precision, shift);
     }
 
-    public static String formatValue(@Nonnull final CoinType type, @Nonnull final Coin value,
+    public static String formatCoinValue(@Nonnull final CoinType type, @Nonnull final Coin value,
                                      @Nonnull final String plusSign, @Nonnull final String minusSign,
                                      final int precision, final int shift) {
-        long longValue = value.longValue();
+        return formatValue(type.getUnitExponent(), value, plusSign, minusSign, precision, shift);
+    }
 
-        final String sign = value.isNegative() ? minusSign : plusSign;
+    private static String formatValue(final long unitExponent, @Nonnull final Monetary value,
+                                         @Nonnull final String plusSign, @Nonnull final String minusSign,
+                                         final int precision, final int shift) {
+        long longValue = value.getValue();
+
+        final String sign = value.signum() == -1 ? minusSign : plusSign;
 
         String formatedValue;
 
         if (shift == 0) {
-            long units = (long) Math.pow(10, type.getUnitExponent());
+            long units = (long) Math.pow(10, unitExponent);
             long precisionUnits = (long) (units / Math.pow(10, precision));
             long roundingPrecisionUnits = precisionUnits / 2;
 
@@ -162,14 +170,22 @@ public class GenericUtils {
             throw new IllegalArgumentException("cannot handle shift: " + shift);
         }
 
-        // Relax precision if incorrectly shows value as 0.00
-        if (formatedValue.equals("0.00") && !value.isZero()) {
-            return formatValue(type, value, plusSign, minusSign, precision + 2, shift);
+        // Relax precision if incorrectly shows value as 0.00 but is in reality not zero
+        if (formatedValue.equals("0.00") && value.getValue() != 0) {
+            return formatValue(unitExponent, value, plusSign, minusSign, precision + 2, shift);
         }
 
         // Add the sign if needed
         formatedValue = String.format(Locale.US, "%s%s", sign, formatedValue);
 
         return formatedValue;
+    }
+
+    public static String formatFiatValue(final Fiat value, final int precision, final int shift) {
+        return formatValue(value.smallestUnitExponent(), value, "", "-", precision, shift);
+    }
+
+    public static String formatFiatValue(Fiat fiat) {
+        return formatFiatValue(fiat, 2, 0);
     }
 }
