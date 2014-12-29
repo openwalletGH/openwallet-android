@@ -58,6 +58,7 @@ public class TransactionsListAdapter extends BaseAdapter {
     private final WalletPocket walletPocket;
 
     private final List<Transaction> transactions = new ArrayList<Transaction>();
+    private final Resources res;
     private int precision = 0;
     private int shift = 0;
     private boolean showEmptyText = false;
@@ -88,7 +89,7 @@ public class TransactionsListAdapter extends BaseAdapter {
 
         this.walletPocket = walletPocket;
 
-        final Resources res = context.getResources();
+        res = context.getResources();
         colorSignificant = res.getColor(R.color.gray_87_text);
         colorLessSignificant = res.getColor(R.color.gray_54_sec_text_icons);
         colorInsignificant = res.getColor(R.color.gray_26_hint_text);
@@ -281,15 +282,31 @@ public class TransactionsListAdapter extends BaseAdapter {
 //        rowDate.setText(time != null ? (DateUtils.getRelativeTimeSpanString(context, time.getTime())) : null);
 
         // address - label
-        final Address address = sent ?
-                WalletUtils.getSendToAddress(tx, walletPocket) : // we send payment to this address
-                WalletUtils.getReceivedWithAddress(tx, walletPocket); // received with this address
+        final Address address;
         final String label;
 
-        if (address != null)
+        if (sent) {
+            // we send payment to those addresses
+            List<Address> sentTo = WalletUtils.getSendToAddress(tx, walletPocket);
+            // For now show only the first address
+            address = sentTo.size() == 0 ? null : sentTo.get(0);
+        } else {
+            // received with those addresses
+            List<Address> receivedWith = WalletUtils.getReceivedWithAddress(tx, walletPocket);
+            // Should be one
+            address = receivedWith.size() == 0 ? null : receivedWith.get(0);
+        }
+
+        if (address != null) {
             label = resolveLabel(address.toString());
-        else
-            label = "?";
+        } else {
+            if (sent) {
+                // If no address found, assume it is an internal transfer
+                label = res.getString(R.string.internal_transfer);
+            } else {
+                label = "?";
+            }
+        }
 
         if (label != null) {
             rowLabel.setText(label);

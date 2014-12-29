@@ -36,6 +36,7 @@ import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.TransactionOutput;
 import org.bitcoinj.script.Script;
 
+import java.util.ArrayList;
 import java.util.Currency;
 import java.util.HashMap;
 import java.util.List;
@@ -83,30 +84,28 @@ public class WalletUtils {
     }
 
     @CheckForNull
-    public static Address getSendToAddress(@Nonnull final Transaction tx, @Nonnull final WalletPocket pocket) {
-        return getToAddress(tx, pocket, false);
+    public static List<Address> getSendToAddress(@Nonnull final Transaction tx, @Nonnull final WalletPocket pocket) {
+        return getToAddresses(tx, pocket, false);
     }
 
 
     @CheckForNull
-    public static Address getReceivedWithAddress(@Nonnull final Transaction tx, @Nonnull final WalletPocket pocket) {
-        return getToAddress(tx, pocket, true);
+    public static List<Address> getReceivedWithAddress(@Nonnull final Transaction tx, @Nonnull final WalletPocket pocket) {
+        return getToAddresses(tx, pocket, true);
     }
 
     @CheckForNull
-    private static Address getToAddress(@Nonnull final Transaction tx,
-                                       @Nonnull final WalletPocket pocket, boolean toMe) {
-        try {
-            for (final TransactionOutput output : tx.getOutputs()) {
+    private static List<Address> getToAddresses(@Nonnull final Transaction tx,
+                                                @Nonnull final WalletPocket pocket, boolean toMe) {
+        List<Address> addresses = new ArrayList<Address>();
+        for (final TransactionOutput output : tx.getOutputs()) {
+            try {
                 if (output.isMine(pocket) == toMe) {
-                    return output.getScriptPubKey().getToAddress(pocket.getCoinType());
+                    addresses.add(output.getScriptPubKey().getToAddress(pocket.getCoinType()));
                 }
-            }
-
-            throw new IllegalStateException();
-        } catch (final ScriptException x) {
-            return null;
+            } catch (final ScriptException x) { /* ignore this output */ }
         }
+        return addresses;
     }
 
     private static final Pattern P_SIGNIFICANT = Pattern.compile("^([-+]" + Constants.CHAR_THIN_SPACE + ")?\\d*(\\.\\d{0,2})?");
