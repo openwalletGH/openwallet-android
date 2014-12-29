@@ -14,7 +14,7 @@ public class BlackcoinMain extends CoinType {
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 500;
 
-        name = "Blackcoin (beta)";
+        name = "Blackcoin";
         symbol = "BC";
         uriScheme = "blackcoin";
         bip44Index = 10;

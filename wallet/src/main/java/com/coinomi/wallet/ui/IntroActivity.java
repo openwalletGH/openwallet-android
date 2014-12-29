@@ -9,7 +9,8 @@ import com.coinomi.wallet.R;
 
 
 public class IntroActivity extends AbstractWalletFragmentActivity
-        implements WelcomeFragment.Listener, PasswordConfirmationFragment.Listener, SetPasswordFragment.Listener {
+        implements WelcomeFragment.Listener, PasswordConfirmationFragment.Listener,
+        SetPasswordFragment.Listener, SelectCoinsFragment.Listener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,17 +47,17 @@ public class IntroActivity extends AbstractWalletFragmentActivity
     }
 
     @Override
-    public void onRestoreWallet(String seed) {
+    public void onSeedCreated(String seed) {
         replaceFragment(RestoreFragment.newInstance(seed));
     }
 
     @Override
-    public void onSetPassword(String seed) {
+    public void onNewSeedVerified(String seed) {
         replaceFragment(SetPasswordFragment.newInstance(seed));
     }
 
     @Override
-    public void onConfirmPassword(String seed, boolean isSeedProtected) {
+    public void onExistingSeedVerified(String seed, boolean isSeedProtected) {
         Bundle args = new Bundle();
         args.putString(Constants.ARG_SEED, seed);
         args.putBoolean(Constants.ARG_SEED_PROTECT, isSeedProtected);
@@ -71,15 +72,21 @@ public class IntroActivity extends AbstractWalletFragmentActivity
 
     @Override
     public void onPasswordConfirmed(Bundle args) {
-        finalizeWalletRestoration(args);
+        selectCoins(args);
     }
 
     @Override
     public void onPasswordSet(Bundle args) {
-        finalizeWalletRestoration(args);
+        selectCoins(args);
     }
 
-    private void finalizeWalletRestoration(Bundle args) {
+    private void selectCoins(Bundle args) {
+        String message = getResources().getString(R.string.select_coins);
+        replaceFragment(SelectCoinsFragment.newInstance(message, true, args));
+    }
+
+    @Override
+    public void onCoinSelection(Bundle args) {
         replaceFragment(FinalizeWalletRestorationFragment.newInstance(args));
     }
 }

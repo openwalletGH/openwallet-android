@@ -86,9 +86,9 @@ public class WelcomeFragment extends Fragment {
     public interface Listener {
         public void onCreateNewWallet();
         public void onRestoreWallet();
-        public void onRestoreWallet(String seed);
-        public void onSetPassword(String seed);
-        public void onConfirmPassword(String seed, boolean isSeedProtected);
+        public void onSeedCreated(String seed);
+        public void onNewSeedVerified(String seed);
+        public void onExistingSeedVerified(String seed, boolean isSeedProtected);
     }
 
 }

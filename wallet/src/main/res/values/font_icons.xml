@@ -30,4 +30,5 @@
     <string name="font_icon_cycle">&#58906;</string>
     <string name="font_icon_shuffle">&#58907;</string>
     <string name="font_icon_seed">&#58908;</string>
+    <string name="font_icon_coins">&#58909;</string>
 </resources>

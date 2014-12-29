@@ -39,6 +39,8 @@ public class Constants {
     public static final String ARG_SEND_TO_ADDRESS = "send_to_address";
     public static final String ARG_SEND_AMOUNT = "send_amount";
     public static final String ARG_COIN_ID = "coin_id";
+    public static final String ARG_MULTIPLE_COIN_IDS = "multiple_coin_ids";
+    public static final String ARG_MULTIPLE_CHOICE = "multiple_choice";
     public static final String ARG_TRANSACTION_ID = "transaction_id";
     public static final String ARG_ERROR = "error";
     public static final String ARG_MESSAGE = "message";
@@ -110,13 +112,11 @@ public class Constants {
     }
 
     public static final CoinType DEFAULT_COIN = BitcoinMain.get();
-    // TODO, make user selectable
-    public static final List<CoinType> DEFAULT_COINS = ImmutableList.of(BitcoinMain.get(),
-            DogecoinMain.get(), LitecoinMain.get());
+    public static final List<CoinType> DEFAULT_COINS = ImmutableList.of((CoinType)BitcoinMain.get());
     public static final List<CoinType> SUPPORTED_COINS = ImmutableList.of(
             BitcoinMain.get(), DogecoinMain.get(),
             NuBitsMain.get(), LitecoinMain.get(),
             NuSharesMain.get(), PeercoinMain.get(),
-            DarkcoinMain.get(), ReddcoinMain.get(),
-            BlackcoinMain.get());
+            DarkcoinMain.get(), BlackcoinMain.get(),
+            ReddcoinMain.get());
 }

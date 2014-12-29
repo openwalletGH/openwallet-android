@@ -53,7 +53,7 @@ public class SeedFragment extends Fragment {
             public void onClick(View v) {
                 log.info("Clicked restore wallet");
                 if (mListener != null) {
-                    mListener.onRestoreWallet(seed);
+                    mListener.onSeedCreated(seed);
                 }
             }
         });

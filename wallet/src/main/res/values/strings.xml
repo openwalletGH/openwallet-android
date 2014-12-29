@@ -158,4 +158,7 @@
     <string name="exchange_rates_load_error">Could not load exchange rates</string>
     <string name="exchange_rates_empty_search">Could not find exchange rate</string>
 
+    <!-- Select Coins -->
+    <string name="select_coins">Select the coins you wish to use with your wallet. You can add more later.</string>
+
 </resources>

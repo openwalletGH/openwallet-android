@@ -19,7 +19,7 @@
             android:paddingTop="@dimen/activity_vertical_margin">
 
             <TextView
-                android:id="@+id/seed_icon"
+                android:id="@+id/coins_icon"
                 style="@style/FontIconBig"
                 android:layout_width="@dimen/font_icon_bg_size"
                 android:layout_height="@dimen/font_icon_bg_size"

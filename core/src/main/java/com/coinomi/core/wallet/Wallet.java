@@ -119,7 +119,7 @@ final public class Wallet {
                 log.info("Creating coin pocket for {}", coin);
                 maybeCreatePocket(coin, key);
                 WalletPocket pocket = getPocket(coin);
-                if (generateAllKeys && pocket != null) {
+                if (generateAllKeys) {
                     pocket.maybeInitializeAllKeys();
                 }
             }

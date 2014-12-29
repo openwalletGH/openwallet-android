@@ -15,10 +15,12 @@ import com.coinomi.wallet.R;
 /**
  * @author Giannis Dzegoutanis
  */
-public class CoinGridItem extends LinearLayout {
+public class CoinGridItem extends LinearLayout implements Checkable {
     private final TextView title;
     private final ImageView icon;
     private final View view;
+
+    private boolean isChecked = false;
 
     public CoinGridItem(Context context) {
         super(context);
@@ -31,5 +33,26 @@ public class CoinGridItem extends LinearLayout {
     public void setCoin(CoinType coin) {
         title.setText(coin.getName());
         icon.setImageResource(Constants.COINS_ICONS.get(coin));
+    }
+
+    @Override
+    public void setChecked(boolean checked) {
+        isChecked = checked;
+
+        if (isChecked) {
+            view.setBackgroundResource(R.color.primary_100);
+        } else {
+            view.setBackgroundResource(0);
+        }
+    }
+
+    @Override
+    public boolean isChecked() {
+        return isChecked;
+    }
+
+    @Override
+    public void toggle() {
+        setSelected(!isChecked);
     }
 }

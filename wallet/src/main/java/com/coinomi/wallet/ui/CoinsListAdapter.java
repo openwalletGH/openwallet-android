@@ -10,6 +10,8 @@ import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.ui.widget.CoinGridItem;
 
+import java.util.List;
+
 import javax.annotation.Nonnull;
 
 /**
@@ -17,27 +19,21 @@ import javax.annotation.Nonnull;
  */
 public class CoinsListAdapter extends BaseAdapter {
     private final Context context;
-    private final WalletApplication application;
+    private final List<CoinType> coins;
 
-    public CoinsListAdapter(final Context context, @Nonnull final WalletApplication application) {
+    public CoinsListAdapter(final Context context, List<CoinType> coins) {
         this.context = context;
-        this.application = application;
+        this.coins = coins;
     }
 
     @Override
     public int getCount() {
-//        if (application.getWallet() != null) {
-//            return application.getWallet().getCoinTypes().size();
-//        }
-        return Constants.SUPPORTED_COINS.size();
+        return coins.size();
     }
 
     @Override
     public CoinType getItem(int position) {
-//        if (application.getWallet() != null) {
-//            return application.getWallet().getCoinTypes().get(position);
-//        }
-        return Constants.SUPPORTED_COINS.get(position);
+        return coins.get(position);
     }
 
     @Override

@@ -71,9 +71,10 @@ public class PasswordConfirmationFragment extends Fragment {
             public void onClick(View v) {
                 Keyboard.hideKeyboard(getActivity());
                 if (mListener != null) {
-                    getArguments().remove(Constants.ARG_MESSAGE);
-                    getArguments().putString(Constants.ARG_PASSWORD, password.getText().toString());
-                    mListener.onPasswordConfirmed(getArguments());
+                    Bundle args = getArguments() == null ? new Bundle() : getArguments();
+                    args.remove(Constants.ARG_MESSAGE);
+                    args.putString(Constants.ARG_PASSWORD, password.getText().toString());
+                    mListener.onPasswordConfirmed(args);
                 }
             }
         });

@@ -130,7 +130,7 @@ public class SetPasswordFragment extends Fragment {
         });
 
         // Next button
-        Button finishButton = (Button) view.findViewById(R.id.button_finish);
+        Button finishButton = (Button) view.findViewById(R.id.button_next);
         finishButton.setOnClickListener(getOnFinishListener());
         finishButton.setImeOptions(EditorInfo.IME_ACTION_DONE);
 

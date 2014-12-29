@@ -84,7 +84,7 @@ public class RestoreFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_restore, container, false);
 
-        Fonts.setTypeface(view.findViewById(R.id.seed_icon), Fonts.Font.COINOMI_FONT_ICONS);
+        Fonts.setTypeface(view.findViewById(R.id.coins_icon), Fonts.Font.COINOMI_FONT_ICONS);
 
         ImageButton scanQrButton = (ImageButton) view.findViewById(R.id.scan_qr_code);
         scanQrButton.setOnClickListener(new View.OnClickListener() {
@@ -212,9 +212,9 @@ public class RestoreFragment extends Fragment {
             SkipDialogFragment skipDialog = SkipDialogFragment.newInstance(seedText);
             skipDialog.show(getFragmentManager(), null);
         } else if (isValid && isNewSeed) {
-            if (mListener != null) mListener.onSetPassword(seedText);
+            if (mListener != null) mListener.onNewSeedVerified(seedText);
         } else if (isValid) {
-            if (mListener != null) mListener.onConfirmPassword(seedText, isSeedProtected);
+            if (mListener != null) mListener.onExistingSeedVerified(seedText, isSeedProtected);
         }
     }
 
@@ -259,7 +259,7 @@ public class RestoreFragment extends Fragment {
                    .setPositiveButton(R.string.button_skip, new DialogInterface.OnClickListener() {
                        @Override
                        public void onClick(DialogInterface dialog, int which) {
-                           if (mListener != null) mListener.onSetPassword(seed);
+                           if (mListener != null) mListener.onNewSeedVerified(seed);
                        }
                    })
                    .setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
