@@ -1,6 +1,7 @@
 package com.coinomi.wallet.ui;
 
 
+
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -12,19 +13,26 @@ import android.widget.Toast;
 
 import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.coins.DogecoinMain;
+import com.coinomi.core.wallet.SimpleHDKeyChain;
 import com.coinomi.core.wallet.Wallet;
+import com.coinomi.core.wallet.WalletPocket;
+import com.coinomi.wallet.Configuration;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.service.CoinService;
-
+import org.bitcoinj.crypto.DeterministicKey;
 import org.bitcoinj.crypto.KeyCrypterScrypt;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.crypto.params.KeyParameter;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 /**
  * Fragment that restores a wallet
@@ -131,7 +139,7 @@ public class FinalizeWalletRestorationFragment extends Fragment {
         }
 
         protected void onPostExecute(Wallet wallet) {
-            verifyDialog.dismiss(); // FIXME crashes when pressing home button before task is over
+            verifyDialog.dismissAllowingStateLoss();
             if (wallet != null) {
                 startWalletActivity();
             }
