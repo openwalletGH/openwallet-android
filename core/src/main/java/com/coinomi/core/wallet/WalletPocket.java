@@ -18,7 +18,6 @@
 
 package com.coinomi.core.wallet;
 
-import com.coinomi.core.coins.BlackcoinMain;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.network.AddressStatus;
 import com.coinomi.core.network.BlockHeader;
@@ -34,7 +33,6 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 import org.bitcoinj.core.Address;
-import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.InsufficientMoneyException;
@@ -156,6 +154,21 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
 
     private final transient CopyOnWriteArrayList<ListenerRegistration<WalletPocketEventListener>> listeners;
     @Nullable private transient Wallet wallet = null;
+
+    private Runnable saveLaterRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (wallet != null) wallet.saveLater();
+        }
+    };
+
+    private Runnable saveNowRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (wallet != null) wallet.saveNow();
+        }
+    };
+    private int TX_DEPTH_SAVE_THRESHOLD = 4;
 
     public WalletPocket(DeterministicKey rootKey, CoinType coinType,
                         @Nullable KeyCrypter keyCrypter, @Nullable KeyParameter key) {
@@ -732,25 +745,28 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
     @Override
     public void onNewBlock(BlockHeader header) {
         log.info("Got a {} block: {}", coinType.getName(), header.getBlockHeight());
+        boolean shouldSave = false;
         lock.lock();
         try {
             lastBlockSeenTimeSecs = header.getTimestamp();
             lastBlockSeenHeight = header.getBlockHeight();
             for (Transaction tx : getTransactions(false)) {
-                maybeUpdateBlockDepth(tx);
+                TransactionConfidence confidence = tx.getConfidence();
+                // Save wallet when we have new TXs
+                if (confidence.getDepthInBlocks() < TX_DEPTH_SAVE_THRESHOLD) shouldSave = true;
+                maybeUpdateBlockDepth(confidence);
             }
             queueOnNewBlock();
         } finally {
             lock.unlock();
         }
-        walletSaveLater();
+        if (shouldSave) walletSaveLater();
     }
 
-    private void maybeUpdateBlockDepth(Transaction tx) {
-        TransactionConfidence confidence = tx.getConfidence();
+    private void maybeUpdateBlockDepth(TransactionConfidence confidence) {
         if (confidence.getConfidenceType() != ConfidenceType.BUILDING) return;
         int newDepth = lastBlockSeenHeight - confidence.getAppearedAtChainHeight() + 1;
-        if (newDepth > 1) tx.getConfidence().setDepthInBlocks(newDepth);
+        if (newDepth > 1) confidence.setDepthInBlocks(newDepth);
     }
 
     @Override
@@ -872,8 +888,9 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
             if (tx != null) {
                 log.info("{} getHeight() = " + historyTx.getHeight(), historyTx.getTxHash());
                 if (historyTx.getHeight() > 0 && tx.getConfidence().getDepthInBlocks() == 0) {
-                    tx.getConfidence().setAppearedAtChainHeight(historyTx.getHeight());
-                    maybeUpdateBlockDepth(tx);
+                    TransactionConfidence confidence = tx.getConfidence();
+                    confidence.setAppearedAtChainHeight(historyTx.getHeight());
+                    maybeUpdateBlockDepth(confidence);
                 }
             } else {
                 log.error("Could not find {} in the transactions pool. Aborting applying state",
@@ -1231,27 +1248,13 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
 
     // Util
     private void walletSaveLater() {
-        if (wallet != null) {
-            // Save in another thread to avoid cyclic locking of Wallet and WalletPocket
-            Threading.USER_THREAD.execute(new Runnable() {
-                @Override
-                public void run() {
-                    wallet.saveLater();
-                }
-            });
-        }
+        // Save in another thread to avoid cyclic locking of Wallet and WalletPocket
+        Threading.USER_THREAD.execute(saveLaterRunnable);
     }
 
     private void walletSaveNow() {
-        if (wallet != null) {
-            // Save in another thread to avoid cyclic locking of Wallet and WalletPocket
-            Threading.USER_THREAD.execute(new Runnable() {
-                @Override
-                public void run() {
-                    wallet.saveNow();
-                }
-            });
-        }
+        // Save in another thread to avoid cyclic locking of Wallet and WalletPocket
+        Threading.USER_THREAD.execute(saveNowRunnable);
     }
 
     public void restoreWalletTransactions(ArrayList<WalletTransaction> wtxs) {
