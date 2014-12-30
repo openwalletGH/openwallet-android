@@ -1,6 +1,5 @@
 package com.coinomi.wallet.service;
 
-import android.annotation.SuppressLint;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.appwidget.AppWidgetManager;
@@ -15,6 +14,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.SystemClock;
+import android.os.storage.StorageManager;
 import android.text.format.DateUtils;
 
 import com.coinomi.core.coins.CoinID;
@@ -51,10 +51,11 @@ import javax.annotation.CheckForNull;
 public class CoinServiceImpl extends Service implements CoinService {
     private WalletApplication application;
     private Configuration config;
-    private ConnectivityManager connMgr;
+    private ConnectivityManager connManager;
+    private ConnectivityHelper connHelper;
 
     @CheckForNull
-    private ServerClients client;
+    private ServerClients clients;
 
     private CoinType lastCoin;
 
@@ -171,17 +172,8 @@ public class CoinServiceImpl extends Service implements CoinService {
 //    }
 //
 
-    private ConnectivityHelper connectivityHelper = new ConnectivityHelper() {
-        @Override
-        public boolean isConnected() {
-            NetworkInfo activeInfo = connMgr.getActiveNetworkInfo();
-            return activeInfo != null && activeInfo.isConnected();
-        }
-    };
-
     private final BroadcastReceiver connectivityReceiver = new BroadcastReceiver() {
         private boolean hasConnectivity;
-        private boolean isNetworkChanged;
         private boolean hasStorage = true;
         private int currentNetworkType = -1;
 
@@ -192,7 +184,8 @@ public class CoinServiceImpl extends Service implements CoinService {
             if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action)) {
                 hasConnectivity = !intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
 
-                NetworkInfo activeInfo = connMgr.getActiveNetworkInfo();
+                NetworkInfo activeInfo = connManager.getActiveNetworkInfo();
+                boolean isNetworkChanged;
                 if (activeInfo != null && activeInfo.isConnected()) {
                     isNetworkChanged = currentNetworkType != activeInfo.getType();
                     currentNetworkType = activeInfo.getType();
@@ -203,39 +196,39 @@ public class CoinServiceImpl extends Service implements CoinService {
                 log.info("network is " + (hasConnectivity ? "up" : "down"));
                 log.info("network type " + (isNetworkChanged ? "changed" : "didn't change"));
 
-                check();
+                check(isNetworkChanged);
             } else if (Intent.ACTION_DEVICE_STORAGE_LOW.equals(action)) {
                 hasStorage = false;
                 log.info("device storage low");
 
-                check();
+                check(false);
             } else if (Intent.ACTION_DEVICE_STORAGE_OK.equals(action)) {
                 hasStorage = true;
                 log.info("device storage ok");
 
-                check();
+                check(false);
             }
         }
 
-        @SuppressLint("Wakelock")
-        private void check() {
+//        @SuppressLint("Wakelock")
+        private void check(boolean isNetworkChanged) {
             Wallet wallet = application.getWallet();
             final boolean hasEverything = hasConnectivity && hasStorage && (wallet != null);
 
-            if (hasEverything && client == null) {
+            if (hasEverything && clients == null) {
 //                log.debug("acquiring wakelock");
 //                wakeLock.acquire();
 
                 log.info("Creating coins clients");
-                client = new ServerClients(Constants.DEFAULT_COINS_SERVERS, wallet, connectivityHelper);
-                if (lastCoin != null) client.startAsync(wallet.getPocket(lastCoin));
+                clients = getServerClients(wallet);
+                if (lastCoin != null) clients.startAsync(wallet.getPocket(lastCoin));
             } else if (hasEverything && isNetworkChanged) {
                 log.info("Restarting coins clients as network changed");
-                client.resetConnections();
-            } else if (!hasEverything && client != null) {
-                log.info("stopping stratum client");
-                client.stopAllAsync();
-                client = null;
+                clients.resetConnections();
+            } else if (!hasEverything && clients != null) {
+                log.info("stopping stratum clients");
+                clients.stopAllAsync();
+                clients = null;
 
 //                log.debug("releasing wakelock");
 //                wakeLock.release();
@@ -243,13 +236,17 @@ public class CoinServiceImpl extends Service implements CoinService {
         }
     };
 
+    private ServerClients getServerClients(Wallet wallet) {
+        return new ServerClients(Constants.DEFAULT_COINS_SERVERS, wallet, connHelper);
+    }
+
     private final BroadcastReceiver tickReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(final Context context, final Intent intent) {
             log.debug("Received a tick {}", intent);
 
-            if (client != null) {
-                client.ping();
+            if (clients != null) {
+                clients.ping();
             }
 
             long lastStop = application.getLastStop();
@@ -303,7 +300,8 @@ public class CoinServiceImpl extends Service implements CoinService {
 
         application = (WalletApplication) getApplication();
         config = application.getConfiguration();
-        connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        connHelper = getConnectivityHelper(connManager);
 
         final IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
@@ -311,6 +309,16 @@ public class CoinServiceImpl extends Service implements CoinService {
         intentFilter.addAction(Intent.ACTION_DEVICE_STORAGE_OK);
         registerReceiver(connectivityReceiver, intentFilter);
         registerReceiver(tickReceiver, new IntentFilter(Intent.ACTION_TIME_TICK));
+    }
+
+    private ConnectivityHelper getConnectivityHelper(final ConnectivityManager manager) {
+        return new ConnectivityHelper() {
+            @Override
+            public boolean isConnected() {
+                NetworkInfo activeInfo = manager.getActiveNetworkInfo();
+                return activeInfo != null && activeInfo.isConnected();
+            }
+        };
     }
 
     @Override
@@ -342,13 +350,13 @@ public class CoinServiceImpl extends Service implements CoinService {
                 }
 
                 List<WalletPocket> pockets = wallet.refresh(coinTypesToReset);
-                if (client != null) {
+                if (clients != null) {
                     if (resetWallet) {
-                        client.stopAllAsync();
+                        clients.stopAllAsync();
                         lastCoin = null;
-                        client = new ServerClients(Constants.DEFAULT_COINS_SERVERS, wallet, connectivityHelper);
+                        clients = new ServerClients(Constants.DEFAULT_COINS_SERVERS, wallet, connHelper);
                     } else {
-                        client.setPockets(pockets, true);
+                        clients.setPockets(pockets, true);
                     }
                 }
             } else {
@@ -357,8 +365,18 @@ public class CoinServiceImpl extends Service implements CoinService {
         } else if (CoinService.ACTION_CONNECT_COIN.equals(action)) {
             if (intent.hasExtra(Constants.ARG_COIN_ID)) {
                 lastCoin = CoinID.typeFromId(intent.getStringExtra(Constants.ARG_COIN_ID));
-                if (client != null && application.getWalletPocket(lastCoin) != null) {
-                    client.startAsync(application.getWalletPocket(lastCoin));
+                WalletPocket pocket = application.getWalletPocket(lastCoin);
+                if (pocket != null) {
+                    if (clients == null && connHelper.isConnected()) {
+                        clients = getServerClients(pocket.getWallet());
+                    }
+
+                    if (clients != null) {
+                        clients.startAsync(pocket);
+                    }
+                } else {
+                    log.warn("Tried to start a service for coin {} but no pocket found.",
+                            lastCoin.getId());
                 }
             } else {
                 log.warn("Missing coin id argument, not doing anything");
@@ -367,7 +385,7 @@ public class CoinServiceImpl extends Service implements CoinService {
             final Sha256Hash hash = new Sha256Hash(intent.getByteArrayExtra(CoinService.ACTION_BROADCAST_TRANSACTION_HASH));
             final Transaction tx = null; // FIXME
 
-            if (client != null)
+            if (clients != null)
             {
                 log.info("broadcasting transaction " + tx.getHashAsString());
                 broadcastTransaction(tx);
@@ -396,9 +414,9 @@ public class CoinServiceImpl extends Service implements CoinService {
 
         unregisterReceiver(connectivityReceiver);
 
-        if (client != null) {
-            client.stopAllAsync();
-            client = null;
+        if (clients != null) {
+            clients.stopAllAsync();
+            clients = null;
         }
 
         delayHandler.removeCallbacksAndMessages(null);
