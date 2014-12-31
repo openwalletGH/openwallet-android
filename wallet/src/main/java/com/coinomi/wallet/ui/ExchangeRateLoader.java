@@ -58,7 +58,6 @@ public final class ExchangeRateLoader extends CursorLoader implements OnSharedPr
         final IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         intentFilter.addAction(Intent.ACTION_TIME_TICK);
-        System.out.println("register!");
         context.registerReceiver(broadcastReceiver, intentFilter);
 
         forceLoad();
@@ -99,7 +98,6 @@ public final class ExchangeRateLoader extends CursorLoader implements OnSharedPr
                     forceLoad();
                 }
             } else if (Intent.ACTION_TIME_TICK.equals(action) && hasConnectivity) {
-                System.out.println("TICK!");
                 forceLoad();
             }
         }
