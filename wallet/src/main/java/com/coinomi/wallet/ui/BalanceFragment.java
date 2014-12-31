@@ -35,6 +35,7 @@ import com.coinomi.wallet.ui.widget.Amount;
 import com.coinomi.wallet.ExchangeRatesProvider;
 import com.coinomi.wallet.ExchangeRatesProvider.ExchangeRate;
 import com.coinomi.wallet.util.ThrottlingWalletChangeListener;
+import com.coinomi.wallet.util.WalletUtils;
 import com.google.common.collect.Lists;
 
 import org.bitcoinj.core.Coin;
@@ -47,6 +48,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.RejectedExecutionException;
 
 import javax.annotation.Nonnull;
@@ -444,7 +446,9 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
     private final LoaderCallbacks<Cursor> rateLoaderCallbacks = new LoaderManager.LoaderCallbacks<Cursor>() {
         @Override
         public Loader<Cursor> onCreateLoader(final int id, final Bundle args) {
-            return new ExchangeRateLoader(getActivity(), config, type);
+            String localSymbol = config.getExchangeCurrencyCode(true);
+            String coinSymbol = type.getSymbol();
+            return new ExchangeRateLoader(getActivity(), config, localSymbol, coinSymbol);
         }
 
         @Override
@@ -455,7 +459,7 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
                 updateView();
                 if (log.isInfoEnabled()) {
                     try {
-                        log.info("NEW EXCHANGE RATE: {}",
+                        log.info("Got exchange rate: {}",
                                 exchangeRate.rate.coinToFiat(type.getOneCoin()).toFriendlyString());
                     } catch (Exception e) { log.warn(e.getMessage()); }
                 }

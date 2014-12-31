@@ -17,11 +17,15 @@ package com.coinomi.wallet.ui;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import com.coinomi.core.coins.CoinType;
 import com.coinomi.wallet.Configuration;
 import com.coinomi.wallet.ExchangeRatesProvider;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.support.v4.content.CursorLoader;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -31,12 +35,18 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
  */
 public final class ExchangeRateLoader extends CursorLoader implements OnSharedPreferenceChangeListener {
     private final Configuration config;
+    private final String packageName;
+    private final Context context;
 
-    public ExchangeRateLoader(final Context context, final Configuration config, final CoinType type) {
-        super(context, ExchangeRatesProvider.contentUri(context.getPackageName(), type, false),
-                null, ExchangeRatesProvider.KEY_CURRENCY_CODE, new String[]{null}, null);
+    public ExchangeRateLoader(final Context context, final Configuration config,
+                              final String localSymbol,
+                              final String coinSymbol) {
+        super(context, ExchangeRatesProvider.contentUriToCrypto(context.getPackageName(), localSymbol, false),
+                null, ExchangeRatesProvider.KEY_CURRENCY_CODE, new String[]{coinSymbol}, null);
 
         this.config = config;
+        this.packageName = context.getPackageName();
+        this.context = context;
     }
 
     @Override
@@ -45,13 +55,19 @@ public final class ExchangeRateLoader extends CursorLoader implements OnSharedPr
 
         config.registerOnSharedPreferenceChangeListener(this);
 
-        onCurrencyChange();
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        intentFilter.addAction(Intent.ACTION_TIME_TICK);
+        System.out.println("register!");
+        context.registerReceiver(broadcastReceiver, intentFilter);
+
+        forceLoad();
     }
 
     @Override
     protected void onStopLoading() {
         config.unregisterOnSharedPreferenceChangeListener(this);
-
+        context.unregisterReceiver(broadcastReceiver);
         super.onStopLoading();
     }
 
@@ -62,10 +78,30 @@ public final class ExchangeRateLoader extends CursorLoader implements OnSharedPr
     }
 
     private void onCurrencyChange() {
-        final String exchangeCurrency = config.getExchangeCurrencyCode();
+        final String localCurrency = config.getExchangeCurrencyCode(true);
 
-        setSelectionArgs(new String[]{exchangeCurrency});
+        Uri newUri = ExchangeRatesProvider.contentUriToCrypto(packageName, localCurrency, false);
+        setUri(newUri);
 
         forceLoad();
     }
+
+    private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        private boolean hasConnectivity = true;
+
+        @Override
+        public void onReceive(final Context context, final Intent intent) {
+            final String action = intent.getAction();
+
+            if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action)) {
+                hasConnectivity = !intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
+                if (hasConnectivity) {
+                    forceLoad();
+                }
+            } else if (Intent.ACTION_TIME_TICK.equals(action) && hasConnectivity) {
+                System.out.println("TICK!");
+                forceLoad();
+            }
+        }
+    };
 }

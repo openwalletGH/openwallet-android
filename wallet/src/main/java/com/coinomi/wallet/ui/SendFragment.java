@@ -68,7 +68,7 @@ public class SendFragment extends Fragment {
     // Loader IDs
     private static final int ID_RATE_LOADER = 0;
 
-    private CoinType coinType;
+    private CoinType type;
     @Nullable private Coin lastBalance; // TODO setup wallet watcher for the latest balance
     private Handler handler = new Handler();
     private EditText sendToAddressView;
@@ -116,10 +116,10 @@ public class SendFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            coinType = (CoinType) checkNotNull(getArguments().getSerializable(COIN_TYPE));
+            type = (CoinType) checkNotNull(getArguments().getSerializable(COIN_TYPE));
         }
         if (activity != null) {
-            pocket = activity.getWalletApplication().getWalletPocket(coinType);
+            pocket = activity.getWalletApplication().getWalletPocket(type);
         }
         setHasOptionsMenu(true);
         mNavigationDrawerFragment = (NavigationDrawerFragment)
@@ -138,8 +138,8 @@ public class SendFragment extends Fragment {
 
 
         AmountEditView sendCoinAmountView = (AmountEditView) view.findViewById(R.id.send_coin_amount);
-        sendCoinAmountView.setCoinType(coinType);
-        sendCoinAmountView.setFormat(coinType.getMonetaryFormat());
+        sendCoinAmountView.setCoinType(type);
+        sendCoinAmountView.setFormat(type.getMonetaryFormat());
 
         AmountEditView sendLocalAmountView = (AmountEditView) view.findViewById(R.id.send_local_amount);
         sendLocalAmountView.setFormat(Constants.LOCAL_CURRENCY_FORMAT);
@@ -230,9 +230,9 @@ public class SendFragment extends Fragment {
         Intent intent = new Intent(getActivity(), SignTransactionActivity.class);
         try {
             if (pocket == null) {
-                throw new NoSuchPocketException("No pocket found for " + coinType.getName());
+                throw new NoSuchPocketException("No pocket found for " + type.getName());
             }
-            intent.putExtra(Constants.ARG_COIN_ID, coinType.getId());
+            intent.putExtra(Constants.ARG_COIN_ID, type.getId());
             intent.putExtra(Constants.ARG_SEND_TO_ADDRESS, toAddress.toString());
             intent.putExtra(Constants.ARG_SEND_AMOUNT, amount.getValue());
             startActivityForResult(intent, SIGN_TRANSACTION);
@@ -257,7 +257,7 @@ public class SendFragment extends Fragment {
                 final String input = intent.getStringExtra(ScanActivity.INTENT_EXTRA_RESULT);
 
                 try {
-                    final CoinURI coinUri = new CoinURI(coinType, input);
+                    final CoinURI coinUri = new CoinURI(type, input);
 
                     Address address = coinUri.getAddress();
                     Coin amount = coinUri.getAmount();
@@ -336,7 +336,7 @@ public class SendFragment extends Fragment {
     private boolean isAmountValid(Coin amount) {
         boolean isValid = amount != null
                 && amount.isPositive()
-                && amount.compareTo(coinType.getMinNonDust()) >= 0;
+                && amount.compareTo(type.getMinNonDust()) >= 0;
         if (isValid && lastBalance != null) {
             // Check if we have the amount
             isValid = amount.compareTo(lastBalance) <= 0;
@@ -393,10 +393,10 @@ public class SendFragment extends Fragment {
                     amountError.setText(R.string.amount_error);
                 } else if (amountParsed.isNegative()) {
                     amountError.setText(R.string.amount_error_negative);
-                } else if (amountParsed.compareTo(coinType.getMinNonDust()) < 0) {
-                    String minAmount = GenericUtils.formatCoinValue(coinType, coinType.getMinNonDust());
+                } else if (amountParsed.compareTo(type.getMinNonDust()) < 0) {
+                    String minAmount = GenericUtils.formatCoinValue(type, type.getMinNonDust());
                     String message = getResources().getString(R.string.amount_error_too_small,
-                            minAmount, coinType.getSymbol());
+                            minAmount, type.getSymbol());
                     amountError.setText(message);
                 } else if (lastBalance != null && amountParsed.compareTo(lastBalance) > 0) {
                     amountError.setText(R.string.amount_error_not_enough_money);
@@ -443,7 +443,7 @@ public class SendFragment extends Fragment {
 
         try {
             if (!addressStr.isEmpty()) {
-                address = new Address(coinType, addressStr);
+                address = new Address(type, addressStr);
             } else {
                 // empty field should not raise error message
                 address = null;
@@ -557,7 +557,9 @@ public class SendFragment extends Fragment {
     private final LoaderCallbacks<Cursor> rateLoaderCallbacks = new LoaderManager.LoaderCallbacks<Cursor>() {
         @Override
         public Loader<Cursor> onCreateLoader(final int id, final Bundle args) {
-            return new ExchangeRateLoader(activity, config, coinType);
+            String localSymbol = config.getExchangeCurrencyCode(true);
+            String coinSymbol = type.getSymbol();
+            return new ExchangeRateLoader(getActivity(), config, localSymbol, coinSymbol);
         }
 
         @Override

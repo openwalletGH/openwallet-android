@@ -113,7 +113,8 @@ public final class ExchangeRatesFragment extends ListFragment implements OnShare
 //        setHasOptionsMenu(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB);
 
         type = CoinID.typeFromId(getArguments().getString(Constants.ARG_COIN_ID));
-        contentUri = ExchangeRatesProvider.contentUri(activity.getPackageName(), type, false);
+        contentUri = ExchangeRatesProvider.contentUriToLocal(activity.getPackageName(),
+                type.getSymbol(), false);
 
         defaultCurrency = config.getExchangeCurrencyCode(true);
         config.registerOnSharedPreferenceChangeListener(this);

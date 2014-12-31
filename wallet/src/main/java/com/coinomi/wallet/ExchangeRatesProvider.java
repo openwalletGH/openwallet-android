@@ -21,18 +21,19 @@ package com.coinomi.wallet;
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.database.MatrixCursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
-import android.database.sqlite.SQLiteQueryBuilder;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
 
 import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.wallet.util.Io;
-import com.coinomi.wallet.util.WalletUtils;
 import com.google.common.base.Charsets;
 
 import org.bitcoinj.core.Coin;
@@ -50,15 +51,14 @@ import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.zip.GZIPInputStream;
 
-import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import static com.coinomi.wallet.Constants.HTTP_TIMEOUT_MS;
 
@@ -67,17 +67,13 @@ import static com.coinomi.wallet.Constants.HTTP_TIMEOUT_MS;
  */
 public class ExchangeRatesProvider extends ContentProvider {
 
-
     public static class ExchangeRate {
-        public ExchangeRate(@Nonnull final CoinType type,
-                            @Nonnull final org.bitcoinj.utils.ExchangeRate rate,
+        public ExchangeRate(@Nonnull final org.bitcoinj.utils.ExchangeRate rate,
                             final String source) {
-            this.type = type;
             this.rate = rate;
             this.source = source;
         }
 
-        public final CoinType type;
         public final org.bitcoinj.utils.ExchangeRate rate;
         public final String source;
 
@@ -91,27 +87,28 @@ public class ExchangeRatesProvider extends ContentProvider {
         }
     }
 
-    private static final String DATABASE_TABLE = "exchange_rates";
-
-    public static final String KEY_ROWID = "_id";
     public static final String KEY_CURRENCY_CODE = "currency_code";
-    private static final String KEY_COIN_ID = "coin_id";
     private static final String KEY_RATE_COIN = "rate_coin";
     private static final String KEY_RATE_FIAT = "rate_fiat";
     private static final String KEY_SOURCE = "source";
 
     private static final String QUERY_PARAM_OFFLINE = "offline";
 
-//    private Helper helper;
+    private ConnectivityManager connManager;
+    private Configuration config;
     private String userAgent;
 
-    @CheckForNull
-    private Map<CoinType, Map<String, ExchangeRate>> allExchangeRates =
-            new HashMap<CoinType, Map<String, ExchangeRate>>(Constants.SUPPORTED_COINS.size());
-    private Map<CoinType, Long> lastUpdatedRates =
-            new HashMap<CoinType, Long>(Constants.SUPPORTED_COINS.size());
+    private Map<String, ExchangeRate> localToCryptoRates = null;
+    private long localToCryptoLastUpdated = 0;
+    private String lastLocalCurrency = null;
 
-    private static final String COINOMI_BASE_URL = "https://ticker.coinomi.net/simple/crypto/%s";
+    private Map<String, ExchangeRate> cryptoToLocalRates = null;
+    private long cryptoToLocalLastUpdated = 0;
+    private String lastCryptoCurrency = null;
+
+    private static final String BASE_URL = "https://ticker.coinomi.net/simple";
+    private static final String TO_LOCAL_URL = BASE_URL + "/to-local/%s";
+    private static final String TO_CRYPTO_URL = BASE_URL + "/to-crypto/%s";
     private static final String COINOMI_SOURCE = "coinomi.com";
 
     private static final Logger log = LoggerFactory.getLogger(ExchangeRatesProvider.class);
@@ -120,28 +117,43 @@ public class ExchangeRatesProvider extends ContentProvider {
     public boolean onCreate() {
         final Context context = getContext();
 
-        this.userAgent = WalletApplication.httpUserAgent();
-//        helper = new Helper(getContext());
+        connManager = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        config = new Configuration(PreferenceManager.getDefaultSharedPreferences(context));
+        userAgent = WalletApplication.httpUserAgent();
 
-//        final List<ExchangeRate> cachedExchangeRates = config.getCachedExchangeRates();
-//        if (cachedExchangeRates != null) {
-//            for (ExchangeRate cachedRate : cachedExchangeRates) {
-//                Map<String, ExchangeRate> exchangeRates = new TreeMap<String, ExchangeRate>();
-//                exchangeRates.put(cachedRate.getCurrencyCode(), cachedRate);
-//                allExchangeRates.put(cachedRate.type, exchangeRates);
-//            }
-//        }
+        lastLocalCurrency = config.getCachedExchangeLocalCurrency();
+        if (lastLocalCurrency != null) {
+            localToCryptoRates = parseExchangeRates(
+                    config.getCachedExchangeRatesJson(), lastLocalCurrency, true);
+            localToCryptoLastUpdated = 0;
+        }
 
         return true;
     }
 
-    public static Uri contentUri(@Nonnull final String packageName,
-                                 @Nonnull final CoinType type,
-                                 final boolean offline) {
-        final Uri.Builder uri = Uri.parse("content://" + packageName + '.' + DATABASE_TABLE)
-                .buildUpon().appendPath("crypto").appendPath(type.getSymbol());
+
+
+    private static Uri.Builder contentUri(@Nonnull final String packageName, final boolean offline) {
+        final Uri.Builder builder =
+                Uri.parse("content://" + packageName + ".exchange_rates").buildUpon();
         if (offline)
-            uri.appendQueryParameter(QUERY_PARAM_OFFLINE, "1");
+            builder.appendQueryParameter(QUERY_PARAM_OFFLINE, "1");
+        return builder;
+    }
+
+    public static Uri contentUriToLocal(@Nonnull final String packageName,
+                                  @Nonnull final String coinSymbol,
+                                  final boolean offline) {
+        final Uri.Builder uri = contentUri(packageName, offline);
+        uri.appendPath("to-local").appendPath(coinSymbol);
+        return uri.build();
+    }
+
+    public static Uri contentUriToCrypto(@Nonnull final String packageName,
+                                  @Nonnull final String localSymbol,
+                                  final boolean offline) {
+        final Uri.Builder uri = contentUri(packageName, offline);
+        uri.appendPath("to-crypto").appendPath(localSymbol);
         return uri.build();
     }
 
@@ -150,65 +162,81 @@ public class ExchangeRatesProvider extends ContentProvider {
                         final String[] selectionArgs, final String sortOrder) {
         final long now = System.currentTimeMillis();
 
-        final SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
-        qb.setTables(DATABASE_TABLE);
-
         final List<String> pathSegments = uri.getPathSegments();
         if (pathSegments.size() != 2) {
             throw new IllegalArgumentException("Unrecognized URI: " + uri);
         }
 
-        final CoinType type = CoinID.typeFromSymbol(uri.getLastPathSegment());
         final boolean offline = uri.getQueryParameter(QUERY_PARAM_OFFLINE) != null;
+        long lastUpdated;
 
-        long lastUpdated = lastUpdatedRates.containsKey(type) ? lastUpdatedRates.get(type) : 0;
+        final String symbol;
+        final boolean isLocalToCrypto;
+
+        if (pathSegments.get(0).equals("to-crypto")) {
+            isLocalToCrypto = true;
+            symbol = pathSegments.get(1);
+            lastUpdated = symbol.equals(lastLocalCurrency) ? localToCryptoLastUpdated : 0;
+        } else if (pathSegments.get(0).equals("to-local")) {
+            isLocalToCrypto = false;
+            symbol = pathSegments.get(1);
+            lastUpdated = symbol.equals(lastCryptoCurrency) ? cryptoToLocalLastUpdated : 0;
+        } else {
+            throw new IllegalArgumentException("Unrecognized URI path: " + uri);
+        }
 
         if (!offline && (lastUpdated == 0 || now - lastUpdated > Constants.RATE_UPDATE_FREQ_MS)) {
-            Map<String, ExchangeRate> newExchangeRates;
-
-            URL url = null;
+            URL url;
             try {
-                url = new URL(String.format(COINOMI_BASE_URL, type.getSymbol()));
+                if (isLocalToCrypto) {
+                    url = new URL(String.format(TO_CRYPTO_URL, symbol));
+                } else {
+                    url = new URL(String.format(TO_LOCAL_URL, symbol));
+                }
             } catch (final MalformedURLException x) {
                 throw new RuntimeException(x); // Should not happen
             }
 
-            newExchangeRates = requestExchangeRates(url, userAgent, COINOMI_SOURCE, type);
+            JSONObject newExchangeRatesJson = requestExchangeRatesJson(url, userAgent);
+            Map<String, ExchangeRate> newExchangeRates =
+                    parseExchangeRates(newExchangeRatesJson, symbol, isLocalToCrypto);
 
             if (newExchangeRates != null) {
-                allExchangeRates.put(type, newExchangeRates);
-                lastUpdatedRates.put(type, now);
-
-//                final ExchangeRate exchangeRateToCache =
-//                        bestExchangeRate(newExchangeRates, config.getExchangeCurrencyCode());
-//                if (exchangeRateToCache != null)
-//                    config.setCachedExchangeRate(exchangeRateToCache);
+                if (isLocalToCrypto) {
+                    localToCryptoRates = newExchangeRates;
+                    localToCryptoLastUpdated = now;
+                    lastLocalCurrency = symbol;
+                    config.setCachedExchangeRates(lastLocalCurrency, newExchangeRatesJson);
+                } else {
+                    cryptoToLocalRates = newExchangeRates;
+                    cryptoToLocalLastUpdated = now;
+                    lastCryptoCurrency = symbol;
+                }
             }
         }
 
-        Map<String, ExchangeRate> exchangeRates = allExchangeRates.get(type);
+        Map<String, ExchangeRate> exchangeRates = isLocalToCrypto ? localToCryptoRates : cryptoToLocalRates;
 
         if (exchangeRates == null)
             return null;
 
         final MatrixCursor cursor = new MatrixCursor(new String[]{BaseColumns._ID,
-                KEY_CURRENCY_CODE, KEY_COIN_ID, KEY_RATE_COIN, KEY_RATE_FIAT, KEY_SOURCE});
+                KEY_CURRENCY_CODE, KEY_RATE_COIN, KEY_RATE_FIAT, KEY_SOURCE});
 
         if (selection == null) {
             for (final Map.Entry<String, ExchangeRate> entry : exchangeRates.entrySet()) {
                 final ExchangeRate exchangeRate = entry.getValue();
                 final org.bitcoinj.utils.ExchangeRate rate = exchangeRate.rate;
                 final String currencyCode = exchangeRate.getCurrencyCode();
-                cursor.newRow().add(currencyCode.hashCode()).add(currencyCode).add(type.getId())
+                cursor.newRow().add(currencyCode.hashCode()).add(currencyCode)
                         .add(rate.coin.value).add(rate.fiat.value).add(exchangeRate.source);
             }
         } else if (selection.equals(KEY_CURRENCY_CODE)) {
-            final String selectionArg = selectionArgs[0];
-            final ExchangeRate exchangeRate = bestExchangeRate(exchangeRates, selectionArg);
+            final ExchangeRate exchangeRate = exchangeRates.get(selectionArgs[0]);
             if (exchangeRate != null) {
                 final org.bitcoinj.utils.ExchangeRate rate = exchangeRate.rate;
                 final String currencyCode = exchangeRate.getCurrencyCode();
-                cursor.newRow().add(currencyCode.hashCode()).add(currencyCode).add(type.getId())
+                cursor.newRow().add(currencyCode.hashCode()).add(currencyCode)
                         .add(rate.coin.value).add(rate.fiat.value).add(exchangeRate.source);
             }
         }
@@ -216,29 +244,13 @@ public class ExchangeRatesProvider extends ContentProvider {
         return cursor;
     }
 
-    private ExchangeRate bestExchangeRate(Map<String, ExchangeRate> exchangeRates, final String currencyCode) {
-        ExchangeRate rate = currencyCode != null ? exchangeRates.get(currencyCode) : null;
-        if (rate != null)
-            return rate;
-
-        final String defaultCode = WalletUtils.localeCurrencyCode();
-        rate = defaultCode != null ? exchangeRates.get(defaultCode) : null;
-
-        if (rate != null)
-            return rate;
-
-        return exchangeRates.get(Constants.DEFAULT_EXCHANGE_CURRENCY);
-    }
-
     public static ExchangeRate getExchangeRate(@Nonnull final Cursor cursor) {
         final String currencyCode = cursor.getString(cursor.getColumnIndexOrThrow(ExchangeRatesProvider.KEY_CURRENCY_CODE));
-        final String coinId = cursor.getString(cursor.getColumnIndexOrThrow(ExchangeRatesProvider.KEY_COIN_ID));
         final Coin rateCoin = Coin.valueOf(cursor.getLong(cursor.getColumnIndexOrThrow(ExchangeRatesProvider.KEY_RATE_COIN)));
         final Fiat rateFiat = Fiat.valueOf(currencyCode, cursor.getLong(cursor.getColumnIndexOrThrow(ExchangeRatesProvider.KEY_RATE_FIAT)));
         final String source = cursor.getString(cursor.getColumnIndexOrThrow(ExchangeRatesProvider.KEY_SOURCE));
 
-        return new ExchangeRate(CoinID.typeFromId(coinId),
-                new org.bitcoinj.utils.ExchangeRate(rateCoin, rateFiat), source);
+        return new ExchangeRate(new org.bitcoinj.utils.ExchangeRate(rateCoin, rateFiat), source);
     }
 
     @Override
@@ -261,12 +273,12 @@ public class ExchangeRatesProvider extends ContentProvider {
         throw new UnsupportedOperationException();
     }
 
+    @Nullable
+    private JSONObject requestExchangeRatesJson(final URL url, final String userAgent) {
+        // Return null if no connection
+        final NetworkInfo activeInfo = connManager.getActiveNetworkInfo();
+        if (activeInfo == null || !activeInfo.isConnected()) return null;
 
-    // TODO do not make a request when no connection is available
-    private static Map<String, ExchangeRate> requestExchangeRates(final URL url,
-                                                                  final String userAgent,
-                                                                  final String source,
-                                                                  final CoinType type) {
         final long start = System.currentTimeMillis();
 
         HttpURLConnection connection = null;
@@ -294,45 +306,10 @@ public class ExchangeRatesProvider extends ContentProvider {
                 final StringBuilder content = new StringBuilder();
                 final long length = Io.copy(reader, content);
 
-                final Map<String, ExchangeRate> rates = new TreeMap<String, ExchangeRate>();
+                log.info("fetched exchange rates from {} ({}), {} chars, took {} ms", url,
+                        contentEncoding, length, System.currentTimeMillis() - start);
 
-                final JSONObject head = new JSONObject(content.toString());
-                for (final Iterator<String> i = head.keys(); i.hasNext(); ) {
-                    final String currencyCode = i.next();
-                    if (!"timestamp".equals(currencyCode)) {
-                        final String rateStr = head.optString(currencyCode, null);
-                        if (rateStr != null) {
-                            try {
-                                BigDecimal rateRaw = new BigDecimal(rateStr);
-                                if (rateRaw.signum() > 0) {
-                                    Coin rateCoin = type.getOneCoin();
-                                    BigDecimal rateFiatUnit = rateRaw.movePointRight(Fiat.SMALLEST_UNIT_EXPONENT);
-
-                                    // Scale the rate up because Fiat class uses only 4 decimal places
-                                    // and precision is lost for low value coins
-                                    while (rateFiatUnit.precision() != 1 && rateFiatUnit.longValue() < 10000) {
-                                        // If the fiat rate is so small that
-                                        rateFiatUnit = rateFiatUnit.multiply(BigDecimal.TEN);
-                                        rateCoin = rateCoin.multiply(10);
-                                    }
-
-                                    final Fiat rateFiat = Fiat.valueOf(currencyCode, rateFiatUnit.longValue());
-
-                                    rates.put(currencyCode, new ExchangeRate(type,
-                                            new org.bitcoinj.utils.ExchangeRate(rateCoin, rateFiat),
-                                            source));
-                                }
-                            } catch (final Exception x) {
-                                log.warn("problem fetching {} exchange rate from {} ({}): {}", currencyCode, url, contentEncoding, x.getMessage());
-                            }
-                        }
-                    }
-                }
-
-                log.info("fetched exchange rates from {} ({}), {} chars, took {} ms", url, contentEncoding, length, System.currentTimeMillis()
-                        - start);
-
-                return rates;
+                return new JSONObject(content.toString());
             } else {
                 log.warn("http status {} when fetching exchange rates from {}", responseCode, url);
             }
@@ -354,46 +331,54 @@ public class ExchangeRatesProvider extends ContentProvider {
         return null;
     }
 
-//    private static class Helper extends SQLiteOpenHelper {
-//        private static final String DATABASE_NAME = "exchange_rates";
-//        private static final int DATABASE_VERSION = 1;
-//
-//        private static final String DATABASE_CREATE = "CREATE TABLE " + DATABASE_TABLE + " ("
-//                + KEY_ROWID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-//                + KEY_CURRENCY_CODE + " TEXT NOT NULL, "
-//                + KEY_COIN_ID + " TEXT NOT NULL, "
-//                + KEY_RATE_COIN + " INTEGER NOT NULL, "
-//                + KEY_RATE_FIAT + " INTEGER NOT NULL, "
-//                + KEY_SOURCE + " TEXT NULL);";
-//
-//        public Helper(final Context context) {
-//            super(context, DATABASE_NAME, null, DATABASE_VERSION);
-//        }
-//
-//        @Override
-//        public void onCreate(final SQLiteDatabase db) {
-//            db.execSQL(DATABASE_CREATE);
-//        }
-//
-//        @Override
-//        public void onUpgrade(final SQLiteDatabase db, final int oldVersion, final int newVersion) {
-//            db.beginTransaction();
-//            try {
-//                for (int v = oldVersion; v < newVersion; v++)
-//                    upgrade(db, v);
-//
-//                db.setTransactionSuccessful();
-//            } finally {
-//                db.endTransaction();
-//            }
-//        }
-//
-//        private void upgrade(final SQLiteDatabase db, final int oldVersion) {
-//            if (oldVersion == 1) {
-//                // future
-//            } else {
-//                throw new UnsupportedOperationException("old=" + oldVersion);
-//            }
-//        }
-//    }
+    private Map<String, ExchangeRate> parseExchangeRates(JSONObject json, String symbol, boolean isLocalToCrypto) {
+        if (json == null) return null;
+
+        final Map<String, ExchangeRate> rates = new TreeMap<String, ExchangeRate>();
+        try {
+            CoinType type = isLocalToCrypto ? null : CoinID.typeFromSymbol(symbol);
+            for (final Iterator<String> i = json.keys(); i.hasNext(); ) {
+                final String currencyCode = i.next();
+                // Skip extras field
+                if (!"extras".equals(currencyCode)) {
+                    final String rateStr = json.optString(currencyCode, null);
+                    if (rateStr != null) {
+                        try {
+                            BigDecimal rateRaw = new BigDecimal(rateStr);
+                            if (rateRaw.signum() > 0) {
+                                if (isLocalToCrypto) type = CoinID.typeFromSymbol(currencyCode);
+                                Coin rateCoin = type.getOneCoin();
+                                BigDecimal rateUnit = rateRaw.movePointRight(Fiat.SMALLEST_UNIT_EXPONENT);
+
+                                // Scale the rate up because Fiat class uses only 4 decimal places
+                                // and precision is lost for low value coins
+                                while (rateUnit.precision() != 1 && rateUnit.longValue() < 10000) {
+                                    // If the fiat rate is so small that
+                                    rateUnit = rateUnit.multiply(BigDecimal.TEN);
+                                    rateCoin = rateCoin.multiply(10);
+                                }
+
+                                String localSymbol = isLocalToCrypto ? symbol : currencyCode;
+                                final Fiat rateLocal = Fiat.valueOf(localSymbol, rateUnit.longValue());
+
+                                rates.put(currencyCode, new ExchangeRate(
+                                        new org.bitcoinj.utils.ExchangeRate(rateCoin, rateLocal),
+                                        COINOMI_SOURCE));
+                            }
+                        } catch (final Exception x) {
+                            log.info("ignoring {}/{}: {}", currencyCode, symbol, x.getMessage());
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.warn("problem parsing exchange rates: {}", e.getMessage());
+        }
+
+        if (rates.size() == 0) {
+            return null;
+        } else {
+            return rates;
+        }
+    }
 }

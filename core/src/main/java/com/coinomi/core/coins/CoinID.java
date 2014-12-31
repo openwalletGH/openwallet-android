@@ -76,18 +76,18 @@ public enum CoinID {
         for(CoinID id : values()) {
             if (id.type.getId().equalsIgnoreCase(stringId)) return id;
         }
-        throw new IllegalArgumentException();
+        throw new IllegalArgumentException("Unsupported ID: " + stringId);
     }
 
     public static CoinID fromUri(String input) {
         for(CoinID id : values()) {
-            if (input.startsWith(id.getCoinType().getUriScheme()+"://")) {
+            if (input.startsWith(id.getCoinType().getUriScheme() + "://")) {
                 return id;
             } else if (input.startsWith(id.getCoinType().getUriScheme()+":")) {
                 return id;
             }
         }
-        throw new IllegalArgumentException();
+        throw new IllegalArgumentException("Unsupported URI: " + input);
     }
 
     public static CoinType typeFromAddress(String address) throws AddressFormatException {
@@ -103,6 +103,6 @@ public enum CoinID {
         for(CoinID id : values()) {
             if (id.type.getSymbol().equalsIgnoreCase(symbol)) return id.type;
         }
-        throw new IllegalArgumentException();
+        throw new IllegalArgumentException("Unsupported coin symbol: " + symbol);
     }
 }
