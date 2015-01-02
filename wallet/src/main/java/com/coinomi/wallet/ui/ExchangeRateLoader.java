@@ -42,7 +42,17 @@ public final class ExchangeRateLoader extends CursorLoader implements OnSharedPr
                               final String localSymbol,
                               final String coinSymbol) {
         super(context, ExchangeRatesProvider.contentUriToCrypto(context.getPackageName(), localSymbol, false),
-                null, ExchangeRatesProvider.KEY_CURRENCY_CODE, new String[]{coinSymbol}, null);
+                null, ExchangeRatesProvider.KEY_CURRENCY_ID, new String[]{coinSymbol}, null);
+
+        this.config = config;
+        this.packageName = context.getPackageName();
+        this.context = context;
+    }
+
+    public ExchangeRateLoader(final Context context, final Configuration config,
+                              final String localSymbol) {
+        super(context, ExchangeRatesProvider.contentUriToCrypto(context.getPackageName(), localSymbol, false),
+                null, null, new String[]{null}, null);
 
         this.config = config;
         this.packageName = context.getPackageName();
@@ -66,7 +76,9 @@ public final class ExchangeRateLoader extends CursorLoader implements OnSharedPr
     @Override
     protected void onStopLoading() {
         config.unregisterOnSharedPreferenceChangeListener(this);
-        context.unregisterReceiver(broadcastReceiver);
+        try {
+            context.unregisterReceiver(broadcastReceiver);
+        } catch (IllegalArgumentException e) { /* ignore */ }
         super.onStopLoading();
     }
 
@@ -77,7 +89,7 @@ public final class ExchangeRateLoader extends CursorLoader implements OnSharedPr
     }
 
     private void onCurrencyChange() {
-        final String localCurrency = config.getExchangeCurrencyCode(true);
+        final String localCurrency = config.getExchangeCurrencyCode();
 
         Uri newUri = ExchangeRatesProvider.contentUriToCrypto(packageName, localCurrency, false);
         setUri(newUri);

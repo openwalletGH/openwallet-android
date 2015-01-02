@@ -62,7 +62,6 @@ public class AmountEditView extends RelativeLayout {
         updateAppearance();
     }
 
-
     public void setLocalCurrency(final String currencyCode) {
         this.type = null;
         localCurrencyCode = currencyCode;
@@ -129,8 +128,10 @@ public class AmountEditView extends RelativeLayout {
     private void updateAppearance() {
         if (type != null) {
             symbol.setText(type.getSymbol());
+            symbol.setVisibility(VISIBLE);
         } else if (localCurrencyCode != null) {
             symbol.setText(localCurrencyCode);
+            symbol.setVisibility(VISIBLE);
         } else {
             symbol.setText(null);
             symbol.setVisibility(GONE);

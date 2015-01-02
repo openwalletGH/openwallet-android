@@ -557,7 +557,7 @@ public class SendFragment extends Fragment {
     private final LoaderCallbacks<Cursor> rateLoaderCallbacks = new LoaderManager.LoaderCallbacks<Cursor>() {
         @Override
         public Loader<Cursor> onCreateLoader(final int id, final Bundle args) {
-            String localSymbol = config.getExchangeCurrencyCode(true);
+            String localSymbol = config.getExchangeCurrencyCode();
             String coinSymbol = type.getSymbol();
             return new ExchangeRateLoader(getActivity(), config, localSymbol, coinSymbol);
         }

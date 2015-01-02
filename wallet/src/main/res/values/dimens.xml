@@ -87,5 +87,7 @@
     <dimen name="exchange_row_padding_vertical">@dimen/row_padding_vertical</dimen>
     <dimen name="exchange_row_padding_horizontal">@dimen/row_padding_horizontal</dimen>
 
+    <!-- Coin list row -->
+    <dimen name="coin_list_row_padding_vertical">8dp</dimen>
 
 </resources>

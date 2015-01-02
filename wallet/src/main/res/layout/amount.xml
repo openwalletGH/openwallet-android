@@ -39,6 +39,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal|end"
+        android:paddingLeft="2dp"
         android:includeFontPadding="false"
         tools:text="SYMBOL" />
 

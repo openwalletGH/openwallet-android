@@ -21,8 +21,6 @@ package com.coinomi.wallet;
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.ConnectivityManager;
@@ -68,17 +66,18 @@ import static com.coinomi.wallet.Constants.HTTP_TIMEOUT_MS;
 public class ExchangeRatesProvider extends ContentProvider {
 
     public static class ExchangeRate {
+        @Nonnull public final org.bitcoinj.utils.ExchangeRate rate;
+        public final String currencyCodeId;
+        public final CoinType type;
+        @Nullable public final String source;
+
         public ExchangeRate(@Nonnull final org.bitcoinj.utils.ExchangeRate rate,
-                            final String source) {
+                            final String currencyCodeId, final CoinType type,
+                            @Nullable final String source) {
             this.rate = rate;
+            this.currencyCodeId = currencyCodeId;
+            this.type = type;
             this.source = source;
-        }
-
-        public final org.bitcoinj.utils.ExchangeRate rate;
-        public final String source;
-
-        public String getCurrencyCode() {
-            return rate.fiat.currencyCode;
         }
 
         @Override
@@ -87,9 +86,11 @@ public class ExchangeRatesProvider extends ContentProvider {
         }
     }
 
-    public static final String KEY_CURRENCY_CODE = "currency_code";
+    public static final String KEY_CURRENCY_ID = "currency_id";
     private static final String KEY_RATE_COIN = "rate_coin";
     private static final String KEY_RATE_FIAT = "rate_fiat";
+    private static final String KEY_RATE_COIN_CODE = "rate_coin_code";
+    private static final String KEY_RATE_FIAT_CODE = "rate_fiat_code";
     private static final String KEY_SOURCE = "source";
 
     private static final String QUERY_PARAM_OFFLINE = "offline";
@@ -221,36 +222,46 @@ public class ExchangeRatesProvider extends ContentProvider {
             return null;
 
         final MatrixCursor cursor = new MatrixCursor(new String[]{BaseColumns._ID,
-                KEY_CURRENCY_CODE, KEY_RATE_COIN, KEY_RATE_FIAT, KEY_SOURCE});
+                KEY_CURRENCY_ID, KEY_RATE_COIN, KEY_RATE_COIN_CODE, KEY_RATE_FIAT, KEY_RATE_FIAT_CODE, KEY_SOURCE});
 
         if (selection == null) {
             for (final Map.Entry<String, ExchangeRate> entry : exchangeRates.entrySet()) {
                 final ExchangeRate exchangeRate = entry.getValue();
-                final org.bitcoinj.utils.ExchangeRate rate = exchangeRate.rate;
-                final String currencyCode = exchangeRate.getCurrencyCode();
-                cursor.newRow().add(currencyCode.hashCode()).add(currencyCode)
-                        .add(rate.coin.value).add(rate.fiat.value).add(exchangeRate.source);
+                addRow(cursor, exchangeRate);
             }
-        } else if (selection.equals(KEY_CURRENCY_CODE)) {
+        } else if (selection.equals(KEY_CURRENCY_ID)) {
             final ExchangeRate exchangeRate = exchangeRates.get(selectionArgs[0]);
             if (exchangeRate != null) {
-                final org.bitcoinj.utils.ExchangeRate rate = exchangeRate.rate;
-                final String currencyCode = exchangeRate.getCurrencyCode();
-                cursor.newRow().add(currencyCode.hashCode()).add(currencyCode)
-                        .add(rate.coin.value).add(rate.fiat.value).add(exchangeRate.source);
+                addRow(cursor, exchangeRate);
             }
         }
 
         return cursor;
     }
 
+    private void addRow(MatrixCursor cursor, ExchangeRate exchangeRate) {
+        final org.bitcoinj.utils.ExchangeRate rate = exchangeRate.rate;
+        final String codeId = exchangeRate.currencyCodeId;
+        cursor.newRow().add(codeId.hashCode()).add(codeId)
+                .add(rate.coin.value).add(exchangeRate.type.getSymbol())
+                .add(rate.fiat.value).add(rate.fiat.currencyCode)
+                .add(exchangeRate.source);
+    }
+
+    public static String getCurrencyCodeId(@Nonnull final Cursor cursor) {
+        return cursor.getString(cursor.getColumnIndexOrThrow(ExchangeRatesProvider.KEY_CURRENCY_ID));
+    }
+
     public static ExchangeRate getExchangeRate(@Nonnull final Cursor cursor) {
-        final String currencyCode = cursor.getString(cursor.getColumnIndexOrThrow(ExchangeRatesProvider.KEY_CURRENCY_CODE));
+        final String codeId = getCurrencyCodeId(cursor);
+        final CoinType type = CoinID.typeFromSymbol(cursor.getString(cursor.getColumnIndexOrThrow(ExchangeRatesProvider.KEY_RATE_COIN_CODE)));
         final Coin rateCoin = Coin.valueOf(cursor.getLong(cursor.getColumnIndexOrThrow(ExchangeRatesProvider.KEY_RATE_COIN)));
-        final Fiat rateFiat = Fiat.valueOf(currencyCode, cursor.getLong(cursor.getColumnIndexOrThrow(ExchangeRatesProvider.KEY_RATE_FIAT)));
+        final String fiatCode = cursor.getString(cursor.getColumnIndexOrThrow(ExchangeRatesProvider.KEY_RATE_FIAT_CODE));
+        final Fiat rateFiat = Fiat.valueOf(fiatCode, cursor.getLong(cursor.getColumnIndexOrThrow(ExchangeRatesProvider.KEY_RATE_FIAT)));
         final String source = cursor.getString(cursor.getColumnIndexOrThrow(ExchangeRatesProvider.KEY_SOURCE));
 
-        return new ExchangeRate(new org.bitcoinj.utils.ExchangeRate(rateCoin, rateFiat), source);
+        org.bitcoinj.utils.ExchangeRate rate = new org.bitcoinj.utils.ExchangeRate(rateCoin, rateFiat);
+        return new ExchangeRate(rate, codeId, type, source);
     }
 
     @Override
@@ -331,22 +342,22 @@ public class ExchangeRatesProvider extends ContentProvider {
         return null;
     }
 
-    private Map<String, ExchangeRate> parseExchangeRates(JSONObject json, String symbol, boolean isLocalToCrypto) {
+    private Map<String, ExchangeRate> parseExchangeRates(JSONObject json, String fromSymbol, boolean isLocalToCrypto) {
         if (json == null) return null;
 
         final Map<String, ExchangeRate> rates = new TreeMap<String, ExchangeRate>();
         try {
-            CoinType type = isLocalToCrypto ? null : CoinID.typeFromSymbol(symbol);
+            CoinType type = isLocalToCrypto ? null : CoinID.typeFromSymbol(fromSymbol);
             for (final Iterator<String> i = json.keys(); i.hasNext(); ) {
-                final String currencyCode = i.next();
+                final String toSymbol = i.next();
                 // Skip extras field
-                if (!"extras".equals(currencyCode)) {
-                    final String rateStr = json.optString(currencyCode, null);
+                if (!"extras".equals(toSymbol)) {
+                    final String rateStr = json.optString(toSymbol, null);
                     if (rateStr != null) {
                         try {
                             BigDecimal rateRaw = new BigDecimal(rateStr);
                             if (rateRaw.signum() > 0) {
-                                if (isLocalToCrypto) type = CoinID.typeFromSymbol(currencyCode);
+                                if (isLocalToCrypto) type = CoinID.typeFromSymbol(toSymbol);
                                 Coin rateCoin = type.getOneCoin();
                                 BigDecimal rateUnit = rateRaw.movePointRight(Fiat.SMALLEST_UNIT_EXPONENT);
 
@@ -358,15 +369,14 @@ public class ExchangeRatesProvider extends ContentProvider {
                                     rateCoin = rateCoin.multiply(10);
                                 }
 
-                                String localSymbol = isLocalToCrypto ? symbol : currencyCode;
+                                String localSymbol = isLocalToCrypto ? fromSymbol : toSymbol;
                                 final Fiat rateLocal = Fiat.valueOf(localSymbol, rateUnit.longValue());
 
-                                rates.put(currencyCode, new ExchangeRate(
-                                        new org.bitcoinj.utils.ExchangeRate(rateCoin, rateLocal),
-                                        COINOMI_SOURCE));
+                                org.bitcoinj.utils.ExchangeRate rate = new org.bitcoinj.utils.ExchangeRate(rateCoin, rateLocal);
+                                rates.put(toSymbol, new ExchangeRate(rate, toSymbol, type, COINOMI_SOURCE));
                             }
                         } catch (final Exception x) {
-                            log.info("ignoring {}/{}: {}", currencyCode, symbol, x.getMessage());
+                            log.info("ignoring {}/{}: {}", toSymbol, fromSymbol, x.getMessage());
                         }
                     }
                 }

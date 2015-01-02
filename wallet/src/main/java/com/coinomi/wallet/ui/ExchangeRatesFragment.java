@@ -18,7 +18,6 @@ package com.coinomi.wallet.ui;
  */
 
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -26,7 +25,6 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
@@ -34,16 +32,10 @@ import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.ResourceCursorAdapter;
-import android.view.ActionMode;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.SearchView;
-import android.widget.SearchView.OnQueryTextListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -59,14 +51,8 @@ import com.coinomi.wallet.ui.widget.CurrencyTextView;
 import com.coinomi.wallet.util.WalletUtils;
 
 import org.bitcoinj.core.Coin;
-import org.bitcoinj.core.Wallet.BalanceType;
-
-import java.util.Currency;
-import java.util.Locale;
 
 import javax.annotation.CheckForNull;
-
-import static com.coinomi.wallet.Constants.DEFAULT_EXCHANGE_CURRENCY;
 
 
 /**
@@ -116,7 +102,7 @@ public final class ExchangeRatesFragment extends ListFragment implements OnShare
         contentUri = ExchangeRatesProvider.contentUriToLocal(activity.getPackageName(),
                 type.getSymbol(), false);
 
-        defaultCurrency = config.getExchangeCurrencyCode(true);
+        defaultCurrency = config.getExchangeCurrencyCode();
         config.registerOnSharedPreferenceChangeListener(this);
 
         adapter = new ExchangeRatesAdapter(activity);
@@ -204,7 +190,7 @@ public final class ExchangeRatesFragment extends ListFragment implements OnShare
         final Cursor cursor = (Cursor) adapter.getItem(position);
         final ExchangeRate exchangeRate = ExchangeRatesProvider.getExchangeRate(cursor);
 
-        defaultCurrency = exchangeRate.getCurrencyCode();
+        defaultCurrency = exchangeRate.currencyCodeId;
         config.setExchangeCurrencyCode(defaultCurrency);
         updateView();
 
@@ -261,7 +247,7 @@ public final class ExchangeRatesFragment extends ListFragment implements OnShare
         }
 
         private int findCurrencyCode(final Cursor cursor, final String currencyCode) {
-            final int currencyCodeColumn = cursor.getColumnIndexOrThrow(ExchangeRatesProvider.KEY_CURRENCY_CODE);
+            final int currencyCodeColumn = cursor.getColumnIndexOrThrow(ExchangeRatesProvider.KEY_CURRENCY_ID);
 
             cursor.moveToPosition(-1);
             while (cursor.moveToNext()) {
@@ -325,7 +311,7 @@ public final class ExchangeRatesFragment extends ListFragment implements OnShare
         @Override
         public void bindView(final View view, final Context context, final Cursor cursor) {
             final ExchangeRate exchangeRate = ExchangeRatesProvider.getExchangeRate(cursor);
-            final boolean isDefaultCurrency = exchangeRate.getCurrencyCode().equals(defaultCurrency);
+            final boolean isDefaultCurrency = exchangeRate.currencyCodeId.equals(defaultCurrency);
 
             view.setBackgroundResource(isDefaultCurrency ? R.color.bg_list_selected : R.color.bg_list);
 
@@ -333,11 +319,10 @@ public final class ExchangeRatesFragment extends ListFragment implements OnShare
 //            defaultView.setVisibility(isDefaultCurrency ? View.VISIBLE : View.INVISIBLE);
 
             final TextView currencyCodeView = (TextView) view.findViewById(R.id.exchange_rate_row_currency_code);
-            String code = exchangeRate.getCurrencyCode();
-            currencyCodeView.setText(code);
+            currencyCodeView.setText(exchangeRate.currencyCodeId);
 
             final TextView currencyNameView = (TextView) view.findViewById(R.id.exchange_rate_row_currency_name);
-            String currencyName = WalletUtils.getCurrencyName(code);
+            String currencyName = WalletUtils.getCurrencyName(exchangeRate.currencyCodeId);
             if (currencyName != null) {
                 currencyNameView.setText(currencyName);
                 currencyNameView.setVisibility(View.VISIBLE);

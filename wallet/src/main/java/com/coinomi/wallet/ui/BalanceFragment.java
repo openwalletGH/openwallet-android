@@ -35,7 +35,6 @@ import com.coinomi.wallet.ui.widget.Amount;
 import com.coinomi.wallet.ExchangeRatesProvider;
 import com.coinomi.wallet.ExchangeRatesProvider.ExchangeRate;
 import com.coinomi.wallet.util.ThrottlingWalletChangeListener;
-import com.coinomi.wallet.util.WalletUtils;
 import com.google.common.collect.Lists;
 
 import org.bitcoinj.core.Coin;
@@ -48,11 +47,9 @@ import org.slf4j.LoggerFactory;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.RejectedExecutionException;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -446,7 +443,7 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
     private final LoaderCallbacks<Cursor> rateLoaderCallbacks = new LoaderManager.LoaderCallbacks<Cursor>() {
         @Override
         public Loader<Cursor> onCreateLoader(final int id, final Bundle args) {
-            String localSymbol = config.getExchangeCurrencyCode(true);
+            String localSymbol = config.getExchangeCurrencyCode();
             String coinSymbol = type.getSymbol();
             return new ExchangeRateLoader(getActivity(), config, localSymbol, coinSymbol);
         }

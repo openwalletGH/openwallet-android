@@ -2,10 +2,8 @@ package com.coinomi.wallet.ui;
 
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -14,7 +12,6 @@ import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.wallet.Wallet;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
-import com.coinomi.wallet.WalletApplication;
 
 import org.spongycastle.crypto.params.KeyParameter;
 

@@ -133,7 +133,7 @@
     <string name="password_add_coin">You are about to create a %1$s pocket in your wallet.</string>
     <string name="adding_coin">Please wait while creating a new pocket for %1$s</string>
     <string name="add_coin_error">Error adding %1$s: %2$s</string>
-    <string name="add_coin_accounts_error">Accounts are not yet supported.</string>
+    <string name="add_coin_accounts_error">Coin already added. Additional accounts are not yet supported.</string>
 
     <!-- Transaction amount visualizer -->
     <string name="internal_transfer">Internal transfer</string>

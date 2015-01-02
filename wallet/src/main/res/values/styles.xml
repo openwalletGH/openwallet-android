@@ -133,7 +133,6 @@
     </style>
     <style name="ExchangeRowAmount" parent="Amount">
         <item name="android:textSize">@dimen/exchange_row_text_size_amount</item>
-        <item name="android:textStyle">bold</item>
     </style>
 
 </resources>

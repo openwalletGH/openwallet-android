@@ -57,7 +57,8 @@ public class Constants {
 
     /** Default currency to use if all default mechanisms fail. */
     public static final String DEFAULT_EXCHANGE_CURRENCY = "USD";
-    public static final MonetaryFormat LOCAL_CURRENCY_FORMAT = new MonetaryFormat().noCode().minDecimals(2).optionalDecimals(2);
+    public static final MonetaryFormat LOCAL_CURRENCY_FORMAT =
+            new MonetaryFormat().noCode().minDecimals(2).optionalDecimals(2).postfixCode();
 
     public static final Charset UTF_8 = Charset.forName("UTF-8");
     public static final Charset US_ASCII = Charset.forName("US-ASCII");
@@ -115,8 +116,8 @@ public class Constants {
     public static final List<CoinType> DEFAULT_COINS = ImmutableList.of((CoinType)BitcoinMain.get());
     public static final List<CoinType> SUPPORTED_COINS = ImmutableList.of(
             BitcoinMain.get(), DogecoinMain.get(),
-            NuBitsMain.get(), LitecoinMain.get(),
-            NuSharesMain.get(), PeercoinMain.get(),
+            LitecoinMain.get(), NuBitsMain.get(),
+            PeercoinMain.get(), NuSharesMain.get(),
             DarkcoinMain.get(), BlackcoinMain.get(),
             ReddcoinMain.get());
 }

@@ -53,6 +53,6 @@ public class NavDrawerItem extends LinearLayout implements Checkable {
 
     @Override
     public void toggle() {
-        setSelected(!isChecked);
+        setChecked(!isChecked);
     }
 }

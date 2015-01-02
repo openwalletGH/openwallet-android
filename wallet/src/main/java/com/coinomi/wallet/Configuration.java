@@ -100,6 +100,7 @@ public class Configuration {
      * Returns the user selected currency. If defaultFallback is set to true it return a default
      * currency is no user selected setting found.
      */
+    @Nullable
     public String getExchangeCurrencyCode(boolean useDefaultFallback) {
         String defaultCode = null;
         if (useDefaultFallback) {
@@ -110,11 +111,10 @@ public class Configuration {
     }
 
     /**
-     * Returns the user selected currency or null otherwise
+     * Returns the user selected currency or if not set the default
      */
-    @Nullable
     public String getExchangeCurrencyCode() {
-        return getExchangeCurrencyCode(false);
+        return getExchangeCurrencyCode(true);
     }
 
     public void setExchangeCurrencyCode(final String exchangeCurrencyCode) {

@@ -62,11 +62,11 @@ public class Amount extends LinearLayout {
         }
     }
 
-    public void setAmount(String amount) {
+    public void setAmount(CharSequence amount) {
         amountView.setText(amount);
     }
 
-    public void setSymbol(String symbol) {
+    public void setSymbol(CharSequence symbol) {
         symbolView.setText(symbol);
     }
 
