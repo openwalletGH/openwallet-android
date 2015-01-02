@@ -35,6 +35,7 @@ import com.coinomi.wallet.ExchangeRatesProvider;
 import com.coinomi.wallet.ExchangeRatesProvider.ExchangeRate;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.ui.widget.AmountEditView;
+import com.coinomi.wallet.util.ThrottlingWalletChangeListener;
 
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.AddressFormatException;
@@ -42,6 +43,7 @@ import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.InsufficientMoneyException;
 import org.bitcoinj.core.Wallet;
 import org.bitcoinj.crypto.KeyCrypterException;
+import org.bitcoinj.utils.Threading;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,9 +123,16 @@ public class SendFragment extends Fragment {
         if (activity != null) {
             pocket = activity.getWalletApplication().getWalletPocket(type);
         }
+        updateBalance();
         setHasOptionsMenu(true);
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
+    }
+
+    private void updateBalance() {
+        if (pocket != null) {
+            lastBalance = pocket.getBalance(false);
+        }
     }
 
     @Override
@@ -193,13 +202,16 @@ public class SendFragment extends Fragment {
 
         loaderManager.initLoader(ID_RATE_LOADER, null, rateLoaderCallbacks);
 
-        if (pocket != null) lastBalance = pocket.getBalance(false);
+        if (pocket != null) pocket.addEventListener(transactionChangeListener, Threading.SAME_THREAD);
 
         updateView();
     }
 
     @Override
     public void onPause() {
+        if (pocket != null) pocket.removeEventListener(transactionChangeListener);
+        transactionChangeListener.removeCallbacks();
+
         loaderManager.destroyLoader(ID_RATE_LOADER);
 
         amountCalculatorLink.setListener(null);
@@ -462,9 +474,9 @@ public class SendFragment extends Fragment {
     }
 
     private void setAmountForEmptyWallet() {
-        if (state != State.INPUT || pocket == null) return;
+        updateBalance();
+        if (state != State.INPUT || pocket == null || lastBalance == null) return;
 
-        lastBalance = pocket.getBalance(false);
         if (lastBalance.isZero()) {
             Toast.makeText(getActivity(), R.string.amount_error_not_enough_money,
                     Toast.LENGTH_LONG).show();
@@ -578,4 +590,12 @@ public class SendFragment extends Fragment {
         public void onLoaderReset(final Loader<Cursor> loader) {
         }
     };
+
+    private final ThrottlingWalletChangeListener transactionChangeListener = new ThrottlingWalletChangeListener() {
+        @Override
+        public void onThrottledWalletChanged() {
+            updateBalance();
+        }
+    };
+
 }
