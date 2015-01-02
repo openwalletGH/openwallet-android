@@ -64,6 +64,17 @@ For now test it manually by installing it `adb install -r wallet/wallet-release.
 
 ## Version history
 
+New in version 1.5.2
+- Added exchange rates for various national currencies
+- Blackcoin support
+- Implemented multiple coin selection on creation or restoring wallet
+- Improved automatic connectivity management with faster reconnects and detection of network change. Added feature to disconnect when the app is in background and idle for 30 minutes.
+- Fix issue when restoring a wallet the previous wallet could reappear
+- General usability and bug fixes
+
+New in version 1.5.1
+- Added beta support for Blackcoin
+
 New in version 1.5.0
 - The supported coins are now Bitcoin, Litecoin, Dogecoin, Peercoin, Darkcoin, Reddcoin, NuBits and NuShares. All will work without changing your seed!
 - Cleaner interface and bug fixes.
