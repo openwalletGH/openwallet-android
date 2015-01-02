@@ -137,7 +137,8 @@ public class AmountEditView extends RelativeLayout {
             symbol.setVisibility(GONE);
         }
 
-        final Spannable hintSpannable = new MonetarySpannable(hintFormat, hint != null ? hint : Coin.ZERO);
+        final Spannable hintSpannable = new MonetarySpannable(hintFormat, amountSigned,
+                hint != null ? hint : Coin.ZERO, type);
         textView.setHint(hintSpannable);
     }
 
