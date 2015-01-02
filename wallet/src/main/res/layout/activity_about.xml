@@ -2,36 +2,82 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fillViewport="true">
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:padding="@dimen/activity_margin">
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:paddingStart="@dimen/activity_horizontal_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingEnd="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin">
 
-        <TextView
-            style="@style/AppNameLong"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/activity_vertical_margin"
-            android:text="@string/app_name_long" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/about_version"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="@style/NormalText"
-            tools:text="X.Y.Z" />
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/coinomi_logo_gradient"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true" />
+
+            <TextView
+                style="@style/AppNameLong"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/app_name_long"
+                android:id="@+id/textView"
+                android:layout_marginTop="172dp"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true" />
+
+            <TextView
+                android:id="@+id/about_version"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/NormalText"
+                tools:text="X.Y.Z"
+                android:layout_below="@+id/textView"
+                android:layout_alignLeft="@+id/textView"
+                android:layout_alignStart="@+id/textView" />
+        </RelativeLayout>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="@style/NormalText"
             android:autoLink="web"
-            android:paddingTop="24dp"
+            android:paddingTop="14dp"
             android:text="@string/about_licence" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="16dp">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="10dp"
+                android:layout_marginRight="10dp"
+                android:src="@drawable/nubits"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/NormalText"
+                android:autoLink="web"
+                android:text="@string/about_credits_nubits" />
+        </LinearLayout>
 
         <TextView
             android:layout_width="wrap_content"
@@ -77,8 +123,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
+            android:layout_marginBottom="16dp"
             android:src="@drawable/coins_network"
             android:layout_gravity="center_horizontal" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/NormalText"
+            android:layout_gravity="center_horizontal"
+            android:paddingTop="16dp"
+            android:text="@string/about_coinomi_copyright" />
 
     </LinearLayout>
 </ScrollView>

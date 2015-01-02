@@ -20,6 +20,9 @@ public class AboutActivity extends AbstractWalletActionBarActivity {
 
         setContentView(R.layout.activity_about);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(false);
+
         TextView version = (TextView) findViewById(R.id.about_version);
         if (getWalletApplication().packageInfo() != null) {
             version.setText(getWalletApplication().packageInfo().versionName);

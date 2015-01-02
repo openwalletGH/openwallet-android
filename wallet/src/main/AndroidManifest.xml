@@ -92,7 +92,9 @@
             android:windowSoftInputMode="stateAlwaysHidden" />
         <activity
             android:name="com.coinomi.wallet.ui.AboutActivity"
-            android:label="@string/title_activity_about" >
+            android:label="@string/title_activity_about"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppThemeCustomActionBar" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.coinomi.wallet.ui.WalletActivity" />
