@@ -2,7 +2,6 @@ package com.coinomi.wallet.ui;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -21,8 +20,8 @@ import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.service.CoinService;
 import com.coinomi.wallet.service.CoinServiceImpl;
+import com.coinomi.wallet.util.Keyboard;
 
-import org.bitcoinj.core.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +34,7 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
     private static final Logger log = LoggerFactory.getLogger(WalletActivity.class);
 
     private static final int RECEIVE = 0;
-    private static final int INFO = 1;
+    private static final int BALANCE = 1;
     private static final int SEND = 2;
 
     private static final int REQUEST_CODE_SCAN = 0;
@@ -85,6 +84,16 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
         // Set OffscreenPageLimit to 2 because receive fragment draws a QR code and we don't
         // want to re-render that if we go to the SendFragment and back
         mViewPager.setOffscreenPageLimit(2);
+        mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override public void onPageScrolled(int pos, float posOffset, int posOffsetPixels) { }
+
+            @Override
+            public void onPageSelected(int position) {
+                if (position == BALANCE) Keyboard.hideKeyboard(WalletActivity.this);
+            }
+
+            @Override public void onPageScrollStateChanged(int state) {}
+        });
 
         // Get the last used wallet pocket and select it
         CoinType lastPocket = getWalletApplication().getConfiguration().getLastPocket();
@@ -126,7 +135,7 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
             coinIconRes = Constants.COINS_ICONS.get(coinType);
             AppSectionsPagerAdapter adapter = new AppSectionsPagerAdapter(this, coinType);
             mViewPager.setAdapter(adapter);
-            mViewPager.setCurrentItem(INFO);
+            mViewPager.setCurrentItem(BALANCE);
             mViewPager.getAdapter().notifyDataSetChanged();
             getWalletApplication().getConfiguration().touchLastPocket(coinType);
             connectCoinService();
@@ -271,6 +280,16 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
         startActivity(new Intent(this, IntroActivity.class));
     }
 
+    @Override
+    public void onBackPressed() {
+        // If not in balance screen, back button brings us there
+        if (mViewPager != null && mViewPager.getCurrentItem() != BALANCE) {
+            mViewPager.setCurrentItem(BALANCE);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
     private static class AppSectionsPagerAdapter extends FragmentStatePagerAdapter {
 
         private final CoinType type;
@@ -294,7 +313,7 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
                 case SEND:
                     if (send == null) send = SendFragment.newInstance(type);
                     return send;
-                case INFO:
+                case BALANCE:
                 default:
                     if (balance == null) balance = BalanceFragment.newInstance(type);
                     return balance;
@@ -313,7 +332,7 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
                     return walletActivity.getString(R.string.wallet_title_request);
                 case SEND:
                     return walletActivity.getString(R.string.wallet_title_send);
-                case INFO:
+                case BALANCE:
                 default:
                     return walletActivity.getString(R.string.wallet_title_balance);
             }
