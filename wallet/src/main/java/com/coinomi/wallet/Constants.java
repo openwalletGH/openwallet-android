@@ -79,7 +79,7 @@ public class Constants {
             new CoinAddress(ReddcoinMain.get(), new ServerAddress("rdd-cce-1.coinomi.net", 5014), new ServerAddress("rdd-cce-2.coinomi.net", 5014)),
             new CoinAddress(NuSharesMain.get(), new ServerAddress("nsr-cce-1.coinomi.net", 5011), new ServerAddress("nsr-cce-2.coinomi.net", 5011)),
             new CoinAddress(NuBitsMain.get(), new ServerAddress("nbt-cce-1.coinomi.net", 5012), new ServerAddress("nbt-cce-2.coinomi.net", 5012)),
-            new CoinAddress(BlackcoinMain.get(), new ServerAddress("bc-cce-1.coinomi.net", 5015), new ServerAddress("bc-cce-2.coinomi.net", 5015)),
+            new CoinAddress(BlackcoinMain.get(), new ServerAddress("blk-cce-1.coinomi.net", 5015), new ServerAddress("blk-cce-2.coinomi.net", 5015)),
 //            new CoinAddress(NamecoinMain.get(), new ServerAddress("54.237.39.245", 5016)),
             new CoinAddress(DarkcoinMain.get(), new ServerAddress("drk-cce-1.coinomi.net", 5013), new ServerAddress("drk-cce-2.coinomi.net", 5013))
     );
