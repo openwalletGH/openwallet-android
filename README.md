@@ -64,6 +64,9 @@ For now test it manually by installing it `adb install -r wallet/wallet-release.
 
 ## Version history
 
+New in version 1.5.3
+- Changed Blackcoin code from BC to BLK
+
 New in version 1.5.2
 - Added exchange rates for various national currencies
 - Blackcoin support
