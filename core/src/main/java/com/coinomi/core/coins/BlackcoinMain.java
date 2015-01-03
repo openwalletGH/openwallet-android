@@ -15,7 +15,7 @@ public class BlackcoinMain extends CoinType {
         spendableCoinbaseDepth = 500;
 
         name = "Blackcoin";
-        symbol = "BC";
+        symbol = "BLK";
         uriScheme = "blackcoin";
         bip44Index = 10;
         unitExponent = 8;
