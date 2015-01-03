@@ -53,7 +53,7 @@ public class Constants {
 
     public static final int HTTP_TIMEOUT_MS = 15 * (int) DateUtils.SECOND_IN_MILLIS;
 
-    public static final long RATE_UPDATE_FREQ_MS = 10 * DateUtils.MINUTE_IN_MILLIS;
+    public static final long RATE_UPDATE_FREQ_MS = 1 * DateUtils.MINUTE_IN_MILLIS;
 
     /** Default currency to use if all default mechanisms fail. */
     public static final String DEFAULT_EXCHANGE_CURRENCY = "USD";
