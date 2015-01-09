@@ -9,8 +9,8 @@ public class DarkcoinTest extends CoinType {
     private DarkcoinTest() {
         id = "darkcoin.test";
 
-        addressHeader = 111;
-        p2shHeader = 196;
+        addressHeader = 139;
+        p2shHeader = 19;
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 100;
 

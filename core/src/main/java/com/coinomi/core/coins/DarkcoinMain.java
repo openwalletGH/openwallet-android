@@ -10,7 +10,7 @@ public class DarkcoinMain extends CoinType {
         id = "darkcoin.main";
 
         addressHeader = 76;
-        p2shHeader = 5;
+        p2shHeader = 16;
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 100;
 
