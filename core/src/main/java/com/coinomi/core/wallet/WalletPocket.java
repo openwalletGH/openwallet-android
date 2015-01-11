@@ -546,7 +546,7 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
 //                }
 
                 if (toMe) {
-                    value = value.add(tx.getValueSentToMe(this));
+                    value = value.add(tx.getValueSentToMe(this, false));
                 } else {
                     value = value.add(tx.getValue(this));
                 }
