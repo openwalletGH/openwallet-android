@@ -259,6 +259,9 @@ public class SendFragment extends Fragment {
         address = null;
         sendAmount = null;
         state = State.INPUT;
+        addressError.setVisibility(View.GONE);
+        amountError.setVisibility(View.GONE);
+        amountWarning.setVisibility(View.GONE);
         updateView();
     }
 
@@ -321,7 +324,7 @@ public class SendFragment extends Fragment {
             @Override
             public void run() {
                 sendToAddressView.setText(address.toString());
-                amountCalculatorLink.setCoinAmount(amount);
+                if (amount != null) amountCalculatorLink.setCoinAmount(amount);
                 validateEverything();
                 requestFocusFirst();
             }
@@ -595,6 +598,7 @@ public class SendFragment extends Fragment {
         @Override
         public void onThrottledWalletChanged() {
             updateBalance();
+            validateAmount();
         }
     };
 
