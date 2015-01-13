@@ -23,5 +23,5 @@ public interface TransactionEventListener {
 
     void onTransactionBroadcast(Transaction transaction);
 
-    void onTransactionBroadcastError(Transaction tx, Throwable throwable);
+    void onTransactionBroadcastError(Transaction tx);
 }

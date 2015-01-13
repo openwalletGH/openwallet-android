@@ -14,6 +14,10 @@ public interface WalletPocketEventListener {
 
     void onTransactionConfidenceChanged(WalletPocket pocket, Transaction tx);
 
+    void onTransactionBroadcastFailure(WalletPocket pocket, Transaction tx);
+
+    void onTransactionBroadcastSuccess(WalletPocket pocket, Transaction tx);
+
     void onPocketChanged(final WalletPocket pocket);
 
     void onConnectivityStatus(final WalletPocketConnectivity pocketConnectivity);

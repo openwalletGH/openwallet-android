@@ -203,6 +203,7 @@ public class SendFragment extends Fragment {
         loaderManager.initLoader(ID_RATE_LOADER, null, rateLoaderCallbacks);
 
         if (pocket != null) pocket.addEventListener(transactionChangeListener, Threading.SAME_THREAD);
+        updateBalance();
 
         updateView();
     }
@@ -289,8 +290,7 @@ public class SendFragment extends Fragment {
                 Exception error = (Exception) intent.getSerializableExtra(Constants.ARG_ERROR);
 
                 if (error == null) {
-                    // TODO confirm transaction broadcast via wallet pocket
-                    Toast.makeText(getActivity(), R.string.sent_msg, Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), R.string.sending_msg, Toast.LENGTH_SHORT).show();
                 } else {
                     if (error instanceof InsufficientMoneyException) {
                         Toast.makeText(getActivity(), R.string.amount_error_not_enough_money, Toast.LENGTH_LONG).show();

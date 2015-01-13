@@ -582,10 +582,6 @@ final public class Wallet {
     }
 
     public void broadcastTx(SendRequest request) throws IOException{
-        broadcastTx(request.type, request.tx, null);
-    }
-
-    private void broadcastTx(CoinType type, Transaction tx, TransactionEventListener listener) throws IOException {
-        getPocket(type).broadcastTx(tx, listener);
+        getPocket(request.type).broadcastTx(request.tx);
     }
 }

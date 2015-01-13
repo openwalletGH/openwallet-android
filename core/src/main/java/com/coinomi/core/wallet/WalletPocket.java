@@ -237,6 +237,31 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
         }
     }
 
+    /**
+     * Just adds the transaction to a pool without doing anything else
+     * @param pool
+     * @param tx
+     */
+    private void simpleAddTransaction(Pool pool, Transaction tx) {
+        transactions.put(tx.getHash(), tx);
+        switch (pool) {
+            case UNSPENT:
+                checkState(unspent.put(tx.getHash(), tx) == null);
+                break;
+            case SPENT:
+                checkState(spent.put(tx.getHash(), tx) == null);
+                break;
+            case PENDING:
+                checkState(pending.put(tx.getHash(), tx) == null);
+                break;
+            case DEAD:
+                checkState(dead.put(tx.getHash(), tx) == null);
+                break;
+            default:
+                throw new RuntimeException("Unknown wallet transaction type " + pool);
+        }
+    }
+
     private static void addWalletTransactionsToSet(Set<WalletTransaction> txs,
                                                    Pool poolType, Collection<Transaction> pool) {
         for (Transaction tx : pool) {
@@ -296,23 +321,7 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
                 }
             }
 
-            transactions.put(tx.getHash(), tx);
-            switch (pool) {
-                case UNSPENT:
-                    checkState(unspent.put(tx.getHash(), tx) == null);
-                    break;
-                case SPENT:
-                    checkState(spent.put(tx.getHash(), tx) == null);
-                    break;
-                case PENDING:
-                    checkState(pending.put(tx.getHash(), tx) == null);
-                    break;
-                case DEAD:
-                    checkState(dead.put(tx.getHash(), tx) == null);
-                    break;
-                default:
-                    throw new RuntimeException("Unknown wallet transaction type " + pool);
-            }
+            simpleAddTransaction(pool, tx);
 
             markNotOwnOutputs(tx);
             connectTransaction(tx);
@@ -571,12 +580,12 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
         broadcastTx(tx, this);
     }
 
-    public void broadcastTx(Transaction tx, TransactionEventListener listener) throws IOException {
+    private void broadcastTx(Transaction tx, TransactionEventListener listener) throws IOException {
         if (isConnected()) {
             if (log.isInfoEnabled()) {
                 log.info("Broadcasting tx {}", Utils.HEX.encode(tx.bitcoinSerialize()));
             }
-            blockchainConnection.broadcastTx(tx, listener);
+            blockchainConnection.broadcastTx(tx, listener != null ? listener : this);
         } else {
             throw new IOException("No connection available");
         }
@@ -968,8 +977,13 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
         if (tx.getConfidence().getConfidenceType() != ConfidenceType.BUILDING) return;
         // Connect to other transactions in the wallet pocket
         if (log.isInfoEnabled()) log.info("Connecting inputs of tx {}", tx.getHash());
+        int txiIndex = 0;
         for (TransactionInput txi : tx.getInputs()) {
-            if (txi.getConnectedOutput() != null) continue; // skip connected inputs
+            if (txi.getConnectedOutput() != null) {
+                log.info("skipping an already connected txi {}", txi);
+                txiIndex++;
+                continue; // skip connected inputs
+            }
             Sha256Hash outputHash = txi.getOutpoint().getHash();
             Transaction fromTx = transactions.get(outputHash);
             if (fromTx != null) {
@@ -983,7 +997,11 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
                         log.warn("Already spent {}, forcing unspent and retry", out);
                         out.markAsUnspent();
                     } else {
-                        log.info("Txi connected to {}:{}", fromTx.getHash(), txi.getOutpoint().getIndex());
+                        if (log.isInfoEnabled()) {
+                            log.info("Connected {}:{} to {}:{}", fromTx.getHash(),
+                                    txi.getOutpoint().getIndex(), tx.getHashAsString(), txiIndex);
+
+                        }
                         break; // No errors, break the loop
                     }
                 }
@@ -991,9 +1009,10 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
                 maybeMovePool(fromTx);
             }
             else {
-                log.info("No output found for input {}:{}", txi.getParentTransaction().getHash(),
-                        txi.getOutpoint().getIndex());
+                log.info("No output found for input {}:{}", tx.getHashAsString(),
+                        txiIndex);
             }
+            txiIndex++;
         }
         maybeMovePool(tx);
     }
@@ -1102,15 +1121,16 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
         try {
             log.info("Transaction sent {}", tx);
             //FIXME, when enabled it breaks the transactions connections and we get an incorrect coin balance
-//            addNewTransactionIfNeeded(tx);
+            addNewTransactionIfNeeded(tx);
         } finally {
             lock.unlock();
         }
+        queueOnTransactionBroadcastSuccess(tx);
     }
 
     @Override
-    public void onTransactionBroadcastError(Transaction tx, Throwable throwable) {
-        log.error("Error broadcasting transaction {}", tx.getHash(), throwable);
+    public void onTransactionBroadcastError(Transaction tx) {
+        queueOnTransactionBroadcastFailure(tx);
     }
 
     @Override
@@ -1222,6 +1242,28 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
         }
     }
 
+    private void queueOnTransactionBroadcastSuccess(final Transaction tx) {
+        for (final ListenerRegistration<WalletPocketEventListener> registration : listeners) {
+            registration.executor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    registration.listener.onTransactionBroadcastSuccess(WalletPocket.this, tx);
+                }
+            });
+        }
+    }
+
+    private void queueOnTransactionBroadcastFailure(final Transaction tx) {
+        for (final ListenerRegistration<WalletPocketEventListener> registration : listeners) {
+            registration.executor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    registration.listener.onTransactionBroadcastFailure(WalletPocket.this, tx);
+                }
+            });
+        }
+    }
+
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //
     // Serialization support
@@ -1258,8 +1300,18 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
     }
 
     public void restoreWalletTransactions(ArrayList<WalletTransaction> wtxs) {
-        for (WalletTransaction wtx : wtxs) {
-            addWalletTransaction(wtx.getPool(), wtx.getTransaction(), false);
+        // FIXME There is a very rare bug that doesn't properly persist tx connections, so do a sanity check by reconnecting transactions
+        lock.lock();
+        try {
+            for (WalletTransaction wtx : wtxs) {
+                simpleAddTransaction(wtx.getPool(), wtx.getTransaction());
+                markNotOwnOutputs(wtx.getTransaction());
+            }
+            for (Transaction utx : getTransactions(false)) {
+                connectTransaction(utx);
+            }
+        } finally {
+            lock.unlock();
         }
     }
 

@@ -65,6 +65,7 @@
     <string name="get_tx_info_error">Could not get transaction information</string>
     <string name="disconnected_label">No connection</string>
     <string name="no_wallet_pocket_selected">No wallet pocket selected</string>
+    <string name="get_tx_broadcast_error">Error broadcasting transaction</string>
 
     <!-- Receive fragment -->
     <string name="receive_address_label">my address</string>
@@ -116,7 +117,8 @@
     <string name="preparing_transaction">Please wait while your transaction is being prepared and sent.</string>
     <string name="no_such_pocket_error">Error occurred while accessing this wallet pocket. If problem persists, try to restore the wallet from seed.</string>
     <string name="password_failed">The password entered is not valid.</string>
-    <string name="sent_msg">Sent! Please wait for confirmation.</string>
+    <string name="sending_msg">Sending&#8230;</string>
+    <string name="sent_msg">Sent! Please wait for a confirmation.</string>
 
     <!-- About Activity -->
     <string name="title_activity_about">About Coinomi</string>

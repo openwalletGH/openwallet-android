@@ -3,6 +3,8 @@ package com.coinomi.wallet.ui;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -16,12 +18,14 @@ import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.uri.CoinURI;
 import com.coinomi.core.uri.CoinURIParseException;
+import com.coinomi.core.wallet.WalletPocket;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.service.CoinService;
 import com.coinomi.wallet.service.CoinServiceImpl;
 import com.coinomi.wallet.util.Keyboard;
 
+import org.bitcoinj.core.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +43,9 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
 
     private static final int REQUEST_CODE_SCAN = 0;
     private static final int ADD_COIN = 1;
+
+    private static final int TX_BROADCAST_OK = 0;
+    private static final int TX_BROADCAST_ERROR = 1;
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -58,6 +65,24 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
     private ViewPager mViewPager;
     private CoinType currentType;
     private Intent connectCoinIntent;
+
+    Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case TX_BROADCAST_OK:
+                    Toast.makeText(WalletActivity.this, getString(R.string.sent_msg),
+                            Toast.LENGTH_LONG).show();
+                    goToBalance();
+                    break;
+                case TX_BROADCAST_ERROR:
+                    Toast.makeText(WalletActivity.this, getString(R.string.get_tx_broadcast_error),
+                            Toast.LENGTH_LONG).show();
+                    goToBalance();
+                    break;
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,6 +139,16 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
     @Override
     public void onLocalAmountClick() {
         startExchangeRates();
+    }
+
+    @Override
+    public void onTransactionBroadcastSuccess(WalletPocket pocket, Transaction transaction) {
+        handler.sendMessage(handler.obtainMessage(TX_BROADCAST_OK, transaction));
+    }
+
+    @Override
+    public void onTransactionBroadcastFailure(WalletPocket pocket, Transaction transaction) {
+        handler.sendMessage(handler.obtainMessage(TX_BROADCAST_ERROR, transaction));
     }
 
     @Override
@@ -198,9 +233,14 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
         mNavigationDrawerFragment.selectItem(coinUri.getType());
         if (mViewPager != null) {
             mViewPager.setCurrentItem(SEND);
-            AppSectionsPagerAdapter adapter = (AppSectionsPagerAdapter) mViewPager.getAdapter();
-            SendFragment send = (SendFragment) adapter.getItem(SEND);
-            send.updateStateFrom(coinUri.getAddress(), coinUri.getAmount(), coinUri.getLabel());
+
+            for (Fragment fragment : getSupportFragmentManager().getFragments()) {
+                if (fragment instanceof SendFragment) {
+                    ((SendFragment) fragment)
+                            .updateStateFrom(coinUri.getAddress(), coinUri.getAmount(), coinUri.getLabel());
+                    break;
+                }
+            }
         }
     }
 
@@ -283,11 +323,18 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
     @Override
     public void onBackPressed() {
         // If not in balance screen, back button brings us there
-        if (mViewPager != null && mViewPager.getCurrentItem() != BALANCE) {
-            mViewPager.setCurrentItem(BALANCE);
-        } else {
+        boolean screenChanged = goToBalance();
+        if (!screenChanged) {
             super.onBackPressed();
         }
+    }
+
+    private boolean goToBalance() {
+        if (mViewPager != null && mViewPager.getCurrentItem() != BALANCE) {
+            mViewPager.setCurrentItem(BALANCE);
+            return true;
+        }
+        return false;
     }
 
     private static class AppSectionsPagerAdapter extends FragmentStatePagerAdapter {

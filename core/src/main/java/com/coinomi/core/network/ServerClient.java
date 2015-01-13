@@ -506,7 +506,7 @@ public class ServerClient implements BlockchainConnection {
             @Override
             public void onFailure(Throwable t) {
                 log.error("Could not get reply for blockchain.transaction.broadcast", t);
-                if (listener != null) listener.onTransactionBroadcastError(tx, t);
+                if (listener != null) listener.onTransactionBroadcastError(tx);
             }
         }, Threading.USER_THREAD);
     }

@@ -127,4 +127,10 @@ public abstract class ThrottlingWalletChangeListener implements WalletPocketEven
 
     @Override
     public void onConnectivityStatus(WalletPocketConnectivity pocketConnectivity) { /* ignore */ }
+
+    @Override
+    public void onTransactionBroadcastFailure(WalletPocket pocket, Transaction tx) { /* ignore */ }
+
+    @Override
+    public void onTransactionBroadcastSuccess(WalletPocket pocket, Transaction tx) { /* ignore */ }
 }
