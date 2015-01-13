@@ -64,6 +64,11 @@ For now test it manually by installing it `adb install -r wallet/wallet-release.
 
 ## Version history
 
+New in version 1.5.4
+- Improved transaction broadcasting and send validation logic
+- Fix issue where the balance was incorrectly calculated in some cases
+- Updated Darkcoin p2sh address versions
+
 New in version 1.5.3
 - Changed Blackcoin code from BC to BLK
 
