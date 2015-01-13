@@ -14,6 +14,7 @@ import com.coinomi.wallet.R;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.TransactionOutput;
+import org.bitcoinj.utils.ExchangeRate;
 
 import static com.coinomi.core.Preconditions.checkState;
 
@@ -25,6 +26,9 @@ public class TransactionAmountVisualizer extends LinearLayout {
 
     private final SendOutput output;
     private final SendOutput fee;
+    private Coin outputAmount;
+    private Coin feeAmount;
+    private boolean isSending;
 
     public TransactionAmountVisualizer(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -37,13 +41,12 @@ public class TransactionAmountVisualizer extends LinearLayout {
         fee.setVisibility(View.GONE);
     }
 
-
     public void setTransaction(WalletPocket pocket, Transaction tx) {
         CoinType type = pocket.getCoinType();
         String symbol = type.getSymbol();
 
         final Coin value = tx.getValue(pocket);
-        final boolean isSending = value.signum() < 0;
+        isSending = value.signum() < 0;
         // if sending and all the outputs point inside the current pocket. If received
         boolean isInternalTransfer = isSending;
         output.setVisibility(View.VISIBLE);
@@ -56,9 +59,11 @@ public class TransactionAmountVisualizer extends LinearLayout {
             }
 
             // TODO support more than one output
-            output.setAmount(GenericUtils.formatCoinValue(type, txo.getValue()));
+            outputAmount = txo.getValue();
+            output.setAmount(GenericUtils.formatCoinValue(type, outputAmount));
             output.setSymbol(symbol);
             output.setAddress(txo.getScriptPubKey().getToAddress(type).toString());
+            break; // TODO remove when supporting more than one output
         }
 
         if (isInternalTransfer) {
@@ -67,11 +72,27 @@ public class TransactionAmountVisualizer extends LinearLayout {
 
         output.setSending(isSending);
 
-        Coin feeAmount = tx.getFee();
+        feeAmount = tx.getFee();
         if (isSending && feeAmount != null && !feeAmount.isZero()) {
             fee.setVisibility(View.VISIBLE);
-            fee.setAmount(GenericUtils.formatCoinValue(type, tx.getFee()));
+            fee.setAmount(GenericUtils.formatCoinValue(type, feeAmount));
             fee.setSymbol(symbol);
+        }
+    }
+
+    public void setExchangeRate(ExchangeRate rate) {
+        if (outputAmount != null) {
+            String fiatAmount = GenericUtils.formatFiatValue(
+                    rate.coinToFiat(outputAmount));
+            output.setAmountLocal(fiatAmount);
+            output.setSymbolLocal(rate.fiat.currencyCode);
+        }
+
+        if (isSending && feeAmount != null) {
+            String fiatAmount = GenericUtils.formatFiatValue(
+                    rate.coinToFiat(feeAmount));
+            fee.setAmountLocal(fiatAmount);
+            fee.setSymbolLocal(rate.fiat.currencyCode);
         }
     }
 }

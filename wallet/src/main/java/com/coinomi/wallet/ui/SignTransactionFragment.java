@@ -1,9 +1,12 @@
 package com.coinomi.wallet.ui;
 
 import android.app.Activity;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,23 +14,20 @@ import android.widget.EditText;
 
 import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
-import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.SendRequest;
 import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.wallet.WalletPocket;
 import com.coinomi.core.wallet.exceptions.NoSuchPocketException;
+import com.coinomi.wallet.Configuration;
 import com.coinomi.wallet.Constants;
+import com.coinomi.wallet.ExchangeRatesProvider;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
-import com.coinomi.wallet.ui.widget.SendOutput;
 import com.coinomi.wallet.ui.widget.TransactionAmountVisualizer;
 import com.coinomi.wallet.util.Keyboard;
 
 import org.bitcoinj.core.Address;
-import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.Coin;
-import org.bitcoinj.core.InsufficientMoneyException;
-import org.bitcoinj.core.TransactionOutput;
 import org.bitcoinj.crypto.KeyCrypter;
 
 import javax.annotation.Nullable;
@@ -42,15 +42,20 @@ import static com.coinomi.core.Preconditions.checkState;
 public class SignTransactionFragment extends Fragment {
     private static final int PASSWORD_CONFIRMATION = 1;
 
+    // Loader IDs
+    private static final int ID_RATE_LOADER = 0;
+
     @Nullable private String password;
     private SignTransactionActivity mListener;
     private MakeTransactionTask makeTransactionTask;
     private WalletApplication application;
+    private Configuration config;
     private TransactionAmountVisualizer txVisualizer;
     private Address sendToAddress;
     private Coin sentAmount;
     private CoinType type;
     private SendRequest request;
+    private LoaderManager loaderManager;
 
     public static SignTransactionFragment newInstance(Bundle args) {
         SignTransactionFragment fragment = new SignTransactionFragment();
@@ -65,6 +70,7 @@ public class SignTransactionFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         application = mListener.getWalletApplication();
+        config = application.getConfiguration();
         makeTransactionTask = null;
 
         Bundle args = getArguments();
@@ -176,10 +182,23 @@ public class SignTransactionFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        loaderManager.initLoader(ID_RATE_LOADER, null, rateLoaderCallbacks);
+    }
+
+    @Override
+    public void onPause() {
+        loaderManager.destroyLoader(ID_RATE_LOADER);
+        super.onPause();
+    }
+
+    @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
             mListener = (SignTransactionActivity) activity;
+            loaderManager = getLoaderManager();
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement " + SignTransactionActivity.class);
@@ -195,4 +214,26 @@ public class SignTransactionFragment extends Fragment {
     public interface Listener {
         public void onSignResult(@Nullable Exception error);
     }
+
+    private final LoaderManager.LoaderCallbacks<Cursor> rateLoaderCallbacks = new LoaderManager.LoaderCallbacks<Cursor>() {
+        @Override
+        public Loader<Cursor> onCreateLoader(final int id, final Bundle args) {
+            String localSymbol = config.getExchangeCurrencyCode();
+            String coinSymbol = type.getSymbol();
+            return new ExchangeRateLoader(getActivity(), config, localSymbol, coinSymbol);
+        }
+
+        @Override
+        public void onLoadFinished(final Loader<Cursor> loader, final Cursor data) {
+            if (data != null && data.getCount() > 0) {
+                data.moveToFirst();
+                final ExchangeRatesProvider.ExchangeRate exchangeRate = ExchangeRatesProvider.getExchangeRate(data);
+                if (txVisualizer != null) txVisualizer.setExchangeRate(exchangeRate.rate);
+            }
+        }
+
+        @Override
+        public void onLoaderReset(final Loader<Cursor> loader) {
+        }
+    };
 }

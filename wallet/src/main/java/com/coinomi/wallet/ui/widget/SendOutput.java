@@ -22,6 +22,8 @@ public class SendOutput extends LinearLayout {
     private final TextView amount;
     private final TextView symbol;
     private final TextView addressOrLabel;
+    private final TextView amountLocal;
+    private final TextView symbolLocal;
 
     private boolean isAddressLabelExpanded = false;
     private String address;
@@ -36,7 +38,12 @@ public class SendOutput extends LinearLayout {
         sendType = (TextView) findViewById(R.id.send_output_type);
         amount = (TextView) findViewById(R.id.amount);
         symbol = (TextView) findViewById(R.id.symbol);
+        amountLocal = (TextView) findViewById(R.id.local_amount);
+        symbolLocal = (TextView) findViewById(R.id.local_symbol);
         addressOrLabel = (TextView) findViewById(R.id.send_to_address);
+
+        amountLocal.setVisibility(GONE);
+        symbolLocal.setVisibility(GONE);
 
         TypedArray a = context.obtainStyledAttributes(attrs,
                 R.styleable.SendOutput, 0, 0);
@@ -73,6 +80,16 @@ public class SendOutput extends LinearLayout {
 
     public void setSymbol(String symbol) {
         this.symbol.setText(symbol);
+    }
+
+    public void setAmountLocal(String amount) {
+        this.amountLocal.setText(amount);
+        this.amountLocal.setVisibility(VISIBLE);
+    }
+
+    public void setSymbolLocal(String symbol) {
+        this.symbolLocal.setText(symbol);
+        this.symbolLocal.setVisibility(VISIBLE);
     }
 
     public void setAddress(String address) {

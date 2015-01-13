@@ -2,42 +2,74 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content" android:layout_height="wrap_content"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
     android:orientation="vertical">
 
     <LinearLayout
         android:orientation="horizontal"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:baselineAligned="true">
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
 
-        <TextView
-            android:id="@+id/send_output_type"
-            style="@style/SendOutputType"
+            <TextView
+                android:id="@+id/send_output_type"
+                style="@style/SendOutputType"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="4dp"
+                android:layout_marginRight="4dp"
+                tools:text="[->" />
+
+            <TextView
+                android:id="@+id/amount"
+                style="@style/SendOutputAmount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="2dp"
+                android:layout_marginEnd="2dp"
+                tools:text="100.1223" />
+
+            <TextView
+                android:id="@+id/symbol"
+                style="@style/AmountSymbol"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                tools:text="SYMBOL"
+                android:paddingBottom="2dp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginEnd="4dp"
-            android:layout_marginRight="4dp"
-            tools:text="[->" />
+            android:paddingBottom="2dp"
+            android:layout_gravity="bottom">
+            <TextView
+                android:id="@+id/local_amount"
+                style="@style/Amount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="2dp"
+                android:layout_marginEnd="2dp"
+                tools:text="101.12" />
 
-        <TextView
-            android:id="@+id/amount"
-            style="@style/SendOutputAmount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginRight="2dp"
-            android:layout_marginEnd="2dp"
-            tools:text="10" />
-
-        <TextView
-            android:id="@+id/symbol"
-            style="@style/AmountSymbol"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            tools:text="SYMBOL"
-            android:paddingBottom="2dp"/>
+            <TextView
+                android:id="@+id/local_symbol"
+                style="@style/AmountSymbol"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="SYMBOL"
+                 />
+        </LinearLayout>
     </LinearLayout>
 
     <TextView
