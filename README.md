@@ -64,6 +64,10 @@ For now test it manually by installing it `adb install -r wallet/wallet-release.
 
 ## Version history
 
+New in version 1.5.5
+- Revert BTC fees to previous values, as transactions are not included fast enough in the blocks
+- Added local currency values in the sign transaction screen
+
 New in version 1.5.4
 - Improved transaction broadcasting and send validation logic
 - Fix issue where the balance was incorrectly calculated in some cases
