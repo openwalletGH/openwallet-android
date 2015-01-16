@@ -8,6 +8,7 @@ import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.DarkcoinMain;
 import com.coinomi.core.coins.DogecoinMain;
+import com.coinomi.core.coins.FeathercoinMain;
 import com.coinomi.core.coins.LitecoinMain;
 import com.coinomi.core.coins.NamecoinMain;
 import com.coinomi.core.coins.NuBitsMain;
@@ -80,6 +81,7 @@ public class Constants {
             new CoinAddress(NuSharesMain.get(), new ServerAddress("nsr-cce-1.coinomi.net", 5011), new ServerAddress("nsr-cce-2.coinomi.net", 5011)),
             new CoinAddress(NuBitsMain.get(), new ServerAddress("nbt-cce-1.coinomi.net", 5012), new ServerAddress("nbt-cce-2.coinomi.net", 5012)),
             new CoinAddress(BlackcoinMain.get(), new ServerAddress("blk-cce-1.coinomi.net", 5015), new ServerAddress("blk-cce-2.coinomi.net", 5015)),
+            new CoinAddress(FeathercoinMain.get(), new ServerAddress("ftc-cce-1.coinomi.net", 5017), new ServerAddress("ftc-cce-2.coinomi.net", 5017)),
 //            new CoinAddress(NamecoinMain.get(), new ServerAddress("54.237.39.245", 5016)),
             new CoinAddress(DarkcoinMain.get(), new ServerAddress("drk-cce-1.coinomi.net", 5013), new ServerAddress("drk-cce-2.coinomi.net", 5013))
     );
@@ -98,6 +100,7 @@ public class Constants {
         COINS_ICONS.put(CoinID.NUBITS_MAIN.getCoinType(), R.drawable.nubits);
         COINS_ICONS.put(CoinID.BLACKCOIN.getCoinType(), R.drawable.blackcoin);
         COINS_ICONS.put(CoinID.NAMECOIN_MAIN.getCoinType(), R.drawable.namecoin);
+        COINS_ICONS.put(CoinID.FEATHERCOIN_MAIN.getCoinType(), R.drawable.feathercoin);
 
         COINS_BLOCK_EXPLORERS = new HashMap<CoinType, String>();
         COINS_BLOCK_EXPLORERS.put(CoinID.BITCOIN_MAIN.getCoinType(), "https://blockchain.info/tx/%s");
@@ -110,6 +113,7 @@ public class Constants {
         COINS_BLOCK_EXPLORERS.put(CoinID.REDDCOIN_MAIN.getCoinType(), "http://live.reddcoin.com/tx/%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.BLACKCOIN.getCoinType(), "http://www.blackcha.in/tx/%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.NAMECOIN_MAIN.getCoinType(), "https://explorer.namecoin.info/tx/%s");
+        COINS_BLOCK_EXPLORERS.put(CoinID.FEATHERCOIN_MAIN.getCoinType(), "http://explorer.feathercoin.com/tx/%s");
     }
 
     public static final CoinType DEFAULT_COIN = BitcoinMain.get();
@@ -119,5 +123,5 @@ public class Constants {
             LitecoinMain.get(), NuBitsMain.get(),
             PeercoinMain.get(), NuSharesMain.get(),
             DarkcoinMain.get(), BlackcoinMain.get(),
-            ReddcoinMain.get());
+            ReddcoinMain.get(), FeathercoinMain.get());
 }
