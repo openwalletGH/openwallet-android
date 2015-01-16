@@ -29,6 +29,15 @@ Android Studio. It will load for a moment before prompting you to select which d
 it on. Select your device from the list, and hit continue.
 
 
+## Contributions
+
+Your contributions are very welcome, be it translations, extra features or new coins support. Just
+fork this repo and create a pull request with your changes.
+
+For new coins support read this [document](https://gist.github.com/erasmospunk/4dac398935e9dc86eed1).
+Generally you need: Electrum-server support, Coinomi core support and a beautiful vector icon!
+
+
 ## Releasing the app
 
 To release the app follow the steps.
