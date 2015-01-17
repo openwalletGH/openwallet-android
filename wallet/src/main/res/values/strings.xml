@@ -39,7 +39,7 @@
     <string name="restore_wallet">Restore a wallet</string>
 
     <!-- Seed fragment -->
-    <string name="seed_info">This is your <i>recovery seed phrase</i>, from it your wallet is generated. Please write it down on a paper and keep it in a secure place, as you would do with paper money. Anyone with access to it has access to the wallet\'s funds.\nIf you lose your seed, we cannot do anything to recover your wallet.</string>
+    <string name="seed_info">This is your <i>recovery seed phrase</i>, which is used to generate the keys for your wallet. Please write it down on a paper and keep it in a secure place, as you would do with paper money. Anyone with access to it has access to the wallet\'s funds.\nIf you lose your seed, we cannot do anything to recover your wallet.</string>
     <string name="seed_title">your seed</string>
     <string name="sample_seed">deliver broken make enrich core vendor ski help sock spy purse roast token jewel female</string>
     <string name="seed_regenerate_title">touch to generate a new seed</string>
@@ -115,7 +115,7 @@
 
     <!-- SignTransactionFragment -->
     <string name="preparing_transaction">Please wait while your transaction is being prepared and sent.</string>
-    <string name="no_such_pocket_error">Error occurred while accessing this wallet pocket. If problem persists, try to restore the wallet from seed.</string>
+    <string name="no_such_pocket_error">An error occurred while accessing this wallet pocket. If the problem persists try to restore the wallet from the seed.</string>
     <string name="password_failed">The password entered is not valid.</string>
     <string name="sending_msg">Sending&#8230;</string>
     <string name="sent_msg">Sent! Please wait for a confirmation.</string>
