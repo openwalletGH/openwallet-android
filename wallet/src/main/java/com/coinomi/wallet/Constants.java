@@ -97,14 +97,14 @@ public class Constants {
                                                     new ServerAddress("ftc-cce-2.coinomi.net", 5017)),
             new CoinAddress(DarkcoinMain.get(),     new ServerAddress("drk-cce-1.coinomi.net", 5013),
                                                     new ServerAddress("drk-cce-2.coinomi.net", 5013)),
-            new CoinAddress(RubycoinMain.get(),     new ServerAddress("venus.rubycoin.org", 50001),
-                                                    new ServerAddress("mars.rubycoin.org", 50001)),
-            new CoinAddress(UroMain.get(),          new ServerAddress("venus.rubycoin.org", 50002),
-                                                    new ServerAddress("mars.rubycoin.org", 50002)),
-            new CoinAddress(DigitalcoinMain.get(),  new ServerAddress("venus.rubycoin.org", 50004),
-                                                    new ServerAddress("mars.rubycoin.org", 50004)),
-            new CoinAddress(CannacoinMain.get(),    new ServerAddress("venus.rubycoin.org", 50003),
-                                                    new ServerAddress("mars.rubycoin.org", 50003))
+            new CoinAddress(RubycoinMain.get(),     new ServerAddress("venus.rubycoin.org", 5018),
+                                                    new ServerAddress("mars.rubycoin.org", 5018)),
+            new CoinAddress(UroMain.get(),          new ServerAddress("venus.rubycoin.org", 5019),
+                                                    new ServerAddress("mars.rubycoin.org", 5019)),
+            new CoinAddress(DigitalcoinMain.get(),  new ServerAddress("venus.rubycoin.org", 5020),
+                                                    new ServerAddress("mars.rubycoin.org", 5020)),
+            new CoinAddress(CannacoinMain.get(),    new ServerAddress("venus.rubycoin.org", 5021),
+                                                    new ServerAddress("mars.rubycoin.org", 5021))
     );
 
     public static final HashMap<CoinType, Integer> COINS_ICONS;
