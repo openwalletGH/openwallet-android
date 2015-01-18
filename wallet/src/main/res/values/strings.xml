@@ -131,6 +131,7 @@
     <string name="about_credits_zxing">QR-code functionality by ZXing\nhttps://github.com/zxing/zxing</string>
     <string name="about_credits_crypto_icons">Crypto-icons by Chris Shepherd\nhttps://github.com/shphrd/crypto-icons</string>
     <string name="about_credits_font_icons">Font-icons by Daniel Bruce\nhttp://www.entypo.com</string>
+    <string name="about_credits_exchange_rates">Exchange rates provided by\nhttp://www.cryptocoincharts.info/\nhttps://bitcoinaverage.com/</string>
     <string name="about_coinomi_copyright">Coinomi 2014&#8211;2015</string>
 
     <!-- Add Coins -->

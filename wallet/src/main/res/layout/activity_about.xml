@@ -127,6 +127,14 @@
             android:paddingTop="16dp"
             android:text="@string/about_credits_font_icons" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/NormalText"
+            android:autoLink="web"
+            android:paddingTop="16dp"
+            android:text="@string/about_credits_exchange_rates" />
+
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
