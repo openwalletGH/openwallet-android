@@ -32,7 +32,11 @@ public enum CoinID {
     NUBITS_MAIN(NuBitsMain.get()),
     NAMECOIN_MAIN(NamecoinMain.get()),
     FEATHERCOIN_MAIN(FeathercoinMain.get()),
-    BLACKCOIN(BlackcoinMain.get())
+    BLACKCOIN_MAIN(BlackcoinMain.get()),
+    RUBYCOIN_MAIN(RubycoinMain.get()),
+    URO_MAIN(UroMain.get()),
+    DIGITALCOIN_MAIN(DigitalcoinMain.get()),
+    CANNACOIN_MAIN(CannacoinMain.get())
     ;
 
     static {

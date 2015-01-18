@@ -59,6 +59,8 @@ import static org.bitcoinj.params.Networks.Family.BLACKCOIN;
 import static org.bitcoinj.params.Networks.Family.PEERCOIN;
 import static org.bitcoinj.params.Networks.Family.NUBITS;
 import static org.bitcoinj.params.Networks.Family.REDDCOIN;
+import static org.bitcoinj.params.Networks.Family.RUBYCOIN;
+import static org.bitcoinj.params.Networks.Family.CANNACOIN;
 
 /**
  * @author Giannis Dzegoutanis
@@ -117,7 +119,8 @@ public class WalletPocketProtobufSerializer {
                 .setVersion((int) tx.getVersion());
 
         Networks.Family family = Networks.getFamily(tx.getParams());
-        if (Networks.isFamily(tx.getParams(), PEERCOIN, NUBITS, BLACKCOIN, REDDCOIN)) {
+        if (Networks.isFamily(tx.getParams(), PEERCOIN, NUBITS, BLACKCOIN,
+                                              REDDCOIN, RUBYCOIN, CANNACOIN)) {
             txBuilder.setTime((int) tx.getTime());
         }
 
@@ -325,7 +328,8 @@ public class WalletPocketProtobufSerializer {
 
         tx.setVersion(txProto.getVersion());
 
-        if (Networks.isFamily(tx.getParams(), PEERCOIN, NUBITS, BLACKCOIN, REDDCOIN)) {
+        if (Networks.isFamily(tx.getParams(), PEERCOIN, NUBITS, BLACKCOIN,
+                                              REDDCOIN, RUBYCOIN, CANNACOIN)) {
             tx.setTime(txProto.getTime());
         }
 
