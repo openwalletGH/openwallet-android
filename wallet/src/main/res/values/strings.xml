@@ -59,7 +59,7 @@
 
     <!-- Balance fragment -->
     <string name="wallet_transactions_coinbase">mined</string>
-    <string name="history_empty">No coins received so far!\n\nYou can get some by trading for traditional money, selling goods or services or earning by working.</string>
+    <string name="history_empty">No coins received so far!\n\nYou can get some through an exchange, trading, and selling goods or services.</string>
     <string name="sent_to">sent to</string>
     <string name="received_with">received with</string>
     <string name="get_tx_info_error">Could not get transaction information</string>
@@ -118,7 +118,7 @@
     <string name="no_such_pocket_error">An error occurred while accessing this wallet pocket. If the problem persists try to restore the wallet from the recovery phrase.</string>
     <string name="password_failed">The password entered is not valid.</string>
     <string name="sending_msg">Sending&#8230;</string>
-    <string name="sent_msg">Sent! Please wait for a confirmation.</string>
+    <string name="sent_msg">Sent! Please wait for transaction confirmation.</string>
 
     <!-- About Activity -->
     <string name="title_activity_about">About Coinomi</string>
@@ -148,12 +148,12 @@
     <string name="status_label">status</string>
     <string name="date_label">date</string>
     <string name="transaction_id_label">transaction id</string>
-    <string name="view_at_a_blockchain_explorer_link">View at a blockchain explorer</string>
+    <string name="view_at_a_blockchain_explorer_link">View on blockchain explorer</string>
     <plurals name="status_building">
         <item quantity="one">%d confirmation</item>
         <item quantity="other">%d confirmations</item>
     </plurals>
-    <string name="status_pending">Waiting for a confirmation</string>
+    <string name="status_pending">Waiting for transaction confirmation</string>
     <string name="status_unknown">Transaction status unknown</string>
 
     <!-- Exchange Rates -->
