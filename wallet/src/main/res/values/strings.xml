@@ -38,28 +38,28 @@
     <string name="create_wallet">Create a new wallet</string>
     <string name="restore_wallet">Restore a wallet</string>
 
-    <!-- Seed fragment -->
-    <string name="seed_info">This is your <i>recovery seed phrase</i>, which is used to generate the keys for your wallet. Please write it down on a paper and keep it in a secure place, as you would do with paper money. Anyone with access to it has access to the wallet\'s funds.\nIf you lose your seed, we cannot do anything to recover your wallet.</string>
-    <string name="seed_title">your seed</string>
+    <!-- Recovery fragment -->
+    <string name="seed_info">This is your <i>recovery phrase</i>, which is used to generate the keys for your wallet. Please write it down on a paper and keep it in a secure place, as you would do with paper money. Anyone with access to it has access to the wallet\'s funds.\nIf you lose your recovery phrase, your wallet cannot be recovered.</string>
+    <string name="seed_title">your recovery phrase</string>
     <string name="sample_seed">deliver broken make enrich core vendor ski help sock spy purse roast token jewel female</string>
-    <string name="seed_regenerate_title">touch to generate a new seed</string>
-    <string name="backed_up_seed">I have copied and stored my seed in a secure place.</string>
+    <string name="seed_regenerate_title">touch to generate a new recovery phrase</string>
+    <string name="backed_up_seed">I have copied and stored my recovery phrase in a secure place.</string>
 
     <!-- Restore fragment -->
-    <string name="restore_info">Please enter your recovery seed:</string>
-    <string name="restore_seed_protected">My seed is password protected</string>
+    <string name="restore_info">Please enter your recovery phrase:</string>
+    <string name="restore_seed_protected">My recovery phrase is password protected</string>
     <string name="restore_skip_title">Skipping verification</string>
-    <string name="restore_skip_info1">Please make sure that your seed matches the following:</string>
+    <string name="restore_skip_info1">Please make sure that your recovery phrase matches the following:</string>
     <string name="restore_skip_info2">It is recommended not to skip verification, so that any misspellings could be detected.</string>
-    <string name="restore_error_checksum">The seed is not valid. Check if some words are misspelled.</string>
-    <string name="restore_error_words">The seed contains unrecognized words.</string>
-    <string name="restore_error_mismatch">The seed entered does not match your seed.</string>
-    <string name="restore_error">Could not verify your seed. %1$s</string>
+    <string name="restore_error_checksum">Recovery phrase is not valid. Check if some words are misspelled.</string>
+    <string name="restore_error_words">Recovery phrase contains unrecognized words.</string>
+    <string name="restore_error_mismatch">Recovery phrase entered does not match your recovery phrase.</string>
+    <string name="restore_error">Could not verify your recovery phrase. %1$s</string>
     <string name="extra_entropy">Extra entropy</string>
 
     <!-- Balance fragment -->
     <string name="wallet_transactions_coinbase">mined</string>
-    <string name="history_empty">No coins received so far!\n\nYou can get some by trading for traditional money, selling goods or services or earning by working.</string>
+    <string name="history_empty">No coins received so far!\n\nYou can get some through an exchange, trading, and selling goods or services.</string>
     <string name="sent_to">sent to</string>
     <string name="received_with">received with</string>
     <string name="get_tx_info_error">Could not get transaction information</string>
@@ -95,8 +95,8 @@
 
     <!-- Set Password fragment -->
     <string name="set_password_info">Set a password to protect your wallet in everyday use.</string>
-    <string name="set_password_seed_protect">Also protect my seed</string>
-    <string name="set_password_seed_protect_info">The password becomes permanent and it is needed when restoring your wallet with the seed.\nWARNING: If you forget your password it will be impossible to restore your wallet!</string>
+    <string name="set_password_seed_protect">Also protect my recovery phrase</string>
+    <string name="set_password_seed_protect_info">The password becomes permanent and it is needed when restoring your wallet with the recovery phrase.\nWARNING: If you forget your password it will be impossible to restore your wallet!</string>
     <string name="set_password1">Type your password</string>
     <string name="set_password2">Re-type your password</string>
     <string name="password_too_common_error">Password \"%1$s\" is to common to be safely used.</string>
@@ -104,7 +104,7 @@
     <string name="passwords_mismatch">Passwords don\'t match</string>
     <string name="password_error">Could not proceed, password errors detected.</string>
     <string name="password_skip_warn">By not setting a password, your wallet can be accessed without authorization.</string>
-    <string name="password_wallet_recovery">To restore your wallet, please provide the same password you used when created the protected seed.\nIf you enter a different password a new empty wallet will be created.</string>
+    <string name="password_wallet_recovery">To restore your wallet, please provide the same password you used when created the protected recovery phrase.\nIf you enter a different password a new empty wallet will be created.</string>
 
     <!-- FinalizeWalletRestorationFragment -->
     <string name="wallet_restoration">Please wait while your wallet is being restored</string>
@@ -115,10 +115,10 @@
 
     <!-- SignTransactionFragment -->
     <string name="preparing_transaction">Please wait while your transaction is being prepared and sent.</string>
-    <string name="no_such_pocket_error">An error occurred while accessing this wallet pocket. If the problem persists try to restore the wallet from the seed.</string>
+    <string name="no_such_pocket_error">An error occurred while accessing this wallet pocket. If the problem persists try to restore the wallet from the recovery phrase.</string>
     <string name="password_failed">The password entered is not valid.</string>
     <string name="sending_msg">Sending&#8230;</string>
-    <string name="sent_msg">Sent! Please wait for a confirmation.</string>
+    <string name="sent_msg">Sent! Please wait for transaction confirmation.</string>
 
     <!-- About Activity -->
     <string name="title_activity_about">About Coinomi</string>
@@ -148,12 +148,12 @@
     <string name="status_label">status</string>
     <string name="date_label">date</string>
     <string name="transaction_id_label">transaction id</string>
-    <string name="view_at_a_blockchain_explorer_link">View at a blockchain explorer</string>
+    <string name="view_at_a_blockchain_explorer_link">View on blockchain explorer</string>
     <plurals name="status_building">
         <item quantity="one">%d confirmation</item>
         <item quantity="other">%d confirmations</item>
     </plurals>
-    <string name="status_pending">Waiting for a confirmation</string>
+    <string name="status_pending">Waiting for transaction confirmation</string>
     <string name="status_unknown">Transaction status unknown</string>
 
     <!-- Exchange Rates -->

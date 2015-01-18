@@ -1,7 +1,7 @@
 Coinomi Wallet
 ===============
 
-Welcome to the Coinomi Wallet app for Android!
+Our goal is to support every cryptocurrency with an active development team. Store all the best cryptocurrency through a single app, without sacrificing security. Private keys are stored on your own device. Instead of having one backup file for every coin, you get a master key that can be memorized or stored on a piece of paper. Restore all wallets from a single recovery phrase.
 
 TODOs:
 
