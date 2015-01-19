@@ -58,7 +58,9 @@
                     style="@style/SeedText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/sample_seed"
+                    tools:text="@string/sample_seed"
+                    android:gravity="center_horizontal"
+                    android:textIsSelectable="true"
                     android:layout_centerVertical="true"
                     android:layout_centerHorizontal="true" />
 
