@@ -78,6 +78,9 @@ For now test it manually by installing it `adb install -r wallet/wallet-release.
 
 ## Version history
 
+New in version 1.5.6 and 1.5.7
+- Cannacoin, Feathercoin, Digicoin and Rubycoin support
+
 New in version 1.5.5
 - Revert BTC fees to previous values, as transactions are not included fast enough in the blocks
 - Added local currency values in the sign transaction screen
