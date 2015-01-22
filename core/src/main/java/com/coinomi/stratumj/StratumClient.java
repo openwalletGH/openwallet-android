@@ -67,13 +67,14 @@ public class StratumClient extends AbstractExecutionThreadService {
                 try {
                     message = queue.take();
                 } catch (InterruptedException ignored) {
+                    
                 }
 
                 if (message != null) {
                     handle(message);
                 }
             }
-            log.debug("Shut down message handler thread: " + Thread.currentThread().getName());
+            log.debug("Shutdown message handler thread: " + Thread.currentThread().getName());
         }
 
         private void handle(BaseMessage message) {
@@ -84,7 +85,7 @@ public class StratumClient extends AbstractExecutionThreadService {
                     future.set(reply);
                     callers.remove(reply.getId());
                 } else {
-                    log.error("Got reply from server by could find any caller",
+                    log.error("Received reply from server, but could not find caller",
                             new MessageException("Orphaned reply", reply.toString()));
                 }
             } else if (message instanceof CallMessage) {
@@ -106,12 +107,12 @@ public class StratumClient extends AbstractExecutionThreadService {
                         }
                     }
                 } else {
-                    log.error("Got a call from server by could find any subscriber",
+                    log.error("Received call from server, but not could find subscriber",
                             new MessageException("Orphaned call", reply.toString()));
                 }
 
             } else {
-                log.error("Cannot handle message",
+                log.error("Unable to handle message",
                         new MessageException("Unhandled message", message.toString()));
             }
         }
@@ -147,7 +148,7 @@ public class StratumClient extends AbstractExecutionThreadService {
             toServer = new DataOutputStream(socket.getOutputStream());
             fromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         } catch (Exception e) {
-            log.info("Could not create socket for {}", serverAddress);
+            log.info("Unable to create socket for {}", serverAddress);
             triggerShutdown();
         }
     }
@@ -159,14 +160,14 @@ public class StratumClient extends AbstractExecutionThreadService {
             log.info("Shutting down {}", serverAddress);
             if (isConnected()) socket.close();
         } catch (IOException e) {
-            log.error("Failed to close socket", e);
+            log.error("Unable to close socket", e);
         }
         pool.shutdown();
     }
 
     @Override
     protected void run() {
-        log.debug("Start listening to server replies");
+        log.debug("Started listening for server replies");
 
         String serverMessage;
         while (isRunning() && isConnected()) {
@@ -178,13 +179,13 @@ public class StratumClient extends AbstractExecutionThreadService {
                 break;
             }
 
-            if (serverMessage == null) {
+            if(serverMessage == null) {
                 log.info("Server closed communications. Shutting down");
                 triggerShutdown();
                 break;
             }
 
-            log.debug("Got message from server: " + serverMessage);
+            log.debug("Received message from server: " + serverMessage);
 
             BaseMessage reply;
             try {
@@ -201,8 +202,7 @@ public class StratumClient extends AbstractExecutionThreadService {
 //                if (callers.containsKey()) {
 //                    SettableFuture<ResultMessage> future = callers.get();
 //                    future.setException(e);
-//                }
-//                else {
+//                } else {
 //                    log.error("Failed orphaned call", e);
 //                }
             } else {
@@ -224,7 +224,7 @@ public class StratumClient extends AbstractExecutionThreadService {
                         queue.put(reply);
                         added = true;
                     } catch (InterruptedException e) {
-                        log.debug("Interrupted while putting server reply to queue. Retrying...");
+                        log.debug("Interrupted while adding server reply to queue. Retrying...");
                     }
                 }
 
@@ -242,7 +242,9 @@ public class StratumClient extends AbstractExecutionThreadService {
         if (isConnected()) {
             try {
                 socket.close();
-            } catch (IOException ignore) { }
+            } catch (IOException ignore) {
+                
+            }
         }
     }
 
