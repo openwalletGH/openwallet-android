@@ -130,42 +130,6 @@ public class GenericUtils {
                 formatedValue = String.format(Locale.US, "%d.%06d", coins, satoshis / (units / 1000000));
             else
                 formatedValue = String.format(Locale.US, "%d.%08d", coins, satoshis);
-//        } else if (shift == 3) {
-//            if (precision == 2)
-//                longValue = longValue - longValue % 1000 + longValue % 1000 / 500 * 1000;
-//            else if (precision == 4)
-//                longValue = longValue - longValue % 10 + longValue % 10 / 5 * 10;
-//            else if (precision == 5)
-//                ;
-//            else
-//                throw new IllegalArgumentException("cannot handle precision/shift: " + precision + "/" + shift);
-//
-//            final long absValue = Math.abs(longValue);
-//            final long coins = absValue / ONE_MBTC_INT;
-//            final long satoshis = (int) (absValue % ONE_MBTC_INT);
-//
-//            if (satoshis % 1000 == 0)
-//                formatedValue = String.format(Locale.US, "%d.%02d", sign, coins, satoshis / 1000);
-//            else if (satoshis % 10 == 0)
-//                formatedValue = String.format(Locale.US, "%d.%04d", sign, coins, satoshis / 10);
-//            else
-//                formatedValue = String.format(Locale.US, "%d.%05d", sign, coins, satoshis);
-//        } else if (shift == 6) {
-//            if (precision == 0)
-//                longValue = longValue - longValue % 100 + longValue % 100 / 50 * 100;
-//            else if (precision == 2)
-//                ;
-//            else
-//                throw new IllegalArgumentException("cannot handle precision/shift: " + precision + "/" + shift);
-//
-//            final long absValue = Math.abs(longValue);
-//            final long coins = absValue / ONE_UBTC_INT;
-//            final long satoshis = (int) (absValue % ONE_UBTC_INT);
-//
-//            if (satoshis % 100 == 0)
-//                formatedValue = String.format(Locale.US, "%d", sign, coins);
-//            else
-//                formatedValue = String.format(Locale.US, "%d.%02d", sign, coins, satoshis);
         } else {
             throw new IllegalArgumentException("cannot handle shift: " + shift);
         }
