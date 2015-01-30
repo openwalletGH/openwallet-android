@@ -21,9 +21,9 @@ import com.coinomi.wallet.service.CoinServiceImpl;
 import com.coinomi.wallet.util.Fonts;
 import com.coinomi.wallet.util.LinuxSecureRandom;
 
-//import org.acra.ACRA;
-//import org.acra.annotation.ReportsCrashes;
-//import org.acra.sender.HttpSender;
+import org.acra.ACRA;
+import org.acra.annotation.ReportsCrashes;
+import org.acra.sender.HttpSender;
 import org.bitcoinj.crypto.MnemonicCode;
 import org.bitcoinj.store.UnreadableWalletException;
 import org.slf4j.Logger;
@@ -41,11 +41,11 @@ import javax.annotation.Nullable;
  * @author Giannis Dzegoutanis
  * @author Andreas Schildbach
  */
-//@ReportsCrashes(
-//        httpMethod = HttpSender.Method.PUT,
-//        reportType = HttpSender.Type.JSON,
-//        formKey = ""
-//)
+@ReportsCrashes(
+        httpMethod = HttpSender.Method.PUT,
+        reportType = HttpSender.Type.JSON,
+        formKey = ""
+)
 public class WalletApplication extends Application {
     private static HashMap<String, Typeface> typefaces;
     private static String httpUserAgent;
