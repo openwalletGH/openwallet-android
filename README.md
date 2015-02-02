@@ -53,6 +53,7 @@ To release the app follow the steps.
 * in build.gradle the package from "com.coinomi.wallet.dev" to "com.coinomi.wallet"
 * in AndroidManifest.xml the android:icon from "ic_launcher_dev" to "ic_launcher" and com.coinomi.wallet.dev.exchange_rates to com.coinomi.wallet.exchange_rates
 * remove all ic_launcher_dev icons with `rm wallet/src/main/res/drawable*/ic_launcher_dev.png`
+* setup ACRA
 
 2) Then in the Android Studio go to:
 
@@ -77,6 +78,12 @@ For now test it manually by installing it `adb install -r wallet/wallet-release.
 
 
 ## Version history
+
+New in version 1.5.8
+- Added the ability to create new addresses and view the previous ones
+- When creating a new wallet, it is now possible to select the passphrase and copy it
+- Usability fix when setting a password
+- Better bug/crash reporting
 
 New in version 1.5.6 and 1.5.7
 - Cannacoin, Feathercoin, Digitalcoin and Rubycoin support
