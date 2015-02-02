@@ -57,6 +57,14 @@
                     android:padding="@dimen/qr_code_padding" />
             </LinearLayout>
 
+            <TextView
+                android:id="@+id/view_previous_addresses"
+                style="@style/LinkButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/view_previous_addresses"/>
+
         </LinearLayout>
     </ScrollView>
 </FrameLayout>

@@ -49,6 +49,7 @@ public class Constants {
     public static final String ARG_TRANSACTION_ID = "transaction_id";
     public static final String ARG_ERROR = "error";
     public static final String ARG_MESSAGE = "message";
+    public static final String ARG_ADDRESS = "address";
 
     public static final String WALLET_FILENAME_PROTOBUF = "wallet";
     public static final long WALLET_WRITE_DELAY = 3;

@@ -126,6 +126,12 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.coinomi.wallet.ui.WalletActivity" />
         </activity>
+        <activity
+            android:name="com.coinomi.wallet.ui.PreviousAddressesActivity"
+            android:label="@string/title_activity_previous_addresses"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppThemeCustomActionBar" >
+        </activity>
 
         <provider
             android:name="com.coinomi.wallet.ExchangeRatesProvider"

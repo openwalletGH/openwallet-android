@@ -845,10 +845,35 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
     }
 
     /**
+     * Returns keys used on external path. This may be fewer than the number that have been deserialized
+     * or held in memory, because of the lookahead zone.
+     */
+    public ArrayList<DeterministicKey> getIssuedExternalKeys() {
+        lock.lock();
+        try {
+            maybeLookAhead();
+            int treeSize = externalKey.getPath().size();
+            ArrayList<DeterministicKey> issuedKeys = new ArrayList<DeterministicKey>();
+            for (ECKey key : simpleKeyChain.getKeys()) {
+                DeterministicKey detkey = (DeterministicKey) key;
+                DeterministicKey parent = detkey.getParent();
+                if (parent == null) continue;
+                if (detkey.getPath().size() <= treeSize) continue;
+                if (parent.equals(internalKey)) continue;
+                if (parent.equals(externalKey) && detkey.getChildNumber().num() >= issuedExternalKeys) continue;
+                issuedKeys.add(detkey);
+            }
+            return issuedKeys;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
      * Returns number of keys used on external path. This may be fewer than the number that have been deserialized
      * or held in memory, because of the lookahead zone.
      */
-    public int getIssuedExternalKeys() {
+    public int getNumIssuedExternalKeys() {
         lock.lock();
         try {
             return issuedExternalKeys;
@@ -861,7 +886,7 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
      * Returns number of keys used on internal path. This may be fewer than the number that have been deserialized
      * or held in memory, because of the lookahead zone.
      */
-    public int getIssuedInternalKeys() {
+    public int getNumIssuedInternalKeys() {
         lock.lock();
         try {
             return issuedInternalKeys;
@@ -907,6 +932,10 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
             }
         }
         return keys.build();
+    }
+
+    public boolean isExternal(DeterministicKey key) {
+        return key.getParent() != null && key.getParent().equals(externalKey);
     }
 }
 

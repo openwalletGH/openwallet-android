@@ -229,8 +229,8 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
 
     @Override
     public void onDestroyView() {
-        super.onDestroyView();
         pocket.removeEventListener(this);
+        super.onDestroyView();
     }
 
     @Override

@@ -27,6 +27,7 @@ import com.coinomi.core.network.interfaces.BlockchainConnection;
 import com.coinomi.core.network.interfaces.ConnectionEventListener;
 import com.coinomi.core.network.interfaces.TransactionEventListener;
 import com.coinomi.core.protos.Protos;
+import com.coinomi.core.wallet.exceptions.Bip44KeyLookAheadExceededException;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -74,6 +75,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -86,6 +89,9 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.annotation.Nullable;
+
+import static org.bitcoinj.wallet.KeyChain.KeyPurpose.RECEIVE_FUNDS;
+import static org.bitcoinj.wallet.KeyChain.KeyPurpose.CHANGE;
 
 import static com.coinomi.core.Preconditions.checkArgument;
 import static com.coinomi.core.Preconditions.checkNotNull;
@@ -100,6 +106,8 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
     private static final Logger log = LoggerFactory.getLogger(WalletPocket.class);
 
     private final ReentrantLock lock = Threading.lock("WalletPocket");
+
+    private final static int TX_DEPTH_SAVE_THRESHOLD = 4;
 
     private final CoinType coinType;
 
@@ -168,7 +176,6 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
             if (wallet != null) wallet.saveNow();
         }
     };
-    private int TX_DEPTH_SAVE_THRESHOLD = 4;
 
     public WalletPocket(DeterministicKey rootKey, CoinType coinType,
                         @Nullable KeyCrypter keyCrypter, @Nullable KeyParameter key) {
@@ -919,6 +926,7 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
     }
 
     private void markUnspentTXO(AddressStatus status, Map<Sha256Hash, Transaction> txs) {
+        checkState(lock.isHeldByCurrentThread());
         Set<UnspentTx> utxs = status.getUnspentTxs();
         ArrayList<TransactionOutput> unspentOutputs = new ArrayList<TransactionOutput>(utxs.size());
         // Mark unspent outputs
@@ -1966,11 +1974,114 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
 
     /** Returns the address used for change outputs. Note: this will probably go away in future. */
     Address getChangeAddress() {
-        return currentAddress(SimpleHDKeyChain.KeyPurpose.CHANGE);
+        return currentAddress(CHANGE);
     }
 
+    /**
+     * Get current receive address, does not mark it as used
+     */
     public Address getReceiveAddress() {
-        return currentAddress(SimpleHDKeyChain.KeyPurpose.RECEIVE_FUNDS);
+        return currentAddress(RECEIVE_FUNDS);
+    }
+
+    /**
+     * Get a fresh address by marking the current receive address as used. It will throw
+     * {@link Bip44KeyLookAheadExceededException} if we requested too many addresses that
+     * exceed the BIP44 look ahead threshold.
+     */
+    public Address getFreshReceiveAddress() throws Bip44KeyLookAheadExceededException {
+        lock.lock();
+        try {
+            DeterministicKey currentUnusedKey = keys.getCurrentUnusedKey(RECEIVE_FUNDS);
+            int maximumKeyIndex = SimpleHDKeyChain.LOOKAHEAD - 1;
+
+            // If there are used keys
+            if (!addressesStatus.isEmpty()) {
+                int lastUsedKeyIndex = 0;
+                // Find the last used key index
+                for (Map.Entry<Address, String> entry : addressesStatus.entrySet()) {
+                    if (entry.getValue() == null) continue;
+                    DeterministicKey usedKey = keys.findKeyFromPubHash(entry.getKey().getHash160());
+                    if (usedKey != null && keys.isExternal(usedKey) && usedKey.getChildNumber().num() > lastUsedKeyIndex) {
+                        lastUsedKeyIndex = usedKey.getChildNumber().num();
+                    }
+                }
+                maximumKeyIndex = lastUsedKeyIndex + SimpleHDKeyChain.LOOKAHEAD;
+            }
+
+            log.info("Maximum key index for new key is {}", maximumKeyIndex);
+
+            // If we exceeded the BIP44 look ahead threshold
+            if (currentUnusedKey.getChildNumber().num() >= maximumKeyIndex) {
+                throw new Bip44KeyLookAheadExceededException();
+            }
+
+            return keys.getKey(RECEIVE_FUNDS).toAddress(coinType);
+        } finally {
+            lock.unlock();
+            walletSaveNow();
+        }
+    }
+
+    private static final Comparator<DeterministicKey> HD_KEY_COMPARATOR =
+            new Comparator<DeterministicKey>() {
+                @Override
+                public int compare(final DeterministicKey k1, final DeterministicKey k2) {
+                    return Integer.compare(k2.getChildNumber().num(), k1.getChildNumber().num());
+                }
+            };
+
+    /**
+     * Returns the number of issued receiving keys
+     */
+    public int getNumberIssuedReceiveAddresses() {
+        lock.lock();
+        try {
+            return keys.getNumIssuedExternalKeys();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Returns a list of addresses that have been issued.
+     * The list is sorted in descending chronological order: older in the end
+     */
+    public List<Address> getIssuedReceiveAddresses() {
+        lock.lock();
+        try {
+            ArrayList<DeterministicKey> issuedKeys = keys.getIssuedExternalKeys();
+            ArrayList<Address> receiveAddresses = new ArrayList<Address>();
+
+            Collections.sort(issuedKeys, HD_KEY_COMPARATOR);
+
+            for (ECKey key : issuedKeys) {
+                receiveAddresses.add(key.toAddress(coinType));
+            }
+            return receiveAddresses;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Get the currently used receiving and change addresses
+     */
+    public Set<Address> getUsedAddresses() {
+        lock.lock();
+        try {
+            HashSet<Address> usedAddresses = new HashSet<Address>();
+
+            for (Map.Entry<Address, String> entry : addressesStatus.entrySet()) {
+                if (entry.getValue() != null) {
+                    usedAddresses.add(entry.getKey());
+                }
+            }
+
+            return usedAddresses;
+        } finally {
+            lock.unlock();
+        }
     }
 
     @VisibleForTesting Address currentAddress(SimpleHDKeyChain.KeyPurpose purpose) {

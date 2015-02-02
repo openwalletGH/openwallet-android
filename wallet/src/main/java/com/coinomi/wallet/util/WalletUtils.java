@@ -48,16 +48,29 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import static com.coinomi.core.Preconditions.checkState;
+
 /**
  * @author Andreas Schildbach
  */
 public class WalletUtils {
 
     public static long longHash(@Nonnull final Sha256Hash hash) {
-        final byte[] bytes = hash.getBytes();
+        return longHash(hash.getBytes());
+    }
 
-        return (bytes[31] & 0xFFl) | ((bytes[30] & 0xFFl) << 8) | ((bytes[29] & 0xFFl) << 16) | ((bytes[28] & 0xFFl) << 24)
-                | ((bytes[27] & 0xFFl) << 32) | ((bytes[26] & 0xFFl) << 40) | ((bytes[25] & 0xFFl) << 48) | ((bytes[23] & 0xFFl) << 56);
+    public static long longHash(@Nonnull final byte[] bytes) {
+        int len = bytes.length;
+        checkState(len >= 8);
+
+        return   (bytes[len - 1] & 0xFFl) |
+                ((bytes[len - 2] & 0xFFl) << 8) |
+                ((bytes[len - 3] & 0xFFl) << 16) |
+                ((bytes[len - 4] & 0xFFl) << 24) |
+                ((bytes[len - 5] & 0xFFl) << 32) |
+                ((bytes[len - 6] & 0xFFl) << 40) |
+                ((bytes[len - 7] & 0xFFl) << 48) |
+                ((bytes[len - 8] & 0xFFl) << 56);
     }
 
     public static boolean isInternal(@Nonnull final Transaction tx) {

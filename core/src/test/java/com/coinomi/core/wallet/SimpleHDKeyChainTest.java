@@ -98,6 +98,12 @@ public class SimpleHDKeyChainTest {
     }
 
     @Test
+    public void externalKeyCheck() {
+        assertFalse(chain.isExternal(chain.getKey(KeyChain.KeyPurpose.CHANGE)));
+        assertTrue(chain.isExternal(chain.getKey(KeyChain.KeyPurpose.RECEIVE_FUNDS)));
+    }
+
+    @Test
     public void events() throws Exception {
         // Check that we get the right events at the right time.
         final List<List<ECKey>> listenerKeys = Lists.newArrayList();

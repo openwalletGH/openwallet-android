@@ -12,8 +12,10 @@
     <string name="action_restore_wallet">Restore wallet</string>
     <string name="action_refresh_wallet">Refresh</string>
     <string name="action_exchange_rates">Exchange rates</string>
+    <string name="action_new_address">New address</string>
 
     <!-- Errors -->
+    <string name="error_generic">Error occurred while performing action</string>
     <string name="error_could_not_read_wallet">Could not read wallet</string>
 
     <!-- Generic items -->
@@ -69,6 +71,8 @@
 
     <!-- Receive fragment -->
     <string name="receive_address_label">my address</string>
+    <string name="view_previous_addresses">View previous addresses</string>
+    <string name="too_many_unused_addresses">Too many unused addresses, try to use one of the previous addresses before creating a new one.</string>
 
     <!-- Send fragment -->
     <string name="send_coins_fragment_receiving_address_label">Pay to</string>
@@ -166,5 +170,10 @@
 
     <!-- Select Coins -->
     <string name="select_coins">Select the coins you wish to use with your wallet. You can add more later.</string>
+
+    <!-- Previous Addresses -->
+    <string name="title_activity_previous_addresses">Previous addresses</string>
+    <string name="previous_addresses_used">Used address</string>
+    <string name="previous_addresses_unused">Unused address</string>
 
 </resources>

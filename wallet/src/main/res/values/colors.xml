@@ -21,6 +21,9 @@
     <color name="send_color_bg">@color/accent_100</color>
     <color name="receive_color_bg">@color/primary_100</color>
 
+    <color name="address_bg_unused">#FFC3E297</color>
+    <color name="address_bg_used">@color/receive_color_bg</color>
+
     <color name="actionbar_fg">@color/white_almost</color>
     <color name="actionbar_bg">@color/primary_500</color>
 
@@ -36,6 +39,7 @@
     <color name="fg_insignificant">@color/gray_26_hint_text</color>
     <color name="fg_error">#ffff0000</color>
     <color name="fg_warning">#ffff7e1f</color>
+    <color name="fg_ok">#ff6db10c</color>
 
     <!-- background -->
     <color name="bg_bright">#ffffffff</color>
