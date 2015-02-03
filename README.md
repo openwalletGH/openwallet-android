@@ -79,6 +79,9 @@ For now test it manually by installing it `adb install -r wallet/wallet-release.
 
 ## Version history
 
+New in version 1.5.9
+- Ask confirmation before creating a new address
+
 New in version 1.5.8
 - Added the ability to create new addresses and view the previous ones
 - When creating a new wallet, it is now possible to select the passphrase and copy it
