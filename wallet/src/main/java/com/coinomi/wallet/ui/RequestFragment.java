@@ -1,10 +1,14 @@
 package com.coinomi.wallet.ui;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
 import android.view.LayoutInflater;
@@ -179,18 +183,59 @@ public class RequestFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_new_address:
-                try {
-                    pocket.getFreshReceiveAddress();
-                    updateView();
-                } catch (Bip44KeyLookAheadExceededException e) {
-                    Toast.makeText(getActivity(), R.string.too_many_unused_addresses, Toast.LENGTH_LONG).show();
-                }
+//                try {
+//                    pocket.getFreshReceiveAddress();
+//                    updateView();
+//                } catch (Bip44KeyLookAheadExceededException e) {
+//                    Toast.makeText(getActivity(), R.string.too_many_unused_addresses, Toast.LENGTH_LONG).show();
+//                }
+                createNewAddress.show(getFragmentManager(), null);
                 return true;
             default:
                 // Not one of ours. Perform default menu processing
                 return super.onOptionsItemSelected(item);
         }
     }
+
+
+    DialogFragment createNewAddress = new DialogFragment() {
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            if (pocket.canCreateFreshReceiveAddress()) {
+                builder.setMessage(R.string.create_new_address)
+                        .setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                try {
+                                    pocket.getFreshReceiveAddress();
+                                    updateView();
+                                } catch (Bip44KeyLookAheadExceededException e) {
+                                    // Should not happen as we checked if we can create a new address
+                                    Toast.makeText(getActivity(), R.string.too_many_unused_addresses, Toast.LENGTH_LONG).show();
+                                }
+                                dismissAllowingStateLoss();
+                            }
+                        })
+                        .setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dismissAllowingStateLoss();
+                            }
+                        });
+            } else {
+                builder.setMessage(R.string.too_many_unused_addresses)
+                        .setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dismissAllowingStateLoss();
+                            }
+                        });
+            }
+            return builder.create();
+        }
+
+    };
 
     private void updateView() {
         receiveAddress = showAddress != null ? showAddress : pocket.getReceiveAddress();

@@ -1985,11 +1985,9 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
     }
 
     /**
-     * Get a fresh address by marking the current receive address as used. It will throw
-     * {@link Bip44KeyLookAheadExceededException} if we requested too many addresses that
-     * exceed the BIP44 look ahead threshold.
+     * Returns true is it is possible to create new fresh receive addresses, false otherwise
      */
-    public Address getFreshReceiveAddress() throws Bip44KeyLookAheadExceededException {
+    public boolean canCreateFreshReceiveAddress() {
         lock.lock();
         try {
             DeterministicKey currentUnusedKey = keys.getCurrentUnusedKey(RECEIVE_FUNDS);
@@ -2012,7 +2010,21 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
             log.info("Maximum key index for new key is {}", maximumKeyIndex);
 
             // If we exceeded the BIP44 look ahead threshold
-            if (currentUnusedKey.getChildNumber().num() >= maximumKeyIndex) {
+            return currentUnusedKey.getChildNumber().num() < maximumKeyIndex;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Get a fresh address by marking the current receive address as used. It will throw
+     * {@link Bip44KeyLookAheadExceededException} if we requested too many addresses that
+     * exceed the BIP44 look ahead threshold.
+     */
+    public Address getFreshReceiveAddress() throws Bip44KeyLookAheadExceededException {
+        lock.lock();
+        try {
+            if (!canCreateFreshReceiveAddress()) {
                 throw new Bip44KeyLookAheadExceededException();
             }
 

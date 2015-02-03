@@ -102,11 +102,13 @@ public class WalletPocketTest {
 
     @Test
     public void issuedKeysLimit() throws Exception {
+        assertTrue(pocket.canCreateFreshReceiveAddress());
         try {
             for (int i = 0; i < 100; i++) {
                 pocket.getFreshReceiveAddress();
             }
         } catch (Bip44KeyLookAheadExceededException e) {
+            assertFalse(pocket.canCreateFreshReceiveAddress());
             // We haven't used any key so the total must be 20 - 1 (the unused key)
             assertEquals(19, pocket.getNumberIssuedReceiveAddresses());
             assertEquals(19, pocket.getIssuedReceiveAddresses().size());
@@ -114,6 +116,7 @@ public class WalletPocketTest {
 
         pocket.onConnection(getBlockchainConnection(type));
 
+        assertTrue(pocket.canCreateFreshReceiveAddress());
         try {
             for (int i = 0; i < 100; i++) {
                 pocket.getFreshReceiveAddress();
@@ -122,6 +125,7 @@ public class WalletPocketTest {
             try {
                 pocket.getFreshReceiveAddress();
             } catch (Bip44KeyLookAheadExceededException e1) { }
+            assertFalse(pocket.canCreateFreshReceiveAddress());
             // We used 18, so the total must be (20-1)+18=37
             assertEquals(37, pocket.getNumberIssuedReceiveAddresses());
             assertEquals(37, pocket.getIssuedReceiveAddresses().size());
@@ -130,11 +134,13 @@ public class WalletPocketTest {
 
     @Test
     public void issuedKeysLimit2() throws Exception {
+        assertTrue(pocket.canCreateFreshReceiveAddress());
         try {
             for (int i = 0; i < 100; i++) {
                 pocket.getFreshReceiveAddress();
             }
         } catch (Bip44KeyLookAheadExceededException e) {
+            assertFalse(pocket.canCreateFreshReceiveAddress());
             // We haven't used any key so the total must be 20 - 1 (the unused key)
             assertEquals(19, pocket.getNumberIssuedReceiveAddresses());
             assertEquals(19, pocket.getIssuedReceiveAddresses().size());
