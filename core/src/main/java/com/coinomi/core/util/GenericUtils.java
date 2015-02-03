@@ -122,14 +122,20 @@ public class GenericUtils {
             final long coins = absValue / units;
             final int satoshis = (int) (absValue % units);
 
-            if (satoshis % (units / 100) == 0)
-                formatedValue = String.format(Locale.US, "%d.%02d", coins, satoshis / (units / 100));
-            else if (satoshis % (units / 10000) == 0)
-                formatedValue = String.format(Locale.US, "%d.%04d", coins, satoshis / (units / 10000));
-            else if (satoshis % (units / 1000000) == 0)
-                formatedValue = String.format(Locale.US, "%d.%06d", coins, satoshis / (units / 1000000));
-            else
-                formatedValue = String.format(Locale.US, "%d.%08d", coins, satoshis);
+            try {
+                if (satoshis % (units / 100) == 0)
+                    formatedValue = String.format(Locale.US, "%d.%02d", coins, satoshis / (units / 100));
+                else if (satoshis % (units / 10000) == 0)
+                    formatedValue = String.format(Locale.US, "%d.%04d", coins, satoshis / (units / 10000));
+                else if (satoshis % (units / 1000000) == 0)
+                    formatedValue = String.format(Locale.US, "%d.%06d", coins, satoshis / (units / 1000000));
+                else
+                    formatedValue = String.format(Locale.US, "%d.%08d", coins, satoshis);
+            } catch (ArithmeticException e) {
+                String message = String.format("satoshis = %d, units = %d, (units / 10000) = %f",
+                        satoshis, units, (double)units / 10000);
+                throw new RuntimeException(message, e);
+            }
         } else {
             throw new IllegalArgumentException("cannot handle shift: " + shift);
         }
