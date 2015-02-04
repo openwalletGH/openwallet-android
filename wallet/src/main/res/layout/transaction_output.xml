@@ -73,12 +73,19 @@
     </LinearLayout>
 
     <TextView
-        android:id="@+id/send_to_address"
+        android:id="@+id/output_label"
+        style="@style/NormalText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        style="@style/Address"
-        android:ellipsize="end"
         android:paddingTop="4dp"
-        tools:text="nUdHXBSBYQPJREXZMBUdu8ARnWM2mz3XQp" />
+        tools:text="Address label" />
+
+    <TextView
+        android:id="@+id/output_address"
+        style="@style/SmallHelpText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:typeface="monospace"
+        tools:text="nUdHX BSBY QPJR EXZM BUdu 8ARn WM2m z3XQp" />
 
 </LinearLayout>

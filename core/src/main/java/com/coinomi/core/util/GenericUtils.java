@@ -91,14 +91,19 @@ public class GenericUtils {
     }
 
     public static String formatCoinValue(@Nonnull final CoinType type, @Nonnull final Coin value,
-                                     @Nonnull final String plusSign, @Nonnull final String minusSign,
-                                     final int precision, final int shift) {
-        return formatValue(type.getUnitExponent(), value, plusSign, minusSign, precision, shift);
+                                         @Nonnull final String plusSign, @Nonnull final String minusSign,
+                                         final int precision, final int shift) {
+        return formatValue(type.getUnitExponent(), value, plusSign, minusSign, precision, shift, false);
+    }
+
+    public static String formatCoinValue(@Nonnull final CoinType type, @Nonnull final Coin value,
+                                         boolean removeFinalZeroes) {
+        return formatValue(type.getUnitExponent(), value, "", "-", 8, 0, removeFinalZeroes);
     }
 
     private static String formatValue(final long unitExponent, @Nonnull final Monetary value,
                                          @Nonnull final String plusSign, @Nonnull final String minusSign,
-                                         final int precision, final int shift) {
+                                         final int precision, final int shift, boolean removeFinalZeroes) {
         long longValue = value.getValue();
 
         final String sign = value.signum() == -1 ? minusSign : plusSign;
@@ -106,7 +111,7 @@ public class GenericUtils {
         String formatedValue;
 
         if (shift == 0) {
-            long units = (long) Math.pow(10, unitExponent);
+            long units = Math.round(Math.pow(10, unitExponent));
             long precisionUnits = (long) (units / Math.pow(10, precision));
             long roundingPrecisionUnits = precisionUnits / 2;
 
@@ -122,27 +127,38 @@ public class GenericUtils {
             final long coins = absValue / units;
             final int satoshis = (int) (absValue % units);
 
-            try {
-                if (satoshis % (units / 100) == 0)
-                    formatedValue = String.format(Locale.US, "%d.%02d", coins, satoshis / (units / 100));
-                else if (satoshis % (units / 10000) == 0)
-                    formatedValue = String.format(Locale.US, "%d.%04d", coins, satoshis / (units / 10000));
-                else if (satoshis % (units / 1000000) == 0)
-                    formatedValue = String.format(Locale.US, "%d.%06d", coins, satoshis / (units / 1000000));
-                else
-                    formatedValue = String.format(Locale.US, "%d.%08d", coins, satoshis);
-            } catch (ArithmeticException e) {
-                String message = String.format("satoshis = %d, units = %d, (units / 10000) = %f",
-                        satoshis, units, (double)units / 10000);
-                throw new RuntimeException(message, e);
+            if (isShiftPossible(units, satoshis, 100)) {
+                formatedValue = String.format(Locale.US, "%d.%02d",
+                        coins, getShiftedCents(units, satoshis, 100));
+
+            } else if (isShiftPossible(units, satoshis, 10000)) {
+                formatedValue = String.format(Locale.US, "%d.%04d",
+                        coins, getShiftedCents(units, satoshis, 10000));
+
+            } else if (isShiftPossible(units, satoshis, 1000000)) {
+                formatedValue = String.format(Locale.US, "%d.%06d", coins,
+                        getShiftedCents(units, satoshis, 1000000));
+
+            } else {
+                formatedValue = String.format(Locale.US, "%d.%08d", coins, satoshis);
             }
+
         } else {
             throw new IllegalArgumentException("cannot handle shift: " + shift);
         }
 
         // Relax precision if incorrectly shows value as 0.00 but is in reality not zero
         if (formatedValue.equals("0.00") && value.getValue() != 0) {
-            return formatValue(unitExponent, value, plusSign, minusSign, precision + 2, shift);
+            return formatValue(unitExponent, value, plusSign, minusSign, precision + 2, shift, removeFinalZeroes);
+        }
+
+        // Remove final zeroes if requested
+        while (removeFinalZeroes && formatedValue.length() > 0 &&
+                formatedValue.contains(".") && formatedValue.endsWith("0")) {
+            formatedValue = formatedValue.substring(0, formatedValue.length() - 1);
+        }
+        if (removeFinalZeroes && formatedValue.length() > 0 && formatedValue.endsWith(".")) {
+            formatedValue = formatedValue.substring(0, formatedValue.length() - 1);
         }
 
         // Add the sign if needed
@@ -151,8 +167,16 @@ public class GenericUtils {
         return formatedValue;
     }
 
+    private static long getShiftedCents(long units, int satoshis, int centAmount) {
+        return satoshis / (units / centAmount);
+    }
+
+    private static boolean isShiftPossible(long units, int satoshis, int centAmount) {
+        return units / centAmount != 0 && satoshis % (units / centAmount) == 0;
+    }
+
     public static String formatFiatValue(final Fiat value, final int precision, final int shift) {
-        return formatValue(value.smallestUnitExponent(), value, "", "-", precision, shift);
+        return formatValue(value.smallestUnitExponent(), value, "", "-", precision, shift, false);
     }
 
     public static String formatFiatValue(Fiat fiat) {

@@ -30,6 +30,7 @@ import com.coinomi.core.wallet.exceptions.Bip44KeyLookAheadExceededException;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
+import org.bitcoinj.wallet.KeyChain;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.junit.Before;
@@ -89,12 +90,16 @@ public class WalletPocketTest {
         assertEquals(0, pocket.getIssuedReceiveAddresses().size());
         assertEquals(0, pocket.keys.getNumIssuedExternalKeys());
 
-        issuedAddresses.add(0, pocket.getFreshReceiveAddress());
+        issuedAddresses.add(0, pocket.currentAddress(KeyChain.KeyPurpose.RECEIVE_FUNDS));
+        Address freshAddress = pocket.getFreshReceiveAddress();
+        assertEquals(freshAddress, pocket.currentAddress(KeyChain.KeyPurpose.RECEIVE_FUNDS));
         assertEquals(1, pocket.getIssuedReceiveAddresses().size());
         assertEquals(1, pocket.keys.getNumIssuedExternalKeys());
         assertEquals(issuedAddresses, pocket.getIssuedReceiveAddresses());
 
-        issuedAddresses.add(0, pocket.getFreshReceiveAddress());
+        issuedAddresses.add(0, pocket.currentAddress(KeyChain.KeyPurpose.RECEIVE_FUNDS));
+        freshAddress = pocket.getFreshReceiveAddress();
+        assertEquals(freshAddress, pocket.currentAddress(KeyChain.KeyPurpose.RECEIVE_FUNDS));
         assertEquals(2, pocket.getIssuedReceiveAddresses().size());
         assertEquals(2, pocket.keys.getNumIssuedExternalKeys());
         assertEquals(issuedAddresses, pocket.getIssuedReceiveAddresses());

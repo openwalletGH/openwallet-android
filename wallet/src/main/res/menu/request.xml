@@ -3,14 +3,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".SendFragment" >
 
-    <item android:id="@+id/action_new_address"
-        android:title="@string/action_new_address"
-        android:icon="@drawable/plus_menu"
-        app:showAsAction="ifRoom" />
-
     <item android:id="@+id/action_share"
         android:title="@string/action_share"
         app:showAsAction="ifRoom"
         app:actionProviderClass="com.coinomi.wallet.util.ShareActionProvider"
         />
+
+    <item android:id="@+id/action_edit_label"
+        android:title="@string/action_edit_label"
+        android:icon="@drawable/edit_menu"
+        app:showAsAction="ifRoom" />
+
+    <item android:id="@+id/action_new_address"
+        android:title="@string/action_new_address"
+        android:icon="@drawable/plus_menu"
+        app:showAsAction="ifRoom" />
 </menu>

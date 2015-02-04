@@ -1,14 +1,19 @@
 package com.coinomi.wallet.ui;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.CursorAdapter;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -17,8 +22,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.EditText;
+import android.widget.FilterQueryProvider;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,6 +35,7 @@ import com.coinomi.core.uri.CoinURIParseException;
 import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.WalletPocket;
 import com.coinomi.core.wallet.exceptions.NoSuchPocketException;
+import com.coinomi.wallet.AddressBookProvider;
 import com.coinomi.wallet.Configuration;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.ExchangeRatesProvider;
@@ -67,13 +74,17 @@ public class SendFragment extends Fragment {
     private static final int REQUEST_CODE_SCAN = 0;
     private static final int SIGN_TRANSACTION = 1;
 
+    private static final int UPDATE_EXCHANGE_RATE = 0;
+    private static final int UPDATE_WALLET_CHANGE = 1;
+
     // Loader IDs
     private static final int ID_RATE_LOADER = 0;
+    private static final int ID_RECEIVING_ADDRESS_LOADER = 1;
 
     private CoinType type;
-    @Nullable private Coin lastBalance; // TODO setup wallet watcher for the latest balance
-    private Handler handler = new Handler();
-    private EditText sendToAddressView;
+    @Nullable
+    private Coin lastBalance; // TODO setup wallet watcher for the latest balance
+    private AutoCompleteTextView sendToAddressView;
     private TextView addressError;
     private CurrencyCalculatorLink amountCalculatorLink;
     private TextView amountError;
@@ -84,12 +95,27 @@ public class SendFragment extends Fragment {
     private State state = State.INPUT;
     private Address address;
     private Coin sendAmount;
-    @Nullable private WalletActivity activity;
-    @Nullable private WalletPocket pocket;
+    @Nullable
+    private WalletActivity activity;
+    @Nullable
+    private WalletPocket pocket;
     private Configuration config;
     private NavigationDrawerFragment mNavigationDrawerFragment;
     private LoaderManager loaderManager;
+    private ReceivingAddressViewAdapter sendToAddressViewAdapter;
 
+    Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case UPDATE_EXCHANGE_RATE:
+                    onExchangeRateUpdate((org.bitcoinj.utils.ExchangeRate) msg.obj);
+                    break;
+                case UPDATE_WALLET_CHANGE:
+                    onWalletUpdate();
+            }
+        }
+    };
 
     private enum State {
         INPUT, PREPARATION, SENDING, SENT, FAILED
@@ -141,10 +167,11 @@ public class SendFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_send, container, false);
 
-        sendToAddressView = (EditText) view.findViewById(R.id.send_to_address);
+        sendToAddressView = (AutoCompleteTextView) view.findViewById(R.id.send_to_address);
+        sendToAddressViewAdapter = new ReceivingAddressViewAdapter(activity);
+        sendToAddressView.setAdapter(sendToAddressViewAdapter);
         sendToAddressView.setOnFocusChangeListener(receivingAddressListener);
         sendToAddressView.addTextChangedListener(receivingAddressListener);
-
 
         AmountEditView sendCoinAmountView = (AmountEditView) view.findViewById(R.id.send_coin_amount);
         sendCoinAmountView.setCoinType(type);
@@ -201,8 +228,10 @@ public class SendFragment extends Fragment {
         amountCalculatorLink.setListener(amountsListener);
 
         loaderManager.initLoader(ID_RATE_LOADER, null, rateLoaderCallbacks);
+        loaderManager.initLoader(ID_RECEIVING_ADDRESS_LOADER, null, receivingAddressLoaderCallbacks);
 
-        if (pocket != null) pocket.addEventListener(transactionChangeListener, Threading.SAME_THREAD);
+        if (pocket != null)
+            pocket.addEventListener(transactionChangeListener, Threading.SAME_THREAD);
         updateBalance();
 
         updateView();
@@ -213,6 +242,7 @@ public class SendFragment extends Fragment {
         if (pocket != null) pocket.removeEventListener(transactionChangeListener);
         transactionChangeListener.removeCallbacks();
 
+        loaderManager.destroyLoader(ID_RECEIVING_ADDRESS_LOADER);
         loaderManager.destroyLoader(ID_RATE_LOADER);
 
         amountCalculatorLink.setListener(null);
@@ -431,7 +461,8 @@ public class SendFragment extends Fragment {
      * Exception is when the amount is lower than the available balance
      */
     private boolean shouldShowErrors(boolean isTyping, Coin amountParsed) {
-        if (amountParsed != null && lastBalance != null && amountParsed.compareTo(lastBalance) >= 0) return true;
+        if (amountParsed != null && lastBalance != null && amountParsed.compareTo(lastBalance) >= 0)
+            return true;
 
         if (isTyping) return false;
         if (amountCalculatorLink.isEmpty()) return false;
@@ -540,7 +571,6 @@ public class SendFragment extends Fragment {
         }
     }
 
-
     EditViewListener receivingAddressListener = new EditViewListener() {
         @Override
         public void onFocusChange(final View v, final boolean hasFocus) {
@@ -582,24 +612,88 @@ public class SendFragment extends Fragment {
             if (data != null && data.getCount() > 0) {
                 data.moveToFirst();
                 final ExchangeRate exchangeRate = ExchangeRatesProvider.getExchangeRate(data);
-
-                if (state == State.INPUT) {
-                    amountCalculatorLink.setExchangeRate(exchangeRate.rate);
-                }
+                handler.sendMessage(handler.obtainMessage(UPDATE_EXCHANGE_RATE, exchangeRate.rate));
             }
         }
 
         @Override
-        public void onLoaderReset(final Loader<Cursor> loader) {
-        }
+        public void onLoaderReset(final Loader<Cursor> loader) { }
     };
+
+    private void onExchangeRateUpdate(org.bitcoinj.utils.ExchangeRate rate) {
+        if (state == State.INPUT) {
+            amountCalculatorLink.setExchangeRate(rate);
+        }
+    }
+
+    private void onWalletUpdate() {
+        updateBalance();
+        validateAmount();
+    }
 
     private final ThrottlingWalletChangeListener transactionChangeListener = new ThrottlingWalletChangeListener() {
         @Override
         public void onThrottledWalletChanged() {
-            updateBalance();
-            validateAmount();
+            handler.sendMessage(handler.obtainMessage(UPDATE_WALLET_CHANGE));
         }
     };
 
+    private final LoaderCallbacks<Cursor> receivingAddressLoaderCallbacks = new LoaderManager.LoaderCallbacks<Cursor>() {
+        @Override
+        public Loader<Cursor> onCreateLoader(final int id, final Bundle args) {
+            final String constraint = args != null ? args.getString("constraint") : null;
+            Uri uri = AddressBookProvider.contentUri(activity.getPackageName(), type);
+            return new CursorLoader(activity, uri, null, AddressBookProvider.SELECTION_QUERY,
+                    new String[]{constraint != null ? constraint : ""}, null);
+        }
+
+        @Override
+        public void onLoadFinished(final Loader<Cursor> cursor, final Cursor data) {
+            sendToAddressViewAdapter.swapCursor(data);
+        }
+
+        @Override
+        public void onLoaderReset(final Loader<Cursor> cursor) {
+            sendToAddressViewAdapter.swapCursor(null);
+        }
+    };
+
+    private final class ReceivingAddressViewAdapter extends CursorAdapter implements FilterQueryProvider {
+        public ReceivingAddressViewAdapter(final Context context) {
+            super(context, null, false);
+            setFilterQueryProvider(this);
+        }
+
+        @Override
+        public View newView(final Context context, final Cursor cursor, final ViewGroup parent) {
+            final LayoutInflater inflater = LayoutInflater.from(context);
+            return inflater.inflate(R.layout.address_book_row, parent, false);
+        }
+
+        @Override
+        public void bindView(final View view, final Context context, final Cursor cursor) {
+            final String label = cursor.getString(cursor.getColumnIndexOrThrow(AddressBookProvider.KEY_LABEL));
+            final String address = cursor.getString(cursor.getColumnIndexOrThrow(AddressBookProvider.KEY_ADDRESS));
+
+            final ViewGroup viewGroup = (ViewGroup) view;
+            final TextView labelView = (TextView) viewGroup.findViewById(R.id.address_book_row_label);
+            labelView.setText(label);
+            final TextView addressView = (TextView) viewGroup.findViewById(R.id.address_book_row_address);
+            addressView.setText(GenericUtils.addressSplitToGroupsMultiline(address));
+        }
+
+        @Override
+        public CharSequence convertToString(final Cursor cursor) {
+            return cursor.getString(cursor.getColumnIndexOrThrow(AddressBookProvider.KEY_ADDRESS));
+        }
+
+        @Override
+        public Cursor runQuery(final CharSequence constraint) {
+            final Bundle args = new Bundle();
+            if (constraint != null)
+                args.putString("constraint", constraint.toString());
+            loaderManager.restartLoader(ID_RECEIVING_ADDRESS_LOADER, args, receivingAddressLoaderCallbacks);
+            return getCursor();
+        }
+    }
 }

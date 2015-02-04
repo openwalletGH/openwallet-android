@@ -80,6 +80,15 @@
             android:layout_gravity="start"
             tools:text="Beer with a friend" />
 
+        <TextView
+            android:id="@+id/transaction_row_address"
+            style="@style/SmallHelpText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:typeface="monospace"
+            tools:text="nUdHX BSBY QPJR EXZM BUdu 8ARn WM2m z3XQp" />
+
         <com.coinomi.wallet.ui.widget.CurrencyTextView
             android:id="@+id/transaction_row_value"
             style="@style/TransactionRowAmount"

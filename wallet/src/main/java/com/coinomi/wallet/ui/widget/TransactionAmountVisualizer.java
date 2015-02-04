@@ -1,16 +1,25 @@
 package com.coinomi.wallet.ui.widget;
 
 import android.content.Context;
+import android.database.ContentObserver;
+import android.os.Handler;
+import android.support.v7.view.ActionMode;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.WalletPocket;
+import com.coinomi.wallet.AddressBookProvider;
 import com.coinomi.wallet.R;
+import com.coinomi.wallet.ui.EditAddressBookEntryFragment;
 
+import org.bitcoinj.core.Address;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.TransactionOutput;
@@ -23,12 +32,14 @@ import static com.coinomi.core.Preconditions.checkState;
  */
 public class TransactionAmountVisualizer extends LinearLayout {
 
-
     private final SendOutput output;
     private final SendOutput fee;
     private Coin outputAmount;
     private Coin feeAmount;
     private boolean isSending;
+
+    private String address;
+    private CoinType type;
 
     public TransactionAmountVisualizer(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -42,7 +53,7 @@ public class TransactionAmountVisualizer extends LinearLayout {
     }
 
     public void setTransaction(WalletPocket pocket, Transaction tx) {
-        CoinType type = pocket.getCoinType();
+        type = pocket.getCoinType();
         String symbol = type.getSymbol();
 
         final Coin value = tx.getValue(pocket);
@@ -62,7 +73,9 @@ public class TransactionAmountVisualizer extends LinearLayout {
             outputAmount = txo.getValue();
             output.setAmount(GenericUtils.formatCoinValue(type, outputAmount));
             output.setSymbol(symbol);
-            output.setAddress(txo.getScriptPubKey().getToAddress(type).toString());
+            address = txo.getScriptPubKey().getToAddress(type).toString();
+            output.setLabelAndAddress(
+                    AddressBookProvider.resolveLabel(getContext(), type, address), address);
             break; // TODO remove when supporting more than one output
         }
 
@@ -94,5 +107,10 @@ public class TransactionAmountVisualizer extends LinearLayout {
             fee.setAmountLocal(fiatAmount);
             fee.setSymbolLocal(rate.fiat.currencyCode);
         }
+    }
+
+    public void resetLabels() {
+        output.setLabelAndAddress(
+                AddressBookProvider.resolveLabel(getContext(), type, address), address);
     }
 }

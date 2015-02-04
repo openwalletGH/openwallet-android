@@ -20,6 +20,7 @@ package com.coinomi.wallet.ui;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +29,7 @@ import android.widget.TextView;
 
 import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.WalletPocket;
+import com.coinomi.wallet.AddressBookProvider;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.util.Fonts;
 import com.coinomi.wallet.util.WalletUtils;
@@ -36,8 +38,10 @@ import org.bitcoinj.core.Address;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
@@ -54,6 +58,9 @@ public class AddressesListAdapter extends BaseAdapter {
     private final WalletPocket pocket;
     private final List<Address> addresses = new ArrayList<Address>();
     private final Set<Address> usedAddresses = new HashSet<Address>();
+
+    private final Map<String, String> labelCache = new HashMap<String, String>();
+    private final static Object CACHE_NULL_MARKER = "";
 
     public AddressesListAdapter(final Context context, @Nonnull final WalletPocket walletPocket) {
         this.context = context;
@@ -126,7 +133,19 @@ public class AddressesListAdapter extends BaseAdapter {
 
     public void bindView(@Nonnull final View row, @Nonnull final Address address) {
         TextView addressLabel = (TextView) row.findViewById(R.id.address_row_label);
-        addressLabel.setText(GenericUtils.addressSplitToGroups(address.toString()));
+        TextView addressRaw = (TextView) row.findViewById(R.id.address_row_address);
+
+        String label = resolveLabel(address.toString());
+
+        if (label != null) {
+            addressLabel.setText(label);
+            addressLabel.setTypeface(Typeface.DEFAULT);
+            addressRaw.setText(GenericUtils.addressSplitToGroups(address.toString()));
+        } else {
+            addressLabel.setText(GenericUtils.addressSplitToGroups(address.toString()));
+            addressLabel.setTypeface(Typeface.MONOSPACE);
+            addressRaw.setVisibility(View.GONE);
+        }
 
         TextView addressUsageLabel = (TextView) row.findViewById(R.id.address_row_usage);
         TextView addressUsageFontIcon = (TextView) row.findViewById(R.id.address_row_usage_font_icon);
@@ -138,8 +157,29 @@ public class AddressesListAdapter extends BaseAdapter {
             addressUsageFontIcon.setBackgroundResource(R.drawable.address_row_cyrcle_bg_used);
         } else {
             addressUsageLabel.setText(R.string.previous_addresses_unused);
-            addressUsageFontIcon.setText(R.string.font_icon_checkmark);
+            addressUsageFontIcon.setText(R.string.font_icon_check);
             addressUsageFontIcon.setBackgroundResource(R.drawable.address_row_cyrcle_bg_unused);
         }
+    }
+
+    private String resolveLabel(@Nonnull final String address) {
+        final String cachedLabel = labelCache.get(address);
+        if (cachedLabel == null) {
+            final String label = AddressBookProvider.resolveLabel(context, pocket.getCoinType(), address);
+            if (label != null) {
+                labelCache.put(address, label);
+            } else {
+                labelCache.put(address, (String)CACHE_NULL_MARKER);
+            }
+            return label;
+        } else {
+            return cachedLabel != CACHE_NULL_MARKER ? cachedLabel : null;
+        }
+    }
+
+    public void clearLabelCache() {
+        labelCache.clear();
+
+        notifyDataSetChanged();
     }
 }

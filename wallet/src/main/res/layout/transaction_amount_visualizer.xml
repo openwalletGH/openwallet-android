@@ -10,13 +10,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal|top"
-        android:layout_marginBottom="@dimen/activity_margin" />
+        android:layout_marginBottom="@dimen/standard_margin" />
 
     <com.coinomi.wallet.ui.widget.SendOutput
         android:id="@+id/transaction_fee"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal|top"
-        android:layout_marginBottom="@dimen/activity_margin"
+        android:layout_marginBottom="@dimen/standard_margin"
         coinomi:is_fee="true" />
 </LinearLayout>

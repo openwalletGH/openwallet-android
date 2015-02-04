@@ -71,6 +71,6 @@ public class PreviousAddressesActivity extends AbstractWalletActionBarActivity i
     @Override
     public void onAddressSelected(Bundle args) {
         currentFragment = VIEW_ADDRESS;
-        replaceFragment(RequestFragment.newInstance(args));
+        replaceFragment(AddressRequestFragment.newInstance(args));
     }
 }

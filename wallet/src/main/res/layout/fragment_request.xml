@@ -24,7 +24,7 @@
                 android:layout_gravity="center_horizontal" >
 
                 <TextView
-                    android:id="@+id/receive_address_label"
+                    android:id="@+id/request_address_info"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
@@ -34,27 +34,60 @@
                     android:textColor="@color/gray_54_sec_text_icons" />
 
                 <TextView
-                    android:id="@+id/receive_address"
+                    android:id="@+id/request_address_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/receive_address_label"
-                    style="@style/Address"
+                    android:layout_below="@+id/request_address_info"
+                    style="@style/NormalText"
                     android:textSize="@dimen/receive_address"
-                    tools:text="nUdH XBSB YQPJ REXZM\nBUdu 8ARn WM2m z3XQp" />
+                    tools:text="Fancy address label" />
+
+                <TextView
+                    android:id="@+id/request_address"
+                    style="@style/SmallHelpText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/request_address_label"
+                    android:typeface="monospace"
+                    tools:text="nUdHX BSBY QPJR EXZM BUdu 8ARn WM2m z3XQp" />
             </RelativeLayout>
 
             <LinearLayout
+                android:orientation="vertical"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
+                android:minWidth="500dp"
                 android:layout_gravity="center_horizontal"
-                android:layout_weight="3"
-                android:gravity="center_vertical">
+                android:layout_weight="1"
+                android:gravity="center">
+
                 <ImageView
                     android:id="@+id/qr_code"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     tools:background="@color/gray_87_text"
                     android:padding="@dimen/qr_code_padding" />
+
+                <!-- TODO improve presentation -->
+                <LinearLayout
+                    android:visibility="gone"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/activity_vertical_margin">
+
+                    <com.coinomi.wallet.ui.widget.AmountEditView
+                        android:id="@+id/send_coin_amount"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.5" />
+
+                    <com.coinomi.wallet.ui.widget.AmountEditView
+                        android:id="@+id/send_local_amount"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.5" />
+                </LinearLayout>
             </LinearLayout>
 
             <TextView

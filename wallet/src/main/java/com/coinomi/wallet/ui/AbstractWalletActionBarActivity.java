@@ -10,7 +10,7 @@ import com.coinomi.wallet.service.CoinService;
  */
 abstract public class AbstractWalletActionBarActivity extends ActionBarActivity {
 
-    protected WalletApplication getWalletApplication() {
+    public WalletApplication getWalletApplication() {
         return (WalletApplication) getApplication();
     }
 

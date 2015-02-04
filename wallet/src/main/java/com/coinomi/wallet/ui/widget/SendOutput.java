@@ -17,33 +17,28 @@ import com.coinomi.wallet.util.Fonts;
  * @author John L. Jegutanis
  */
 public class SendOutput extends LinearLayout {
-    private static final int MAX_LINES = 5;
-    private final TextView sendType;
-    private final TextView amount;
-    private final TextView symbol;
-    private final TextView addressOrLabel;
-    private final TextView amountLocal;
-    private final TextView symbolLocal;
+    private TextView sendType;
+    private TextView amount;
+    private TextView symbol;
+    private TextView amountLocal;
+    private TextView symbolLocal;
+    private TextView addressLabelView;
+    private TextView addressView;
 
-    private boolean isAddressLabelExpanded = false;
     private String address;
     private String label;
     private boolean isSending;
 
+    public SendOutput(Context context) {
+        super(context);
+
+        inflateView(context);
+    }
+
     public SendOutput(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        LayoutInflater.from(context).inflate(R.layout.transaction_output, this, true);
-
-        sendType = (TextView) findViewById(R.id.send_output_type);
-        amount = (TextView) findViewById(R.id.amount);
-        symbol = (TextView) findViewById(R.id.symbol);
-        amountLocal = (TextView) findViewById(R.id.local_amount);
-        symbolLocal = (TextView) findViewById(R.id.local_symbol);
-        addressOrLabel = (TextView) findViewById(R.id.send_to_address);
-
-        amountLocal.setVisibility(GONE);
-        symbolLocal.setVisibility(GONE);
+        inflateView(context);
 
         TypedArray a = context.obtainStyledAttributes(attrs,
                 R.styleable.SendOutput, 0, 0);
@@ -52,26 +47,21 @@ public class SendOutput extends LinearLayout {
         } finally {
             a.recycle();
         }
-
-        getRootView().setOnClickListener(getOnClickListener());
     }
 
-    private OnClickListener getOnClickListener() {
-        return new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (isAddressLabelExpanded) {
-                    addressOrLabel.setSingleLine(true);
-                    addressOrLabel.setMaxLines(1);
-                    isAddressLabelExpanded = false;
-                } else {
-                    addressOrLabel.setSingleLine(false);
-                    addressOrLabel.setMaxLines(MAX_LINES);
-                    isAddressLabelExpanded = true;
-                }
-                updateAddressLabel();
-            }
-        };
+    private void inflateView(Context context) {
+        LayoutInflater.from(context).inflate(R.layout.transaction_output, this, true);
+
+        sendType = (TextView) findViewById(R.id.send_output_type);
+        amount = (TextView) findViewById(R.id.amount);
+        symbol = (TextView) findViewById(R.id.symbol);
+        amountLocal = (TextView) findViewById(R.id.local_amount);
+        symbolLocal = (TextView) findViewById(R.id.local_symbol);
+        addressLabelView = (TextView) findViewById(R.id.output_label);
+        addressView = (TextView) findViewById(R.id.output_address);
+
+        amountLocal.setVisibility(GONE);
+        symbolLocal.setVisibility(GONE);
     }
 
     public void setAmount(String amount) {
@@ -93,31 +83,39 @@ public class SendOutput extends LinearLayout {
     }
 
     public void setAddress(String address) {
-        label = null;
         this.address = address;
-        updateAddressLabel();
+        updateView();
     }
 
-    private void updateAddressLabel() {
-        if (address != null) {
-            addressOrLabel.setTypeface(Typeface.MONOSPACE);
-            addressOrLabel.setText(GenericUtils.addressSplitToGroups(address));
-        } else if (label != null) {
-            addressOrLabel.setTypeface(Typeface.DEFAULT);
-            addressOrLabel.setText(label);
+    private void updateView() {
+        if (label != null) {
+            addressLabelView.setText(label);
+            addressLabelView.setTypeface(Typeface.DEFAULT);
+            addressLabelView.setVisibility(View.VISIBLE);
+            if (address != null) {
+                addressView.setText(GenericUtils.addressSplitToGroups(address));
+                addressView.setVisibility(View.VISIBLE);
+            } else {
+                addressView.setVisibility(View.GONE);
+            }
+        } else {
+            addressLabelView.setText(GenericUtils.addressSplitToGroups(address));
+            addressLabelView.setTypeface(Typeface.MONOSPACE);
+            addressLabelView.setVisibility(View.VISIBLE);
+            addressView.setVisibility(View.GONE);
         }
     }
 
     public void setLabel(String label) {
-        address = null;
         this.label = label;
-        updateAddressLabel();
+        updateView();
     }
 
     public void setIsFee(boolean isFee) {
         if (isFee) {
             sendType.setText(R.string.fee);
-            addressOrLabel.setVisibility(GONE);
+            addressLabelView.setVisibility(GONE);
+            addressView.setVisibility(GONE);
         } else {
             if (!sendType.isInEditMode()) { // If not displayed within a developer tool
                 updateIcon();
@@ -137,5 +135,11 @@ public class SendOutput extends LinearLayout {
     public void setSending(boolean isSending) {
         this.isSending = isSending;
         updateIcon();
+    }
+
+    public void setLabelAndAddress(String label, String address) {
+        this.label = label;
+        this.address = address;
+        updateView();
     }
 }

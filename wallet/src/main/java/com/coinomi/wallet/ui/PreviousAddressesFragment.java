@@ -1,6 +1,8 @@
 package com.coinomi.wallet.ui;
 
 import android.app.Activity;
+import android.content.ContentResolver;
+import android.database.ContentObserver;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -15,6 +17,7 @@ import android.widget.Toast;
 import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.wallet.WalletPocket;
+import com.coinomi.wallet.AddressBookProvider;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
@@ -39,6 +42,7 @@ public class PreviousAddressesFragment extends Fragment {
     private CoinType type;
     private WalletPocket pocket;
     private AddressesListAdapter adapter;
+    private ContentResolver resolver;
 
     Handler handler = new Handler() {
         @Override
@@ -47,6 +51,13 @@ public class PreviousAddressesFragment extends Fragment {
                 case UPDATE_VIEW:
                     updateView();
             }
+        }
+    };
+
+    private final ContentObserver addressBookObserver = new ContentObserver(handler) {
+        @Override
+        public void onChange(final boolean selfChange) {
+            adapter.clearLabelCache();
         }
     };
 
@@ -79,10 +90,13 @@ public class PreviousAddressesFragment extends Fragment {
 
         final ListView previousAddresses = (ListView) view.findViewById(R.id.previous_addresses);
 
-        // Set a space in the end of the list
-        View listFooter = new View(getActivity());
-        listFooter.setMinimumHeight(getResources().getDimensionPixelSize(R.dimen.activity_vertical_margin));
-        previousAddresses.addFooterView(listFooter);
+        // Set a space to the beginning and end of the list. If possible find a better way
+        View spacerView = new View(getActivity());
+        spacerView.setMinimumHeight(getResources().getDimensionPixelSize(R.dimen.half_standard_margin));
+        previousAddresses.addHeaderView(spacerView);
+        spacerView = new View(getActivity());
+        spacerView.setMinimumHeight(getResources().getDimensionPixelSize(R.dimen.half_standard_margin));
+        previousAddresses.addFooterView(spacerView);
 
         // Init list adapter
         adapter = new AddressesListAdapter(inflater.getContext(), pocket);
@@ -117,6 +131,20 @@ public class PreviousAddressesFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        resolver.registerContentObserver(AddressBookProvider.contentUri(
+                getActivity().getPackageName(), type), true, addressBookObserver);
+        updateView();
+    }
+
+    @Override
+    public void onPause() {
+        resolver.unregisterContentObserver(addressBookObserver);
+        super.onPause();
+    }
+
+    @Override
     public void onDestroyView() {
         pocket.removeEventListener(walletListener);
         walletListener.removeCallbacks();
@@ -139,6 +167,7 @@ public class PreviousAddressesFragment extends Fragment {
         super.onAttach(activity);
         try {
             listener = (Listener) activity;
+            resolver = activity.getContentResolver();
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement " + PreviousAddressesFragment.Listener.class);

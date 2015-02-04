@@ -341,7 +341,7 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
 
         private final CoinType type;
         private final WalletActivity walletActivity;
-        private RequestFragment request;
+        private AddressRequestFragment request;
         private SendFragment send;
         private BalanceFragment balance;
 
@@ -355,7 +355,7 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
         public Fragment getItem(int i) {
             switch (i) {
                 case RECEIVE:
-                    if (request == null) request = RequestFragment.newInstance(type);
+                    if (request == null) request = AddressRequestFragment.newInstance(type);
                     return request;
                 case SEND:
                     if (send == null) send = SendFragment.newInstance(type);

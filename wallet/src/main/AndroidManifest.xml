@@ -137,6 +137,10 @@
             android:name="com.coinomi.wallet.ExchangeRatesProvider"
             android:authorities="com.coinomi.wallet.dev.exchange_rates"
             android:exported="false" />
+        <provider
+            android:name="com.coinomi.wallet.AddressBookProvider"
+            android:authorities="com.coinomi.wallet.dev.address_book"
+            android:exported="false" />
 
         <service
             android:name="com.coinomi.wallet.service.CoinServiceImpl"

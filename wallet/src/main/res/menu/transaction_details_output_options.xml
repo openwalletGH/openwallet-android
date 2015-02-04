@@ -1,13 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".SendFragment" >
-
-    <item android:id="@+id/action_share"
-        android:title="@string/action_share"
-        app:showAsAction="ifRoom"
-        app:actionProviderClass="com.coinomi.wallet.util.ShareActionProvider"
-        />
+    tools:context=".TransactionDetailsFragment" >
 
     <item android:id="@+id/action_edit_label"
         android:title="@string/action_edit_label"

@@ -39,10 +39,12 @@ import android.widget.TextView;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.WalletPocket;
+import com.coinomi.wallet.AddressBookProvider;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.ui.widget.CurrencyTextView;
 import com.coinomi.wallet.util.Fonts;
 import com.coinomi.wallet.util.WalletUtils;
+
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.Transaction;
@@ -76,7 +78,7 @@ public class TransactionsListAdapter extends BaseAdapter {
     private final String fontIconReceivedWith;
 
     private final Map<String, String> labelCache = new HashMap<String, String>();
-    private final static String CACHE_NULL_MARKER = "";
+    private final static Object CACHE_NULL_MARKER = "";
 
     private static final String CONFIDENCE_SYMBOL_DEAD = "\u271D"; // latin cross
     private static final String CONFIDENCE_SYMBOL_UNKNOWN = "?";
@@ -109,23 +111,20 @@ public class TransactionsListAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
-    public void clear()
-    {
+    public void clear() {
         transactions.clear();
 
         notifyDataSetChanged();
     }
 
-    public void replace(@Nonnull final Transaction tx)
-    {
+    public void replace(@Nonnull final Transaction tx) {
         transactions.clear();
         transactions.add(tx);
 
         notifyDataSetChanged();
     }
 
-    public void replace(@Nonnull final Collection<Transaction> transactions)
-    {
+    public void replace(@Nonnull final Collection<Transaction> transactions) {
         this.transactions.clear();
         this.transactions.addAll(transactions);
 
@@ -135,8 +134,7 @@ public class TransactionsListAdapter extends BaseAdapter {
     }
 
     @Override
-    public boolean isEmpty()
-    {
+    public boolean isEmpty() {
         return showEmptyText && super.isEmpty();
     }
 
@@ -206,6 +204,7 @@ public class TransactionsListAdapter extends BaseAdapter {
         // TODO implement date
 //        final TextView rowDate = (TextView) row.findViewById(R.id.transaction_row_time);
         final TextView rowLabel = (TextView) row.findViewById(R.id.transaction_row_label);
+        final TextView rowAddress = (TextView) row.findViewById(R.id.transaction_row_address);
         final CurrencyTextView rowValue = (CurrencyTextView) row.findViewById(R.id.transaction_row_value);
 
         // confidence
@@ -246,17 +245,17 @@ public class TransactionsListAdapter extends BaseAdapter {
             rowConfirmationsFontIcon.setTextColor(colorLessSignificant);
             switch (confidence.getDepthInBlocks()) {
                 case 0: // No confirmations
-                    rowConfirmationsFontIcon.setText(res.getString(R.string.font_icon_progress_0));
+                    rowConfirmationsFontIcon.setText(res.getString(R.string.font_icon_progress_empty));
                     rowConfirmationsFontIcon.setTextColor(colorInsignificant); // PENDING
                     break;
                 case 1: // 1 out of 3 confirmations
-                    rowConfirmationsFontIcon.setText(res.getString(R.string.font_icon_progress_1));
+                    rowConfirmationsFontIcon.setText(res.getString(R.string.font_icon_progress_one));
                     break;
                 case 2: // 2 out of 3 confirmations
-                    rowConfirmationsFontIcon.setText(res.getString(R.string.font_icon_progress_2));
+                    rowConfirmationsFontIcon.setText(res.getString(R.string.font_icon_progress_two));
                     break;
                 case 3: // 3 out of 3 confirmations
-                    rowConfirmationsFontIcon.setText(res.getString(R.string.font_icon_progress_3));
+                    rowConfirmationsFontIcon.setText(res.getString(R.string.font_icon_progress_full));
                     break;
             }
         } else {
@@ -310,9 +309,19 @@ public class TransactionsListAdapter extends BaseAdapter {
 
         if (label != null) {
             rowLabel.setText(label);
-        } else {
+            if (address != null) {
+                rowAddress.setText(GenericUtils.addressSplitToGroups(address.toString()));
+                rowAddress.setVisibility(View.VISIBLE);
+            } else {
+                rowAddress.setVisibility(View.GONE);
+            }
+        } else if (address != null) {
             rowLabel.setText(GenericUtils.addressSplitToGroups(address.toString()));
+            rowAddress.setVisibility(View.GONE);
+        } else {
+            rowLabel.setText("???"); // should not happen
         }
+        rowAddress.setVisibility(View.GONE);
         rowLabel.setTypeface(label != null ? Typeface.DEFAULT : Typeface.MONOSPACE);
 
         // value
@@ -322,25 +331,21 @@ public class TransactionsListAdapter extends BaseAdapter {
     }
 
     private String resolveLabel(@Nonnull final String address) {
-        return null;
-//        final String cachedLabel = labelCache.get(address);
-//        if (cachedLabel == null)
-//        {
-//            final String label = AddressBookProvider.resolveLabel(context, address);
-//            if (label != null)
-//                labelCache.put(address, label);
-//            else
-//                labelCache.put(address, CACHE_NULL_MARKER);
-//            return label;
-//        }
-//        else
-//        {
-//            return cachedLabel != CACHE_NULL_MARKER ? cachedLabel : null;
-//        }
+        final String cachedLabel = labelCache.get(address);
+        if (cachedLabel == null) {
+            final String label = AddressBookProvider.resolveLabel(context, walletPocket.getCoinType(), address);
+            if (label != null) {
+                labelCache.put(address, label);
+            } else {
+                labelCache.put(address, (String)CACHE_NULL_MARKER);
+            }
+            return label;
+        } else {
+            return cachedLabel != CACHE_NULL_MARKER ? cachedLabel : null;
+        }
     }
 
-    public void clearLabelCache()
-    {
+    public void clearLabelCache() {
         labelCache.clear();
 
         notifyDataSetChanged();

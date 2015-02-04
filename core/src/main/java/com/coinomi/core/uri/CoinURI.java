@@ -394,7 +394,7 @@ public class CoinURI {
         
         if (amount != null) {
             builder.append(QUESTION_MARK_SEPARATOR).append(FIELD_AMOUNT).append("=");
-            builder.append(GenericUtils.formatCoinValue(type, amount));
+            builder.append(GenericUtils.formatCoinValue(type, amount, true));
             questionMarkHasBeenOutput = true;
         }
         

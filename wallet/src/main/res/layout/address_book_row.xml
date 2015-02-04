@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/transaction_row_padding_vertical"
+    android:paddingEnd="@dimen/transaction_row_padding_horizontal"
+    android:paddingLeft="@dimen/transaction_row_padding_horizontal"
+    android:paddingRight="@dimen/transaction_row_padding_horizontal"
+    android:paddingStart="@dimen/transaction_row_padding_horizontal"
+    android:paddingTop="@dimen/transaction_row_padding_vertical">
+
+    <TextView
+        android:id="@+id/address_book_row_label"
+        style="@style/NormalText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="Address label" />
+
+    <TextView
+        android:id="@+id/address_book_row_address"
+        style="@style/SecondaryText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:typeface="monospace"
+        tools:text="nUdHX BSBY QPJR EXZM BUdu 8ARn WM2m z3XQp" />
+
+</LinearLayout>

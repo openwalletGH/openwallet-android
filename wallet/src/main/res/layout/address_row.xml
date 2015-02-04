@@ -4,21 +4,26 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingBottom="@dimen/transaction_row_padding_vertical"
-    android:paddingEnd="@dimen/transaction_row_padding_horizontal"
-    android:paddingLeft="@dimen/transaction_row_padding_horizontal"
-    android:paddingRight="@dimen/transaction_row_padding_horizontal"
-    android:paddingStart="@dimen/transaction_row_padding_horizontal"
-    android:paddingTop="@dimen/transaction_row_padding_vertical">
-
+    android:paddingBottom="@dimen/half_standard_margin"
+    android:paddingEnd="@dimen/activity_horizontal_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingStart="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/half_standard_margin">
 
     <TextView
         android:id="@+id/address_row_label"
         style="@style/NormalText"
-        android:typeface="monospace"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="start"
+        tools:text="Address label" />
+
+    <TextView
+        android:id="@+id/address_row_address"
+        style="@style/SmallHelpText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:typeface="monospace"
         tools:text="nUdHX BSBY QPJR EXZM BUdu 8ARn WM2m z3XQp" />
 
     <LinearLayout

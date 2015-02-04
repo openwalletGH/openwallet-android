@@ -6,6 +6,7 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="action_scan_qr_code">Scan</string>
     <string name="action_share">Share</string>
+    <string name="action_edit_label">Edit label</string>
     <string name="action_empty_wallet">Empty wallet</string>
     <string name="action_settings">Settings</string>
     <string name="action_about">About</string>
@@ -24,6 +25,13 @@
     <string name="button_finish">FINISH</string>
     <string name="button_confirm">CONFIRM</string>
     <string name="button_cancel">CANCEL</string>
+    <string name="button_dismiss">DISMISS</string>
+    <string name="button_delete">DELETE</string>
+    <string name="button_add">ADD</string>
+    <string name="button_save">SAVE</string>
+    <string name="button_set">SET</string>
+    <string name="button_remove">REMOVE</string>
+    <string name="button_edit">EDIT</string>
     <string name="button_send">SEND</string>
     <string name="button_skip">SKIP</string>
     <string name="button_add_coins">+ COINS</string>
@@ -72,11 +80,13 @@
     <!-- Receive fragment -->
     <string name="receive_address_label">my address</string>
     <string name="create_new_address">Create a new address?</string>
+    <string name="create_new_address_name">Name (optional)</string>
     <string name="view_previous_addresses">View previous addresses</string>
     <string name="too_many_unused_addresses">Too many unused addresses, try to use one of the previous addresses before creating a new one.</string>
 
     <!-- Send fragment -->
     <string name="send_coins_fragment_receiving_address_label">Pay to</string>
+    <string name="send_coins_fragment_receiving_address_tip">type name or address</string>
     <string name="send_coins_fragment_receiving_address_error">Invalid Bitcoin Address!</string>
     <string name="send_coins_fragment_amount_label">Amount to pay</string>
     <string name="send_coins_fragment_button_send">Send</string>
@@ -151,6 +161,8 @@
 
     <!-- Transaction Details -->
     <string name="title_activity_transaction_details">Transaction details</string>
+    <string name="sent">sent</string>
+    <string name="received">received</string>
     <string name="status_label">status</string>
     <string name="date_label">date</string>
     <string name="transaction_id_label">transaction id</string>
@@ -173,8 +185,14 @@
     <string name="select_coins">Select the coins you wish to use with your wallet. You can add more later.</string>
 
     <!-- Previous Addresses -->
-    <string name="title_activity_previous_addresses">Previous addresses</string>
+    <string name="title_activity_previous_addresses">My previous addresses</string>
     <string name="previous_addresses_used">Used address</string>
     <string name="previous_addresses_unused">Unused address</string>
+
+    <!-- Edit Address Book Entry -->
+    <string name="edit_address_book_entry_dialog_title_add">Add address</string>
+    <string name="edit_address_book_entry_dialog_title_edit">Edit address</string>
+    <string name="edit_address_book_entry_dialog_address_label">Address</string>
+    <string name="edit_address_book_entry_dialog_label_label">Name</string>
 
 </resources>

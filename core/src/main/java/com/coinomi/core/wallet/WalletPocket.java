@@ -2027,8 +2027,8 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
             if (!canCreateFreshReceiveAddress()) {
                 throw new Bip44KeyLookAheadExceededException();
             }
-
-            return keys.getKey(RECEIVE_FUNDS).toAddress(coinType);
+            keys.getKey(RECEIVE_FUNDS);
+            return currentAddress(RECEIVE_FUNDS);
         } finally {
             lock.unlock();
             walletSaveNow();
@@ -2096,17 +2096,15 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
         }
     }
 
+    /**
+     * Get the currently latest unused address by purpose.
+     */
     @VisibleForTesting Address currentAddress(SimpleHDKeyChain.KeyPurpose purpose) {
         lock.lock();
         try {
-            DeterministicKey key = keys.getCurrentUnusedKey(purpose);
-//            DeterministicKey key = keys.getKey(purpose);
-            log.info("Current address, get key n. {} {}", key.getChildNumber().num(),
-                    key.toAddress(coinType));
-            return key.toAddress(coinType);
+            return keys.getCurrentUnusedKey(purpose).toAddress(coinType);
         } finally {
             lock.unlock();
-
             subscribeIfNeeded();
         }
     }
