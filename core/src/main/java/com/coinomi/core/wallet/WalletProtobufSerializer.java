@@ -23,7 +23,7 @@ import javax.annotation.Nullable;
 import static com.google.common.base.Preconditions.checkState;
 
 /**
- * @author Giannis Dzegoutanis
+ * @author John L. Jegutanis
  */
 public class WalletProtobufSerializer {
 

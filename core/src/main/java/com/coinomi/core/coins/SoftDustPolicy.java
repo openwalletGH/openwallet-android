@@ -1,7 +1,7 @@
 package com.coinomi.core.coins;
 
 /**
- * @author Giannis Dzegoutanis
+ * @author John L. Jegutanis
  */
 public enum SoftDustPolicy {
     // Used by coins like Litecoin and Dogecoin, where if a soft dust TXOs are present, add base fee

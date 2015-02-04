@@ -12,7 +12,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 /**
- * @author Giannis Dzegoutanis
+ * @author John L. Jegutanis
  */
 public class CallMessage extends BaseMessage {
 

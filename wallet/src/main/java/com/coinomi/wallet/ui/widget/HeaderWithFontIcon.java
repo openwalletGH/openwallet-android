@@ -9,7 +9,7 @@ import com.coinomi.wallet.R;
 import com.coinomi.wallet.util.Fonts;
 
 /**
- * @author Giannis Dzegoutanis
+ * @author John L. Jegutanis
  */
 public class HeaderWithFontIcon extends LinearLayout {
     private final TextView fontIconView;

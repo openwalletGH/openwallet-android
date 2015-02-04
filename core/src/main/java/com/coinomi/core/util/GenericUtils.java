@@ -15,7 +15,7 @@ import javax.annotation.Nonnull;
 
 /**
  * @author Andreas Schildbach
- * @author Giannis Dzegoutanis
+ * @author John L. Jegutanis
  */
 public class GenericUtils {
     private static final Pattern charactersO0 = Pattern.compile("[0O]");

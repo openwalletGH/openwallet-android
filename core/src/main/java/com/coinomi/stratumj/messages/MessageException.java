@@ -1,7 +1,7 @@
 package com.coinomi.stratumj.messages;
 
 /**
- * @author Giannis Dzegoutanis
+ * @author John L. Jegutanis
  */
 public class MessageException extends Exception {
     public MessageException(String error, ResultMessage result) {

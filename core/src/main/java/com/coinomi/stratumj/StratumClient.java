@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 
 /**
- * @author Giannis Dzegoutanis
+ * @author John L. Jegutanis
  */
 public class StratumClient extends AbstractExecutionThreadService {
     private static final Logger log = LoggerFactory.getLogger(StratumClient.class);

@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 
 /**
- * @author Giannis Dzegoutanis
+ * @author John L. Jegutanis
  * @author Andreas Schildbach
  */
 public class Configuration {

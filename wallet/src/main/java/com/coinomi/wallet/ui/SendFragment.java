@@ -57,7 +57,7 @@ import static com.coinomi.core.Preconditions.checkNotNull;
  * Fragment that prepares a transaction
  *
  * @author Andreas Schildbach
- * @author Giannis Dzegoutanis
+ * @author John L. Jegutanis
  */
 public class SendFragment extends Fragment {
     private static final Logger log = LoggerFactory.getLogger(SendFragment.class);

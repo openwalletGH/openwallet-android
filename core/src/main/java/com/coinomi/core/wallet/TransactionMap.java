@@ -6,7 +6,7 @@ import org.bitcoinj.core.Transaction;
 import java.util.HashMap;
 
 /**
- * @author Giannis Dzegoutanis
+ * @author John L. Jegutanis
  */
 public class TransactionMap extends HashMap<Sha256Hash, Transaction> {
 

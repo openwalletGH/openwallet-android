@@ -43,7 +43,7 @@ import org.bitcoinj.utils.MonetaryFormat;
 
 /**
  * @author Andreas Schildbach
- * @author Giannis Dzegoutanis
+ * @author John L. Jegutanis
  */
 public final class CurrencyTextView extends TextView {
     private CoinType type = null;

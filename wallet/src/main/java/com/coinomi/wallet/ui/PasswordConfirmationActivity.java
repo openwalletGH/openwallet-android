@@ -11,7 +11,7 @@ import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 
 /**
- * @author Giannis Dzegoutanis
+ * @author John L. Jegutanis
  */
 public class PasswordConfirmationActivity extends AbstractWalletFragmentActivity
         implements PasswordConfirmationFragment.Listener{

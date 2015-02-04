@@ -1,7 +1,7 @@
 package com.coinomi.core.wallet.exceptions;
 
 /**
- * @author Giannis Dzegoutanis
+ * @author John L. Jegutanis
  */
 public class Bip44KeyLookAheadExceededException extends Throwable {
 }

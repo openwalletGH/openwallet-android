@@ -57,7 +57,7 @@ import javax.annotation.CheckForNull;
 
 /**
  * @author Andreas Schildbach
- * @author Giannis Dzegoutanis
+ * @author John L. Jegutanis
  */
 public final class ExchangeRatesFragment extends ListFragment implements OnSharedPreferenceChangeListener {
     private Activity activity;

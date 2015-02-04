@@ -12,7 +12,7 @@ import com.coinomi.wallet.R;
 import javax.annotation.Nullable;
 
 /**
- * @author Giannis Dzegoutanis
+ * @author John L. Jegutanis
  */
 public class Amount extends LinearLayout {
     private final FontFitTextView amountView;

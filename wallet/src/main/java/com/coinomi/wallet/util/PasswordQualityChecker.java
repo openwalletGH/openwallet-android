@@ -13,7 +13,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * @author Giannis Dzegoutanis
+ * @author John L. Jegutanis
  *
  * This class checks the quality of the provided password, for example if it is too common.
  *

@@ -5,7 +5,7 @@ import android.os.Bundle;
 import com.coinomi.wallet.R;
 
 /**
- * @author Giannis Dzegoutanis
+ * @author John L. Jegutanis
  */
 public class ExchangeRatesActivity extends AbstractWalletActionBarActivity {
     @Override

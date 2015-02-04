@@ -7,7 +7,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
 /**
- * @author Giannis Dzegoutanis
+ * @author John L. Jegutanis
  */
 public class Keyboard {
 

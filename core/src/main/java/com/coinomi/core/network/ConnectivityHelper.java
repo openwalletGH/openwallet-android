@@ -1,7 +1,7 @@
 package com.coinomi.core.network;
 
 /**
- * @author Giannis Dzegoutanis
+ * @author John L. Jegutanis
  */
 public interface ConnectivityHelper {
     public boolean isConnected();

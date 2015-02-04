@@ -16,7 +16,7 @@ import com.coinomi.wallet.R;
 import org.bitcoinj.utils.Fiat;
 
 /**
- * @author Giannis Dzegoutanis
+ * @author John L. Jegutanis
  */
 public class CoinListItem extends LinearLayout implements Checkable {
     private final TextView title;

@@ -45,7 +45,7 @@ import static com.coinomi.core.Preconditions.checkState;
 import static com.google.common.util.concurrent.Service.State.NEW;
 
 /**
- * @author Giannis Dzegoutanis
+ * @author John L. Jegutanis
  */
 public class ServerClient implements BlockchainConnection {
     private static final Logger log = LoggerFactory.getLogger(ServerClient.class);

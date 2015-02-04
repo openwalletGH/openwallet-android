@@ -8,7 +8,7 @@ import java.util.List;
 import javax.annotation.CheckForNull;
 
 /**
- * @author Giannis Dzegoutanis
+ * @author John L. Jegutanis
  * @author Andreas Schildbach
  */
 public interface CoinService {

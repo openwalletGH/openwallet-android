@@ -7,7 +7,7 @@ import com.google.common.collect.ImmutableList;
 import java.util.List;
 
 /**
- * @author Giannis Dzegoutanis
+ * @author John L. Jegutanis
  */
 final public class CoinAddress {
     final private CoinType type;

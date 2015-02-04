@@ -12,7 +12,7 @@ import com.coinomi.wallet.ui.widget.NavDrawerItem;
 import javax.annotation.Nonnull;
 
 /**
- * @author Giannis Dzegoutanis
+ * @author John L. Jegutanis
  */
 public class NavDrawerListAdapter extends BaseAdapter {
     private final Context context;

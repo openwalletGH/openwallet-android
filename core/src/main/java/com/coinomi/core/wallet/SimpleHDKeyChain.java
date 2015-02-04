@@ -43,7 +43,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.Lists.newLinkedList;
 
 /**
- * @author Giannis Dzegoutanis
+ * @author John L. Jegutanis
  * @author 2013 The bitcoinj developers.
  */
 

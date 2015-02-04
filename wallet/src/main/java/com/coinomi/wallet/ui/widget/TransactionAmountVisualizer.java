@@ -19,7 +19,7 @@ import org.bitcoinj.utils.ExchangeRate;
 import static com.coinomi.core.Preconditions.checkState;
 
 /**
- * @author Giannis Dzegoutanis
+ * @author John L. Jegutanis
  */
 public class TransactionAmountVisualizer extends LinearLayout {
 

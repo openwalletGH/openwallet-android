@@ -4,7 +4,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 /**
- * @author Giannis Dzegoutanis
+ * @author John L. Jegutanis
  */
 public class ResultMessage extends BaseMessage {
     protected ResultMessage(String source) throws JSONException {

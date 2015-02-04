@@ -14,7 +14,7 @@ import java.util.Map;
 import static com.google.common.base.Preconditions.checkState;
 
 /**
- * @author Giannis Dzegoutanis
+ * @author John L. Jegutanis
  */
 public class SimpleKeyChain extends BasicKeyChain {
 

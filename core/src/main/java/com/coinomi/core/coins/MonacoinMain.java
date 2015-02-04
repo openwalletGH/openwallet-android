@@ -3,7 +3,7 @@ package com.coinomi.core.coins;
 import org.bitcoinj.core.Coin;
 
 /**
- * @author Giannis Dzegoutanis
+ * @author John L. Jegutanis
  */
 public class MonacoinMain extends CoinType {
     private MonacoinMain() {

@@ -13,7 +13,7 @@ import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 
 /**
- * @author Giannis Dzegoutanis
+ * @author John L. Jegutanis
  */
 public class NavDrawerItem extends LinearLayout implements Checkable {
     private final TextView title;

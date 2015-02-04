@@ -14,7 +14,7 @@ import com.coinomi.wallet.R;
 import com.coinomi.wallet.util.Fonts;
 
 /**
- * @author Giannis Dzegoutanis
+ * @author John L. Jegutanis
  */
 public class SendOutput extends LinearLayout {
     private static final int MAX_LINES = 5;

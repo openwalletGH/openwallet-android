@@ -38,7 +38,7 @@ import java.util.HashMap;
 import javax.annotation.Nullable;
 
 /**
- * @author Giannis Dzegoutanis
+ * @author John L. Jegutanis
  * @author Andreas Schildbach
  */
 @ReportsCrashes(

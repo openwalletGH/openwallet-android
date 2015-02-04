@@ -9,7 +9,7 @@ import android.widget.TextView;
 import java.util.HashMap;
 
 /**
- * @author Giannis Dzegoutanis
+ * @author John L. Jegutanis
  */
 public class Fonts {
 

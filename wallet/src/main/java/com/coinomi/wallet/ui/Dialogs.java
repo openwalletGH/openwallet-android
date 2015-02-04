@@ -10,7 +10,7 @@ import android.support.v4.app.DialogFragment;
 import com.coinomi.wallet.R;
 
 /**
- * @author Giannis Dzegoutanis
+ * @author John L. Jegutanis
  */
 public class Dialogs {
     public static final String MESSAGE = "message";

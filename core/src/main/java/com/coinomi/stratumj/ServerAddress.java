@@ -1,7 +1,7 @@
 package com.coinomi.stratumj;
 
 /**
- * @author Giannis Dzegoutanis
+ * @author John L. Jegutanis
  */
 final public class ServerAddress {
     final private String host;

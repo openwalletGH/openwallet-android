@@ -12,7 +12,7 @@ import org.bitcoinj.core.Transaction;
 import java.util.List;
 
 /**
- * @author Giannis Dzegoutanis
+ * @author John L. Jegutanis
  */
 public interface BlockchainConnection {
     void subscribeToBlockchain(final TransactionEventListener listener);

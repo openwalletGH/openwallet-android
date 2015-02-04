@@ -5,7 +5,7 @@ import com.coinomi.core.coins.CoinType;
 import java.util.Date;
 
 /**
- * @author Giannis Dzegoutanis
+ * @author John L. Jegutanis
  */
 public class BlockHeader {
     final CoinType type;

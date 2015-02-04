@@ -44,7 +44,7 @@ import javax.annotation.Nonnull;
 
 /**
  * @author Andreas Schildbach
- * @author Giannis Dzegoutanis
+ * @author John L. Jegutanis
  */
 public class AddressesListAdapter extends BaseAdapter {
     private final Context context;

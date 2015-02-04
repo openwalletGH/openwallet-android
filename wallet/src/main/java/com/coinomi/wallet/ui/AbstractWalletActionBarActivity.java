@@ -6,7 +6,7 @@ import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.service.CoinService;
 
 /**
- * @author Giannis Dzegoutanis
+ * @author John L. Jegutanis
  */
 abstract public class AbstractWalletActionBarActivity extends ActionBarActivity {
 

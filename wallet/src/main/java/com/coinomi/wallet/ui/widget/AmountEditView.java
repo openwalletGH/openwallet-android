@@ -25,7 +25,7 @@ import javax.annotation.Nullable;
 
 /**
  * @author Andreas Schildbach
- * @author Giannis Dzegoutanis
+ * @author John L. Jegutanis
  */
 public class AmountEditView extends RelativeLayout {
     private final TextView symbol;

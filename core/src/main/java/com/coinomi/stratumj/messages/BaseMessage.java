@@ -9,7 +9,7 @@ import java.util.Collection;
 import javax.annotation.Nullable;
 
 /**
- * @author Giannis Dzegoutanis
+ * @author John L. Jegutanis
  */
 public class BaseMessage extends JSONObject {
 

@@ -4,7 +4,7 @@ import org.bitcoinj.core.*;
 import org.bitcoinj.core.Wallet;
 
 /**
- * @author Giannis Dzegoutanis
+ * @author John L. Jegutanis
  */
 public interface WalletPocketEventListener {
 
