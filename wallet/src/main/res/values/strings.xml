@@ -114,7 +114,7 @@
     <string name="set_password_seed_protect_info">The password becomes permanent and it is needed when restoring your wallet with the recovery phrase.\nWARNING: If you forget your password it will be impossible to restore your wallet!</string>
     <string name="set_password1">Type your password</string>
     <string name="set_password2">Re-type your password</string>
-    <string name="password_too_common_error">Password \"%1$s\" is to common to be safely used.</string>
+    <string name="password_too_common_error">Password \"%1$s\" is too common to be safely used.</string>
     <string name="password_too_short_error">Password is too short, minimum %1$d characters.</string>
     <string name="passwords_mismatch">Passwords don\'t match</string>
     <string name="password_error">Could not proceed, password errors detected.</string>
