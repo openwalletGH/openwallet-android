@@ -98,11 +98,14 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
         }
     };
 
+    private WalletPocket pocket;
+    private CoinType type;
+    private Coin currentBalance;
+    private boolean isFullAmount = false;
+
     private WalletApplication application;
     private ContentResolver resolver;
     private Configuration config;
-    private WalletPocket pocket;
-    private CoinType type;
     private TransactionsListAdapter adapter;
 
     private LoaderManager loaderManager;
@@ -111,7 +114,6 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
     private Amount mainAmount;
     private Amount localAmount;
     private TextView connectionLabel;
-    private Coin currentBalance;
     private Listener listener;
 
     private final ContentObserver addressBookObserver = new ContentObserver(handler) {
@@ -205,6 +207,13 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
 
         mainAmount = (Amount) view.findViewById(R.id.main_amount);
         mainAmount.setSymbol(type.getSymbol());
+        mainAmount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                isFullAmount = !isFullAmount;
+                updateView();
+            }
+        });
         localAmount = (Amount) view.findViewById(R.id.amount_local);
         localAmount.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -517,7 +526,7 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
     private void updateView() {
         if (currentBalance != null) {
             String newBalanceStr = GenericUtils.formatCoinValue(type, currentBalance,
-                    AMOUNT_FULL_PRECISION, AMOUNT_SHIFT);
+                    isFullAmount ? AMOUNT_FULL_PRECISION : AMOUNT_SHORT_PRECISION, AMOUNT_SHIFT);
             mainAmount.setAmount(newBalanceStr);
         }
 
