@@ -79,6 +79,10 @@ For now test it manually by installing it `adb install -r wallet/wallet-release.
 
 ## Version history
 
+New in version 1.5.10
+- Balance screen shows the amount with 4 decimal places (click to view the full amount)
+- Basic address book
+
 New in version 1.5.9
 - Ask confirmation before creating a new address
 
