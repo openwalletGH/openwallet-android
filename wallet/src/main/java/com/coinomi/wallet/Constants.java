@@ -19,6 +19,7 @@ import com.coinomi.core.coins.RubycoinMain;
 import com.coinomi.core.coins.UroMain;
 import com.coinomi.core.coins.DigitalcoinMain;
 import com.coinomi.core.coins.CannacoinMain;
+import com.coinomi.core.coins.DigibyteMain;
 import com.coinomi.core.network.CoinAddress;
 import com.coinomi.stratumj.ServerAddress;
 import com.google.common.collect.ImmutableList;
@@ -105,7 +106,9 @@ public class Constants {
             new CoinAddress(DigitalcoinMain.get(),  new ServerAddress("dgc-cce-1.coinomi.net", 5020),
                                                     new ServerAddress("dgc-cce-2.coinomi.net", 5020)),
             new CoinAddress(CannacoinMain.get(),    new ServerAddress("ccn-cce-1.coinomi.net", 5021),
-                                                    new ServerAddress("ccn-cce-2.coinomi.net", 5021))
+                                                    new ServerAddress("ccn-cce-2.coinomi.net", 5021)),
+            new CoinAddress(DigibyteMain.get(),     new ServerAddress("digibytewiki.com", 50001)),       // https://github.com/digibyte/electrum-dgb-server
+                                                    new ServerAddress("digielectrum.cryptoservices.net", 50001)) // Not Yet Live
     );
 
     public static final HashMap<CoinType, Integer> COINS_ICONS;
@@ -127,6 +130,7 @@ public class Constants {
         COINS_ICONS.put(CoinID.URO_MAIN.getCoinType(), R.drawable.uro);
         COINS_ICONS.put(CoinID.DIGITALCOIN_MAIN.getCoinType(), R.drawable.digitalcoin);
         COINS_ICONS.put(CoinID.CANNACOIN_MAIN.getCoinType(), R.drawable.cannacoin);
+        COINS_ICONS.put(CoinID.DIGIBYTE_MAIN.getCoinType(), R.drawable.digibyte);        
 
         COINS_BLOCK_EXPLORERS = new HashMap<CoinType, String>();
         COINS_BLOCK_EXPLORERS.put(CoinID.BITCOIN_MAIN.getCoinType(), "https://blockchain.info/tx/%s");
@@ -144,6 +148,7 @@ public class Constants {
         COINS_BLOCK_EXPLORERS.put(CoinID.URO_MAIN.getCoinType(), "https://chainz.cryptoid.info/uro/tx.dws?%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.DIGITALCOIN_MAIN.getCoinType(), "https://chainz.cryptoid.info/dgc/tx.dws?%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.CANNACOIN_MAIN.getCoinType(), "https://chainz.cryptoid.info/ccn/tx.dws?%s");
+        COINS_BLOCK_EXPLORERS.put(CoinID.DIGIBYTE_MAIN.getCoinType(), "https://digiexplorer.info/tx/%s");        
     }
 
     public static final CoinType DEFAULT_COIN = BitcoinMain.get();
@@ -161,5 +166,6 @@ public class Constants {
             ReddcoinMain.get(),
             FeathercoinMain.get(),
             DigitalcoinMain.get(),
-            CannacoinMain.get());
+            CannacoinMain.get(),
+            DigibyteMain.get());
 }

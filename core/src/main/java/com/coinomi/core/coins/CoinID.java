@@ -36,7 +36,8 @@ public enum CoinID {
     RUBYCOIN_MAIN(RubycoinMain.get()),
     URO_MAIN(UroMain.get()),
     DIGITALCOIN_MAIN(DigitalcoinMain.get()),
-    CANNACOIN_MAIN(CannacoinMain.get())
+    CANNACOIN_MAIN(CannacoinMain.get()),
+    DIGIBYTE_MAIN(DigibyteMain.get())    
     ;
 
     static {
