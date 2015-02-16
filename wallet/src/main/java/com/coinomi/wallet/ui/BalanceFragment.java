@@ -410,8 +410,13 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
     }
 
     @Override
-    public void onLoadFinished(Loader<List<Transaction>> loader, List<Transaction> transactions) {
-        adapter.replace(transactions);
+    public void onLoadFinished(Loader<List<Transaction>> loader, final List<Transaction> transactions) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                adapter.replace(transactions);
+            }
+        });
     }
 
     @Override
