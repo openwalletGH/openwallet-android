@@ -2039,7 +2039,10 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
             new Comparator<DeterministicKey>() {
                 @Override
                 public int compare(final DeterministicKey k1, final DeterministicKey k2) {
-                    return Integer.compare(k2.getChildNumber().num(), k1.getChildNumber().num());
+                    int key1Num = k1.getChildNumber().num();
+                    int key2Num = k2.getChildNumber().num();
+                    // In reality Integer.compare(key2Num, key1Num) but is not available on older devices
+                    return (key2Num < key1Num) ? -1 : ((key2Num == key1Num) ? 0 : 1);
                 }
             };
 
