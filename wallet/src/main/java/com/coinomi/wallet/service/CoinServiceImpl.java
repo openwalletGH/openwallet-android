@@ -396,7 +396,7 @@ public class CoinServiceImpl extends Service implements CoinService {
             }
         }
 
-        return START_NOT_STICKY;
+        return START_REDELIVER_INTENT;
     }
 
     private void broadcastTransaction(Transaction tx) {
