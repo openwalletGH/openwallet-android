@@ -320,6 +320,7 @@ public class AddressRequestFragment extends Fragment {
     };
 
     private void updateView() {
+        if (isRemoving() || isDetached()) return;
         receiveAddress = showAddress != null ? showAddress : pocket.getReceiveAddress();
 
         // Don't show previous addresses link if we are showing a specific address

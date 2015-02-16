@@ -187,6 +187,7 @@ public class TransactionDetailsFragment extends Fragment {
     }
 
     private void updateView() {
+        if (isRemoving() || isDetached()) return;
         if (txId == null) {
             cannotShowTxDetails();
         } else {
