@@ -60,15 +60,17 @@ public class AddressBookProvider extends ContentProvider {
                                       @Nonnull final String address) {
         String label = null;
 
-        final Uri uri = contentUri(context.getPackageName(), type).buildUpon().appendPath(address).build();
-        final Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
+        if (context != null) {
+            final Uri uri = contentUri(context.getPackageName(), type).buildUpon().appendPath(address).build();
+            final Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
 
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                label = cursor.getString(cursor.getColumnIndexOrThrow(AddressBookProvider.KEY_LABEL));
+            if (cursor != null) {
+                if (cursor.moveToFirst()) {
+                    label = cursor.getString(cursor.getColumnIndexOrThrow(AddressBookProvider.KEY_LABEL));
+                }
+
+                cursor.close();
             }
-
-            cursor.close();
         }
 
         return label;
