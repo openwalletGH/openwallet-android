@@ -15,7 +15,7 @@ public class DigibyteMain extends CoinType {
         spendableCoinbaseDepth = 100;
         dumpedPrivateKeyHeader = 128;
 
-        name = "Digibyte";
+        name = "Digibyte (beta)";
         symbol = "DGB";
         uriScheme = "digibyte";
         bip44Index = 20;
