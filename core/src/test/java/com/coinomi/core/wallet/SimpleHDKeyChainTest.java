@@ -98,6 +98,16 @@ public class SimpleHDKeyChainTest {
     }
 
     @Test
+    public void getLastIssuedKey() {
+        assertNull(chain.getLastIssuedKey(KeyChain.KeyPurpose.RECEIVE_FUNDS));
+        assertNull(chain.getLastIssuedKey(KeyChain.KeyPurpose.CHANGE));
+        DeterministicKey extKey = chain.getKey(KeyChain.KeyPurpose.RECEIVE_FUNDS);
+        DeterministicKey intKey = chain.getKey(KeyChain.KeyPurpose.CHANGE);
+        assertEquals(extKey, chain.getLastIssuedKey(KeyChain.KeyPurpose.RECEIVE_FUNDS));
+        assertEquals(intKey, chain.getLastIssuedKey(KeyChain.KeyPurpose.CHANGE));
+    }
+
+    @Test
     public void externalKeyCheck() {
         assertFalse(chain.isExternal(chain.getKey(KeyChain.KeyPurpose.CHANGE)));
         assertTrue(chain.isExternal(chain.getKey(KeyChain.KeyPurpose.RECEIVE_FUNDS)));

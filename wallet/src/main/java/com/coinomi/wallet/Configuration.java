@@ -49,7 +49,7 @@ public class Configuration {
     private static final String PREFS_KEY_CHANGE_LOG_VERSION = "change_log_version";
     public static final String PREFS_KEY_REMIND_BACKUP = "remind_backup";
 
-    public static final String PREFS_KEY_AUTO_ADDRESSES = "auto_addresses";
+    public static final String PREFS_KEY_MANUAL_RECEIVING_ADDRESSES = "manual_receiving_addresses";
 
     private static final int PREFS_DEFAULT_BTC_SHIFT = 3;
     private static final int PREFS_DEFAULT_BTC_PRECISION = 2;
@@ -160,4 +160,7 @@ public class Configuration {
         prefs.edit().putBoolean(PREFS_KEY_LAST_EXCHANGE_DIRECTION, exchangeDirection).apply();
     }
 
+    public boolean isManualReceivingAddressManagement() {
+        return prefs.getBoolean(PREFS_KEY_MANUAL_RECEIVING_ADDRESSES, false);
+    }
 }

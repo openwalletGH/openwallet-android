@@ -7,6 +7,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -66,6 +67,7 @@ public class AddressRequestFragment extends Fragment {
     private static final Logger log = LoggerFactory.getLogger(AddressRequestFragment.class);
 
     private static final int UPDATE_VIEW = 0;
+    private static final int UPDATE_EXCHANGE_RATE = 1;
 
     // Loader IDs
     private static final int ID_RATE_LOADER = 0;
@@ -99,6 +101,9 @@ public class AddressRequestFragment extends Fragment {
             switch (msg.what) {
                 case UPDATE_VIEW:
                     updateView();
+                    break;
+                case UPDATE_EXCHANGE_RATE:
+                    amountCalculatorLink.setExchangeRate((org.bitcoinj.utils.ExchangeRate) msg.obj);
             }
         }
     };
@@ -288,7 +293,14 @@ public class AddressRequestFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         try {
-                            final Address newAddress = pocket.getFreshReceiveAddress();
+                            Address newAddress = null;
+                            Address freshAddress = pocket.getFreshReceiveAddress();
+                            if (config.isManualReceivingAddressManagement()) {
+                                newAddress = pocket.getLastUsedReceiveAddress();
+                            }
+                            if (newAddress == null) {
+                                newAddress = freshAddress;
+                            }
                             final String newLabel = viewLabel.getText().toString().trim();
 
                             if (!newLabel.isEmpty()) {
@@ -321,7 +333,18 @@ public class AddressRequestFragment extends Fragment {
 
     private void updateView() {
         if (isRemoving() || isDetached()) return;
-        receiveAddress = showAddress != null ? showAddress : pocket.getReceiveAddress();
+        receiveAddress = null;
+        if (showAddress != null) {
+            receiveAddress =  showAddress;
+        } else {
+            if (config.isManualReceivingAddressManagement()) {
+                receiveAddress = pocket.getLastUsedReceiveAddress();
+            }
+
+            if (receiveAddress == null) {
+                receiveAddress = pocket.getReceiveAddress();
+            }
+        }
 
         // Don't show previous addresses link if we are showing a specific address
         if (showAddress == null && pocket.getNumberIssuedReceiveAddresses() != 0) {
@@ -391,7 +414,7 @@ public class AddressRequestFragment extends Fragment {
             if (data != null && data.getCount() > 0) {
                 data.moveToFirst();
                 final ExchangeRatesProvider.ExchangeRate exchangeRate = ExchangeRatesProvider.getExchangeRate(data);
-                amountCalculatorLink.setExchangeRate(exchangeRate.rate);
+                handler.sendMessage(handler.obtainMessage(UPDATE_EXCHANGE_RATE, exchangeRate.rate));
             }
         }
 

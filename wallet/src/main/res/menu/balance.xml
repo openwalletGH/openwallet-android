@@ -8,4 +8,8 @@
         android:icon="@drawable/qr_code_menu"
         app:showAsAction="ifRoom" />
 
+    <item android:id="@+id/action_refresh_wallet"
+        android:title="@string/action_refresh_wallet"
+        app:showAsAction="never" />
+
 </menu>

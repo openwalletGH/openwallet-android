@@ -1985,6 +1985,24 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
     }
 
     /**
+     * Get the last used receiving address
+     */
+    @Nullable
+    public Address getLastUsedReceiveAddress() {
+        lock.lock();
+        try {
+            DeterministicKey lastUsedKey = keys.getLastIssuedKey(RECEIVE_FUNDS);
+            if (lastUsedKey != null) {
+                return lastUsedKey.toAddress(coinType);
+            } else {
+                return null;
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
      * Returns true is it is possible to create new fresh receive addresses, false otherwise
      */
     public boolean canCreateFreshReceiveAddress() {

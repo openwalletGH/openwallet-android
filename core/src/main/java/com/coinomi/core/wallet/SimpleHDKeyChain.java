@@ -214,6 +214,34 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
         }
     }
 
+    /**
+     * Get the last issued key
+     */
+    @Nullable
+    public DeterministicKey getLastIssuedKey(KeyPurpose purpose) {
+        lock.lock();
+        try {
+            List<DeterministicKey> keys;
+            switch (purpose) {
+                case RECEIVE_FUNDS:
+                case REFUND:
+                    if (issuedExternalKeys <= 0) return null;
+                    keys = getDeterministicKeys(1, externalKey, issuedExternalKeys);
+                    break;
+                case CHANGE:
+                    if (issuedInternalKeys <= 0) return null;
+                    keys = getDeterministicKeys(1, internalKey, issuedInternalKeys);
+                    break;
+                default:
+                    throw new UnsupportedOperationException();
+            }
+
+            return keys.get(0);
+        } finally {
+            lock.unlock();
+        }
+    }
+
     /** Returns a freshly derived key that has not been returned by this method before. */
     @Override
     public DeterministicKey getKey(KeyPurpose purpose) {
