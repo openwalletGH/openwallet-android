@@ -1,0 +1,25 @@
+package com.coinomi.wallet.ui;
+
+import android.os.Bundle;
+
+import com.coinomi.wallet.R;
+
+/**
+ * @author John L. Jegutanis
+ */
+public class SettingsActivity extends AbstractWalletActionBarActivity {
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_settings);
+
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.container, new SettingsFragment())
+                    .commit();
+        }
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(false);
+    }
+}

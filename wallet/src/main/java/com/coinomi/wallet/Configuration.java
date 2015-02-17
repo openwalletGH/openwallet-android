@@ -32,6 +32,8 @@ public class Configuration {
     private static final String PREFS_KEY_LAST_USED = "last_used";
     public static final String PREFS_KEY_LAST_POCKET = "last_pocket";
 
+
+    /* Preference keys. Check also res/xml/preferences.xml */
     public static final String PREFS_KEY_BTC_PRECISION = "btc_precision";
     public static final String PREFS_KEY_CONNECTIVITY_NOTIFICATION = "connectivity_notification";
     public static final String PREFS_KEY_EXCHANGE_CURRENCY = "exchange_currency";
@@ -46,6 +48,8 @@ public class Configuration {
     private static final String PREFS_KEY_LAST_EXCHANGE_DIRECTION = "last_exchange_direction";
     private static final String PREFS_KEY_CHANGE_LOG_VERSION = "change_log_version";
     public static final String PREFS_KEY_REMIND_BACKUP = "remind_backup";
+
+    public static final String PREFS_KEY_AUTO_ADDRESSES = "auto_addresses";
 
     private static final int PREFS_DEFAULT_BTC_SHIFT = 3;
     private static final int PREFS_DEFAULT_BTC_PRECISION = 2;

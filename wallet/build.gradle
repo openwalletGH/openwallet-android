@@ -32,6 +32,12 @@ android {
     }
 }
 
+repositories {
+    flatDir {
+        dirs 'aars'
+    }
+}
+
 //sourceSets {
 //    unitTest {
 //        java.srcDir file('src/test/java')
@@ -60,6 +66,7 @@ dependencies {
     compile 'com.google.protobuf:protobuf-java:2.5.0'
     compile 'com.google.zxing:core:3.1.0'
     compile 'ch.acra:acra:4.5.0'
+    compile 'com.android.support:support-v4-preferencefragment:1.0.0@aar'
 }
 
 //apply plugin: 'robolectric'

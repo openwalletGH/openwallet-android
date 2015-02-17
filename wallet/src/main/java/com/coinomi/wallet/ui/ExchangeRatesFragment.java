@@ -39,14 +39,17 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.coinomi.core.coins.BitcoinMain;
 import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.util.GenericUtils;
 import com.coinomi.wallet.Configuration;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.ExchangeRatesProvider;
 import com.coinomi.wallet.ExchangeRatesProvider.ExchangeRate;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
+import com.coinomi.wallet.ui.widget.Amount;
 import com.coinomi.wallet.ui.widget.CurrencyTextView;
 import com.coinomi.wallet.util.WalletUtils;
 
@@ -95,10 +98,11 @@ public final class ExchangeRatesFragment extends ListFragment implements OnShare
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-//        setRetainInstance(true);
-//        setHasOptionsMenu(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB);
-
-        type = CoinID.typeFromId(getArguments().getString(Constants.ARG_COIN_ID));
+        if (getArguments() != null && getArguments().containsKey(Constants.ARG_COIN_ID)) {
+            type = CoinID.typeFromId(getArguments().getString(Constants.ARG_COIN_ID));
+        } else {
+            type = BitcoinMain.get();
+        }
         contentUri = ExchangeRatesProvider.contentUriToLocal(activity.getPackageName(),
                 type.getSymbol(), false);
 
@@ -331,9 +335,18 @@ public final class ExchangeRatesFragment extends ListFragment implements OnShare
                 currencyNameView.setVisibility(View.INVISIBLE);
             }
 
-            final CurrencyTextView rateView = (CurrencyTextView) view.findViewById(R.id.exchange_rate_row_rate);
-            rateView.setFormat(Constants.LOCAL_CURRENCY_FORMAT);
-            rateView.setAmount(exchangeRate.rate.coinToFiat(rateBase));
+//            final CurrencyTextView rateView = (CurrencyTextView) view.findViewById(R.id.exchange_rate_row_rate);
+//            rateView.setFormat(Constants.LOCAL_CURRENCY_FORMAT);
+//            rateView.setAmount(exchangeRate.rate.coinToFiat(rateBase));
+
+
+            final Amount rateAmountUnitView = (Amount) view.findViewById(R.id.exchange_rate_row_rate_unit);
+            rateAmountUnitView.setAmount(GenericUtils.formatCoinValue(type, rateBase, true));
+            rateAmountUnitView.setSymbol(type.getSymbol());
+
+            final Amount rateAmountView = (Amount) view.findViewById(R.id.exchange_rate_row_rate);
+            rateAmountView.setAmount(exchangeRate.rate.coinToFiat(rateBase).toPlainString());
+            rateAmountView.setSymbol(exchangeRate.currencyCodeId);
 
 //            final CurrencyTextView walletView = (CurrencyTextView) view.findViewById(R.id.exchange_rate_row_balance);
 //            walletView.setFormat(Constants.LOCAL_FORMAT);

@@ -265,11 +265,7 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
-            // TODO launch settings here
-            return true;
-        } else if (id == R.id.action_restore_wallet) {
-            startRestore();
-            finish();
+            startActivity(new Intent(WalletActivity.this, SettingsActivity.class));
             return true;
         } else if (id == R.id.action_scan_qr_code) {
             startActivityForResult(new Intent(this, ScanActivity.class), REQUEST_CODE_SCAN);
@@ -279,9 +275,6 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
             return true;
         } else if (id == R.id.action_about) {
             startActivity(new Intent(WalletActivity.this, AboutActivity.class));
-            return true;
-        } else if (id == R.id.action_exchange_rates) {
-            startExchangeRates();
             return true;
         }
 

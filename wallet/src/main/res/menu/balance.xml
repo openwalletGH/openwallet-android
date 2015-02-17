@@ -8,8 +8,4 @@
         android:icon="@drawable/qr_code_menu"
         app:showAsAction="ifRoom" />
 
-    <item android:id="@+id/action_exchange_rates"
-        android:title="@string/action_exchange_rates"
-        app:showAsAction="never" />
-
 </menu>

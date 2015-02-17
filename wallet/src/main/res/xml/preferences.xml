@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <Preference android:title="@string/pref_title_exchange_rates" >
+        <intent android:targetPackage="@string/app_package"
+            android:targetClass="com.coinomi.wallet.ui.ExchangeRatesActivity" />
+    </Preference>
+
+    <Preference android:title="@string/pref_title_restore_wallet" >
+        <intent android:targetPackage="@string/app_package"
+            android:targetClass="com.coinomi.wallet.ui.IntroActivity" />
+    </Preference>
+
+    <CheckBoxPreference
+        android:key="manual_receiving_addresses"
+        android:title="@string/pref_title_manual_receiving_addresses"
+        android:summary="@string/pref_summary_manual_receiving_addresses"
+        android:defaultValue="false"/>
+</PreferenceScreen>

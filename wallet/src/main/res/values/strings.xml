@@ -2,6 +2,7 @@
 <resources>
 
     <string name="app_name">Coinomi (dev)</string>
+    <string name="app_package">com.coinomi.wallet.dev</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="action_scan_qr_code">Scan</string>
@@ -10,9 +11,7 @@
     <string name="action_empty_wallet">Empty wallet</string>
     <string name="action_settings">Settings</string>
     <string name="action_about">About</string>
-    <string name="action_restore_wallet">Restore wallet</string>
     <string name="action_refresh_wallet">Refresh</string>
-    <string name="action_exchange_rates">Exchange rates</string>
     <string name="action_new_address">New address</string>
 
     <!-- Errors -->
@@ -39,7 +38,7 @@
     <string name="wallet_title_request">receive</string>
     <string name="wallet_title_balance">balance</string>
     <string name="wallet_title_send">send</string>
-
+    <string name="almost_equal_to">≈</string>
     <!-- SendOutput widget -->
     <string name="fee">Fee</string>
 
@@ -194,5 +193,13 @@
     <string name="edit_address_book_entry_dialog_title_edit">Edit address</string>
     <string name="edit_address_book_entry_dialog_address_label">Address</string>
     <string name="edit_address_book_entry_dialog_label_label">Name</string>
+
+    <!-- Settings -->
+    <string name="title_activity_settings">Settings</string>
+    <string name="pref_title_restore_wallet">Restore wallet</string>
+    <string name="pref_title_exchange_rates">Exchange rates</string>
+    <string name="pref_title_manual_receiving_addresses">Manual receiving addresses</string>
+    <string name="pref_summary_manual_receiving_addresses">Do not create a fresh receiving address once the previous one is used.</string>
+
 
 </resources>

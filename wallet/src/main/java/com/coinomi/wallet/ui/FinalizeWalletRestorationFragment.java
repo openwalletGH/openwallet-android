@@ -151,8 +151,9 @@ public class FinalizeWalletRestorationFragment extends Fragment {
     }
 
     private void startWalletActivity() {
-        startActivity(new Intent(getActivity(), WalletActivity.class));
-        getActivity().finish();
+        Intent intent = new Intent(getActivity(), WalletActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
     }
 
     private void showErrorAndStartIntroActivity(String errorMessage) {

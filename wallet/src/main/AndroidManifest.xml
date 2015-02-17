@@ -132,6 +132,15 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppThemeCustomActionBar" >
         </activity>
+        <activity
+            android:name="com.coinomi.wallet.ui.SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppThemeCustomActionBar" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.coinomi.wallet.ui.WalletActivity" />
+        </activity>
 
         <provider
             android:name="com.coinomi.wallet.ExchangeRatesProvider"
