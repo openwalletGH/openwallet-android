@@ -159,7 +159,7 @@ public class RestoreFragment extends Fragment {
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                verifyMnemonic();
+                verifyMnemonicAndProceed();
             }
         };
     }
@@ -170,16 +170,35 @@ public class RestoreFragment extends Fragment {
             public void onClick(View v) {
                 log.info("Skipping seed verification.");
                 mnemonicTextView.setText("");
-                verifyMnemonic(seed, true);
+                verifyMnemonicAndProceed(seed, true);
             }
         };
     }
 
-    private void verifyMnemonic() {
-        verifyMnemonic(mnemonicTextView.getText().toString(), false);
+    private void verifyMnemonicAndProceed() {
+        verifyMnemonicAndProceed(mnemonicTextView.getText().toString(), false);
     }
 
-    private void verifyMnemonic(String seedText, boolean skipSeedEntry) {
+    private void verifyMnemonicAndProceed(String seedText, boolean skipSeedEntry) {
+        boolean isValid = verifyMnemonic(seedText);
+
+        if (isValid) {
+            if (skipSeedEntry) {
+                SkipDialogFragment skipDialog = SkipDialogFragment.newInstance(seedText);
+                skipDialog.show(getFragmentManager(), null);
+            } else if (isNewSeed) {
+                if (mListener != null) mListener.onNewSeedVerified(seedText);
+            } else {
+                if (mListener != null) mListener.onExistingSeedVerified(seedText, isSeedProtected);
+            }
+        }
+    }
+
+    private boolean verifyMnemonic() {
+        return verifyMnemonic(mnemonicTextView.getText().toString());
+    }
+
+    private boolean verifyMnemonic(String seedText) {
         log.info("Verifying seed");
         ArrayList<String> seedWords = new ArrayList<String>();
         for (String word : seedText.trim().split(" ")) {
@@ -208,14 +227,7 @@ public class RestoreFragment extends Fragment {
             isValid = false;
         }
 
-        if (isValid && skipSeedEntry) {
-            SkipDialogFragment skipDialog = SkipDialogFragment.newInstance(seedText);
-            skipDialog.show(getFragmentManager(), null);
-        } else if (isValid && isNewSeed) {
-            if (mListener != null) mListener.onNewSeedVerified(seedText);
-        } else if (isValid) {
-            if (mListener != null) mListener.onExistingSeedVerified(seedText, isSeedProtected);
-        }
+        return isValid;
     }
 
     public static class SkipDialogFragment extends DialogFragment {
@@ -283,7 +295,9 @@ public class RestoreFragment extends Fragment {
     }
 
     private void clearError() {
-        if (errorΜessage.isShown()) errorΜessage.setVisibility(View.GONE);
+        if (errorΜessage.getVisibility() == View.VISIBLE) {
+            errorΜessage.setVisibility(View.GONE);
+        }
     }
 
     private void handleScan() {
@@ -295,6 +309,7 @@ public class RestoreFragment extends Fragment {
         if (requestCode == REQUEST_CODE_SCAN) {
             if (resultCode == Activity.RESULT_OK) {
                 mnemonicTextView.setText(intent.getStringExtra(ScanActivity.INTENT_EXTRA_RESULT));
+                verifyMnemonic();
             }
         }
     }
