@@ -124,9 +124,14 @@ public class FinalizeWalletRestorationFragment extends Fragment {
                 } else {
                     wallet = new Wallet(seedWords);
                 }
-                KeyCrypterScrypt crypter = new KeyCrypterScrypt();
-                KeyParameter aesKey = crypter.deriveKey(password);
-                wallet.encrypt(crypter, aesKey);
+
+                KeyParameter aesKey = null;
+                if (password != null && !password.isEmpty()) {
+                    KeyCrypterScrypt crypter = new KeyCrypterScrypt();
+                    aesKey = crypter.deriveKey(password);
+                    wallet.encrypt(crypter, aesKey);
+                }
+
                 wallet.createCoinPockets(coinsToCreate, true, aesKey);
                 getWalletApplication().setWallet(wallet);
                 getWalletApplication().saveWalletNow();

@@ -34,10 +34,10 @@ public class WelcomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_welcome, container, false);
-//        Fonts.setTypeface(view.findViewById(R.id.welcome_text), Fonts.Font.ROBOTO_REGULAR);
 
         view.findViewById(R.id.create_wallet).setOnClickListener(getOnCreateListener());
         view.findViewById(R.id.restore_wallet).setOnClickListener(getOnRestoreListener());
+        view.findViewById(R.id.test_wallet).setOnClickListener(getOnTestListener());
 
         return view;
     }
@@ -66,6 +66,18 @@ public class WelcomeFragment extends Fragment {
         };
     }
 
+    private View.OnClickListener getOnTestListener() {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                log.info("Clicked test wallet");
+                if (mListener != null) {
+                    mListener.onTestWallet();
+                }
+            }
+        };
+    }
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -86,6 +98,7 @@ public class WelcomeFragment extends Fragment {
     public interface Listener {
         public void onCreateNewWallet();
         public void onRestoreWallet();
+        public void onTestWallet();
         public void onSeedCreated(String seed);
         public void onNewSeedVerified(String seed);
         public void onExistingSeedVerified(String seed, boolean isSeedProtected);

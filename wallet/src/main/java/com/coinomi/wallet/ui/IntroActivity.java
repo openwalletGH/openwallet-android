@@ -4,8 +4,14 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 
+import com.coinomi.core.coins.CoinID;
+import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.wallet.Wallet;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class IntroActivity extends AbstractWalletFragmentActivity
@@ -44,6 +50,17 @@ public class IntroActivity extends AbstractWalletFragmentActivity
     @Override
     public void onRestoreWallet() {
         replaceFragment(RestoreFragment.newInstance());
+    }
+
+    @Override
+    public void onTestWallet() {
+        Bundle args = new Bundle();
+        args.putString(Constants.ARG_SEED, Wallet.generateMnemonicString(Constants.SEED_ENTROPY_DEFAULT));
+        args.putBoolean(Constants.ARG_SEED_PROTECT, false);
+        args.putString(Constants.ARG_PASSWORD, null);
+        args.putStringArrayList(Constants.ARG_MULTIPLE_COIN_IDS, Constants.DEFAULT_TEST_COIN_IDS);
+
+        replaceFragment(FinalizeWalletRestorationFragment.newInstance(args));
     }
 
     @Override

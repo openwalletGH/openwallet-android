@@ -106,6 +106,16 @@ final public class Wallet {
         return mnemonic;
     }
 
+    public static String generateMnemonicString(int entropyBitsSize) {
+        List<String> mnemonicWords = Wallet.generateMnemonic(entropyBitsSize);
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < mnemonicWords.size(); i++) {
+            sb.append(mnemonicWords.get(i));
+            sb.append(' ');
+        }
+        return sb.toString();
+    }
+
     public void createCoinPocket(CoinType coin, boolean generateAllKeys,
                                   @Nullable KeyParameter key) {
         createCoinPockets(Lists.newArrayList(coin), generateAllKeys, key);

@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
@@ -94,10 +95,14 @@ public class SignTransactionFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_make_transaction, container, false);
 
         final EditText passwordView = (EditText) view.findViewById(R.id.password);
+        final TextView passwordLabelView = (TextView) view.findViewById(R.id.enter_password_label);
         if (application.getWallet() != null && application.getWallet().isEncrypted()) {
             passwordView.requestFocus();
+            passwordView.setVisibility(View.VISIBLE);
+            passwordLabelView.setVisibility(View.VISIBLE);
         } else {
             passwordView.setVisibility(View.GONE);
+            passwordLabelView.setVisibility(View.GONE);
         }
 
         WalletPocket pocket = application.getWalletPocket(type);

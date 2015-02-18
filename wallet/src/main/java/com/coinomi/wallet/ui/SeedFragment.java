@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.coinomi.core.wallet.Wallet;
+import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.util.Fonts;
 
@@ -27,8 +28,6 @@ import java.util.List;
  */
 public class SeedFragment extends Fragment {
     private static final Logger log = LoggerFactory.getLogger(SeedFragment.class);
-    private static final int ENTROPY_DEFAULT = 160;
-    private static final int ENTROPY_EXTRA = 256;
 
     private WelcomeFragment.Listener mListener;
     private String seed;
@@ -98,9 +97,9 @@ public class SeedFragment extends Fragment {
     private void generateNewSeed(TextView mnemonicView) {
         log.info("Clicked generate a new seed");
         if (hasExtraEntropy) {
-            generateMnemonic(mnemonicView, ENTROPY_EXTRA);
+            generateMnemonic(mnemonicView, Constants.SEED_ENTROPY_EXTRA);
         } else {
-            generateMnemonic(mnemonicView, ENTROPY_DEFAULT);
+            generateMnemonic(mnemonicView, Constants.SEED_ENTROPY_DEFAULT);
         }
     }
 
@@ -113,7 +112,7 @@ public class SeedFragment extends Fragment {
             throw new ClassCastException(activity.toString()
                     + " must implement WelcomeFragment.OnFragmentInteractionListener");
         }
-        seed = createSeed(ENTROPY_DEFAULT);
+        seed = createSeed(Constants.SEED_ENTROPY_DEFAULT);
     }
 
     @Override
@@ -123,13 +122,7 @@ public class SeedFragment extends Fragment {
     }
 
     private static String createSeed(int entropySize) {
-        List<String> mnemonicWords = Wallet.generateMnemonic(entropySize);
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < mnemonicWords.size(); i++) {
-            sb.append(mnemonicWords.get(i));
-            sb.append(' ');
-        }
-        return sb.toString();
+        return Wallet.generateMnemonicString(entropySize);
     }
 
     private void setSeed(TextView textView) {
