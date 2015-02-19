@@ -77,6 +77,7 @@ public class ShowSeedFragment extends Fragment {
 
         seedLayout = view.findViewById(R.id.show_seed_layout);
         seedEncryptedLayout = view.findViewById(R.id.seed_encrypted_layout);
+        seedEncryptedLayout.setVisibility(View.GONE);
         // Hide layout as maybe we have to show the password dialog
         seedLayout.setVisibility(View.GONE);
         seedView = (TextView) view.findViewById(R.id.seed);
@@ -122,14 +123,15 @@ public class ShowSeedFragment extends Fragment {
             if (wallet.getSeed() == null) {
                 if (listener != null) listener.onSeedNotAvailable();
             } else if (wallet.getSeed().isEncrypted()) {
+                seedEncryptedLayout.setVisibility(View.VISIBLE);
                 if (password == null) {
                     passwordDialog.show(getFragmentManager(), null);
                 } else {
                     maybeStartDecryptTask();
                 }
             } else {
+                seedEncryptedLayout.setVisibility(View.GONE);
                 maybeStartDecryptTask();
-//                updateSeed(Wallet.mnemonicToString(wallet.getMnemonicCode()));
             }
         }
     }
@@ -215,6 +217,7 @@ public class ShowSeedFragment extends Fragment {
                     seedPasswordProtectedView.setVisibility(View.GONE);
                 }
             } else {
+                seedEncryptedLayout.setVisibility(View.VISIBLE);
                 DialogBuilder.warn(getActivity(), R.string.unlocking_wallet_error_title)
                         .setMessage(R.string.unlocking_wallet_error_detail)
                         .setNegativeButton(R.string.button_dismiss, null)
