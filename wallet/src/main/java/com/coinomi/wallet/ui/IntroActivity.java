@@ -54,6 +54,7 @@ public class IntroActivity extends AbstractWalletFragmentActivity
         args.putBoolean(Constants.ARG_SEED_PROTECT, false);
         args.putString(Constants.ARG_PASSWORD, null);
         args.putStringArrayList(Constants.ARG_MULTIPLE_COIN_IDS, Constants.DEFAULT_TEST_COIN_IDS);
+        args.putBoolean(Constants.ARG_TEST_WALLET, true);
 
         replaceFragment(FinalizeWalletRestorationFragment.newInstance(args));
     }

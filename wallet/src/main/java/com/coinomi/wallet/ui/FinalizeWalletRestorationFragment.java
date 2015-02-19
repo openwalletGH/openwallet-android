@@ -44,6 +44,7 @@ public class FinalizeWalletRestorationFragment extends Fragment {
     private String password;
     private boolean seedProtect;
     private List<CoinType> coinsToCreate;
+    private boolean isTestWallet;
 
     private WalletFromSeedTask walletFromSeedTask;
 
@@ -68,6 +69,7 @@ public class FinalizeWalletRestorationFragment extends Fragment {
             seed = args.getString(Constants.ARG_SEED);
             password = args.getString(Constants.ARG_PASSWORD);
             seedProtect = args.getBoolean(Constants.ARG_SEED_PROTECT);
+            isTestWallet = args.getBoolean(Constants.ARG_TEST_WALLET, false);
             coinsToCreate = getCoinsTypes(args);
 
             walletFromSeedTask = new WalletFromSeedTask();
@@ -157,6 +159,7 @@ public class FinalizeWalletRestorationFragment extends Fragment {
 
     private void startWalletActivity() {
         Intent intent = new Intent(getActivity(), WalletActivity.class);
+        intent.putExtra(Constants.ARG_TEST_WALLET, isTestWallet);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }

@@ -1,6 +1,7 @@
 package com.coinomi.wallet.ui;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -94,6 +95,15 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
             finish();
             return;
         }
+
+        if (getIntent().getBooleanExtra(Constants.ARG_TEST_WALLET, false)) {
+            new AlertDialog.Builder(this)
+                    .setTitle(R.string.test_wallet)
+                    .setMessage(R.string.test_wallet_message)
+                    .setNeutralButton(R.string.button_ok, null)
+                    .create().show();
+        }
+
         mTitle = getTitle();
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)
