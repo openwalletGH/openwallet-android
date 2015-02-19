@@ -87,6 +87,14 @@ public class SignTransactionFragment extends Fragment {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
+        loaderManager.initLoader(ID_RATE_LOADER, null, rateLoaderCallbacks);
+    }
+
+    @Override
+    public void onDestroy() {
+        loaderManager.destroyLoader(ID_RATE_LOADER);
+        super.onDestroy();
     }
 
     @Override
@@ -184,18 +192,6 @@ public class SignTransactionFragment extends Fragment {
                 mListener.onSignResult(error);
             }
         }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        loaderManager.initLoader(ID_RATE_LOADER, null, rateLoaderCallbacks);
-    }
-
-    @Override
-    public void onPause() {
-        loaderManager.destroyLoader(ID_RATE_LOADER);
-        super.onPause();
     }
 
     @Override

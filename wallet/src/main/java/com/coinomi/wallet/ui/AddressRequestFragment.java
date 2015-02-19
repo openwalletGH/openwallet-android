@@ -156,6 +156,14 @@ public class AddressRequestFragment extends Fragment {
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
         maxQrSize = LayoutUtils.calculateMaxQrCodeSize(getResources());
+
+        loaderManager.initLoader(ID_RATE_LOADER, null, rateLoaderCallbacks);
+    }
+
+    @Override
+    public void onDestroy() {
+        loaderManager.destroyLoader(ID_RATE_LOADER);
+        super.onDestroy();
     }
 
     @Override
@@ -201,14 +209,12 @@ public class AddressRequestFragment extends Fragment {
         amountCalculatorLink.setListener(amountsListener);
         resolver.registerContentObserver(AddressBookProvider.contentUri(
                 getActivity().getPackageName(), type), true, addressBookObserver);
-        loaderManager.initLoader(ID_RATE_LOADER, null, rateLoaderCallbacks);
 
         updateView();
     }
 
     @Override
     public void onPause() {
-        loaderManager.destroyLoader(ID_RATE_LOADER);
         resolver.unregisterContentObserver(addressBookObserver);
         amountCalculatorLink.setListener(null);
         super.onPause();

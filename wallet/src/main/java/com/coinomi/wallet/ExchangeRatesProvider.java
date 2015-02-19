@@ -132,8 +132,6 @@ public class ExchangeRatesProvider extends ContentProvider {
         return true;
     }
 
-
-
     private static Uri.Builder contentUri(@Nonnull final String packageName, final boolean offline) {
         final Uri.Builder builder =
                 Uri.parse("content://" + packageName + ".exchange_rates").buildUpon();
@@ -376,7 +374,7 @@ public class ExchangeRatesProvider extends ContentProvider {
                                 rates.put(toSymbol, new ExchangeRate(rate, toSymbol, type, COINOMI_SOURCE));
                             }
                         } catch (final Exception x) {
-                            log.info("ignoring {}/{}: {}", toSymbol, fromSymbol, x.getMessage());
+                            log.debug("ignoring {}/{}: {}", toSymbol, fromSymbol, x.getMessage());
                         }
                     }
                 }

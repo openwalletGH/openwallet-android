@@ -154,6 +154,17 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
         setHasOptionsMenu(true);
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
+
+        loaderManager.initLoader(ID_TRANSACTION_LOADER, null, this);
+        loaderManager.initLoader(ID_RATE_LOADER, null, rateLoaderCallbacks);
+    }
+
+    @Override
+    public void onDestroy() {
+        loaderManager.destroyLoader(ID_TRANSACTION_LOADER);
+        loaderManager.destroyLoader(ID_RATE_LOADER);
+
+        super.onDestroy();
     }
 
     @Override
@@ -381,9 +392,6 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
         resolver.registerContentObserver(AddressBookProvider.contentUri(
                 getActivity().getPackageName(), type), true, addressBookObserver);
 
-        loaderManager.initLoader(ID_TRANSACTION_LOADER, null, this);
-        loaderManager.initLoader(ID_RATE_LOADER, null, rateLoaderCallbacks);
-
         pocket.addEventListener(transactionChangeListener, Threading.SAME_THREAD);
 
         checkEmptyPocketMessage(pocket);
@@ -395,9 +403,6 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
     public void onPause() {
         pocket.removeEventListener(transactionChangeListener);
         transactionChangeListener.removeCallbacks();
-
-        loaderManager.destroyLoader(ID_TRANSACTION_LOADER);
-        loaderManager.destroyLoader(ID_RATE_LOADER);
 
         resolver.unregisterContentObserver(addressBookObserver);
 

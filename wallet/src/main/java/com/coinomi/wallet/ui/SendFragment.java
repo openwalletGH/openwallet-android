@@ -153,6 +153,9 @@ public class SendFragment extends Fragment {
         setHasOptionsMenu(true);
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
+
+        loaderManager.initLoader(ID_RATE_LOADER, null, rateLoaderCallbacks);
+        loaderManager.initLoader(ID_RECEIVING_ADDRESS_LOADER, null, receivingAddressLoaderCallbacks);
     }
 
     private void updateBalance() {
@@ -216,9 +219,16 @@ public class SendFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
-        super.onDestroyView();
-
         config.setLastExchangeDirection(amountCalculatorLink.getExchangeDirection());
+        super.onDestroyView();
+    }
+
+    @Override
+    public void onDestroy() {
+        loaderManager.destroyLoader(ID_RECEIVING_ADDRESS_LOADER);
+        loaderManager.destroyLoader(ID_RATE_LOADER);
+
+        super.onDestroy();
     }
 
     @Override
@@ -226,9 +236,6 @@ public class SendFragment extends Fragment {
         super.onResume();
 
         amountCalculatorLink.setListener(amountsListener);
-
-        loaderManager.initLoader(ID_RATE_LOADER, null, rateLoaderCallbacks);
-        loaderManager.initLoader(ID_RECEIVING_ADDRESS_LOADER, null, receivingAddressLoaderCallbacks);
 
         if (pocket != null)
             pocket.addEventListener(transactionChangeListener, Threading.SAME_THREAD);
@@ -241,9 +248,6 @@ public class SendFragment extends Fragment {
     public void onPause() {
         if (pocket != null) pocket.removeEventListener(transactionChangeListener);
         transactionChangeListener.removeCallbacks();
-
-        loaderManager.destroyLoader(ID_RECEIVING_ADDRESS_LOADER);
-        loaderManager.destroyLoader(ID_RATE_LOADER);
 
         amountCalculatorLink.setListener(null);
 
