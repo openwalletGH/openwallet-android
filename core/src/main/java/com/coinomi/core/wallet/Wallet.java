@@ -1,13 +1,11 @@
 package com.coinomi.core.wallet;
 
 import com.coinomi.core.coins.CoinType;
-import com.coinomi.core.network.interfaces.TransactionEventListener;
 import com.coinomi.core.protos.Protos;
 import com.coinomi.core.wallet.exceptions.NoSuchPocketException;
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.InsufficientMoneyException;
-import org.bitcoinj.core.Transaction;
 import org.bitcoinj.crypto.DeterministicHierarchy;
 import org.bitcoinj.crypto.DeterministicKey;
 import org.bitcoinj.crypto.HDKeyDerivation;
@@ -108,6 +106,10 @@ final public class Wallet {
 
     public static String generateMnemonicString(int entropyBitsSize) {
         List<String> mnemonicWords = Wallet.generateMnemonic(entropyBitsSize);
+        return mnemonicToString(mnemonicWords);
+    }
+
+    public static String mnemonicToString(List<String> mnemonicWords) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < mnemonicWords.size(); i++) {
             sb.append(mnemonicWords.get(i));

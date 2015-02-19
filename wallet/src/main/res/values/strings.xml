@@ -33,12 +33,19 @@
     <string name="button_edit">EDIT</string>
     <string name="button_send">SEND</string>
     <string name="button_skip">SKIP</string>
+    <string name="button_retry">RETRY</string>
     <string name="button_add_coins">+ COINS</string>
     <string name="scan_qr_code">Scan QR code</string>
     <string name="wallet_title_request">receive</string>
     <string name="wallet_title_balance">balance</string>
     <string name="wallet_title_send">send</string>
     <string name="almost_equal_to">≈</string>
+    <string name="wallet_locked_message">Your wallet is locked</string>
+    <string name="unlock_wallet_title">Unlock your wallet</string>
+    <string name="unlocking_wallet_working">Unlocking your wallet&#8230;</string>
+    <string name="unlocking_wallet_error_title">Unlocking error</string>
+    <string name="unlocking_wallet_error_detail">Please check that your password is correct.\nIf this error persists try to restore your wallet.</string>
+
     <!-- SendOutput widget -->
     <string name="fee">Fee</string>
 
@@ -201,6 +208,14 @@
     <string name="pref_title_exchange_rates">Exchange rates</string>
     <string name="pref_title_manual_receiving_addresses">Manual receiving addresses</string>
     <string name="pref_summary_manual_receiving_addresses">Do not create a fresh receiving address once the previous one is used.</string>
+
+    <!-- Show Seed -->
+    <string name="title_activity_show_seed">Show recovery phrase</string>
+    <string name="seed_not_available_title">No recovery phrase found</string>
+    <string name="seed_not_available">Your recovery phrase is not saved on this device.\nTry restoring your wallet to solve this.</string>
+    <string name="seed_encrypted_touch_to_decrypt">Touch to unlock</string>
+    <string name="seed_working">Please wait&#8230;</string>
+    <string name="seed_password_protected">This recovery phrase is password protected</string>
 
 
 </resources>

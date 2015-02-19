@@ -7,7 +7,6 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -44,7 +43,7 @@ import com.coinomi.wallet.ExchangeRatesProvider;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.ui.widget.AmountEditView;
-import com.coinomi.wallet.util.Fonts;
+import com.coinomi.wallet.util.LayoutUtils;
 import com.coinomi.wallet.util.Qr;
 import com.coinomi.wallet.util.ShareActionProvider;
 import com.coinomi.wallet.util.ThrottlingWalletChangeListener;
@@ -156,10 +155,7 @@ public class AddressRequestFragment extends Fragment {
         setHasOptionsMenu(true);
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
-        // Qr-code size calculation
-        int qrPadding = getResources().getDimensionPixelSize(R.dimen.qr_code_padding);
-        int qrCodeViewSize = getResources().getDimensionPixelSize(R.dimen.qr_code_size);
-        maxQrSize = qrCodeViewSize - 2 * qrPadding;
+        maxQrSize = LayoutUtils.calculateMaxQrCodeSize(getResources());
     }
 
     @Override
@@ -250,7 +246,7 @@ public class AddressRequestFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_new_address:
-                createNewAddress.show(getFragmentManager(), null);
+                createNewAddressDialog.show(getFragmentManager(), null);
                 return true;
             case R.id.action_edit_label:
                 EditAddressBookEntryFragment.edit(getFragmentManager(), type, receiveAddress.toString());
@@ -269,7 +265,7 @@ public class AddressRequestFragment extends Fragment {
         this.loaderManager = getLoaderManager();
     }
 
-    DialogFragment createNewAddress = new DialogFragment() {
+    DialogFragment createNewAddressDialog = new DialogFragment() {
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             Dialog dialog;
@@ -328,7 +324,6 @@ public class AddressRequestFragment extends Fragment {
             }
             return dialog;
         }
-
     };
 
     private void updateView() {

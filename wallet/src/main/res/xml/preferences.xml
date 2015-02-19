@@ -6,6 +6,11 @@
             android:targetClass="com.coinomi.wallet.ui.ExchangeRatesActivity" />
     </Preference>
 
+    <Preference android:title="@string/title_activity_show_seed" >
+        <intent android:targetPackage="@string/app_package"
+            android:targetClass="com.coinomi.wallet.ui.ShowSeedActivity" />
+    </Preference>
+
     <Preference android:title="@string/pref_title_restore_wallet" >
         <intent android:targetPackage="@string/app_package"
             android:targetClass="com.coinomi.wallet.ui.IntroActivity" />

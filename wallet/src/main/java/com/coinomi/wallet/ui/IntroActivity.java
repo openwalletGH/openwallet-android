@@ -4,14 +4,9 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 
-import com.coinomi.core.coins.CoinID;
-import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.wallet.Wallet;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class IntroActivity extends AbstractWalletFragmentActivity

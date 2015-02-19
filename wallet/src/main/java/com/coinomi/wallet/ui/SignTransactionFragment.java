@@ -179,7 +179,7 @@ public class SignTransactionFragment extends Fragment {
         }
 
         protected void onPostExecute(Exception error) {
-            busyDialog.dismiss();
+            busyDialog.dismissAllowingStateLoss();
             if (mListener != null) {
                 mListener.onSignResult(error);
             }

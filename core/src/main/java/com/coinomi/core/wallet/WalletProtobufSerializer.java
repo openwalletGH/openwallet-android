@@ -229,6 +229,4 @@ public class WalletProtobufSerializer {
     public static Protos.Wallet parseToProto(InputStream input) throws IOException {
         return Protos.Wallet.parseFrom(input);
     }
-
-
 }

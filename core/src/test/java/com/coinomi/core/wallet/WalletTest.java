@@ -54,7 +54,7 @@ public class WalletTest {
         Wallet newWallet = WalletProtobufSerializer.readWallet(walletProto);
 
         assertEquals(walletProto.toString(), newWallet.toProtobuf().toString());
-
+        assertArrayEquals(MNEMONIC.toArray(), newWallet.getMnemonicCode().toArray());
     }
 
 

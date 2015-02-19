@@ -1,10 +1,10 @@
 @font-face {
 	font-family: 'icomoon';
-	src:url('fonts/icomoon.eot?9qk2k3');
-	src:url('fonts/icomoon.eot?#iefix9qk2k3') format('embedded-opentype'),
-		url('fonts/icomoon.woff?9qk2k3') format('woff'),
-		url('fonts/icomoon.ttf?9qk2k3') format('truetype'),
-		url('fonts/icomoon.svg?9qk2k3#icomoon') format('svg');
+	src:url('fonts/icomoon.eot?-picuuo');
+	src:url('fonts/icomoon.eot?#iefix-picuuo') format('embedded-opentype'),
+		url('fonts/icomoon.woff?-picuuo') format('woff'),
+		url('fonts/icomoon.ttf?-picuuo') format('truetype'),
+		url('fonts/icomoon.svg?-picuuo#icomoon') format('svg');
 	font-weight: normal;
 	font-style: normal;
 }
@@ -21,6 +21,14 @@
 	/* Better Font Rendering =========== */
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
+}
+
+.icon-lock-open-wallet:before {
+	content: "\e621";
+}
+
+.icon-lock-wallet:before {
+	content: "\e622";
 }
 
 .icon-receive-coins:before {
