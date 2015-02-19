@@ -51,9 +51,9 @@ To release the app follow the steps.
 
 1) Change the following:
 
-* in strings.xml app_name string from "Coinomi (dev)" to "Coinomi"
+* in strings.xml app_name string to "Coinomi" and app_package to com.coinomi.wallet
 * in build.gradle the package from "com.coinomi.wallet.dev" to "com.coinomi.wallet"
-* in AndroidManifest.xml the android:icon from "ic_launcher_dev" to "ic_launcher" and com.coinomi.wallet.dev.exchange_rates to com.coinomi.wallet.exchange_rates
+* in AndroidManifest.xml the android:icon to "ic_launcher" and all "com.coinomi.wallet.dev.*"  to "com.coinomi.wallet.*"
 * remove all ic_launcher_dev icons with `rm wallet/src/main/res/drawable*/ic_launcher_dev.png`
 * setup ACRA
 
@@ -73,13 +73,19 @@ For now test it manually by installing it `adb install -r wallet/wallet-release.
 
 5) Create a GIT release commit:
 
-* Checkout a throwaway branch
 * Create a commit with the log entry similar to the description in the Play Store
-* Checkout the release branch and run `git merge <throwaway-branch-name>`
-* Create a tag with the version of the released APK
+* Create a tag with the version of the released APK with `git tag vX.Y.Z <commit-hash>`
 
 
 ## Version history
+
+New in version 1.5.11
+- New settings screen
+- Ability to view recovery phrase in the settings
+- Manual receiving address management (enable in settings)
+- Testnet for Bitcoin, Litecoin and Dogecoin
+- Usability tweaks
+- Bug and crash fixes
 
 New in version 1.5.10
 - Balance screen shows the amount with 4 decimal places (click to view the full amount)
