@@ -81,7 +81,7 @@ For now test it manually by installing it `adb install -r wallet/wallet-release.
 
 New in version 1.5.11
 - New settings screen
-- Ability to view recovery phrase in the settings
+- Ability to view recovery phrase in settings
 - Manual receiving address management (enable in settings)
 - Testnet for Bitcoin, Litecoin and Dogecoin
 - Usability tweaks
