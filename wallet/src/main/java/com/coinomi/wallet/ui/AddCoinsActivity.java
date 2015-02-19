@@ -1,10 +1,17 @@
 package com.coinomi.wallet.ui;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.coinomi.core.coins.CoinID;
@@ -21,7 +28,7 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 
 public class AddCoinsActivity extends AbstractWalletActionBarActivity
-        implements SelectCoinsFragment.Listener, PasswordConfirmationFragment.Listener{
+        implements SelectCoinsFragment.Listener {
 
     @CheckForNull private Wallet wallet;
     private WalletFromSeedTask addCoinTask;
@@ -59,28 +66,32 @@ public class AddCoinsActivity extends AbstractWalletActionBarActivity
         ArrayList<String> ids = args.getStringArrayList(Constants.ARG_MULTIPLE_COIN_IDS);
 
         // For new we add only one coin at a time
-        this.selectedCoin = CoinID.typeFromId(ids.get(0));
+        selectedCoin = CoinID.typeFromId(ids.get(0));
 
-        if (wallet.isPocketExists(this.selectedCoin)) {
-            String message = getResources().getString(R.string.add_coin_accounts_error);
-            Toast.makeText(AddCoinsActivity.this, message, Toast.LENGTH_LONG).show();
+        if (wallet.isPocketExists(selectedCoin)) {
+            new AlertDialog.Builder(this)
+                    .setTitle(getString(R.string.coin_already_added_title, selectedCoin.getName()))
+                    .setMessage(R.string.coin_already_added)
+                    .setNeutralButton(R.string.button_ok, null)
+                    .create().show();
             return;
         }
 
         if (wallet.isEncrypted()) {
-            String message = getResources().getString(
-                    R.string.password_add_coin, this.selectedCoin.getName());
-            replaceFragment(PasswordConfirmationFragment.newInstance(message));
+            addCoinPasswordDialog.show(getSupportFragmentManager(), null);
         } else {
-            addCoin(null);
+            new AlertDialog.Builder(this)
+                    .setTitle(getString(R.string.adding_coin_confirmation_title, selectedCoin.getName()))
+                    .setPositiveButton(R.string.button_add, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            addCoin(null);
+                        }
+                    })
+                    .setNegativeButton(R.string.button_cancel, null)
+                    .create().show();
         }
     }
-
-    @Override
-    public void onPasswordConfirmed(Bundle args) {
-        addCoin(args.getString(Constants.ARG_PASSWORD));
-    }
-
 
     private void addCoin(@Nullable String password) {
         if (selectedCoin != null && addCoinTask == null) {
@@ -103,7 +114,7 @@ public class AddCoinsActivity extends AbstractWalletActionBarActivity
         protected void onPreExecute() {
             super.onPreExecute();
             verifyDialog = Dialogs.ProgressDialogFragment.newInstance(
-                    getResources().getString(R.string.adding_coin, type.getName()));
+                    getResources().getString(R.string.adding_coin_working, type.getName()));
             verifyDialog.show(getSupportFragmentManager(), null);
         }
 
@@ -144,4 +155,26 @@ public class AddCoinsActivity extends AbstractWalletActionBarActivity
 
         finish();
     }
+
+    private DialogFragment addCoinPasswordDialog = new DialogFragment() {
+        public TextView passwordView;
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            final LayoutInflater inflater = LayoutInflater.from(getActivity());
+            final View view = inflater.inflate(R.layout.get_password_dialog, null);
+            passwordView = (TextView) view.findViewById(R.id.password);
+
+            return new DialogBuilder(getActivity())
+                    .setTitle(getString(R.string.adding_coin_confirmation_title, selectedCoin.getName()))
+                    .setView(view)
+                    .setNegativeButton(R.string.button_cancel, null)
+                    .setPositiveButton(R.string.button_add, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            addCoin(passwordView.getText().toString());
+                        }
+                    }).create();
+        }
+    };
 }
