@@ -1,5 +1,7 @@
 package com.coinomi.wallet.ui;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -49,6 +51,25 @@ public class IntroActivity extends AbstractWalletFragmentActivity
 
     @Override
     public void onTestWallet() {
+        if (getWalletApplication().getWallet() == null) {
+            makeTestWallet();
+        } else {
+            new AlertDialog.Builder(this)
+                    .setTitle(R.string.test_wallet_warning_title)
+                    .setMessage(R.string.test_wallet_warning_message)
+                    .setNegativeButton(R.string.button_cancel, null)
+                    .setPositiveButton(R.string.button_confirm, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            makeTestWallet();
+                        }
+                    })
+                    .create().show();
+        }
+
+    }
+
+    private void makeTestWallet() {
         Bundle args = new Bundle();
         args.putString(Constants.ARG_SEED, Wallet.generateMnemonicString(Constants.SEED_ENTROPY_DEFAULT));
         args.putBoolean(Constants.ARG_SEED_PROTECT, false);
