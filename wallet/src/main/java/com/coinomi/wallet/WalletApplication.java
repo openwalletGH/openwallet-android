@@ -14,14 +14,13 @@ import android.widget.Toast;
 
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.wallet.Wallet;
-import com.coinomi.core.wallet.WalletPocket;
+import com.coinomi.core.wallet.WalletPocketHD;
 import com.coinomi.core.wallet.WalletProtobufSerializer;
 import com.coinomi.wallet.service.CoinService;
 import com.coinomi.wallet.service.CoinServiceImpl;
 import com.coinomi.wallet.util.Fonts;
 import com.coinomi.wallet.util.LinuxSecureRandom;
 
-import org.acra.ACRA;
 import org.acra.annotation.ReportsCrashes;
 import org.acra.sender.HttpSender;
 import org.bitcoinj.crypto.MnemonicCode;
@@ -187,7 +186,7 @@ public class WalletApplication extends Application {
     }
 
     @Nullable
-    public WalletPocket getWalletPocket(CoinType type) {
+    public WalletPocketHD getWalletPocket(CoinType type) {
         if (wallet != null && wallet.isPocketExists(type)) {
             return wallet.getPocket(type);
         }

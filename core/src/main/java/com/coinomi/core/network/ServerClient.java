@@ -4,7 +4,7 @@ import com.coinomi.core.network.interfaces.BlockchainConnection;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.network.interfaces.ConnectionEventListener;
 import com.coinomi.core.network.interfaces.TransactionEventListener;
-import com.coinomi.core.wallet.WalletPocket;
+import com.coinomi.core.wallet.WalletPocketHD;
 import com.coinomi.stratumj.ServerAddress;
 import com.coinomi.stratumj.StratumClient;
 import com.coinomi.stratumj.messages.CallMessage;
@@ -204,14 +204,14 @@ public class ServerClient implements BlockchainConnection {
     }
 
     // TODO support more than one pocket
-    public void maybeSetWalletPocket(WalletPocket pocket) {
+    public void maybeSetWalletPocket(WalletPocketHD pocket) {
         if (eventListeners.isEmpty()) {
             setWalletPocket(pocket, false);
         }
     }
 
     // TODO support more than one pocket
-    public void setWalletPocket(WalletPocket pocket, boolean reconnect) {
+    public void setWalletPocket(WalletPocketHD pocket, boolean reconnect) {
         if (isConnected()) broadcastOnDisconnect();
         eventListeners.clear();
         addEventListener(pocket);

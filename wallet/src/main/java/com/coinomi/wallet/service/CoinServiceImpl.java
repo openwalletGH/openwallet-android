@@ -14,14 +14,13 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.SystemClock;
-import android.os.storage.StorageManager;
 import android.text.format.DateUtils;
 
 import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.network.ConnectivityHelper;
 import com.coinomi.core.network.ServerClients;
-import com.coinomi.core.wallet.WalletPocket;
+import com.coinomi.core.wallet.WalletPocketHD;
 import com.coinomi.wallet.Configuration;
 import com.coinomi.wallet.Constants;
 import com.coinomi.core.wallet.Wallet;
@@ -349,7 +348,7 @@ public class CoinServiceImpl extends Service implements CoinService {
                     resetWallet = true;
                 }
 
-                List<WalletPocket> pockets = wallet.refresh(coinTypesToReset);
+                List<WalletPocketHD> pockets = wallet.refresh(coinTypesToReset);
                 if (clients != null) {
                     if (resetWallet) {
                         clients.stopAllAsync();
@@ -365,7 +364,7 @@ public class CoinServiceImpl extends Service implements CoinService {
         } else if (CoinService.ACTION_CONNECT_COIN.equals(action)) {
             if (intent.hasExtra(Constants.ARG_COIN_ID)) {
                 lastCoin = CoinID.typeFromId(intent.getStringExtra(Constants.ARG_COIN_ID));
-                WalletPocket pocket = application.getWalletPocket(lastCoin);
+                WalletPocketHD pocket = application.getWalletPocket(lastCoin);
                 if (pocket != null) {
                     if (clients == null && connHelper.isConnected()) {
                         clients = getServerClients(pocket.getWallet());

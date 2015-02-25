@@ -19,7 +19,7 @@ import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.uri.CoinURI;
 import com.coinomi.core.uri.CoinURIParseException;
-import com.coinomi.core.wallet.WalletPocket;
+import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.service.CoinService;
@@ -152,12 +152,12 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
     }
 
     @Override
-    public void onTransactionBroadcastSuccess(WalletPocket pocket, Transaction transaction) {
+    public void onTransactionBroadcastSuccess(WalletAccount pocket, Transaction transaction) {
         handler.sendMessage(handler.obtainMessage(TX_BROADCAST_OK, transaction));
     }
 
     @Override
-    public void onTransactionBroadcastFailure(WalletPocket pocket, Transaction transaction) {
+    public void onTransactionBroadcastFailure(WalletAccount pocket, Transaction transaction) {
         handler.sendMessage(handler.obtainMessage(TX_BROADCAST_ERROR, transaction));
     }
 

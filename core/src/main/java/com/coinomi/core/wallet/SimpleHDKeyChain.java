@@ -948,7 +948,7 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
     /**
      * Returns leaf keys issued by this chain (including lookahead zone but no lookahead threshold)
      */
-    public List<DeterministicKey> getLeafKeys() {
+    public List<DeterministicKey> getActiveKeys() {
         ImmutableList.Builder<DeterministicKey> keys = ImmutableList.builder();
         for (ECKey key : getKeys(true)) {
             DeterministicKey dKey = (DeterministicKey) key;

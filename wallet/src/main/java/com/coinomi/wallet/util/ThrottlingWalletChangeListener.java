@@ -18,21 +18,18 @@ package com.coinomi.wallet.util;
  */
 
 
-import java.math.BigInteger;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 import android.os.Handler;
 
-import com.coinomi.core.wallet.WalletPocket;
+import com.coinomi.core.wallet.WalletAccount;
+import com.coinomi.core.wallet.WalletPocketHD;
 import com.coinomi.core.wallet.WalletPocketConnectivity;
 import com.coinomi.core.wallet.WalletPocketEventListener;
+
 import org.bitcoinj.core.Coin;
-import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.Transaction;
-import org.bitcoinj.core.Wallet;
-import org.bitcoinj.script.Script;
 
 /**
  * @author Andreas Schildbach
@@ -75,7 +72,7 @@ public abstract class ThrottlingWalletChangeListener implements WalletPocketEven
     }
 
     @Override
-    public final void onPocketChanged(final WalletPocket pocket) {
+    public final void onPocketChanged(final WalletAccount pocket) {
         if (relevant.getAndSet(false)) {
             handler.removeCallbacksAndMessages(null);
 
@@ -114,13 +111,13 @@ public abstract class ThrottlingWalletChangeListener implements WalletPocketEven
     }
 
     @Override
-    public void onTransactionConfidenceChanged(final WalletPocket pocket, final Transaction tx) {
+    public void onTransactionConfidenceChanged(final WalletAccount pocket, final Transaction tx) {
         if (confidenceRelevant)
             relevant.set(true);
     }
 
     @Override
-    public void onNewBlock(final WalletPocket pocket) {
+    public void onNewBlock(final WalletAccount pocket) {
         if (confidenceRelevant)
             relevant.set(true);
     }
@@ -129,8 +126,8 @@ public abstract class ThrottlingWalletChangeListener implements WalletPocketEven
     public void onConnectivityStatus(WalletPocketConnectivity pocketConnectivity) { /* ignore */ }
 
     @Override
-    public void onTransactionBroadcastFailure(WalletPocket pocket, Transaction tx) { /* ignore */ }
+    public void onTransactionBroadcastFailure(WalletAccount pocket, Transaction tx) { /* ignore */ }
 
     @Override
-    public void onTransactionBroadcastSuccess(WalletPocket pocket, Transaction tx) { /* ignore */ }
+    public void onTransactionBroadcastSuccess(WalletAccount pocket, Transaction tx) { /* ignore */ }
 }

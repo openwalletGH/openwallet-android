@@ -36,7 +36,7 @@ import org.bitcoinj.crypto.KeyCrypter;
 import org.bitcoinj.params.Networks;
 import org.bitcoinj.store.UnreadableWalletException;
 import org.bitcoinj.wallet.WalletTransaction;
-import com.google.common.collect.Lists;
+
 import com.google.protobuf.ByteString;
 
 import org.slf4j.Logger;
@@ -71,7 +71,7 @@ public class WalletPocketProtobufSerializer {
     // Used for de-serialization
     protected Map<ByteString, Transaction> txMap = new HashMap<ByteString, Transaction>();
 
-    public static Protos.WalletPocket toProtobuf(WalletPocket pocket) {
+    public static Protos.WalletPocket toProtobuf(WalletPocketHD pocket) {
 
         Protos.WalletPocket.Builder walletBuilder = Protos.WalletPocket.newBuilder();
         walletBuilder.setNetworkIdentifier(pocket.getCoinType().getId());
@@ -252,7 +252,7 @@ public class WalletPocketProtobufSerializer {
      *
      * @throws UnreadableWalletException thrown in various error conditions (see description).
      */
-    public WalletPocket readWallet(Protos.WalletPocket walletProto, @Nullable KeyCrypter keyCrypter) throws UnreadableWalletException {
+    public WalletPocketHD readWallet(Protos.WalletPocket walletProto, @Nullable KeyCrypter keyCrypter) throws UnreadableWalletException {
         CoinType coinType;
         try {
             coinType = CoinID.typeFromId(walletProto.getNetworkIdentifier());
@@ -267,7 +267,7 @@ public class WalletPocketProtobufSerializer {
         } else {
             chain = SimpleHDKeyChain.fromProtobuf(walletProto.getKeyList());
         }
-        WalletPocket pocket = new WalletPocket(chain, coinType);
+        WalletPocketHD pocket = new WalletPocketHD(chain, coinType);
 
         if (walletProto.hasDescription()) {
             pocket.setDescription(walletProto.getDescription());

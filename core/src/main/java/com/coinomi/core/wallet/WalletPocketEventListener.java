@@ -1,7 +1,6 @@
 package com.coinomi.core.wallet;
 
 import org.bitcoinj.core.*;
-import org.bitcoinj.core.Wallet;
 
 /**
  * @author John L. Jegutanis
@@ -10,15 +9,15 @@ public interface WalletPocketEventListener {
 
     void onNewBalance(Coin newBalance, Coin pendingAmount);
 
-    void onNewBlock(WalletPocket pocket);
+    void onNewBlock(WalletAccount pocket);
 
-    void onTransactionConfidenceChanged(WalletPocket pocket, Transaction tx);
+    void onTransactionConfidenceChanged(WalletAccount pocket, Transaction tx);
 
-    void onTransactionBroadcastFailure(WalletPocket pocket, Transaction tx);
+    void onTransactionBroadcastFailure(WalletAccount pocket, Transaction tx);
 
-    void onTransactionBroadcastSuccess(WalletPocket pocket, Transaction tx);
+    void onTransactionBroadcastSuccess(WalletAccount pocket, Transaction tx);
 
-    void onPocketChanged(final WalletPocket pocket);
+    void onPocketChanged(final WalletAccount pocket);
 
     void onConnectivityStatus(final WalletPocketConnectivity pocketConnectivity);
 }

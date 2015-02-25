@@ -13,16 +13,12 @@ import android.widget.Toast;
 
 import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
-import com.coinomi.core.coins.DogecoinMain;
-import com.coinomi.core.wallet.SimpleHDKeyChain;
 import com.coinomi.core.wallet.Wallet;
-import com.coinomi.core.wallet.WalletPocket;
-import com.coinomi.wallet.Configuration;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.service.CoinService;
-import org.bitcoinj.crypto.DeterministicKey;
+
 import org.bitcoinj.crypto.KeyCrypterScrypt;
 
 import org.slf4j.Logger;
@@ -31,8 +27,6 @@ import org.spongycastle.crypto.params.KeyParameter;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.annotation.Nullable;
 
 /**
  * Fragment that restores a wallet

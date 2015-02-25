@@ -24,23 +24,19 @@ import android.widget.Toast;
 import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.util.GenericUtils;
-import com.coinomi.core.wallet.WalletPocket;
+import com.coinomi.core.wallet.WalletPocketHD;
 import com.coinomi.wallet.AddressBookProvider;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
-import com.coinomi.wallet.ui.widget.TransactionAmountVisualizer;
 import com.coinomi.wallet.util.ThrottlingWalletChangeListener;
 
-import org.bitcoinj.core.Address;
 import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.TransactionConfidence;
 import org.bitcoinj.core.TransactionOutput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
 
 import static com.coinomi.core.Preconditions.checkNotNull;
 
@@ -54,7 +50,7 @@ public class TransactionDetailsFragment extends Fragment {
     private static final int UPDATE_VIEW = 0;
 
     private Sha256Hash txId;
-    private WalletPocket pocket;
+    private WalletPocketHD pocket;
     private CoinType type;
 
     private ListView outputRows;
@@ -200,7 +196,7 @@ public class TransactionDetailsFragment extends Fragment {
         }
     }
 
-    private void showTxDetails(WalletPocket pocket, Transaction tx) {
+    private void showTxDetails(WalletPocketHD pocket, Transaction tx) {
         TransactionConfidence confidence = tx.getConfidence();
         String txStatusText;
         switch (confidence.getConfidenceType()) {

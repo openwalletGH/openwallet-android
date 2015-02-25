@@ -34,7 +34,7 @@ import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.uri.CoinURI;
 import com.coinomi.core.util.GenericUtils;
-import com.coinomi.core.wallet.WalletPocket;
+import com.coinomi.core.wallet.WalletPocketHD;
 import com.coinomi.core.wallet.exceptions.Bip44KeyLookAheadExceededException;
 import com.coinomi.wallet.AddressBookProvider;
 import com.coinomi.wallet.Configuration;
@@ -86,7 +86,7 @@ public class AddressRequestFragment extends Fragment {
 
     private NavigationDrawerFragment mNavigationDrawerFragment;
     @Nullable private ShareActionProvider mShareActionProvider;
-    private WalletPocket pocket;
+    private WalletPocketHD pocket;
     private int maxQrSize;
     @Nullable private Address showAddress;
 

@@ -17,7 +17,7 @@ import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.wallet.SendRequest;
 import com.coinomi.core.wallet.Wallet;
-import com.coinomi.core.wallet.WalletPocket;
+import com.coinomi.core.wallet.WalletPocketHD;
 import com.coinomi.core.wallet.exceptions.NoSuchPocketException;
 import com.coinomi.wallet.Configuration;
 import com.coinomi.wallet.Constants;
@@ -113,7 +113,7 @@ public class SignTransactionFragment extends Fragment {
             passwordLabelView.setVisibility(View.GONE);
         }
 
-        WalletPocket pocket = application.getWalletPocket(type);
+        WalletPocketHD pocket = application.getWalletPocket(type);
         boolean emptyWallet = sentAmount.equals(pocket.getBalance(false));
 
         // TODO handle in a task onCreate

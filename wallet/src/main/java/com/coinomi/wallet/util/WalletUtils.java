@@ -26,7 +26,7 @@ import android.text.style.StyleSpan;
 
 import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
-import com.coinomi.core.wallet.WalletPocket;
+import com.coinomi.core.wallet.WalletPocketHD;
 import com.coinomi.wallet.Constants;
 
 import org.bitcoinj.core.Address;
@@ -97,19 +97,19 @@ public class WalletUtils {
     }
 
     @CheckForNull
-    public static List<Address> getSendToAddress(@Nonnull final Transaction tx, @Nonnull final WalletPocket pocket) {
+    public static List<Address> getSendToAddress(@Nonnull final Transaction tx, @Nonnull final WalletPocketHD pocket) {
         return getToAddresses(tx, pocket, false);
     }
 
 
     @CheckForNull
-    public static List<Address> getReceivedWithAddress(@Nonnull final Transaction tx, @Nonnull final WalletPocket pocket) {
+    public static List<Address> getReceivedWithAddress(@Nonnull final Transaction tx, @Nonnull final WalletPocketHD pocket) {
         return getToAddresses(tx, pocket, true);
     }
 
     @CheckForNull
     private static List<Address> getToAddresses(@Nonnull final Transaction tx,
-                                                @Nonnull final WalletPocket pocket, boolean toMe) {
+                                                @Nonnull final WalletPocketHD pocket, boolean toMe) {
         List<Address> addresses = new ArrayList<Address>();
         for (final TransactionOutput output : tx.getOutputs()) {
             try {

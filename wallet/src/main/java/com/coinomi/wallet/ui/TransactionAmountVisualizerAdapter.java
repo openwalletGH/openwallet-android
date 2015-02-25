@@ -8,11 +8,10 @@ import android.widget.BaseAdapter;
 
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.util.GenericUtils;
-import com.coinomi.core.wallet.WalletPocket;
+import com.coinomi.core.wallet.WalletPocketHD;
 import com.coinomi.wallet.AddressBookProvider;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.ui.widget.SendOutput;
-import com.coinomi.wallet.ui.widget.TransactionAmountVisualizer;
 
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.Transaction;
@@ -21,8 +20,6 @@ import org.bitcoinj.core.TransactionOutput;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Nonnull;
-
 /**
  * @author John L. Jegutanis
  */
@@ -30,7 +27,7 @@ public class TransactionAmountVisualizerAdapter extends BaseAdapter {
     private final Context context;
     private final LayoutInflater inflater;
 
-    private final WalletPocket pocket;
+    private final WalletPocketHD pocket;
     private boolean isSending;
     private CoinType type;
     private String symbol;
@@ -41,7 +38,7 @@ public class TransactionAmountVisualizerAdapter extends BaseAdapter {
 
     private int itemCount;
 
-    public TransactionAmountVisualizerAdapter(final Context context, final WalletPocket walletPocket) {
+    public TransactionAmountVisualizerAdapter(final Context context, final WalletPocketHD walletPocket) {
         this.context = context;
         inflater = LayoutInflater.from(context);
         pocket = walletPocket;

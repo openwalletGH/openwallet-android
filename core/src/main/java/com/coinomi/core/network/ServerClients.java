@@ -2,7 +2,7 @@ package com.coinomi.core.network;
 
 import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.coins.CoinType;
-import com.coinomi.core.wallet.WalletPocket;
+import com.coinomi.core.wallet.WalletPocketHD;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,8 +42,8 @@ public class ServerClients {
         setPockets(wallet.getPockets(), false);
     }
 
-    public void setPockets(List<WalletPocket> pockets, boolean reconnect) {
-        for (WalletPocket pocket : pockets) {
+    public void setPockets(List<WalletPocketHD> pockets, boolean reconnect) {
+        for (WalletPocketHD pocket : pockets) {
             if (!connections.containsKey(pocket.getCoinType())) continue;
             connections.get(pocket.getCoinType()).setWalletPocket(pocket, reconnect);
         }
@@ -55,7 +55,7 @@ public class ServerClients {
         }
     }
 
-    public void startAsync(WalletPocket pocket) {
+    public void startAsync(WalletPocketHD pocket) {
         CoinType type = pocket.getCoinType();
         if (connections.containsKey(type)) {
             ServerClient c = connections.get(type);

@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static com.coinomi.core.Preconditions.checkArgument;
 import static com.coinomi.core.Preconditions.checkNotNull;
@@ -40,13 +41,15 @@ import static com.coinomi.core.Preconditions.checkState;
  */
 public class TransactionCreator {
     private static final Logger log = LoggerFactory.getLogger(TransactionCreator.class);
-    private final WalletPocket pocket;
+    private final WalletAccount pocket;
     private final CoinType coinType;
 
     private final CoinSelector coinSelector = new DefaultCoinSelector();
+    private final ReentrantLock lock; // TODO remove
 
-    public TransactionCreator(WalletPocket pocket) {
+    public TransactionCreator(WalletPocketHD pocket) {
         this.pocket = pocket;
+        lock = pocket.lock;
         coinType = pocket.coinType;
     }
 
@@ -64,7 +67,7 @@ public class TransactionCreator {
      * @throws IllegalArgumentException                     if you try and complete the same SendRequest twice
      */
     void completeTx(SendRequest req) throws InsufficientMoneyException {
-        pocket.lock.lock();
+        lock.lock();
         try {
             checkArgument(!req.completed, "Given SendRequest has already been completed.");
             // Calculate the amount of value we need to import.
@@ -171,7 +174,7 @@ public class TransactionCreator {
             req.fee = calculatedFee;
             log.info("  completed: {}", req.tx);
         } finally {
-            pocket.lock.unlock();
+            lock.unlock();
         }
     }
 
@@ -182,7 +185,7 @@ public class TransactionCreator {
      * and it's not guaranteed that transaction will be complete in the end.</p>
      */
     void signTransaction(SendRequest req) {
-        pocket.lock.lock();
+        lock.lock();
         try {
             Transaction tx = req.tx;
             List<TransactionInput> inputs = tx.getInputs();
@@ -226,7 +229,7 @@ public class TransactionCreator {
             // resolve missing sigs if any
             new MissingSigResolutionSigner(req.missingSigsMode).signInputs(proposal, maybeDecryptingKeyBag);
         } finally {
-            pocket.lock.unlock();
+            lock.unlock();
         }
     }
 
@@ -236,10 +239,10 @@ public class TransactionCreator {
      * keys for and which are not already marked as spent.
      */
     LinkedList<TransactionOutput> calculateAllSpendCandidates(boolean excludeImmatureCoinbases) {
-        pocket.lock.lock();
+        lock.lock();
         try {
             LinkedList<TransactionOutput> candidates = Lists.newLinkedList();
-            for (Transaction tx : pocket.unspent.values()) {
+            for (Transaction tx : pocket.getUnspentTransactions().values()) {
                 // Do not try and spend coinbases that were mined too recently, the protocol forbids it.
                 if (excludeImmatureCoinbases && !tx.isMature()) continue;
                 for (TransactionOutput output : tx.getOutputs()) {
@@ -249,9 +252,9 @@ public class TransactionCreator {
             }
 
             // If we have pending transactions, remove from candidates any future spent outputs
-            for (Transaction pendingTx : pocket.pending.values()) {
+            for (Transaction pendingTx : pocket.getPendingTransactions().values()) {
                 for (TransactionInput input : pendingTx.getInputs()) {
-                    Transaction tx = pocket.transactions.get(input.getOutpoint().getHash());
+                    Transaction tx = pocket.getTransactions().get(input.getOutpoint().getHash());
                     if (tx == null) continue;
                     TransactionOutput pendingSpentOutput = tx.getOutput((int) input.getOutpoint().getIndex());
                     candidates.remove(pendingSpentOutput);
@@ -259,13 +262,13 @@ public class TransactionCreator {
             }
             return candidates;
         } finally {
-            pocket.lock.unlock();
+            lock.unlock();
         }
     }
 
     private FeeCalculation calculateFee(SendRequest req, Coin value, List<TransactionInput> originalInputs,
                                         int numberOfSoftDustOutputs, LinkedList<TransactionOutput> candidates) throws InsufficientMoneyException {
-        checkState(pocket.lock.isHeldByCurrentThread());
+        checkState(lock.isHeldByCurrentThread());
         FeeCalculation result = new FeeCalculation();
         // There are 3 possibilities for what adding change might do:
         // 1) No effect

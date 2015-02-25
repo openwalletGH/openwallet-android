@@ -1,25 +1,17 @@
 package com.coinomi.wallet.ui.widget;
 
 import android.content.Context;
-import android.database.ContentObserver;
-import android.os.Handler;
-import android.support.v7.view.ActionMode;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.util.GenericUtils;
-import com.coinomi.core.wallet.WalletPocket;
+import com.coinomi.core.wallet.WalletPocketHD;
 import com.coinomi.wallet.AddressBookProvider;
 import com.coinomi.wallet.R;
-import com.coinomi.wallet.ui.EditAddressBookEntryFragment;
 
-import org.bitcoinj.core.Address;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.TransactionOutput;
@@ -52,7 +44,7 @@ public class TransactionAmountVisualizer extends LinearLayout {
         fee.setVisibility(View.GONE);
     }
 
-    public void setTransaction(WalletPocket pocket, Transaction tx) {
+    public void setTransaction(WalletPocketHD pocket, Transaction tx) {
         type = pocket.getCoinType();
         String symbol = type.getSymbol();
 

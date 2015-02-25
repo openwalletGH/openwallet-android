@@ -54,7 +54,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author John L. Jegutanis
  */
-public class WalletPocketTest {
+public class WalletPocketHDTest {
     static final List<String> MNEMONIC = ImmutableList.of("citizen", "fever", "scale", "nurse", "brief", "round", "ski", "fiction", "car", "fitness", "pluck", "act");
     static final byte[] aesKeyBytes = {0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7};
     private static final long AMOUNT_TO_SEND = 2700000000L;
@@ -63,7 +63,7 @@ public class WalletPocketTest {
     CoinType type = DogecoinTest.get();
     DeterministicHierarchy hierarchy = new DeterministicHierarchy(masterKey);
     DeterministicKey rootKey = hierarchy.get(type.getBip44Path(0), false, true);
-    WalletPocket pocket;
+    WalletPocketHD pocket;
     KeyParameter aesKey = new KeyParameter(aesKeyBytes);
     KeyCrypter crypter = new KeyCrypterScrypt();
 
@@ -71,7 +71,7 @@ public class WalletPocketTest {
     public void setup() {
         BriefLogFormatter.init();
 
-        pocket = new WalletPocket(rootKey, type, null, null);
+        pocket = new WalletPocketHD(rootKey, type, null, null);
         pocket.keys.setLookaheadSize(20);
     }
 
@@ -200,7 +200,7 @@ public class WalletPocketTest {
 
         Protos.WalletPocket walletPocketProto = pocket.toProtobuf();
 
-        WalletPocket newPocket = new WalletPocketProtobufSerializer().readWallet(walletPocketProto, null);
+        WalletPocketHD newPocket = new WalletPocketProtobufSerializer().readWallet(walletPocketProto, null);
 
         assertEquals(pocket.getBalance().value, newPocket.getBalance().value);
 
@@ -241,7 +241,7 @@ public class WalletPocketTest {
         pocket.maybeInitializeAllKeys();
         Protos.WalletPocket walletPocketProto = pocket.toProtobuf();
 
-        WalletPocket newPocket = new WalletPocketProtobufSerializer().readWallet(walletPocketProto, null);
+        WalletPocketHD newPocket = new WalletPocketProtobufSerializer().readWallet(walletPocketProto, null);
 
         assertEquals(walletPocketProto.toString(), newPocket.toProtobuf().toString());
 
@@ -250,7 +250,7 @@ public class WalletPocketTest {
         assertEquals(0, newPocket.keys.getNumIssuedInternalKeys());
 
         // 20 lookahead + 20 lookahead
-        assertEquals(40, newPocket.keys.getLeafKeys().size());
+        assertEquals(40, newPocket.keys.getActiveKeys().size());
     }
 
 
@@ -261,7 +261,7 @@ public class WalletPocketTest {
 
         Protos.WalletPocket walletPocketProto = pocket.toProtobuf();
 
-        WalletPocket newPocket = new WalletPocketProtobufSerializer().readWallet(walletPocketProto, crypter);
+        WalletPocketHD newPocket = new WalletPocketProtobufSerializer().readWallet(walletPocketProto, crypter);
 
         assertEquals(walletPocketProto.toString(), newPocket.toProtobuf().toString());
 
@@ -286,7 +286,7 @@ public class WalletPocketTest {
 
         assertAllKeysEncrypted(pocket);
 
-        WalletPocket newPocket = new WalletPocketProtobufSerializer().readWallet(pocket.toProtobuf(), crypter);
+        WalletPocketHD newPocket = new WalletPocketProtobufSerializer().readWallet(pocket.toProtobuf(), crypter);
 
         assertAllKeysEncrypted(newPocket);
 
@@ -297,7 +297,7 @@ public class WalletPocketTest {
         assertAllKeysDecrypted(newPocket);
     }
 
-    private void assertAllKeysDecrypted(WalletPocket pocket) {
+    private void assertAllKeysDecrypted(WalletPocketHD pocket) {
         List<ECKey> keys = pocket.keys.getKeys(false);
         for (ECKey k : keys) {
             DeterministicKey key = (DeterministicKey) k;
@@ -306,7 +306,7 @@ public class WalletPocketTest {
         }
     }
 
-    private void assertAllKeysEncrypted(WalletPocket pocket) {
+    private void assertAllKeysEncrypted(WalletPocketHD pocket) {
         List<ECKey> keys = pocket.keys.getKeys(false);
         for (ECKey k : keys) {
             DeterministicKey key = (DeterministicKey) k;

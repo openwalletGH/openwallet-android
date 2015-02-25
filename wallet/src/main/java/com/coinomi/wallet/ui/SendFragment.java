@@ -33,7 +33,7 @@ import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.uri.CoinURI;
 import com.coinomi.core.uri.CoinURIParseException;
 import com.coinomi.core.util.GenericUtils;
-import com.coinomi.core.wallet.WalletPocket;
+import com.coinomi.core.wallet.WalletPocketHD;
 import com.coinomi.core.wallet.exceptions.NoSuchPocketException;
 import com.coinomi.wallet.AddressBookProvider;
 import com.coinomi.wallet.Configuration;
@@ -98,7 +98,7 @@ public class SendFragment extends Fragment {
     @Nullable
     private WalletActivity activity;
     @Nullable
-    private WalletPocket pocket;
+    private WalletPocketHD pocket;
     private Configuration config;
     private NavigationDrawerFragment mNavigationDrawerFragment;
     private LoaderManager loaderManager;

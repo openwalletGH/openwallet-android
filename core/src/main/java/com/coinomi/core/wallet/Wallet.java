@@ -52,7 +52,7 @@ final public class Wallet {
 
     private final ReentrantLock lock = Threading.lock("KeyChain");
 
-    @GuardedBy("lock") private final LinkedHashMap<CoinType, WalletPocket> pockets;
+    @GuardedBy("lock") private final LinkedHashMap<CoinType, WalletPocketHD> pockets;
 
     @Nullable private DeterministicSeed seed;
     private DeterministicKey masterKey;
@@ -74,13 +74,13 @@ final public class Wallet {
 
         seed = new DeterministicSeed(mnemonic, null, password, 0);
         masterKey = HDKeyDerivation.createMasterPrivateKey(seed.getSeedBytes());
-        pockets = new LinkedHashMap<CoinType, WalletPocket>();
+        pockets = new LinkedHashMap<CoinType, WalletPocketHD>();
     }
 
     public Wallet(DeterministicKey masterKey, @Nullable DeterministicSeed seed) {
         this.seed = seed;
         this.masterKey = masterKey;
-        pockets = new LinkedHashMap<CoinType, WalletPocket>();
+        pockets = new LinkedHashMap<CoinType, WalletPocketHD>();
     }
 
     public static List<String> generateMnemonic(int entropyBitsSize) {
@@ -130,7 +130,7 @@ final public class Wallet {
             for (CoinType coin : coins) {
                 log.info("Creating coin pocket for {}", coin);
                 maybeCreatePocket(coin, key);
-                WalletPocket pocket = getPocket(coin);
+                WalletPocketHD pocket = getPocket(coin);
                 if (generateAllKeys) {
                     pocket.maybeInitializeAllKeys();
                 }
@@ -155,7 +155,7 @@ final public class Wallet {
     /**
      * Get a pocket for a coin type. Returns null if no pocket exists
      */
-    public WalletPocket getPocket(CoinType coinType) {
+    public WalletPocketHD getPocket(CoinType coinType) {
         lock.lock();
         try {
             return checkNotNull(pockets.get(coinType));
@@ -164,10 +164,10 @@ final public class Wallet {
         }
     }
 
-    public List<WalletPocket> getPockets(List<CoinType> types) {
+    public List<WalletPocketHD> getPockets(List<CoinType> types) {
         lock.lock();
         try {
-            ImmutableList.Builder<WalletPocket> builder = ImmutableList.builder();
+            ImmutableList.Builder<WalletPocketHD> builder = ImmutableList.builder();
             for (CoinType type : types) {
                 builder.add(pockets.get(type));
             }
@@ -177,7 +177,7 @@ final public class Wallet {
         }
     }
 
-    public List<WalletPocket> getPockets() {
+    public List<WalletPocketHD> getPockets() {
         lock.lock();
         try {
             return ImmutableList.copyOf(pockets.values());
@@ -204,7 +204,7 @@ final public class Wallet {
             hierarchy= new DeterministicHierarchy(masterKey);
         }
         DeterministicKey rootKey = hierarchy.get(coinType.getBip44Path(ACCOUNT_ZERO), false, true);
-        WalletPocket newPocket = new WalletPocket(rootKey, coinType, getKeyCrypter(), key);
+        WalletPocketHD newPocket = new WalletPocketHD(rootKey, coinType, getKeyCrypter(), key);
         if (isEncrypted() && !newPocket.isEncrypted()) {
             newPocket.encrypt(getKeyCrypter(), key);
         }
@@ -212,7 +212,7 @@ final public class Wallet {
     }
 
 
-    /* package */ void addPocket(WalletPocket pocket) {
+    /* package */ void addPocket(WalletPocketHD pocket) {
         lock.lock();
         try {
             checkState(!pockets.containsKey(pocket.getCoinType()), "Cannot replace an existing wallet pocket");
@@ -230,7 +230,7 @@ final public class Wallet {
     public void maybeInitializeAllPockets() {
         lock.lock();
         try {
-            for (WalletPocket pocket : getPockets()) {
+            for (WalletPocketHD pocket : getPockets()) {
                 pocket.maybeInitializeAllKeys();
             }
         } finally {
@@ -298,7 +298,7 @@ final public class Wallet {
     public SendRequest sendCoinsOffline(Address address, Coin amount, @Nullable String password)
             throws InsufficientMoneyException, NoSuchPocketException {
         CoinType type = (CoinType) address.getParameters();
-        WalletPocket pocket = getPocket(type);
+        WalletPocketHD pocket = getPocket(type);
         SendRequest request = null;
         if (pocket != null) {
             request = pocket.sendCoinsOffline(address, amount, password);
@@ -309,7 +309,7 @@ final public class Wallet {
     }
 
     public void completeAndSignTx(SendRequest request) throws InsufficientMoneyException, NoSuchPocketException {
-        WalletPocket pocket = getPocket(request.type);
+        WalletPocketHD pocket = getPocket(request.type);
         if (pocket != null) {
             if (request.completed) {
                 pocket.signTransaction(request);
@@ -334,11 +334,11 @@ final public class Wallet {
         return version;
     }
 
-    public List<WalletPocket> refresh(List<CoinType> coinTypesToReset) {
+    public List<WalletPocketHD> refresh(List<CoinType> coinTypesToReset) {
         lock.lock();
         try {
-            List<WalletPocket> refreshPockets = getPockets(coinTypesToReset);
-            for (WalletPocket pocket : refreshPockets) {
+            List<WalletPocketHD> refreshPockets = getPockets(coinTypesToReset);
+            for (WalletPocketHD pocket : refreshPockets) {
                 pocket.refresh();
             }
             saveLater();
@@ -549,7 +549,7 @@ final public class Wallet {
             if (seed != null) seed = seed.encrypt(keyCrypter, aesKey);
             masterKey = masterKey.encrypt(keyCrypter, aesKey, null);
 
-            for (WalletPocket pocket : pockets.values()) {
+            for (WalletPocketHD pocket : pockets.values()) {
                 pocket.encrypt(keyCrypter, aesKey);
             }
         } finally {
@@ -577,7 +577,7 @@ final public class Wallet {
 
             masterKey = masterKey.decrypt(getKeyCrypter(), aesKey);
 
-            for (WalletPocket pocket : pockets.values()) {
+            for (WalletPocketHD pocket : pockets.values()) {
                 pocket.decrypt(aesKey);
             }
         } finally {

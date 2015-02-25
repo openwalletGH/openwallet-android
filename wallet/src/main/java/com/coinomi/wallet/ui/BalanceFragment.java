@@ -26,17 +26,18 @@ import android.widget.Toast;
 
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.util.GenericUtils;
-import com.coinomi.core.wallet.WalletPocket;
+import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.core.wallet.WalletPocketConnectivity;
 import com.coinomi.core.wallet.WalletPocketEventListener;
+import com.coinomi.core.wallet.WalletPocketHD;
 import com.coinomi.wallet.AddressBookProvider;
 import com.coinomi.wallet.Configuration;
 import com.coinomi.wallet.Constants;
+import com.coinomi.wallet.ExchangeRatesProvider;
+import com.coinomi.wallet.ExchangeRatesProvider.ExchangeRate;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.ui.widget.Amount;
-import com.coinomi.wallet.ExchangeRatesProvider;
-import com.coinomi.wallet.ExchangeRatesProvider.ExchangeRate;
 import com.coinomi.wallet.util.ThrottlingWalletChangeListener;
 import com.google.common.collect.Lists;
 
@@ -98,7 +99,7 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
         }
     };
 
-    private WalletPocket pocket;
+    private WalletPocketHD pocket;
     private CoinType type;
     private Coin currentBalance;
     private boolean isFullAmount = false;
@@ -277,29 +278,29 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
 
     // Handled by ThrottlingWalletChangeListener
     @Override
-    public void onNewBlock(WalletPocket pocket) {
+    public void onNewBlock(WalletAccount pocket) {
     }
 
     @Override
-    public void onTransactionConfidenceChanged(WalletPocket pocket, Transaction tx) {
+    public void onTransactionConfidenceChanged(WalletAccount pocket, Transaction tx) {
     }
 
     @Override
-    public void onTransactionBroadcastFailure(WalletPocket pocket, Transaction tx) {
+    public void onTransactionBroadcastFailure(WalletAccount pocket, Transaction tx) {
         if (listener != null) listener.onTransactionBroadcastFailure(pocket, tx);
     }
 
     @Override
-    public void onTransactionBroadcastSuccess(WalletPocket pocket, Transaction tx) {
+    public void onTransactionBroadcastSuccess(WalletAccount pocket, Transaction tx) {
         if (listener != null) listener.onTransactionBroadcastSuccess(pocket, tx);
     }
 
     @Override
-    public void onPocketChanged(WalletPocket pocket) {
+    public void onPocketChanged(WalletAccount pocket) {
         checkEmptyPocketMessage(pocket);
     }
 
-    private void checkEmptyPocketMessage(WalletPocket pocket) {
+    private void checkEmptyPocketMessage(WalletAccount pocket) {
         if (emptyPocketMessage.isShown()) {
             if (!pocket.isNew()) {
                 handler.post(new Runnable() {
@@ -428,9 +429,9 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
     public void onLoaderReset(Loader<List<Transaction>> loader) { /* ignore */ }
 
     private static class TransactionsLoader extends AsyncTaskLoader<List<Transaction>> {
-        private final WalletPocket walletPocket;
+        private final WalletPocketHD walletPocket;
 
-        private TransactionsLoader(final Context context, @Nonnull final WalletPocket walletPocket) {
+        private TransactionsLoader(final Context context, @Nonnull final WalletPocketHD walletPocket) {
             super(context);
 
             this.walletPocket = walletPocket;
@@ -559,8 +560,8 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
     public interface Listener {
         public void onLocalAmountClick();
 
-        public void onTransactionBroadcastSuccess(WalletPocket pocket, Transaction transaction);
+        public void onTransactionBroadcastSuccess(WalletAccount pocket, Transaction transaction);
 
-        public void onTransactionBroadcastFailure(WalletPocket pocket, Transaction transaction);
+        public void onTransactionBroadcastFailure(WalletAccount pocket, Transaction transaction);
     }
 }

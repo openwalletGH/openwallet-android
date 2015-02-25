@@ -16,7 +16,7 @@ import android.widget.Toast;
 
 import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
-import com.coinomi.core.wallet.WalletPocket;
+import com.coinomi.core.wallet.WalletPocketHD;
 import com.coinomi.wallet.AddressBookProvider;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
@@ -40,7 +40,7 @@ public class PreviousAddressesFragment extends Fragment {
     private Listener listener;
 
     private CoinType type;
-    private WalletPocket pocket;
+    private WalletPocketHD pocket;
     private AddressesListAdapter adapter;
     private ContentResolver resolver;
 
