@@ -78,6 +78,9 @@ public class WalletPocketProtobufSerializer {
         if (pocket.getDescription() != null) {
             walletBuilder.setDescription(pocket.getDescription());
         }
+        if (pocket.getId() != null) {
+            walletBuilder.setId(pocket.getId());
+        }
 
         for (AddressStatus status : pocket.getAllAddressStatus()) {
             Protos.AddressStatus.Builder addressStatus = Protos.AddressStatus.newBuilder();
@@ -267,7 +270,13 @@ public class WalletPocketProtobufSerializer {
         } else {
             chain = SimpleHDKeyChain.fromProtobuf(walletProto.getKeyList());
         }
-        WalletPocketHD pocket = new WalletPocketHD(chain, coinType);
+
+        WalletPocketHD pocket;
+        if (walletProto.hasId()) {
+            pocket = new WalletPocketHD(walletProto.getId(), chain, coinType);
+        } else {
+            pocket = new WalletPocketHD(chain, coinType);
+        }
 
         if (walletProto.hasDescription()) {
             pocket.setDescription(walletProto.getDescription());

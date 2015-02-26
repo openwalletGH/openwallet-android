@@ -74,23 +74,7 @@ public class WalletPocketHD extends TransactionWatcherWallet {
 
     private String description;
 
-    public @VisibleForTesting SimpleHDKeyChain keys;
-
-    @Nullable private transient Wallet wallet = null;
-
-    private Runnable saveLaterRunnable = new Runnable() {
-        @Override
-        public void run() {
-            if (wallet != null) wallet.saveLater();
-        }
-    };
-
-    private Runnable saveNowRunnable = new Runnable() {
-        @Override
-        public void run() {
-            if (wallet != null) wallet.saveNow();
-        }
-    };
+    @VisibleForTesting SimpleHDKeyChain keys;
 
     public WalletPocketHD(DeterministicKey rootKey, CoinType coinType,
                           @Nullable KeyCrypter keyCrypter, @Nullable KeyParameter key) {
@@ -98,32 +82,30 @@ public class WalletPocketHD extends TransactionWatcherWallet {
     }
 
     WalletPocketHD(SimpleHDKeyChain keys, CoinType coinType) {
-        super(checkNotNull(coinType));
+        this(keys.getId(), keys, coinType);
+    }
+
+    WalletPocketHD(String id, SimpleHDKeyChain keys, CoinType coinType) {
+        super(id, checkNotNull(coinType));
         this.keys = checkNotNull(keys);
         transactionCreator = new TransactionCreator(this);
     }
-
 
     /******************************************************************************************************************/
 
     //region Vending transactions and other internal state
 
-
-
-    public CoinType getCoinType() {
-        return coinType;
-    }
-
     /**
-     * Get the wallet pocket's KeyCrypter, or null if the wallet pocket is not encrypted.
-     * (Used in encrypting/ decrypting an ECKey).
+     * Get the BIP44 index of this account
      */
-    @Nullable
-    public KeyCrypter getKeyCrypter() {
-        return keys.getKeyCrypter();
+    public int getAccountIndex() {
+        lock.lock();
+        try {
+            return keys.getAccountIndex();
+        } finally {
+            lock.unlock();
+        }
     }
-
-
 
     /**
      * Set the description of the wallet.
@@ -141,14 +123,6 @@ public class WalletPocketHD extends TransactionWatcherWallet {
      */
     public String getDescription() {
         return description;
-    }
-
-    public void setWallet(Wallet wallet) {
-        this.wallet = wallet;
-    }
-
-    public Wallet getWallet() {
-        return wallet;
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -175,26 +149,41 @@ public class WalletPocketHD extends TransactionWatcherWallet {
         }
     }
 
-    // Util
-    @Override
-    public void walletSaveLater() {
-        // Save in another thread to avoid cyclic locking of Wallet and WalletPocket
-        Threading.USER_THREAD.execute(saveLaterRunnable);
-    }
-
-    void walletSaveNow() {
-        // Save in another thread to avoid cyclic locking of Wallet and WalletPocket
-        Threading.USER_THREAD.execute(saveNowRunnable);
-    }
-
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //
     // Encryption support
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    boolean isEncrypted() {
-        return keys.isEncrypted();
+
+    @Override
+    public boolean isEncryptable() {
+        return true;
+    }
+
+    @Override
+    public boolean isEncrypted() {
+        lock.lock();
+        try {
+            return keys.isEncrypted();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Get the wallet pocket's KeyCrypter, or null if the wallet pocket is not encrypted.
+     * (Used in encrypting/ decrypting an ECKey).
+     */
+    @Nullable
+    @Override
+    public KeyCrypter getKeyCrypter() {
+        lock.lock();
+        try {
+            return keys.getKeyCrypter();
+        } finally {
+            lock.unlock();
+        }
     }
 
     /**
@@ -204,6 +193,7 @@ public class WalletPocketHD extends TransactionWatcherWallet {
      * @throws org.bitcoinj.crypto.KeyCrypterException Thrown if the wallet encryption fails for some reason,
      *         leaving the group unchanged.
      */
+    @Override
     public void encrypt(KeyCrypter keyCrypter, KeyParameter aesKey) {
         checkNotNull(keyCrypter);
         checkNotNull(aesKey);
@@ -222,7 +212,8 @@ public class WalletPocketHD extends TransactionWatcherWallet {
      *
      * @throws org.bitcoinj.crypto.KeyCrypterException Thrown if the wallet decryption fails for some reason, leaving the group unchanged.
      */
-    /* package */ void decrypt(KeyParameter aesKey) {
+    @Override
+    public void decrypt(KeyParameter aesKey) {
         checkNotNull(aesKey);
 
         lock.lock();
@@ -258,7 +249,6 @@ public class WalletPocketHD extends TransactionWatcherWallet {
         }
         return sendCoinsOffline(address, amount, key);
     }
-
 
     /**
      * {@link #sendCoinsOffline(Address, Coin)}

@@ -256,6 +256,10 @@ message WalletPocket {
     repeated Transaction transaction = 7;
 
     repeated AddressStatus address_status = 8;
+
+    optional string id = 9;
+
+    // Next tag: 10
 }
 
 /** The parameters used in the scrypt key derivation function.
@@ -291,6 +295,7 @@ message Wallet {
     optional int32 version = 1 [default = 1];
 
     optional Key seed = 2;
+    optional bool seed_password_protected = 7;
 
     required Key master_key = 3;
 
@@ -298,4 +303,6 @@ message Wallet {
     optional ScryptParameters encryption_parameters = 5;
 
     repeated WalletPocket pockets = 6;
+
+    // Next tag: 8
 }

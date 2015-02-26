@@ -4,6 +4,8 @@ package com.coinomi.core.wallet;
 import com.coinomi.core.protos.Protos;
 import org.bitcoinj.core.BloomFilter;
 import org.bitcoinj.core.ECKey;
+import org.bitcoinj.core.Sha256Hash;
+import org.bitcoinj.core.Utils;
 import org.bitcoinj.crypto.ChildNumber;
 import org.bitcoinj.crypto.DeterministicHierarchy;
 import org.bitcoinj.crypto.DeterministicKey;
@@ -964,6 +966,14 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
 
     public boolean isExternal(DeterministicKey key) {
         return key.getParent() != null && key.getParent().equals(externalKey);
+    }
+
+    public int getAccountIndex() {
+        return rootKey.getChildNumber().num();
+    }
+
+    public String getId() {
+        return Utils.HEX.encode(rootKey.getPubKeyHash());
     }
 }
 

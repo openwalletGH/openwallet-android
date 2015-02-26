@@ -32,6 +32,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -52,7 +53,8 @@ final public class Wallet {
 
     private final ReentrantLock lock = Threading.lock("KeyChain");
 
-    @GuardedBy("lock") private final LinkedHashMap<CoinType, WalletPocketHD> pockets;
+    @GuardedBy("lock") private final LinkedHashMap<CoinType, ArrayList<WalletAccount>> accountsByType;
+    @GuardedBy("lock") private final LinkedHashMap<String, WalletAccount> accounts;
 
     @Nullable private DeterministicSeed seed;
     private DeterministicKey masterKey;
@@ -74,13 +76,15 @@ final public class Wallet {
 
         seed = new DeterministicSeed(mnemonic, null, password, 0);
         masterKey = HDKeyDerivation.createMasterPrivateKey(seed.getSeedBytes());
-        pockets = new LinkedHashMap<CoinType, WalletPocketHD>();
+        accountsByType = new LinkedHashMap<CoinType, ArrayList<WalletAccount>>();
+        accounts = new LinkedHashMap<String, WalletAccount>();
     }
 
     public Wallet(DeterministicKey masterKey, @Nullable DeterministicSeed seed) {
         this.seed = seed;
         this.masterKey = masterKey;
-        pockets = new LinkedHashMap<CoinType, WalletPocketHD>();
+        accountsByType = new LinkedHashMap<CoinType, ArrayList<WalletAccount>>();
+        accounts = new LinkedHashMap<String, WalletAccount>();
     }
 
     public static List<String> generateMnemonic(int entropyBitsSize) {
@@ -118,23 +122,25 @@ final public class Wallet {
         return sb.toString();
     }
 
-    public void createCoinPocket(CoinType coin, boolean generateAllKeys,
+    public WalletAccount createAccount(CoinType coin, boolean generateAllKeys,
                                   @Nullable KeyParameter key) {
-        createCoinPockets(Lists.newArrayList(coin), generateAllKeys, key);
+        return createAccounts(Lists.newArrayList(coin), generateAllKeys, key).get(0);
     }
 
-    public void createCoinPockets(List<CoinType> coins, boolean generateAllKeys,
+    public List<WalletAccount> createAccounts(List<CoinType> coins, boolean generateAllKeys,
                                   @Nullable KeyParameter key) {
         lock.lock();
         try {
+            ImmutableList.Builder<WalletAccount> newAccounts = ImmutableList.builder();
             for (CoinType coin : coins) {
                 log.info("Creating coin pocket for {}", coin);
-                maybeCreatePocket(coin, key);
-                WalletPocketHD pocket = getPocket(coin);
+                WalletPocketHD newAccount = createAndAddAccount(coin, key);
                 if (generateAllKeys) {
-                    pocket.maybeInitializeAllKeys();
+                    newAccount.maybeInitializeAllKeys();
                 }
+                newAccounts.add(newAccount);
             }
+            return newAccounts.build();
         } finally {
             lock.unlock();
         }
@@ -143,33 +149,41 @@ final public class Wallet {
     /**
      * Check if pocket exists
      */
-    public boolean isPocketExists(CoinType coinType) {
+    public boolean isAccountExists(CoinType coinType) {
         lock.lock();
         try {
-            return pockets.containsKey(coinType);
+            return accountsByType.containsKey(coinType);
         } finally {
             lock.unlock();
         }
     }
 
     /**
-     * Get a pocket for a coin type. Returns null if no pocket exists
+     * Get a specific account, null if does not exist
      */
-    public WalletPocketHD getPocket(CoinType coinType) {
-        lock.lock();
-        try {
-            return checkNotNull(pockets.get(coinType));
-        } finally {
-            lock.unlock();
-        }
+    @Nullable
+    public WalletAccount getAccount(String id) {
+        return accounts.get(id);
     }
 
-    public List<WalletPocketHD> getPockets(List<CoinType> types) {
+    /**
+     * Get accounts for a specific coin type. Returns empty list if no account exists
+     */
+    public List<WalletAccount> getAccounts(CoinType coinType) {
+        return getAccounts(Lists.newArrayList(coinType));
+    }
+
+    /**
+     * Get accounts for a specific coin type. Returns empty list if no account exists
+     */
+    public List<WalletAccount> getAccounts(List<CoinType> types) {
         lock.lock();
         try {
-            ImmutableList.Builder<WalletPocketHD> builder = ImmutableList.builder();
+            ImmutableList.Builder<WalletAccount> builder = ImmutableList.builder();
             for (CoinType type : types) {
-                builder.add(pockets.get(type));
+                if (isAccountExists(type)) {
+                    builder.addAll(accountsByType.get(type));
+                }
             }
             return builder.build();
         } finally {
@@ -177,47 +191,68 @@ final public class Wallet {
         }
     }
 
-    public List<WalletPocketHD> getPockets() {
+    public List<WalletAccount> getAllAccounts() {
         lock.lock();
         try {
-            return ImmutableList.copyOf(pockets.values());
+            return ImmutableList.copyOf(accounts.values());
         } finally {
             lock.unlock();
         }
     }
 
-    private void maybeCreatePocket(CoinType coinType, @Nullable KeyParameter key) {
+    /**
+     * Generate and add a new BIP44 account for a specific coin type
+     */
+    private WalletPocketHD createAndAddAccount(CoinType coinType, @Nullable KeyParameter key) {
         checkState(lock.isHeldByCurrentThread());
-        if (!pockets.containsKey(coinType)) {
-            createPocket(coinType, key);
-        }
-    }
-
-
-    private void createPocket(CoinType coinType, @Nullable KeyParameter key) {
-        checkState(lock.isHeldByCurrentThread());
-        checkState(!pockets.containsKey(coinType));
         DeterministicHierarchy hierarchy;
         if (isEncrypted()) {
             hierarchy = new DeterministicHierarchy(masterKey.decrypt(getKeyCrypter(), key));
         } else {
             hierarchy= new DeterministicHierarchy(masterKey);
         }
-        DeterministicKey rootKey = hierarchy.get(coinType.getBip44Path(ACCOUNT_ZERO), false, true);
+        int newIndex = getLastAccountIndex(coinType) + 1;
+        DeterministicKey rootKey = hierarchy.get(coinType.getBip44Path(newIndex), false, true);
         WalletPocketHD newPocket = new WalletPocketHD(rootKey, coinType, getKeyCrypter(), key);
         if (isEncrypted() && !newPocket.isEncrypted()) {
             newPocket.encrypt(getKeyCrypter(), key);
         }
-        addPocket(newPocket);
+        addAccount(newPocket);
+        return newPocket;
     }
 
+    /**
+     * Get the last BIP44 account index of an account in this wallet. If no accounts found return -1
+     */
+    private int getLastAccountIndex(CoinType coinType) {
+        if (!isAccountExists(coinType)) {
+            return -1;
+        }
+        int lastIndex = -1;
+        for (WalletAccount account : accountsByType.get(coinType)) {
+            if (account instanceof WalletPocketHD) {
+                int index = ((WalletPocketHD) account).getAccountIndex();
+                if (index > lastIndex) {
+                    lastIndex = index;
+                }
+            }
+        }
+        return lastIndex;
+    }
 
-    /* package */ void addPocket(WalletPocketHD pocket) {
+    /* package */ void addAccount(WalletAccount pocket) {
         lock.lock();
         try {
-            checkState(!pockets.containsKey(pocket.getCoinType()), "Cannot replace an existing wallet pocket");
-            //TODO check if key crypter is the same
-            pockets.put(pocket.getCoinType(), pocket);
+            String id = pocket.getId();
+            CoinType type = pocket.getCoinType();
+
+            checkState(!accounts.containsKey(id), "Cannot replace an existing wallet pocket");
+
+            if (!accountsByType.containsKey(type)) {
+                accountsByType.put(type, new ArrayList<WalletAccount>());
+            }
+            accountsByType.get(type).add(pocket);
+            accounts.put(pocket.getId(), pocket);
             pocket.setWallet(this);
         } finally {
             lock.unlock();
@@ -230,14 +265,17 @@ final public class Wallet {
     public void maybeInitializeAllPockets() {
         lock.lock();
         try {
-            for (WalletPocketHD pocket : getPockets()) {
-                pocket.maybeInitializeAllKeys();
+            for (WalletAccount account : accounts.values()) {
+                if (account instanceof WalletPocketHD) {
+                    ((WalletPocketHD)account).maybeInitializeAllKeys();
+                }
             }
         } finally {
             lock.unlock();
         }
     }
 
+    //TODO remove public and implement seed password protection check
     public DeterministicKey getMasterKey() {
         lock.lock();
         try {
@@ -270,10 +308,12 @@ final public class Wallet {
         }
     }
 
+    //TODO
+    @Deprecated
     public List<CoinType> getCoinTypes() {
         lock.lock();
         try {
-            return ImmutableList.copyOf(pockets.keySet());
+            return ImmutableList.copyOf(accountsByType.keySet());
         } finally {
             lock.unlock();
         }
@@ -290,36 +330,36 @@ final public class Wallet {
         }
     }
 
-    public SendRequest sendCoinsOffline(Address address, Coin amount)
-            throws InsufficientMoneyException, NoSuchPocketException {
-        return sendCoinsOffline(address, amount, null);
-    }
-
-    public SendRequest sendCoinsOffline(Address address, Coin amount, @Nullable String password)
-            throws InsufficientMoneyException, NoSuchPocketException {
-        CoinType type = (CoinType) address.getParameters();
-        WalletPocketHD pocket = getPocket(type);
-        SendRequest request = null;
-        if (pocket != null) {
-            request = pocket.sendCoinsOffline(address, amount, password);
-        } else {
-            throwNoSuchPocket(type);
-        }
-        return request;
-    }
-
-    public void completeAndSignTx(SendRequest request) throws InsufficientMoneyException, NoSuchPocketException {
-        WalletPocketHD pocket = getPocket(request.type);
-        if (pocket != null) {
-            if (request.completed) {
-                pocket.signTransaction(request);
-            } else {
-                pocket.completeTx(request);
-            }
-        } else {
-            throwNoSuchPocket(request.type);
-        }
-    }
+//    public SendRequest sendCoinsOffline(Address address, Coin amount)
+//            throws InsufficientMoneyException, NoSuchPocketException {
+//        return sendCoinsOffline(address, amount, null);
+//    }
+//
+//    public SendRequest sendCoinsOffline(Address address, Coin amount, @Nullable String password)
+//            throws InsufficientMoneyException, NoSuchPocketException {
+//        CoinType type = (CoinType) address.getParameters();
+//        WalletPocketHD pocket = getPocket(type);
+//        SendRequest request = null;
+//        if (pocket != null) {
+//            request = pocket.sendCoinsOffline(address, amount, password);
+//        } else {
+//            throwNoSuchPocket(type);
+//        }
+//        return request;
+//    }
+//
+//    public void completeAndSignTx(SendRequest request) throws InsufficientMoneyException, NoSuchPocketException {
+//        WalletPocketHD pocket = getPocket(request.type);
+//        if (pocket != null) {
+//            if (request.completed) {
+//                pocket.signTransaction(request);
+//            } else {
+//                pocket.completeTx(request);
+//            }
+//        } else {
+//            throwNoSuchPocket(request.type);
+//        }
+//    }
 
     private void throwNoSuchPocket(CoinType type) throws NoSuchPocketException {
         throw new NoSuchPocketException("Tried to send from pocket " + type.getName() +
@@ -334,15 +374,18 @@ final public class Wallet {
         return version;
     }
 
-    public List<WalletPocketHD> refresh(List<CoinType> coinTypesToReset) {
+    public List<WalletAccount> refresh(List<String> accountsToReset) {
         lock.lock();
         try {
-            List<WalletPocketHD> refreshPockets = getPockets(coinTypesToReset);
-            for (WalletPocketHD pocket : refreshPockets) {
-                pocket.refresh();
+            ImmutableList.Builder<WalletAccount> refreshedAccounts = ImmutableList.builder();
+            for (String id : accountsToReset) {
+                WalletAccount account = getAccount(id);
+                if (account != null) {
+                    account.refresh();
+                }
             }
             saveLater();
-            return refreshPockets;
+            return refreshedAccounts.build();
         } finally {
             lock.unlock();
         }
@@ -549,8 +592,10 @@ final public class Wallet {
             if (seed != null) seed = seed.encrypt(keyCrypter, aesKey);
             masterKey = masterKey.encrypt(keyCrypter, aesKey, null);
 
-            for (WalletPocketHD pocket : pockets.values()) {
-                pocket.encrypt(keyCrypter, aesKey);
+            for (WalletAccount account : accounts.values()) {
+                if (account.isEncryptable()) {
+                    account.encrypt(keyCrypter, aesKey);
+                }
             }
         } finally {
             lock.unlock();
@@ -577,8 +622,10 @@ final public class Wallet {
 
             masterKey = masterKey.decrypt(getKeyCrypter(), aesKey);
 
-            for (WalletPocketHD pocket : pockets.values()) {
-                pocket.decrypt(aesKey);
+            for (WalletAccount account : accounts.values()) {
+                if (account.isEncryptable()) {
+                    account.decrypt(aesKey);
+                }
             }
         } finally {
             lock.unlock();
@@ -593,7 +640,8 @@ final public class Wallet {
         }
     }
 
-    public void broadcastTx(SendRequest request) throws IOException{
-        getPocket(request.type).broadcastTx(request.tx);
-    }
+    // TODO
+//    public void broadcastTx(SendRequest request) throws IOException {
+//        getPocket(request.type).broadcastTx(request.tx);
+//    }
 }

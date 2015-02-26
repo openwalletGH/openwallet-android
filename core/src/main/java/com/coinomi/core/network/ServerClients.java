@@ -2,6 +2,7 @@ package com.coinomi.core.network;
 
 import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.core.wallet.WalletPocketHD;
 
 import org.slf4j.Logger;
@@ -39,13 +40,14 @@ public class ServerClients {
             connections.put(coinAddress.getType(), client);
         }
 
-        setPockets(wallet.getPockets(), false);
+        setPockets(wallet.getAllAccounts(), false);
     }
 
-    public void setPockets(List<WalletPocketHD> pockets, boolean reconnect) {
-        for (WalletPocketHD pocket : pockets) {
+    public void setPockets(List<WalletAccount> pockets, boolean reconnect) {
+        for (WalletAccount pocket : pockets) {
             if (!connections.containsKey(pocket.getCoinType())) continue;
-            connections.get(pocket.getCoinType()).setWalletPocket(pocket, reconnect);
+            // FIXME
+            connections.get(pocket.getCoinType()).setWalletPocket((WalletPocketHD) pocket, reconnect);
         }
     }
 

@@ -10352,6 +10352,20 @@ public final class Protos {
      */
     com.coinomi.core.protos.Protos.AddressStatusOrBuilder getAddressStatusOrBuilder(
         int index);
+
+    /**
+     * <code>optional string id = 9;</code>
+     */
+    boolean hasId();
+    /**
+     * <code>optional string id = 9;</code>
+     */
+    java.lang.String getId();
+    /**
+     * <code>optional string id = 9;</code>
+     */
+    com.google.protobuf.ByteString
+        getIdBytes();
   }
   /**
    * Protobuf type {@code com.coinomi.core.protos.WalletPocket}
@@ -10458,6 +10472,12 @@ public final class Protos {
                 mutable_bitField0_ |= 0x00000080;
               }
               addressStatus_.add(input.readMessage(com.coinomi.core.protos.Protos.AddressStatus.PARSER, extensionRegistry));
+              break;
+            }
+            case 74: {
+              com.google.protobuf.ByteString bs = input.readBytes();
+              bitField0_ |= 0x00000020;
+              id_ = bs;
               break;
             }
           }
@@ -10783,6 +10803,48 @@ public final class Protos {
       return addressStatus_.get(index);
     }
 
+    public static final int ID_FIELD_NUMBER = 9;
+    private java.lang.Object id_;
+    /**
+     * <code>optional string id = 9;</code>
+     */
+    public boolean hasId() {
+      return ((bitField0_ & 0x00000020) == 0x00000020);
+    }
+    /**
+     * <code>optional string id = 9;</code>
+     */
+    public java.lang.String getId() {
+      java.lang.Object ref = id_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          id_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string id = 9;</code>
+     */
+    public com.google.protobuf.ByteString
+        getIdBytes() {
+      java.lang.Object ref = id_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        id_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private void initFields() {
       networkIdentifier_ = "";
       description_ = "";
@@ -10792,6 +10854,7 @@ public final class Protos {
       lastSeenBlockTimeSecs_ = 0L;
       transaction_ = java.util.Collections.emptyList();
       addressStatus_ = java.util.Collections.emptyList();
+      id_ = "";
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -10852,6 +10915,9 @@ public final class Protos {
       for (int i = 0; i < addressStatus_.size(); i++) {
         output.writeMessage(8, addressStatus_.get(i));
       }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        output.writeBytes(9, getIdBytes());
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -10892,6 +10958,10 @@ public final class Protos {
       for (int i = 0; i < addressStatus_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(8, addressStatus_.get(i));
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(9, getIdBytes());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -11045,6 +11115,8 @@ public final class Protos {
         } else {
           addressStatusBuilder_.clear();
         }
+        id_ = "";
+        bitField0_ = (bitField0_ & ~0x00000100);
         return this;
       }
 
@@ -11120,6 +11192,10 @@ public final class Protos {
         } else {
           result.addressStatus_ = addressStatusBuilder_.build();
         }
+        if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
+          to_bitField0_ |= 0x00000020;
+        }
+        result.id_ = id_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -11232,6 +11308,11 @@ public final class Protos {
               addressStatusBuilder_.addAllMessages(other.addressStatus_);
             }
           }
+        }
+        if (other.hasId()) {
+          bitField0_ |= 0x00000100;
+          id_ = other.id_;
+          onChanged();
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -12333,6 +12414,82 @@ public final class Protos {
         return addressStatusBuilder_;
       }
 
+      private java.lang.Object id_ = "";
+      /**
+       * <code>optional string id = 9;</code>
+       */
+      public boolean hasId() {
+        return ((bitField0_ & 0x00000100) == 0x00000100);
+      }
+      /**
+       * <code>optional string id = 9;</code>
+       */
+      public java.lang.String getId() {
+        java.lang.Object ref = id_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            id_ = s;
+          }
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string id = 9;</code>
+       */
+      public com.google.protobuf.ByteString
+          getIdBytes() {
+        java.lang.Object ref = id_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          id_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string id = 9;</code>
+       */
+      public Builder setId(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000100;
+        id_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string id = 9;</code>
+       */
+      public Builder clearId() {
+        bitField0_ = (bitField0_ & ~0x00000100);
+        id_ = getDefaultInstance().getId();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string id = 9;</code>
+       */
+      public Builder setIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000100;
+        id_ = value;
+        onChanged();
+        return this;
+      }
+
       // @@protoc_insertion_point(builder_scope:com.coinomi.core.protos.WalletPocket)
     }
 
@@ -13167,6 +13324,15 @@ public final class Protos {
     com.coinomi.core.protos.Protos.KeyOrBuilder getSeedOrBuilder();
 
     /**
+     * <code>optional bool seed_password_protected = 7;</code>
+     */
+    boolean hasSeedPasswordProtected();
+    /**
+     * <code>optional bool seed_password_protected = 7;</code>
+     */
+    boolean getSeedPasswordProtected();
+
+    /**
      * <code>required .com.coinomi.core.protos.Key master_key = 3;</code>
      */
     boolean hasMasterKey();
@@ -13301,7 +13467,7 @@ public final class Protos {
             }
             case 26: {
               com.coinomi.core.protos.Protos.Key.Builder subBuilder = null;
-              if (((bitField0_ & 0x00000004) == 0x00000004)) {
+              if (((bitField0_ & 0x00000008) == 0x00000008)) {
                 subBuilder = masterKey_.toBuilder();
               }
               masterKey_ = input.readMessage(com.coinomi.core.protos.Protos.Key.PARSER, extensionRegistry);
@@ -13309,7 +13475,7 @@ public final class Protos {
                 subBuilder.mergeFrom(masterKey_);
                 masterKey_ = subBuilder.buildPartial();
               }
-              bitField0_ |= 0x00000004;
+              bitField0_ |= 0x00000008;
               break;
             }
             case 32: {
@@ -13318,14 +13484,14 @@ public final class Protos {
               if (value == null) {
                 unknownFields.mergeVarintField(4, rawValue);
               } else {
-                bitField0_ |= 0x00000008;
+                bitField0_ |= 0x00000010;
                 encryptionType_ = value;
               }
               break;
             }
             case 42: {
               com.coinomi.core.protos.Protos.ScryptParameters.Builder subBuilder = null;
-              if (((bitField0_ & 0x00000010) == 0x00000010)) {
+              if (((bitField0_ & 0x00000020) == 0x00000020)) {
                 subBuilder = encryptionParameters_.toBuilder();
               }
               encryptionParameters_ = input.readMessage(com.coinomi.core.protos.Protos.ScryptParameters.PARSER, extensionRegistry);
@@ -13333,15 +13499,20 @@ public final class Protos {
                 subBuilder.mergeFrom(encryptionParameters_);
                 encryptionParameters_ = subBuilder.buildPartial();
               }
-              bitField0_ |= 0x00000010;
+              bitField0_ |= 0x00000020;
               break;
             }
             case 50: {
-              if (!((mutable_bitField0_ & 0x00000020) == 0x00000020)) {
+              if (!((mutable_bitField0_ & 0x00000040) == 0x00000040)) {
                 pockets_ = new java.util.ArrayList<com.coinomi.core.protos.Protos.WalletPocket>();
-                mutable_bitField0_ |= 0x00000020;
+                mutable_bitField0_ |= 0x00000040;
               }
               pockets_.add(input.readMessage(com.coinomi.core.protos.Protos.WalletPocket.PARSER, extensionRegistry));
+              break;
+            }
+            case 56: {
+              bitField0_ |= 0x00000004;
+              seedPasswordProtected_ = input.readBool();
               break;
             }
           }
@@ -13352,7 +13523,7 @@ public final class Protos {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e.getMessage()).setUnfinishedMessage(this);
       } finally {
-        if (((mutable_bitField0_ & 0x00000020) == 0x00000020)) {
+        if (((mutable_bitField0_ & 0x00000040) == 0x00000040)) {
           pockets_ = java.util.Collections.unmodifiableList(pockets_);
         }
         this.unknownFields = unknownFields.build();
@@ -13556,13 +13727,28 @@ public final class Protos {
       return seed_;
     }
 
+    public static final int SEED_PASSWORD_PROTECTED_FIELD_NUMBER = 7;
+    private boolean seedPasswordProtected_;
+    /**
+     * <code>optional bool seed_password_protected = 7;</code>
+     */
+    public boolean hasSeedPasswordProtected() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    /**
+     * <code>optional bool seed_password_protected = 7;</code>
+     */
+    public boolean getSeedPasswordProtected() {
+      return seedPasswordProtected_;
+    }
+
     public static final int MASTER_KEY_FIELD_NUMBER = 3;
     private com.coinomi.core.protos.Protos.Key masterKey_;
     /**
      * <code>required .com.coinomi.core.protos.Key master_key = 3;</code>
      */
     public boolean hasMasterKey() {
-      return ((bitField0_ & 0x00000004) == 0x00000004);
+      return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
      * <code>required .com.coinomi.core.protos.Key master_key = 3;</code>
@@ -13583,7 +13769,7 @@ public final class Protos {
      * <code>optional .com.coinomi.core.protos.Wallet.EncryptionType encryption_type = 4 [default = UNENCRYPTED];</code>
      */
     public boolean hasEncryptionType() {
-      return ((bitField0_ & 0x00000008) == 0x00000008);
+      return ((bitField0_ & 0x00000010) == 0x00000010);
     }
     /**
      * <code>optional .com.coinomi.core.protos.Wallet.EncryptionType encryption_type = 4 [default = UNENCRYPTED];</code>
@@ -13598,7 +13784,7 @@ public final class Protos {
      * <code>optional .com.coinomi.core.protos.ScryptParameters encryption_parameters = 5;</code>
      */
     public boolean hasEncryptionParameters() {
-      return ((bitField0_ & 0x00000010) == 0x00000010);
+      return ((bitField0_ & 0x00000020) == 0x00000020);
     }
     /**
      * <code>optional .com.coinomi.core.protos.ScryptParameters encryption_parameters = 5;</code>
@@ -13651,6 +13837,7 @@ public final class Protos {
     private void initFields() {
       version_ = 1;
       seed_ = com.coinomi.core.protos.Protos.Key.getDefaultInstance();
+      seedPasswordProtected_ = false;
       masterKey_ = com.coinomi.core.protos.Protos.Key.getDefaultInstance();
       encryptionType_ = com.coinomi.core.protos.Protos.Wallet.EncryptionType.UNENCRYPTED;
       encryptionParameters_ = com.coinomi.core.protos.Protos.ScryptParameters.getDefaultInstance();
@@ -13701,17 +13888,20 @@ public final class Protos {
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeMessage(2, seed_);
       }
-      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
         output.writeMessage(3, masterKey_);
       }
-      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
         output.writeEnum(4, encryptionType_.getNumber());
       }
-      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
         output.writeMessage(5, encryptionParameters_);
       }
       for (int i = 0; i < pockets_.size(); i++) {
         output.writeMessage(6, pockets_.get(i));
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeBool(7, seedPasswordProtected_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -13730,21 +13920,25 @@ public final class Protos {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(2, seed_);
       }
-      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(3, masterKey_);
       }
-      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(4, encryptionType_.getNumber());
       }
-      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(5, encryptionParameters_);
       }
       for (int i = 0; i < pockets_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(6, pockets_.get(i));
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(7, seedPasswordProtected_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -13879,23 +14073,25 @@ public final class Protos {
           seedBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000002);
+        seedPasswordProtected_ = false;
+        bitField0_ = (bitField0_ & ~0x00000004);
         if (masterKeyBuilder_ == null) {
           masterKey_ = com.coinomi.core.protos.Protos.Key.getDefaultInstance();
         } else {
           masterKeyBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000004);
-        encryptionType_ = com.coinomi.core.protos.Protos.Wallet.EncryptionType.UNENCRYPTED;
         bitField0_ = (bitField0_ & ~0x00000008);
+        encryptionType_ = com.coinomi.core.protos.Protos.Wallet.EncryptionType.UNENCRYPTED;
+        bitField0_ = (bitField0_ & ~0x00000010);
         if (encryptionParametersBuilder_ == null) {
           encryptionParameters_ = com.coinomi.core.protos.Protos.ScryptParameters.getDefaultInstance();
         } else {
           encryptionParametersBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000010);
+        bitField0_ = (bitField0_ & ~0x00000020);
         if (pocketsBuilder_ == null) {
           pockets_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000020);
+          bitField0_ = (bitField0_ & ~0x00000040);
         } else {
           pocketsBuilder_.clear();
         }
@@ -13942,17 +14138,21 @@ public final class Protos {
         if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
           to_bitField0_ |= 0x00000004;
         }
+        result.seedPasswordProtected_ = seedPasswordProtected_;
+        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+          to_bitField0_ |= 0x00000008;
+        }
         if (masterKeyBuilder_ == null) {
           result.masterKey_ = masterKey_;
         } else {
           result.masterKey_ = masterKeyBuilder_.build();
         }
-        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
-          to_bitField0_ |= 0x00000008;
-        }
-        result.encryptionType_ = encryptionType_;
         if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
           to_bitField0_ |= 0x00000010;
+        }
+        result.encryptionType_ = encryptionType_;
+        if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
+          to_bitField0_ |= 0x00000020;
         }
         if (encryptionParametersBuilder_ == null) {
           result.encryptionParameters_ = encryptionParameters_;
@@ -13960,9 +14160,9 @@ public final class Protos {
           result.encryptionParameters_ = encryptionParametersBuilder_.build();
         }
         if (pocketsBuilder_ == null) {
-          if (((bitField0_ & 0x00000020) == 0x00000020)) {
+          if (((bitField0_ & 0x00000040) == 0x00000040)) {
             pockets_ = java.util.Collections.unmodifiableList(pockets_);
-            bitField0_ = (bitField0_ & ~0x00000020);
+            bitField0_ = (bitField0_ & ~0x00000040);
           }
           result.pockets_ = pockets_;
         } else {
@@ -13990,6 +14190,9 @@ public final class Protos {
         if (other.hasSeed()) {
           mergeSeed(other.getSeed());
         }
+        if (other.hasSeedPasswordProtected()) {
+          setSeedPasswordProtected(other.getSeedPasswordProtected());
+        }
         if (other.hasMasterKey()) {
           mergeMasterKey(other.getMasterKey());
         }
@@ -14003,7 +14206,7 @@ public final class Protos {
           if (!other.pockets_.isEmpty()) {
             if (pockets_.isEmpty()) {
               pockets_ = other.pockets_;
-              bitField0_ = (bitField0_ & ~0x00000020);
+              bitField0_ = (bitField0_ & ~0x00000040);
             } else {
               ensurePocketsIsMutable();
               pockets_.addAll(other.pockets_);
@@ -14016,7 +14219,7 @@ public final class Protos {
               pocketsBuilder_.dispose();
               pocketsBuilder_ = null;
               pockets_ = other.pockets_;
-              bitField0_ = (bitField0_ & ~0x00000020);
+              bitField0_ = (bitField0_ & ~0x00000040);
               pocketsBuilder_ = 
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getPocketsFieldBuilder() : null;
@@ -14246,6 +14449,38 @@ public final class Protos {
         return seedBuilder_;
       }
 
+      private boolean seedPasswordProtected_ ;
+      /**
+       * <code>optional bool seed_password_protected = 7;</code>
+       */
+      public boolean hasSeedPasswordProtected() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      /**
+       * <code>optional bool seed_password_protected = 7;</code>
+       */
+      public boolean getSeedPasswordProtected() {
+        return seedPasswordProtected_;
+      }
+      /**
+       * <code>optional bool seed_password_protected = 7;</code>
+       */
+      public Builder setSeedPasswordProtected(boolean value) {
+        bitField0_ |= 0x00000004;
+        seedPasswordProtected_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bool seed_password_protected = 7;</code>
+       */
+      public Builder clearSeedPasswordProtected() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        seedPasswordProtected_ = false;
+        onChanged();
+        return this;
+      }
+
       private com.coinomi.core.protos.Protos.Key masterKey_ = com.coinomi.core.protos.Protos.Key.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           com.coinomi.core.protos.Protos.Key, com.coinomi.core.protos.Protos.Key.Builder, com.coinomi.core.protos.Protos.KeyOrBuilder> masterKeyBuilder_;
@@ -14253,7 +14488,7 @@ public final class Protos {
        * <code>required .com.coinomi.core.protos.Key master_key = 3;</code>
        */
       public boolean hasMasterKey() {
-        return ((bitField0_ & 0x00000004) == 0x00000004);
+        return ((bitField0_ & 0x00000008) == 0x00000008);
       }
       /**
        * <code>required .com.coinomi.core.protos.Key master_key = 3;</code>
@@ -14278,7 +14513,7 @@ public final class Protos {
         } else {
           masterKeyBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000004;
+        bitField0_ |= 0x00000008;
         return this;
       }
       /**
@@ -14292,7 +14527,7 @@ public final class Protos {
         } else {
           masterKeyBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000004;
+        bitField0_ |= 0x00000008;
         return this;
       }
       /**
@@ -14300,7 +14535,7 @@ public final class Protos {
        */
       public Builder mergeMasterKey(com.coinomi.core.protos.Protos.Key value) {
         if (masterKeyBuilder_ == null) {
-          if (((bitField0_ & 0x00000004) == 0x00000004) &&
+          if (((bitField0_ & 0x00000008) == 0x00000008) &&
               masterKey_ != com.coinomi.core.protos.Protos.Key.getDefaultInstance()) {
             masterKey_ =
               com.coinomi.core.protos.Protos.Key.newBuilder(masterKey_).mergeFrom(value).buildPartial();
@@ -14311,7 +14546,7 @@ public final class Protos {
         } else {
           masterKeyBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000004;
+        bitField0_ |= 0x00000008;
         return this;
       }
       /**
@@ -14324,14 +14559,14 @@ public final class Protos {
         } else {
           masterKeyBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000004);
+        bitField0_ = (bitField0_ & ~0x00000008);
         return this;
       }
       /**
        * <code>required .com.coinomi.core.protos.Key master_key = 3;</code>
        */
       public com.coinomi.core.protos.Protos.Key.Builder getMasterKeyBuilder() {
-        bitField0_ |= 0x00000004;
+        bitField0_ |= 0x00000008;
         onChanged();
         return getMasterKeyFieldBuilder().getBuilder();
       }
@@ -14367,7 +14602,7 @@ public final class Protos {
        * <code>optional .com.coinomi.core.protos.Wallet.EncryptionType encryption_type = 4 [default = UNENCRYPTED];</code>
        */
       public boolean hasEncryptionType() {
-        return ((bitField0_ & 0x00000008) == 0x00000008);
+        return ((bitField0_ & 0x00000010) == 0x00000010);
       }
       /**
        * <code>optional .com.coinomi.core.protos.Wallet.EncryptionType encryption_type = 4 [default = UNENCRYPTED];</code>
@@ -14382,7 +14617,7 @@ public final class Protos {
         if (value == null) {
           throw new NullPointerException();
         }
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000010;
         encryptionType_ = value;
         onChanged();
         return this;
@@ -14391,7 +14626,7 @@ public final class Protos {
        * <code>optional .com.coinomi.core.protos.Wallet.EncryptionType encryption_type = 4 [default = UNENCRYPTED];</code>
        */
       public Builder clearEncryptionType() {
-        bitField0_ = (bitField0_ & ~0x00000008);
+        bitField0_ = (bitField0_ & ~0x00000010);
         encryptionType_ = com.coinomi.core.protos.Protos.Wallet.EncryptionType.UNENCRYPTED;
         onChanged();
         return this;
@@ -14404,7 +14639,7 @@ public final class Protos {
        * <code>optional .com.coinomi.core.protos.ScryptParameters encryption_parameters = 5;</code>
        */
       public boolean hasEncryptionParameters() {
-        return ((bitField0_ & 0x00000010) == 0x00000010);
+        return ((bitField0_ & 0x00000020) == 0x00000020);
       }
       /**
        * <code>optional .com.coinomi.core.protos.ScryptParameters encryption_parameters = 5;</code>
@@ -14429,7 +14664,7 @@ public final class Protos {
         } else {
           encryptionParametersBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000010;
+        bitField0_ |= 0x00000020;
         return this;
       }
       /**
@@ -14443,7 +14678,7 @@ public final class Protos {
         } else {
           encryptionParametersBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000010;
+        bitField0_ |= 0x00000020;
         return this;
       }
       /**
@@ -14451,7 +14686,7 @@ public final class Protos {
        */
       public Builder mergeEncryptionParameters(com.coinomi.core.protos.Protos.ScryptParameters value) {
         if (encryptionParametersBuilder_ == null) {
-          if (((bitField0_ & 0x00000010) == 0x00000010) &&
+          if (((bitField0_ & 0x00000020) == 0x00000020) &&
               encryptionParameters_ != com.coinomi.core.protos.Protos.ScryptParameters.getDefaultInstance()) {
             encryptionParameters_ =
               com.coinomi.core.protos.Protos.ScryptParameters.newBuilder(encryptionParameters_).mergeFrom(value).buildPartial();
@@ -14462,7 +14697,7 @@ public final class Protos {
         } else {
           encryptionParametersBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000010;
+        bitField0_ |= 0x00000020;
         return this;
       }
       /**
@@ -14475,14 +14710,14 @@ public final class Protos {
         } else {
           encryptionParametersBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000010);
+        bitField0_ = (bitField0_ & ~0x00000020);
         return this;
       }
       /**
        * <code>optional .com.coinomi.core.protos.ScryptParameters encryption_parameters = 5;</code>
        */
       public com.coinomi.core.protos.Protos.ScryptParameters.Builder getEncryptionParametersBuilder() {
-        bitField0_ |= 0x00000010;
+        bitField0_ |= 0x00000020;
         onChanged();
         return getEncryptionParametersFieldBuilder().getBuilder();
       }
@@ -14516,9 +14751,9 @@ public final class Protos {
       private java.util.List<com.coinomi.core.protos.Protos.WalletPocket> pockets_ =
         java.util.Collections.emptyList();
       private void ensurePocketsIsMutable() {
-        if (!((bitField0_ & 0x00000020) == 0x00000020)) {
+        if (!((bitField0_ & 0x00000040) == 0x00000040)) {
           pockets_ = new java.util.ArrayList<com.coinomi.core.protos.Protos.WalletPocket>(pockets_);
-          bitField0_ |= 0x00000020;
+          bitField0_ |= 0x00000040;
          }
       }
 
@@ -14668,7 +14903,7 @@ public final class Protos {
       public Builder clearPockets() {
         if (pocketsBuilder_ == null) {
           pockets_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000020);
+          bitField0_ = (bitField0_ & ~0x00000040);
           onChanged();
         } else {
           pocketsBuilder_.clear();
@@ -14745,7 +14980,7 @@ public final class Protos {
           pocketsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
               com.coinomi.core.protos.Protos.WalletPocket, com.coinomi.core.protos.Protos.WalletPocket.Builder, com.coinomi.core.protos.Protos.WalletPocketOrBuilder>(
                   pockets_,
-                  ((bitField0_ & 0x00000020) == 0x00000020),
+                  ((bitField0_ & 0x00000040) == 0x00000040),
                   getParentForChildren(),
                   isClean());
           pockets_ = null;
@@ -14881,7 +15116,7 @@ public final class Protos {
       "\n\010token_id\030\014 \001(\005\"5\n\004Pool\022\013\n\007UNSPENT\020\004\022\t\n" +
       "\005SPENT\020\005\022\010\n\004DEAD\020\n\022\013\n\007PENDING\020\020\"0\n\rAddre" +
       "ssStatus\022\017\n\007address\030\001 \002(\t\022\016\n\006status\030\002 \002(" +
-      "\t\"\306\002\n\014WalletPocket\022\032\n\022network_identifier" +
+      "\t\"\322\002\n\014WalletPocket\022\032\n\022network_identifier" +
       "\030\001 \002(\t\022\023\n\013description\030\002 \001(\t\022)\n\003key\030\003 \003(\013",
       "2\034.com.coinomi.core.protos.Key\022\034\n\024last_s" +
       "een_block_hash\030\004 \001(\014\022\036\n\026last_seen_block_" +
@@ -14889,20 +15124,21 @@ public final class Protos {
       "s\030\006 \001(\003\0229\n\013transaction\030\007 \003(\0132$.com.coino" +
       "mi.core.protos.Transaction\022>\n\016address_st" +
       "atus\030\010 \003(\0132&.com.coinomi.core.protos.Add" +
-      "ressStatus\"N\n\020ScryptParameters\022\014\n\004salt\030\001" +
-      " \002(\014\022\020\n\001n\030\002 \001(\003:\00516384\022\014\n\001r\030\003 \001(\005:\0018\022\014\n\001" +
-      "p\030\004 \001(\005:\0011\"\242\003\n\006Wallet\022\022\n\007version\030\001 \001(\005:\001" +
-      "1\022*\n\004seed\030\002 \001(\0132\034.com.coinomi.core.proto",
-      "s.Key\0220\n\nmaster_key\030\003 \002(\0132\034.com.coinomi." +
-      "core.protos.Key\022T\n\017encryption_type\030\004 \001(\016" +
-      "2..com.coinomi.core.protos.Wallet.Encryp" +
-      "tionType:\013UNENCRYPTED\022H\n\025encryption_para" +
-      "meters\030\005 \001(\0132).com.coinomi.core.protos.S" +
-      "cryptParameters\0226\n\007pockets\030\006 \003(\0132%.com.c" +
-      "oinomi.core.protos.WalletPocket\"N\n\016Encry" +
-      "ptionType\022\017\n\013UNENCRYPTED\020\001\022\030\n\024ENCRYPTED_" +
-      "SCRYPT_AES\020\002\022\021\n\rENCRYPTED_AES\020\003B!\n\027com.c" +
-      "oinomi.core.protosB\006Protos"
+      "ressStatus\022\n\n\002id\030\t \001(\t\"N\n\020ScryptParamete" +
+      "rs\022\014\n\004salt\030\001 \002(\014\022\020\n\001n\030\002 \001(\003:\00516384\022\014\n\001r\030" +
+      "\003 \001(\005:\0018\022\014\n\001p\030\004 \001(\005:\0011\"\303\003\n\006Wallet\022\022\n\007ver" +
+      "sion\030\001 \001(\005:\0011\022*\n\004seed\030\002 \001(\0132\034.com.coinom",
+      "i.core.protos.Key\022\037\n\027seed_password_prote" +
+      "cted\030\007 \001(\010\0220\n\nmaster_key\030\003 \002(\0132\034.com.coi" +
+      "nomi.core.protos.Key\022T\n\017encryption_type\030" +
+      "\004 \001(\0162..com.coinomi.core.protos.Wallet.E" +
+      "ncryptionType:\013UNENCRYPTED\022H\n\025encryption" +
+      "_parameters\030\005 \001(\0132).com.coinomi.core.pro" +
+      "tos.ScryptParameters\0226\n\007pockets\030\006 \003(\0132%." +
+      "com.coinomi.core.protos.WalletPocket\"N\n\016" +
+      "EncryptionType\022\017\n\013UNENCRYPTED\020\001\022\030\n\024ENCRY" +
+      "PTED_SCRYPT_AES\020\002\022\021\n\rENCRYPTED_AES\020\003B!\n\027",
+      "com.coinomi.core.protosB\006Protos"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -14975,7 +15211,7 @@ public final class Protos {
     internal_static_com_coinomi_core_protos_WalletPocket_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_coinomi_core_protos_WalletPocket_descriptor,
-        new java.lang.String[] { "NetworkIdentifier", "Description", "Key", "LastSeenBlockHash", "LastSeenBlockHeight", "LastSeenBlockTimeSecs", "Transaction", "AddressStatus", });
+        new java.lang.String[] { "NetworkIdentifier", "Description", "Key", "LastSeenBlockHash", "LastSeenBlockHeight", "LastSeenBlockTimeSecs", "Transaction", "AddressStatus", "Id", });
     internal_static_com_coinomi_core_protos_ScryptParameters_descriptor =
       getDescriptor().getMessageTypes().get(10);
     internal_static_com_coinomi_core_protos_ScryptParameters_fieldAccessorTable = new
@@ -14987,7 +15223,7 @@ public final class Protos {
     internal_static_com_coinomi_core_protos_Wallet_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_coinomi_core_protos_Wallet_descriptor,
-        new java.lang.String[] { "Version", "Seed", "MasterKey", "EncryptionType", "EncryptionParameters", "Pockets", });
+        new java.lang.String[] { "Version", "Seed", "SeedPasswordProtected", "MasterKey", "EncryptionType", "EncryptionParameters", "Pockets", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

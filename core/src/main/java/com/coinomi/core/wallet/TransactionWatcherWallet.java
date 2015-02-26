@@ -58,6 +58,7 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
 
     final ReentrantLock lock = Threading.lock("TransactionWatcherWallet");
     protected final CoinType coinType;
+    protected final String id;
 
     @Nullable private Sha256Hash lastBlockSeenHash;
     private int lastBlockSeenHeight = -1;
@@ -103,8 +104,26 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
     private BlockchainConnection blockchainConnection;
     private List<ListenerRegistration<WalletPocketEventListener>> listeners;
 
+    // Wallet that this account belongs
+    @Nullable private transient Wallet wallet = null;
 
-    public TransactionWatcherWallet(CoinType coinType) {
+    private Runnable saveLaterRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (wallet != null) wallet.saveLater();
+        }
+    };
+
+    private Runnable saveNowRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (wallet != null) wallet.saveNow();
+        }
+    };
+
+    // Constructor
+    public TransactionWatcherWallet(String id, CoinType coinType) {
+        this.id = id;
         this.coinType = coinType;
         addressesStatus = new HashMap<Address, String>();
         addressesSubscribed = new ArrayList<Address>();
@@ -120,8 +139,39 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
     }
 
     @Override
+    public String getId() {
+        return id;
+    }
+
+    @Override
+    public CoinType getCoinType() {
+        return coinType;
+    }
+
+    @Override
     public boolean isNew() {
         return unspent.size() + spent.size() + pending.size() == 0;
+    }
+
+    public void setWallet(Wallet wallet) {
+        this.wallet = wallet;
+    }
+
+    public Wallet getWallet() {
+        return wallet;
+    }
+
+    // Util
+    @Override
+    public void walletSaveLater() {
+        // Save in another thread to avoid cyclic locking of Wallet and WalletPocket
+        Threading.USER_THREAD.execute(saveLaterRunnable);
+    }
+
+    @Override
+    public void walletSaveNow() {
+        // Save in another thread to avoid cyclic locking of Wallet and WalletPocket
+        Threading.USER_THREAD.execute(saveNowRunnable);
     }
 
     /**
@@ -301,6 +351,7 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
      * This is useful if you have some keys and wish to replay the block chain into the wallet in order to pick them up.
      * Triggers auto saving.
      */
+    @Override
     public void refresh() {
         lock.lock();
         try {

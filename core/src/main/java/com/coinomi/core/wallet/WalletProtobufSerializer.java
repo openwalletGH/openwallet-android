@@ -95,8 +95,14 @@ public class WalletProtobufSerializer {
         }
 
         // Add serialized pockets
-        for (WalletPocketHD pocket : wallet.getPockets()) {
-            walletBuilder.addPockets(WalletPocketProtobufSerializer.toProtobuf(pocket));
+        for (WalletAccount account : wallet.getAllAccounts()) {
+            Protos.WalletPocket pocketProto;
+            if (account instanceof WalletPocketHD) {
+                pocketProto = WalletPocketProtobufSerializer.toProtobuf((WalletPocketHD) account);
+            } else {
+                throw new RuntimeException("Implement serialization for: " + account.getClass());
+            }
+            walletBuilder.addPockets(pocketProto);
         }
 
         return walletBuilder.build();
@@ -182,7 +188,7 @@ public class WalletProtobufSerializer {
         WalletPocketProtobufSerializer pocketSerializer = new WalletPocketProtobufSerializer();
         for (Protos.WalletPocket pocketProto : walletProto.getPocketsList()) {
             WalletPocketHD pocket = pocketSerializer.readWallet(pocketProto, crypter);
-            wallet.addPocket(pocket);
+            wallet.addAccount(pocket);
         }
 
         return wallet;
