@@ -11,10 +11,8 @@ import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.List;
 
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 /**
  * @author John L. Jegutanis
@@ -36,39 +34,39 @@ abstract public class CoinType extends NetworkParameters implements Serializable
 
 
     public String getName() {
-        return checkNotNull(name);
+        return checkNotNull(name, "A coin failed to set a name");
     }
 
     public String getSymbol() {
-        return checkNotNull(symbol);
+        return checkNotNull(symbol, "Coin " + name + " failed to set a symbol");
     }
 
     public String getUriScheme() {
-        return checkNotNull(uriScheme);
+        return checkNotNull(uriScheme, "Coin " + name + " failed to set a URI scheme");
     }
 
     public int getBip44Index() {
-        return checkNotNull(bip44Index);
+        return checkNotNull(bip44Index, "Coin " + name + " failed to set a BIP 44 index");
     }
 
     public int getUnitExponent() {
-        return checkNotNull(unitExponent);
+        return checkNotNull(unitExponent, "Coin " + name + " failed to set a unit exponent");
     }
 
     public Coin getFeePerKb() {
-        return checkNotNull(feePerKb);
+        return checkNotNull(feePerKb, "Coin " + name + " failed to set a fee per kilobyte");
     }
 
     public Coin getMinNonDust() {
-        return checkNotNull(minNonDust);
+        return checkNotNull(minNonDust, "Coin " + name + " failed to set a minimum amount to be considered not dust");
     }
 
     public Coin getSoftDustLimit() {
-        return checkNotNull(softDustLimit);
+        return checkNotNull(softDustLimit, "Coin " + name + " failed to set a soft dust limit");
     }
 
     public SoftDustPolicy getSoftDustPolicy() {
-        return checkNotNull(softDustPolicy);
+        return checkNotNull(softDustPolicy, "Coin " + name + " failed to set a soft dust policy");
     }
 
     public List<ChildNumber> getBip44Path(int account) {
