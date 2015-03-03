@@ -253,16 +253,16 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
         transactions.put(tx.getHash(), tx);
         switch (pool) {
             case UNSPENT:
-                checkState(unspent.put(tx.getHash(), tx) == null);
+                checkState(unspent.put(tx.getHash(), tx) == null, "Transaction with hash " + tx.getHashAsString() + " is already in unspent");
                 break;
             case SPENT:
-                checkState(spent.put(tx.getHash(), tx) == null);
+                checkState(spent.put(tx.getHash(), tx) == null, "Transaction with hash " + tx.getHashAsString() + " is already in spent");
                 break;
             case PENDING:
-                checkState(pending.put(tx.getHash(), tx) == null);
+                checkState(pending.put(tx.getHash(), tx) == null, "Transaction with hash " + tx.getHashAsString() + " is already in pending");
                 break;
             case DEAD:
-                checkState(dead.put(tx.getHash(), tx) == null);
+                checkState(dead.put(tx.getHash(), tx) == null, "Transaction with hash " + tx.getHashAsString() + " is already in dead");
                 break;
             default:
                 throw new RuntimeException("Unknown wallet transaction type " + pool);
@@ -294,7 +294,7 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
      * Marks outputs as spent, if we don't have the keys
      */
     private void markNotOwnOutputs(Transaction transaction) {
-        checkState(lock.isHeldByCurrentThread());
+        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
         for (TransactionOutput txo : transaction.getOutputs()) {
             if (txo.isAvailableForSpending()) {
                 // We don't have keys for this txo therefore it is not ours
@@ -627,7 +627,7 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
      * Returns true if registered successfully or false if status already updating
      */
     @VisibleForTesting boolean registerStatusForUpdate(AddressStatus status) {
-        checkNotNull(status.getStatus());
+        checkNotNull(status.getStatus(), "Address status is null");
 
         lock.lock();
         try {
@@ -896,7 +896,7 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
     }
 
     private void applyState(AddressStatus status, HashMap<Sha256Hash, Transaction> txs) {
-        checkState(lock.isHeldByCurrentThread());
+        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
         log.info("Applying state {} - {}", status.getAddress(), status.getStatus());
         // Connect inputs to outputs
         for (HistoryTx historyTx : status.getHistoryTxs()) {
@@ -926,7 +926,7 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
     }
 
     private void markUnspentTXO(AddressStatus status, Map<Sha256Hash, Transaction> txs) {
-        checkState(lock.isHeldByCurrentThread());
+        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
         Set<UnspentTx> utxs = status.getUnspentTxs();
         ArrayList<TransactionOutput> unspentOutputs = new ArrayList<TransactionOutput>(utxs.size());
         // Mark unspent outputs
@@ -980,7 +980,7 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
     }
 
     private void connectTransaction(Transaction tx) {
-        checkState(lock.isHeldByCurrentThread());
+        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
         // Skip if not confirmed
         if (tx.getConfidence().getConfidenceType() != ConfidenceType.BUILDING) return;
         // Connect to other transactions in the wallet pocket
@@ -1057,7 +1057,7 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
      * Will flip transaction from spent/unspent pool if needed.
      */
     private void maybeFlipSpentUnspent(Transaction tx) {
-        checkState(lock.isHeldByCurrentThread());
+        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
         if (tx.isEveryOwnedOutputSpent(this)) {
             // There's nothing left I can spend in this transaction.
             if (unspent.remove(tx.getHash()) != null) {
@@ -1074,14 +1074,14 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
 
 
     private void fetchTransactions(List<? extends HistoryTx> txes) {
-        checkState(lock.isHeldByCurrentThread());
+        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
         for (HistoryTx tx : txes) {
             fetchTransactionIfNeeded(tx.getTxHash());
         }
     }
 
     private void fetchTransactionIfNeeded(Sha256Hash txHash) {
-        checkState(lock.isHeldByCurrentThread());
+        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
         // Check if need to fetch the transaction
         if (!isTransactionAvailableOrQueued(txHash)) {
             log.info("Going to fetch transaction with hash {}", txHash);
@@ -1093,12 +1093,12 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
     }
 
     private boolean isTransactionAvailableOrQueued(Sha256Hash txHash) {
-        checkState(lock.isHeldByCurrentThread());
+        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
         return getTransaction(txHash) != null || fetchingTransactions.contains(txHash);
     }
 
     private void addNewTransactionIfNeeded(Transaction tx) {
-        checkState(lock.isHeldByCurrentThread());
+        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
 
         // If was fetching this tx, remove it
         fetchingTransactions.remove(tx.getHash());
@@ -1211,7 +1211,7 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
     }
 
     private void queueOnNewBalance() {
-        checkState(lock.isHeldByCurrentThread());
+        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
         final Coin balance = getBalance();
         final Coin pendingBalance = getPendingBalance();
         for (final ListenerRegistration<WalletPocketEventListener> registration : listeners) {
@@ -1226,7 +1226,7 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
     }
 
     private void queueOnNewBlock() {
-        checkState(lock.isHeldByCurrentThread());
+        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
         for (final ListenerRegistration<WalletPocketEventListener> registration : listeners) {
             registration.executor.execute(new Runnable() {
                 @Override
@@ -1341,8 +1341,8 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
      *         leaving the group unchanged.
      */
     public void encrypt(KeyCrypter keyCrypter, KeyParameter aesKey) {
-        checkNotNull(keyCrypter);
-        checkNotNull(aesKey);
+        checkNotNull(keyCrypter, "Attempt to encrypt with null KeyCrypter.");
+        checkNotNull(aesKey, "Attempt to encrypt with null KeyParameter.");
 
         lock.lock();
         try {
@@ -1359,7 +1359,7 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
      * @throws org.bitcoinj.crypto.KeyCrypterException Thrown if the wallet decryption fails for some reason, leaving the group unchanged.
      */
     /* package */ void decrypt(KeyParameter aesKey) {
-        checkNotNull(aesKey);
+        checkNotNull(aesKey, "Attempt to decrypt with null KeyParameter");
 
         lock.lock();
         try {
@@ -1389,8 +1389,8 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
             throws InsufficientMoneyException {
         KeyParameter key = null;
         if (password != null) {
-            checkState(isEncrypted());
-            key = checkNotNull(getKeyCrypter()).deriveKey(password);
+            checkState(isEncrypted(), "Wallet is not encrypted but password was provided");
+            key = checkNotNull(getKeyCrypter(), "KeyCrypter was null").deriveKey(password);
         }
         return sendCoinsOffline(address, amount, key);
     }
@@ -1401,7 +1401,7 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
      */
     public SendRequest sendCoinsOffline(Address address, Coin amount, @Nullable KeyParameter aesKey)
             throws InsufficientMoneyException {
-        checkState(address.getParameters() instanceof CoinType);
+        checkState(address.getParameters() instanceof CoinType, "Address is not a CoinType");
         SendRequest request = SendRequest.to(address, amount);
         request.aesKey = aesKey;
 
@@ -1588,8 +1588,8 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
             Transaction tx = req.tx;
             List<TransactionInput> inputs = tx.getInputs();
             List<TransactionOutput> outputs = tx.getOutputs();
-            checkState(inputs.size() > 0);
-            checkState(outputs.size() > 0);
+            checkState(inputs.size() > 0, "Nonzero amout of inputs required");
+            checkState(outputs.size() > 0, "Nonzero amout of outputs required");
 
             KeyBag maybeDecryptingKeyBag = new DecryptingKeyBag(keys, req.aesKey);
 
@@ -1666,7 +1666,7 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
 
     private FeeCalculation calculateFee(SendRequest req, Coin value, List<TransactionInput> originalInputs,
                                        int numberOfSoftDustOutputs, LinkedList<TransactionOutput> candidates) throws InsufficientMoneyException {
-        checkState(lock.isHeldByCurrentThread());
+        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
         FeeCalculation result = new FeeCalculation();
         // There are 3 possibilities for what adding change might do:
         // 1) No effect
@@ -1725,7 +1725,7 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
                 valueMissing = valueNeeded.subtract(selection.valueGathered);
                 break;
             }
-            checkState(selection.gathered.size() > 0 || originalInputs.size() > 0);
+            checkState(selection.gathered.size() > 0 || originalInputs.size() > 0, "No inputs");
 
             // We keep track of an upper bound on transaction size to calculate fees that need to be added.
             // Note that the difference between the upper bound and lower bound is usually small enough that it
@@ -1800,7 +1800,7 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
             for (TransactionOutput output : selection.gathered) {
                 TransactionInput input = req.tx.addInput(output);
                 // If the scriptBytes don't default to none, our size calculations will be thrown off.
-                checkState(input.getScriptBytes().length == 0);
+                checkState(input.getScriptBytes().length == 0, "scriptBytes didn't default to null, so our size calculations will be thrown off");
             }
 
             // Estimate transaction size and loop again if we need more fee per kb. The serialized tx doesn't
@@ -1820,21 +1820,21 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
             } else if (eitherCategory2Or3) {
                 // If we are in selection2, we will require at least CENT additional. If we do that, there is no way
                 // we can end up back here because CENT additional will always get us to 1
-                checkState(selection2 == null);
-                checkState(additionalValueForNextCategory.equals(coinType.getSoftDustLimit()));
+                checkState(selection2 == null, "Selection 2 was not null");
+                checkState(additionalValueForNextCategory.equals(coinType.getSoftDustLimit()), "Additional value to get to the next category did not equal the soft dust limit");
                 selection2 = selection;
-                selection2Change = checkNotNull(changeOutput); // If we get no change in category 2, we are actually in category 3
+                selection2Change = checkNotNull(changeOutput, "Change output was null, category should be 3"); // If we get no change in category 2, we are actually in category 3
             } else {
                 // Once we get a category 1 (change kept), we should break out of the loop because we can't do better
-                checkState(selection1 == null);
-                checkState(additionalValueForNextCategory == null);
+                checkState(selection1 == null, "Selection 1 was not null");
+                checkState(additionalValueForNextCategory == null, "Additional value for next category was not null");
                 selection1 = selection;
                 selection1Change = changeOutput;
             }
 
             if (additionalValueForNextCategory != null) {
                 if (additionalValueSelected != null)
-                    checkState(additionalValueForNextCategory.compareTo(additionalValueSelected) > 0);
+                    checkState(additionalValueForNextCategory.compareTo(additionalValueSelected) == 1, "Did not select enough additional value to reach the next category");
                 continue;
             }
             break;
@@ -1843,7 +1843,7 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
         resetTxInputs(req, originalInputs);
 
         if (selection3 == null && selection2 == null && selection1 == null) {
-            checkNotNull(valueMissing);
+            checkNotNull(valueMissing, "Null amout of value missing");
             log.warn("Insufficient value in wallet for send: needed {} more", valueMissing.toFriendlyString());
             throw new InsufficientMoneyException(valueMissing);
         }
@@ -1861,7 +1861,7 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
         }
 
         if (selection2 != null) {
-            Coin fee = selection2.valueGathered.subtract(checkNotNull(selection2Change).getValue());
+            Coin fee = selection2.valueGathered.subtract(checkNotNull(selection2Change, "Selection 2 change was null").getValue());
             if (lowestFee == null || fee.compareTo(lowestFee) < 0) {
                 lowestFee = fee;
                 result.bestCoinSelection = selection2;
