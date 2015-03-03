@@ -183,8 +183,8 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
     }
 
     WalletPocket(SimpleHDKeyChain keys, CoinType coinType) {
-        this.keys = checkNotNull(keys);
-        this.coinType = checkNotNull(coinType);
+        this.keys = checkNotNull(keys, "Attempting to create a WalletPocket with null keys");
+        this.coinType = checkNotNull(coinType, "Attempting to create a WalletPocket with a null coin type");
         int lookAhead = 2 * SimpleHDKeyChain.LOOKAHEAD;
         addressesStatus = new HashMap<Address, String>(lookAhead);
         addressesSubscribed = new ArrayList<Address>(lookAhead);
