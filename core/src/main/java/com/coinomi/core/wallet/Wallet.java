@@ -197,7 +197,7 @@ final public class Wallet {
     private void createPocket(CoinType coinType, @Nullable KeyParameter key) {
         checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
         checkNotNull(coinType, "Attempting to create a pocket for a null coin");
-        checkState(!pockets.containsKey(coinType), "Coin " + coinType + " already has a pocket");
+        checkState(!pockets.containsKey(coinType), "A coin already has a pocket");
         DeterministicHierarchy hierarchy;
         if (isEncrypted()) {
             hierarchy = new DeterministicHierarchy(masterKey.decrypt(getKeyCrypter(), key));

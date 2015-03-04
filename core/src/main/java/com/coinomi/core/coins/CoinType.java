@@ -38,35 +38,35 @@ abstract public class CoinType extends NetworkParameters implements Serializable
     }
 
     public String getSymbol() {
-        return checkNotNull(symbol, "Coin " + name + " failed to set a symbol");
+        return checkNotNull(symbol, "A coin failed to set a symbol");
     }
 
     public String getUriScheme() {
-        return checkNotNull(uriScheme, "Coin " + name + " failed to set a URI scheme");
+        return checkNotNull(uriScheme, "A coin failed to set a URI scheme");
     }
 
     public int getBip44Index() {
-        return checkNotNull(bip44Index, "Coin " + name + " failed to set a BIP 44 index");
+        return checkNotNull(bip44Index, "A coin failed to set a BIP 44 index");
     }
 
     public int getUnitExponent() {
-        return checkNotNull(unitExponent, "Coin " + name + " failed to set a unit exponent");
+        return checkNotNull(unitExponent, "A coin failed to set a unit exponent");
     }
 
     public Coin getFeePerKb() {
-        return checkNotNull(feePerKb, "Coin " + name + " failed to set a fee per kilobyte");
+        return checkNotNull(feePerKb, "A coin failed to set a fee per kilobyte");
     }
 
     public Coin getMinNonDust() {
-        return checkNotNull(minNonDust, "Coin " + name + " failed to set a minimum amount to be considered not dust");
+        return checkNotNull(minNonDust, "A coin failed to set a minimum amount to be considered not dust");
     }
 
     public Coin getSoftDustLimit() {
-        return checkNotNull(softDustLimit, "Coin " + name + " failed to set a soft dust limit");
+        return checkNotNull(softDustLimit, "A coin failed to set a soft dust limit");
     }
 
     public SoftDustPolicy getSoftDustPolicy() {
-        return checkNotNull(softDustPolicy, "Coin " + name + " failed to set a soft dust policy");
+        return checkNotNull(softDustPolicy, "A coin failed to set a soft dust policy");
     }
 
     public List<ChildNumber> getBip44Path(int account) {

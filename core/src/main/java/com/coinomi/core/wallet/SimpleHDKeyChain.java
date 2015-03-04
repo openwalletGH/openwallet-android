@@ -742,7 +742,7 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
     public BloomFilter getFilter(int size, double falsePositiveRate, long tweak) {
         lock.lock();
         try {
-            checkArgument(size >= numBloomFilterEntries(), "Bloom filter too small (" + size + ") to hold " + (numKeys() * 2) + " entries");
+            checkArgument(size >= numBloomFilterEntries(), "Bloom filter too small");
             maybeLookAhead();
             return simpleKeyChain.getFilter(size, falsePositiveRate, tweak);
         } finally {
