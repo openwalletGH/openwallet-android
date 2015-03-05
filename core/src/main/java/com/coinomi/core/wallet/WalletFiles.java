@@ -78,12 +78,12 @@ public class WalletFiles {
         this.executor.setKeepAliveTime(5, TimeUnit.SECONDS);
         this.executor.allowCoreThreadTimeOut(true);
         this.executor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
-        this.wallet = checkNotNull(wallet);
+        this.wallet = checkNotNull(wallet, "Cannot save a null wallet");
         // File must only be accessed from the auto-save executor from now on, to avoid simultaneous access.
-        this.file = checkNotNull(file);
+        this.file = checkNotNull(file, "Cannot save to a null file");
         this.savePending = new AtomicBoolean();
         this.delay = delay;
-        this.delayTimeUnit = checkNotNull(delayTimeUnit);
+        this.delayTimeUnit = checkNotNull(delayTimeUnit, "Cannot use a null delay time unit");
 
         this.saver = new Callable<Void>() {
             @Override public Void call() throws Exception {
@@ -103,7 +103,7 @@ public class WalletFiles {
      * The given listener will be called on the autosave thread before and after the wallet is saved to disk.
      */
     public void setListener(@Nonnull Listener listener) {
-        this.vListener = checkNotNull(listener);
+        this.vListener = checkNotNull(listener, "Cannot set a null listener");
     }
 
     /** Actually write the wallet file to disk, using an atomic rename when possible. Runs on the current thread. */

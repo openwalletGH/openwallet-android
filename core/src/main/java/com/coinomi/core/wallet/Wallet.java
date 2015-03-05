@@ -158,7 +158,7 @@ final public class Wallet {
     public WalletPocket getPocket(CoinType coinType) {
         lock.lock();
         try {
-            return checkNotNull(pockets.get(coinType));
+            return checkNotNull(pockets.get(coinType), "Requested pocket does not exist");
         } finally {
             lock.unlock();
         }
@@ -187,7 +187,7 @@ final public class Wallet {
     }
 
     private void maybeCreatePocket(CoinType coinType, @Nullable KeyParameter key) {
-        checkState(lock.isHeldByCurrentThread());
+        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
         if (!pockets.containsKey(coinType)) {
             createPocket(coinType, key);
         }
@@ -195,8 +195,9 @@ final public class Wallet {
 
 
     private void createPocket(CoinType coinType, @Nullable KeyParameter key) {
-        checkState(lock.isHeldByCurrentThread());
-        checkState(!pockets.containsKey(coinType));
+        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
+        checkNotNull(coinType, "Attempting to create a pocket for a null coin");
+        checkState(!pockets.containsKey(coinType), "A coin already has a pocket");
         DeterministicHierarchy hierarchy;
         if (isEncrypted()) {
             hierarchy = new DeterministicHierarchy(masterKey.decrypt(getKeyCrypter(), key));
@@ -541,8 +542,8 @@ final public class Wallet {
      *         leaving the group unchanged.
      */
     public void encrypt(KeyCrypter keyCrypter, KeyParameter aesKey) {
-        checkNotNull(keyCrypter);
-        checkNotNull(aesKey);
+        checkNotNull(keyCrypter, "Attempting to encrypt with a null KeyCrypter");
+        checkNotNull(aesKey, "Attempting to encrypt with a null KeyParameter");
 
         lock.lock();
         try {
@@ -558,14 +559,14 @@ final public class Wallet {
     }
 
     /* package */ void decrypt(KeyParameter aesKey) {
-        checkNotNull(aesKey);
+        checkNotNull(aesKey, "Attemting to decrypt with a null KeyParameter");
 
         lock.lock();
         try {
-            checkState(isEncrypted());
+            checkState(isEncrypted(), "Wallet is already decrypted");
 
             if (seed != null) {
-                checkState(seed.isEncrypted());
+                checkState(seed.isEncrypted(), "Seed is already decrypted");
                 List<String> mnemonic = null;
                 try {
                     mnemonic = decodeMnemonicCode(getKeyCrypter().decrypt(seed.getEncryptedData(), aesKey));
