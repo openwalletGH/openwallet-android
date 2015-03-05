@@ -253,16 +253,16 @@ public class WalletPocket implements TransactionBag, TransactionEventListener, C
         transactions.put(tx.getHash(), tx);
         switch (pool) {
             case UNSPENT:
-                checkState(unspent.put(tx.getHash(), tx) == null, "Transaction with hash " + tx.getHashAsString() + " is already in unspent");
+                checkState(unspent.put(tx.getHash(), tx) == null, "Transaction is already in unspent");
                 break;
             case SPENT:
-                checkState(spent.put(tx.getHash(), tx) == null, "Transaction with hash " + tx.getHashAsString() + " is already in spent");
+                checkState(spent.put(tx.getHash(), tx) == null, "Transaction is already in spent");
                 break;
             case PENDING:
-                checkState(pending.put(tx.getHash(), tx) == null, "Transaction with hash " + tx.getHashAsString() + " is already in pending");
+                checkState(pending.put(tx.getHash(), tx) == null, "Transaction is already in pending");
                 break;
             case DEAD:
-                checkState(dead.put(tx.getHash(), tx) == null, "Transaction with hash " + tx.getHashAsString() + " is already in dead");
+                checkState(dead.put(tx.getHash(), tx) == null, "Transaction is already in dead");
                 break;
             default:
                 throw new RuntimeException("Unknown wallet transaction type " + pool);

@@ -407,7 +407,7 @@ public class WalletPocketProtobufSerializer {
                             tx.getHashAsString(), byteStringToHash(spentByTransactionHash)));
                 }
                 final int spendingIndex = transactionOutput.getSpentByTransactionIndex();
-                TransactionInput input = checkNotNull(spendingTx.getInput(spendingIndex), "Spending index " + spendingIndex + " of transaction " + spendingTx.getHashAsString() +" does not exist");
+                TransactionInput input = checkNotNull(spendingTx.getInput(spendingIndex), "A spending index does not exist");
                 input.connect(output);
             }
         }
