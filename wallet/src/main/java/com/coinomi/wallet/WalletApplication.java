@@ -13,6 +13,7 @@ import android.preference.PreferenceManager;
 import android.widget.Toast;
 
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.util.HardwareSoftwareCompliance;
 import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.wallet.WalletPocket;
 import com.coinomi.core.wallet.WalletProtobufSerializer;
@@ -21,7 +22,6 @@ import com.coinomi.wallet.service.CoinServiceImpl;
 import com.coinomi.wallet.util.Fonts;
 import com.coinomi.wallet.util.LinuxSecureRandom;
 
-import org.acra.ACRA;
 import org.acra.annotation.ReportsCrashes;
 import org.acra.sender.HttpSender;
 import org.bitcoinj.crypto.MnemonicCode;
@@ -98,15 +98,26 @@ public class WalletApplication extends Application {
             }
         }
 
+        config.updateLastVersionCode(packageInfo.versionCode);
+
+        performComplianceTests();
+
         walletFile = getFileStreamPath(Constants.WALLET_FILENAME_PROTOBUF);
 
         loadWallet();
 
-        config.updateLastVersionCode(packageInfo.versionCode);
-
         afterLoadWallet();
 
         Fonts.initFonts(this.getAssets());
+    }
+
+    /**
+     * Some devices have software bugs that causes the EC crypto to malfunction.
+     */
+    private void performComplianceTests() {
+        if (!HardwareSoftwareCompliance.isEllipticCurveCryptographyCompliant()) {
+            config.setDeviceCompatible(false);
+        }
     }
 
     private void afterLoadWallet()

@@ -58,6 +58,8 @@
     <!-- Intro -->
     <string name="test_wallet_warning_title">Create a test wallet?</string>
     <string name="test_wallet_warning_message">If you create a new test wallet, your existing wallet will be lost unless you backed up you <i>recovery phrase</i>.</string>
+    <string name="incompatible_device_warning_title">Incompatible device</string>
+    <string name="incompatible_device_warning_message">It was detected that this device cannot perform certain cryptographic functions due to software or hardware bugs.\nThis could be solved by the manufacturer with an update.\n\nContact us if you have any questions: playstore@coinomi.com</string>
 
     <!-- Recovery fragment -->
     <string name="seed_info">This is your <i>recovery phrase</i>, which is used to generate the keys for your wallet. Please write it down on a paper and keep it in a secure place, as you would do with paper money. Anyone with access to it has access to the wallet\'s funds.\nIf you lose your recovery phrase, your wallet cannot be recovered.</string>
