@@ -20,10 +20,25 @@ public class IntroActivity extends AbstractWalletFragmentActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_intro);
 
-        if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new WelcomeFragment())
-                    .commit();
+        // If we detected that this device is incompatible
+        if (!getWalletApplication().getConfiguration().isDeviceCompatible()) {
+            new AlertDialog.Builder(this)
+                    .setTitle(R.string.incompatible_device_warning_title)
+                    .setMessage(R.string.incompatible_device_warning_message)
+                    .setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            finish();
+                        }
+                    })
+                    .setCancelable(false)
+                    .create().show();
+        } else {
+            if (savedInstanceState == null) {
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.container, new WelcomeFragment())
+                        .commit();
+            }
         }
     }
 

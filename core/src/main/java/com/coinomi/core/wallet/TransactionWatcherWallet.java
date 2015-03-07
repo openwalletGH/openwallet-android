@@ -265,7 +265,7 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
      * Marks outputs as spent, if we don't have the keys
      */
     private void markNotOwnOutputs(Transaction transaction) {
-        checkState(lock.isHeldByCurrentThread());
+        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
         for (TransactionOutput txo : transaction.getOutputs()) {
             if (txo.isAvailableForSpending()) {
                 // We don't have keys for this txo therefore it is not ours
@@ -786,7 +786,7 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
     }
 
     private void applyState(AddressStatus status, HashMap<Sha256Hash, Transaction> txs) {
-        checkState(lock.isHeldByCurrentThread());
+        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
         log.info("Applying state {} - {}", status.getAddress(), status.getStatus());
         // Connect inputs to outputs
         for (ServerClient.HistoryTx historyTx : status.getHistoryTxs()) {
@@ -816,7 +816,7 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
     }
 
     private void markUnspentTXO(AddressStatus status, Map<Sha256Hash, Transaction> txs) {
-        checkState(lock.isHeldByCurrentThread());
+        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
         Set<ServerClient.UnspentTx> utxs = status.getUnspentTxs();
         ArrayList<TransactionOutput> unspentOutputs = new ArrayList<TransactionOutput>(utxs.size());
         // Mark unspent outputs
@@ -870,7 +870,7 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
     }
 
     private void connectTransaction(Transaction tx) {
-        checkState(lock.isHeldByCurrentThread());
+        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
         // Skip if not confirmed
         if (tx.getConfidence().getConfidenceType() != TransactionConfidence.ConfidenceType.BUILDING) return;
         // Connect to other transactions in the wallet pocket
@@ -947,7 +947,7 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
      * Will flip transaction from spent/unspent pool if needed.
      */
     private void maybeFlipSpentUnspent(Transaction tx) {
-        checkState(lock.isHeldByCurrentThread());
+        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
         if (tx.isEveryOwnedOutputSpent(this)) {
             // There's nothing left I can spend in this transaction.
             if (unspent.remove(tx.getHash()) != null) {
@@ -964,14 +964,14 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
 
 
     private void fetchTransactions(List<? extends ServerClient.HistoryTx> txes) {
-        checkState(lock.isHeldByCurrentThread());
+        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
         for (ServerClient.HistoryTx tx : txes) {
             fetchTransactionIfNeeded(tx.getTxHash());
         }
     }
 
     private void fetchTransactionIfNeeded(Sha256Hash txHash) {
-        checkState(lock.isHeldByCurrentThread());
+        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
         // Check if need to fetch the transaction
         if (!isTransactionAvailableOrQueued(txHash)) {
             log.info("Going to fetch transaction with hash {}", txHash);
@@ -983,12 +983,12 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
     }
 
     private boolean isTransactionAvailableOrQueued(Sha256Hash txHash) {
-        checkState(lock.isHeldByCurrentThread());
+        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
         return getTransaction(txHash) != null || fetchingTransactions.contains(txHash);
     }
 
     private void addNewTransactionIfNeeded(Transaction tx) {
-        checkState(lock.isHeldByCurrentThread());
+        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
 
         // If was fetching this tx, remove it
         fetchingTransactions.remove(tx.getHash());
@@ -1120,7 +1120,7 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
     }
 
     void queueOnNewBalance() {
-        checkState(lock.isHeldByCurrentThread());
+        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
         final Coin balance = getBalance();
         final Coin pendingBalance = getPendingBalance();
         for (final ListenerRegistration<WalletPocketEventListener> registration : listeners) {
@@ -1135,7 +1135,7 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
     }
 
     void queueOnNewBlock() {
-        checkState(lock.isHeldByCurrentThread());
+        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
         for (final ListenerRegistration<WalletPocketEventListener> registration : listeners) {
             registration.executor.execute(new Runnable() {
                 @Override

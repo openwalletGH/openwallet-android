@@ -46,7 +46,7 @@ public class SimpleKeyChain extends BasicKeyChain {
                     .setEncryptedPrivateKey(ByteString.copyFrom(data.encryptedBytes))
                     .setInitialisationVector(ByteString.copyFrom(data.initialisationVector));
             // We don't allow mixing of encryption types at the moment.
-            checkState(item.getEncryptionType() == org.bitcoinj.wallet.Protos.Wallet.EncryptionType.ENCRYPTED_SCRYPT_AES);
+            checkState(item.getEncryptionType() == org.bitcoinj.wallet.Protos.Wallet.EncryptionType.ENCRYPTED_SCRYPT_AES, "We don't allow mixing of encryption types at the moment");
             proto.setType(Protos.Key.Type.ENCRYPTED_SCRYPT_AES);
         } else {
             final byte[] secret = item.getSecretBytes();

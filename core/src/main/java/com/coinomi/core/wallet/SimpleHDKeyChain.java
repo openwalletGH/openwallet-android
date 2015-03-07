@@ -151,7 +151,7 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
         for (ECKey eckey : chain.simpleKeyChain.getKeys()) {
             DeterministicKey key = (DeterministicKey) eckey;
             if (!isLeaf(key)) continue; // Not a leaf key.
-            DeterministicKey parent = hierarchy.get(checkNotNull(key.getParent()).getPath(), false, false);
+            DeterministicKey parent = hierarchy.get(checkNotNull(key.getParent(), "Key has no parent").getPath(), false, false);
             // Clone the key to the new encrypted hierarchy.
             key = new DeterministicKey(key.getPubOnly(), parent);
             hierarchy.putKey(key);
@@ -162,7 +162,7 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
     private DeterministicKey encryptNonLeaf(KeyParameter aesKey, SimpleHDKeyChain chain,
                                             DeterministicKey parent, ImmutableList<ChildNumber> path) {
         DeterministicKey key = chain.hierarchy.get(path, true, false);
-        key = key.encrypt(checkNotNull(simpleKeyChain.getKeyCrypter()), aesKey, parent);
+        key = key.encrypt(checkNotNull(simpleKeyChain.getKeyCrypter(), "Chain has null KeyCrypter"), aesKey, parent);
         hierarchy.putKey(key);
         simpleKeyChain.importKey(key);
         return key;
@@ -253,7 +253,7 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
     /** Returns freshly derived key/s that have not been returned by this method before. */
     @Override
     public List<DeterministicKey> getKeys(KeyPurpose purpose, int numberOfKeys) {
-        checkArgument(numberOfKeys > 0);
+        checkArgument(numberOfKeys > 0, "Need at least 1 key");
         lock.lock();
         try {
             DeterministicKey parentKey;
@@ -590,7 +590,7 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
         if (chain == null) {
             throw new UnreadableWalletException("Could not create a key chain.");
         }
-        checkState(lookaheadSize >= 0);
+        checkState(lookaheadSize >= 0, "Negative lookahead size");
         chain.setLookaheadSize(lookaheadSize);
         chain.maybeLookAhead();
         return chain;
@@ -649,9 +649,9 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
 
     @Override
     public SimpleHDKeyChain toEncrypted(CharSequence password) {
-        checkNotNull(password);
-        checkArgument(password.length() > 0);
-        checkState(!rootKey.isEncrypted());
+        checkNotNull(password, "Attempt to encrypt with a null password.");
+        checkArgument(password.length() > 0, "Attempt to encrypt with an empty password.");
+        checkState(!rootKey.isEncrypted(), "Attempt to encrypt a root key that is already encrypted.");
         checkState(!rootKey.isPubKeyOnly(), "Attempt to encrypt a watching chain.");
         KeyCrypter scrypt = new KeyCrypterScrypt();
         KeyParameter derivedKey = scrypt.deriveKey(password);
@@ -665,8 +665,8 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
 
     @Override
     public SimpleHDKeyChain toDecrypted(CharSequence password) {
-        checkNotNull(password);
-        checkArgument(password.length() > 0);
+        checkNotNull(password, "Attempt to decrypt with a null password.");
+        checkArgument(password.length() > 0, "Attempt to decrypt with an empty password.");
         KeyCrypter crypter = getKeyCrypter();
         checkState(crypter != null, "Chain not encrypted");
         KeyParameter derivedKey = crypter.deriveKey(password);
@@ -676,7 +676,7 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
     @Override
     public SimpleHDKeyChain toDecrypted(KeyParameter aesKey) {
         checkState(getKeyCrypter() != null, "Key chain not encrypted");
-        checkState(rootKey.isEncrypted());
+        checkState(rootKey.isEncrypted(), "Root key not encrypted");
         DeterministicKey decKey = rootKey.decrypt(getKeyCrypter(), aesKey);
         SimpleHDKeyChain chain = new SimpleHDKeyChain(decKey);
         // Now double check that the keys match to catch the case where the key is wrong but padding didn't catch it.
@@ -688,8 +688,8 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
         for (ECKey eckey : simpleKeyChain.getKeys()) {
             DeterministicKey key = (DeterministicKey) eckey;
             if (!isLeaf(key)) continue; // Not a leaf key.
-            checkState(key.isEncrypted());
-            DeterministicKey parent = chain.hierarchy.get(checkNotNull(key.getParent()).getPath(), false, false);
+            checkState(key.isEncrypted(), "Key is not encrypted");
+            DeterministicKey parent = chain.hierarchy.get(checkNotNull(key.getParent(), "Key has null parent").getPath(), false, false);
             // Clone the key to the new decrypted hierarchy.
             key = new DeterministicKey(key.getPubOnly(), parent);
             chain.hierarchy.putKey(key);
@@ -706,14 +706,14 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
 
     @Override
     public boolean checkPassword(CharSequence password) {
-        checkNotNull(password);
+        checkNotNull(password,"Password is null");
         checkState(getKeyCrypter() != null, "Key chain not encrypted");
         return checkAESKey(getKeyCrypter().deriveKey(password));
     }
 
     @Override
     public boolean checkAESKey(KeyParameter aesKey) {
-        checkNotNull(aesKey);
+        checkNotNull(aesKey, "Cannot check null KeyParameter");
         checkState(getKeyCrypter() != null, "Key chain not encrypted");
         try {
             return rootKey.decrypt(aesKey).getPubKeyPoint().equals(rootKey.getPubKeyPoint());
@@ -744,7 +744,7 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
     public BloomFilter getFilter(int size, double falsePositiveRate, long tweak) {
         lock.lock();
         try {
-            checkArgument(size >= numBloomFilterEntries());
+            checkArgument(size >= numBloomFilterEntries(), "Bloom filter too small");
             maybeLookAhead();
             return simpleKeyChain.getFilter(size, falsePositiveRate, tweak);
         } finally {
@@ -839,7 +839,7 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
     }
 
     private List<DeterministicKey> maybeLookAhead(DeterministicKey parent, int issued) {
-        checkState(lock.isHeldByCurrentThread());
+        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
         return maybeLookAhead(parent, issued, getLookaheadSize(), getLookaheadThreshold());
     }
 
@@ -850,7 +850,7 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
      * The returned mutable list of keys must be inserted into the basic key chain.
      */
     private List<DeterministicKey> maybeLookAhead(DeterministicKey parent, int issued, int lookaheadSize, int lookaheadThreshold) {
-        checkState(lock.isHeldByCurrentThread());
+        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
         final int numChildren = hierarchy.getNumChildren(parent.getPath());
         final int needed = issued + lookaheadSize + lookaheadThreshold - numChildren;
 

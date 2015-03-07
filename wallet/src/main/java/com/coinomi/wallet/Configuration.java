@@ -51,6 +51,8 @@ public class Configuration {
 
     public static final String PREFS_KEY_MANUAL_RECEIVING_ADDRESSES = "manual_receiving_addresses";
 
+    public static final String PREFS_KEY_DEVICE_COMPATIBLE = "device_compatible";
+
     private static final int PREFS_DEFAULT_BTC_SHIFT = 3;
     private static final int PREFS_DEFAULT_BTC_PRECISION = 2;
 
@@ -162,5 +164,14 @@ public class Configuration {
 
     public boolean isManualReceivingAddressManagement() {
         return prefs.getBoolean(PREFS_KEY_MANUAL_RECEIVING_ADDRESSES, false);
+    }
+
+
+    public void setDeviceCompatible(final boolean isDeviceCompatible) {
+        prefs.edit().putBoolean(PREFS_KEY_DEVICE_COMPATIBLE, isDeviceCompatible).apply();
+    }
+
+    public boolean isDeviceCompatible() {
+        return prefs.getBoolean(PREFS_KEY_DEVICE_COMPATIBLE, true);
     }
 }

@@ -268,7 +268,7 @@ public class TransactionCreator {
 
     private FeeCalculation calculateFee(SendRequest req, Coin value, List<TransactionInput> originalInputs,
                                         int numberOfSoftDustOutputs, LinkedList<TransactionOutput> candidates) throws InsufficientMoneyException {
-        checkState(lock.isHeldByCurrentThread());
+        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
         FeeCalculation result = new FeeCalculation();
         // There are 3 possibilities for what adding change might do:
         // 1) No effect

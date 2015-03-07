@@ -34,6 +34,7 @@
     <string name="button_send">SEND</string>
     <string name="button_skip">SKIP</string>
     <string name="button_retry">RETRY</string>
+    <string name="button_download">DOWNLOAD</string>
     <string name="button_add_coins">+ COINS</string>
     <string name="scan_qr_code">Scan QR code</string>
     <string name="wallet_title_request">receive</string>
@@ -58,6 +59,8 @@
     <!-- Intro -->
     <string name="test_wallet_warning_title">Create a test wallet?</string>
     <string name="test_wallet_warning_message">If you create a new test wallet, your existing wallet will be lost unless you backed up you <i>recovery phrase</i>.</string>
+    <string name="incompatible_device_warning_title">Incompatible device</string>
+    <string name="incompatible_device_warning_message">It was detected that this device cannot perform certain cryptographic functions due to software or hardware bugs.\nThis could be solved by the manufacturer with an update.\n\nContact us if you have any questions: playstore@coinomi.com</string>
 
     <!-- Recovery fragment -->
     <string name="seed_info">This is your <i>recovery phrase</i>, which is used to generate the keys for your wallet. Please write it down on a paper and keep it in a secure place, as you would do with paper money. Anyone with access to it has access to the wallet\'s funds.\nIf you lose your recovery phrase, your wallet cannot be recovered.</string>
@@ -80,6 +83,8 @@
 
     <!-- Wallet activity -->
     <string name="test_wallet_message">This is a test wallet, where you can send and receive testnet Bitcoins, Litecoin and Dogecoins.\n\nIf you want to use normally the wallet, it is recommended to create a new one by going to <b>Settings > Restore wallet > Create a new wallet</b>.</string>
+    <string name="wallet_update_title">New version available</string>
+    <string name="wallet_update_message">A new version of Coinomi is available, it contains new features and fixes.</string>
 
     <!-- Balance fragment -->
     <string name="wallet_transactions_coinbase">mined</string>

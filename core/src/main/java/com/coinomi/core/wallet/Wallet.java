@@ -163,7 +163,12 @@ final public class Wallet {
      */
     @Nullable
     public WalletAccount getAccount(String id) {
-        return accounts.get(id);
+        lock.lock();
+        try {
+            return accounts.get(id);
+        } finally {
+            lock.unlock();
+        }
     }
 
     /**
@@ -204,7 +209,8 @@ final public class Wallet {
      * Generate and add a new BIP44 account for a specific coin type
      */
     private WalletPocketHD createAndAddAccount(CoinType coinType, @Nullable KeyParameter key) {
-        checkState(lock.isHeldByCurrentThread());
+        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
+        checkNotNull(coinType, "Attempting to create a pocket for a null coin");
         DeterministicHierarchy hierarchy;
         if (isEncrypted()) {
             hierarchy = new DeterministicHierarchy(masterKey.decrypt(getKeyCrypter(), key));
@@ -573,7 +579,12 @@ final public class Wallet {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public boolean isEncrypted() {
-        return masterKey.isEncrypted();
+        lock.lock();
+        try {
+            return masterKey.isEncrypted();
+        } finally {
+            lock.unlock();
+        }
     }
 
     /**
@@ -584,8 +595,8 @@ final public class Wallet {
      *         leaving the group unchanged.
      */
     public void encrypt(KeyCrypter keyCrypter, KeyParameter aesKey) {
-        checkNotNull(keyCrypter);
-        checkNotNull(aesKey);
+        checkNotNull(keyCrypter, "Attempting to encrypt with a null KeyCrypter");
+        checkNotNull(aesKey, "Attempting to encrypt with a null KeyParameter");
 
         lock.lock();
         try {
@@ -603,14 +614,14 @@ final public class Wallet {
     }
 
     /* package */ void decrypt(KeyParameter aesKey) {
-        checkNotNull(aesKey);
+        checkNotNull(aesKey, "Attemting to decrypt with a null KeyParameter");
 
         lock.lock();
         try {
-            checkState(isEncrypted());
+            checkState(isEncrypted(), "Wallet is already decrypted");
 
             if (seed != null) {
-                checkState(seed.isEncrypted());
+                checkState(seed.isEncrypted(), "Seed is already decrypted");
                 List<String> mnemonic = null;
                 try {
                     mnemonic = decodeMnemonicCode(getKeyCrypter().decrypt(seed.getEncryptedData(), aesKey));

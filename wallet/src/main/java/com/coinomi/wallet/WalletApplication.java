@@ -13,6 +13,7 @@ import android.preference.PreferenceManager;
 import android.widget.Toast;
 
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.util.HardwareSoftwareCompliance;
 import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.wallet.WalletPocketHD;
 import com.coinomi.core.wallet.WalletProtobufSerializer;
@@ -56,7 +57,8 @@ public class WalletApplication extends Application {
     private Intent coinServiceResetWalletIntent;
 
     private File walletFile;
-    @Nullable private Wallet wallet;
+    @Nullable
+    private Wallet wallet;
     private PackageInfo packageInfo;
 
     private long lastStop;
@@ -97,19 +99,29 @@ public class WalletApplication extends Application {
             }
         }
 
+        config.updateLastVersionCode(packageInfo.versionCode);
+
+        performComplianceTests();
+
         walletFile = getFileStreamPath(Constants.WALLET_FILENAME_PROTOBUF);
 
         loadWallet();
-
-        config.updateLastVersionCode(packageInfo.versionCode);
 
         afterLoadWallet();
 
         Fonts.initFonts(this.getAssets());
     }
 
-    private void afterLoadWallet()
-    {
+    /**
+     * Some devices have software bugs that causes the EC crypto to malfunction.
+     */
+    private void performComplianceTests() {
+        if (!HardwareSoftwareCompliance.isEllipticCurveCryptographyCompliant()) {
+            config.setDeviceCompatible(false);
+        }
+    }
+
+    private void afterLoadWallet() {
 //        wallet.autosaveToFile(walletFile, 1, TimeUnit.SECONDS, new WalletAutosaveEventListener());
 //
         // clean up spam
@@ -189,8 +201,9 @@ public class WalletApplication extends Application {
     public WalletPocketHD getWalletPocket(CoinType type) {
         if (wallet != null && wallet.isPocketExists(type)) {
             return wallet.getPocket(type);
+        } else {
+            return null;
         }
-        else { return null; }
     }
 
     /**
@@ -245,7 +258,6 @@ public class WalletApplication extends Application {
     }
 
 
-
     public void saveWalletNow() {
         if (wallet != null) {
             wallet.saveNow();
@@ -273,26 +285,20 @@ public class WalletApplication extends Application {
         }
     }
 
-    public void stopBlockchainService()
-    {
+    public void stopBlockchainService() {
         stopService(coinServiceIntent);
     }
 
 
-    public static PackageInfo packageInfoFromContext(final Context context)
-    {
-        try
-        {
+    public static PackageInfo packageInfoFromContext(final Context context) {
+        try {
             return context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
-        }
-        catch (final PackageManager.NameNotFoundException x)
-        {
+        } catch (final PackageManager.NameNotFoundException x) {
             throw new RuntimeException(x);
         }
     }
 
-    public PackageInfo packageInfo()
-    {
+    public PackageInfo packageInfo() {
         return packageInfo;
     }
 
