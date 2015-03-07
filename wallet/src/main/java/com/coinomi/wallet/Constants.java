@@ -124,8 +124,7 @@ public class Constants {
                                                     new ServerAddress("dgc-cce-2.coinomi.net", 5020)),
             new CoinAddress(CannacoinMain.get(),    new ServerAddress("ccn-cce-1.coinomi.net", 5021),
                                                     new ServerAddress("ccn-cce-2.coinomi.net", 5021)),
-            new CoinAddress(DigibyteMain.get(),     new ServerAddress("digibytewiki.com", 50001),       // https://github.com/digibyte/electrum-dgb-server
-                                                    new ServerAddress("digielectrum.cryptoservices.net", 50001)) // Not Yet Live
+            new CoinAddress(DigibyteMain.get(),     new ServerAddress("digibytewiki.com", 50001))       // https://github.com/digibyte/electrum-dgb-server
     );
 
     public static final HashMap<CoinType, Integer> COINS_ICONS;
@@ -193,6 +192,7 @@ public class Constants {
             BlackcoinMain.get(),
             RubycoinMain.get(),
             ReddcoinMain.get(),
+            DigibyteMain.get(),
             FeathercoinMain.get(),
             DigitalcoinMain.get(),
             CannacoinMain.get(),
