@@ -34,6 +34,7 @@
     <string name="button_send">SEND</string>
     <string name="button_skip">SKIP</string>
     <string name="button_retry">RETRY</string>
+    <string name="button_download">DOWNLOAD</string>
     <string name="button_add_coins">+ COINS</string>
     <string name="scan_qr_code">Scan QR code</string>
     <string name="wallet_title_request">receive</string>
@@ -82,6 +83,8 @@
 
     <!-- Wallet activity -->
     <string name="test_wallet_message">This is a test wallet, where you can send and receive testnet Bitcoins, Litecoin and Dogecoins.\n\nIf you want to use normally the wallet, it is recommended to create a new one by going to <b>Settings > Restore wallet > Create a new wallet</b>.</string>
+    <string name="wallet_update_title">New version available</string>
+    <string name="wallet_update_message">A new version of Coinomi is available, it contains new features and fixes.</string>
 
     <!-- Balance fragment -->
     <string name="wallet_transactions_coinbase">mined</string>

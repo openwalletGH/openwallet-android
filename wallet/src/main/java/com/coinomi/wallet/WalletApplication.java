@@ -57,7 +57,8 @@ public class WalletApplication extends Application {
     private Intent coinServiceResetWalletIntent;
 
     private File walletFile;
-    @Nullable private Wallet wallet;
+    @Nullable
+    private Wallet wallet;
     private PackageInfo packageInfo;
 
     private long lastStop;
@@ -120,8 +121,7 @@ public class WalletApplication extends Application {
         }
     }
 
-    private void afterLoadWallet()
-    {
+    private void afterLoadWallet() {
 //        wallet.autosaveToFile(walletFile, 1, TimeUnit.SECONDS, new WalletAutosaveEventListener());
 //
         // clean up spam
@@ -201,8 +201,9 @@ public class WalletApplication extends Application {
     public WalletPocket getWalletPocket(CoinType type) {
         if (wallet != null && wallet.isPocketExists(type)) {
             return wallet.getPocket(type);
+        } else {
+            return null;
         }
-        else { return null; }
     }
 
     /**
@@ -257,7 +258,6 @@ public class WalletApplication extends Application {
     }
 
 
-
     public void saveWalletNow() {
         if (wallet != null) {
             wallet.saveNow();
@@ -285,26 +285,20 @@ public class WalletApplication extends Application {
         }
     }
 
-    public void stopBlockchainService()
-    {
+    public void stopBlockchainService() {
         stopService(coinServiceIntent);
     }
 
 
-    public static PackageInfo packageInfoFromContext(final Context context)
-    {
-        try
-        {
+    public static PackageInfo packageInfoFromContext(final Context context) {
+        try {
             return context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
-        }
-        catch (final PackageManager.NameNotFoundException x)
-        {
+        } catch (final PackageManager.NameNotFoundException x) {
             throw new RuntimeException(x);
         }
     }
 
-    public PackageInfo packageInfo()
-    {
+    public PackageInfo packageInfo() {
         return packageInfo;
     }
 

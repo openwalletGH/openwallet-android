@@ -2,7 +2,12 @@ package com.coinomi.wallet.ui;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -11,6 +16,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
+import android.text.format.DateUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -24,11 +30,18 @@ import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.service.CoinService;
 import com.coinomi.wallet.service.CoinServiceImpl;
+import com.coinomi.wallet.tasks.CheckUpdateTask;
 import com.coinomi.wallet.util.Keyboard;
+import com.coinomi.wallet.util.SystemUtils;
 
 import org.bitcoinj.core.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 
 /**
  * @author John L. Jegutanis
@@ -102,6 +115,10 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
                     .setMessage(R.string.test_wallet_message)
                     .setNeutralButton(R.string.button_ok, null)
                     .create().show();
+        }
+
+        if (savedInstanceState == null) {
+            checkAlerts();
         }
 
         mTitle = getTitle();
@@ -203,6 +220,58 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setIcon(coinIconRes);
         actionBar.setTitle(mTitle);
+    }
+
+    private void checkAlerts() {
+        // If not store version, show update dialog if needed
+        if (!SystemUtils.isStoreVersion(this)) {
+            final PackageInfo packageInfo = getWalletApplication().packageInfo();
+            new CheckUpdateTask() {
+                @Override
+                protected void onPostExecute(Integer serverVersionCode) {
+                    if (serverVersionCode != null && serverVersionCode > packageInfo.versionCode) {
+                        showUpdateDialog();
+                    }
+                }
+            }.execute();
+        }
+    }
+
+    private void showUpdateDialog() {
+
+        final PackageManager pm = getPackageManager();
+//        final Intent marketIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(String.format(Constants.MARKET_APP_URL, getPackageName())));
+        final Intent binaryIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constants.BINARY_URL));
+
+        final AlertDialog.Builder builder = new AlertDialog.Builder(WalletActivity.this);
+        builder.setTitle(R.string.wallet_update_title);
+        builder.setMessage(R.string.wallet_update_message);
+
+        // Disable market link for now
+//        if (pm.resolveActivity(marketIntent, 0) != null)
+//        {
+//            builder.setPositiveButton("Play Store", new DialogInterface.OnClickListener() {
+//                @Override
+//                public void onClick(final DialogInterface dialog, final int id) {
+//                    startActivity(marketIntent);
+//                    finish();
+//                }
+//            });
+//        }
+
+        if (pm.resolveActivity(binaryIntent, 0) != null)
+        {
+            builder.setNeutralButton(R.string.button_download, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(final DialogInterface dialog, final int id) {
+                    startActivity(binaryIntent);
+                    finish();
+                }
+            });
+        }
+
+        builder.setNegativeButton(R.string.button_dismiss, null);
+        builder.create().show();
     }
 
     @Override

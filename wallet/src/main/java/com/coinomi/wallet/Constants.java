@@ -83,6 +83,11 @@ public class Constants {
     public static final char CURRENCY_PLUS_SIGN = '+';
     public static final char CURRENCY_MINUS_SIGN = '-';
 
+    public static final String MARKET_APP_URL = "market://details?id=%s";
+    public static final String BINARY_URL = "https://github.com/Coinomi/coinomi-android/releases";
+
+    public static final String VERSION_URL = "http://coinomi.com/version";
+
     // TODO move to resource files
     public static final List<CoinAddress> DEFAULT_COINS_SERVERS = ImmutableList.of(
             new CoinAddress(BitcoinMain.get(),      new ServerAddress("btc-cce-1.coinomi.net", 5001),
