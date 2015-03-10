@@ -70,7 +70,6 @@ public class SendFragment extends Fragment {
     private static final Logger log = LoggerFactory.getLogger(SendFragment.class);
 
     // the fragment initialization parameters
-    private static final String COIN_TYPE = "coin_type";
     private static final int REQUEST_CODE_SCAN = 0;
     private static final int SIGN_TRANSACTION = 1;
 
@@ -82,8 +81,7 @@ public class SendFragment extends Fragment {
     private static final int ID_RECEIVING_ADDRESS_LOADER = 1;
 
     private CoinType type;
-    @Nullable
-    private Coin lastBalance; // TODO setup wallet watcher for the latest balance
+    @Nullable private Coin lastBalance; // TODO setup wallet watcher for the latest balance
     private AutoCompleteTextView sendToAddressView;
     private TextView addressError;
     private CurrencyCalculatorLink amountCalculatorLink;
@@ -95,10 +93,9 @@ public class SendFragment extends Fragment {
     private State state = State.INPUT;
     private Address address;
     private Coin sendAmount;
-    @Nullable
-    private WalletActivity activity;
-    @Nullable
-    private WalletPocketHD pocket;
+    @Nullable private WalletActivity activity;
+    @Nullable private String accountId;
+    @Nullable private WalletPocketHD pocket;
     private Configuration config;
     private NavigationDrawerFragment mNavigationDrawerFragment;
     private LoaderManager loaderManager;
@@ -125,13 +122,13 @@ public class SendFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param type the type of the coin
+     * @param accountId the id of an account
      * @return A new instance of fragment WalletSendCoins.
      */
-    public static SendFragment newInstance(CoinType type) {
+    public static SendFragment newInstance(String accountId) {
         SendFragment fragment = new SendFragment();
         Bundle args = new Bundle();
-        args.putSerializable(COIN_TYPE, type);
+        args.putSerializable(Constants.ARG_ACCOUNT_ID, accountId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -143,12 +140,18 @@ public class SendFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            type = (CoinType) checkNotNull(getArguments().getSerializable(COIN_TYPE));
+        if (getArguments() != null && activity != null) {
+            accountId = checkNotNull(getArguments().getString(Constants.ARG_ACCOUNT_ID));
+            //TODO
+            pocket = (WalletPocketHD) activity.getWalletApplication().getAccount(accountId);
         }
-        if (activity != null) {
-            pocket = activity.getWalletApplication().getWalletPocket(type);
+
+        if (pocket == null) {
+            Toast.makeText(getActivity(), R.string.no_such_pocket_error, Toast.LENGTH_LONG).show();
+            return;
         }
+
+        type = pocket.getCoinType();
         updateBalance();
         setHasOptionsMenu(true);
         mNavigationDrawerFragment = (NavigationDrawerFragment)
@@ -279,7 +282,7 @@ public class SendFragment extends Fragment {
             if (pocket == null) {
                 throw new NoSuchPocketException("No pocket found for " + type.getName());
             }
-            intent.putExtra(Constants.ARG_COIN_ID, type.getId());
+            intent.putExtra(Constants.ARG_ACCOUNT_ID, type.getId());
             intent.putExtra(Constants.ARG_SEND_TO_ADDRESS, toAddress.toString());
             intent.putExtra(Constants.ARG_SEND_AMOUNT, amount.getValue());
             startActivityForResult(intent, SIGN_TRANSACTION);

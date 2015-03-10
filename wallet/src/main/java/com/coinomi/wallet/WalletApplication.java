@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.util.HardwareSoftwareCompliance;
 import com.coinomi.core.wallet.Wallet;
+import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.core.wallet.WalletPocketHD;
 import com.coinomi.core.wallet.WalletProtobufSerializer;
 import com.coinomi.wallet.service.CoinService;
@@ -198,20 +199,31 @@ public class WalletApplication extends Application {
     }
 
     @Nullable
-    public WalletPocketHD getWalletPocket(CoinType type) {
-        if (wallet != null && wallet.isPocketExists(type)) {
-            return wallet.getPocket(type);
+    public WalletAccount getAccount(String accountId) {
+        if (wallet != null) {
+            return wallet.getAccount(accountId);
         } else {
             return null;
         }
     }
 
     /**
-     * Check if pocket exists
+     * Check if account exists
      */
-    public boolean isPocketExists(CoinType type) {
+    public boolean isAccountExists(String accountId) {
         if (wallet != null) {
-            return wallet.isPocketExists(type);
+            return wallet.isAccountExists(accountId);
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Check if accounts exists for the spesific coin type
+     */
+    public boolean isAccountExists(CoinType type) {
+        if (wallet != null) {
+            return wallet.isAccountExists(type);
         } else {
             return false;
         }

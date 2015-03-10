@@ -82,7 +82,7 @@ public class WalletPocketHD extends TransactionWatcherWallet {
     }
 
     WalletPocketHD(SimpleHDKeyChain keys, CoinType coinType) {
-        this(keys.getId(), keys, coinType);
+        this(keys.getId(coinType.getId()), keys, coinType);
     }
 
     WalletPocketHD(String id, SimpleHDKeyChain keys, CoinType coinType) {

@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -16,7 +15,6 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.text.format.DateUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -37,11 +35,6 @@ import com.coinomi.wallet.util.SystemUtils;
 import org.bitcoinj.core.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
-import java.net.UnknownHostException;
 
 /**
  * @author John L. Jegutanis
@@ -78,6 +71,7 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
      */
     private ViewPager mViewPager;
     private CoinType currentType;
+    private String currentAccountId;
     private Intent connectCoinIntent;
 
     Handler handler = new Handler() {
@@ -179,10 +173,10 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
     }
 
     @Override
-    public void onNavigationDrawerCoinSelected(CoinType coinType) {
-        log.info("Coin selected {}", coinType);
+    public void onAccountSelected(WalletAccount account) {
+        log.info("Coin selected {}", account.getId());
 
-        openPocket(coinType);
+        openPocket(account);
     }
 
     @Override
@@ -190,16 +184,17 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
         startActivityForResult(new Intent(WalletActivity.this, AddCoinsActivity.class), ADD_COIN);
     }
 
-    private void openPocket(CoinType coinType) {
-        if (mViewPager != null && !coinType.equals(currentType)) {
-            currentType = coinType;
-            mTitle = coinType.getName();
-            coinIconRes = Constants.COINS_ICONS.get(coinType);
-            AppSectionsPagerAdapter adapter = new AppSectionsPagerAdapter(this, coinType);
+    private void openPocket(WalletAccount account) {
+        if (mViewPager != null && !account.getId().equals(currentAccountId)) {
+            currentAccountId = account.getId();
+            currentType = account.getCoinType();
+            mTitle = currentType.getName();
+            coinIconRes = Constants.COINS_ICONS.get(currentType);
+            AppSectionsPagerAdapter adapter = new AppSectionsPagerAdapter(this, account);
             mViewPager.setAdapter(adapter);
             mViewPager.setCurrentItem(BALANCE);
             mViewPager.getAdapter().notifyDataSetChanged();
-            getWalletApplication().getConfiguration().touchLastPocket(coinType);
+            getWalletApplication().getConfiguration().touchLastPocket(currentType);
             connectCoinService();
         }
     }
@@ -210,7 +205,7 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
                     getWalletApplication(), CoinServiceImpl.class);
         }
         // Open connection if needed or possible
-        connectCoinIntent.putExtra(Constants.ARG_COIN_ID, currentType.getId());
+        connectCoinIntent.putExtra(Constants.ARG_ACCOUNT_ID, currentAccountId);
         getWalletApplication().startService(connectCoinIntent);
     }
 
@@ -288,7 +283,7 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
                     if (!Constants.SUPPORTED_COINS.contains(scannedType)) {
                         String error = getResources().getString(R.string.unsupported_coin, scannedType.getName());
                         throw new CoinURIParseException(error);
-                    } else if (!getWalletApplication().isPocketExists(scannedType)) {
+                    } else if (!getWalletApplication().isAccountExists(scannedType)) {
                         String error = getResources().getString(R.string.coin_not_added, scannedType.getName());
                         throw new CoinURIParseException(error);
                     }
@@ -301,9 +296,11 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
             }
         } else if (requestCode == ADD_COIN) {
             if (resultCode == Activity.RESULT_OK) {
+                // TODO
+                String accountId = intent.getStringExtra(Constants.ARG_ACCOUNT_ID);
+                WalletAccount account = getWalletApplication().getWallet().getAccount(accountId);
                 mNavigationDrawerFragment.notifyDataSetChanged();
-                CoinType type = CoinID.typeFromId(intent.getStringExtra(Constants.ARG_COIN_ID));
-                mNavigationDrawerFragment.selectItem(type);
+                mNavigationDrawerFragment.selectItem(account.getCoinType());
             }
         }
     }
@@ -374,7 +371,7 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
         if (getWalletApplication().getWallet() != null) {
             Intent intent = new Intent(CoinService.ACTION_RESET_WALLET, null,
                     getWalletApplication(), CoinServiceImpl.class);
-            intent.putExtra(Constants.ARG_COIN_ID, currentType.getId());
+            intent.putExtra(Constants.ARG_ACCOUNT_ID, currentAccountId);
             getWalletApplication().startService(intent);
             // FIXME, we get a crash if the activity is not restarted
             Intent introIntent = new Intent(WalletActivity.this, WalletActivity.class);
@@ -411,30 +408,30 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
 
     private static class AppSectionsPagerAdapter extends FragmentStatePagerAdapter {
 
-        private final CoinType type;
         private final WalletActivity walletActivity;
+        private final String accountId;
         private AddressRequestFragment request;
         private SendFragment send;
         private BalanceFragment balance;
 
-        public AppSectionsPagerAdapter(WalletActivity walletActivity, CoinType type) {
+        public AppSectionsPagerAdapter(WalletActivity walletActivity, WalletAccount account) {
             super(walletActivity.getSupportFragmentManager());
             this.walletActivity = walletActivity;
-            this.type = type;
+            this.accountId = account.getId();
         }
 
         @Override
         public Fragment getItem(int i) {
             switch (i) {
                 case RECEIVE:
-                    if (request == null) request = AddressRequestFragment.newInstance(type);
+                    if (request == null) request = AddressRequestFragment.newInstance(accountId);
                     return request;
                 case SEND:
-                    if (send == null) send = SendFragment.newInstance(type);
+                    if (send == null) send = SendFragment.newInstance(accountId);
                     return send;
                 case BALANCE:
                 default:
-                    if (balance == null) balance = BalanceFragment.newInstance(type);
+                    if (balance == null) balance = BalanceFragment.newInstance(accountId);
                     return balance;
             }
         }

@@ -6,8 +6,12 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.ui.widget.NavDrawerItem;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.annotation.Nonnull;
 
@@ -17,26 +21,40 @@ import javax.annotation.Nonnull;
 public class NavDrawerListAdapter extends BaseAdapter {
     private final Context context;
     private final WalletApplication application;
+    private List<WalletAccount> items;
 
     public NavDrawerListAdapter(final Context context, @Nonnull final WalletApplication application) {
         this.context = context;
         this.application = application;
+        buildData();
+    }
+
+    @Override
+    public void notifyDataSetChanged() {
+        buildData();
+        super.notifyDataSetChanged();
+    }
+
+    private void buildData() {
+        if (application.getWallet() != null) {
+            items = application.getWallet().getAllAccounts();
+        } else {
+            items = new ArrayList<WalletAccount>();
+        }
     }
 
     @Override
     public int getCount() {
-        if (application.getWallet() != null) {
-            return application.getWallet().getCoinTypes().size();
-        }
-        return 0;
+        return items.size();
     }
 
     @Override
-    public CoinType getItem(int position) {
-        if (application.getWallet() != null) {
-            return application.getWallet().getCoinTypes().get(position);
+    public WalletAccount getItem(int position) {
+        if (items.size() > position) {
+            return items.get(position);
+        } else {
+            return null;
         }
-        return null;
     }
 
     @Override
@@ -50,8 +68,8 @@ public class NavDrawerListAdapter extends BaseAdapter {
             row = new NavDrawerItem(context);
         }
 
-        CoinType coinType = getItem(position);
-        if (coinType != null) ((NavDrawerItem) row).setCoin(coinType);
+        WalletAccount account = getItem(position);
+        if (account != null) ((NavDrawerItem) row).setAccount(account);
 
         return row;
     }

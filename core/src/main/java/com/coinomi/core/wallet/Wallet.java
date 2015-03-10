@@ -147,12 +147,24 @@ final public class Wallet {
     }
 
     /**
-     * Check if pocket exists
+     * Check if account exists
      */
     public boolean isAccountExists(CoinType coinType) {
         lock.lock();
         try {
             return accountsByType.containsKey(coinType);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Check if account exists
+     */
+    public boolean isAccountExists(String accountId) {
+        lock.lock();
+        try {
+            return accounts.containsKey(accountId);
         } finally {
             lock.unlock();
         }
@@ -200,6 +212,16 @@ final public class Wallet {
         lock.lock();
         try {
             return ImmutableList.copyOf(accounts.values());
+        } finally {
+            lock.unlock();
+        }
+    }
+
+
+    public List getAccountIds() {
+        lock.lock();
+        try {
+            return ImmutableList.copyOf(accounts.keySet());
         } finally {
             lock.unlock();
         }
@@ -314,16 +336,16 @@ final public class Wallet {
         }
     }
 
-    //TODO
-    @Deprecated
-    public List<CoinType> getCoinTypes() {
-        lock.lock();
-        try {
-            return ImmutableList.copyOf(accountsByType.keySet());
-        } finally {
-            lock.unlock();
-        }
-    }
+//    //TODO
+//    @Deprecated
+//    public List<CoinType> getCoinTypes() {
+//        lock.lock();
+//        try {
+//            return ImmutableList.copyOf(accountsByType.keySet());
+//        } finally {
+//            lock.unlock();
+//        }
+//    }
 
     /** Returns the {@link KeyCrypter} in use or null if the key chain is not encrypted. */
     @Nullable
@@ -380,18 +402,15 @@ final public class Wallet {
         return version;
     }
 
-    public List<WalletAccount> refresh(List<String> accountsToReset) {
+    public WalletAccount refresh(String accountIdToReset) {
         lock.lock();
         try {
-            ImmutableList.Builder<WalletAccount> refreshedAccounts = ImmutableList.builder();
-            for (String id : accountsToReset) {
-                WalletAccount account = getAccount(id);
-                if (account != null) {
-                    account.refresh();
-                }
+            WalletAccount account = getAccount(accountIdToReset);
+            if (account != null) {
+                account.refresh();
+                saveLater();
             }
-            saveLater();
-            return refreshedAccounts.build();
+            return account;
         } finally {
             lock.unlock();
         }

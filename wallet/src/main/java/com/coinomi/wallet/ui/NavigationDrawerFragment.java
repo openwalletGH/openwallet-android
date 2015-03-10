@@ -1,5 +1,6 @@
 package com.coinomi.wallet.ui;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.app.Activity;
 import android.support.v7.app.ActionBar;
@@ -19,11 +20,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
+
+import org.bitcoinj.core.Transaction;
+
+import java.util.List;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
@@ -62,6 +69,7 @@ public class NavigationDrawerFragment extends Fragment {
     private boolean mUserLearnedDrawer;
     private WalletApplication application;
     private View addCoinsButton;
+    private NavDrawerListAdapter listAdapter;
 
     public NavigationDrawerFragment() {
     }
@@ -104,7 +112,8 @@ public class NavigationDrawerFragment extends Fragment {
                 selectItem(position);
             }
         });
-        mDrawerListView.setAdapter(new NavDrawerListAdapter(getActivity(), application));
+        listAdapter = new NavDrawerListAdapter(getActivity(), application);
+        mDrawerListView.setAdapter(listAdapter);
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
 
         addCoinsButton = view.findViewById(R.id.add_coins);
@@ -201,15 +210,27 @@ public class NavigationDrawerFragment extends Fragment {
     }
 
     void selectCoinInit(CoinType coinType) {
+//        TODO
         if (application.getWallet() != null) {
-            int position = application.getWallet().getCoinTypes().indexOf(coinType);
+//            int position = application.getWallet().getCoinTypes().indexOf(coinType);
+            List<WalletAccount> accounts = application.getWallet().getAccounts(coinType);
+            int position = 0;
+            if (accounts.size() > 0) {
+                position = application.getWallet().getAllAccounts().indexOf(accounts.get(0));
+            }
             selectItem(position, false);
         }
     }
 
     void selectItem(CoinType coinType) {
+//        TODO
         if (application.getWallet() != null) {
-            int position = application.getWallet().getCoinTypes().indexOf(coinType);
+//            int position = application.getWallet().getCoinTypes().indexOf(coinType);
+            List<WalletAccount> accounts = application.getWallet().getAccounts(coinType);
+            int position = 0;
+            if (accounts.size() > 0) {
+                position = application.getWallet().getAllAccounts().indexOf(accounts.get(0));
+            }
             selectItem(position, true);
         }
     }
@@ -230,7 +251,10 @@ public class NavigationDrawerFragment extends Fragment {
             mDrawerLayout.closeDrawer(mFragmentContainerView);
         }
         if (mCallbacks != null && application.getWallet() != null) {
-            mCallbacks.onNavigationDrawerCoinSelected(application.getWallet().getCoinTypes().get(position));
+//            WalletAccount item = listAdapter.getItem(position);
+            WalletAccount item = application.getWallet().getAllAccounts().get(position);
+//            mCallbacks.onNavigationDrawerCoinSelected(application.getWallet().getCoinTypes().get(position));
+            mCallbacks.onAccountSelected(item);
         }
     }
 
@@ -313,10 +337,9 @@ public class NavigationDrawerFragment extends Fragment {
      * Callbacks interface that all activities using this fragment must implement.
      */
     public static interface NavigationDrawerCallbacks {
-        /**
-         * Called when an item in the navigation drawer is selected.
-         */
-        void onNavigationDrawerCoinSelected(CoinType coinType);
+//        void onNavigationDrawerCoinSelected(CoinType coinType);
+
+        void onAccountSelected(WalletAccount account);
 
         void onNavigationDrawerAddCoinsSelected();
     }

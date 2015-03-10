@@ -40,6 +40,7 @@ public class PreviousAddressesFragment extends Fragment {
     private Listener listener;
 
     private CoinType type;
+    private String accountId;
     private WalletPocketHD pocket;
     private AddressesListAdapter adapter;
     private ContentResolver resolver;
@@ -61,10 +62,10 @@ public class PreviousAddressesFragment extends Fragment {
         }
     };
 
-    public static PreviousAddressesFragment newInstance(CoinType coinType) {
+    public static PreviousAddressesFragment newInstance(String accountId) {
         PreviousAddressesFragment fragment = new PreviousAddressesFragment();
         Bundle args = new Bundle();
-        args.putString(Constants.ARG_COIN_ID, coinType.getId());
+        args.putString(Constants.ARG_ACCOUNT_ID, accountId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -76,10 +77,16 @@ public class PreviousAddressesFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            type = CoinID.typeFromId(getArguments().getString(Constants.ARG_COIN_ID));
+            accountId = getArguments().getString(Constants.ARG_ACCOUNT_ID);
         }
         WalletApplication walletApplication = (WalletApplication) getActivity().getApplication();
-        pocket = checkNotNull(walletApplication.getWalletPocket(type));
+        // TODO
+        pocket = (WalletPocketHD) walletApplication.getAccount(accountId);
+        if (pocket == null) {
+            Toast.makeText(getActivity(), R.string.no_such_pocket_error, Toast.LENGTH_LONG).show();
+            return;
+        }
+        type = pocket.getCoinType();
     }
 
     @Override
@@ -111,7 +118,7 @@ public class PreviousAddressesFragment extends Fragment {
 
                     if (obj != null && obj instanceof Address) {
                         Bundle args = new Bundle();
-                        args.putString(Constants.ARG_COIN_ID, type.getId());
+                        args.putString(Constants.ARG_ACCOUNT_ID, accountId);
                         args.putString(Constants.ARG_ADDRESS, obj.toString());
                         listener.onAddressSelected(args);
                     } else {

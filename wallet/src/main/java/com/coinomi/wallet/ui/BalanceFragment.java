@@ -64,8 +64,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class BalanceFragment extends Fragment implements WalletPocketEventListener, LoaderCallbacks<List<Transaction>> {
     private static final Logger log = LoggerFactory.getLogger(BalanceFragment.class);
 
-    private static final String COIN_TYPE = "coin_type";
-
     private static final int NEW_BALANCE = 0;
     private static final int PENDING = 1;
     private static final int CONNECTIVITY = 2;
@@ -99,24 +97,25 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
         }
     };
 
+    private String accountId;
     private WalletPocketHD pocket;
     private CoinType type;
     private Coin currentBalance;
-    private boolean isFullAmount = false;
 
+    private boolean isFullAmount = false;
     private WalletApplication application;
     private ContentResolver resolver;
     private Configuration config;
-    private TransactionsListAdapter adapter;
 
+    private TransactionsListAdapter adapter;
     private LoaderManager loaderManager;
     private View emptyPocketMessage;
     private NavigationDrawerFragment mNavigationDrawerFragment;
     private Amount mainAmount;
     private Amount localAmount;
     private TextView connectionLabel;
-    private Listener listener;
 
+    private Listener listener;
     private final ContentObserver addressBookObserver = new ContentObserver(handler) {
         @Override
         public void onChange(final boolean selfChange) {
@@ -128,13 +127,13 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param type of the coin
+     * @param accountId of the account
      * @return A new instance of fragment InfoFragment.
      */
-    public static BalanceFragment newInstance(CoinType type) {
+    public static BalanceFragment newInstance(String accountId) {
         BalanceFragment fragment = new BalanceFragment();
         Bundle args = new Bundle();
-        args.putSerializable(COIN_TYPE, type);
+        args.putSerializable(Constants.ARG_ACCOUNT_ID, accountId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -147,11 +146,15 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            type = (CoinType) getArguments().getSerializable(COIN_TYPE);
+            accountId = getArguments().getString(Constants.ARG_ACCOUNT_ID);
         }
-
-        checkNotNull(type);
-        pocket = application.getWalletPocket(type);
+        //TODO
+        pocket = (WalletPocketHD) application.getAccount(accountId);
+        if (pocket == null) {
+            Toast.makeText(getActivity(), R.string.no_such_pocket_error, Toast.LENGTH_LONG).show();
+            return;
+        }
+        type = pocket.getCoinType();
         setHasOptionsMenu(true);
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
@@ -207,7 +210,7 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
 
                     if (obj != null && obj instanceof Transaction) {
                         Intent intent = new Intent(getActivity(), TransactionDetailsActivity.class);
-                        intent.putExtra(Constants.ARG_COIN_ID, type.getId());
+                        intent.putExtra(Constants.ARG_ACCOUNT_ID, accountId);
                         intent.putExtra(Constants.ARG_TRANSACTION_ID, ((Transaction) obj).getHashAsString());
                         startActivity(intent);
                     } else {

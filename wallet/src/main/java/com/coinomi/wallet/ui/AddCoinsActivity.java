@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.wallet.Wallet;
+import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 
@@ -68,14 +69,14 @@ public class AddCoinsActivity extends AbstractWalletActionBarActivity
         // For new we add only one coin at a time
         selectedCoin = CoinID.typeFromId(ids.get(0));
 
-        if (wallet.isPocketExists(selectedCoin)) {
-            new AlertDialog.Builder(this)
-                    .setTitle(getString(R.string.coin_already_added_title, selectedCoin.getName()))
-                    .setMessage(R.string.coin_already_added)
-                    .setNeutralButton(R.string.button_ok, null)
-                    .create().show();
-            return;
-        }
+//        if (wallet.isPocketExists(selectedCoin)) {
+//            new AlertDialog.Builder(this)
+//                    .setTitle(getString(R.string.coin_already_added_title, selectedCoin.getName()))
+//                    .setMessage(R.string.coin_already_added)
+//                    .setNeutralButton(R.string.button_ok, null)
+//                    .create().show();
+//            return;
+//        }
 
         if (wallet.isEncrypted()) {
             addCoinPasswordDialog.show(getSupportFragmentManager(), null);
@@ -104,6 +105,7 @@ public class AddCoinsActivity extends AbstractWalletActionBarActivity
         private final CoinType type;
         @Nullable private final String password;
         private Dialogs.ProgressDialogFragment verifyDialog;
+        private WalletAccount newAccount;
 
         private WalletFromSeedTask(CoinType type, @Nullable String password) {
             this.type = type;
@@ -126,7 +128,7 @@ public class AddCoinsActivity extends AbstractWalletActionBarActivity
                 if (wallet.isEncrypted() && wallet.getKeyCrypter() != null) {
                     key = wallet.getKeyCrypter().deriveKey(password);
                 }
-                wallet.createCoinPocket(type, true, key);
+                newAccount = wallet.createAccount(type, true, key);
                 wallet.saveNow();
             } catch (RuntimeException e) {
                 exception = e;
@@ -137,11 +139,11 @@ public class AddCoinsActivity extends AbstractWalletActionBarActivity
 
         protected void onPostExecute(Exception e) {
             verifyDialog.dismiss();
-            result(e == null ? null : e.getMessage());
+            result(newAccount, e == null ? null : e.getMessage());
         }
     }
 
-    public void result(@Nullable String errorMessage) {
+    public void result(WalletAccount newAccount, @Nullable String errorMessage) {
         final Intent result = new Intent();
         if (errorMessage != null) {
             String message = getResources().getString(R.string.add_coin_error,
@@ -149,7 +151,7 @@ public class AddCoinsActivity extends AbstractWalletActionBarActivity
             Toast.makeText(AddCoinsActivity.this, message, Toast.LENGTH_LONG).show();
             setResult(RESULT_CANCELED, result);
         } else {
-            result.putExtra(Constants.ARG_COIN_ID, selectedCoin.getId());
+            result.putExtra(Constants.ARG_ACCOUNT_ID, newAccount.getId());
             setResult(RESULT_OK, result);
         }
 

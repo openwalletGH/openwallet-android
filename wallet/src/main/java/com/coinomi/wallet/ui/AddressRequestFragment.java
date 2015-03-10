@@ -86,6 +86,7 @@ public class AddressRequestFragment extends Fragment {
 
     private NavigationDrawerFragment mNavigationDrawerFragment;
     @Nullable private ShareActionProvider mShareActionProvider;
+    private String accountId;
     private WalletPocketHD pocket;
     private int maxQrSize;
     @Nullable private Address showAddress;
@@ -120,13 +121,13 @@ public class AddressRequestFragment extends Fragment {
         return fragment;
     }
 
-    public static AddressRequestFragment newInstance(CoinType coinType) {
-        return newInstance(coinType, null);
+    public static AddressRequestFragment newInstance(String accountId) {
+        return newInstance(accountId, null);
     }
 
-    public static AddressRequestFragment newInstance(CoinType coinType, @Nullable Address showAddress) {
+    public static AddressRequestFragment newInstance(String accountId, @Nullable Address showAddress) {
         Bundle args = new Bundle();
-        args.putString(Constants.ARG_COIN_ID, coinType.getId());
+        args.putString(Constants.ARG_ACCOUNT_ID, accountId);
         if (showAddress != null) {
             args.putString(Constants.ARG_ADDRESS, showAddress.toString());
         }
@@ -139,9 +140,10 @@ public class AddressRequestFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        WalletApplication walletApplication = (WalletApplication) getActivity().getApplication();
         Bundle args = getArguments();
         if (args != null) {
-            type = CoinID.typeFromId(args.getString(Constants.ARG_COIN_ID));
+            accountId = args.getString(Constants.ARG_ACCOUNT_ID);
             if (args.containsKey(Constants.ARG_ADDRESS)) {
                 try {
                     showAddress = new Address(type, args.getString(Constants.ARG_ADDRESS));
@@ -150,8 +152,13 @@ public class AddressRequestFragment extends Fragment {
                 }
             }
         }
-        WalletApplication walletApplication = (WalletApplication) getActivity().getApplication();
-        pocket = checkNotNull(walletApplication.getWalletPocket(type));
+        // TODO
+        pocket = (WalletPocketHD) checkNotNull(walletApplication.getAccount(accountId));
+        if (pocket == null) {
+            Toast.makeText(getActivity(), R.string.no_such_pocket_error, Toast.LENGTH_LONG).show();
+            return;
+        }
+        type = pocket.getCoinType();
         setHasOptionsMenu(true);
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
@@ -190,7 +197,7 @@ public class AddressRequestFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), PreviousAddressesActivity.class);
-                intent.putExtra(Constants.ARG_COIN_ID, type.getId());
+                intent.putExtra(Constants.ARG_ACCOUNT_ID, accountId);
                 startActivity(intent);
             }
         });

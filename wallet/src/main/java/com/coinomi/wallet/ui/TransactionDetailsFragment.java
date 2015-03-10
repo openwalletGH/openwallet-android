@@ -50,6 +50,7 @@ public class TransactionDetailsFragment extends Fragment {
     private static final int UPDATE_VIEW = 0;
 
     private Sha256Hash txId;
+    private String accountId;
     private WalletPocketHD pocket;
     private CoinType type;
 
@@ -77,6 +78,16 @@ public class TransactionDetailsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            accountId = getArguments().getString(Constants.ARG_ACCOUNT_ID);
+        }
+        // TODO
+        pocket = (WalletPocketHD) getWalletApplication().getAccount(accountId);
+        if (pocket == null) {
+            Toast.makeText(getActivity(), R.string.no_such_pocket_error, Toast.LENGTH_LONG).show();
+            return;
+        }
+        type = pocket.getCoinType();
     }
 
     @Override
@@ -99,8 +110,6 @@ public class TransactionDetailsFragment extends Fragment {
         txIdView = (TextView) footer.findViewById(R.id.tx_id);
         blockExplorerLink = (TextView) footer.findViewById(R.id.block_explorer_link);
 
-        type = CoinID.typeFromId(getArguments().getString(Constants.ARG_COIN_ID));
-        pocket = checkNotNull(getWalletApplication().getWalletPocket(type));
         pocket.addEventListener(walletListener);
 
         adapter = new TransactionAmountVisualizerAdapter(inflater.getContext(), pocket);

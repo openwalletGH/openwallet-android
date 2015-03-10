@@ -26,10 +26,13 @@ import com.google.protobuf.ByteString;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.spongycastle.crypto.digests.RIPEMD160Digest;
 import org.spongycastle.crypto.params.KeyParameter;
 import org.spongycastle.math.ec.ECPoint;
 
 import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -973,7 +976,18 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
     }
 
     public String getId() {
-        return Utils.HEX.encode(rootKey.getPubKeyHash());
+        return getId("");
+    }
+
+    public String getId(String salt) {
+        try {
+            MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
+            sha256.update(salt.getBytes());
+            byte[] hash = sha256.digest(rootKey.getPubKey());
+            return Utils.HEX.encode(hash);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);  // Cannot happen.
+        }
     }
 }
 

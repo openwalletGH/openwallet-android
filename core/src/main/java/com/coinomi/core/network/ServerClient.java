@@ -203,25 +203,25 @@ public class ServerClient implements BlockchainConnection {
         return stratumClient != null && stratumClient.isConnected();
     }
 
-    // TODO support more than one pocket
-    public void maybeSetWalletPocket(WalletPocketHD pocket) {
-        if (eventListeners.isEmpty()) {
-            setWalletPocket(pocket, false);
-        }
-    }
-
-    // TODO support more than one pocket
-    public void setWalletPocket(WalletPocketHD pocket, boolean reconnect) {
-        if (isConnected()) broadcastOnDisconnect();
-        eventListeners.clear();
-        addEventListener(pocket);
-        if (reconnect && isConnected()) {
-            resetConnection();
-            // will broadcast event on reconnect
-        } else {
-            if (isConnected()) broadcastOnConnection();
-        }
-    }
+//    // TODO support more than one pocket
+//    public void maybeSetWalletPocket(WalletPocketHD pocket) {
+//        if (eventListeners.isEmpty()) {
+//            setWalletPocket(pocket, false);
+//        }
+//    }
+//
+//    // TODO support more than one pocket
+//    public void setWalletPocket(WalletPocketHD pocket, boolean reconnect) {
+//        if (isConnected()) broadcastOnDisconnect();
+//        eventListeners.clear();
+//        addEventListener(pocket);
+//        if (reconnect && isConnected()) {
+//            resetConnection();
+//            // will broadcast event on reconnect
+//        } else {
+//            if (isConnected()) broadcastOnConnection();
+//        }
+//    }
 
     /**
      * Will disconnect from the server and immediately will try to reconnect
@@ -234,7 +234,7 @@ public class ServerClient implements BlockchainConnection {
      * Adds an event listener object. Methods on this object are called when something interesting happens,
      * like new connection to a server. The listener is executed by {@link org.bitcoinj.utils.Threading#USER_THREAD}.
      */
-    private void addEventListener(ConnectionEventListener listener) {
+    public void addEventListener(ConnectionEventListener listener) {
         addEventListener(listener, Threading.USER_THREAD);
     }
 
@@ -243,14 +243,18 @@ public class ServerClient implements BlockchainConnection {
      * like new connection to a server. The listener is executed by the given executor.
      */
     private void addEventListener(ConnectionEventListener listener, Executor executor) {
+        boolean isNew = !ListenerRegistration.removeFromList(listener, eventListeners);
         eventListeners.add(new ListenerRegistration<ConnectionEventListener>(listener, executor));
+        if (isNew && isConnected()) {
+            broadcastOnConnection();
+        }
     }
 
     /**
      * Removes the given event listener object. Returns true if the listener was removed, false if that listener
      * was never added.
      */
-    private boolean removeEventListener(ConnectionEventListener listener) {
+    public boolean removeEventListener(ConnectionEventListener listener) {
         return ListenerRegistration.removeFromList(listener, eventListeners);
     }
 

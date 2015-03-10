@@ -9,6 +9,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 
@@ -30,7 +31,8 @@ public class NavDrawerItem extends LinearLayout implements Checkable {
         icon = (ImageView) findViewById(R.id.item_icon);
     }
 
-    public void setCoin(CoinType coin) {
+    public void setAccount(WalletAccount account) {
+        CoinType coin = account.getCoinType();
         title.setText(coin.getName());
         icon.setImageResource(Constants.COINS_ICONS.get(coin));
     }

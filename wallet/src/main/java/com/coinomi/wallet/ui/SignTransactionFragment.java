@@ -12,11 +12,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.wallet.SendRequest;
 import com.coinomi.core.wallet.Wallet;
+import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.core.wallet.WalletPocketHD;
 import com.coinomi.core.wallet.exceptions.NoSuchPocketException;
 import com.coinomi.wallet.Configuration;
@@ -57,6 +59,8 @@ public class SignTransactionFragment extends Fragment {
     private CoinType type;
     private SendRequest request;
     private LoaderManager loaderManager;
+    private String accountId;
+    private WalletPocketHD pocket;
 
     public static SignTransactionFragment newInstance(Bundle args) {
         SignTransactionFragment fragment = new SignTransactionFragment();
@@ -76,12 +80,15 @@ public class SignTransactionFragment extends Fragment {
 
         Bundle args = getArguments();
         checkNotNull(args, "Must provide arguments");
-        checkState(args.containsKey(Constants.ARG_COIN_ID), "Must provide a coin id");
+        checkState(args.containsKey(Constants.ARG_ACCOUNT_ID), "Must provide a coin id");
         checkState(args.containsKey(Constants.ARG_SEND_TO_ADDRESS), "Must provide an address string");
         checkState(args.containsKey(Constants.ARG_SEND_AMOUNT), "Must provide an amount to send");
 
         try {
-            type = CoinID.typeFromId(args.getString(Constants.ARG_COIN_ID));
+            accountId = getArguments().getString(Constants.ARG_ACCOUNT_ID);
+            // TODO
+            pocket = (WalletPocketHD) application.getAccount(accountId);
+            type = pocket.getCoinType();
             sendToAddress = new Address(type, args.getString(Constants.ARG_SEND_TO_ADDRESS));
             sentAmount = Coin.valueOf(args.getLong(Constants.ARG_SEND_AMOUNT));
         } catch (Exception e) {
@@ -113,7 +120,6 @@ public class SignTransactionFragment extends Fragment {
             passwordLabelView.setVisibility(View.GONE);
         }
 
-        WalletPocketHD pocket = application.getWalletPocket(type);
         boolean emptyWallet = sentAmount.equals(pocket.getBalance(false));
 
         // TODO handle in a task onCreate
@@ -178,8 +184,8 @@ public class SignTransactionFragment extends Fragment {
                     request.aesKey = crypter.deriveKey(password);
                 }
                 request.signInputs = true;
-                wallet.completeAndSignTx(request);
-                wallet.broadcastTx(request);
+                pocket.completeTx(request);
+                pocket.broadcastTx(request.tx);
             }
             catch (Exception e) { error = e; }
 

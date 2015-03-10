@@ -50,6 +50,7 @@ public class Constants {
     public static final String ARG_SEND_TO_ADDRESS = "send_to_address";
     public static final String ARG_SEND_AMOUNT = "send_amount";
     public static final String ARG_COIN_ID = "coin_id";
+    public static final String ARG_ACCOUNT_ID = "coin_id";
     public static final String ARG_MULTIPLE_COIN_IDS = "multiple_coin_ids";
     public static final String ARG_MULTIPLE_CHOICE = "multiple_choice";
     public static final String ARG_TRANSACTION_ID = "transaction_id";

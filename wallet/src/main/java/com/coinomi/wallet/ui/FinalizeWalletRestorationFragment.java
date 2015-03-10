@@ -128,7 +128,7 @@ public class FinalizeWalletRestorationFragment extends Fragment {
                     wallet.encrypt(crypter, aesKey);
                 }
 
-                wallet.createCoinPockets(coinsToCreate, true, aesKey);
+                wallet.createAccounts(coinsToCreate, true, aesKey);
                 getWalletApplication().setWallet(wallet);
                 getWalletApplication().saveWalletNow();
                 getWalletApplication().startBlockchainService(CoinService.ServiceMode.RESET_WALLET);
