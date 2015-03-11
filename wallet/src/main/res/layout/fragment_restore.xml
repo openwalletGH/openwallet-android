@@ -83,9 +83,9 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
-                <TextView
+                <Button
                     android:id="@+id/seed_entry_skip"
-                    style="@style/LinkButton"
+                    style="@style/BorderlessButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/button_skip"

@@ -26,9 +26,9 @@
         android:typeface="monospace"
         tools:text="d11e6246c976ccf1d565192cd9b5592b0e4c0c6e01c220f0a75e13dfb93fcb83" />
 
-    <TextView
+    <Button
         android:id="@+id/block_explorer_link"
-        style="@style/LinkButton"
+        style="@style/BorderlessButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"

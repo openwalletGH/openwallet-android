@@ -100,7 +100,7 @@
     <string name="receive_address_label">my address</string>
     <string name="create_new_address">Create a new address?</string>
     <string name="create_new_address_name">Name (optional)</string>
-    <string name="view_previous_addresses">View previous addresses</string>
+    <string name="view_previous_addresses">Previous addresses</string>
     <string name="too_many_unused_addresses">Too many unused addresses, try to use one of the previous addresses before creating a new one.</string>
 
     <!-- Send fragment -->

@@ -4,9 +4,12 @@
     <color name="primary_500">#03A9F4</color>
     <color name="primary_100">#B3E5FC</color>
     <color name="primary_900">#01579B</color>
-    <color name="accent_100">#FFF9C4</color>
-    <color name="accent_900">#F57F17</color>
-    <color name="accent_A200">#FFFF00</color>
+    <color name="accent">#0091EA</color>
+
+    <color name="send_light">#FFECB3</color>
+    <color name="send_normal">#FF6F00</color>
+    <color name="receive_light">#B3E5FC</color>
+    <color name="receive_normal">#0277BD</color>
 
     <color name="white">#FFFFFF</color>
     <color name="white_almost">#F3F3F3</color>
@@ -16,10 +19,10 @@
     <color name="gray_26_hint_text">#42000000</color>
     <color name="gray_12_dividers">#1e000000</color>
 
-    <color name="send_color_fg">@color/accent_900</color>
-    <color name="receive_color_fg">@color/primary_900</color>
-    <color name="send_color_bg">@color/accent_100</color>
-    <color name="receive_color_bg">@color/primary_100</color>
+    <color name="send_color_fg">@color/send_normal</color>
+    <color name="receive_color_fg">@color/receive_normal</color>
+    <color name="send_color_bg">@color/send_light</color>
+    <color name="receive_color_bg">@color/receive_light</color>
 
     <color name="address_bg_unused">#FFC3E297</color>
     <color name="address_bg_used">@color/receive_color_bg</color>

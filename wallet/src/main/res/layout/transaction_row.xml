@@ -22,10 +22,9 @@
             android:layout_width="@dimen/transaction_row_direction_bg_size"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginRight="@dimen/transaction_row_margin_direction"
-            android:layout_marginEnd="@dimen/transaction_row_margin_direction"
             android:background="@drawable/transaction_row_cyrcle_bg_pending"
             android:gravity="center"
+            android:layout_margin="@dimen/transaction_row_margin_direction"
             tools:text="[->" />
 
         <TextView

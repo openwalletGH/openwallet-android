@@ -5,4 +5,9 @@
         <item name="android:textColor">@color/actionbar_fg</item>
         <item name="android:elevation">4dp</item>
     </style>
+
+    <style name="TransactionRowDirectionFontIcon" parent="SecondaryText">
+        <item name="android:textSize">@dimen/transaction_row_direction_font_icon_size</item>
+        <item name="android:elevation">2dp</item>
+    </style>
 </resources>

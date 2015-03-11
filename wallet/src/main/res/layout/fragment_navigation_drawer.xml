@@ -17,12 +17,11 @@
         android:divider="@android:color/transparent"
         android:dividerHeight="0dp" />
 
-    <TextView
+    <Button
         android:id="@+id/add_coins"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        style="@style/LinkButton"
-        android:padding="8dp"
+        style="@style/BorderlessButton"
         android:text="@string/button_add_coins"
         android:layout_gravity="center_horizontal" />
 
