@@ -5,9 +5,8 @@
 
     <item android:id="@+id/action_share"
         android:title="@string/action_share"
-        app:showAsAction="ifRoom"
-        app:actionProviderClass="com.coinomi.wallet.util.ShareActionProvider"
-        />
+        android:icon="@drawable/share_menu"
+        app:showAsAction="ifRoom" />
 
     <item android:id="@+id/action_edit_label"
         android:title="@string/action_edit_label"

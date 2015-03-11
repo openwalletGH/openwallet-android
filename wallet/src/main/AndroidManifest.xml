@@ -57,7 +57,7 @@
             android:name="com.coinomi.wallet.ui.WalletActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:theme="@style/AppThemeCustomActionBar"
+            android:theme="@style/AppThemeNoTitleBar"
             android:windowSoftInputMode="adjustResize" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -68,19 +68,19 @@
         <activity
             android:name="com.coinomi.wallet.ui.IntroActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/NoTitleBar"
+            android:theme="@style/AppThemeNoTitleBar"
             android:windowSoftInputMode="adjustResize" >
         </activity>
         <activity
             android:name="com.coinomi.wallet.ui.PasswordConfirmationActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/NoTitleBar"
+            android:theme="@style/AppThemeNoTitleBar"
             android:windowSoftInputMode="adjustResize" >
         </activity>
         <activity
             android:name="com.coinomi.wallet.ui.SignTransactionActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/NoTitleBar"
+            android:theme="@style/AppThemeNoTitleBar"
             android:windowSoftInputMode="adjustResize" >
         </activity>
         <activity
@@ -88,13 +88,13 @@
             android:configChanges="orientation|keyboard|keyboardHidden"
             android:screenOrientation="landscape"
             android:stateNotNeeded="true"
-            android:theme="@style/NoTitleBar"
+            android:theme="@style/AppThemeNoTitleBar"
             android:windowSoftInputMode="stateAlwaysHidden" />
         <activity
             android:name="com.coinomi.wallet.ui.AboutActivity"
             android:label="@string/title_activity_about"
             android:screenOrientation="portrait"
-            android:theme="@style/AppThemeCustomActionBar" >
+            android:theme="@style/AppTheme" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.coinomi.wallet.ui.WalletActivity" />
@@ -103,7 +103,7 @@
             android:name="com.coinomi.wallet.ui.AddCoinsActivity"
             android:label="@string/title_activity_add_coins"
             android:screenOrientation="portrait"
-            android:theme="@style/AppThemeCustomActionBar" >
+            android:theme="@style/AppTheme" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.coinomi.wallet.ui.WalletActivity" />
@@ -112,7 +112,7 @@
             android:name="com.coinomi.wallet.ui.TransactionDetailsActivity"
             android:label="@string/title_activity_transaction_details"
             android:screenOrientation="portrait"
-            android:theme="@style/AppThemeCustomActionBar" >
+            android:theme="@style/AppTheme" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.coinomi.wallet.ui.WalletActivity" />
@@ -121,7 +121,7 @@
             android:name="com.coinomi.wallet.ui.ExchangeRatesActivity"
             android:label="@string/title_activity_exchange_rates"
             android:screenOrientation="portrait"
-            android:theme="@style/AppThemeCustomActionBar" >
+            android:theme="@style/AppTheme" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.coinomi.wallet.ui.WalletActivity" />
@@ -130,13 +130,13 @@
             android:name="com.coinomi.wallet.ui.PreviousAddressesActivity"
             android:label="@string/title_activity_previous_addresses"
             android:screenOrientation="portrait"
-            android:theme="@style/AppThemeCustomActionBar" >
+            android:theme="@style/AppTheme" >
         </activity>
         <activity
             android:name="com.coinomi.wallet.ui.SettingsActivity"
             android:label="@string/title_activity_settings"
             android:screenOrientation="portrait"
-            android:theme="@style/AppThemeCustomActionBar" >
+            android:theme="@style/AppTheme" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.coinomi.wallet.ui.WalletActivity" />
@@ -145,7 +145,7 @@
             android:name="com.coinomi.wallet.ui.ShowSeedActivity"
             android:label="@string/title_activity_show_seed"
             android:screenOrientation="portrait"
-            android:theme="@style/AppThemeCustomActionBar" >
+            android:theme="@style/AppTheme" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.coinomi.wallet.ui.SettingsActivity" />

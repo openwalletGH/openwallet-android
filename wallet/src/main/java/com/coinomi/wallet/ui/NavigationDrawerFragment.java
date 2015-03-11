@@ -5,13 +5,13 @@ import android.support.v7.app.ActionBarActivity;
 import android.app.Activity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -131,6 +131,12 @@ public class NavigationDrawerFragment extends Fragment {
         return mDrawerLayout != null && mDrawerLayout.isDrawerOpen(mFragmentContainerView);
     }
 
+    public void closeDrawer() {
+        if (mDrawerLayout != null) {
+            mDrawerLayout.closeDrawer(mFragmentContainerView);
+        }
+    }
+
     /**
      * Users of this fragment must call this method to set up the navigation drawer interactions.
      *
@@ -154,7 +160,6 @@ public class NavigationDrawerFragment extends Fragment {
         mDrawerToggle = new ActionBarDrawerToggle(
                 getActivity(),                    /* host Activity */
                 mDrawerLayout,                    /* DrawerLayout object */
-                R.drawable.ic_drawer,             /* nav drawer image to replace 'Up' caret */
                 R.string.navigation_drawer_open,  /* "open drawer" description for accessibility */
                 R.string.navigation_drawer_close  /* "close drawer" description for accessibility */
         ) {
@@ -247,8 +252,8 @@ public class NavigationDrawerFragment extends Fragment {
         if (mDrawerListView != null) {
             mDrawerListView.setItemChecked(position, true);
         }
-        if (mDrawerLayout != null && closeDrawer) {
-            mDrawerLayout.closeDrawer(mFragmentContainerView);
+        if (closeDrawer) {
+            closeDrawer();
         }
         if (mCallbacks != null && application.getWallet() != null) {
 //            WalletAccount item = listAdapter.getItem(position);
@@ -259,9 +264,7 @@ public class NavigationDrawerFragment extends Fragment {
     }
 
     private void addCoins() {
-        if (mDrawerLayout != null) {
-            mDrawerLayout.closeDrawer(mFragmentContainerView);
-        }
+        closeDrawer();
         if (mCallbacks != null && application.getWallet() != null) {
             mCallbacks.onNavigationDrawerAddCoinsSelected();
         }
@@ -323,10 +326,10 @@ public class NavigationDrawerFragment extends Fragment {
      */
     private void showGlobalContextActionBar() {
         ActionBar actionBar = getActionBar();
-        actionBar.setDisplayShowTitleEnabled(true);
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        actionBar.setIcon(R.drawable.ic_launcher);
-        actionBar.setTitle(R.string.app_name);
+//        actionBar.setDisplayShowTitleEnabled(true);
+//        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+//        actionBar.setIcon(R.drawable.ic_launcher);
+//        actionBar.setTitle(R.string.app_name);
     }
 
     private ActionBar getActionBar() {

@@ -1,20 +1,27 @@
 <resources>
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light">
+    <style name="AppThemeNoTitleBar" parent="Theme.AppCompat.Light.NoActionBar">
+
+        <item name="colorPrimary">@color/primary_500</item>
+
+        <!-- colorPrimaryDark is used for the status bar -->
+        <item name="colorPrimaryDark">@color/primary_900</item>
+
+        <!-- colorAccent is used as the default value for colorControlActivated,
+             which is used to tint widgets -->
+        <item name="colorAccent">@color/accent_A200</item>
     </style>
 
-    <style name="AppThemeCustomActionBar" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="actionBarStyle">@style/CustomActionBar</item>
-        <item name="android:windowContentOverlay">@null</item>
-    </style>
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- colorPrimary is used for the default action bar background -->
+        <item name="colorPrimary">@color/primary_500</item>
 
-    <style name="CustomActionBar" parent="Widget.AppCompat.Light.ActionBar.Solid.Inverse">
-        <item name="background">@color/actionbar_bg</item>
-    </style>
+        <!-- colorPrimaryDark is used for the status bar -->
+        <item name="colorPrimaryDark">@color/primary_900</item>
 
-    <style name="NoTitleBar" parent="AppTheme">
-        <item name="android:windowNoTitle">true</item>
+        <!-- colorAccent is used as the default value for colorControlActivated,
+             which is used to tint widgets -->
+        <item name="colorAccent">@color/accent_A200</item>
     </style>
 
     <!-- Special Button styles -->

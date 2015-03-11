@@ -19,7 +19,6 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.support.v4.view.MenuItemCompat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -45,7 +44,7 @@ import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.ui.widget.AmountEditView;
 import com.coinomi.wallet.util.LayoutUtils;
 import com.coinomi.wallet.util.Qr;
-import com.coinomi.wallet.util.ShareActionProvider;
+import com.coinomi.wallet.util.ShareHelper;
 import com.coinomi.wallet.util.ThrottlingWalletChangeListener;
 
 import org.bitcoinj.core.Address;
@@ -85,7 +84,6 @@ public class AddressRequestFragment extends Fragment {
     private View previousAddressesLink;
 
     private NavigationDrawerFragment mNavigationDrawerFragment;
-    @Nullable private ShareActionProvider mShareActionProvider;
     private String accountId;
     private WalletPocketHD pocket;
     private int maxQrSize;
@@ -245,19 +243,15 @@ public class AddressRequestFragment extends Fragment {
             } else {
                 inflater.inflate(R.menu.request_single_address, menu);
             }
-
-            // Set up ShareActionProvider's default share intent
-            MenuItem shareItem = menu.findItem(R.id.action_share);
-            mShareActionProvider = (ShareActionProvider)
-                    MenuItemCompat.getActionProvider(shareItem);
-
-            setShareIntent(receiveAddress);
         }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.action_share:
+                ShareHelper.share(getActivity(), receiveAddress.toString());
+                return true;
             case R.id.action_new_address:
                 createNewAddressDialog.show(getFragmentManager(), null);
                 return true;
@@ -361,8 +355,6 @@ public class AddressRequestFragment extends Fragment {
             previousAddressesLink.setVisibility(View.GONE);
         }
 
-        setShareIntent(receiveAddress);
-
         // TODO, get amount and description, update QR if needed
 
         updateLabel();
@@ -386,15 +378,6 @@ public class AddressRequestFragment extends Fragment {
                     GenericUtils.addressSplitToGroupsMultiline(receiveAddress.toString()));
             addressLabelView.setTypeface(Typeface.MONOSPACE);
             addressView.setVisibility(View.GONE);
-        }
-    }
-
-    private void setShareIntent(Address address) {
-        if (mShareActionProvider != null && address != null) {
-            Intent intent = new Intent(Intent.ACTION_SEND);
-            intent.putExtra(Intent.EXTRA_TEXT, address.toString());
-            intent.setType("text/plain");
-            mShareActionProvider.setShareIntent(intent);
         }
     }
 

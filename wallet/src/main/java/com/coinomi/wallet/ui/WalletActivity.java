@@ -15,6 +15,8 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -117,6 +119,9 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
 
         mTitle = getTitle();
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
         // Set up the drawer.
@@ -211,9 +216,10 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
 
     public void restoreActionBar() {
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+
+//        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         actionBar.setDisplayShowTitleEnabled(true);
-        actionBar.setIcon(coinIconRes);
+//        actionBar.setIcon(coinIconRes);
         actionBar.setTitle(mTitle);
     }
 
@@ -391,6 +397,11 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
 
     @Override
     public void onBackPressed() {
+        if (mNavigationDrawerFragment != null && mNavigationDrawerFragment.isDrawerOpen()) {
+            mNavigationDrawerFragment.closeDrawer();
+            return;
+        }
+
         // If not in balance screen, back button brings us there
         boolean screenChanged = goToBalance();
         if (!screenChanged) {
