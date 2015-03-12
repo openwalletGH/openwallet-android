@@ -217,10 +217,7 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
 
     public void restoreActionBar() {
         ActionBar actionBar = getSupportActionBar();
-
-//        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         actionBar.setDisplayShowTitleEnabled(true);
-//        actionBar.setIcon(coinIconRes);
         actionBar.setTitle(mTitle);
     }
 
@@ -327,7 +324,6 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
         }
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         if (mNavigationDrawerFragment != null && !mNavigationDrawerFragment.isDrawerOpen()) {
@@ -390,10 +386,6 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
     private void startIntro() {
         Intent introIntent = new Intent(this, IntroActivity.class);
         startActivity(introIntent);
-    }
-
-    private void startRestore() {
-        startActivity(new Intent(this, IntroActivity.class));
     }
 
     @Override
