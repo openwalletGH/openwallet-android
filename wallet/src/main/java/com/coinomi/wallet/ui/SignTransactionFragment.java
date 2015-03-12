@@ -184,7 +184,7 @@ public class SignTransactionFragment extends Fragment {
                     request.aesKey = crypter.deriveKey(password);
                 }
                 request.signInputs = true;
-                pocket.completeTx(request);
+                pocket.completeAndSignTx(request);
                 pocket.broadcastTx(request.tx);
             }
             catch (Exception e) { error = e; }

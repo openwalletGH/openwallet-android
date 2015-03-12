@@ -284,6 +284,14 @@ public class WalletPocketHD extends TransactionWatcherWallet {
         return false;
     }
 
+    public void completeAndSignTx(SendRequest request) throws InsufficientMoneyException {
+        if (request.completed) {
+            signTransaction(request);
+        } else {
+            completeTx(request);
+        }
+    }
+
     /**
      * Given a spend request containing an incomplete transaction, makes it valid by adding outputs and signed inputs
      * according to the instructions in the request. The transaction in the request is modified by this method.

@@ -282,7 +282,7 @@ public class SendFragment extends Fragment {
             if (pocket == null) {
                 throw new NoSuchPocketException("No pocket found for " + type.getName());
             }
-            intent.putExtra(Constants.ARG_ACCOUNT_ID, type.getId());
+            intent.putExtra(Constants.ARG_ACCOUNT_ID, pocket.getId());
             intent.putExtra(Constants.ARG_SEND_TO_ADDRESS, toAddress.toString());
             intent.putExtra(Constants.ARG_SEND_AMOUNT, amount.getValue());
             startActivityForResult(intent, SIGN_TRANSACTION);
