@@ -119,8 +119,9 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
 
         mTitle = getTitle();
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        setSupportActionBar(toolbar);
+        getSupportActionBar().setElevation(0);
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);

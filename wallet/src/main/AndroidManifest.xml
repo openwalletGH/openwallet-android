@@ -57,7 +57,7 @@
             android:name="com.coinomi.wallet.ui.WalletActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:theme="@style/AppThemeNoTitleBar"
+            android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustResize" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

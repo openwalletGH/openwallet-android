@@ -30,7 +30,7 @@
     <color name="actionbar_fg">@color/white_almost</color>
     <color name="actionbar_bg">@color/primary_500</color>
 
-    <color name="navigation_drawer_bg">#ddFFFFFF</color>
+    <color name="navigation_drawer_bg">#F0FFFFFF</color>
 
     <!-- Font icons -->
     <color name="font_icon_fg_color">@color/white_almost</color>

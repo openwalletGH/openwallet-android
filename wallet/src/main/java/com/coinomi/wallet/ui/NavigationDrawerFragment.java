@@ -326,10 +326,8 @@ public class NavigationDrawerFragment extends Fragment {
      */
     private void showGlobalContextActionBar() {
         ActionBar actionBar = getActionBar();
-//        actionBar.setDisplayShowTitleEnabled(true);
-//        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-//        actionBar.setIcon(R.drawable.ic_launcher);
-//        actionBar.setTitle(R.string.app_name);
+        actionBar.setDisplayShowTitleEnabled(true);
+        actionBar.setTitle(R.string.app_name);
     }
 
     private ActionBar getActionBar() {
