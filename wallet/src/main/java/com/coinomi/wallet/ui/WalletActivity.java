@@ -15,13 +15,10 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.widget.Toolbar;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.uri.CoinURI;
 import com.coinomi.core.uri.CoinURIParseException;
@@ -37,6 +34,8 @@ import com.coinomi.wallet.util.SystemUtils;
 import org.bitcoinj.core.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /**
  * @author John L. Jegutanis
@@ -299,18 +298,23 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
             }
         } else if (requestCode == ADD_COIN) {
             if (resultCode == Activity.RESULT_OK) {
-                // TODO
                 String accountId = intent.getStringExtra(Constants.ARG_ACCOUNT_ID);
-                WalletAccount account = getWalletApplication().getWallet().getAccount(accountId);
                 mNavigationDrawerFragment.notifyDataSetChanged();
-                mNavigationDrawerFragment.selectItem(account.getCoinType());
+                mNavigationDrawerFragment.selectAccount(accountId);
             }
         }
     }
 
     private void setSendFromCoin(CoinURI coinUri) throws CoinURIParseException {
-        mNavigationDrawerFragment.selectItem(coinUri.getType());
-        if (mViewPager != null) {
+        List<WalletAccount> accounts = getAccounts(coinUri.getType());
+        if (mViewPager != null && mNavigationDrawerFragment != null && accounts.size() > 0) {
+            WalletAccount account;
+            if (accounts.size() > 1) {
+                //TODO show a dialog to select the correct account
+                Toast.makeText(this, "Selecting first account", Toast.LENGTH_SHORT).show();
+            }
+            account = accounts.get(0);
+            mNavigationDrawerFragment.selectAccount(account);
             mViewPager.setCurrentItem(SEND);
 
             for (Fragment fragment : getSupportFragmentManager().getFragments()) {
@@ -360,7 +364,7 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
     }
 
     void startExchangeRates() {
-        WalletAccount account = getWalletApplication().getAccount(currentAccountId);
+        WalletAccount account = getAccount(currentAccountId);
         if (account != null) {
             Intent intent = new Intent(this, ExchangeRatesActivity.class);
             intent.putExtra(Constants.ARG_COIN_ID, account.getCoinType().getId());

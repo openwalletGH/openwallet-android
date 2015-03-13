@@ -226,17 +226,19 @@ public class NavigationDrawerFragment extends Fragment {
         }
     }
 
-    void selectItem(CoinType coinType) {
+    void selectAccount(WalletAccount account) {
 //        TODO
         if (application.getWallet() != null) {
-//            int position = application.getWallet().getCoinTypes().indexOf(coinType);
-            List<WalletAccount> accounts = application.getWallet().getAccounts(coinType);
             int position = 0;
-            if (accounts.size() > 0) {
-                position = application.getWallet().getAllAccounts().indexOf(accounts.get(0));
+            if (account != null) {
+                position = application.getWallet().getAllAccounts().indexOf(account);
             }
             selectItem(position, true);
         }
+    }
+
+    void selectAccount(String accountId) {
+        selectAccount(application.getAccount(accountId));
     }
 
     private void selectItem(int position) {
@@ -255,6 +257,7 @@ public class NavigationDrawerFragment extends Fragment {
             closeDrawer();
         }
         if (mCallbacks != null && application.getWallet() != null) {
+            // TODO
 //            WalletAccount item = listAdapter.getItem(position);
             WalletAccount item = application.getWallet().getAllAccounts().get(position);
 //            mCallbacks.onNavigationDrawerCoinSelected(application.getWallet().getCoinTypes().get(position));

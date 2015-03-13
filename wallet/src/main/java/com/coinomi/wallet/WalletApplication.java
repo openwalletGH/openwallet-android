@@ -16,7 +16,6 @@ import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.util.HardwareSoftwareCompliance;
 import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.wallet.WalletAccount;
-import com.coinomi.core.wallet.WalletPocketHD;
 import com.coinomi.core.wallet.WalletProtobufSerializer;
 import com.coinomi.wallet.service.CoinService;
 import com.coinomi.wallet.service.CoinServiceImpl;
@@ -35,6 +34,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.annotation.Nullable;
 
@@ -202,6 +202,15 @@ public class WalletApplication extends Application {
     public WalletAccount getAccount(String accountId) {
         if (wallet != null) {
             return wallet.getAccount(accountId);
+        } else {
+            return null;
+        }
+    }
+
+    @Nullable
+    public List<WalletAccount> getAccounts(CoinType type) {
+        if (wallet != null) {
+            return wallet.getAccounts(type);
         } else {
             return null;
         }
