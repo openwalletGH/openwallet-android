@@ -25,6 +25,8 @@ import static org.bitcoinj.wallet.KeyChain.KeyPurpose.RECEIVE_FUNDS;
 public interface WalletAccount extends TransactionBag, KeyBag, TransactionEventListener, ConnectionEventListener, Serializable {
 
     String getId();
+    String getDescription();
+    void setDescription(String description);
 
     CoinType getCoinType();
 

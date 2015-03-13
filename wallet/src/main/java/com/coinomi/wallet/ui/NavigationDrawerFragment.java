@@ -214,14 +214,13 @@ public class NavigationDrawerFragment extends Fragment {
         ((NavDrawerListAdapter)mDrawerListView.getAdapter()).notifyDataSetChanged();
     }
 
-    void selectCoinInit(CoinType coinType) {
+    void selectAccountInit(String accountId) {
 //        TODO
         if (application.getWallet() != null) {
-//            int position = application.getWallet().getCoinTypes().indexOf(coinType);
-            List<WalletAccount> accounts = application.getWallet().getAccounts(coinType);
+            WalletAccount account = application.getAccount(accountId);
             int position = 0;
-            if (accounts.size() > 0) {
-                position = application.getWallet().getAllAccounts().indexOf(accounts.get(0));
+            if (account != null) {
+                position = application.getWallet().getAllAccounts().indexOf(account);
             }
             selectItem(position, false);
         }

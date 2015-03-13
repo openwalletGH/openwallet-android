@@ -111,6 +111,7 @@ public class WalletPocketHD extends TransactionWatcherWallet {
      * Set the description of the wallet.
      * This is a Unicode encoding string typically entered by the user as descriptive text for the wallet.
      */
+    @Override
     public void setDescription(String description) {
         lock.lock();
         this.description = description;
@@ -121,6 +122,7 @@ public class WalletPocketHD extends TransactionWatcherWallet {
     /**
      * Get the description of the wallet. See {@link WalletPocketHD#setDescription(String))}
      */
+    @Override
     public String getDescription() {
         return description;
     }

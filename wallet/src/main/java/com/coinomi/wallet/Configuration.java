@@ -6,6 +6,8 @@ import android.text.format.DateUtils;
 
 import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.wallet.Wallet;
+import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.wallet.util.WalletUtils;
 import com.coinomi.wallet.ExchangeRatesProvider.ExchangeRate;
 
@@ -30,7 +32,9 @@ public class Configuration {
 
     private static final String PREFS_KEY_LAST_VERSION = "last_version";
     private static final String PREFS_KEY_LAST_USED = "last_used";
-    public static final String PREFS_KEY_LAST_POCKET = "last_pocket";
+    @Deprecated
+    private static final String PREFS_KEY_LAST_POCKET = "last_pocket";
+    private static final String PREFS_KEY_LAST_ACCOUNT = "last_account";
 
 
     /* Preference keys. Check also res/xml/preferences.xml */
@@ -73,6 +77,14 @@ public class Configuration {
             log.info("detected app upgrade: " + lastVersionCode + " -> " + currentVersionCode);
         else if (currentVersionCode < lastVersionCode)
             log.warn("detected app downgrade: " + lastVersionCode + " -> " + currentVersionCode);
+
+        applyUpdates();
+    }
+
+    private void applyUpdates() {
+        if (prefs.contains(PREFS_KEY_LAST_POCKET)) {
+            prefs.edit().remove(PREFS_KEY_LAST_POCKET).apply();
+        }
     }
 
     public long getLastUsedAgo() {
@@ -89,16 +101,16 @@ public class Configuration {
         log.info("just being used - last used {} minutes ago", (now - prefsLastUsed) / DateUtils.MINUTE_IN_MILLIS);
     }
 
-    public CoinType getLastPocket() {
-        String coinId = prefs.getString(PREFS_KEY_LAST_POCKET, Constants.DEFAULT_COIN.getId());
-        return CoinID.fromId(coinId).getCoinType();
+    @Nullable
+    public String getLastAccountId() {
+        return prefs.getString(PREFS_KEY_LAST_ACCOUNT, null);
     }
 
-    public void touchLastPocket(CoinType type) {
-        String lastId = prefs.getString(PREFS_KEY_LAST_POCKET, Constants.DEFAULT_COIN.getId());
-        if (!lastId.equals(type.getId())) {
-            prefs.edit().putString(PREFS_KEY_LAST_POCKET, type.getId()).apply();
-            log.info("last used wallet pocket: {} ", type.getName());
+    public void touchLastAccountId(String accountId) {
+        String lastAccountId = prefs.getString(PREFS_KEY_LAST_ACCOUNT, Constants.DEFAULT_COIN.getId());
+        if (!lastAccountId.equals(accountId)) {
+            prefs.edit().putString(PREFS_KEY_LAST_ACCOUNT, accountId).apply();
+            log.info("last used wallet account id: {}", accountId);
         }
     }
 

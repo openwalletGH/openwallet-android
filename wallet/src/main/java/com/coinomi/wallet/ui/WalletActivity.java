@@ -72,7 +72,6 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
      * For SharedPreferences, used to check if first launch ever.
      */
     private ViewPager mViewPager;
-    private CoinType currentType;
     private String currentAccountId;
     private Intent connectCoinIntent;
 
@@ -148,8 +147,8 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
         });
 
         // Get the last used wallet pocket and select it
-        CoinType lastPocket = getWalletApplication().getConfiguration().getLastPocket();
-        mNavigationDrawerFragment.selectCoinInit(lastPocket);
+        String lastAccountId = getWalletApplication().getConfiguration().getLastAccountId();
+        mNavigationDrawerFragment.selectAccountInit(lastAccountId);
     }
 
     @Override
@@ -193,14 +192,14 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
     private void openPocket(WalletAccount account) {
         if (mViewPager != null && !account.getId().equals(currentAccountId)) {
             currentAccountId = account.getId();
-            currentType = account.getCoinType();
-            mTitle = currentType.getName();
-            coinIconRes = Constants.COINS_ICONS.get(currentType);
+            CoinType type = account.getCoinType();
+            mTitle = type.getName();
+            coinIconRes = Constants.COINS_ICONS.get(type);
             AppSectionsPagerAdapter adapter = new AppSectionsPagerAdapter(this, account);
             mViewPager.setAdapter(adapter);
             mViewPager.setCurrentItem(BALANCE);
             mViewPager.getAdapter().notifyDataSetChanged();
-            getWalletApplication().getConfiguration().touchLastPocket(currentType);
+            getWalletApplication().getConfiguration().touchLastAccountId(currentAccountId);
             connectCoinService();
         }
     }
@@ -361,9 +360,10 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
     }
 
     void startExchangeRates() {
-        if (currentType != null) {
+        WalletAccount account = getWalletApplication().getAccount(currentAccountId);
+        if (account != null) {
             Intent intent = new Intent(this, ExchangeRatesActivity.class);
-            intent.putExtra(Constants.ARG_COIN_ID, currentType.getId());
+            intent.putExtra(Constants.ARG_COIN_ID, account.getCoinType().getId());
             startActivity(intent);
         } else {
             Toast.makeText(this, R.string.no_wallet_pocket_selected, Toast.LENGTH_LONG).show();

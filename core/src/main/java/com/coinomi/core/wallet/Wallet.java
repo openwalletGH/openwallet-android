@@ -147,7 +147,7 @@ final public class Wallet {
     }
 
     /**
-     * Check if account exists
+     * Check if at least one account exists for a specific coin
      */
     public boolean isAccountExists(CoinType coinType) {
         lock.lock();
@@ -161,7 +161,8 @@ final public class Wallet {
     /**
      * Check if account exists
      */
-    public boolean isAccountExists(String accountId) {
+    public boolean isAccountExists(@Nullable String accountId) {
+        if (accountId == null) return false;
         lock.lock();
         try {
             return accounts.containsKey(accountId);
@@ -174,10 +175,11 @@ final public class Wallet {
      * Get a specific account, null if does not exist
      */
     @Nullable
-    public WalletAccount getAccount(String id) {
+    public WalletAccount getAccount(@Nullable String accountId) {
+        if (accountId == null) return null;
         lock.lock();
         try {
-            return accounts.get(id);
+            return accounts.get(accountId);
         } finally {
             lock.unlock();
         }
