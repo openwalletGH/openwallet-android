@@ -227,7 +227,9 @@ public class ServerClient implements BlockchainConnection {
      * Will disconnect from the server and immediately will try to reconnect
      */
     public void resetConnection() {
-        stratumClient.disconnect();
+        if (stratumClient != null) {
+            stratumClient.disconnect();
+        }
     }
 
     /**
