@@ -22,6 +22,7 @@ import android.widget.Toast;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.uri.CoinURI;
 import com.coinomi.core.uri.CoinURIParseException;
+import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
@@ -96,10 +97,15 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
         }
     }
 
+    Wallet wallet;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wallet);
+
+        // TODO remove debug
+        wallet = getWallet();
 
         if (getWalletApplication().getWallet() == null) {
             startIntro();
@@ -150,8 +156,11 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
         });
 
         // Get the last used wallet pocket and select it
-        String lastAccountId = getWalletApplication().getConfiguration().getLastAccountId();
-        mNavigationDrawerFragment.selectAccountInit(lastAccountId);
+        WalletAccount lastAccount = getAccount(getWalletApplication().getConfiguration().getLastAccountId());
+        if (lastAccount != null) {
+            mNavigationDrawerFragment.selectAccount(lastAccount, false);
+            openPocket(lastAccount, false);
+        }
     }
 
     @Override
@@ -184,7 +193,7 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
     public void onAccountSelected(WalletAccount account) {
         log.info("Coin selected {}", account.getId());
 
-        openPocket(account);
+        openPocket(account, false);
     }
 
     @Override
@@ -193,7 +202,15 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
     }
 
     private void openPocket(WalletAccount account) {
-        if (mViewPager != null && !account.getId().equals(currentAccountId)) {
+        openPocket(account, true);
+    }
+
+    private void openPocket(String accountId) {
+        openPocket(getAccount(accountId), true);
+    }
+
+    private void openPocket(WalletAccount account, boolean selectInNavDrawer) {
+        if (account != null && mViewPager != null && !account.getId().equals(currentAccountId)) {
             currentAccountId = account.getId();
             CoinType type = account.getCoinType();
             mTitle = type.getName();
@@ -204,6 +221,9 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
             mViewPager.getAdapter().notifyDataSetChanged();
             getWalletApplication().getConfiguration().touchLastAccountId(currentAccountId);
             connectCoinService();
+            if (selectInNavDrawer && mNavigationDrawerFragment != null ) {
+                mNavigationDrawerFragment.selectAccount(account);
+            }
         }
     }
 
@@ -278,47 +298,52 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
     @Override
     public void onActivityResult(final int requestCode, final int resultCode, final Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
-        if (requestCode == REQUEST_CODE_SCAN) {
-            if (resultCode == Activity.RESULT_OK) {
-                final String input = intent.getStringExtra(ScanActivity.INTENT_EXTRA_RESULT);
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                if (requestCode == REQUEST_CODE_SCAN) {
+                    if (resultCode == Activity.RESULT_OK) {
+                        final String input = intent.getStringExtra(ScanActivity.INTENT_EXTRA_RESULT);
 
-                try {
-                    final CoinURI coinUri = new CoinURI(input);
-                    CoinType scannedType = coinUri.getType();
+                        try {
+                            final CoinURI coinUri = new CoinURI(input);
+                            CoinType scannedType = coinUri.getType();
 
-                    if (!Constants.SUPPORTED_COINS.contains(scannedType)) {
-                        String error = getResources().getString(R.string.unsupported_coin, scannedType.getName());
-                        throw new CoinURIParseException(error);
-                    } else if (!getWalletApplication().isAccountExists(scannedType)) {
-                        String error = getResources().getString(R.string.coin_not_added, scannedType.getName());
-                        throw new CoinURIParseException(error);
+                            if (!Constants.SUPPORTED_COINS.contains(scannedType)) {
+                                String error = getResources().getString(R.string.unsupported_coin, scannedType.getName());
+                                throw new CoinURIParseException(error);
+                            } else if (!getWalletApplication().isAccountExists(scannedType)) {
+                                String error = getResources().getString(R.string.coin_not_added, scannedType.getName());
+                                throw new CoinURIParseException(error);
+                            }
+
+                            setSendFromCoin(coinUri);
+                        } catch (final CoinURIParseException e) {
+                            String error = getResources().getString(R.string.uri_error, e.getMessage());
+                            Toast.makeText(WalletActivity.this, error, Toast.LENGTH_LONG).show();
+                        }
                     }
-
-                    setSendFromCoin(coinUri);
-                } catch (final CoinURIParseException e) {
-                    String error = getResources().getString(R.string.uri_error, e.getMessage());
-                    Toast.makeText(this, error, Toast.LENGTH_LONG).show();
+                } else if (requestCode == ADD_COIN) {
+                    if (resultCode == Activity.RESULT_OK) {
+                        final String accountId = intent.getStringExtra(Constants.ARG_ACCOUNT_ID);
+                        mNavigationDrawerFragment.notifyDataSetChanged();
+                        openPocket(accountId);
+                    }
                 }
             }
-        } else if (requestCode == ADD_COIN) {
-            if (resultCode == Activity.RESULT_OK) {
-                String accountId = intent.getStringExtra(Constants.ARG_ACCOUNT_ID);
-                mNavigationDrawerFragment.notifyDataSetChanged();
-                mNavigationDrawerFragment.selectAccount(accountId);
-            }
-        }
+        });
     }
 
-    private void setSendFromCoin(CoinURI coinUri) throws CoinURIParseException {
+    private void setSendFromCoin(final CoinURI coinUri) throws CoinURIParseException {
         List<WalletAccount> accounts = getAccounts(coinUri.getType());
         if (mViewPager != null && mNavigationDrawerFragment != null && accounts.size() > 0) {
-            WalletAccount account;
+            final WalletAccount account;
             if (accounts.size() > 1) {
                 //TODO show a dialog to select the correct account
                 Toast.makeText(this, "Selecting first account", Toast.LENGTH_SHORT).show();
             }
             account = accounts.get(0);
-            mNavigationDrawerFragment.selectAccount(account);
+            openPocket(account);
             mViewPager.setCurrentItem(SEND);
 
             for (Fragment fragment : getSupportFragmentManager().getFragments()) {

@@ -1,16 +1,17 @@
 package com.coinomi.wallet.ui;
 
-import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
 import android.app.Activity;
-import android.support.v7.app.ActionBar;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,17 +21,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 
-import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.wallet.WalletAccount;
-import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
-
-import org.bitcoinj.core.Transaction;
-
-import java.util.List;
+import com.coinomi.wallet.util.WeakHandler;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
@@ -38,6 +33,9 @@ import java.util.List;
  * design guidelines</a> for a complete explanation of the behaviors implemented here.
  */
 public class NavigationDrawerFragment extends Fragment {
+
+    private static final int SELECT_ACCOUNT = 0;
+    private static final int SELECT_ACCOUNT_INIT = 1;
 
     /**
      * Remember the position of the selected item.
@@ -70,6 +68,32 @@ public class NavigationDrawerFragment extends Fragment {
     private WalletApplication application;
     private View addCoinsButton;
     private NavDrawerListAdapter listAdapter;
+
+
+    private final Handler handler = new MyHandler(this);
+    private static class MyHandler extends WeakHandler<NavigationDrawerFragment> {
+        public MyHandler(NavigationDrawerFragment ref) { super(ref); }
+
+        @Override
+        protected void weakHandleMessage(NavigationDrawerFragment ref, Message msg) {
+            switch (msg.what) {
+                case SELECT_ACCOUNT:
+                    if (msg.obj instanceof String) {
+                        ref.selectAccount((String)msg.obj, true);
+                    } else if (msg.obj instanceof WalletAccount) {
+                        ref.selectAccount((WalletAccount)msg.obj, true);
+                    }
+                    break;
+                case SELECT_ACCOUNT_INIT:
+                    if (msg.obj instanceof String) {
+                        ref.selectAccount((String)msg.obj, false);
+                    } else if (msg.obj instanceof WalletAccount) {
+                        ref.selectAccount((WalletAccount)msg.obj, false);
+                    }
+                    break;
+            }
+        }
+    }
 
     public NavigationDrawerFragment() {
     }
@@ -210,42 +234,38 @@ public class NavigationDrawerFragment extends Fragment {
         mDrawerLayout.setDrawerListener(mDrawerToggle);
     }
 
-    void notifyDataSetChanged() {
+    public void notifyDataSetChanged() {
         ((NavDrawerListAdapter)mDrawerListView.getAdapter()).notifyDataSetChanged();
     }
 
-    void selectAccountInit(String accountId) {
-//        TODO
-        if (application.getWallet() != null) {
-            WalletAccount account = application.getAccount(accountId);
-            int position = 0;
-            if (account != null) {
-                position = application.getWallet().getAllAccounts().indexOf(account);
-            }
-            selectItem(position, false);
-        }
+    public void selectAccount(WalletAccount account) {
+        selectAccount(account, true);
     }
 
-    void selectAccount(WalletAccount account) {
+    public void selectAccount(String accountId) {
+        selectAccount(accountId, true);
+    }
+
+    public void selectAccount(WalletAccount account, boolean closeDrawer) {
 //        TODO
         if (application.getWallet() != null) {
             int position = 0;
             if (account != null) {
                 position = application.getWallet().getAllAccounts().indexOf(account);
             }
-            selectItem(position, true);
+            selectItem(position, closeDrawer, false);
         }
     }
 
-    void selectAccount(String accountId) {
-        selectAccount(application.getAccount(accountId));
+    public void selectAccount(String accountId, boolean closeDrawer) {
+        selectAccount(application.getAccount(accountId), closeDrawer);
     }
 
     private void selectItem(int position) {
-        selectItem(position, true);
+        selectItem(position, true, true);
     }
 
-    private void selectItem(int position, boolean closeDrawer) {
+    private void selectItem(int position, boolean closeDrawer, boolean enableCallbacks) {
         if (position < 0) {
             position = 0;
         }
@@ -256,7 +276,7 @@ public class NavigationDrawerFragment extends Fragment {
         if (closeDrawer) {
             closeDrawer();
         }
-        if (mCallbacks != null && application.getWallet() != null) {
+        if (enableCallbacks && mCallbacks != null && application.getWallet() != null) {
             // TODO
 //            WalletAccount item = listAdapter.getItem(position);
             WalletAccount item = application.getWallet().getAllAccounts().get(position);

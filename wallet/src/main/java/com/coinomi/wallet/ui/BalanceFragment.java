@@ -253,7 +253,7 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
         // Set connected for now...
         setConnectivityStatus(WalletPocketConnectivity.CONNECTED);
         // ... but check the status in some seconds
-        new Handler().postDelayed(new Runnable() {
+        handler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 if (pocket != null) {
