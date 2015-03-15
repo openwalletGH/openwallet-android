@@ -39,6 +39,7 @@ import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.ui.widget.Amount;
 import com.coinomi.wallet.util.ThrottlingWalletChangeListener;
+import com.coinomi.wallet.util.WeakHandler;
 import com.google.common.collect.Lists;
 
 import org.bitcoinj.core.Coin;
@@ -54,8 +55,6 @@ import java.util.List;
 import java.util.concurrent.RejectedExecutionException;
 
 import javax.annotation.Nonnull;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Use the {@link BalanceFragment#newInstance} factory method to
@@ -77,25 +76,28 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
     private static final int ID_TRANSACTION_LOADER = 0;
     private static final int ID_RATE_LOADER = 1;
 
-    Handler handler = new Handler() {
+    private final Handler handler = new MyHandler(this);
+    private static class MyHandler extends WeakHandler<BalanceFragment> {
+        public MyHandler(BalanceFragment ref) { super(ref); }
+
         @Override
-        public void handleMessage(Message msg) {
+        protected void weakHandleMessage(BalanceFragment ref, Message msg) {
             switch (msg.what) {
                 case NEW_BALANCE:
-                    updateBalance((Coin) msg.obj);
+                    ref.updateBalance((Coin) msg.obj);
                     break;
                 case PENDING:
-                    setPending((Coin) msg.obj);
+                    ref.setPending((Coin) msg.obj);
                     break;
                 case CONNECTIVITY:
-                    setConnectivityStatus((WalletPocketConnectivity) msg.obj);
+                    ref.setConnectivityStatus((WalletPocketConnectivity) msg.obj);
                     break;
                 case UPDATE_VIEW:
-                    updateView();
+                    ref.updateView();
                     break;
             }
         }
-    };
+    }
 
     private String accountId;
     private WalletPocketHD pocket;

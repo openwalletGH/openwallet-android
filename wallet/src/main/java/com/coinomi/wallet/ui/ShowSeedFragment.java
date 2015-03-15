@@ -21,6 +21,7 @@ import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.util.Fonts;
 import com.coinomi.wallet.util.LayoutUtils;
 import com.coinomi.wallet.util.Qr;
+import com.coinomi.wallet.util.WeakHandler;
 
 import org.bitcoinj.crypto.DeterministicKey;
 import org.bitcoinj.crypto.HDKeyDerivation;
@@ -52,15 +53,18 @@ public class ShowSeedFragment extends Fragment {
     private Wallet wallet;
     private String password;
 
-    Handler handler = new Handler() {
+    private final Handler handler = new MyHandler(this);
+    private static class MyHandler extends WeakHandler<ShowSeedFragment> {
+        public MyHandler(ShowSeedFragment ref) { super(ref); }
+
         @Override
-        public void handleMessage(Message msg) {
+        protected void weakHandleMessage(ShowSeedFragment ref, Message msg) {
             switch (msg.what) {
                 case UPDATE_VIEW:
-                    updateView();
+                    ref.updateView();
             }
         }
-    };
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

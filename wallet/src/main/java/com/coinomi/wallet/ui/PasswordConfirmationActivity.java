@@ -1,13 +1,9 @@
 package com.coinomi.wallet.ui;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.AttributeSet;
-import android.view.View;
 
-import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 
 /**

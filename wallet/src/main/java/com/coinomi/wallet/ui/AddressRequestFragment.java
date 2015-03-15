@@ -29,7 +29,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.uri.CoinURI;
 import com.coinomi.core.util.GenericUtils;
@@ -46,6 +45,7 @@ import com.coinomi.wallet.util.LayoutUtils;
 import com.coinomi.wallet.util.Qr;
 import com.coinomi.wallet.util.ShareHelper;
 import com.coinomi.wallet.util.ThrottlingWalletChangeListener;
+import com.coinomi.wallet.util.WeakHandler;
 
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.AddressFormatException;
@@ -93,18 +93,21 @@ public class AddressRequestFragment extends Fragment {
     private ContentResolver resolver;
     private LoaderManager loaderManager;
 
-    Handler handler = new Handler() {
+    private final Handler handler = new MyHandler(this);
+    private static class MyHandler extends WeakHandler<AddressRequestFragment> {
+        public MyHandler(AddressRequestFragment ref) { super(ref); }
+
         @Override
-        public void handleMessage(Message msg) {
+        protected void weakHandleMessage(AddressRequestFragment ref, Message msg) {
             switch (msg.what) {
                 case UPDATE_VIEW:
-                    updateView();
+                    ref.updateView();
                     break;
                 case UPDATE_EXCHANGE_RATE:
-                    amountCalculatorLink.setExchangeRate((org.bitcoinj.utils.ExchangeRate) msg.obj);
+                    ref.amountCalculatorLink.setExchangeRate((org.bitcoinj.utils.ExchangeRate) msg.obj);
             }
         }
-    };
+    }
 
     private final ContentObserver addressBookObserver = new ContentObserver(handler) {
         @Override

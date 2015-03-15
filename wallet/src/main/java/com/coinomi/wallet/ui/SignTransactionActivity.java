@@ -3,16 +3,9 @@ package com.coinomi.wallet.ui;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.widget.Toast;
 
-import com.coinomi.core.wallet.exceptions.NoSuchPocketException;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
-import com.coinomi.wallet.WalletApplication;
-import org.bitcoinj.core.InsufficientMoneyException;
-import org.bitcoinj.crypto.KeyCrypterException;
-
-import java.io.IOException;
 
 import javax.annotation.Nullable;
 

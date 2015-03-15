@@ -30,6 +30,7 @@ import com.coinomi.wallet.service.CoinServiceImpl;
 import com.coinomi.wallet.tasks.CheckUpdateTask;
 import com.coinomi.wallet.util.Keyboard;
 import com.coinomi.wallet.util.SystemUtils;
+import com.coinomi.wallet.util.WeakHandler;
 
 import org.bitcoinj.core.Transaction;
 import org.slf4j.Logger;
@@ -74,23 +75,26 @@ final public class WalletActivity extends AbstractWalletActionBarActivity implem
     private String currentAccountId;
     private Intent connectCoinIntent;
 
-    Handler handler = new Handler() {
+    private final Handler handler = new MyHandler(this);
+    private static class MyHandler extends WeakHandler<WalletActivity> {
+        public MyHandler(WalletActivity ref) { super(ref); }
+
         @Override
-        public void handleMessage(Message msg) {
+        protected void weakHandleMessage(WalletActivity ref, Message msg) {
             switch (msg.what) {
                 case TX_BROADCAST_OK:
-                    Toast.makeText(WalletActivity.this, getString(R.string.sent_msg),
+                    Toast.makeText(ref, ref.getString(R.string.sent_msg),
                             Toast.LENGTH_LONG).show();
-                    goToBalance();
+                    ref.goToBalance();
                     break;
                 case TX_BROADCAST_ERROR:
-                    Toast.makeText(WalletActivity.this, getString(R.string.get_tx_broadcast_error),
+                    Toast.makeText(ref, ref.getString(R.string.get_tx_broadcast_error),
                             Toast.LENGTH_LONG).show();
-                    goToBalance();
+                    ref.goToBalance();
                     break;
             }
         }
-    };
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

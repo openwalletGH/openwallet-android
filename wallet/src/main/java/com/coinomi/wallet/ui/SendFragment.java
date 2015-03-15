@@ -43,6 +43,7 @@ import com.coinomi.wallet.ExchangeRatesProvider.ExchangeRate;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.ui.widget.AmountEditView;
 import com.coinomi.wallet.util.ThrottlingWalletChangeListener;
+import com.coinomi.wallet.util.WeakHandler;
 
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.AddressFormatException;
@@ -94,25 +95,28 @@ public class SendFragment extends Fragment {
     private Address address;
     private Coin sendAmount;
     @Nullable private WalletActivity activity;
-    @Nullable private String accountId;
     @Nullable private WalletPocketHD pocket;
     private Configuration config;
     private NavigationDrawerFragment mNavigationDrawerFragment;
     private LoaderManager loaderManager;
     private ReceivingAddressViewAdapter sendToAddressViewAdapter;
 
-    Handler handler = new Handler() {
+    Handler handler = new MyHandler(this);
+    private static class MyHandler extends WeakHandler<SendFragment> {
+        public MyHandler(SendFragment referencingObject) { super(referencingObject); }
+
         @Override
-        public void handleMessage(Message msg) {
+        protected void weakHandleMessage(SendFragment ref, Message msg) {
             switch (msg.what) {
                 case UPDATE_EXCHANGE_RATE:
-                    onExchangeRateUpdate((org.bitcoinj.utils.ExchangeRate) msg.obj);
+                    ref.onExchangeRateUpdate((org.bitcoinj.utils.ExchangeRate) msg.obj);
                     break;
                 case UPDATE_WALLET_CHANGE:
-                    onWalletUpdate();
+                    ref.onWalletUpdate();
             }
         }
-    };
+    }
+
 
     private enum State {
         INPUT, PREPARATION, SENDING, SENT, FAILED
@@ -141,7 +145,7 @@ public class SendFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null && activity != null) {
-            accountId = checkNotNull(getArguments().getString(Constants.ARG_ACCOUNT_ID));
+            String accountId = checkNotNull(getArguments().getString(Constants.ARG_ACCOUNT_ID));
             //TODO
             pocket = (WalletPocketHD) activity.getWalletApplication().getAccount(accountId);
         }

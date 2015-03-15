@@ -14,7 +14,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.wallet.WalletPocketHD;
 import com.coinomi.wallet.AddressBookProvider;
@@ -22,12 +21,11 @@ import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.util.ThrottlingWalletChangeListener;
+import com.coinomi.wallet.util.WeakHandler;
 
 import org.bitcoinj.core.Address;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static com.coinomi.core.Preconditions.checkNotNull;
 
 /**
  *
@@ -45,15 +43,18 @@ public class PreviousAddressesFragment extends Fragment {
     private AddressesListAdapter adapter;
     private ContentResolver resolver;
 
-    Handler handler = new Handler() {
+    private final Handler handler = new MyHandler(this);
+    private static class MyHandler extends WeakHandler<PreviousAddressesFragment> {
+        public MyHandler(PreviousAddressesFragment ref) { super(ref); }
+
         @Override
-        public void handleMessage(Message msg) {
+        protected void weakHandleMessage(PreviousAddressesFragment ref, Message msg) {
             switch (msg.what) {
                 case UPDATE_VIEW:
-                    updateView();
+                    ref.updateView();
             }
         }
-    };
+    }
 
     private final ContentObserver addressBookObserver = new ContentObserver(handler) {
         @Override

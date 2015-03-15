@@ -2,7 +2,6 @@ package com.coinomi.wallet.service;
 
 import android.app.NotificationManager;
 import android.app.Service;
-import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -10,29 +9,22 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Binder;
-import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.SystemClock;
 import android.text.format.DateUtils;
 
-import com.coinomi.core.coins.CoinID;
-import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.network.ConnectivityHelper;
 import com.coinomi.core.network.ServerClients;
+import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.wallet.WalletAccount;
-import com.coinomi.core.wallet.WalletPocketHD;
 import com.coinomi.wallet.Configuration;
 import com.coinomi.wallet.Constants;
-import com.coinomi.core.wallet.Wallet;
 import com.coinomi.wallet.WalletApplication;
 
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.Transaction;
-
-import com.google.common.collect.ImmutableList;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,8 +51,6 @@ public class CoinServiceImpl extends Service implements CoinService {
 
     private String lastAccount;
 
-    private final Handler handler = new Handler();
-    private final Handler delayHandler = new Handler();
 //    private PowerManager.WakeLock wakeLock;
 
     private NotificationManager nm;
@@ -411,17 +401,12 @@ public class CoinServiceImpl extends Service implements CoinService {
         log.debug(".onDestroy()");
 
         unregisterReceiver(tickReceiver);
-
-//        application.getWallet().removeEventListener(walletEventListener);
-
         unregisterReceiver(connectivityReceiver);
 
         if (clients != null) {
             clients.stopAllAsync();
             clients = null;
         }
-
-        delayHandler.removeCallbacksAndMessages(null);
 
         application.saveWalletNow();
 
@@ -441,30 +426,4 @@ public class CoinServiceImpl extends Service implements CoinService {
         log.warn("low memory detected, stopping service");
         stopSelf();
     }
-
-    public void notifyWidgets()
-    {
-        final AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
-
-//        final ComponentName providerName = new ComponentName(this, WalletBalanceWidgetProvider.class);
-//
-//        try
-//        {
-//            final int[] appWidgetIds = appWidgetManager.getAppWidgetIds(providerName);
-//
-//            if (appWidgetIds.length > 0)
-//            {
-//                final Wallet wallet = application.getWallet();
-//                final BigInteger balance = wallet.getBalance(Wallet.BalanceType.ESTIMATED);
-//
-//                WalletBalanceWidgetProvider.updateWidgets(this, appWidgetManager, appWidgetIds, balance);
-//            }
-//        }
-//        catch (final RuntimeException x) // system server dead?
-//        {
-//            log.warn("cannot update app widgets", x);
-//        }
-    }
-
-
 }

@@ -3,6 +3,7 @@ package com.coinomi.wallet.ui;
 import android.support.v7.app.ActionBarActivity;
 
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.service.CoinService;
@@ -27,6 +28,11 @@ abstract public class AbstractWalletActionBarActivity extends ActionBarActivity 
 
     public List<WalletAccount> getAccounts(CoinType type) {
         return getWalletApplication().getAccounts(type);
+    }
+
+    @Nullable
+    public Wallet getWallet() {
+        return getWalletApplication().getWallet();
     }
 
     @Override
