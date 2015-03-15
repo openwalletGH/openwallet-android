@@ -69,14 +69,14 @@ public class AddCoinsActivity extends AbstractWalletActionBarActivity
         // For new we add only one coin at a time
         selectedCoin = CoinID.typeFromId(ids.get(0));
 
-//        if (wallet.isPocketExists(selectedCoin)) {
-//            new AlertDialog.Builder(this)
-//                    .setTitle(getString(R.string.coin_already_added_title, selectedCoin.getName()))
-//                    .setMessage(R.string.coin_already_added)
-//                    .setNeutralButton(R.string.button_ok, null)
-//                    .create().show();
-//            return;
-//        }
+        if (wallet.isAccountExists(selectedCoin)) {
+            new AlertDialog.Builder(this)
+                    .setTitle(getString(R.string.coin_already_added_title, selectedCoin.getName()))
+                    .setMessage(R.string.coin_already_added)
+                    .setPositiveButton(R.string.button_ok, null)
+                    .create().show();
+            return;
+        }
 
         if (wallet.isEncrypted()) {
             addCoinPasswordDialog.show(getSupportFragmentManager(), null);
