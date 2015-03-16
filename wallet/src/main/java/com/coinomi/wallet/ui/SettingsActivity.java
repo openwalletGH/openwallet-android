@@ -7,7 +7,7 @@ import com.coinomi.wallet.R;
 /**
  * @author John L. Jegutanis
  */
-public class SettingsActivity extends AbstractWalletActionBarActivity {
+public class SettingsActivity extends BaseWalletActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

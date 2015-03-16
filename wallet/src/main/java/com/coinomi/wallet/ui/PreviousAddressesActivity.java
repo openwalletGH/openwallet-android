@@ -7,7 +7,7 @@ import android.view.MenuItem;
 
 import com.coinomi.wallet.R;
 
-public class PreviousAddressesActivity extends AbstractWalletActionBarActivity implements
+public class PreviousAddressesActivity extends BaseWalletActivity implements
         PreviousAddressesFragment.Listener {
 
 

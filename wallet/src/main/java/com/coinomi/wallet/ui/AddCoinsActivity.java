@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 
-public class AddCoinsActivity extends AbstractWalletActionBarActivity
+public class AddCoinsActivity extends BaseWalletActivity
         implements SelectCoinsFragment.Listener {
 
     @CheckForNull private Wallet wallet;

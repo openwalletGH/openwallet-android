@@ -39,7 +39,7 @@ import android.view.ViewGroup;
  * @author Andreas Schildbach
  * @author John L. Jegutanis
  */
-public final class AddressBookActivity extends AbstractWalletActivity {
+public final class AddressBookActivity extends BaseWalletActivity {
 //    public static void start(final Context context) {
 //        context.startActivity(new Intent(context, AddressBookActivity.class));
 //    }

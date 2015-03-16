@@ -43,7 +43,7 @@ import java.util.List;
  * @author John L. Jegutanis
  * @author Andreas Schildbach
  */
-final public class WalletActivity extends AbstractWalletActionBarActivity implements
+final public class WalletActivity extends BaseWalletActivity implements
         NavigationDrawerFragment.NavigationDrawerCallbacks, BalanceFragment.Listener {
     private static final Logger log = LoggerFactory.getLogger(WalletActivity.class);
 

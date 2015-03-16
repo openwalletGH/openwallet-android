@@ -8,7 +8,7 @@ import com.coinomi.wallet.R;
 /**
  * @author John L. Jegutanis
  */
-public class ShowSeedActivity  extends AbstractWalletActionBarActivity implements ShowSeedFragment.Listener {
+public class ShowSeedActivity  extends BaseWalletActivity implements ShowSeedFragment.Listener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

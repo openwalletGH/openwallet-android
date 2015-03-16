@@ -15,7 +15,7 @@ import javax.annotation.Nullable;
 /**
  * @author John L. Jegutanis
  */
-abstract public class AbstractWalletActionBarActivity extends ActionBarActivity {
+abstract public class BaseWalletActivity extends ActionBarActivity {
 
     public WalletApplication getWalletApplication() {
         return (WalletApplication) getApplication();

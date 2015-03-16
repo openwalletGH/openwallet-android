@@ -17,19 +17,8 @@ package com.coinomi.wallet.ui;
  */
 
 
-import java.io.IOException;
-import java.util.EnumMap;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnCancelListener;
-import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -59,10 +48,17 @@ import com.google.zxing.ResultPointCallback;
 import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.qrcode.QRCodeReader;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.EnumMap;
+import java.util.Map;
+
 /**
  * @author Andreas Schildbach
  */
-public final class ScanActivity extends AbstractWalletActivity implements SurfaceHolder.Callback
+public final class ScanActivity extends Activity implements SurfaceHolder.Callback
 {
     public static final String INTENT_EXTRA_RESULT = "result";
 
