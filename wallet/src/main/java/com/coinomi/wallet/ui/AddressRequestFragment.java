@@ -3,8 +3,11 @@ package com.coinomi.wallet.ui;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.ContentObserver;
@@ -273,6 +276,9 @@ public class AddressRequestFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.action_share:
                 UiUtils.share(getActivity(), receiveAddress.toString());
+                return true;
+            case R.id.action_copy:
+                UiUtils.copy(getActivity(), receiveAddress.toString());
                 return true;
             case R.id.action_new_address:
                 createNewAddressDialog.show(getFragmentManager(), null);

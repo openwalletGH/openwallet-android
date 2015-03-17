@@ -5,6 +5,7 @@
     <string name="app_package">com.coinomi.wallet.dev</string>
     <string name="action_scan_qr_code">Scan</string>
     <string name="action_share">Share</string>
+    <string name="action_copy">Copy</string>
     <string name="action_edit_label">Edit label</string>
     <string name="action_empty_wallet">Empty wallet</string>
     <string name="action_settings">Settings</string>
@@ -35,6 +36,7 @@
     <string name="button_download">DOWNLOAD</string>
     <string name="button_add_coins">+ COINS</string>
     <string name="scan_qr_code">Scan QR code</string>
+    <string name="copied_to_clipboard">Copied to clipboard</string>
     <string name="wallet_title_request">receive</string>
     <string name="wallet_title_balance">balance</string>
     <string name="wallet_title_send">send</string>

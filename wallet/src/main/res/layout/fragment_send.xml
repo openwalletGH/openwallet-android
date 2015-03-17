@@ -38,6 +38,7 @@
                     android:id="@+id/send_to_address"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    style="@style/NormalText"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"
                     android:layout_below="@+id/pay_to_label"
