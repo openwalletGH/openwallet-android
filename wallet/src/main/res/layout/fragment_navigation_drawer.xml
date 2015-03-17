@@ -2,10 +2,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:paddingBottom="8dp"
-    android:paddingTop="8dp"
     android:background="@color/navigation_drawer_bg"
+    android:orientation="vertical"
     tools:context=".NavigationDrawerFragment">
 
     <ListView
@@ -17,13 +15,18 @@
         android:divider="@android:color/transparent"
         android:dividerHeight="0dp" />
 
-    <Button
-        android:id="@+id/add_coins"
-        android:layout_width="wrap_content"
+    <FrameLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        style="@style/BorderlessButton"
-        android:text="@string/button_add_coins"
-        android:layout_gravity="center_horizontal" />
+        android:background="@color/white">
 
+        <Button
+            android:id="@+id/add_coins"
+            style="@style/BorderlessButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/button_add_coins" />
+    </FrameLayout>
 </LinearLayout>
 

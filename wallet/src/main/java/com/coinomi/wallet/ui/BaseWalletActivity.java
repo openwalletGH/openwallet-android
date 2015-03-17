@@ -26,6 +26,10 @@ abstract public class BaseWalletActivity extends ActionBarActivity {
         return getWalletApplication().getAccount(accountId);
     }
 
+    public List<WalletAccount> getAllAccounts() {
+        return getWalletApplication().getAllAccounts();
+    }
+
     public List<WalletAccount> getAccounts(CoinType type) {
         return getWalletApplication().getAccounts(type);
     }

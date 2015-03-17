@@ -31,6 +31,7 @@
     <color name="actionbar_bg">@color/primary_500</color>
 
     <color name="navigation_drawer_bg">#F0FFFFFF</color>
+    <color name="navigation_drawer_add_coins_bg">#A0FFFFFF</color>
 
     <!-- Font icons -->
     <color name="font_icon_fg_color">@color/white_almost</color>

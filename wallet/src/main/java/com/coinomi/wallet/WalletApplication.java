@@ -21,6 +21,7 @@ import com.coinomi.wallet.service.CoinService;
 import com.coinomi.wallet.service.CoinServiceImpl;
 import com.coinomi.wallet.util.Fonts;
 import com.coinomi.wallet.util.LinuxSecureRandom;
+import com.google.common.collect.ImmutableList;
 
 import org.acra.annotation.ReportsCrashes;
 import org.acra.sender.HttpSender;
@@ -207,12 +208,19 @@ public class WalletApplication extends Application {
         }
     }
 
-    @Nullable
     public List<WalletAccount> getAccounts(CoinType type) {
         if (wallet != null) {
             return wallet.getAccounts(type);
         } else {
-            return null;
+            return ImmutableList.of();
+        }
+    }
+
+    public List<WalletAccount> getAllAccounts() {
+        if (wallet != null) {
+            return wallet.getAllAccounts();
+        } else {
+            return ImmutableList.of();
         }
     }
 

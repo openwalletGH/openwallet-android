@@ -37,7 +37,14 @@ import org.bitcoinj.core.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import static com.coinomi.wallet.ui.NavDrawerItemType.ITEM_SECTION_TITLE;
+import static com.coinomi.wallet.ui.NavDrawerItemType.ITEM_SEPARATOR;
+import static com.coinomi.wallet.ui.NavDrawerItemType.ITEM_COIN;
+import static com.coinomi.wallet.ui.NavDrawerItemType.ITEM_TRADE;
+
 
 /**
  * @author John L. Jegutanis
@@ -75,6 +82,7 @@ final public class WalletActivity extends BaseWalletActivity implements
     private ViewPager mViewPager;
     private String currentAccountId;
     private Intent connectCoinIntent;
+    private List<NavDrawerItem> navDrawerItems = new ArrayList<>();
 
     private final Handler handler = new MyHandler(this);
     private static class MyHandler extends WeakHandler<WalletActivity> {
@@ -97,15 +105,10 @@ final public class WalletActivity extends BaseWalletActivity implements
         }
     }
 
-    Wallet wallet;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wallet);
-
-        // TODO remove debug
-        wallet = getWallet();
 
         if (getWalletApplication().getWallet() == null) {
             startIntro();
@@ -134,9 +137,11 @@ final public class WalletActivity extends BaseWalletActivity implements
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
         // Set up the drawer.
+        createNavDrawerItems();
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
-                (DrawerLayout) findViewById(R.id.drawer_layout));
+                (DrawerLayout) findViewById(R.id.drawer_layout),
+                navDrawerItems);
 
         // Set up the ViewPager, attaching the adapter and setting up a listener for when the
         // user swipes between sections.
@@ -158,8 +163,31 @@ final public class WalletActivity extends BaseWalletActivity implements
         // Get the last used wallet pocket and select it
         WalletAccount lastAccount = getAccount(getWalletApplication().getConfiguration().getLastAccountId());
         if (lastAccount != null) {
-            mNavigationDrawerFragment.selectAccount(lastAccount, false);
+            navDrawerSelectAccount(lastAccount, false);
             openPocket(lastAccount, false);
+        }
+    }
+
+    private void navDrawerSelectAccount(WalletAccount account, boolean closeDrawer) {
+        if (mNavigationDrawerFragment != null) {
+            int position = 0;
+            for (NavDrawerItem item : navDrawerItems) {
+                if (item.itemType == ITEM_COIN && account.getId().equals(item.itemData)) {
+                    mNavigationDrawerFragment.setSelectedItem(position, closeDrawer);
+                }
+                position++;
+            }
+        }
+    }
+
+    private void createNavDrawerItems() {
+        navDrawerItems.clear();
+//        NavDrawerItem.addItem(navDrawerItems, ITEM_SECTION_TITLE, getString(R.string.navigation_drawer_services));
+//        NavDrawerItem.addItem(navDrawerItems, ITEM_TRADE, getString(R.string.title_activity_trade), R.drawable.trade, null);
+        NavDrawerItem.addItem(navDrawerItems, ITEM_SECTION_TITLE, getString(R.string.navigation_drawer_wallet));
+        for (WalletAccount account : getAllAccounts()) {
+            CoinType type = account.getCoinType();
+            NavDrawerItem.addItem(navDrawerItems, ITEM_COIN, type.getName(), Constants.COINS_ICONS.get(type), account.getId());
         }
     }
 
@@ -190,15 +218,20 @@ final public class WalletActivity extends BaseWalletActivity implements
     }
 
     @Override
-    public void onAccountSelected(WalletAccount account) {
-        log.info("Coin selected {}", account.getId());
+    public void onAccountSelected(String accountId) {
+        log.info("Coin selected {}", accountId);
 
-        openPocket(account, false);
+        openPocket(getAccount(accountId), false);
     }
 
     @Override
-    public void onNavigationDrawerAddCoinsSelected() {
+    public void onAddCoinsSelected() {
         startActivityForResult(new Intent(WalletActivity.this, AddCoinsActivity.class), ADD_COIN);
+    }
+
+    @Override
+    public void onTradeSelected() {
+        System.out.println("WalletActivity.onTradeSelected");
     }
 
     private void openPocket(WalletAccount account) {
@@ -221,8 +254,8 @@ final public class WalletActivity extends BaseWalletActivity implements
             mViewPager.getAdapter().notifyDataSetChanged();
             getWalletApplication().getConfiguration().touchLastAccountId(currentAccountId);
             connectCoinService();
-            if (selectInNavDrawer && mNavigationDrawerFragment != null ) {
-                mNavigationDrawerFragment.selectAccount(account);
+            if (selectInNavDrawer) {
+                navDrawerSelectAccount(account, true);
             }
         }
     }
@@ -326,7 +359,8 @@ final public class WalletActivity extends BaseWalletActivity implements
                 } else if (requestCode == ADD_COIN) {
                     if (resultCode == Activity.RESULT_OK) {
                         final String accountId = intent.getStringExtra(Constants.ARG_ACCOUNT_ID);
-                        mNavigationDrawerFragment.notifyDataSetChanged();
+                        createNavDrawerItems();
+                        mNavigationDrawerFragment.setItems(navDrawerItems);
                         openPocket(accountId);
                     }
                 }

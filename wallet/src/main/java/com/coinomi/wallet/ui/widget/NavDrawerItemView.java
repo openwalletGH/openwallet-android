@@ -8,22 +8,19 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.coinomi.core.coins.CoinType;
-import com.coinomi.core.wallet.WalletAccount;
-import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 
 /**
  * @author John L. Jegutanis
  */
-public class NavDrawerItem extends LinearLayout implements Checkable {
+public class NavDrawerItemView extends LinearLayout implements Checkable {
     private final TextView title;
     private final ImageView icon;
     private final View view;
 
     private boolean isChecked = false;
 
-    public NavDrawerItem(Context context) {
+    public NavDrawerItemView(Context context) {
         super(context);
 
         view = LayoutInflater.from(context).inflate(R.layout.nav_drawer_item, this, true);
@@ -31,10 +28,9 @@ public class NavDrawerItem extends LinearLayout implements Checkable {
         icon = (ImageView) findViewById(R.id.item_icon);
     }
 
-    public void setAccount(WalletAccount account) {
-        CoinType coin = account.getCoinType();
-        title.setText(coin.getName());
-        icon.setImageResource(Constants.COINS_ICONS.get(coin));
+    public void setData(String titleStr, int iconRes) {
+        title.setText(titleStr);
+        icon.setImageResource(iconRes);
     }
 
     @Override

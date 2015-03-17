@@ -3,8 +3,6 @@
 
     <string name="app_name">Coinomi (dev)</string>
     <string name="app_package">com.coinomi.wallet.dev</string>
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="action_scan_qr_code">Scan</string>
     <string name="action_share">Share</string>
     <string name="action_edit_label">Edit label</string>
@@ -46,6 +44,13 @@
     <string name="unlocking_wallet_working">Unlocking your wallet&#8230;</string>
     <string name="unlocking_wallet_error_title">Unlocking error</string>
     <string name="unlocking_wallet_error_detail">Please check that your password is correct.\nIf this error persists try to restore your wallet.</string>
+
+    <!-- Nav drawer -->
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="navigation_drawer_services">Services</string>
+    <string name="navigation_drawer_wallet">Wallet</string>
+
 
     <!-- SendOutput widget -->
     <string name="fee">Fee</string>
@@ -231,5 +236,7 @@
     <string name="seed_working">Please wait&#8230;</string>
     <string name="seed_password_protected">This recovery phrase is password protected</string>
 
+    <!-- Trade -->
+    <string name="title_activity_trade">Trade</string>
 
 </resources>

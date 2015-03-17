@@ -4,6 +4,7 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="standard_margin">16dp</dimen>
     <dimen name="half_standard_margin">8dp</dimen>
+    <dimen name="quarter_standard_margin">4dp</dimen>
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 
@@ -14,6 +15,9 @@
     <!-- Generic sizes taken from
          http://www.google.com/design/spec/style/typography.html#typography-standard-styles -->
     <dimen name="caption">12sp</dimen>
+
+    <!-- Coin icons -->
+    <dimen name="generic_icon_size">36dp</dimen>
 
     <!-- Font icons -->
     <dimen name="font_icon_bg_size">50dp</dimen>
@@ -89,7 +93,7 @@
     <dimen name="exchange_row_padding_horizontal">@dimen/row_padding_horizontal</dimen>
 
     <!-- Coin list row -->
-    <dimen name="coin_list_row_padding_vertical">8dp</dimen>
+    <dimen name="coin_list_row_padding_vertical">@dimen/quarter_standard_margin</dimen>
 
     <!-- Address row -->
     <dimen name="address_row_status_bg_size">22dp</dimen>
