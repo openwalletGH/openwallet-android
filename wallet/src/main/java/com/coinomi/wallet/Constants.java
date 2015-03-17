@@ -193,7 +193,7 @@ public class Constants {
             BlackcoinMain.get(),
             RubycoinMain.get(),
             ReddcoinMain.get(),
-            DigibyteMain.get(),
+//            DigibyteMain.get(),
             FeathercoinMain.get(),
             DigitalcoinMain.get(),
             CannacoinMain.get(),
