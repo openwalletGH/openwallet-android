@@ -28,6 +28,7 @@ import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.util.ThrottlingWalletChangeListener;
+import com.coinomi.wallet.util.UiUtils;
 import com.coinomi.wallet.util.WeakHandler;
 
 import org.bitcoinj.core.Sha256Hash;
@@ -134,55 +135,14 @@ public class TransactionDetailsFragment extends Fragment {
 
                     if (obj != null && obj instanceof TransactionOutput) {
                         TransactionOutput txo = (TransactionOutput) obj;
-                        actionForOutput(txo);
+                        String address = txo.getScriptPubKey().getToAddress(type).toString();
+                        UiUtils.startActionModeForAddress(address, type,
+                                getActivity(), getFragmentManager());
                     }
                 }
             }
         };
     }
-
-    private void actionForOutput(final TransactionOutput txo) {
-        if (!(getActivity() instanceof ActionBarActivity)) {
-            log.warn("To show action mode, your activity must extend " + ActionBarActivity.class);
-            return;
-        }
-
-        final String address = txo.getScriptPubKey().getToAddress(type).toString();
-
-        ((ActionBarActivity) getActivity()).startSupportActionMode(new ActionMode.Callback() {
-
-            @Override
-            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-                final MenuInflater inflater = mode.getMenuInflater();
-                inflater.inflate(R.menu.transaction_details_output_options, menu);
-
-                return true;
-            }
-
-            @Override
-            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-                final String label = AddressBookProvider.resolveLabel(getActivity(), type, address);
-                mode.setTitle(label != null ? label : GenericUtils.addressSplitToGroups(address));
-                return true;
-            }
-
-            @Override
-            public boolean onActionItemClicked(ActionMode mode, MenuItem menuItem) {
-                switch (menuItem.getItemId()) {
-                    case R.id.action_edit_label:
-                        EditAddressBookEntryFragment.edit(getFragmentManager(), type, address);
-                        mode.finish();
-                        return true;
-                }
-
-                return false;
-            }
-
-            @Override
-            public void onDestroyActionMode(ActionMode actionMode) { }
-        });
-    }
-
 
     @Override
     public void onDestroyView() {

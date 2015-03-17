@@ -17,8 +17,11 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -43,7 +46,7 @@ import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.ui.widget.AmountEditView;
 import com.coinomi.wallet.util.LayoutUtils;
 import com.coinomi.wallet.util.Qr;
-import com.coinomi.wallet.util.ShareHelper;
+import com.coinomi.wallet.util.UiUtils;
 import com.coinomi.wallet.util.ThrottlingWalletChangeListener;
 import com.coinomi.wallet.util.WeakHandler;
 
@@ -70,7 +73,7 @@ public class AddressRequestFragment extends Fragment {
     // Loader IDs
     private static final int ID_RATE_LOADER = 0;
 
-
+    @Nullable private Address showAddress;
     private Address receiveAddress;
     private Coin amount;
     private String label;
@@ -87,7 +90,6 @@ public class AddressRequestFragment extends Fragment {
     private String accountId;
     private WalletPocketHD pocket;
     private int maxQrSize;
-    @Nullable private Address showAddress;
 
     private Configuration config;
     private ContentResolver resolver;
@@ -182,6 +184,10 @@ public class AddressRequestFragment extends Fragment {
 
         addressLabelView = (TextView) view.findViewById(R.id.request_address_label);
         addressView = (TextView) view.findViewById(R.id.request_address);
+        View.OnClickListener addressOnClickListener = getAddressOnClickListener();
+        addressLabelView.setOnClickListener(addressOnClickListener);
+        addressView.setOnClickListener(addressOnClickListener);
+
         qrView = (ImageView) view.findViewById(R.id.qr_code);
 
         AmountEditView sendCoinAmountView = (AmountEditView) view.findViewById(R.id.send_coin_amount);
@@ -208,6 +214,19 @@ public class AddressRequestFragment extends Fragment {
         pocket.addEventListener(walletListener);
 
         return view;
+    }
+
+    private View.OnClickListener getAddressOnClickListener() {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (showAddress != null) {
+                    receiveAddress =  showAddress;
+                }
+                UiUtils.startActionModeForAddress(receiveAddress.toString(), type,
+                        getActivity(), getFragmentManager());
+            }
+        };
     }
 
     @Override
@@ -253,7 +272,7 @@ public class AddressRequestFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_share:
-                ShareHelper.share(getActivity(), receiveAddress.toString());
+                UiUtils.share(getActivity(), receiveAddress.toString());
                 return true;
             case R.id.action_new_address:
                 createNewAddressDialog.show(getFragmentManager(), null);
