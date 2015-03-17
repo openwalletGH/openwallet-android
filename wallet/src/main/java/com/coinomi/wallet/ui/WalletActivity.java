@@ -162,6 +162,10 @@ final public class WalletActivity extends BaseWalletActivity implements
 
         // Get the last used wallet pocket and select it
         WalletAccount lastAccount = getAccount(getWalletApplication().getConfiguration().getLastAccountId());
+        if (lastAccount == null && getAllAccounts().size() > 0) {
+            lastAccount = getAllAccounts().get(0);
+        }
+        // TODO, when we are able to remove accounts, show a message when no accounts found
         if (lastAccount != null) {
             navDrawerSelectAccount(lastAccount, false);
             openPocket(lastAccount, false);
