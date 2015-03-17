@@ -108,6 +108,10 @@ public class SelectCoinsFragment extends Fragment {
             header.setFontIcon(R.string.font_icon_coins);
             header.setMessage(R.string.select_coins);
             coinList.addHeaderView(header, null, false);
+        } else {
+            View topPaddingView = new View(activity);
+            topPaddingView.setMinimumHeight(getResources().getDimensionPixelSize(R.dimen.half_standard_margin));
+            coinList.addHeaderView(topPaddingView, null, false);
         }
         if (isMultipleChoice) coinList.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
         coinList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
