@@ -12,7 +12,7 @@ TODOs:
 
 Install [Android Studio](https://developer.android.com/sdk/installing/studio.html). Once it is
 running, import coinomi-android by navigating to where you cloned or downloaded it and selecting
-settings.gradle. When it is finished importing, click on the SDK Manager ![SDK Manager](https://developer.android.com/images/tools/sdk-manager-studio.png). You will need to install SDK version 19.
+settings.gradle. When it is finished importing, click on the SDK Manager ![SDK Manager](https://developer.android.com/images/tools/sdk-manager-studio.png). You will need to install SDK version 21.
 
 <br/>
 Make sure that you have JDK 7 installed before building. You can get it [Here](http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html). Once you have that installed, navigate to File > Project Structure > SDK Location and change the path of your current JDK to the path of the new JDK. **The project will not build with JDK 8**. 
@@ -78,6 +78,13 @@ For now test it manually by installing it `adb install -r wallet/wallet-release.
 
 
 ## Version history
+
+New in version 1.5.12
+- Click on any addresses to edit the label or copy it
+- Dedicated copy address button in the receive screen
+- New user interface for Android Lollipop devices
+- Improved icons
+- Bug and crash fixes
 
 New in version 1.5.11
 - New settings screen
