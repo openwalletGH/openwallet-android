@@ -213,17 +213,17 @@ public class TransactionsListAdapter extends BaseAdapter {
             rowValue.setTextColor(colorInsignificant);
             rowDirectionText.setTextColor(colorInsignificant);
             rowDirectionFontIcon.setTextColor(colorInsignificant);
-            rowDirectionFontIcon.setBackgroundResource(R.drawable.transaction_row_cyrcle_bg_pending);
+            rowDirectionFontIcon.setBackgroundResource(R.drawable.transaction_row_circle_bg_pending);
         } else if (confidenceType == ConfidenceType.BUILDING) {
             rowLabel.setTextColor(colorSignificant);
             rowValue.setTextColor(colorSignificant);
             rowDirectionText.setTextColor(colorLessSignificant);
             rowDirectionFontIcon.setTextColor(colorLessSignificant);
             if (value.isNegative()) {
-                rowDirectionFontIcon.setBackgroundResource(R.drawable.transaction_row_cyrcle_bg_send);
+                rowDirectionFontIcon.setBackgroundResource(R.drawable.transaction_row_circle_bg_send);
                 rowValue.setTextColor(res.getColor(R.color.send_color_fg));
             } else {
-                rowDirectionFontIcon.setBackgroundResource(R.drawable.transaction_row_cyrcle_bg_receive);
+                rowDirectionFontIcon.setBackgroundResource(R.drawable.transaction_row_circle_bg_receive);
                 rowValue.setTextColor(res.getColor(R.color.receive_color_fg));
             }
         } else if (confidenceType == ConfidenceType.DEAD) {
@@ -236,7 +236,7 @@ public class TransactionsListAdapter extends BaseAdapter {
             rowLabel.setTextColor(colorInsignificant);
             rowValue.setTextColor(colorInsignificant);
             rowDirectionFontIcon.setTextColor(colorInsignificant);
-            rowDirectionFontIcon.setBackgroundResource(R.drawable.transaction_row_cyrcle_bg_pending);
+            rowDirectionFontIcon.setBackgroundResource(R.drawable.transaction_row_circle_bg_pending);
         }
 
         // Confirmations

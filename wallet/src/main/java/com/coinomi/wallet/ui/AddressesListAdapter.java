@@ -154,11 +154,11 @@ public class AddressesListAdapter extends BaseAdapter {
         if (usedAddresses.contains(address)) {
             addressUsageLabel.setText(R.string.previous_addresses_used);
             addressUsageFontIcon.setText(R.string.font_icon_receive_coins);
-            addressUsageFontIcon.setBackgroundResource(R.drawable.address_row_cyrcle_bg_used);
+            addressUsageFontIcon.setBackgroundResource(R.drawable.address_row_circle_bg_used);
         } else {
             addressUsageLabel.setText(R.string.previous_addresses_unused);
             addressUsageFontIcon.setText(R.string.font_icon_check);
-            addressUsageFontIcon.setBackgroundResource(R.drawable.address_row_cyrcle_bg_unused);
+            addressUsageFontIcon.setBackgroundResource(R.drawable.address_row_circle_bg_unused);
         }
     }
 

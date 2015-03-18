@@ -344,7 +344,7 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
             case WORKING:
                 // TODO support WORKING state
             case CONNECTED:
-                connectionLabel.setVisibility(View.INVISIBLE);
+                connectionLabel.setVisibility(View.GONE);
                 break;
             default:
             case DISCONNECTED:

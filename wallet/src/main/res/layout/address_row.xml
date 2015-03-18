@@ -40,7 +40,7 @@
             android:textSize="@dimen/address_row_status_text_size"
             android:layout_marginRight="4dp"
             android:layout_marginEnd="4dp"
-            android:background="@drawable/address_row_cyrcle_bg_used"
+            android:background="@drawable/address_row_circle_bg_used"
             android:gravity="center"
             tools:text="->]" />
 
