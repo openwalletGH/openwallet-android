@@ -1,10 +1,14 @@
 package com.coinomi.wallet.ui;
 
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.wallet.WalletAccount;
+import com.coinomi.wallet.Configuration;
 import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.service.CoinService;
 
@@ -32,6 +36,22 @@ abstract public class BaseWalletActivity extends ActionBarActivity {
 
     public List<WalletAccount> getAccounts(CoinType type) {
         return getWalletApplication().getAccounts(type);
+    }
+
+    public Configuration getConfiguration() {
+        return getWalletApplication().getConfiguration();
+    }
+
+    public void replaceFragment(Fragment fragment, int container) {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+        // Replace whatever is in the fragment_container view with this fragment,
+        // and add the transaction to the back stack so the user can navigate back
+        transaction.replace(container, fragment);
+        transaction.addToBackStack(null);
+
+        // Commit the transaction
+        transaction.commit();
     }
 
     @Nullable

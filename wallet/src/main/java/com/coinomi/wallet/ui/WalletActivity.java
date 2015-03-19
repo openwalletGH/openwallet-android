@@ -40,6 +40,8 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import static com.coinomi.wallet.ui.NavDrawerItemType.ITEM_SECTION_TITLE;
 import static com.coinomi.wallet.ui.NavDrawerItemType.ITEM_SEPARATOR;
 import static com.coinomi.wallet.ui.NavDrawerItemType.ITEM_COIN;
@@ -73,8 +75,6 @@ final public class WalletActivity extends BaseWalletActivity implements
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
     private CharSequence mTitle;
-
-    private int coinIconRes = R.drawable.ic_launcher;
 
     /**
      * For SharedPreferences, used to check if first launch ever.
@@ -172,8 +172,8 @@ final public class WalletActivity extends BaseWalletActivity implements
         }
     }
 
-    private void navDrawerSelectAccount(WalletAccount account, boolean closeDrawer) {
-        if (mNavigationDrawerFragment != null) {
+    private void navDrawerSelectAccount(@Nullable WalletAccount account, boolean closeDrawer) {
+        if (mNavigationDrawerFragment != null && account != null) {
             int position = 0;
             for (NavDrawerItem item : navDrawerItems) {
                 if (item.itemType == ITEM_COIN && account.getId().equals(item.itemData)) {
@@ -186,8 +186,8 @@ final public class WalletActivity extends BaseWalletActivity implements
 
     private void createNavDrawerItems() {
         navDrawerItems.clear();
-//        NavDrawerItem.addItem(navDrawerItems, ITEM_SECTION_TITLE, getString(R.string.navigation_drawer_services));
-//        NavDrawerItem.addItem(navDrawerItems, ITEM_TRADE, getString(R.string.title_activity_trade), R.drawable.trade, null);
+        NavDrawerItem.addItem(navDrawerItems, ITEM_SECTION_TITLE, getString(R.string.navigation_drawer_services));
+        NavDrawerItem.addItem(navDrawerItems, ITEM_TRADE, getString(R.string.title_activity_trade), R.drawable.trade, null);
         NavDrawerItem.addItem(navDrawerItems, ITEM_SECTION_TITLE, getString(R.string.navigation_drawer_wallet));
         for (WalletAccount account : getAllAccounts()) {
             CoinType type = account.getCoinType();
@@ -235,7 +235,9 @@ final public class WalletActivity extends BaseWalletActivity implements
 
     @Override
     public void onTradeSelected() {
-        System.out.println("WalletActivity.onTradeSelected");
+        startActivity(new Intent(WalletActivity.this, TradeActivity.class));
+        // Reselect the current account as the trade is a separate activity
+        navDrawerSelectAccount(getAccount(currentAccountId), true);
     }
 
     private void openPocket(WalletAccount account) {
@@ -251,7 +253,6 @@ final public class WalletActivity extends BaseWalletActivity implements
             currentAccountId = account.getId();
             CoinType type = account.getCoinType();
             mTitle = type.getName();
-            coinIconRes = Constants.COINS_ICONS.get(type);
             AppSectionsPagerAdapter adapter = new AppSectionsPagerAdapter(this, account);
             mViewPager.setAdapter(adapter);
             mViewPager.setCurrentItem(BALANCE);

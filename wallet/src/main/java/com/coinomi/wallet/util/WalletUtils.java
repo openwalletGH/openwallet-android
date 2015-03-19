@@ -26,6 +26,7 @@ import android.text.style.StyleSpan;
 
 import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.core.wallet.WalletPocketHD;
 import com.coinomi.wallet.Constants;
 
@@ -54,6 +55,18 @@ import static com.coinomi.core.Preconditions.checkState;
  * @author Andreas Schildbach
  */
 public class WalletUtils {
+
+    public static String getDescriptionOrCoinName(WalletAccount account) {
+        return account.getDescription() != null ? account.getDescription() : account.getCoinType().getName();
+    }
+
+    public static int getIconRes(CoinType type) {
+        return Constants.COINS_ICONS.get(type);
+    }
+
+    public static int getIconRes(WalletAccount account) {
+        return getIconRes(account.getCoinType());
+    }
 
     public static long longHash(@Nonnull final Sha256Hash hash) {
         return longHash(hash.getBytes());

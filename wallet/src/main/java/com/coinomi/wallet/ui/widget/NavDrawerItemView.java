@@ -8,7 +8,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.coinomi.core.wallet.WalletAccount;
+import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
+import com.coinomi.wallet.util.WalletUtils;
 
 /**
  * @author John L. Jegutanis

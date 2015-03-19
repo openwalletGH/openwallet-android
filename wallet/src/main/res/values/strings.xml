@@ -12,6 +12,7 @@
     <string name="action_about">About</string>
     <string name="action_refresh_wallet">Refresh</string>
     <string name="action_new_address">New address</string>
+    <string name="action_swap_coins">Swap coins</string>
 
     <!-- Errors -->
     <string name="error_generic">Error occurred while performing action</string>
@@ -240,5 +241,9 @@
 
     <!-- Trade -->
     <string name="title_activity_trade">Trade</string>
+    <string name="trade_info">Select the coins you wish to trade.\nThe converted coins will be automatically added to your wallet.</string>
+    <string name="trade_from_coin_label">trade</string>
+    <string name="trade_to_coin_label">receive</string>
+    <string name="trade_warn_no_account_found">You will be prompted to add a %1$s wallet</string>
 
 </resources>
