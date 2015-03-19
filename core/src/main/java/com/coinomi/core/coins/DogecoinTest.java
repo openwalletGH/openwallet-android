@@ -15,7 +15,7 @@ public class DogecoinTest extends CoinType {
         spendableCoinbaseDepth = 240; // COINBASE_MATURITY_NEW
 
         name = "Dogecoin Test";
-        symbol = "DOGE";
+        symbol = "DOGETEST";
         uriScheme = "dogecoin";
         bip44Index = 1;
         unitExponent = 8;

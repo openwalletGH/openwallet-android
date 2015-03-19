@@ -15,7 +15,7 @@ public class DarkcoinTest extends CoinType {
         spendableCoinbaseDepth = 100;
 
         name = "Darkcoin Test";
-        symbol = "DRK";
+        symbol = "DRKTEST";
         uriScheme = "darkcoin";
         bip44Index = 1;
         unitExponent = 8;

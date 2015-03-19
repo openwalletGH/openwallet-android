@@ -31,6 +31,9 @@ import android.provider.BaseColumns;
 
 import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.coins.FiatType;
+import com.coinomi.core.coins.FiatValue;
+import com.coinomi.core.coins.Value;
 import com.coinomi.wallet.util.Io;
 import com.google.common.base.Charsets;
 
@@ -66,23 +69,20 @@ import static com.coinomi.wallet.Constants.HTTP_TIMEOUT_MS;
 public class ExchangeRatesProvider extends ContentProvider {
 
     public static class ExchangeRate {
-        @Nonnull public final org.bitcoinj.utils.ExchangeRate rate;
+        @Nonnull public final com.coinomi.core.util.ExchangeRate rate;
         public final String currencyCodeId;
-        public final CoinType type;
         @Nullable public final String source;
 
-        public ExchangeRate(@Nonnull final org.bitcoinj.utils.ExchangeRate rate,
-                            final String currencyCodeId, final CoinType type,
-                            @Nullable final String source) {
+        public ExchangeRate(@Nonnull final com.coinomi.core.util.ExchangeRate rate,
+                            final String currencyCodeId, @Nullable final String source) {
             this.rate = rate;
             this.currencyCodeId = currencyCodeId;
-            this.type = type;
             this.source = source;
         }
 
         @Override
         public String toString() {
-            return getClass().getSimpleName() + '[' + rate.fiat + ']';
+            return getClass().getSimpleName() + '[' + rate.value1 + " ~ " + rate.value2 + ']';
         }
     }
 
@@ -238,11 +238,11 @@ public class ExchangeRatesProvider extends ContentProvider {
     }
 
     private void addRow(MatrixCursor cursor, ExchangeRate exchangeRate) {
-        final org.bitcoinj.utils.ExchangeRate rate = exchangeRate.rate;
+        final com.coinomi.core.util.ExchangeRate rate = exchangeRate.rate;
         final String codeId = exchangeRate.currencyCodeId;
         cursor.newRow().add(codeId.hashCode()).add(codeId)
-                .add(rate.coin.value).add(exchangeRate.type.getSymbol())
-                .add(rate.fiat.value).add(rate.fiat.currencyCode)
+                .add(rate.value1.value).add(rate.value1.type.getSymbol())
+                .add(rate.value2.value).add(rate.value2.type.getSymbol())
                 .add(exchangeRate.source);
     }
 
@@ -253,13 +253,13 @@ public class ExchangeRatesProvider extends ContentProvider {
     public static ExchangeRate getExchangeRate(@Nonnull final Cursor cursor) {
         final String codeId = getCurrencyCodeId(cursor);
         final CoinType type = CoinID.typeFromSymbol(cursor.getString(cursor.getColumnIndexOrThrow(ExchangeRatesProvider.KEY_RATE_COIN_CODE)));
-        final Coin rateCoin = Coin.valueOf(cursor.getLong(cursor.getColumnIndexOrThrow(ExchangeRatesProvider.KEY_RATE_COIN)));
+        final Value rateCoin = Value.valueOf(type, cursor.getLong(cursor.getColumnIndexOrThrow(ExchangeRatesProvider.KEY_RATE_COIN)));
         final String fiatCode = cursor.getString(cursor.getColumnIndexOrThrow(ExchangeRatesProvider.KEY_RATE_FIAT_CODE));
-        final Fiat rateFiat = Fiat.valueOf(fiatCode, cursor.getLong(cursor.getColumnIndexOrThrow(ExchangeRatesProvider.KEY_RATE_FIAT)));
+        final Value rateFiat = FiatValue.valueOf(fiatCode, cursor.getLong(cursor.getColumnIndexOrThrow(ExchangeRatesProvider.KEY_RATE_FIAT)));
         final String source = cursor.getString(cursor.getColumnIndexOrThrow(ExchangeRatesProvider.KEY_SOURCE));
 
-        org.bitcoinj.utils.ExchangeRate rate = new org.bitcoinj.utils.ExchangeRate(rateCoin, rateFiat);
-        return new ExchangeRate(rate, codeId, type, source);
+        com.coinomi.core.util.ExchangeRate rate = new com.coinomi.core.util.ExchangeRate(rateCoin, rateFiat);
+        return new ExchangeRate(rate, codeId, source);
     }
 
     @Override
@@ -353,26 +353,13 @@ public class ExchangeRatesProvider extends ContentProvider {
                     final String rateStr = json.optString(toSymbol, null);
                     if (rateStr != null) {
                         try {
-                            BigDecimal rateRaw = new BigDecimal(rateStr);
-                            if (rateRaw.signum() > 0) {
-                                if (isLocalToCrypto) type = CoinID.typeFromSymbol(toSymbol);
-                                Coin rateCoin = type.getOneCoin();
-                                BigDecimal rateUnit = rateRaw.movePointRight(Fiat.SMALLEST_UNIT_EXPONENT);
+                            if (isLocalToCrypto) type = CoinID.typeFromSymbol(toSymbol);
+                            String localSymbol = isLocalToCrypto ? fromSymbol : toSymbol;
+                            final Value rateCoin = type.oneCoin();
+                            final Value rateLocal = FiatValue.parse(localSymbol, rateStr);
 
-                                // Scale the rate up because Fiat class uses only 4 decimal places
-                                // and precision is lost for low value coins
-                                while (rateUnit.precision() != 1 && rateUnit.longValue() < 10000) {
-                                    // If the fiat rate is so small that
-                                    rateUnit = rateUnit.multiply(BigDecimal.TEN);
-                                    rateCoin = rateCoin.multiply(10);
-                                }
-
-                                String localSymbol = isLocalToCrypto ? fromSymbol : toSymbol;
-                                final Fiat rateLocal = Fiat.valueOf(localSymbol, rateUnit.longValue());
-
-                                org.bitcoinj.utils.ExchangeRate rate = new org.bitcoinj.utils.ExchangeRate(rateCoin, rateLocal);
-                                rates.put(toSymbol, new ExchangeRate(rate, toSymbol, type, COINOMI_SOURCE));
-                            }
+                            com.coinomi.core.util.ExchangeRate rate = new com.coinomi.core.util.ExchangeRate(rateCoin, rateLocal);
+                            rates.put(toSymbol, new ExchangeRate(rate, toSymbol, COINOMI_SOURCE));
                         } catch (final Exception x) {
                             log.debug("ignoring {}/{}: {}", toSymbol, fromSymbol, x.getMessage());
                         }

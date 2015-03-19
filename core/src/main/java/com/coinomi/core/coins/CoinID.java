@@ -10,6 +10,7 @@ import org.bitcoinj.params.Networks;
 import com.coinomi.core.uri.CoinURIParseException;
 import com.google.common.collect.ImmutableList;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -46,6 +47,16 @@ public enum CoinID {
 
         for (CoinID id : values()) {
             Networks.register(id.type);
+        }
+
+        // Test if currency codes are unique
+        HashSet<String> codes = new HashSet<>();
+        for (CoinID id : values()) {
+            if (codes.contains(id.type.symbol)) {
+                throw new IllegalStateException(
+                        "Coin currency codes must be unique, double found: " + id.type.symbol);
+            }
+            codes.add(id.type.symbol);
         }
     }
 

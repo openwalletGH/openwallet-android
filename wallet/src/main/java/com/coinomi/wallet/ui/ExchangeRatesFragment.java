@@ -42,6 +42,7 @@ import android.widget.Toast;
 import com.coinomi.core.coins.BitcoinMain;
 import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.coins.Value;
 import com.coinomi.core.util.GenericUtils;
 import com.coinomi.wallet.Configuration;
 import com.coinomi.wallet.Constants;
@@ -345,8 +346,9 @@ public final class ExchangeRatesFragment extends ListFragment implements OnShare
             rateAmountUnitView.setSymbol(type.getSymbol());
 
             final Amount rateAmountView = (Amount) view.findViewById(R.id.exchange_rate_row_rate);
-            rateAmountView.setAmount(exchangeRate.rate.coinToFiat(rateBase).toPlainString());
-            rateAmountView.setSymbol(exchangeRate.currencyCodeId);
+            Value fiatAmount = exchangeRate.rate.convert(type, rateBase);
+            rateAmountView.setAmount(GenericUtils.formatFiatValue(fiatAmount));
+            rateAmountView.setSymbol(fiatAmount.type.getSymbol());
 
 //            final CurrencyTextView walletView = (CurrencyTextView) view.findViewById(R.id.exchange_rate_row_balance);
 //            walletView.setFormat(Constants.LOCAL_FORMAT);

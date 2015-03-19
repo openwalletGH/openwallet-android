@@ -25,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.coins.Value;
 import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.core.wallet.WalletPocketConnectivity;
@@ -526,7 +527,7 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
                 if (log.isInfoEnabled()) {
                     try {
                         log.info("Got exchange rate: {}",
-                                exchangeRate.rate.coinToFiat(type.getOneCoin()).toFriendlyString());
+                                exchangeRate.rate.convert(type.oneCoin()).toFriendlyString());
                     } catch (Exception e) {
                         log.warn(e.getMessage());
                     }
@@ -548,10 +549,9 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
 
         if (currentBalance != null && exchangeRate != null && getView() != null) {
             try {
-                String fiatAmount = GenericUtils.formatFiatValue(
-                        exchangeRate.rate.coinToFiat(currentBalance));
-                localAmount.setAmount(fiatAmount);
-                localAmount.setSymbol(exchangeRate.rate.fiat.currencyCode);
+                Value fiatAmount = exchangeRate.rate.convert(type, currentBalance);
+                localAmount.setAmount(GenericUtils.formatFiatValue(fiatAmount));
+                localAmount.setSymbol(fiatAmount.type.getSymbol());
             } catch (Exception e) {
                 // Should not happen
                 localAmount.setAmount("");

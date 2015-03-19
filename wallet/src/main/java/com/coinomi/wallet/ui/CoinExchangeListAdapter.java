@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.wallet.ExchangeRatesProvider;
 import com.coinomi.wallet.ExchangeRatesProvider.ExchangeRate;
 import com.coinomi.wallet.ui.widget.CoinListItem;
 
@@ -47,7 +48,7 @@ public class CoinExchangeListAdapter extends BaseAdapter {
     public void setExchangeRates(@Nullable List<ExchangeRate> newRates) {
         if (newRates != null) {
             for (ExchangeRate rate : newRates) {
-                if (coins.contains(rate.type)) {
+                if (isRateRelative(rate)) {
                     this.rates.put(rate.currencyCodeId, rate);
                 }
             }
@@ -55,6 +56,15 @@ public class CoinExchangeListAdapter extends BaseAdapter {
             rates.clear();
         }
         notifyDataSetChanged();
+    }
+
+    private boolean isRateRelative(ExchangeRate rate) {
+        if (rate.rate.value1.type instanceof CoinType && coins.contains(rate.rate.value1.type)) {
+            return true;
+        } else if (rate.rate.value2.type instanceof CoinType && coins.contains(rate.rate.value2.type)) {
+            return true;
+        }
+        return false;
     }
 
     @Nullable

@@ -1,0 +1,236 @@
+package com.coinomi.core.coins;
+
+/**
+ * Copyright 2014 Andreas Schildbach
+ * Copyright 2015 John L. Jegutanis
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import org.bitcoinj.core.Coin;
+import org.bitcoinj.core.Monetary;
+import com.google.common.math.LongMath;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+
+import javax.annotation.Nonnull;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+/**
+ * Represents a monetary value. This class is immutable.
+ */
+public class Value implements Monetary, Comparable<Value>, Serializable {
+    /**
+     * The type of this value
+     */
+    public final ValueType type;
+    /**
+     * The number of units of this monetary value.
+     */
+    public final long value;
+
+    Value(final ValueType type, final long units) {
+        this.type = checkNotNull(type);
+        this.value = units;
+    }
+
+    public static Value valueOf(final ValueType type, final long units) {
+        return new Value(type, units);
+    }
+
+
+    public static Value valueOf(final ValueType type, final Coin coin) {
+        return new Value(type, coin.value);
+    }
+
+    @Override
+    public int smallestUnitExponent() {
+        return type.getUnitExponent();
+    }
+
+    /**
+     * Returns the number of units of this monetary value.
+     */
+    @Override
+    public long getValue() {
+        return value;
+    }
+
+    public Coin toCoin() {
+        return Coin.valueOf(value);
+    }
+
+    /**
+     * Convert an amount expressed in the way humans are used to into units.
+     */
+    public static Value valueOf(final ValueType type, final int coins, final int cents) {
+        checkArgument(cents < 100);
+        checkArgument(cents >= 0);
+        checkArgument(coins >= 0);
+        return type.oneCoin().multiply(coins).add(type.oneCoin().divide(100).multiply(cents));
+    }
+
+    /**
+     * Parses an amount expressed in the way humans are used to.<p>
+     * <p/>
+     * This takes string in a format understood by {@link BigDecimal#BigDecimal(String)},
+     * for example "0", "1", "0.10", "1.23E3", "1234.5E-5".
+     *
+     * @throws IllegalArgumentException if you try to specify fractional units, or a value out of range.
+     */
+    public static Value parseValue(final ValueType type, final String str) {
+        return Value.valueOf(type, new BigDecimal(str).movePointRight(type.getUnitExponent()).toBigIntegerExact().longValue());
+    }
+
+    public Value add(final Value value) {
+        return new Value(this.type, LongMath.checkedAdd(this.value, value.value));
+    }
+
+    public Value subtract(final Value value) {
+        return new Value(this.type, LongMath.checkedSubtract(this.value, value.value));
+    }
+
+    public Value multiply(final long factor) {
+        return new Value(this.type, LongMath.checkedMultiply(this.value, factor));
+    }
+
+    public Value divide(final long divisor) {
+        return new Value(this.type, this.value / divisor);
+    }
+
+    public Value[] divideAndRemainder(final long divisor) {
+        return new Value[] { new Value(this.type, this.value / divisor), new Value(this.type, this.value % divisor) };
+    }
+
+    public long divide(final Value divisor) {
+        return this.value / divisor.value;
+    }
+
+    /**
+     * Returns true if and only if this instance represents a monetary value greater than zero,
+     * otherwise false.
+     */
+    public boolean isPositive() {
+        return signum() == 1;
+    }
+
+    /**
+     * Returns true if and only if this instance represents a monetary value less than zero,
+     * otherwise false.
+     */
+    public boolean isNegative() {
+        return signum() == -1;
+    }
+
+    /**
+     * Returns true if and only if this instance represents zero monetary value,
+     * otherwise false.
+     */
+    public boolean isZero() {
+        return signum() == 0;
+    }
+
+    /**
+     * Returns true if the monetary value represented by this instance is greater than that
+     * of the given other Value, otherwise false.
+     */
+    public boolean isGreaterThan(Value other) {
+        return compareTo(other) > 0;
+    }
+
+    /**
+     * Returns true if the monetary value represented by this instance is less than that
+     * of the given other Value, otherwise false.
+     */
+    public boolean isLessThan(Value other) {
+        return compareTo(other) < 0;
+    }
+
+    public Value shiftLeft(final int n) {
+        return new Value(this.type, this.value << n);
+    }
+
+    public Value shiftRight(final int n) {
+        return new Value(this.type, this.value >> n);
+    }
+
+    @Override
+    public int signum() {
+        if (this.value == 0)
+            return 0;
+        return this.value < 0 ? -1 : 1;
+    }
+
+    public Value negate() {
+        return new Value(this.type, -this.value);
+    }
+
+    /**
+     * Returns the number of units of this monetary value. It's deprecated in favour of accessing {@link #value}
+     * directly.
+     */
+    public long longValue() {
+        return this.value;
+    }
+
+    /**
+     * Returns the value as a 0.12 type string. More digits after the decimal place will be used
+     * if necessary, but two will always be present.
+     */
+    public String toFriendlyString() {
+        return type.getMonetaryFormat().format(this).toString();
+    }
+
+    /**
+     * <p>
+     * Returns the value as a plain string denominated in BTC.
+     * The result is unformatted with no trailing zeroes.
+     * For instance, a value of 150000 satoshis gives an output string of "0.0015" BTC
+     * </p>
+     */
+    public String toPlainString() {
+        return type.getPlainFormat().format(this).toString();
+    }
+
+    @Override
+    public String toString() {
+        return Long.toString(value);
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (o == this)
+            return true;
+        if (o == null || o.getClass() != getClass())
+            return false;
+        final Value other = (Value) o;
+        if (this.value != other.value)
+            return false;
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) this.value;
+    }
+
+    @Override
+    public int compareTo(@Nonnull final Value other) {
+        if (this.value == other.value)
+            return 0;
+        return this.value > other.value ? 1 : -1;
+    }
+}

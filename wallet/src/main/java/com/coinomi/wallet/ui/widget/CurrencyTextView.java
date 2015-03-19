@@ -18,36 +18,32 @@ package com.coinomi.wallet.ui.widget;
  */
 
 
-import javax.annotation.Nonnull;
-
 import android.content.Context;
 import android.graphics.Paint;
-import android.text.Editable;
-import android.text.Spannable;
-import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
 import com.coinomi.core.coins.CoinType;
-import com.coinomi.core.util.GenericUtils;
+import com.coinomi.core.coins.Value;
+import com.coinomi.core.coins.ValueType;
+import com.coinomi.core.util.MonetaryFormat;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.util.MonetarySpannable;
-import com.coinomi.wallet.util.WalletUtils;
 
-import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.Monetary;
-import org.bitcoinj.utils.MonetaryFormat;
+
+import javax.annotation.Nonnull;
 
 /**
  * @author Andreas Schildbach
  * @author John L. Jegutanis
  */
 public final class CurrencyTextView extends TextView {
-    private CoinType type = null;
-    private Monetary amount = null;
+    private ValueType type = null;
+    private Value amount = null;
     private MonetaryFormat format = null;
     private boolean alwaysSigned = false;
     private RelativeSizeSpan prefixRelativeSizeSpan = null;
@@ -62,14 +58,10 @@ public final class CurrencyTextView extends TextView {
         super(context, attrs);
     }
 
-    public void setType(CoinType type) {
-        this.type = type;
-        if (format == null) format = type.getMonetaryFormat().noCode();
-        updateView();
-    }
-
-    public void setAmount(@Nonnull final Monetary amount) {
+    public void setAmount(@Nonnull final Value amount) {
         this.amount = amount;
+        this.type = amount.type;
+        if (format == null) format = type.getMonetaryFormat().noCode();
         updateView();
     }
 
@@ -120,7 +112,7 @@ public final class CurrencyTextView extends TextView {
         if (amount != null) {
 //            text = new MonetarySpannable(format, alwaysSigned, amount, type)
 //                    .applyMarkup(prefixRelativeSizeSpan, prefixColorSpan, insignificantRelativeSizeSpan);
-            text = new MonetarySpannable(format, alwaysSigned, amount, type);
+            text = new MonetarySpannable(format, alwaysSigned, amount);
         } else {
             text = null;
         }

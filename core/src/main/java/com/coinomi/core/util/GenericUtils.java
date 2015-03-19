@@ -2,6 +2,7 @@ package com.coinomi.core.util;
 
 
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.coins.Value;
 
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.Monetary;
@@ -74,11 +75,12 @@ public class GenericUtils {
 
     public static Coin parseCoin(final CoinType type, final String str)
             throws IllegalArgumentException, ArithmeticException {
-        long units = new BigDecimal(str)
-                .movePointRight(type.getUnitExponent())
-                .toBigIntegerExact()
-                .longValue();
-        return Coin.valueOf(units);
+//        long units = new BigDecimal(str)
+//                .movePointRight(type.getUnitExponent())
+//                .toBigIntegerExact()
+//                .longValue();
+//        return Coin.valueOf(units);
+        return Value.parseValue(type, str).toCoin();
     }
 
     public static String formatCoinValue(@Nonnull final CoinType type, @Nonnull final Coin value) {
@@ -175,11 +177,11 @@ public class GenericUtils {
         return units / centAmount != 0 && satoshis % (units / centAmount) == 0;
     }
 
-    public static String formatFiatValue(final Fiat value, final int precision, final int shift) {
-        return formatValue(value.smallestUnitExponent(), value, "", "-", precision, shift, false);
+    public static String formatFiatValue(final Value fiat, final int precision, final int shift) {
+        return formatValue(fiat.smallestUnitExponent(), fiat, "", "-", precision, shift, false);
     }
 
-    public static String formatFiatValue(Fiat fiat) {
+    public static String formatFiatValue(Value fiat) {
         return formatFiatValue(fiat, 2, 0);
     }
 }

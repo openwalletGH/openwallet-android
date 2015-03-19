@@ -14,6 +14,7 @@ import com.coinomi.core.coins.DigitalcoinMain;
 import com.coinomi.core.coins.DogecoinMain;
 import com.coinomi.core.coins.DogecoinTest;
 import com.coinomi.core.coins.FeathercoinMain;
+import com.coinomi.core.coins.FiatType;
 import com.coinomi.core.coins.LitecoinMain;
 import com.coinomi.core.coins.LitecoinTest;
 import com.coinomi.core.coins.NuBitsMain;
@@ -23,11 +24,10 @@ import com.coinomi.core.coins.ReddcoinMain;
 import com.coinomi.core.coins.RubycoinMain;
 import com.coinomi.core.coins.UroMain;
 import com.coinomi.core.network.CoinAddress;
+import com.coinomi.core.util.MonetaryFormat;
 import com.coinomi.stratumj.ServerAddress;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-
-import org.bitcoinj.utils.MonetaryFormat;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -71,8 +71,6 @@ public class Constants {
 
     /** Default currency to use if all default mechanisms fail. */
     public static final String DEFAULT_EXCHANGE_CURRENCY = "USD";
-    public static final MonetaryFormat LOCAL_CURRENCY_FORMAT =
-            new MonetaryFormat().noCode().minDecimals(2).optionalDecimals(2).postfixCode();
 
     public static final Charset UTF_8 = Charset.forName("UTF-8");
     public static final Charset US_ASCII = Charset.forName("US-ASCII");

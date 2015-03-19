@@ -3,11 +3,8 @@ package com.coinomi.wallet.ui;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.ContentObserver;
@@ -20,11 +17,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -36,6 +30,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.coins.FiatType;
 import com.coinomi.core.uri.CoinURI;
 import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.WalletPocketHD;
@@ -109,7 +104,7 @@ public class AddressRequestFragment extends Fragment {
                     ref.updateView();
                     break;
                 case UPDATE_EXCHANGE_RATE:
-                    ref.amountCalculatorLink.setExchangeRate((org.bitcoinj.utils.ExchangeRate) msg.obj);
+                    ref.amountCalculatorLink.setExchangeRate((com.coinomi.core.util.ExchangeRate) msg.obj);
             }
         }
     }
@@ -194,13 +189,13 @@ public class AddressRequestFragment extends Fragment {
         qrView = (ImageView) view.findViewById(R.id.qr_code);
 
         AmountEditView sendCoinAmountView = (AmountEditView) view.findViewById(R.id.send_coin_amount);
-        sendCoinAmountView.setCoinType(type);
+        sendCoinAmountView.setType(type);
         sendCoinAmountView.setFormat(type.getMonetaryFormat());
 
         AmountEditView sendLocalAmountView = (AmountEditView) view.findViewById(R.id.send_local_amount);
-        sendLocalAmountView.setFormat(Constants.LOCAL_CURRENCY_FORMAT);
+        sendLocalAmountView.setFormat(FiatType.FRIENDLY_FORMAT);
 
-        amountCalculatorLink = new CurrencyCalculatorLink(sendCoinAmountView, sendLocalAmountView);
+        amountCalculatorLink = new CurrencyCalculatorLink(type, sendCoinAmountView, sendLocalAmountView);
 
         previousAddressesLink = view.findViewById(R.id.view_previous_addresses);
         previousAddressesLink.setOnClickListener(new View.OnClickListener() {
@@ -449,7 +444,7 @@ public class AddressRequestFragment extends Fragment {
         }
 
         void checkAndUpdateAmount() {
-            Coin amountParsed = amountCalculatorLink.getAmount();
+            Coin amountParsed = amountCalculatorLink.getPrimaryAmountCoin();
             if (isValid(amountParsed)) {
                 amount = amountParsed;
             } else {

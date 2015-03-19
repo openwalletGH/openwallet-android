@@ -30,6 +30,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.coins.FiatType;
 import com.coinomi.core.uri.CoinURI;
 import com.coinomi.core.uri.CoinURIParseException;
 import com.coinomi.core.util.GenericUtils;
@@ -109,7 +110,7 @@ public class SendFragment extends Fragment {
         protected void weakHandleMessage(SendFragment ref, Message msg) {
             switch (msg.what) {
                 case UPDATE_EXCHANGE_RATE:
-                    ref.onExchangeRateUpdate((org.bitcoinj.utils.ExchangeRate) msg.obj);
+                    ref.onExchangeRateUpdate((com.coinomi.core.util.ExchangeRate) msg.obj);
                     break;
                 case UPDATE_WALLET_CHANGE:
                     ref.onWalletUpdate();
@@ -184,13 +185,13 @@ public class SendFragment extends Fragment {
         sendToAddressView.addTextChangedListener(receivingAddressListener);
 
         AmountEditView sendCoinAmountView = (AmountEditView) view.findViewById(R.id.send_coin_amount);
-        sendCoinAmountView.setCoinType(type);
+        sendCoinAmountView.setType(type);
         sendCoinAmountView.setFormat(type.getMonetaryFormat());
 
         AmountEditView sendLocalAmountView = (AmountEditView) view.findViewById(R.id.send_local_amount);
-        sendLocalAmountView.setFormat(Constants.LOCAL_CURRENCY_FORMAT);
+        sendLocalAmountView.setFormat(FiatType.FRIENDLY_FORMAT);
 
-        amountCalculatorLink = new CurrencyCalculatorLink(sendCoinAmountView, sendLocalAmountView);
+        amountCalculatorLink = new CurrencyCalculatorLink(type, sendCoinAmountView, sendLocalAmountView);
         amountCalculatorLink.setExchangeDirection(config.getLastExchangeDirection());
 
         addressError = (TextView) view.findViewById(R.id.address_error_message);
@@ -297,7 +298,7 @@ public class SendFragment extends Fragment {
 
     private void reset() {
         sendToAddressView.setText(null);
-        amountCalculatorLink.setCoinAmount(null);
+        amountCalculatorLink.setPrimaryAmount(null);
         address = null;
         sendAmount = null;
         state = State.INPUT;
@@ -365,7 +366,7 @@ public class SendFragment extends Fragment {
             @Override
             public void run() {
                 sendToAddressView.setText(address.toString());
-                if (amount != null) amountCalculatorLink.setCoinAmount(amount);
+                if (amount != null) amountCalculatorLink.setPrimaryAmount(type, amount);
                 validateEverything();
                 requestFocusFirst();
             }
@@ -428,7 +429,7 @@ public class SendFragment extends Fragment {
     }
 
     private void validateAmount(boolean isTyping) {
-        Coin amountParsed = amountCalculatorLink.getAmount();
+        Coin amountParsed = amountCalculatorLink.getPrimaryAmountCoin();
 
         if (isAmountValid(amountParsed)) {
             sendAmount = amountParsed;
@@ -526,7 +527,7 @@ public class SendFragment extends Fragment {
             Toast.makeText(getActivity(), R.string.amount_error_not_enough_money,
                     Toast.LENGTH_LONG).show();
         } else {
-            amountCalculatorLink.setCoinAmount(lastBalance);
+            amountCalculatorLink.setPrimaryAmount(type, lastBalance);
             validateAmount();
         }
     }
@@ -631,7 +632,7 @@ public class SendFragment extends Fragment {
         public void onLoaderReset(final Loader<Cursor> loader) { }
     };
 
-    private void onExchangeRateUpdate(org.bitcoinj.utils.ExchangeRate rate) {
+    private void onExchangeRateUpdate(com.coinomi.core.util.ExchangeRate rate) {
         if (state == State.INPUT) {
             amountCalculatorLink.setExchangeRate(rate);
         }

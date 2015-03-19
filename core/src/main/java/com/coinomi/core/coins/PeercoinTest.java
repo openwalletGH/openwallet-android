@@ -15,7 +15,7 @@ public class PeercoinTest extends CoinType {
         spendableCoinbaseDepth = 500;
 
         name = "Peercoin Test";
-        symbol = "PPC";
+        symbol = "PPCTEST";
         uriScheme = "peercoin"; // TODO verify, could be ppcoin?
         bip44Index = 1;
         unitExponent = 6;

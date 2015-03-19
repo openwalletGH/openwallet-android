@@ -24,6 +24,7 @@ import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.LitecoinMain;
 import com.coinomi.core.uri.CoinURI;
 import com.coinomi.core.uri.CoinURIParseException;
+import com.coinomi.core.util.ExchangeRate;
 import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.wallet.WalletPocketHD;
 import com.coinomi.core.wallet.exceptions.NoSuchPocketException;
@@ -39,7 +40,6 @@ import org.bitcoinj.core.Address;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.InsufficientMoneyException;
 import org.bitcoinj.crypto.KeyCrypterException;
-import org.bitcoinj.utils.ExchangeRate;
 import org.bitcoinj.utils.Fiat;
 import org.bitcoinj.utils.Threading;
 import org.slf4j.Logger;
@@ -148,18 +148,17 @@ public class TradeSelectFragment extends Fragment {
         toCoinSpinner.setAdapter(new AvailableAccountsAdaptor(activity, Constants.SUPPORTED_COINS));
 
         AmountEditView tradeCoinAmountView = (AmountEditView) view.findViewById(R.id.trade_coin_amount);
-        tradeCoinAmountView.setCoinType(fromCoinType);
+        tradeCoinAmountView.setType(fromCoinType);
         tradeCoinAmountView.setFormat(fromCoinType.getMonetaryFormat());
 
         AmountEditView receiveCoinAmountView = (AmountEditView) view.findViewById(R.id.receive_coin_amount);
-        receiveCoinAmountView.setCoinType(toCoinType);
-        // TODO use CoinType instead local currency
-//        receiveCoinAmountView.setFormat(toCoinType.getMonetaryFormat());
-        receiveCoinAmountView.setFormat(Constants.LOCAL_CURRENCY_FORMAT);
+        receiveCoinAmountView.setType(toCoinType);
+        receiveCoinAmountView.setFormat(toCoinType.getMonetaryFormat());
 
-        amountCalculatorLink = new CurrencyCalculatorLink(tradeCoinAmountView, receiveCoinAmountView);
+        amountCalculatorLink = new CurrencyCalculatorLink(fromCoinType, tradeCoinAmountView, receiveCoinAmountView);
         // TODO get rate from shapeshift and don't use Fiat
-        amountCalculatorLink.setExchangeRate(new ExchangeRate(Fiat.parseFiat(toCoinType.getSymbol(), "142.9856")));
+        ExchangeRate rate = new ExchangeRate(BitcoinMain.get().oneCoin(), LitecoinMain.get().oneCoin().multiply(140));
+        amountCalculatorLink.setExchangeRate(rate);
 //        amountCalculatorLink.setExchangeDirection(config.getLastExchangeDirection());
 
         receiveCoinWarning = (TextView) view.findViewById(R.id.warn_no_account_found);
@@ -264,7 +263,7 @@ public class TradeSelectFragment extends Fragment {
 
     private void reset() {
 //        sendToAddressView.setText(null);
-        amountCalculatorLink.setCoinAmount(null);
+        amountCalculatorLink.setPrimaryAmount(null);
         tradeAmount = null;
         receiveAmount = null;
 //        state = State.INPUT;
@@ -333,7 +332,7 @@ public class TradeSelectFragment extends Fragment {
 //            @Override
 //            public void run() {
 //                sendToAddressView.setText(address.toString());
-//                if (amount != null) amountCalculatorLink.setCoinAmount(amount);
+//                if (amount != null) amountCalculatorLink.setPrimaryAmount(amount);
 //                validateEverything();
 //                requestFocusFirst();
 //            }
@@ -401,7 +400,7 @@ public class TradeSelectFragment extends Fragment {
 
     private void validateAmount(boolean isTyping) {
         // TODO
-//        Coin amountParsed = amountCalculatorLink.getAmount();
+//        Coin amountParsed = amountCalculatorLink.getPrimaryAmount();
 //
 //        if (isAmountValid(amountParsed)) {
 //            sendAmount = amountParsed;
@@ -501,7 +500,7 @@ public class TradeSelectFragment extends Fragment {
             Toast.makeText(getActivity(), R.string.amount_error_not_enough_money,
                     Toast.LENGTH_LONG).show();
         } else {
-            amountCalculatorLink.setCoinAmount(lastBalance);
+            amountCalculatorLink.setPrimaryAmount(fromCoinType, lastBalance);
             validateAmount();
         }
     }

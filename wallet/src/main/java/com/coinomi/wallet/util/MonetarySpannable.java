@@ -18,55 +18,49 @@ package com.coinomi.wallet.util;
  */
 
 
-import static com.google.common.base.Preconditions.checkArgument;
-
-import java.util.regex.Matcher;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import org.bitcoinj.core.Monetary;
-import org.bitcoinj.utils.MonetaryFormat;
-
 import android.graphics.Typeface;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 
-import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.util.MonetaryFormat;
 import com.coinomi.wallet.Constants;
+
+import org.bitcoinj.core.Monetary;
+
+import java.util.regex.Matcher;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * @author Andreas Schildbach
  */
 public final class MonetarySpannable extends SpannableString {
-    public MonetarySpannable(final MonetaryFormat format, final boolean signed,
-                             @Nullable final Monetary monetary, @Nullable CoinType type) {
-        super(format(format, signed, monetary, type));
+    public MonetarySpannable(final MonetaryFormat format, final boolean signed, @Nullable final Monetary value) {
+        super(format(format, signed, value));
     }
 
-    public MonetarySpannable(final MonetaryFormat format, final boolean signed, @Nullable final Monetary monetary) {
-        super(format(format, signed, monetary, null));
-    }
-
-    public MonetarySpannable(final MonetaryFormat format, @Nullable final Monetary monetary) {
-        super(format(format, false, monetary, null));
+    public MonetarySpannable(final MonetaryFormat format, @Nullable final Monetary value) {
+        super(format(format, false, value));
     }
 
     private static CharSequence format(final MonetaryFormat format, final boolean signed,
-                                       final Monetary monetary, CoinType type) {
-        if (monetary == null)
+                                       final Monetary value) {
+        if (value == null)
             return "";
 
-        checkArgument(monetary.signum() >= 0 || signed);
+        checkArgument(value.signum() >= 0 || signed);
 
-        int smallestUnitExponent = type != null ? type.getUnitExponent() : monetary.smallestUnitExponent();
+        int smallestUnitExponent = value.smallestUnitExponent();
 
         if (signed)
-            return format.negativeSign(Constants.CURRENCY_MINUS_SIGN).positiveSign(Constants.CURRENCY_PLUS_SIGN).format(monetary, smallestUnitExponent);
+            return format.negativeSign(Constants.CURRENCY_MINUS_SIGN).positiveSign(Constants.CURRENCY_PLUS_SIGN).format(value, smallestUnitExponent);
         else
-            return format.format(monetary, smallestUnitExponent);
+            return format.format(value, smallestUnitExponent);
     }
 
     public MonetarySpannable applyMarkup(@Nullable final Object prefixSpan1, @Nullable final Object prefixSpan2,

@@ -21,20 +21,25 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.bitcoinj.core.Coin;
-import org.bitcoinj.utils.ExchangeRate;
-import org.bitcoinj.utils.Fiat;
-
 import android.view.View;
 
+import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.coins.FiatValue;
+import com.coinomi.core.coins.Value;
+import com.coinomi.core.coins.ValueType;
+import com.coinomi.core.util.ExchangeRate;
 import com.coinomi.wallet.ui.widget.AmountEditView;
 import com.coinomi.wallet.ui.widget.AmountEditView.Listener;
+
+import org.bitcoinj.core.Coin;
 
 
 /**
  * @author Andreas Schildbach
+ * @author John L. Jegutanis
  */
 public final class CurrencyCalculatorLink {
+    private final ValueType primaryType;
     private final AmountEditView coinAmountView;
     private final AmountEditView localAmountView;
 
@@ -81,7 +86,10 @@ public final class CurrencyCalculatorLink {
         }
     };
 
-    public CurrencyCalculatorLink(@Nonnull final AmountEditView coinAmountView, @Nonnull final AmountEditView localAmountView) {
+    public CurrencyCalculatorLink(ValueType primaryType,
+                                  @Nonnull final AmountEditView coinAmountView,
+                                  @Nonnull final AmountEditView localAmountView) {
+        this.primaryType = primaryType;
         this.coinAmountView = coinAmountView;
         this.coinAmountView.setListener(coinAmountViewListener);
 
@@ -108,13 +116,19 @@ public final class CurrencyCalculatorLink {
     }
 
     @CheckForNull
-    public Coin getAmount() {
+    public Coin getPrimaryAmountCoin() {
+        Value value = getPrimaryAmount();
+    return value != null ? value.toCoin() : null;
+    }
+
+    @CheckForNull
+    public Value getPrimaryAmount() {
         if (exchangeDirection) {
-            return (Coin) coinAmountView.getAmount();
+            return coinAmountView.getAmount();
         } else if (exchangeRate != null) {
-            final Fiat localAmount = (Fiat) localAmountView.getAmount();
+            final Value localAmount = localAmountView.getAmount();
             try {
-                return localAmount != null ? exchangeRate.fiatToCoin(localAmount) : null;
+                return localAmount != null ? exchangeRate.convert(localAmount) : null;
             } catch (ArithmeticException x) {
                 return null;
             }
@@ -124,7 +138,7 @@ public final class CurrencyCalculatorLink {
     }
 
     public boolean hasAmount() {
-        return getAmount() != null;
+        return getPrimaryAmount() != null;
     }
 
     private void update() {
@@ -132,23 +146,23 @@ public final class CurrencyCalculatorLink {
 
         if (exchangeRate != null) {
             localAmountView.setEnabled(enabled);
-            localAmountView.setLocalCurrency(exchangeRate.fiat.currencyCode);
+            localAmountView.setType(exchangeRate.getOtherType(primaryType));
             localAmountView.setVisibility(View.VISIBLE);
 
             if (exchangeDirection) {
-                final Coin coinAmount = (Coin) coinAmountView.getAmount();
+                final Value coinAmount = coinAmountView.getAmount();
                 if (coinAmount != null) {
                     localAmountView.setAmount(null, false);
-                    localAmountView.setHint(exchangeRate.coinToFiat(coinAmount));
+                    localAmountView.setHint(exchangeRate.convert(coinAmount));
                     coinAmountView.setHint(null);
                 }
             } else {
-                final Fiat localAmount = (Fiat) localAmountView.getAmount();
+                final Value localAmount = localAmountView.getAmount();
                 if (localAmount != null) {
                     localAmountView.setHint(null);
                     coinAmountView.setAmount(null, false);
                     try {
-                        coinAmountView.setHint(exchangeRate.fiatToCoin(localAmount));
+                        coinAmountView.setHint(exchangeRate.convert(localAmount));
                     } catch (final ArithmeticException x) {
                         coinAmountView.setHint(null);
                     }
@@ -183,13 +197,17 @@ public final class CurrencyCalculatorLink {
         activeTextView().requestFocus();
     }
 
-    public void setCoinAmount(@Nullable final Coin amount) {
+    public void setPrimaryAmount(@Nullable final Value amount) {
         final Listener listener = this.listener;
         this.listener = null;
 
         coinAmountView.setAmount(amount, true);
 
         this.listener = listener;
+    }
+
+    public void setPrimaryAmount(CoinType type, Coin amount) {
+        setPrimaryAmount(Value.valueOf(type, amount));
     }
 
     public boolean isEmpty() {

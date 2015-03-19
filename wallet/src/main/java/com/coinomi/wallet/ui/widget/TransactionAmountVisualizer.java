@@ -7,6 +7,8 @@ import android.view.View;
 import android.widget.LinearLayout;
 
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.coins.Value;
+import com.coinomi.core.util.ExchangeRate;
 import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.WalletPocketHD;
 import com.coinomi.wallet.AddressBookProvider;
@@ -15,7 +17,6 @@ import com.coinomi.wallet.R;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.TransactionOutput;
-import org.bitcoinj.utils.ExchangeRate;
 
 import static com.coinomi.core.Preconditions.checkState;
 
@@ -87,17 +88,15 @@ public class TransactionAmountVisualizer extends LinearLayout {
 
     public void setExchangeRate(ExchangeRate rate) {
         if (outputAmount != null) {
-            String fiatAmount = GenericUtils.formatFiatValue(
-                    rate.coinToFiat(outputAmount));
-            output.setAmountLocal(fiatAmount);
-            output.setSymbolLocal(rate.fiat.currencyCode);
+            Value fiatAmount = rate.convert(type, outputAmount);
+            output.setAmountLocal(GenericUtils.formatFiatValue(fiatAmount));
+            output.setSymbolLocal(fiatAmount.type.getSymbol());
         }
 
         if (isSending && feeAmount != null) {
-            String fiatAmount = GenericUtils.formatFiatValue(
-                    rate.coinToFiat(feeAmount));
-            fee.setAmountLocal(fiatAmount);
-            fee.setSymbolLocal(rate.fiat.currencyCode);
+            Value fiatAmount = rate.convert(type, feeAmount);
+            fee.setAmountLocal(GenericUtils.formatFiatValue(fiatAmount));
+            fee.setSymbolLocal(fiatAmount.type.getSymbol());
         }
     }
 

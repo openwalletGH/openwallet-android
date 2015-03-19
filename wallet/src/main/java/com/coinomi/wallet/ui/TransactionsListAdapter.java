@@ -37,6 +37,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.coins.Value;
 import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.WalletPocketHD;
 import com.coinomi.wallet.AddressBookProvider;
@@ -326,8 +327,7 @@ public class TransactionsListAdapter extends BaseAdapter {
 
         // value
         rowValue.setAlwaysSigned(true);
-        rowValue.setType(type);
-        rowValue.setAmount(value);
+        rowValue.setAmount(Value.valueOf(type, value));
     }
 
     private String resolveLabel(@Nonnull final String address) {

@@ -11,13 +11,13 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.coins.Value;
+import com.coinomi.core.coins.ValueType;
+import com.coinomi.core.util.MonetaryFormat;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.util.MonetarySpannable;
 
 import org.bitcoinj.core.Coin;
-import org.bitcoinj.core.Monetary;
-import org.bitcoinj.utils.MonetaryFormat;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -31,11 +31,10 @@ public class AmountEditView extends RelativeLayout {
     private final TextView symbol;
     private final EditText textView;
     private Listener listener;
-    private String localCurrencyCode = null;
-    private CoinType type;
+    @Nullable private ValueType type;
     private MonetaryFormat inputFormat;
     private boolean amountSigned = false;
-    private Monetary hint;
+    private Value hint;
     private MonetaryFormat hintFormat = new MonetaryFormat().noCode();
 
     public static interface Listener {
@@ -62,15 +61,8 @@ public class AmountEditView extends RelativeLayout {
         updateAppearance();
     }
 
-    public void setLocalCurrency(final String currencyCode) {
-        this.type = null;
-        localCurrencyCode = currencyCode;
-        updateAppearance();
-    }
-
-    public void setCoinType(final CoinType type) {
+    public void setType(@Nullable final ValueType type) {
         this.type = type;
-        localCurrencyCode = null;
         updateAppearance();
     }
 
@@ -78,7 +70,7 @@ public class AmountEditView extends RelativeLayout {
         this.listener = listener;
     }
 
-    public void setHint(@Nullable final Monetary hint) {
+    public void setHint(@Nullable final Value hint) {
         this.hint = hint;
         updateAppearance();
     }
@@ -88,16 +80,14 @@ public class AmountEditView extends RelativeLayout {
     }
 
     @CheckForNull
-    public Monetary getAmount() {
+    public Value getAmount() {
         final String str = textView.getText().toString().trim();
-        Monetary amount = null;
+        Value amount = null;
 
         try {
             if (!str.isEmpty()) {
                 if (type != null) {
-                    amount = inputFormat.parse(str, type.getUnitExponent());
-                } else if (localCurrencyCode != null) {
-                    amount = inputFormat.parseFiat(localCurrencyCode, str);
+                    amount = inputFormat.parse(type, str);
                 }
             }
         } catch (final Exception x) { /* ignored */ }
@@ -105,11 +95,11 @@ public class AmountEditView extends RelativeLayout {
         return amount;
     }
 
-    public void setAmount(@Nullable final Monetary amount, final boolean fireListener) {
+    public void setAmount(@Nullable final Value value, final boolean fireListener) {
         if (!fireListener) textViewListener.setFire(false);
 
-        if (amount != null) {
-            textView.setText(new MonetarySpannable(inputFormat, amountSigned, amount, type));
+        if (value != null) {
+            textView.setText(new MonetarySpannable(inputFormat, amountSigned, value));
         } else {
             textView.setText(null);
         }
@@ -129,16 +119,13 @@ public class AmountEditView extends RelativeLayout {
         if (type != null) {
             symbol.setText(type.getSymbol());
             symbol.setVisibility(VISIBLE);
-        } else if (localCurrencyCode != null) {
-            symbol.setText(localCurrencyCode);
-            symbol.setVisibility(VISIBLE);
         } else {
             symbol.setText(null);
             symbol.setVisibility(GONE);
         }
 
         final Spannable hintSpannable = new MonetarySpannable(hintFormat, amountSigned,
-                hint != null ? hint : Coin.ZERO, type);
+                hint != null ? hint : Coin.ZERO);
         textView.setHint(hintSpannable);
     }
 
@@ -174,7 +161,7 @@ public class AmountEditView extends RelativeLayout {
         @Override
         public void onFocusChange(final View v, final boolean hasFocus) {
             if (!hasFocus) {
-                final Monetary amount = getAmount();
+                final Value amount = getAmount();
                 if (amount != null)
                     setAmount(amount, false);
             }

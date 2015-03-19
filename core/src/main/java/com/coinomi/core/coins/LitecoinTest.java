@@ -15,7 +15,7 @@ public class LitecoinTest extends CoinType {
         spendableCoinbaseDepth = 100;
 
         name = "Litecoin Test";
-        symbol = "LTC";
+        symbol = "LTCTEST";
         uriScheme = "litecoin";
         bip44Index = 1;
         unitExponent = 8;

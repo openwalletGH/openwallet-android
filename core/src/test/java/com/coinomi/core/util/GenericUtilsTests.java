@@ -18,6 +18,9 @@ public class GenericUtilsTests {
 
     @Test
     public void parseCoin() {
+        assertEquals(Coin.valueOf(13370000), GenericUtils.parseCoin(BitcoinMain.get(), "0.1337"));
+        assertEquals(Coin.valueOf(13370000), GenericUtils.parseCoin(BitcoinMain.get(), ".1337"));
+
         // Bitcoin family
         assertEquals(Coin.valueOf(133700000), GenericUtils.parseCoin(BitcoinMain.get(), "1.337"));
         assertEquals(Coin.valueOf(133700), GenericUtils.parseCoin(BitcoinMain.get(), "0.001337"));

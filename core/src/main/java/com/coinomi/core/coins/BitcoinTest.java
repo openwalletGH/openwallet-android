@@ -16,7 +16,7 @@ public class BitcoinTest extends CoinType {
         dumpedPrivateKeyHeader = 239;
 
         name = "Bitcoin Test";
-        symbol = "BTC";
+        symbol = "BTCTEST";
         uriScheme = "bitcoin";
         bip44Index = 1;
         unitExponent = 8;
