@@ -228,7 +228,7 @@
     <string name="pref_title_restore_wallet">Restore wallet</string>
     <string name="pref_title_exchange_rates">Exchange rates</string>
     <string name="pref_title_manual_receiving_addresses">Manual receiving addresses</string>
-    <string name="pref_summary_manual_receiving_addresses">Reuse a manually-set receiving address instead of obtaining a new one automatically for every transaction.</string>
+    <string name="pref_summary_manual_receiving_addresses">Do not automatically create a new address for every transaction</string>
 
     <!-- Show Seed -->
     <string name="title_activity_show_seed">Show recovery phrase</string>
