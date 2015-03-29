@@ -21,9 +21,9 @@ public class ReddcoinMain extends CoinType {
         uriScheme = "reddcoin";
         bip44Index = 4;
         unitExponent = 8;
-        feePerKb = Coin.valueOf(100000);
-        minNonDust = Coin.valueOf(1000000);   // 0.01 RDD mininput
-        softDustLimit = Coin.valueOf(100000000); // 1 RDD
+        feePerKb = value(100000);
+        minNonDust = value(1000000);   // 0.01 RDD mininput
+        softDustLimit = value(100000000); // 1 RDD
         softDustPolicy = SoftDustPolicy.BASE_FEE_FOR_EACH_SOFT_DUST_TXO;
     }
 

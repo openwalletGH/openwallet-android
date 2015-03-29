@@ -31,6 +31,7 @@ import android.widget.Toast;
 
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.FiatType;
+import com.coinomi.core.coins.Value;
 import com.coinomi.core.uri.CoinURI;
 import com.coinomi.core.uri.CoinURIParseException;
 import com.coinomi.core.util.GenericUtils;
@@ -168,7 +169,7 @@ public class SendFragment extends Fragment {
 
     private void updateBalance() {
         if (pocket != null) {
-            lastBalance = pocket.getBalance(false);
+            lastBalance = pocket.getBalance(false).toCoin();
         }
     }
 
@@ -191,7 +192,7 @@ public class SendFragment extends Fragment {
         AmountEditView sendLocalAmountView = (AmountEditView) view.findViewById(R.id.send_local_amount);
         sendLocalAmountView.setFormat(FiatType.FRIENDLY_FORMAT);
 
-        amountCalculatorLink = new CurrencyCalculatorLink(type, sendCoinAmountView, sendLocalAmountView);
+        amountCalculatorLink = new CurrencyCalculatorLink(sendCoinAmountView, sendLocalAmountView);
         amountCalculatorLink.setExchangeDirection(config.getLastExchangeDirection());
 
         addressError = (TextView) view.findViewById(R.id.address_error_message);
@@ -288,8 +289,8 @@ public class SendFragment extends Fragment {
                 throw new NoSuchPocketException("No pocket found for " + type.getName());
             }
             intent.putExtra(Constants.ARG_ACCOUNT_ID, pocket.getId());
-            intent.putExtra(Constants.ARG_SEND_TO_ADDRESS, toAddress.toString());
-            intent.putExtra(Constants.ARG_SEND_AMOUNT, amount.getValue());
+            intent.putExtra(Constants.ARG_SEND_TO_ADDRESS, toAddress);
+            intent.putExtra(Constants.ARG_SEND_VALUE, Value.valueOf(type, amount));
             startActivityForResult(intent, SIGN_TRANSACTION);
         } catch (NoSuchPocketException e) {
             Toast.makeText(getActivity(), R.string.no_such_pocket_error, Toast.LENGTH_LONG).show();
@@ -335,7 +336,7 @@ public class SendFragment extends Fragment {
                     Toast.makeText(getActivity(), R.string.sending_msg, Toast.LENGTH_SHORT).show();
                 } else {
                     if (error instanceof InsufficientMoneyException) {
-                        Toast.makeText(getActivity(), R.string.amount_error_not_enough_money, Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(), R.string.amount_error_not_enough_money_plain, Toast.LENGTH_LONG).show();
                     } else if (error instanceof NoSuchPocketException) {
                         Toast.makeText(getActivity(), R.string.no_such_pocket_error, Toast.LENGTH_LONG).show();
                     } else if (error instanceof KeyCrypterException) {
@@ -456,7 +457,10 @@ public class SendFragment extends Fragment {
                             minAmount, type.getSymbol());
                     amountError.setText(message);
                 } else if (lastBalance != null && amountParsed.compareTo(lastBalance) > 0) {
-                    amountError.setText(R.string.amount_error_not_enough_money);
+                    String balance = GenericUtils.formatCoinValue(type, lastBalance);
+                    String message = getResources().getString(R.string.amount_error_not_enough_money,
+                            balance, type.getSymbol());
+                    amountError.setText(message);
                 } else { // Should not happen, but show a generic error
                     amountError.setText(R.string.amount_error);
                 }
@@ -469,8 +473,7 @@ public class SendFragment extends Fragment {
     }
 
     /**
-     * Show errors if the user is not typing and the input is not empty and the amount is zero.
-     * Exception is when the amount is lower than the available balance
+     * Decide if should show errors in the UI.
      */
     private boolean shouldShowErrors(boolean isTyping, Coin amountParsed) {
         if (amountParsed != null && lastBalance != null && amountParsed.compareTo(lastBalance) >= 0)
@@ -524,7 +527,10 @@ public class SendFragment extends Fragment {
         if (state != State.INPUT || pocket == null || lastBalance == null) return;
 
         if (lastBalance.isZero()) {
-            Toast.makeText(getActivity(), R.string.amount_error_not_enough_money,
+            String balance = GenericUtils.formatCoinValue(type, lastBalance);
+            String message = getResources().getString(R.string.amount_error_not_enough_money,
+                    balance, type.getSymbol());
+            Toast.makeText(getActivity(), balance,
                     Toast.LENGTH_LONG).show();
         } else {
             amountCalculatorLink.setPrimaryAmount(type, lastBalance);

@@ -40,7 +40,6 @@ import org.bitcoinj.script.Script;
 
 import java.util.ArrayList;
 import java.util.Currency;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -56,7 +55,6 @@ import static com.coinomi.core.Preconditions.checkState;
  * @author Andreas Schildbach
  */
 public class WalletUtils {
-
     public static String getDescriptionOrCoinName(WalletAccount account) {
         return account.getDescription() != null ? account.getDescription() : account.getCoinType().getName();
     }

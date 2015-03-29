@@ -204,8 +204,6 @@ public class ShowSeedFragment extends Fragment {
             return null;
         }
 
-
-
         protected void onPostExecute(Void aVoid) {
             decryptSeedTask = null;
             password = null;

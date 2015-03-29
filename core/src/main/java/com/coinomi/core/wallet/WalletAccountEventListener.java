@@ -1,13 +1,15 @@
 package com.coinomi.core.wallet;
 
-import org.bitcoinj.core.*;
+import com.coinomi.core.coins.Value;
+
+import org.bitcoinj.core.Transaction;
 
 /**
  * @author John L. Jegutanis
  */
-public interface WalletPocketEventListener {
+public interface WalletAccountEventListener {
 
-    void onNewBalance(Coin newBalance, Coin pendingAmount);
+    void onNewBalance(Value newBalance, Value pendingAmount);
 
     void onNewBlock(WalletAccount pocket);
 

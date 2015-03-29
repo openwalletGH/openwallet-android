@@ -7,17 +7,19 @@ import android.os.Handler;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 
+import org.bitcoinj.core.Address;
+
 import javax.annotation.Nullable;
 
 public class SignTransactionActivity extends AbstractWalletFragmentActivity
-        implements SignTransactionFragment.Listener {
+        implements MakeTransactionFragment.Listener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_transaction);
 
         getSupportFragmentManager().beginTransaction()
-                .add(R.id.container, SignTransactionFragment.newInstance(getIntent().getExtras()))
+                .add(R.id.container, MakeTransactionFragment.newInstance(getIntent().getExtras()))
                 .commit();
     }
 
@@ -37,4 +39,7 @@ public class SignTransactionActivity extends AbstractWalletFragmentActivity
             }
         });
     }
+
+    @Override
+    public void onTradeDeposit(Address deposit) { }
 }

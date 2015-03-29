@@ -28,6 +28,7 @@ import javax.annotation.Nonnull;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Represents a monetary value. This class is immutable.
@@ -84,22 +85,40 @@ public class Value implements Monetary, Comparable<Value>, Serializable {
     }
 
     /**
-     * Parses an amount expressed in the way humans are used to.<p>
-     * <p/>
+     * Parses an amount expressed in the way humans are used to.
+     *
      * This takes string in a format understood by {@link BigDecimal#BigDecimal(String)},
      * for example "0", "1", "0.10", "1.23E3", "1234.5E-5".
      *
-     * @throws IllegalArgumentException if you try to specify fractional units, or a value out of range.
+     * @throws IllegalArgumentException if you try to specify fractional units, or a value out of
+     * range.
      */
-    public static Value parseValue(final ValueType type, final String str) {
-        return Value.valueOf(type, new BigDecimal(str).movePointRight(type.getUnitExponent()).toBigIntegerExact().longValue());
+    public static Value parse(final ValueType type, final String str) {
+        return parse(type, new BigDecimal(str));
+    }
+
+    /**
+     * Parses a {@link BigDecimal} amount expressed in the way humans are used to.
+     *
+     * @throws IllegalArgumentException if you try to specify fractional units, or a value out of
+     * range.
+     */
+    public static Value parse(final ValueType type, final BigDecimal decimal) {
+        return Value.valueOf(type, decimal.movePointRight(type.getUnitExponent())
+                .toBigIntegerExact().longValue());
     }
 
     public Value add(final Value value) {
+        checkArgument(type.equals(value.type), "Cannot add a different type");
+        return new Value(this.type, LongMath.checkedAdd(this.value, value.value));
+    }
+
+    public Value add(final Coin value) {
         return new Value(this.type, LongMath.checkedAdd(this.value, value.value));
     }
 
     public Value subtract(final Value value) {
+        checkArgument(type.equals(value.type), "Cannot subtract a different type");
         return new Value(this.type, LongMath.checkedSubtract(this.value, value.value));
     }
 
@@ -112,10 +131,12 @@ public class Value implements Monetary, Comparable<Value>, Serializable {
     }
 
     public Value[] divideAndRemainder(final long divisor) {
-        return new Value[] { new Value(this.type, this.value / divisor), new Value(this.type, this.value % divisor) };
+        return new Value[] { new Value(this.type, this.value / divisor),
+                             new Value(this.type, this.value % divisor) };
     }
 
     public long divide(final Value divisor) {
+        checkArgument(type.equals(divisor.type), "Cannot divide with a different type");
         return this.value / divisor.value;
     }
 
@@ -179,14 +200,6 @@ public class Value implements Monetary, Comparable<Value>, Serializable {
     }
 
     /**
-     * Returns the number of units of this monetary value. It's deprecated in favour of accessing {@link #value}
-     * directly.
-     */
-    public long longValue() {
-        return this.value;
-    }
-
-    /**
      * Returns the value as a 0.12 type string. More digits after the decimal place will be used
      * if necessary, but two will always be present.
      */
@@ -207,7 +220,7 @@ public class Value implements Monetary, Comparable<Value>, Serializable {
 
     @Override
     public String toString() {
-        return Long.toString(value);
+        return toPlainString() + type.getSymbol();
     }
 
     @Override
@@ -217,7 +230,7 @@ public class Value implements Monetary, Comparable<Value>, Serializable {
         if (o == null || o.getClass() != getClass())
             return false;
         final Value other = (Value) o;
-        if (this.value != other.value)
+        if (this.value != other.value || !this.type.equals(other.type))
             return false;
         return true;
     }
@@ -229,8 +242,36 @@ public class Value implements Monetary, Comparable<Value>, Serializable {
 
     @Override
     public int compareTo(@Nonnull final Value other) {
+        checkArgument(type.equals(other.type), "Cannot compare different types");
         if (this.value == other.value)
             return 0;
         return this.value > other.value ? 1 : -1;
+    }
+
+    public boolean isDust() {
+        return compareTo(type.minNonDust()) < 0;
+    }
+
+    public boolean isOfType(ValueType otherType) {
+        return type.equals(otherType);
+    }
+
+    public boolean isOfType(Value otherValue) {
+        return type.equals(otherValue.type);
+    }
+
+    /**
+     * Check if the value is within the [min, max] range
+     */
+    public boolean within(Value min, Value max) {
+        return compareTo(min) >=0 && compareTo(max) <= 0;
+    }
+
+    public static Value max(Value value1, Value value2) {
+        return value1.compareTo(value2) >= 0 ? value1 : value2;
+    }
+
+    public static Value min(Value value1, Value value2) {
+        return value1.compareTo(value2) <= 0 ? value1 : value2;
     }
 }

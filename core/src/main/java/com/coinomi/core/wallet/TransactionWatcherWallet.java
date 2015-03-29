@@ -1,11 +1,11 @@
 package com.coinomi.core.wallet;
 
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.coins.Value;
 import com.coinomi.core.network.AddressStatus;
 import com.coinomi.core.network.BlockHeader;
 import com.coinomi.core.network.ServerClient;
 import com.coinomi.core.network.interfaces.BlockchainConnection;
-import com.coinomi.core.network.interfaces.ConnectionEventListener;
 import com.coinomi.core.network.interfaces.TransactionEventListener;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
@@ -13,16 +13,13 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 import org.bitcoinj.core.Address;
-import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.ScriptException;
 import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.Transaction;
-import org.bitcoinj.core.TransactionBag;
 import org.bitcoinj.core.TransactionConfidence;
 import org.bitcoinj.core.TransactionInput;
 import org.bitcoinj.core.TransactionOutput;
 import org.bitcoinj.core.Utils;
-import org.bitcoinj.script.Script;
 import org.bitcoinj.utils.ListenerRegistration;
 import org.bitcoinj.utils.Threading;
 import org.bitcoinj.wallet.WalletTransaction;
@@ -58,7 +55,6 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
 
     final ReentrantLock lock = Threading.lock("TransactionWatcherWallet");
     protected final CoinType coinType;
-    protected final String id;
 
     @Nullable private Sha256Hash lastBlockSeenHash;
     private int lastBlockSeenHeight = -1;
@@ -102,7 +98,7 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
     // All transactions together.
     protected final Map<Sha256Hash, Transaction> transactions;
     private BlockchainConnection blockchainConnection;
-    private List<ListenerRegistration<WalletPocketEventListener>> listeners;
+    private List<ListenerRegistration<WalletAccountEventListener>> listeners;
 
     // Wallet that this account belongs
     @Nullable private transient Wallet wallet = null;
@@ -122,8 +118,7 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
     };
 
     // Constructor
-    public TransactionWatcherWallet(String id, CoinType coinType) {
-        this.id = id;
+    public TransactionWatcherWallet(CoinType coinType) {
         this.coinType = coinType;
         addressesStatus = new HashMap<Address, String>();
         addressesSubscribed = new ArrayList<Address>();
@@ -135,12 +130,7 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
         pending = new HashMap<Sha256Hash, Transaction>();
         dead = new HashMap<Sha256Hash, Transaction>();
         transactions = new HashMap<Sha256Hash, Transaction>();
-        listeners = new CopyOnWriteArrayList<ListenerRegistration<WalletPocketEventListener>>();
-    }
-
-    @Override
-    public String getId() {
-        return id;
+        listeners = new CopyOnWriteArrayList<ListenerRegistration<WalletAccountEventListener>>();
     }
 
     @Override
@@ -457,11 +447,11 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
         }
     }
 
-    public Coin getBalance() {
+    public Value getBalance() {
         return getBalance(false);
     }
 
-    public Coin getBalance(boolean includeUnconfirmed) {
+    public Value getBalance(boolean includeUnconfirmed) {
         lock.lock();
         try {
 //            log.info("Get balance includeUnconfirmed = {}", includeUnconfirmed);
@@ -474,7 +464,7 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
         }
     }
 
-    public Coin getPendingBalance() {
+    public Value getPendingBalance() {
         lock.lock();
         try {
 //            log.info("Get pending balance");
@@ -484,10 +474,10 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
         }
     }
 
-    Coin getTxBalance(Iterable<Transaction> txs, boolean toMe) {
+    Value getTxBalance(Iterable<Transaction> txs, boolean toMe) {
         lock.lock();
         try {
-            Coin value = Coin.ZERO;
+            Value value = coinType.value(0);
             for (Transaction tx : txs) {
 //                log.info("tx {}", tx.getHash());
 //                log.info("tx.getValue {}", tx.getValue(this));
@@ -1121,9 +1111,9 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
 
     void queueOnNewBalance() {
         checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
-        final Coin balance = getBalance();
-        final Coin pendingBalance = getPendingBalance();
-        for (final ListenerRegistration<WalletPocketEventListener> registration : listeners) {
+        final Value balance = getBalance();
+        final Value pendingBalance = getPendingBalance();
+        for (final ListenerRegistration<WalletAccountEventListener> registration : listeners) {
             registration.executor.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -1136,7 +1126,7 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
 
     void queueOnNewBlock() {
         checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
-        for (final ListenerRegistration<WalletPocketEventListener> registration : listeners) {
+        for (final ListenerRegistration<WalletAccountEventListener> registration : listeners) {
             registration.executor.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -1149,7 +1139,7 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
 
     void queueOnConnectivity() {
         final WalletPocketConnectivity connectivity = getConnectivityStatus();
-        for (final ListenerRegistration<WalletPocketEventListener> registration : listeners) {
+        for (final ListenerRegistration<WalletAccountEventListener> registration : listeners) {
             registration.executor.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -1160,7 +1150,7 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
     }
 
     void queueOnTransactionBroadcastSuccess(final Transaction tx) {
-        for (final ListenerRegistration<WalletPocketEventListener> registration : listeners) {
+        for (final ListenerRegistration<WalletAccountEventListener> registration : listeners) {
             registration.executor.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -1171,7 +1161,7 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
     }
 
     void queueOnTransactionBroadcastFailure(final Transaction tx) {
-        for (final ListenerRegistration<WalletPocketEventListener> registration : listeners) {
+        for (final ListenerRegistration<WalletAccountEventListener> registration : listeners) {
             registration.executor.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -1182,15 +1172,15 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
     }
 
 
-    public void addEventListener(WalletPocketEventListener listener) {
+    public void addEventListener(WalletAccountEventListener listener) {
         addEventListener(listener, Threading.USER_THREAD);
     }
 
-    public void addEventListener(WalletPocketEventListener listener, Executor executor) {
-        listeners.add(new ListenerRegistration<WalletPocketEventListener>(listener, executor));
+    public void addEventListener(WalletAccountEventListener listener, Executor executor) {
+        listeners.add(new ListenerRegistration<>(listener, executor));
     }
 
-    public boolean removeEventListener(WalletPocketEventListener listener) {
+    public boolean removeEventListener(WalletAccountEventListener listener) {
         return ListenerRegistration.removeFromList(listener, listeners);
     }
 
@@ -1198,6 +1188,23 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
         return addressesPendingSubscription.isEmpty() && statusPendingUpdates.isEmpty() && fetchingTransactions.isEmpty();
     }
 
+
+    public boolean broadcastTxSync(Transaction tx) throws IOException {
+        if (isConnected()) {
+            if (log.isInfoEnabled()) {
+                log.info("Broadcasting tx {}", Utils.HEX.encode(tx.bitcoinSerialize()));
+            }
+            boolean success = blockchainConnection.broadcastTxSync(tx);
+            if (success) {
+                onTransactionBroadcast(tx);
+            } else {
+                onTransactionBroadcastError(tx);
+            }
+            return success;
+        } else {
+            throw new IOException("No connection available");
+        }
+    }
 
     public void broadcastTx(Transaction tx) throws IOException {
         broadcastTx(tx, this);

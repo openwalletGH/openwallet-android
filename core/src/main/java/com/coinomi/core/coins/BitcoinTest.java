@@ -16,13 +16,13 @@ public class BitcoinTest extends CoinType {
         dumpedPrivateKeyHeader = 239;
 
         name = "Bitcoin Test";
-        symbol = "BTCTEST";
+        symbol = "BTCt";
         uriScheme = "bitcoin";
         bip44Index = 1;
         unitExponent = 8;
-        feePerKb = Coin.valueOf(10000);
-        minNonDust = Coin.valueOf(5460);
-        softDustLimit = Coin.valueOf(1000000); // 0.01 BTC
+        feePerKb = value(10000);
+        minNonDust = value(5460);
+        softDustLimit = value(1000000); // 0.01 BTC
         softDustPolicy = SoftDustPolicy.AT_LEAST_BASE_FEE_IF_SOFT_DUST_TXO_PRESENT;
     }
 

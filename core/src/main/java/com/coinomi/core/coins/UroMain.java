@@ -19,9 +19,9 @@ public class UroMain extends CoinType {
         uriScheme = "uro";
         bip44Index = 17;
         unitExponent = 8;
-        feePerKb = Coin.valueOf(100000);
-        minNonDust = Coin.valueOf(1000); // 0.00001 URO mininput
-        softDustLimit = Coin.valueOf(100000); // 0.001 URO
+        feePerKb = value(100000);
+        minNonDust = value(1000); // 0.00001 URO mininput
+        softDustLimit = value(100000); // 0.001 URO
         softDustPolicy = SoftDustPolicy.BASE_FEE_FOR_EACH_SOFT_DUST_TXO;
     }
 

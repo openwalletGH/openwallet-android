@@ -174,7 +174,7 @@ public class Configuration {
         prefs.edit().putBoolean(PREFS_KEY_LAST_EXCHANGE_DIRECTION, exchangeDirection).apply();
     }
 
-    public boolean isManualReceivingAddressManagement() {
+    public boolean isManualAddressManagement() {
         return prefs.getBoolean(PREFS_KEY_MANUAL_RECEIVING_ADDRESSES, false);
     }
 

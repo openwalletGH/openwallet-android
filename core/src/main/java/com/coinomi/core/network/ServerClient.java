@@ -34,6 +34,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -515,6 +516,27 @@ public class ServerClient implements BlockchainConnection {
                 if (listener != null) listener.onTransactionBroadcastError(tx);
             }
         }, Threading.USER_THREAD);
+    }
+
+    @Override
+    public boolean broadcastTxSync(final Transaction tx) {
+        checkNotNull(stratumClient);
+
+        CallMessage message = new CallMessage("blockchain.transaction.broadcast",
+                Arrays.asList(Utils.HEX.encode(tx.bitcoinSerialize())));
+
+        try {
+            ResultMessage result = stratumClient.call(message).get();
+            String txId = result.getResult().getString(0);
+
+            // FIXME could return {u'message': u'', u'code': -25}
+            log.info("got tx {} =?= {}", txId, tx.getHash());
+            checkState(tx.getHash().toString().equals(txId));
+            return true;
+        } catch (Exception e) {
+            log.error("Could not get reply for blockchain.transaction.broadcast", e);
+        }
+        return false;
     }
 
     @Override

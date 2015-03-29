@@ -28,8 +28,8 @@ import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
 import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.WalletAccount;
+import com.coinomi.core.wallet.WalletAccountEventListener;
 import com.coinomi.core.wallet.WalletPocketConnectivity;
-import com.coinomi.core.wallet.WalletPocketEventListener;
 import com.coinomi.core.wallet.WalletPocketHD;
 import com.coinomi.wallet.AddressBookProvider;
 import com.coinomi.wallet.Configuration;
@@ -61,7 +61,7 @@ import javax.annotation.Nonnull;
  * Use the {@link BalanceFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class BalanceFragment extends Fragment implements WalletPocketEventListener, LoaderCallbacks<List<Transaction>> {
+public class BalanceFragment extends Fragment implements WalletAccountEventListener, LoaderCallbacks<List<Transaction>> {
     private static final Logger log = LoggerFactory.getLogger(BalanceFragment.class);
 
     private static final int NEW_BALANCE = 0;
@@ -85,10 +85,10 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
         protected void weakHandleMessage(BalanceFragment ref, Message msg) {
             switch (msg.what) {
                 case NEW_BALANCE:
-                    ref.updateBalance((Coin) msg.obj);
+                    ref.updateBalance((Value) msg.obj);
                     break;
                 case PENDING:
-                    ref.setPending((Coin) msg.obj);
+                    ref.setPending((Value) msg.obj);
                     break;
                 case CONNECTIVITY:
                     ref.setConnectivityStatus((WalletPocketConnectivity) msg.obj);
@@ -277,7 +277,7 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
     }
 
     @Override
-    public void onNewBalance(Coin newBalance, Coin pendingAmount) {
+    public void onNewBalance(Value newBalance, Value pendingAmount) {
         handler.sendMessage(handler.obtainMessage(NEW_BALANCE, newBalance));
         handler.sendMessage(handler.obtainMessage(PENDING, pendingAmount));
     }
@@ -324,18 +324,18 @@ public class BalanceFragment extends Fragment implements WalletPocketEventListen
         handler.sendMessage(handler.obtainMessage(CONNECTIVITY, pocketConnectivity));
     }
 
-    private void updateBalance(Coin newBalance) {
-        currentBalance = newBalance;
+    private void updateBalance(Value newBalance) {
+        currentBalance = newBalance.toCoin();
 
         updateView();
     }
 
-    private void setPending(Coin pendingAmount) {
+    private void setPending(Value pendingAmount) {
         if (pendingAmount.isZero()) {
             mainAmount.setAmountPending(null);
         } else {
-            String pendingAmountStr = GenericUtils.formatCoinValue(type, pendingAmount,
-                    AMOUNT_FULL_PRECISION, AMOUNT_SHIFT);
+            String pendingAmountStr = GenericUtils.formatCoinValue(pendingAmount.type,
+                    pendingAmount.toCoin(),AMOUNT_FULL_PRECISION, AMOUNT_SHIFT);
             mainAmount.setAmountPending(pendingAmountStr);
         }
     }

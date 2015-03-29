@@ -20,8 +20,8 @@ public class MonacoinMain extends CoinType {
         bip44Index = 12;
         unitExponent = 8;
         // TODO set correct values
-        feePerKb = Coin.valueOf(1);
-        minNonDust = Coin.valueOf(1000);
+        feePerKb = value(1);
+        minNonDust = value(1000);
         throw new RuntimeException(name+" bip44Index " + bip44Index + "is not standardized");
     }
 

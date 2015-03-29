@@ -2,6 +2,7 @@ package com.coinomi.wallet.util;
 
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.Fragment;
 
 import java.lang.ref.WeakReference;
 
@@ -18,6 +19,12 @@ public abstract class WeakHandler<T> extends Handler {
     public void handleMessage(Message msg) {
         T ref = reference.get();
         if (ref != null) {
+            // Do not call if is a detached fragment
+            if (ref instanceof Fragment) {
+                Fragment f = (Fragment) ref;
+                if (f.isRemoving() || f.isDetached() || f.getActivity() == null) return;
+            }
+
             weakHandleMessage(ref, msg);
         }
     }

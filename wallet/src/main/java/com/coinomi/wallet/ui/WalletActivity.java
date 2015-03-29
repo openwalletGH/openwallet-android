@@ -120,7 +120,7 @@ final public class WalletActivity extends BaseWalletActivity implements
             new AlertDialog.Builder(this)
                     .setTitle(R.string.test_wallet)
                     .setMessage(R.string.test_wallet_message)
-                    .setNeutralButton(R.string.button_ok, null)
+                    .setPositiveButton(R.string.button_ok, null)
                     .create().show();
         }
 

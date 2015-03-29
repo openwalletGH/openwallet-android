@@ -94,6 +94,9 @@ public class TransactionAmountVisualizerAdapter extends BaseAdapter {
     public View getView(int position, View row, ViewGroup parent) {
         if (row == null) {
             row = inflater.inflate(R.layout.transaction_details_output_row, null);
+
+            ((SendOutput) row).setSendLabel(context.getString(R.string.sent));
+            ((SendOutput) row).setReceiveLabel(context.getString(R.string.received));
         }
 
         final SendOutput output = (SendOutput) row;

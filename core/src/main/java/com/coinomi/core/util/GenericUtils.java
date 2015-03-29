@@ -3,12 +3,11 @@ package com.coinomi.core.util;
 
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
+import com.coinomi.core.coins.ValueType;
 
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.Monetary;
-import org.bitcoinj.utils.Fiat;
 
-import java.math.BigDecimal;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
@@ -80,25 +79,29 @@ public class GenericUtils {
 //                .toBigIntegerExact()
 //                .longValue();
 //        return Coin.valueOf(units);
-        return Value.parseValue(type, str).toCoin();
+        return Value.parse(type, str).toCoin();
     }
 
-    public static String formatCoinValue(@Nonnull final CoinType type, @Nonnull final Coin value) {
+    public static String formatValue(@Nonnull final Value value) {
+        return formatCoinValue(value.type, value.toCoin(), "", "-", 8, 0);
+    }
+
+    public static String formatCoinValue(@Nonnull final ValueType type, @Nonnull final Coin value) {
         return formatCoinValue(type, value, "", "-", 8, 0);
     }
 
-    public static String formatCoinValue(@Nonnull final CoinType type, @Nonnull final Coin value,
+    public static String formatCoinValue(@Nonnull final ValueType type, @Nonnull final Coin value,
                                          final int precision, final int shift) {
         return formatCoinValue(type, value, "", "-", precision, shift);
     }
 
-    public static String formatCoinValue(@Nonnull final CoinType type, @Nonnull final Coin value,
+    public static String formatCoinValue(@Nonnull final ValueType type, @Nonnull final Coin value,
                                          @Nonnull final String plusSign, @Nonnull final String minusSign,
                                          final int precision, final int shift) {
         return formatValue(type.getUnitExponent(), value, plusSign, minusSign, precision, shift, false);
     }
 
-    public static String formatCoinValue(@Nonnull final CoinType type, @Nonnull final Coin value,
+    public static String formatCoinValue(@Nonnull final ValueType type, @Nonnull final Coin value,
                                          boolean removeFinalZeroes) {
         return formatValue(type.getUnitExponent(), value, "", "-", 8, 0, removeFinalZeroes);
     }

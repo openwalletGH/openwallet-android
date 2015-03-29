@@ -10,6 +10,7 @@ import org.bitcoinj.params.Networks;
 import com.coinomi.core.uri.CoinURIParseException;
 import com.google.common.collect.ImmutableList;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -36,8 +37,10 @@ public enum CoinID {
     URO_MAIN(UroMain.get()),
     DIGITALCOIN_MAIN(DigitalcoinMain.get()),
     CANNACOIN_MAIN(CannacoinMain.get()),
-    DIGIBYTE_MAIN(DigibyteMain.get())    
-    ;
+    DIGIBYTE_MAIN(DigibyteMain.get()),;
+
+    private static HashMap<String, CoinType> idLookup = new HashMap<>();
+    private static HashMap<String, CoinType> symbolLookup = new HashMap<>();
 
     static {
         Set<NetworkParameters> bitcoinjNetworks = Networks.get();
@@ -49,14 +52,18 @@ public enum CoinID {
             Networks.register(id.type);
         }
 
-        // Test if currency codes are unique
-        HashSet<String> codes = new HashSet<>();
         for (CoinID id : values()) {
-            if (codes.contains(id.type.symbol)) {
+            if (symbolLookup.containsKey(id.type.symbol)) {
                 throw new IllegalStateException(
                         "Coin currency codes must be unique, double found: " + id.type.symbol);
             }
-            codes.add(id.type.symbol);
+            symbolLookup.put(id.type.symbol, id.type);
+
+            if (idLookup.containsKey(id.type.getId())) {
+                throw new IllegalStateException(
+                        "Coin IDs must be unique, double found: " + id.type.getId());
+            }
+            idLookup.put(id.type.getId(), id.type);
         }
     }
 
@@ -76,29 +83,22 @@ public enum CoinID {
     }
 
     public static List<CoinType> getSupportedCoins() {
-        ImmutableList.Builder<CoinType> builder = ImmutableList.builder();
-        for (CoinID id : values()) {
-            builder.add(id.type);
-        }
-        return builder.build();
+        return ImmutableList.copyOf(idLookup.values());
     }
 
     public static CoinType typeFromId(String stringId) {
-        return fromId(stringId).type;
-    }
-
-    public static CoinID fromId(String stringId) {
-        for(CoinID id : values()) {
-            if (id.type.getId().equalsIgnoreCase(stringId)) return id;
+        if (idLookup.containsKey(stringId)) {
+            return idLookup.get(stringId);
+        } else {
+            throw new IllegalArgumentException("Unsupported ID: " + stringId);
         }
-        throw new IllegalArgumentException("Unsupported ID: " + stringId);
     }
 
     public static CoinID fromUri(String input) {
-        for(CoinID id : values()) {
+        for (CoinID id : values()) {
             if (input.startsWith(id.getCoinType().getUriScheme() + "://")) {
                 return id;
-            } else if (input.startsWith(id.getCoinType().getUriScheme()+":")) {
+            } else if (input.startsWith(id.getCoinType().getUriScheme() + ":")) {
                 return id;
             }
         }
@@ -114,10 +114,15 @@ public enum CoinID {
         }
     }
 
+    public static boolean isSymbolSupported(String symbol) {
+        return symbolLookup.containsKey(symbol);
+    }
+
     public static CoinType typeFromSymbol(String symbol) {
-        for(CoinID id : values()) {
-            if (id.type.getSymbol().equalsIgnoreCase(symbol)) return id.type;
+        if (symbolLookup.containsKey(symbol.toUpperCase())) {
+            return symbolLookup.get(symbol.toUpperCase());
+        } else {
+            throw new IllegalArgumentException("Unsupported coin symbol: " + symbol);
         }
-        throw new IllegalArgumentException("Unsupported coin symbol: " + symbol);
     }
 }

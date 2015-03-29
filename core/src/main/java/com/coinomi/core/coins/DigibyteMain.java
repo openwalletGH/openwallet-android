@@ -20,9 +20,9 @@ public class DigibyteMain extends CoinType {
         uriScheme = "digibyte";
         bip44Index = 20;
         unitExponent = 8;
-        feePerKb = Coin.valueOf(10000);
-        minNonDust = Coin.valueOf(5460);
-        softDustLimit = Coin.valueOf(100000);
+        feePerKb = value(10000);
+        minNonDust = value(5460);
+        softDustLimit = value(100000);
         softDustPolicy = SoftDustPolicy.BASE_FEE_FOR_EACH_SOFT_DUST_TXO;
     }
 

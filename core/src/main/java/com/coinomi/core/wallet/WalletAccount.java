@@ -1,6 +1,7 @@
 package com.coinomi.core.wallet;
 
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.coins.Value;
 import com.coinomi.core.network.interfaces.ConnectionEventListener;
 import com.coinomi.core.network.interfaces.TransactionEventListener;
 
@@ -15,9 +16,7 @@ import org.spongycastle.crypto.params.KeyParameter;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
-
-import static org.bitcoinj.wallet.KeyChain.KeyPurpose.CHANGE;
-import static org.bitcoinj.wallet.KeyChain.KeyPurpose.RECEIVE_FUNDS;
+import java.util.concurrent.Executor;
 
 /**
  * @author John L. Jegutanis
@@ -32,6 +31,9 @@ public interface WalletAccount extends TransactionBag, KeyBag, TransactionEventL
 
     boolean isNew();
 
+    Value getBalance(boolean includeUnconfirmed);
+//    Value getSpendableBalance();
+
     void refresh();
 
     boolean isConnected();
@@ -45,6 +47,13 @@ public interface WalletAccount extends TransactionBag, KeyBag, TransactionEventL
      * Get current receive address, does not mark it as used
      */
     Address getReceiveAddress();
+
+    /**
+     * Get current refund address, does not mark it as used.
+     *
+     * Notice: This address could be the same as the current receive address
+     */
+    Address getRefundAddress();
 
 
     Map<Sha256Hash, Transaction> getUnspentTransactions();
@@ -63,4 +72,10 @@ public interface WalletAccount extends TransactionBag, KeyBag, TransactionEventL
     KeyCrypter getKeyCrypter();
     void encrypt(KeyCrypter keyCrypter, KeyParameter aesKey);
     void decrypt(KeyParameter aesKey);
+
+    boolean equals(WalletAccount otherAccount);
+
+    void addEventListener(WalletAccountEventListener listener);
+    void addEventListener(WalletAccountEventListener listener, Executor executor);
+    boolean removeEventListener(WalletAccountEventListener listener);
 }

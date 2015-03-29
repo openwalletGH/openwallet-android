@@ -13,10 +13,13 @@ import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.WalletPocketHD;
 import com.coinomi.wallet.AddressBookProvider;
 import com.coinomi.wallet.R;
+import com.google.common.collect.ImmutableList;
 
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.TransactionOutput;
+
+import java.util.List;
 
 import static com.coinomi.core.Preconditions.checkState;
 
@@ -43,6 +46,11 @@ public class TransactionAmountVisualizer extends LinearLayout {
         output.setVisibility(View.GONE);
         fee = (SendOutput) findViewById(R.id.transaction_fee);
         fee.setVisibility(View.GONE);
+
+        if (isInEditMode()) {
+            output.setVisibility(View.VISIBLE);
+            fee.setVisibility(View.VISIBLE);
+        }
     }
 
     public void setTransaction(WalletPocketHD pocket, Transaction tx) {
@@ -100,8 +108,20 @@ public class TransactionAmountVisualizer extends LinearLayout {
         }
     }
 
+    /**
+     * Hide the output address and label. Useful when we are exchanging, where the send address is
+     * not important to the user.
+     */
+    public void hideAddresses() {
+        output.hideLabelAndAddress();
+    }
+
     public void resetLabels() {
         output.setLabelAndAddress(
                 AddressBookProvider.resolveLabel(getContext(), type, address), address);
+    }
+
+    public List<SendOutput> getOutputs() {
+        return ImmutableList.of(output);
     }
 }

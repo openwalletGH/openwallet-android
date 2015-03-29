@@ -23,18 +23,17 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import android.os.Handler;
 
+import com.coinomi.core.coins.Value;
 import com.coinomi.core.wallet.WalletAccount;
-import com.coinomi.core.wallet.WalletPocketHD;
+import com.coinomi.core.wallet.WalletAccountEventListener;
 import com.coinomi.core.wallet.WalletPocketConnectivity;
-import com.coinomi.core.wallet.WalletPocketEventListener;
 
-import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.Transaction;
 
 /**
  * @author Andreas Schildbach
  */
-public abstract class ThrottlingWalletChangeListener implements WalletPocketEventListener
+public abstract class ThrottlingWalletChangeListener implements WalletAccountEventListener
 {
     private final long throttleMs;
     private final boolean coinsRelevant;
@@ -105,7 +104,7 @@ public abstract class ThrottlingWalletChangeListener implements WalletPocketEven
     public abstract void onThrottledWalletChanged();
 
     @Override
-    public void onNewBalance(Coin newBalance, Coin pendingAmount) {
+    public void onNewBalance(Value newBalance, Value pendingAmount) {
         if (coinsRelevant)
             relevant.set(true);
     }

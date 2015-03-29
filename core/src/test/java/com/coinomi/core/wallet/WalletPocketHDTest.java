@@ -510,6 +510,11 @@ public class WalletPocketHDTest {
         }
 
         @Override
+        public boolean broadcastTxSync(Transaction tx) {
+            return false;
+        }
+
+        @Override
         public void ping() {}
     }
 

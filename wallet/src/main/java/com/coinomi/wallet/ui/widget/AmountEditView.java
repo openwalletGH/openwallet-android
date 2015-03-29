@@ -34,7 +34,7 @@ public class AmountEditView extends RelativeLayout {
     @Nullable private ValueType type;
     private MonetaryFormat inputFormat;
     private boolean amountSigned = false;
-    private Value hint;
+    @Nullable private Value hint;
     private MonetaryFormat hintFormat = new MonetaryFormat().noCode();
 
     public static interface Listener {
@@ -53,6 +53,13 @@ public class AmountEditView extends RelativeLayout {
 
         textView.addTextChangedListener(textViewListener);
         textView.setOnFocusChangeListener(textViewListener);
+    }
+
+    public void reset() {
+        textView.setText(null);
+        symbol.setText(null);
+        type = null;
+        hint = null;
     }
 
     public void setFormat(final MonetaryFormat inputFormat) {

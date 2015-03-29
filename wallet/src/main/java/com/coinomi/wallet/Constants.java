@@ -47,10 +47,13 @@ public class Constants {
     public static final String ARG_SEED = "seed";
     public static final String ARG_SEED_PROTECT = "seed_protect";
     public static final String ARG_PASSWORD = "password";
+    public static final String ARG_EMPTY_WALLET = "empty_wallet";
     public static final String ARG_SEND_TO_ADDRESS = "send_to_address";
-    public static final String ARG_SEND_AMOUNT = "send_amount";
+    public static final String ARG_SEND_TO_COIN_TYPE = "send_to_coin_type";
+    public static final String ARG_SEND_TO_ACCOUNT_ID = "send_to_account_id";
+    public static final String ARG_SEND_VALUE = "send_value";
     public static final String ARG_COIN_ID = "coin_id";
-    public static final String ARG_ACCOUNT_ID = "coin_id";
+    public static final String ARG_ACCOUNT_ID = "account_id";
     public static final String ARG_MULTIPLE_COIN_IDS = "multiple_coin_ids";
     public static final String ARG_MULTIPLE_CHOICE = "multiple_choice";
     public static final String ARG_TRANSACTION_ID = "transaction_id";
@@ -65,6 +68,8 @@ public class Constants {
 
     public static final long STOP_SERVICE_AFTER_IDLE_SECS = 30 * 60; // 30 mins
 
+    public static final String HTTP_CACHE_DIR = "http_cache";
+    public static final int HTTP_CACHE_SIZE = 256 * 1024; // 256 KiB
     public static final int HTTP_TIMEOUT_MS = 15 * (int) DateUtils.SECOND_IN_MILLIS;
 
     public static final long RATE_UPDATE_FREQ_MS = 1 * DateUtils.MINUTE_IN_MILLIS;

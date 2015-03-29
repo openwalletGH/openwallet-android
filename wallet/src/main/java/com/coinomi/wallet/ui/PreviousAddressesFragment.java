@@ -120,7 +120,7 @@ public class PreviousAddressesFragment extends Fragment {
                     if (obj != null && obj instanceof Address) {
                         Bundle args = new Bundle();
                         args.putString(Constants.ARG_ACCOUNT_ID, accountId);
-                        args.putString(Constants.ARG_ADDRESS, obj.toString());
+                        args.putSerializable(Constants.ARG_ADDRESS, (Address)obj);
                         listener.onAddressSelected(args);
                     } else {
                         Toast.makeText(getActivity(), R.string.error_generic, Toast.LENGTH_LONG).show();

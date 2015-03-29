@@ -23,6 +23,10 @@
     <dimen name="font_icon_bg_size">50dp</dimen>
     <dimen name="font_icon_text_size">24sp</dimen>
 
+    <!-- Generic items -->
+    <dimen name="generic_circle_bg_size">22dp</dimen>
+    <dimen name="generic_circle_text_size">14sp</dimen>
+
     <!-- Amount Widget -->
     <dimen name="amount_margin_top">16dp</dimen>
     <dimen name="amount_margin_bottom">4dp</dimen>

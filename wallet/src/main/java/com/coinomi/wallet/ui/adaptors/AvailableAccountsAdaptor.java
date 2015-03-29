@@ -7,10 +7,13 @@ import android.widget.BaseAdapter;
 
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.wallet.WalletAccount;
+import com.coinomi.core.wallet.WalletPocketHD;
 import com.coinomi.wallet.ui.widget.NavDrawerItemView;
 import com.coinomi.wallet.util.WalletUtils;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,40 +22,96 @@ import java.util.List;
 public class AvailableAccountsAdaptor extends BaseAdapter {
 
     private final Context context;
-    private final List<Entry> entries;
+    private List<Entry> entries;
 
-    private static class Entry {
-        public int iconRes;
-        public String title;
+    public static class Entry {
+        final public int iconRes;
+        final public String title;
+        final public Object accountOrCoinType;
 
         public Entry(WalletAccount account) {
             iconRes = WalletUtils.getIconRes(account);
             title = WalletUtils.getDescriptionOrCoinName(account);
+            accountOrCoinType = account;
         }
 
         public Entry(CoinType type) {
             iconRes = WalletUtils.getIconRes(type);
             title = type.getName();
+            accountOrCoinType = type;
+        }
+
+        // Used for search
+        private Entry(Object accountOrCoinType) {
+            iconRes = -1;
+            title = null;
+            this.accountOrCoinType = accountOrCoinType;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+//            return accountOrCoinType.getClass().isInstance(o) && accountOrCoinType.equals(o);
+            boolean result = accountOrCoinType.getClass().isInstance(o);
+            result = result && accountOrCoinType.equals(o);
+            return result;
         }
     }
 
-    public AvailableAccountsAdaptor(final Context context, final List accountsOrCoinTypes) {
+    public AvailableAccountsAdaptor(final Context context) {
         this.context = context;
-        this.entries = createEntries(accountsOrCoinTypes);
+        entries = ImmutableList.of();
     }
 
-    private static List<Entry> createEntries(List list) {
-        ImmutableList.Builder<Entry> builder = ImmutableList.builder();
-        for (Object o : list) {
-            if (o instanceof CoinType) {
-                builder.add(new Entry((CoinType) o));
-            } else if (o instanceof WalletAccount) {
-                builder.add(new Entry((WalletAccount) o));
+    /**
+     * Create an adaptor that contains all accounts that are in the validTypes list.
+     *
+     * If includeTypes is true, it will also include any coin type that is in not in accounts but is
+     * in the validTypes.
+     */
+    public AvailableAccountsAdaptor(final Context context, final List<WalletAccount> accounts,
+                                    final List<CoinType> validTypes, final boolean includeTypes) {
+        this.context = context;
+        entries = createEntries(accounts, validTypes, includeTypes);
+    }
+
+    public int getAccountOrTypePosition(Object accountOrCoinType) {
+        return entries.indexOf(accountOrCoinType);
+    }
+
+    /**
+     * Update the adaptor to include all accounts that are in the validTypes list.
+     *
+     * If includeTypes is true, it will also include any coin type that is in not in accounts but is
+     * in the validTypes.
+     */
+    public void update(final List<WalletAccount> accounts, final List<CoinType> validTypes,
+                       final boolean includeTypes) {
+        entries = createEntries(accounts, validTypes, includeTypes);
+        notifyDataSetChanged();
+    }
+
+    private static ImmutableList<Entry> createEntries(final List<WalletAccount> accounts,
+                                                      final List<CoinType> validTypes,
+                                                      final boolean includeTypes) {
+        final ArrayList<CoinType> typesToAdd = Lists.newArrayList(validTypes);
+
+        final ImmutableList.Builder<Entry> listBuilder = ImmutableList.builder();
+        for (WalletAccount account : accounts) {
+            if (validTypes.contains(account.getCoinType())) {
+                listBuilder.add(new Entry(account));
+                // Don't add this type as we just added the account for this type
+                typesToAdd.remove(account.getCoinType());
             }
         }
-        return builder.build();
-    }
 
+        if (includeTypes) {
+            for (CoinType type : typesToAdd) {
+                listBuilder.add(new Entry(type));
+            }
+        }
+
+        return listBuilder.build();
+    }
 
     @Override
     public int getCount() {
@@ -60,7 +119,7 @@ public class AvailableAccountsAdaptor extends BaseAdapter {
     }
 
     @Override
-    public Object getItem(int position) {
+    public Entry getItem(int position) {
         return entries.get(position);
     }
 
@@ -75,7 +134,7 @@ public class AvailableAccountsAdaptor extends BaseAdapter {
             convertView = new NavDrawerItemView(context);
         }
 
-        Entry entry = (Entry) getItem(position);
+        final Entry entry = getItem(position);
         ((NavDrawerItemView) convertView).setData(entry.title, entry.iconRes);
 
         return convertView;

@@ -11,13 +11,14 @@ import android.widget.TextView;
 
 import com.coinomi.core.util.GenericUtils;
 import com.coinomi.wallet.R;
-import com.coinomi.wallet.util.Fonts;
+
+import javax.annotation.Nullable;
 
 /**
  * @author John L. Jegutanis
  */
 public class SendOutput extends LinearLayout {
-    private TextView sendType;
+    private TextView sendTypeText;
     private TextView amount;
     private TextView symbol;
     private TextView amountLocal;
@@ -28,6 +29,9 @@ public class SendOutput extends LinearLayout {
     private String address;
     private String label;
     private boolean isSending;
+    private String sendLabel;
+    private String receiveLabel;
+    private String feeLabel;
 
     public SendOutput(Context context) {
         super(context);
@@ -52,7 +56,7 @@ public class SendOutput extends LinearLayout {
     private void inflateView(Context context) {
         LayoutInflater.from(context).inflate(R.layout.transaction_output, this, true);
 
-        sendType = (TextView) findViewById(R.id.send_output_type);
+        sendTypeText = (TextView) findViewById(R.id.send_output_type_text);
         amount = (TextView) findViewById(R.id.amount);
         symbol = (TextView) findViewById(R.id.symbol);
         amountLocal = (TextView) findViewById(R.id.local_amount);
@@ -62,6 +66,8 @@ public class SendOutput extends LinearLayout {
 
         amountLocal.setVisibility(GONE);
         symbolLocal.setVisibility(GONE);
+        addressLabelView.setVisibility(View.GONE);
+        addressView.setVisibility(View.GONE);
     }
 
     public void setAmount(String amount) {
@@ -98,10 +104,13 @@ public class SendOutput extends LinearLayout {
             } else {
                 addressView.setVisibility(View.GONE);
             }
-        } else {
+        } else if (address != null) {
             addressLabelView.setText(GenericUtils.addressSplitToGroups(address));
             addressLabelView.setTypeface(Typeface.MONOSPACE);
             addressLabelView.setVisibility(View.VISIBLE);
+            addressView.setVisibility(View.GONE);
+        } else {
+            addressLabelView.setVisibility(View.GONE);
             addressView.setVisibility(View.GONE);
         }
     }
@@ -113,33 +122,84 @@ public class SendOutput extends LinearLayout {
 
     public void setIsFee(boolean isFee) {
         if (isFee) {
-            sendType.setText(R.string.fee);
+            setTypeLabel(getFeeLabel());
             addressLabelView.setVisibility(GONE);
             addressView.setVisibility(GONE);
         } else {
-            if (!sendType.isInEditMode()) { // If not displayed within a developer tool
-                updateIcon();
-            }
+            updateDirectionLabels();
         }
     }
 
-    private void updateIcon() {
-        Fonts.setTypeface(sendType, Fonts.Font.COINOMI_FONT_ICONS);
+    private void updateDirectionLabels() {
         if (isSending) {
-            sendType.setText(getResources().getString(R.string.font_icon_send_coins));
+            setTypeLabel(getSendLabel());
         } else {
-            sendType.setText(getResources().getString(R.string.font_icon_receive_coins));
+            setTypeLabel(getReceiveLabel());
         }
+    }
+
+    private void setTypeLabel(String typeLabel) {
+        if (typeLabel.isEmpty()) {
+            sendTypeText.setVisibility(GONE);
+        } else {
+            sendTypeText.setVisibility(VISIBLE);
+            sendTypeText.setText(typeLabel);
+        }
+    }
+
+    private String getSendLabel() {
+        if (sendLabel == null) {
+            return getResources().getString(R.string.send);
+        } else {
+            return sendLabel;
+        }
+    }
+
+    private String getReceiveLabel() {
+        if (receiveLabel == null) {
+            return getResources().getString(R.string.receive);
+        } else {
+            return receiveLabel;
+        }
+    }
+
+    private String getFeeLabel() {
+        if (feeLabel == null) {
+            return getResources().getString(R.string.fee);
+        } else {
+            return feeLabel;
+        }
+    }
+
+    public void setSendLabel(String sendLabel) {
+        this.sendLabel = sendLabel;
+        updateDirectionLabels();
+    }
+
+    public void setReceiveLabel(String receiveLabel) {
+        this.receiveLabel = receiveLabel;
+        updateDirectionLabels();
+    }
+
+    public void setFeeLabel(String feeLabel) {
+        this.feeLabel = feeLabel;
+        updateDirectionLabels();
     }
 
     public void setSending(boolean isSending) {
         this.isSending = isSending;
-        updateIcon();
+        updateDirectionLabels();
     }
 
     public void setLabelAndAddress(String label, String address) {
         this.label = label;
         this.address = address;
+        updateView();
+    }
+
+    public void hideLabelAndAddress() {
+        this.label = null;
+        this.address = null;
         updateView();
     }
 }

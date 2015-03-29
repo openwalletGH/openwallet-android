@@ -32,6 +32,7 @@ import android.widget.Toast;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.FiatType;
 import com.coinomi.core.uri.CoinURI;
+import com.coinomi.core.util.ExchangeRate;
 import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.WalletPocketHD;
 import com.coinomi.core.wallet.exceptions.Bip44KeyLookAheadExceededException;
@@ -49,7 +50,6 @@ import com.coinomi.wallet.util.ThrottlingWalletChangeListener;
 import com.coinomi.wallet.util.WeakHandler;
 
 import org.bitcoinj.core.Address;
-import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.Coin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,7 +104,7 @@ public class AddressRequestFragment extends Fragment {
                     ref.updateView();
                     break;
                 case UPDATE_EXCHANGE_RATE:
-                    ref.amountCalculatorLink.setExchangeRate((com.coinomi.core.util.ExchangeRate) msg.obj);
+                    ref.amountCalculatorLink.setExchangeRate((ExchangeRate) msg.obj);
             }
         }
     }
@@ -130,7 +130,7 @@ public class AddressRequestFragment extends Fragment {
         Bundle args = new Bundle();
         args.putString(Constants.ARG_ACCOUNT_ID, accountId);
         if (showAddress != null) {
-            args.putString(Constants.ARG_ADDRESS, showAddress.toString());
+            args.putSerializable(Constants.ARG_ADDRESS, showAddress);
         }
         return newInstance(args);
     }
@@ -146,11 +146,7 @@ public class AddressRequestFragment extends Fragment {
         if (args != null) {
             accountId = args.getString(Constants.ARG_ACCOUNT_ID);
             if (args.containsKey(Constants.ARG_ADDRESS)) {
-                try {
-                    showAddress = new Address(type, args.getString(Constants.ARG_ADDRESS));
-                } catch (AddressFormatException e) {
-                    throw new RuntimeException(e);
-                }
+                showAddress = (Address) args.getSerializable(Constants.ARG_ADDRESS);
             }
         }
         // TODO
@@ -195,7 +191,7 @@ public class AddressRequestFragment extends Fragment {
         AmountEditView sendLocalAmountView = (AmountEditView) view.findViewById(R.id.send_local_amount);
         sendLocalAmountView.setFormat(FiatType.FRIENDLY_FORMAT);
 
-        amountCalculatorLink = new CurrencyCalculatorLink(type, sendCoinAmountView, sendLocalAmountView);
+        amountCalculatorLink = new CurrencyCalculatorLink(sendCoinAmountView, sendLocalAmountView);
 
         previousAddressesLink = view.findViewById(R.id.view_previous_addresses);
         previousAddressesLink.setOnClickListener(new View.OnClickListener() {
@@ -319,14 +315,8 @@ public class AddressRequestFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         try {
-                            Address newAddress = null;
-                            Address freshAddress = pocket.getFreshReceiveAddress();
-                            if (config.isManualReceivingAddressManagement()) {
-                                newAddress = pocket.getLastUsedReceiveAddress();
-                            }
-                            if (newAddress == null) {
-                                newAddress = freshAddress;
-                            }
+                            Address newAddress = pocket.getFreshReceiveAddress(
+                                    config.isManualAddressManagement());
                             final String newLabel = viewLabel.getText().toString().trim();
 
                             if (!newLabel.isEmpty()) {
@@ -362,13 +352,7 @@ public class AddressRequestFragment extends Fragment {
         if (showAddress != null) {
             receiveAddress =  showAddress;
         } else {
-            if (config.isManualReceivingAddressManagement()) {
-                receiveAddress = pocket.getLastUsedReceiveAddress();
-            }
-
-            if (receiveAddress == null) {
-                receiveAddress = pocket.getReceiveAddress();
-            }
+            receiveAddress = pocket.getReceiveAddress(config.isManualAddressManagement());
         }
 
         // Don't show previous addresses link if we are showing a specific address

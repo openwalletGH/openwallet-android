@@ -21,14 +21,7 @@
         style="@style/NormalText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
         tools:text="47 confirmations" />
-
-    <TextView
-        android:id="@+id/send_direction"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
-        tools:text="@string/sent_to"
-        android:textColor="@color/gray_54_sec_text_icons" />
 
 </LinearLayout>

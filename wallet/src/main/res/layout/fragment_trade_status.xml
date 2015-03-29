@@ -1,0 +1,190 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" tools:context="com.coinomi.wallet.ui.TradeStatusFragment">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/activity_vertical_margin"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:paddingTop="@dimen/activity_vertical_margin">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="0.2"
+                android:paddingBottom="@dimen/activity_vertical_margin"
+                android:gravity="bottom"
+                android:text="@string/trade_status_message"
+                style="@style/NormalText" />
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.8"
+                android:paddingBottom="@dimen/activity_vertical_margin"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="@dimen/activity_vertical_margin"
+                    android:text="@string/trade_status_label"
+                    android:textColor="@color/gray_54_sec_text_icons" />
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="@dimen/activity_vertical_margin"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/trade_deposit_status_icon"
+                        style="@style/GenericCircleGreen"
+                        android:layout_width="@dimen/generic_circle_bg_size"
+                        android:layout_height="@dimen/generic_circle_bg_size"
+                        android:layout_marginLeft="@dimen/half_standard_margin"
+                        android:layout_marginStart="@dimen/half_standard_margin"
+                        android:layout_marginRight="@dimen/standard_margin"
+                        android:layout_marginEnd="@dimen/standard_margin"
+                        android:gravity="center"
+                        android:text="@string/font_icon_check"
+                        tools:text="√" />
+
+                    <ProgressBar
+                        android:id="@+id/trade_deposit_status_progress"
+                        style="@style/Widget.AppCompat.ProgressBar"
+                        android:layout_width="@dimen/generic_circle_bg_size"
+                        android:layout_height="@dimen/generic_circle_bg_size"
+                        android:layout_marginLeft="@dimen/half_standard_margin"
+                        android:layout_marginStart="@dimen/half_standard_margin"
+                        android:layout_marginRight="@dimen/standard_margin"
+                        android:layout_marginEnd="@dimen/standard_margin"
+                        android:gravity="center"
+                        tools:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/trade_deposit_status_text"
+                        style="@style/NormalText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="Received deposit of 0.08BTC" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="@dimen/activity_vertical_margin"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/trade_exchange_status_icon"
+                        style="@style/GenericCircleGreen"
+                        android:layout_width="@dimen/generic_circle_bg_size"
+                        android:layout_height="@dimen/generic_circle_bg_size"
+                        android:layout_marginLeft="@dimen/half_standard_margin"
+                        android:layout_marginStart="@dimen/half_standard_margin"
+                        android:layout_marginRight="@dimen/standard_margin"
+                        android:layout_marginEnd="@dimen/standard_margin"
+                        android:gravity="center"
+                        android:text="@string/font_icon_check"
+                        tools:visibility="gone"/>
+
+                    <ProgressBar
+                        android:id="@+id/trade_exchange_status_progress"
+                        style="@style/Widget.AppCompat.ProgressBar"
+                        android:layout_width="@dimen/generic_circle_bg_size"
+                        android:layout_height="@dimen/generic_circle_bg_size"
+                        android:layout_marginLeft="@dimen/half_standard_margin"
+                        android:layout_marginStart="@dimen/half_standard_margin"
+                        android:layout_marginRight="@dimen/standard_margin"
+                        android:layout_marginEnd="@dimen/standard_margin"
+                        android:gravity="center" />
+
+                    <TextView
+                        android:id="@+id/trade_exchange_status_text"
+                        style="@style/NormalText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="Waiting for trade..." />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="@dimen/activity_vertical_margin"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/trade_error_status_icon"
+                        style="@style/GenericCircleRed"
+                        android:layout_width="@dimen/generic_circle_bg_size"
+                        android:layout_height="@dimen/generic_circle_bg_size"
+                        android:layout_marginLeft="@dimen/half_standard_margin"
+                        android:layout_marginStart="@dimen/half_standard_margin"
+                        android:layout_marginRight="@dimen/standard_margin"
+                        android:layout_marginEnd="@dimen/standard_margin"
+                        android:gravity="center"
+                        android:text="@string/font_icon_cross"
+                        tools:text="X" />
+
+                    <TextView
+                        android:id="@+id/trade_error_status_text"
+                        style="@style/NormalText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="Trade failed: error message" />
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/trade_view_transaction"
+                    style="@style/BorderlessButtonLink"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/trade_status_view_transaction"/>
+
+                <Button
+                    android:id="@+id/trade_email_receipt"
+                    style="@style/BorderlessButtonLink"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/trade_status_email_receipt"/>
+
+            </LinearLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="bottom">
+                <Button
+                    android:id="@+id/button_finish"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:text="@string/button_finish" />
+
+                <include
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignBottom="@id/button_finish"
+                    layout="@layout/powered_by_shapeshift"/>
+            </RelativeLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+</FrameLayout>

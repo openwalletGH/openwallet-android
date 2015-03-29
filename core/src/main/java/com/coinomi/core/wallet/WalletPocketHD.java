@@ -61,6 +61,7 @@ import static org.bitcoinj.wallet.KeyChain.KeyPurpose.CHANGE;
 import static com.coinomi.core.Preconditions.checkArgument;
 import static com.coinomi.core.Preconditions.checkNotNull;
 import static com.coinomi.core.Preconditions.checkState;
+import static org.bitcoinj.wallet.KeyChain.KeyPurpose.REFUND;
 
 /**
  * @author John L. Jegutanis
@@ -72,6 +73,7 @@ public class WalletPocketHD extends TransactionWatcherWallet {
 
     private final TransactionCreator transactionCreator;
 
+    private final String id;
     private String description;
 
     @VisibleForTesting SimpleHDKeyChain keys;
@@ -86,7 +88,8 @@ public class WalletPocketHD extends TransactionWatcherWallet {
     }
 
     WalletPocketHD(String id, SimpleHDKeyChain keys, CoinType coinType) {
-        super(id, checkNotNull(coinType));
+        super(checkNotNull(coinType));
+        this.id = id;
         this.keys = checkNotNull(keys);
         transactionCreator = new TransactionCreator(this);
     }
@@ -107,6 +110,12 @@ public class WalletPocketHD extends TransactionWatcherWallet {
         }
     }
 
+
+    @Override
+    public String getId() {
+        return id;
+    }
+
     /**
      * Set the description of the wallet.
      * This is a Unicode encoding string typically entered by the user as descriptive text for the wallet.
@@ -125,6 +134,13 @@ public class WalletPocketHD extends TransactionWatcherWallet {
     @Override
     public String getDescription() {
         return description;
+    }
+
+    @Override
+    public boolean equals(WalletAccount other) {
+        return other != null &&
+                getId().equals(other.getId()) &&
+                getCoinType().equals(other.getCoinType());
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -377,14 +393,28 @@ public class WalletPocketHD extends TransactionWatcherWallet {
         return currentAddress(RECEIVE_FUNDS);
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public Address getRefundAddress() {
+        return currentAddress(REFUND);
+    }
+
+    public Address getReceiveAddress(boolean isManualAddressManagement) {
+        return getAddress(RECEIVE_FUNDS, isManualAddressManagement);
+    }
+
+    public Address getRefundAddress(boolean isManualAddressManagement) {
+        return getAddress(REFUND, isManualAddressManagement);
+    }
+
     /**
      * Get the last used receiving address
      */
     @Nullable
-    public Address getLastUsedReceiveAddress() {
+    public Address getLastUsedAddress(SimpleHDKeyChain.KeyPurpose purpose) {
         lock.lock();
         try {
-            DeterministicKey lastUsedKey = keys.getLastIssuedKey(RECEIVE_FUNDS);
+            DeterministicKey lastUsedKey = keys.getLastIssuedKey(purpose);
             if (lastUsedKey != null) {
                 return lastUsedKey.toAddress(coinType);
             } else {
@@ -440,6 +470,24 @@ public class WalletPocketHD extends TransactionWatcherWallet {
             }
             keys.getKey(RECEIVE_FUNDS);
             return currentAddress(RECEIVE_FUNDS);
+        } finally {
+            lock.unlock();
+            walletSaveNow();
+        }
+    }
+
+    public Address getFreshReceiveAddress(boolean isManualAddressManagement) throws Bip44KeyLookAheadExceededException {
+        lock.lock();
+        try {
+            Address newAddress = null;
+            Address freshAddress = getFreshReceiveAddress();
+            if (isManualAddressManagement) {
+                newAddress = getLastUsedAddress(RECEIVE_FUNDS);
+            }
+            if (newAddress == null) {
+                newAddress = freshAddress;
+            }
+            return newAddress;
         } finally {
             lock.unlock();
             walletSaveNow();
@@ -510,6 +558,19 @@ public class WalletPocketHD extends TransactionWatcherWallet {
         }
     }
 
+    public Address getAddress(SimpleHDKeyChain.KeyPurpose purpose,
+                              boolean isManualAddressManagement) {
+        Address receiveAddress = null;
+        if (isManualAddressManagement) {
+            receiveAddress = getLastUsedAddress(purpose);
+        }
+
+        if (receiveAddress == null) {
+            receiveAddress = currentAddress(purpose);
+        }
+        return receiveAddress;
+    }
+
     /**
      * Get the currently latest unused address by purpose.
      */
@@ -546,5 +607,10 @@ public class WalletPocketHD extends TransactionWatcherWallet {
 
     public void markAddressAsUsed(Address address) {
         keys.markPubHashAsUsed(address.getHash160());
+    }
+
+    @Override
+    public String toString() {
+        return WalletPocketHD.class.getSimpleName() + " " + id.substring(0, 4)+ " " + coinType;
     }
 }

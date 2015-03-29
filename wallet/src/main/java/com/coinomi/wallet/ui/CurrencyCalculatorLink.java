@@ -17,21 +17,19 @@ package com.coinomi.wallet.ui;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import android.view.View;
 
 import com.coinomi.core.coins.CoinType;
-import com.coinomi.core.coins.FiatValue;
 import com.coinomi.core.coins.Value;
-import com.coinomi.core.coins.ValueType;
 import com.coinomi.core.util.ExchangeRate;
 import com.coinomi.wallet.ui.widget.AmountEditView;
 import com.coinomi.wallet.ui.widget.AmountEditView.Listener;
 
 import org.bitcoinj.core.Coin;
+
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 
 /**
@@ -39,14 +37,13 @@ import org.bitcoinj.core.Coin;
  * @author John L. Jegutanis
  */
 public final class CurrencyCalculatorLink {
-    private final ValueType primaryType;
     private final AmountEditView coinAmountView;
     private final AmountEditView localAmountView;
 
     private Listener listener = null;
     private boolean enabled = true;
     private ExchangeRate exchangeRate = null;
-    private boolean exchangeDirection = true;
+    @Nullable private boolean exchangeDirection = true;
 
     private final AmountEditView.Listener coinAmountViewListener = new AmountEditView.Listener() {
         @Override
@@ -86,10 +83,8 @@ public final class CurrencyCalculatorLink {
         }
     };
 
-    public CurrencyCalculatorLink(ValueType primaryType,
-                                  @Nonnull final AmountEditView coinAmountView,
+    public CurrencyCalculatorLink(@Nonnull final AmountEditView coinAmountView,
                                   @Nonnull final AmountEditView localAmountView) {
-        this.primaryType = primaryType;
         this.coinAmountView = coinAmountView;
         this.coinAmountView.setListener(coinAmountViewListener);
 
@@ -109,19 +104,19 @@ public final class CurrencyCalculatorLink {
         update();
     }
 
-    public void setExchangeRate(@Nonnull final ExchangeRate exchangeRate) {
+    public void setExchangeRate(@Nullable final ExchangeRate exchangeRate) {
         this.exchangeRate = exchangeRate;
 
         update();
     }
 
-    @CheckForNull
+    @Nullable
     public Coin getPrimaryAmountCoin() {
         Value value = getPrimaryAmount();
-    return value != null ? value.toCoin() : null;
+        return value != null ? value.toCoin() : null;
     }
 
-    @CheckForNull
+    @Nullable
     public Value getPrimaryAmount() {
         if (exchangeDirection) {
             return coinAmountView.getAmount();
@@ -137,6 +132,33 @@ public final class CurrencyCalculatorLink {
         }
     }
 
+    @Nullable
+    public Value getSecondaryAmount() {
+        if (exchangeRate == null) return null;
+
+        if (exchangeDirection) {
+            final Value coinAmount = coinAmountView.getAmount();
+            try {
+                return coinAmount != null ? exchangeRate.convert(coinAmount) : null;
+            } catch (ArithmeticException x) {
+                return null;
+            }
+        } else {
+            return localAmountView.getAmount();
+        }
+    }
+
+    /**
+     * Get the amount that the user entered, could be either type
+     */
+    public Value getRequestedAmount() {
+        if (exchangeDirection) {
+            return coinAmountView.getAmount();
+        } else {
+            return localAmountView.getAmount();
+        }
+    }
+
     public boolean hasAmount() {
         return getPrimaryAmount() != null;
     }
@@ -146,8 +168,10 @@ public final class CurrencyCalculatorLink {
 
         if (exchangeRate != null) {
             localAmountView.setEnabled(enabled);
-            localAmountView.setType(exchangeRate.getOtherType(primaryType));
+            localAmountView.setType(exchangeRate.getDestinationType());
             localAmountView.setVisibility(View.VISIBLE);
+
+            coinAmountView.setType(exchangeRate.getSourceType());
 
             if (exchangeDirection) {
                 final Value coinAmount = coinAmountView.getAmount();
@@ -195,6 +219,13 @@ public final class CurrencyCalculatorLink {
 
     public void requestFocus() {
         activeTextView().requestFocus();
+    }
+
+    public void setExchangeRateHints(@Nullable final Value primaryAmount) {
+        if (exchangeRate != null) {
+            coinAmountView.setHint(primaryAmount);
+            localAmountView.setHint(exchangeRate.convert(primaryAmount));
+        }
     }
 
     public void setPrimaryAmount(@Nullable final Value amount) {

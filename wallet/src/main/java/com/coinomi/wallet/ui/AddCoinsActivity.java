@@ -4,10 +4,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,8 +17,7 @@ import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
-
-import org.spongycastle.crypto.params.KeyParameter;
+import com.coinomi.wallet.tasks.AddCoinTask;
 
 import java.util.ArrayList;
 
@@ -32,7 +28,7 @@ public class AddCoinsActivity extends BaseWalletActivity
         implements SelectCoinsFragment.Listener {
 
     @CheckForNull private Wallet wallet;
-    private WalletFromSeedTask addCoinTask;
+    private MyAddCoinTask addCoinTask;
     private CoinType selectedCoin;
 
     @Override
@@ -48,18 +44,6 @@ public class AddCoinsActivity extends BaseWalletActivity
         getSupportActionBar().setDisplayShowHomeEnabled(false);
 
         wallet = getWalletApplication().getWallet();
-    }
-
-    private void replaceFragment(Fragment fragment) {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-
-        // Replace whatever is in the fragment_container view with this fragment,
-        // and add the transaction to the back stack so the user can navigate back
-        transaction.replace(R.id.container, fragment);
-        transaction.addToBackStack(null);
-
-        // Commit the transaction
-        transaction.commit();
     }
 
     @Override
@@ -96,48 +80,27 @@ public class AddCoinsActivity extends BaseWalletActivity
 
     private void addCoin(@Nullable String password) {
         if (selectedCoin != null && addCoinTask == null) {
-            addCoinTask = new WalletFromSeedTask(selectedCoin, password);
+            addCoinTask = new MyAddCoinTask(selectedCoin, wallet, password);
             addCoinTask.execute();
         }
     }
 
-    private class WalletFromSeedTask extends AsyncTask<Void, Void, Exception> {
-        private final CoinType type;
-        @Nullable private final String password;
+    private class MyAddCoinTask extends AddCoinTask {
         private Dialogs.ProgressDialogFragment verifyDialog;
-        private WalletAccount newAccount;
 
-        private WalletFromSeedTask(CoinType type, @Nullable String password) {
-            this.type = type;
-            this.password = password;
+        public MyAddCoinTask(CoinType type, Wallet wallet, @Nullable String password) {
+            super(type, wallet, password);
         }
 
         @Override
         protected void onPreExecute() {
-            super.onPreExecute();
             verifyDialog = Dialogs.ProgressDialogFragment.newInstance(
                     getResources().getString(R.string.adding_coin_working, type.getName()));
             verifyDialog.show(getSupportFragmentManager(), null);
         }
 
         @Override
-        protected Exception doInBackground(Void... params) {
-            KeyParameter key = null;
-            Exception exception = null;
-            try {
-                if (wallet.isEncrypted() && wallet.getKeyCrypter() != null) {
-                    key = wallet.getKeyCrypter().deriveKey(password);
-                }
-                newAccount = wallet.createAccount(type, true, key);
-                wallet.saveNow();
-            } catch (RuntimeException e) {
-                exception = e;
-            }
-
-            return exception;
-        }
-
-        protected void onPostExecute(Exception e) {
+        protected void onPostExecute(Exception e, WalletAccount newAccount) {
             verifyDialog.dismiss();
             result(newAccount, e == null ? null : e.getMessage());
         }

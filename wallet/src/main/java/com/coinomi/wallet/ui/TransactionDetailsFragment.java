@@ -7,12 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.view.ActionMode;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -21,9 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.coinomi.core.coins.CoinType;
-import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.WalletPocketHD;
-import com.coinomi.wallet.AddressBookProvider;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
@@ -57,7 +50,6 @@ public class TransactionDetailsFragment extends Fragment {
     private TextView txStatusView;
     private TextView txIdView;
     private TextView blockExplorerLink;
-    private TextView sendDirectionView;
 
     private final Handler handler = new MyHandler(this);
     private static class MyHandler extends WeakHandler<TransactionDetailsFragment> {
@@ -103,7 +95,6 @@ public class TransactionDetailsFragment extends Fragment {
         View header = inflater.inflate(R.layout.fragment_transaction_details_header, null);
         outputRows.addHeaderView(header, null, false);
         txStatusView = (TextView) header.findViewById(R.id.tx_status);
-        sendDirectionView = (TextView) header.findViewById(R.id.send_direction);
 
         // Footer
         View footer = inflater.inflate(R.layout.fragment_transaction_details_footer, null);
@@ -182,8 +173,6 @@ public class TransactionDetailsFragment extends Fragment {
                 txStatusText = getString(R.string.status_unknown);
         }
         txStatusView.setText(txStatusText);
-        boolean isSending = tx.getValue(pocket).signum() < 0;
-        sendDirectionView.setText(isSending ? R.string.sent : R.string.received);
         adapter.setTransaction(tx);
         txIdView.setText(tx.getHashAsString());
         setupBlockExplorerLink(pocket.getCoinType(), tx.getHashAsString());

@@ -7,22 +7,31 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Typeface;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.StrictMode;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.exchange.shapeshift.ShapeShift;
+import com.coinomi.core.network.ConnectivityHelper;
 import com.coinomi.core.util.HardwareSoftwareCompliance;
 import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.wallet.WalletAccount;
+import com.coinomi.core.wallet.WalletPocketHD;
 import com.coinomi.core.wallet.WalletProtobufSerializer;
 import com.coinomi.wallet.service.CoinService;
 import com.coinomi.wallet.service.CoinServiceImpl;
 import com.coinomi.wallet.util.Fonts;
 import com.coinomi.wallet.util.LinuxSecureRandom;
 import com.google.common.collect.ImmutableList;
+import com.squareup.okhttp.Cache;
+import com.squareup.okhttp.ConnectionSpec;
+import com.squareup.okhttp.OkHttpClient;
 
+import org.acra.ACRA;
 import org.acra.annotation.ReportsCrashes;
 import org.acra.sender.HttpSender;
 import org.bitcoinj.crypto.MnemonicCode;
@@ -34,8 +43,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 
@@ -44,17 +55,21 @@ import javax.annotation.Nullable;
  * @author Andreas Schildbach
  */
 @ReportsCrashes(
+        // Also uncomment ACRA.init(this) in onCreate
         httpMethod = HttpSender.Method.PUT,
         reportType = HttpSender.Type.JSON,
         formKey = ""
 )
 public class WalletApplication extends Application {
+    private static final Logger log = LoggerFactory.getLogger(WalletApplication.class);
+
     private static HashMap<String, Typeface> typefaces;
     private static String httpUserAgent;
     private Configuration config;
     private ActivityManager activityManager;
 
     private Intent coinServiceIntent;
+    private Intent coinServiceConnectIntent;
     private Intent coinServiceCancelCoinsReceivedIntent;
     private Intent coinServiceResetWalletIntent;
 
@@ -65,15 +80,21 @@ public class WalletApplication extends Application {
 
     private long lastStop;
 
-    private static final Logger log = LoggerFactory.getLogger(WalletApplication.class);
+    private ConnectivityManager connManager;
+    private OkHttpClient client;
+    private ShapeShift shapeShift;
 
     @Override
     public void onCreate() {
+//        ACRA.init(this);
+
         new LinuxSecureRandom(); // init proper random number generator
 
         initLogging();
 
-        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectAll().permitDiskReads().permitDiskWrites().penaltyLog().build());
+        // TODO review this
+        StrictMode.setThreadPolicy(
+                new StrictMode.ThreadPolicy.Builder().detectAll().permitDiskReads().permitDiskWrites().penaltyLog().build());
 
         super.onCreate();
 
@@ -81,12 +102,12 @@ public class WalletApplication extends Application {
 
         httpUserAgent = "Coinomi/" + packageInfo.versionName + " (Android)";
 
-//        ACRA.init(this);
-
         config = new Configuration(PreferenceManager.getDefaultSharedPreferences(this));
         activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
 
         coinServiceIntent = new Intent(this, CoinServiceImpl.class);
+        coinServiceConnectIntent = new Intent(CoinService.ACTION_CONNECT_COIN,
+                null, this, CoinServiceImpl.class);
         coinServiceCancelCoinsReceivedIntent = new Intent(CoinService.ACTION_CANCEL_COINS_RECEIVED,
                 null, this, CoinServiceImpl.class);
         coinServiceResetWalletIntent = new Intent(CoinService.ACTION_RESET_WALLET,
@@ -105,13 +126,39 @@ public class WalletApplication extends Application {
 
         performComplianceTests();
 
-        walletFile = getFileStreamPath(Constants.WALLET_FILENAME_PROTOBUF);
+        connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
+        walletFile = getFileStreamPath(Constants.WALLET_FILENAME_PROTOBUF);
         loadWallet();
 
         afterLoadWallet();
 
         Fonts.initFonts(this.getAssets());
+    }
+
+    public boolean isConnected() {
+        NetworkInfo activeInfo = connManager.getActiveNetworkInfo();
+        return activeInfo != null && activeInfo.isConnected();
+    }
+
+    public OkHttpClient getHttpClient() {
+        if (client == null) {
+            client = new OkHttpClient();
+            client.setConnectionSpecs(Collections.singletonList(ConnectionSpec.MODERN_TLS));
+            client.setConnectTimeout(Constants.HTTP_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+            // Setup cache
+            File cacheDir = new File(getCacheDir(), Constants.HTTP_CACHE_DIR);
+            Cache cache = new Cache(cacheDir, Constants.HTTP_CACHE_SIZE);
+            client.setCache(cache);
+        }
+        return client;
+    }
+
+    public ShapeShift getShapeShift() {
+        if (shapeShift == null) {
+            shapeShift = new ShapeShift(getHttpClient());
+        }
+        return shapeShift;
     }
 
     /**
@@ -341,5 +388,12 @@ public class WalletApplication extends Application {
 
     public long getLastStop() {
         return lastStop;
+    }
+
+    public void maybeConnectAccount(WalletAccount account) {
+        if (!account.isConnected()) {
+            coinServiceConnectIntent.putExtra(Constants.ARG_ACCOUNT_ID, account.getId());
+            startService(coinServiceConnectIntent);
+        }
     }
 }

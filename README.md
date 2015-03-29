@@ -55,7 +55,7 @@ To release the app follow the steps.
 * in build.gradle the package from "com.coinomi.wallet.dev" to "com.coinomi.wallet"
 * in AndroidManifest.xml the android:icon to "ic_launcher" and all "com.coinomi.wallet.dev.*"  to "com.coinomi.wallet.*"
 * remove all ic_launcher_dev icons with `rm wallet/src/main/res/drawable*/ic_launcher_dev.png`
-* setup ACRA
+* setup ACRA and ShapeShift
 
 2) Then in the Android Studio go to:
 

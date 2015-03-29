@@ -31,14 +31,12 @@ import android.provider.BaseColumns;
 
 import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
-import com.coinomi.core.coins.FiatType;
 import com.coinomi.core.coins.FiatValue;
 import com.coinomi.core.coins.Value;
+import com.coinomi.core.util.ExchangeRateBase;
 import com.coinomi.wallet.util.Io;
 import com.google.common.base.Charsets;
 
-import org.bitcoinj.core.Coin;
-import org.bitcoinj.utils.Fiat;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +46,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -69,11 +66,11 @@ import static com.coinomi.wallet.Constants.HTTP_TIMEOUT_MS;
 public class ExchangeRatesProvider extends ContentProvider {
 
     public static class ExchangeRate {
-        @Nonnull public final com.coinomi.core.util.ExchangeRate rate;
+        @Nonnull public final ExchangeRateBase rate;
         public final String currencyCodeId;
         @Nullable public final String source;
 
-        public ExchangeRate(@Nonnull final com.coinomi.core.util.ExchangeRate rate,
+        public ExchangeRate(@Nonnull final ExchangeRateBase rate,
                             final String currencyCodeId, @Nullable final String source) {
             this.rate = rate;
             this.currencyCodeId = currencyCodeId;
@@ -238,7 +235,7 @@ public class ExchangeRatesProvider extends ContentProvider {
     }
 
     private void addRow(MatrixCursor cursor, ExchangeRate exchangeRate) {
-        final com.coinomi.core.util.ExchangeRate rate = exchangeRate.rate;
+        final ExchangeRateBase rate = exchangeRate.rate;
         final String codeId = exchangeRate.currencyCodeId;
         cursor.newRow().add(codeId.hashCode()).add(codeId)
                 .add(rate.value1.value).add(rate.value1.type.getSymbol())
@@ -258,7 +255,7 @@ public class ExchangeRatesProvider extends ContentProvider {
         final Value rateFiat = FiatValue.valueOf(fiatCode, cursor.getLong(cursor.getColumnIndexOrThrow(ExchangeRatesProvider.KEY_RATE_FIAT)));
         final String source = cursor.getString(cursor.getColumnIndexOrThrow(ExchangeRatesProvider.KEY_SOURCE));
 
-        com.coinomi.core.util.ExchangeRate rate = new com.coinomi.core.util.ExchangeRate(rateCoin, rateFiat);
+        ExchangeRateBase rate = new ExchangeRateBase(rateCoin, rateFiat);
         return new ExchangeRate(rate, codeId, source);
     }
 
@@ -358,7 +355,7 @@ public class ExchangeRatesProvider extends ContentProvider {
                             final Value rateCoin = type.oneCoin();
                             final Value rateLocal = FiatValue.parse(localSymbol, rateStr);
 
-                            com.coinomi.core.util.ExchangeRate rate = new com.coinomi.core.util.ExchangeRate(rateCoin, rateLocal);
+                            ExchangeRateBase rate = new ExchangeRateBase(rateCoin, rateLocal);
                             rates.put(toSymbol, new ExchangeRate(rate, toSymbol, COINOMI_SOURCE));
                         } catch (final Exception x) {
                             log.debug("ignoring {}/{}: {}", toSymbol, fromSymbol, x.getMessage());

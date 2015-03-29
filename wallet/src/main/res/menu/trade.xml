@@ -7,4 +7,10 @@
         android:title="@string/action_swap_coins"
         android:icon="@drawable/swap_menu"
         app:showAsAction="ifRoom"/>
+
+    <item android:id="@+id/action_refresh"
+        android:title="@string/action_refresh"
+        android:icon="@drawable/refresh_menu"
+        app:showAsAction="ifRoom" />
+
 </menu>

@@ -3,6 +3,8 @@ package com.coinomi.core.coins;
 
 import com.coinomi.core.util.MonetaryFormat;
 
+import org.bitcoinj.core.Address;
+import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.crypto.ChildNumber;
@@ -28,14 +30,14 @@ abstract public class CoinType extends NetworkParameters implements ValueType, S
     protected String uriScheme;
     protected Integer bip44Index;
     protected Integer unitExponent;
-    protected Coin feePerKb;
-    protected Coin minNonDust;
-    protected Coin softDustLimit;
+    protected Value feePerKb;
+    protected Value minNonDust;
+    protected Value softDustLimit;
     protected SoftDustPolicy softDustPolicy;
 
-    private MonetaryFormat friendlyFormat;
-    private MonetaryFormat plainFormat;
-    private Value oneCoin;
+    private transient MonetaryFormat friendlyFormat;
+    private transient MonetaryFormat plainFormat;
+    private transient Value oneCoin;
 
     @Override
     public String getName() {
@@ -60,15 +62,31 @@ abstract public class CoinType extends NetworkParameters implements ValueType, S
         return checkNotNull(unitExponent, "A coin failed to set a unit exponent");
     }
 
+    @Deprecated
     public Coin getFeePerKb() {
+        return feePerKb().toCoin();
+    }
+
+    public Value feePerKb() {
         return checkNotNull(feePerKb, "A coin failed to set a fee per kilobyte");
     }
 
+    @Deprecated
     public Coin getMinNonDust() {
+        return minNonDust().toCoin();
+    }
+
+    @Override
+    public Value minNonDust() {
         return checkNotNull(minNonDust, "A coin failed to set a minimum amount to be considered not dust");
     }
 
+    @Deprecated
     public Coin getSoftDustLimit() {
+        return softDustLimit().toCoin();
+    }
+
+    public Value softDustLimit() {
         return checkNotNull(softDustLimit, "A coin failed to set a soft dust limit");
     }
 
@@ -79,6 +97,10 @@ abstract public class CoinType extends NetworkParameters implements ValueType, S
     public List<ChildNumber> getBip44Path(int account) {
         String path = String.format(BIP_44_KEY_PATH, bip44Index, account);
         return HDUtils.parsePath(path);
+    }
+
+    public Address address(String addressStr) throws AddressFormatException {
+        return new Address(this, addressStr);
     }
 
     /**
@@ -101,6 +123,21 @@ abstract public class CoinType extends NetworkParameters implements ValueType, S
     }
 
     @Override
+    public Value value(String string) {
+        return Value.parse(this, string);
+    }
+
+    @Override
+    public Value value(Coin coin) {
+        return Value.valueOf(this, coin);
+    }
+
+    @Override
+    public Value value(long units) {
+        return Value.valueOf(this, units);
+    }
+
+    @Override
     public String getPaymentProtocolId() {
         throw new RuntimeException("Method not implemented");
     }
@@ -118,7 +155,7 @@ abstract public class CoinType extends NetworkParameters implements ValueType, S
     public MonetaryFormat getMonetaryFormat() {
         if (friendlyFormat == null) {
             friendlyFormat = new MonetaryFormat()
-                    .shift(0).minDecimals(2).noCode().code(0, symbol).postfixCode();
+                    .shift(0).minDecimals(2).code(0, symbol).postfixCode();
             switch (unitExponent) {
                 case 8:
                     friendlyFormat = friendlyFormat.optionalDecimals(2, 2, 2);

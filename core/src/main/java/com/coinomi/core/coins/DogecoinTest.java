@@ -15,13 +15,13 @@ public class DogecoinTest extends CoinType {
         spendableCoinbaseDepth = 240; // COINBASE_MATURITY_NEW
 
         name = "Dogecoin Test";
-        symbol = "DOGETEST";
+        symbol = "DOGEt";
         uriScheme = "dogecoin";
         bip44Index = 1;
         unitExponent = 8;
-        feePerKb = Coin.valueOf(100000000L);
-        minNonDust = Coin.valueOf(1);
-        softDustLimit = Coin.valueOf(100000000L); // 1 DOGE
+        feePerKb = value(100000000L);
+        minNonDust = value(1);
+        softDustLimit = value(100000000L); // 1 DOGE
         softDustPolicy = SoftDustPolicy.BASE_FEE_FOR_EACH_SOFT_DUST_TXO;
     }
 

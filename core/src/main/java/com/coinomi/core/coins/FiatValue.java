@@ -1,6 +1,5 @@
 package com.coinomi.core.coins;
 
-import org.bitcoinj.core.Coin;
 import org.bitcoinj.utils.Fiat;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -33,6 +32,6 @@ public class FiatValue {
      * @throws IllegalArgumentException if you try to specify fractional units, or a value out of range.
      */
     public static Value parse(final String currencyCode, final String str) {
-        return Value.parseValue(FiatType.get(currencyCode), str);
+        return Value.parse(FiatType.get(currencyCode), str);
     }
 }

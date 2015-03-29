@@ -20,35 +20,64 @@ package com.coinomi.core.coins;
 
 import static com.coinomi.core.coins.Value.*;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
+import org.bitcoinj.core.Coin;
 import org.junit.Test;
 
+import java.math.BigDecimal;
+
 public class ValueTest {
-    ValueType[] types = {BitcoinMain.get(), LitecoinMain.get(), NuBitsMain.get(), FiatType.get("USD")};
+    final CoinType BTC = BitcoinMain.get();
+    final CoinType LTC = LitecoinMain.get();
+    final CoinType NBT = NuBitsMain.get();
+    final FiatType USD = FiatType.get("USD");
+
+    ValueType[] types = {BTC, LTC, NBT, USD};
 
     @Test
-    public void testParseCoin() {
+    public void testParseValue() {
         for (ValueType type : types) {
-            runTestParseCoin(type);
+            runTestParseValue(type);
         }
     }
 
-    public void runTestParseCoin(ValueType type) {
+    public void runTestParseValue(ValueType type) {
         // String version
         Value cent = type.oneCoin().divide(100);
-        assertEquals(cent, parseValue(type, "0.01"));
-        assertEquals(cent, parseValue(type, "1E-2"));
-        assertEquals(type.oneCoin().add(cent), parseValue(type, "1.01"));
-        assertEquals(type.oneCoin().negate(), parseValue(type, "-1"));
+        assertEquals(cent, parse(type, "0.01"));
+        assertEquals(cent, parse(type, "1E-2"));
+        assertEquals(type.oneCoin().add(cent), parse(type, "1.01"));
+        assertEquals(type.oneCoin().negate(), parse(type, "-1"));
         try {
-            parseValue(type, "2E-20");
+            parse(type, "2E-20");
             org.junit.Assert.fail("should not have accepted fractional satoshis");
-        } catch (ArithmeticException e) {
+        } catch (ArithmeticException e) {}
+    }
+
+
+    @Test
+    public void testParseValue2() {
+        for (ValueType type : types) {
+            runTestParseValue2(type);
         }
+    }
+
+    public void runTestParseValue2(ValueType type) {
+        // BigDecimal version
+        Value cent = type.oneCoin().divide(100);
+        BigDecimal bigDecimalCent = BigDecimal.ONE.divide(new BigDecimal(100));
+        assertEquals(cent, parse(type, bigDecimalCent));
+        assertEquals(type.oneCoin().add(cent), parse(type, BigDecimal.ONE.add(bigDecimalCent)));
+        assertEquals(type.oneCoin().negate(), parse(type, BigDecimal.ONE.negate()));
+        try {
+            parse(type, new BigDecimal("2E-20"));
+            org.junit.Assert.fail("should not have accepted fractional satoshis");
+        } catch (ArithmeticException e) {}
     }
 
     @Test
@@ -93,5 +122,75 @@ public class ValueTest {
         assertTrue(valueOf(type, 1).isLessThan(valueOf(type, 2)));
         assertFalse(valueOf(type, 2).isLessThan(valueOf(type, 2)));
         assertFalse(valueOf(type, 2).isLessThan(valueOf(type, 1)));
+    }
+
+    @Test
+    public void testEquals() {
+        Value btcSatoshi = Value.valueOf(BitcoinMain.get(), 1);
+        Value btcSatoshi2 = Value.valueOf(BitcoinMain.get(), 1);
+        Value btcValue = Value.parse(BitcoinMain.get(), "3.14159");
+        Value ltcSatoshi = Value.valueOf(LitecoinMain.get(), 1);
+        Value ppcValue = Value.parse(PeercoinMain.get(), "3.14159");
+
+        assertTrue(btcSatoshi.equals(btcSatoshi2));
+        assertFalse(btcSatoshi.equals(ltcSatoshi));
+        assertFalse(btcSatoshi.equals(btcValue));
+        assertFalse(btcSatoshi.equals(ppcValue));
+        assertFalse(btcValue.equals(ppcValue));
+    }
+
+    @Test
+    public void testIsOfType() {
+        assertTrue(BTC.oneCoin().isOfType(BTC));
+        assertTrue(BTC.oneCoin().isOfType(BTC.oneCoin()));
+        assertFalse(BTC.oneCoin().isOfType(LTC));
+        assertFalse(BTC.oneCoin().isOfType(LTC.oneCoin()));
+    }
+
+    @Test
+    public void testWithin() {
+        assertTrue(BTC.value("5").within(BTC.value("1"), BTC.value("10")));
+        assertTrue(BTC.value("1").within(BTC.value("1"), BTC.value("10")));
+        assertTrue(BTC.value("10").within(BTC.value("1"), BTC.value("10")));
+        assertFalse(BTC.value("0.1").within(BTC.value("1"), BTC.value("10")));
+        assertFalse(BTC.value("11").within(BTC.value("1"), BTC.value("10")));
+    }
+
+    @Test
+    public void testMathOperators() {
+        assertEquals(BTC.value("3.14159"), BTC.value("3").add(BTC.value(".14159")));
+        assertEquals(BTC.value("2"), BTC.oneCoin().add(Coin.COIN));
+        assertEquals(LTC.value("1"), LTC.value("100").subtract(LTC.value("99")));
+        assertEquals(100L, USD.value("100").divide(USD.value("1")));
+        assertArrayEquals(new Value[]{NBT.value("0.0001"), NBT.value("0.0002")},
+                NBT.value("0.0012").divideAndRemainder(10));
+        // max
+        assertEquals(BTC.value("10"), Value.max(BTC.value("1"), BTC.value("10")));
+        assertEquals(BTC.value("0.5"), Value.max(BTC.value("0.5"), BTC.value("-0.5")));
+        assertEquals(BTC.value("1"), Value.max(BTC.value("1"), BTC.value("0")));
+        // min
+        assertEquals(BTC.value("1"), Value.min(BTC.value("1"), BTC.value("10")));
+        assertEquals(BTC.value("-0.5"), Value.min(BTC.value("0.5"), BTC.value("-0.5")));
+        assertEquals(BTC.value("0"), Value.min(BTC.value("1"), BTC.value("0")));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testAddFail() {
+        BTC.oneCoin().add(LTC.oneCoin());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testSubtractFail() {
+        BTC.oneCoin().subtract(LTC.oneCoin());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testDivideFail() {
+        BTC.oneCoin().divide(LTC.oneCoin());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCompareFail() {
+        BTC.oneCoin().divide(LTC.oneCoin());
     }
 }

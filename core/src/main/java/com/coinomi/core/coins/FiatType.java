@@ -3,6 +3,8 @@ package com.coinomi.core.coins;
 import com.coinomi.core.util.Currencies;
 import com.coinomi.core.util.MonetaryFormat;
 
+import org.bitcoinj.core.Coin;
+
 import java.math.BigInteger;
 import java.util.HashMap;
 
@@ -20,12 +22,12 @@ public class FiatType implements ValueType {
     public static final MonetaryFormat FRIENDLY_FORMAT = new MonetaryFormat().noCode()
             .minDecimals(2).optionalDecimals(2, 2, 2).postfixCode();
 
-    private static final HashMap<String, FiatType> types = new HashMap<String, FiatType>();
+    private static final HashMap<String, FiatType> types = new HashMap<>();
 
     private final String name;
     private final String currencyCode;
-    private Value oneCoin;
-    private MonetaryFormat friendlyFormat;
+    private transient Value oneCoin;
+    private transient MonetaryFormat friendlyFormat;
 
     public FiatType(final String currencyCode, @Nullable final String name) {
         this.name = name != null ? name : "";
@@ -61,6 +63,26 @@ public class FiatType implements ValueType {
             oneCoin = Value.valueOf(this, units.longValue());
         }
         return oneCoin;
+    }
+
+    @Override
+    public Value minNonDust() {
+        return value(1);
+    }
+
+    @Override
+    public Value value(Coin coin) {
+        return Value.valueOf(this, coin);
+    }
+
+    @Override
+    public Value value(long units) {
+        return Value.valueOf(this, units);
+    }
+
+    @Override
+    public Value value(String string) {
+        return Value.parse(this, string);
     }
 
     @Override

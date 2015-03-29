@@ -25,6 +25,8 @@ public interface BlockchainConnection {
 
     void broadcastTx(final Transaction tx, final TransactionEventListener listener);
 
+    boolean broadcastTxSync(final Transaction tx);
+
     void ping();
 
 }

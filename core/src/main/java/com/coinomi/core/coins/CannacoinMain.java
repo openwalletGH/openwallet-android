@@ -21,9 +21,9 @@ public class CannacoinMain extends CoinType {
         uriScheme = "cannacoin";
         bip44Index = 19;
         unitExponent = 8;
-        feePerKb = Coin.valueOf(100000);
-        minNonDust = Coin.valueOf(1000000);
-        softDustLimit = Coin.valueOf(100000000);
+        feePerKb = value(100000);
+        minNonDust = value(1000000);
+        softDustLimit = value(100000000);
         softDustPolicy = SoftDustPolicy.BASE_FEE_FOR_EACH_SOFT_DUST_TXO;
     }
 
