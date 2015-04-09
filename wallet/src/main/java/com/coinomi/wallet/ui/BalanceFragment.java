@@ -287,19 +287,9 @@ public class BalanceFragment extends Fragment implements WalletAccountEventListe
     public void onNewBlock(WalletAccount pocket) {
     }
 
-    @Override
-    public void onTransactionConfidenceChanged(WalletAccount pocket, Transaction tx) {
-    }
-
-    @Override
-    public void onTransactionBroadcastFailure(WalletAccount pocket, Transaction tx) {
-        if (listener != null) listener.onTransactionBroadcastFailure(pocket, tx);
-    }
-
-    @Override
-    public void onTransactionBroadcastSuccess(WalletAccount pocket, Transaction tx) {
-        if (listener != null) listener.onTransactionBroadcastSuccess(pocket, tx);
-    }
+    @Override public void onTransactionConfidenceChanged(WalletAccount pocket, Transaction tx) { }
+    @Override public void onTransactionBroadcastFailure(WalletAccount pocket, Transaction tx) { }
+    @Override public void onTransactionBroadcastSuccess(WalletAccount pocket, Transaction tx) { }
 
     @Override
     public void onPocketChanged(WalletAccount pocket) {
@@ -564,9 +554,5 @@ public class BalanceFragment extends Fragment implements WalletAccountEventListe
 
     public interface Listener {
         public void onLocalAmountClick();
-
-        public void onTransactionBroadcastSuccess(WalletAccount pocket, Transaction transaction);
-
-        public void onTransactionBroadcastFailure(WalletAccount pocket, Transaction transaction);
     }
 }

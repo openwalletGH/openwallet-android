@@ -35,6 +35,7 @@ import com.coinomi.core.coins.Value;
 import com.coinomi.core.uri.CoinURI;
 import com.coinomi.core.uri.CoinURIParseException;
 import com.coinomi.core.util.GenericUtils;
+import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.core.wallet.WalletPocketHD;
 import com.coinomi.core.wallet.exceptions.NoSuchPocketException;
 import com.coinomi.wallet.AddressBookProvider;
@@ -43,6 +44,7 @@ import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.ExchangeRatesProvider;
 import com.coinomi.wallet.ExchangeRatesProvider.ExchangeRate;
 import com.coinomi.wallet.R;
+import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.ui.widget.AmountEditView;
 import com.coinomi.wallet.util.ThrottlingWalletChangeListener;
 import com.coinomi.wallet.util.WeakHandler;
@@ -51,6 +53,7 @@ import org.bitcoinj.core.Address;
 import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.InsufficientMoneyException;
+import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.Wallet;
 import org.bitcoinj.crypto.KeyCrypterException;
 import org.bitcoinj.utils.Threading;
@@ -96,7 +99,8 @@ public class SendFragment extends Fragment {
     private State state = State.INPUT;
     private Address address;
     private Coin sendAmount;
-    @Nullable private WalletActivity activity;
+    private WalletApplication application;
+    private Listener listener;
     @Nullable private WalletPocketHD pocket;
     private Configuration config;
     private NavigationDrawerFragment mNavigationDrawerFragment;
@@ -104,6 +108,7 @@ public class SendFragment extends Fragment {
     private ReceivingAddressViewAdapter sendToAddressViewAdapter;
 
     Handler handler = new MyHandler(this);
+
     private static class MyHandler extends WeakHandler<SendFragment> {
         public MyHandler(SendFragment referencingObject) { super(referencingObject); }
 
@@ -146,10 +151,10 @@ public class SendFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null && activity != null) {
+        if (getArguments() != null) {
             String accountId = checkNotNull(getArguments().getString(Constants.ARG_ACCOUNT_ID));
             //TODO
-            pocket = (WalletPocketHD) activity.getWalletApplication().getAccount(accountId);
+            pocket = (WalletPocketHD) application.getAccount(accountId);
         }
 
         if (pocket == null) {
@@ -180,7 +185,7 @@ public class SendFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_send, container, false);
 
         sendToAddressView = (AutoCompleteTextView) view.findViewById(R.id.send_to_address);
-        sendToAddressViewAdapter = new ReceivingAddressViewAdapter(activity);
+        sendToAddressViewAdapter = new ReceivingAddressViewAdapter(application);
         sendToAddressView.setAdapter(sendToAddressViewAdapter);
         sendToAddressView.setOnFocusChangeListener(receivingAddressListener);
         sendToAddressView.addTextChangedListener(receivingAddressListener);
@@ -276,7 +281,7 @@ public class SendFragment extends Fragment {
         }
         state = State.PREPARATION;
         updateView();
-        if (activity != null && activity.getWalletApplication().getWallet() != null) {
+        if (application.getWallet() != null) {
             onMakeTransaction(address, sendAmount);
         }
         reset();
@@ -288,9 +293,16 @@ public class SendFragment extends Fragment {
             if (pocket == null) {
                 throw new NoSuchPocketException("No pocket found for " + type.getName());
             }
+
+            // Decide if emptying wallet or not
+            if (lastBalance != null && amount.compareTo(lastBalance) == 0) {
+                intent.putExtra(Constants.ARG_EMPTY_WALLET, true);
+            } else {
+                intent.putExtra(Constants.ARG_SEND_VALUE, Value.valueOf(type, amount));
+            }
             intent.putExtra(Constants.ARG_ACCOUNT_ID, pocket.getId());
             intent.putExtra(Constants.ARG_SEND_TO_ADDRESS, toAddress);
-            intent.putExtra(Constants.ARG_SEND_VALUE, Value.valueOf(type, amount));
+
             startActivityForResult(intent, SIGN_TRANSACTION);
         } catch (NoSuchPocketException e) {
             Toast.makeText(getActivity(), R.string.no_such_pocket_error, Toast.LENGTH_LONG).show();
@@ -334,6 +346,7 @@ public class SendFragment extends Fragment {
 
                 if (error == null) {
                     Toast.makeText(getActivity(), R.string.sending_msg, Toast.LENGTH_SHORT).show();
+                    if (listener != null) listener.onTransactionBroadcastSuccess(pocket, null);
                 } else {
                     if (error instanceof InsufficientMoneyException) {
                         Toast.makeText(getActivity(), R.string.amount_error_not_enough_money_plain, Toast.LENGTH_LONG).show();
@@ -350,6 +363,7 @@ public class SendFragment extends Fragment {
                         String errorMessage = getString(R.string.send_coins_error, error.getMessage());
                         Toast.makeText(getActivity(), errorMessage, Toast.LENGTH_LONG).show();
                     }
+                    if (listener != null) listener.onTransactionBroadcastFailure(pocket, null);
                 }
             }
         }
@@ -564,19 +578,25 @@ public class SendFragment extends Fragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            this.activity = (WalletActivity) activity;
-            this.config = ((WalletActivity) activity).getWalletApplication().getConfiguration();
+            this.listener = (Listener) activity;
+            this.application = (WalletApplication) activity.getApplication();
+            this.config = application.getConfiguration();
             this.loaderManager = getLoaderManager();
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement " + WalletActivity.class);
+                    + " must implement " + Listener.class);
         }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        activity = null;
+        listener = null;
+    }
+
+    public interface Listener {
+        public void onTransactionBroadcastSuccess(WalletAccount pocket, Transaction transaction);
+        public void onTransactionBroadcastFailure(WalletAccount pocket, Transaction transaction);
     }
 
     private abstract class EditViewListener implements View.OnFocusChangeListener, TextWatcher {
@@ -660,8 +680,8 @@ public class SendFragment extends Fragment {
         @Override
         public Loader<Cursor> onCreateLoader(final int id, final Bundle args) {
             final String constraint = args != null ? args.getString("constraint") : null;
-            Uri uri = AddressBookProvider.contentUri(activity.getPackageName(), type);
-            return new CursorLoader(activity, uri, null, AddressBookProvider.SELECTION_QUERY,
+            Uri uri = AddressBookProvider.contentUri(application.getPackageName(), type);
+            return new CursorLoader(application, uri, null, AddressBookProvider.SELECTION_QUERY,
                     new String[]{constraint != null ? constraint : ""}, null);
         }
 

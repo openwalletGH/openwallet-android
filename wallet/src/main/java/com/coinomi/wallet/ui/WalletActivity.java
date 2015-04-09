@@ -53,7 +53,8 @@ import static com.coinomi.wallet.ui.NavDrawerItemType.ITEM_TRADE;
  * @author Andreas Schildbach
  */
 final public class WalletActivity extends BaseWalletActivity implements
-        NavigationDrawerFragment.NavigationDrawerCallbacks, BalanceFragment.Listener {
+        NavigationDrawerFragment.NavigationDrawerCallbacks, BalanceFragment.Listener,
+        SendFragment.Listener {
     private static final Logger log = LoggerFactory.getLogger(WalletActivity.class);
 
     private static final int RECEIVE = 0;
