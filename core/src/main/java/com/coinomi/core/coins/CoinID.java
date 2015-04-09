@@ -2,16 +2,12 @@ package com.coinomi.core.coins;
 
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.AddressFormatException;
-import org.bitcoinj.core.Base58;
-import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.params.Networks;
 
-import com.coinomi.core.uri.CoinURIParseException;
 import com.google.common.collect.ImmutableList;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -27,7 +23,7 @@ public enum CoinID {
     DOGECOIN_TEST(DogecoinTest.get()),
     REDDCOIN_MAIN(ReddcoinMain.get()),
     PEERCOIN_MAIN(PeercoinMain.get()),
-    DARKCOIN_MAIN(DarkcoinMain.get()),
+    DASH_MAIN(DashMain.get()),
     NUSHARES_MAIN(NuSharesMain.get()),
     NUBITS_MAIN(NuBitsMain.get()),
     NAMECOIN_MAIN(NamecoinMain.get()),

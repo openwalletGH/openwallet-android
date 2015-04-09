@@ -20,7 +20,7 @@ package com.coinomi.core.uri;
 
 import com.coinomi.core.coins.BitcoinMain;
 import com.coinomi.core.coins.BitcoinTest;
-import com.coinomi.core.coins.DarkcoinMain;
+import com.coinomi.core.coins.DashMain;
 import com.coinomi.core.coins.DogecoinMain;
 import com.coinomi.core.coins.LitecoinMain;
 import com.coinomi.core.coins.PeercoinMain;
@@ -101,9 +101,9 @@ public class CoinURITest {
         assertEquals("peercoin:" + goodAddressStr + "?amount=12.34&label=Hello&message=AMessage", CoinURI.convertToCoinURI(goodAddress, parseCoin(PeercoinMain.get(), "12.34"), "Hello", "AMessage"));
 
         // Darkcoin
-        goodAddress = new Address(DarkcoinMain.get(), hash160);
+        goodAddress = new Address(DashMain.get(), hash160);
         goodAddressStr = goodAddress.toString();
-        assertEquals("darkcoin:" + goodAddressStr + "?amount=12.34&label=Hello&message=AMessage", CoinURI.convertToCoinURI(goodAddress, parseCoin(DarkcoinMain.get(), "12.34"), "Hello", "AMessage"));
+        assertEquals("darkcoin:" + goodAddressStr + "?amount=12.34&label=Hello&message=AMessage", CoinURI.convertToCoinURI(goodAddress, parseCoin(DashMain.get(), "12.34"), "Hello", "AMessage"));
     }
 
     @Test
@@ -131,10 +131,10 @@ public class CoinURITest {
         assertEquals("12.34", GenericUtils.formatCoinValue(PeercoinMain.get(), testObject.getAmount()));
 
         // Darkcoin
-        goodAddress = new Address(DarkcoinMain.get(), hash160);
+        goodAddress = new Address(DashMain.get(), hash160);
         goodAddressStr = goodAddress.toString();
-        testObject = new CoinURI(DarkcoinMain.get(), "darkcoin:" + goodAddressStr + "?amount=12.34");
-        assertEquals("12.34", GenericUtils.formatCoinValue(DarkcoinMain.get(), testObject.getAmount()));
+        testObject = new CoinURI(DashMain.get(), "darkcoin:" + goodAddressStr + "?amount=12.34");
+        assertEquals("12.34", GenericUtils.formatCoinValue(DashMain.get(), testObject.getAmount()));
     }
 
     @Test

@@ -1,36 +1,19 @@
 package com.coinomi.wallet.ui;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.support.v4.app.DialogFragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.TextView;
 
-import com.coinomi.core.coins.CoinID;
-import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
-import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
-import com.coinomi.wallet.tasks.AddCoinTask;
-import com.coinomi.wallet.util.WeakHandler;
 
 import org.bitcoinj.core.Address;
-
-import java.util.ArrayList;
 
 import javax.annotation.Nullable;
 
 
 public class TradeActivity extends BaseWalletActivity implements
-        TradeSelectFragment.Listener, MakeTransactionFragment.Listener,
-        TradeStatusFragment.Listener, TradeSelectFragmentOld.Listener {
+        TradeSelectFragment.Listener, MakeTransactionFragment.Listener, TradeStatusFragment.Listener {
 
     private int containerRes;
 
@@ -44,13 +27,6 @@ public class TradeActivity extends BaseWalletActivity implements
         setContentView(R.layout.activity_trade);
 
         containerRes = R.id.container;
-
-//        new AlertDialog.Builder(this)
-//                .setTitle(R.string.terms_of_use_title)
-//                .setMessage(R.string.terms_of_use_message)
-//                .setNegativeButton(R.string.button_disagree, null)
-//                .setPositiveButton(R.string.button_agree, null)
-//                .create().show();
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()

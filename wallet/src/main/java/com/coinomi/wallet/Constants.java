@@ -8,13 +8,12 @@ import com.coinomi.core.coins.BlackcoinMain;
 import com.coinomi.core.coins.CannacoinMain;
 import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
-import com.coinomi.core.coins.DarkcoinMain;
+import com.coinomi.core.coins.DashMain;
 import com.coinomi.core.coins.DigibyteMain;
 import com.coinomi.core.coins.DigitalcoinMain;
 import com.coinomi.core.coins.DogecoinMain;
 import com.coinomi.core.coins.DogecoinTest;
 import com.coinomi.core.coins.FeathercoinMain;
-import com.coinomi.core.coins.FiatType;
 import com.coinomi.core.coins.LitecoinMain;
 import com.coinomi.core.coins.LitecoinTest;
 import com.coinomi.core.coins.NuBitsMain;
@@ -24,7 +23,6 @@ import com.coinomi.core.coins.ReddcoinMain;
 import com.coinomi.core.coins.RubycoinMain;
 import com.coinomi.core.coins.UroMain;
 import com.coinomi.core.network.CoinAddress;
-import com.coinomi.core.util.MonetaryFormat;
 import com.coinomi.stratumj.ServerAddress;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -118,7 +116,7 @@ public class Constants {
                                                     new ServerAddress("blk-cce-2.coinomi.net", 5015)),
             new CoinAddress(FeathercoinMain.get(),  new ServerAddress("ftc-cce-1.coinomi.net", 5017),
                                                     new ServerAddress("ftc-cce-2.coinomi.net", 5017)),
-            new CoinAddress(DarkcoinMain.get(),     new ServerAddress("drk-cce-1.coinomi.net", 5013),
+            new CoinAddress(DashMain.get(),     new ServerAddress("drk-cce-1.coinomi.net", 5013),
                                                     new ServerAddress("drk-cce-2.coinomi.net", 5013)),
             new CoinAddress(RubycoinMain.get(),     new ServerAddress("rby-cce-1.coinomi.net", 5018),
                                                     new ServerAddress("rby-cce-2.coinomi.net", 5018)),
@@ -142,7 +140,7 @@ public class Constants {
         COINS_ICONS.put(CoinID.LITECOIN_MAIN.getCoinType(), R.drawable.litecoin);
         COINS_ICONS.put(CoinID.LITECOIN_TEST.getCoinType(), R.drawable.litecoin_test);
         COINS_ICONS.put(CoinID.PEERCOIN_MAIN.getCoinType(), R.drawable.peercoin);
-        COINS_ICONS.put(CoinID.DARKCOIN_MAIN.getCoinType(), R.drawable.darkcoin);
+        COINS_ICONS.put(CoinID.DASH_MAIN.getCoinType(), R.drawable.dash);
         COINS_ICONS.put(CoinID.REDDCOIN_MAIN.getCoinType(), R.drawable.reddcoin);
         COINS_ICONS.put(CoinID.NUSHARES_MAIN.getCoinType(), R.drawable.nushares);
         COINS_ICONS.put(CoinID.NUBITS_MAIN.getCoinType(), R.drawable.nubits);
@@ -163,7 +161,7 @@ public class Constants {
         COINS_BLOCK_EXPLORERS.put(CoinID.LITECOIN_MAIN.getCoinType(), "http://ltc.blockr.io/tx/info/%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.LITECOIN_TEST.getCoinType(), "https://chain.so/tx/LTCTEST/%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.PEERCOIN_MAIN.getCoinType(), "http://ppc.blockr.io/tx/info/%s");
-        COINS_BLOCK_EXPLORERS.put(CoinID.DARKCOIN_MAIN.getCoinType(), "https://bitinfocharts.com/darkcoin/tx/%s");
+        COINS_BLOCK_EXPLORERS.put(CoinID.DASH_MAIN.getCoinType(), "https://bitinfocharts.com/darkcoin/tx/%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.NUSHARES_MAIN.getCoinType(), "http://blockexplorer.nu/transactions/%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.NUBITS_MAIN.getCoinType(), "http://blockexplorer.nu/transactions/%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.REDDCOIN_MAIN.getCoinType(), "http://live.reddcoin.com/tx/%s");
@@ -192,7 +190,7 @@ public class Constants {
             NuBitsMain.get(),
             PeercoinMain.get(),
             NuSharesMain.get(),
-            DarkcoinMain.get(),
+            DashMain.get(),
             BlackcoinMain.get(),
             RubycoinMain.get(),
             ReddcoinMain.get(),
