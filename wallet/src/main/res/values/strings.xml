@@ -61,7 +61,7 @@
     <!-- SendOutput widget -->
     <string name="fee">Transaction fee</string>
     <string name="send">Send</string>
-    <string name="trade">Trade</string>
+    <string name="trade">Exchange</string>
     <string name="receive">Receive</string>
 
     <!-- Welcome fragment -->
@@ -170,7 +170,7 @@
     <string name="password_failed">The password entered is not valid.</string>
     <string name="sending_msg">Sending&#8230;</string>
     <string name="sent_msg">Sent! Please wait for transaction confirmation.</string>
-    <string name="trade_expired">Trade expired</string>
+    <string name="trade_expired">Exchange expired</string>
     <string name="tx_confirm_timer_message">Please confirm this transaction in the next %1$s</string>
     <plurals name="tx_confirm_timer_minute">
         <item quantity="one">%s minute</item>
@@ -258,15 +258,15 @@
     <string name="seed_working">Please wait&#8230;</string>
     <string name="seed_password_protected">This recovery phrase is password protected</string>
 
-    <!-- Trade -->
+    <!-- Exchange -->
 
-    <string name="title_activity_trade">Trade (beta)</string>
-    <string name="trade_info">Select the coins you wish to trade.\nThe converted coins will be automatically added to your wallet.</string>
-    <string name="trade_from_coin_label">trade</string>
+    <string name="title_activity_trade">Exchange (beta)</string>
+    <string name="trade_info">Select the coins you wish to exchange.\nThe converted coins will be automatically added to your wallet.</string>
+    <string name="trade_from_coin_label">exchange</string>
     <string name="trade_to_coin_label">receive</string>
     <string name="trade_warn_no_account_found">You will be prompted to add a %1$s wallet</string>
     <string name="trade_warn_no_connection_title">No connection</string>
-    <string name="trade_warn_no_connection_message">Internet connection is needed to trade.</string>
+    <string name="trade_warn_no_connection_message">Internet connection is needed to exchange coins.</string>
     <string name="trade_market_info_error">Could not get information about %1$s - %2$s pair</string>
     <string name="trade_error">Exchange error</string>
     <string name="trade_error_message">An error occurred while connecting to the exchange.\n\nTechnical details:\n\n<b>%1$s</b></string>
@@ -274,16 +274,16 @@
     <string name="trade_error_max_limit">The supplied amount exceeds the limit of %1$s %2$s. Please use a smaller amount.</string>
     <string name="trade_error_min_limit">The minimum amount is at least %1$s or %2$s</string>
 
-    <!-- Trade Status -->
-    <string name="trade_status_message">Your trade will complete shortly. You can exit this screen without affecting the trade.</string>
+    <!-- Exchange Status -->
+    <string name="trade_status_message">Your order will complete shortly. You can exit this screen without affecting the exchange.</string>
     <string name="trade_status_label">status</string>
     <string name="trade_status_waiting_deposit">Waiting for deposit&#8230;</string>
     <string name="trade_status_received_deposit">Received deposit of %1$s</string>
-    <string name="trade_status_waiting_trade">Waiting for trade&#8230;</string>
-    <string name="trade_status_complete">Trade complete, sent %1$s</string>
+    <string name="trade_status_waiting_trade">Waiting for exchange&#8230;</string>
+    <string name="trade_status_complete">Exchange complete, sent %1$s</string>
     <string name="trade_status_view_transaction">View transaction</string>
     <string name="trade_status_email_receipt">Email receipt</string>
-    <string name="trade_status_failed">Trade failed: %1$s</string>
+    <string name="trade_status_failed">Exchange failed: %1$s</string>
 
     <!-- ShapeShift -->
     <string name="about_shapeshift_title">About ShapeShift.io</string>

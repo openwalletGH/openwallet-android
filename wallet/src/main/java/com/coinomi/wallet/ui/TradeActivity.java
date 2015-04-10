@@ -41,7 +41,14 @@ public class TradeActivity extends BaseWalletActivity implements
         args.putString(Constants.ARG_ACCOUNT_ID, fromAccount.getId());
         args.putString(Constants.ARG_SEND_TO_ACCOUNT_ID, toAccount.getId());
         if (amount.type.equals(fromAccount.getCoinType())) {
-            args.putSerializable(Constants.ARG_SEND_VALUE, amount);
+            // TODO set the empty wallet flag in the fragment
+            // Decide if emptying wallet or not
+            Value lastBalance = fromAccount.getBalance(false);
+            if (amount.compareTo(lastBalance) == 0) {
+                args.putSerializable(Constants.ARG_EMPTY_WALLET, true);
+            } else {
+                args.putSerializable(Constants.ARG_SEND_VALUE, amount);
+            }
         } else if (amount.type.equals(toAccount.getCoinType())) {
             args.putSerializable(Constants.ARG_SEND_VALUE, amount);
         } else {

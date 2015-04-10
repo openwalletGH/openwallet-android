@@ -79,6 +79,11 @@ For now test it manually by installing it `adb install -r wallet/wallet-release.
 
 ## Version history
 
+New in version 1.5.13
+- Integrated exchange (beta)
+- Rebranding of Darkcoin to Dash
+- UI tweaks
+
 New in version 1.5.12
 - Click on any addresses to edit the label or copy it
 - Dedicated copy address button in the receive screen
