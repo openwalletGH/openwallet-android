@@ -321,7 +321,7 @@ final public class WalletActivity extends BaseWalletActivity implements
 
         if (pm.resolveActivity(binaryIntent, 0) != null)
         {
-            builder.setNeutralButton(R.string.button_download, new DialogInterface.OnClickListener() {
+            builder.setPositiveButton(R.string.button_download, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(final DialogInterface dialog, final int id) {
                     startActivity(binaryIntent);
