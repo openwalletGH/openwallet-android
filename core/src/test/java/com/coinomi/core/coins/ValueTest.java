@@ -161,6 +161,7 @@ public class ValueTest {
         assertEquals(BTC.value("3.14159"), BTC.value("3").add(BTC.value(".14159")));
         assertEquals(BTC.value("2"), BTC.oneCoin().add(Coin.COIN));
         assertEquals(LTC.value("1"), LTC.value("100").subtract(LTC.value("99")));
+        assertEquals(LTC.value("1"), LTC.value("100").subtract("99"));
         assertEquals(100L, USD.value("100").divide(USD.value("1")));
         assertArrayEquals(new Value[]{NBT.value("0.0001"), NBT.value("0.0002")},
                 NBT.value("0.0012").divideAndRemainder(10));

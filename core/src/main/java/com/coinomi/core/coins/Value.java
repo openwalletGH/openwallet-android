@@ -122,6 +122,10 @@ public class Value implements Monetary, Comparable<Value>, Serializable {
         return new Value(this.type, LongMath.checkedSubtract(this.value, value.value));
     }
 
+    public Value subtract(String str) {
+        return subtract(type.value(str));
+    }
+
     public Value multiply(final long factor) {
         return new Value(this.type, LongMath.checkedMultiply(this.value, factor));
     }

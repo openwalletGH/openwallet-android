@@ -35,9 +35,4 @@ public class ShapeShiftLimit extends ShapeShiftPairBase {
             minimum = null;
         }
     }
-
-    private static Value parseValue(CoinType type, String string, RoundingMode roundingMode) {
-        BigDecimal value = new BigDecimal(string).setScale(type.getUnitExponent(), roundingMode);
-        return Value.parse(type, value);
-    }
 }

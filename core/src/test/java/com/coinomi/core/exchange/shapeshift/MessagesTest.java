@@ -5,6 +5,7 @@ import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.DogecoinMain;
 import com.coinomi.core.coins.LitecoinMain;
 import com.coinomi.core.coins.NuBitsMain;
+import com.coinomi.core.coins.PeercoinMain;
 import com.coinomi.core.coins.Value;
 import com.coinomi.core.exchange.shapeshift.data.ShapeShiftAmountTx;
 import com.coinomi.core.exchange.shapeshift.data.ShapeShiftCoin;
@@ -33,6 +34,7 @@ public class MessagesTest {
     final CoinType LTC = LitecoinMain.get();
     final CoinType DOGE = DogecoinMain.get();
     final CoinType NBT = NuBitsMain.get();
+    final CoinType PPC = PeercoinMain.get();
     final Value ONE_BTC = BTC.oneCoin();
     final Value ONE_LTC = LTC.oneCoin();
 
@@ -100,12 +102,12 @@ public class MessagesTest {
     public void testMarketInfo() throws JSONException, ShapeShiftException {
         JSONObject json = new JSONObject(
                 "{" +
-                    "\"pair\" : \"btc_nbt\"," +
-                    "\"rate\" : \"100\"," +
-                    "\"minerFee\" : \"0.01\"," +
-                    "\"limit\" : \"4\"," +
-                    "\"minimum\" : 0.00000104" +
-                "}");
+                        "\"pair\" : \"btc_nbt\"," +
+                        "\"rate\" : \"100\"," +
+                        "\"minerFee\" : \"0.01\"," +
+                        "\"limit\" : \"4\"," +
+                        "\"minimum\" : 0.00000104" +
+                        "}");
         ShapeShiftMarketInfo marketInfo = new ShapeShiftMarketInfo(json);
         assertNotNull(marketInfo);
         assertFalse(marketInfo.isError);
@@ -122,6 +124,57 @@ public class MessagesTest {
         assertEquals(NBT.value("99.99"), marketInfo.rate.convert(BTC.value("1")));
         assertEquals(BTC.value("4"), marketInfo.limit);
         assertEquals(BTC.value("0.00000104"), marketInfo.minimum);
+    }
+
+    @Test
+    public void testMarketInfo2() throws JSONException, ShapeShiftException {
+        ShapeShiftMarketInfo info = new ShapeShiftMarketInfo(new JSONObject(
+                "{\n" +
+                        "pair: \"ppc_btc\",\n" +
+                        "rate: 0.00098678,\n" +
+                        "minerFee: 0.0001,\n" +
+                        "limit: 2162.11925969,\n" +
+                        "minimum: 0.17391304\n" +
+                        "}"));
+        assertEquals(BTC.value("0.00098678").subtract("0.0001"), info.rate.convert(PPC.value("1")));
+        assertEquals(PPC.value("2162.119259"), info.limit);
+        assertEquals(PPC.value("0.173914"), info.minimum);
+
+        info = new ShapeShiftMarketInfo(new JSONObject(
+                "{\n" +
+                        "pair: \"btc_ppc\",\n" +
+                        "rate: 866.73913043,\n" +
+                        "minerFee: 0.01,\n" +
+                        "limit: 1.1185671,\n" +
+                        "minimum: 0.0000198\n" +
+                        "}"));
+        assertEquals(PPC.value("866.739130").subtract("0.01"), info.rate.convert(BTC.value("1")));
+        assertEquals(BTC.value("1.1185671"), info.limit);
+        assertEquals(BTC.value("0.0000198"), info.minimum);
+
+        info = new ShapeShiftMarketInfo(new JSONObject(
+                "{\n" +
+                        "pair: \"btc_nbt\",\n" +
+                        "rate: 226.39568082,\n" +
+                        "minerFee: 0.01,\n" +
+                        "limit: 3.70968678,\n" +
+                        "minimum: 0.00008692\n" +
+                        "}"));
+        assertEquals(NBT.value("226.3957").subtract("0.01"), info.rate.convert(BTC.value("1")));
+        assertEquals(BTC.value("3.70968678"), info.limit);
+        assertEquals(BTC.value("0.00008692"), info.minimum);
+
+        info = new ShapeShiftMarketInfo(new JSONObject(
+                "{\n" +
+                        "pair: \"nbt_btc\",\n" +
+                        "rate: 0.00433171,\n" +
+                        "minerFee: 0.0001,\n" +
+                        "limit: 1021.50337123,\n" +
+                        "minimum: 0.04542677\n" +
+                        "}"));
+        assertEquals(BTC.value("0.00433171").subtract("0.0001"), info.rate.convert(NBT.value("1")));
+        assertEquals(NBT.value("1021.5033"), info.limit);
+        assertEquals(NBT.value("0.0455"), info.minimum);
     }
 
     @Test
@@ -287,16 +340,16 @@ public class MessagesTest {
     public void testTxStatus3() throws JSONException, ShapeShiftException {
         JSONObject json = new JSONObject(
                 "{" +
-                    "status: \"complete\"," +
-                    "address: \"1NDQPAGamGePkSZXW2CYBzXJEefB7N4bTN\"," +
-                    "withdraw: \"LMmeBWH17TWkQKvK7YFio2oiimPAzrHG6f\"," +
-                    "incomingCoin: 0.00297537," +
-                    "incomingType: \"BTC\"," +
-                    "outgoingCoin: \"0.42000000\"," +
-                    "outgoingType: \"LTC\"," +
-                    "transaction: " +
+                        "status: \"complete\"," +
+                        "address: \"1NDQPAGamGePkSZXW2CYBzXJEefB7N4bTN\"," +
+                        "withdraw: \"LMmeBWH17TWkQKvK7YFio2oiimPAzrHG6f\"," +
+                        "incomingCoin: 0.00297537," +
+                        "incomingType: \"BTC\"," +
+                        "outgoingCoin: \"0.42000000\"," +
+                        "outgoingType: \"LTC\"," +
+                        "transaction: " +
                         "\"66fa0b4c11227f9f05efa13d23e58c65b50acbd6395a126b5cd751064e6e79df\"" +
-                "}");
+                        "}");
         ShapeShiftTxStatus txStatus = new ShapeShiftTxStatus(json);
         assertNotNull(txStatus);
         assertFalse(txStatus.isError);
@@ -307,6 +360,33 @@ public class MessagesTest {
         assertEquals(LTC, txStatus.withdraw.getParameters());
         assertEquals(BTC.value("0.00297537"), txStatus.incomingValue);
         assertEquals(LTC.value("0.42"), txStatus.outgoingValue);
+        assertEquals("66fa0b4c11227f9f05efa13d23e58c65b50acbd6395a126b5cd751064e6e79df",
+                txStatus.transactionId);
+    }
+
+    @Test
+    public void testTxStatus3Alt() throws JSONException, ShapeShiftException {
+        JSONObject json = new JSONObject(
+                "{\n" +
+                        "status: \"complete\",\n" +
+                        "address: \"1NDQPAGamGePkSZXW2CYBzXJEefB7N4bTN\",\n" +
+                        "withdraw: \"BB6kZZi87mCd7mC1tWWJjuKGPTYQ1n2Fcg\",\n" +
+                        "incomingCoin: 0.01,\n" +
+                        "incomingType: \"BTC\",\n" +
+                        "outgoingCoin: \"2.32997513\",\n" +
+                        "outgoingType: \"NBT\",\n" +
+                        "transaction: \"66fa0b4c11227f9f05efa13d23e58c65b50acbd6395a126b5cd751064e6e79df\"\n" +
+                        "}");
+        ShapeShiftTxStatus txStatus = new ShapeShiftTxStatus(json);
+        assertNotNull(txStatus);
+        assertFalse(txStatus.isError);
+        assertEquals(ShapeShiftTxStatus.Status.COMPLETE, txStatus.status);
+        assertEquals("1NDQPAGamGePkSZXW2CYBzXJEefB7N4bTN", txStatus.address.toString());
+        assertEquals(BTC, txStatus.address.getParameters());
+        assertEquals("BB6kZZi87mCd7mC1tWWJjuKGPTYQ1n2Fcg", txStatus.withdraw.toString());
+        assertEquals(NBT, txStatus.withdraw.getParameters());
+        assertEquals(BTC.value("0.01"), txStatus.incomingValue);
+        assertEquals(NBT.value("2.33"), txStatus.outgoingValue);
         assertEquals("66fa0b4c11227f9f05efa13d23e58c65b50acbd6395a126b5cd751064e6e79df",
                 txStatus.transactionId);
     }
@@ -333,17 +413,7 @@ public class MessagesTest {
     @Test
     public void testTxStatus5() throws JSONException, ShapeShiftException {
         JSONObject json = new JSONObject(
-                "{" +
-                        "status: \"new_fancy_optional_status\"," +
-                        "address: \"1NDQPAGamGePkSZXW2CYBzXJEefB7N4bTN\"," +
-                        "withdraw: \"LMmeBWH17TWkQKvK7YFio2oiimPAzrHG6f\"," +
-                        "incomingCoin: 0.00297537," +
-                        "incomingType: \"BTC\"," +
-                        "outgoingCoin: \"0.42000000\"," +
-                        "outgoingType: \"LTC\"," +
-                        "transaction: " +
-                        "\"66fa0b4c11227f9f05efa13d23e58c65b50acbd6395a126b5cd751064e6e79df\"" +
-                        "}");
+                "{status: \"new_fancy_optional_status\"}");
         ShapeShiftTxStatus txStatus = new ShapeShiftTxStatus(json);
         assertNotNull(txStatus);
         assertFalse(txStatus.isError);

@@ -9,6 +9,8 @@ import org.bitcoinj.core.AddressFormatException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.math.RoundingMode;
+
 /**
  * @author John L. Jegutanis
  */
@@ -47,7 +49,7 @@ public class ShapeShiftTxStatus extends ShapeShiftBase {
                         inType = CoinID.typeFromSymbol(data.getString("incomingType"));
                         address = new Address(inType, data.getString("address"));
                         withdraw = null;
-                        incomingValue = Value.parse(inType, data.getString("incomingCoin"));
+                        incomingValue = parseValueRound(inType, data.getString("incomingCoin"));
                         outgoingValue = null;
                         transactionId = null;
                         break;
@@ -57,8 +59,8 @@ public class ShapeShiftTxStatus extends ShapeShiftBase {
                         outType = CoinID.typeFromSymbol(data.getString("outgoingType"));
                         address = new Address(inType, data.getString("address"));
                         withdraw = new Address(outType, data.getString("withdraw"));
-                        incomingValue = Value.parse(inType, data.getString("incomingCoin"));
-                        outgoingValue = Value.parse(outType, data.getString("outgoingCoin"));
+                        incomingValue = parseValueRound(inType, data.getString("incomingCoin"));
+                        outgoingValue = parseValueRound(outType, data.getString("outgoingCoin"));
                         transactionId = data.getString("transaction");
                         break;
                     case "failed":
