@@ -160,7 +160,7 @@ public class ShapeShift extends Connection {
         Request request = new Request.Builder().url(apiUrl).build();
         ShapeShiftTxStatus reply = new ShapeShiftTxStatus(getMakeApiCall(request));
         if (!reply.isError && reply.address != null) checkAddress(address, reply.address);
-        return reply;
+        return new ShapeShiftTxStatus(reply, address);
     }
 
     /**

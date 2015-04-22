@@ -7,4 +7,7 @@
     <declare-styleable name="SendOutput">
         <attr name="is_fee" format="boolean" />
     </declare-styleable>
+    <declare-styleable name="AddressView">
+        <attr name="multi_line" format="boolean" />
+    </declare-styleable>
 </resources>

@@ -13,4 +13,7 @@
         android:icon="@drawable/refresh_menu"
         app:showAsAction="ifRoom" />
 
+    <item android:id="@+id/action_exchange_history"
+        android:title="@string/action_exchange_history"
+        app:showAsAction="never" />
 </menu>

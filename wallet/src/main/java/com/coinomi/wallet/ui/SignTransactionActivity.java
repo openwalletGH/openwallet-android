@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Handler;
 
 import com.coinomi.wallet.Constants;
+import com.coinomi.wallet.ExchangeHistoryProvider;
 import com.coinomi.wallet.R;
 
 import org.bitcoinj.core.Address;
@@ -41,5 +42,6 @@ public class SignTransactionActivity extends AbstractWalletFragmentActivity
     }
 
     @Override
-    public void onTradeDeposit(Address deposit) { }
+    public void onTradeDeposit(ExchangeHistoryProvider.ExchangeEntry exchangeEntry) { }
+
 }

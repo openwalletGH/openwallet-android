@@ -78,7 +78,6 @@
     <dimen name="transaction_row_confirmations_font_icon_size">18sp</dimen>
     <dimen name="transaction_row_text_size_direction_text">@dimen/row_text_size_header_text</dimen>
     <dimen name="transaction_row_text_size_amount">@dimen/row_text_size_amount</dimen>
-    <dimen name="transaction_row_text_size_label">@dimen/row_text_size_label</dimen>
     <dimen name="transaction_row_text_size_date">@dimen/row_text_size_date</dimen>
     <dimen name="transaction_row_padding_vertical">@dimen/row_padding_vertical</dimen>
     <dimen name="transaction_row_padding_horizontal">@dimen/row_padding_horizontal</dimen>

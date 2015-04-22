@@ -4,10 +4,12 @@ import com.coinomi.core.util.MonetaryFormat;
 
 import org.bitcoinj.core.Coin;
 
+import java.io.Serializable;
+
 /**
  * @author John L. Jegutanis
  */
-public interface ValueType {
+public interface ValueType extends Serializable {
     public String getName();
     public String getSymbol();
     public int getUnitExponent();

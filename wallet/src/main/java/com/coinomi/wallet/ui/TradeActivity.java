@@ -5,6 +5,7 @@ import android.os.Bundle;
 import com.coinomi.core.coins.Value;
 import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.wallet.Constants;
+import com.coinomi.wallet.ExchangeHistoryProvider.ExchangeEntry;
 import com.coinomi.wallet.R;
 
 import org.bitcoinj.core.Address;
@@ -75,9 +76,9 @@ public class TradeActivity extends BaseWalletActivity implements
     }
 
     @Override
-    public void onTradeDeposit(Address deposit) {
+    public void onTradeDeposit(ExchangeEntry exchangeEntry) {
         getSupportFragmentManager().popBackStack();
-        replaceFragment(TradeStatusFragment.newInstance(deposit), containerRes);
+        replaceFragment(TradeStatusFragment.newInstance(exchangeEntry, true), containerRes);
     }
 
     @Override

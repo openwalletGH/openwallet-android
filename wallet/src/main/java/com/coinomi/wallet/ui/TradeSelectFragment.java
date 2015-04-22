@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -290,6 +291,9 @@ public class TradeSelectFragment extends Fragment {
             case R.id.action_swap_coins:
                 swapAccounts();
                 return true;
+            case R.id.action_exchange_history:
+                startActivity(new Intent(getActivity(), ExchangeHistoryActivity.class));
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -403,14 +407,15 @@ public class TradeSelectFragment extends Fragment {
                     getString(R.string.trade_error_message, error));
         }
 
-        builder.setNegativeButton(R.string.button_dismiss, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (listener != null) {
-                    listener.onAbort();
-                }
-            }
-        });
+        builder.setNegativeButton(R.string.button_dismiss, null);
+//        builder.setNegativeButton(R.string.button_dismiss, new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//                if (listener != null) {
+//                    listener.onAbort();
+//                }
+//            }
+//        });
         builder.setPositiveButton(R.string.button_retry, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -982,7 +987,7 @@ public class TradeSelectFragment extends Fragment {
         protected void onPreExecute() {
             busyDialog = Dialogs.ProgressDialogFragment.newInstance(
                     getString(R.string.contacting_exchange));
-            busyDialog.setCancelable(false);
+//            busyDialog.setCancelable(false);
             busyDialog.show(getFragmentManager(), null);
         }
 

@@ -95,5 +95,26 @@ public class ShapeShiftTxStatus extends ShapeShiftBase {
             transactionId = null;
         }
     }
+
+    public ShapeShiftTxStatus(ShapeShiftTxStatus reply, Address address) {
+        super(reply.errorMessage);
+        status = reply.status;
+        this.address = address;
+        withdraw = reply.withdraw;
+        incomingValue = reply.incomingValue;
+        outgoingValue = reply.outgoingValue;
+        transactionId = reply.transactionId;
+    }
+
+    public ShapeShiftTxStatus(Status status, Address address, Address withdraw,
+                              Value incomingValue, Value outgoingValue, String transactionId) {
+        super((String) null);
+        this.status = status;
+        this.address = address;
+        this.withdraw = withdraw;
+        this.incomingValue = incomingValue;
+        this.outgoingValue = outgoingValue;
+        this.transactionId = transactionId;
+    }
 }
 

@@ -58,6 +58,7 @@ public class Constants {
     public static final String ARG_ERROR = "error";
     public static final String ARG_MESSAGE = "message";
     public static final String ARG_ADDRESS = "address";
+    public static final String ARG_EXCHANGE_ENTRY = "exchange_entry";
     public static final String ARG_TEST_WALLET = "test_wallet";
 
     public static final String WALLET_FILENAME_PROTOBUF = "wallet";

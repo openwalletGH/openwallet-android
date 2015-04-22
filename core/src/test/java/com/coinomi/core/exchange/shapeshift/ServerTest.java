@@ -186,6 +186,7 @@ public class ServerTest {
         ShapeShiftTxStatus txStatusReply = shapeShift.getTxStatus(address);
         assertFalse(txStatusReply.isError);
         assertEquals(ShapeShiftTxStatus.Status.NO_DEPOSITS, txStatusReply.status);
+        assertEquals(address, txStatusReply.address);
 
         txStatusReply = shapeShift.getTxStatus(address);
         assertFalse(txStatusReply.isError);

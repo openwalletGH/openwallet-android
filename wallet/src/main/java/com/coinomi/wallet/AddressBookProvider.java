@@ -17,10 +17,6 @@ package com.coinomi.wallet;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.List;
-
-import javax.annotation.Nonnull;
-
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.Context;
@@ -31,6 +27,12 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
 import com.coinomi.core.coins.CoinType;
+
+import org.bitcoinj.core.Address;
+
+import java.util.List;
+
+import javax.annotation.Nonnull;
 
 /**
  * @author Andreas Schildbach
@@ -54,6 +56,10 @@ public class AddressBookProvider extends ContentProvider {
 
     private static Uri contentUri(@Nonnull final String packageName, @Nonnull final String coinId) {
         return Uri.parse("content://" + packageName + '.' + DATABASE_TABLE + "/" + coinId);
+    }
+
+    public static String resolveLabel(final Context context, final Address address) {
+        return resolveLabel(context, (CoinType) address.getParameters(), address.toString());
     }
 
     public static String resolveLabel(final Context context, @Nonnull CoinType type,

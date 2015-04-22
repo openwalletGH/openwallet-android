@@ -140,8 +140,8 @@
     <style name="TransactionRowDate" parent="SecondaryText">
         <item name="android:textSize">@dimen/transaction_row_text_size_date</item>
     </style>
-    <style name="TransactionRowLabel" parent="NormalText">
-        <item name="android:textSize">@dimen/transaction_row_text_size_label</item>
+    <style name="AddressRowLabel" parent="NormalText">
+        <item name="android:textSize">@dimen/row_text_size_label</item>
     </style>
     <style name="TransactionRowAmount" parent="Amount">
         <item name="android:textSize">@dimen/transaction_row_text_size_amount</item>

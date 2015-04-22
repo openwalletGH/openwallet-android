@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:scrollbars="none" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:orientation="vertical" >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/NormalText"
+            android:layout_marginTop="8dp"
+            android:text="@string/email_receipt_message" />
+
+        <EditText
+            android:id="@+id/email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/NormalText"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp"
+            android:imeOptions="flagNoExtractUi"
+            android:inputType="textEmailAddress"
+            android:singleLine="true" >
+            <requestFocus />
+        </EditText>
+    </LinearLayout>
+</ScrollView>

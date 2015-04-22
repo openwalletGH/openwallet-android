@@ -305,6 +305,15 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
         if (save) walletSaveLater();
     }
 
+
+    /**
+     * Returns a transaction object given its hash, if it exists in this wallet, or null otherwise.
+     */
+    @Nullable
+    public Transaction getTransaction(String transactionId) {
+        return getTransaction(new Sha256Hash(transactionId));
+    }
+
     /**
      * Returns a transaction object given its hash, if it exists in this wallet, or null otherwise.
      */

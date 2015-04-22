@@ -101,4 +101,20 @@ public class UiUtils {
         }
         Toast.makeText(activity, R.string.copied_to_clipboard, Toast.LENGTH_SHORT).show();
     }
+
+    public static void setVisible(View view) {
+        setVisibility(view, View.VISIBLE);
+    }
+
+    public static void setInvisible(View view) {
+        setVisibility(view, View.INVISIBLE);
+    }
+
+    public static void setGone(View view) {
+        setVisibility(view, View.GONE);
+    }
+
+    public static void setVisibility(View view, int visibility) {
+        if (view.getVisibility() != visibility) view.setVisibility(visibility);
+    }
 }

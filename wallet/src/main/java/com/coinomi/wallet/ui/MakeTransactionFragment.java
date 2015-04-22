@@ -2,9 +2,10 @@ package com.coinomi.wallet.ui;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Intent;
+import android.content.ContentResolver;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -30,30 +31,25 @@ import com.coinomi.core.util.ExchangeRate;
 import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.SendRequest;
 import com.coinomi.core.wallet.Wallet;
-import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.core.wallet.WalletPocketHD;
 import com.coinomi.core.wallet.exceptions.NoSuchPocketException;
-import com.coinomi.wallet.AddressBookProvider;
 import com.coinomi.wallet.Configuration;
-import com.coinomi.wallet.Constants;
+import com.coinomi.wallet.ExchangeHistoryProvider;
 import com.coinomi.wallet.ExchangeRatesProvider;
+import com.coinomi.wallet.ExchangeHistoryProvider.ExchangeEntry;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
-import com.coinomi.wallet.service.CoinService;
-import com.coinomi.wallet.service.CoinServiceImpl;
 import com.coinomi.wallet.ui.widget.SendOutput;
 import com.coinomi.wallet.ui.widget.TransactionAmountVisualizer;
 import com.coinomi.wallet.util.Keyboard;
 import com.coinomi.wallet.util.WeakHandler;
 
 import org.bitcoinj.core.Address;
-import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.InsufficientMoneyException;
 import org.bitcoinj.crypto.KeyCrypter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.annotation.Nullable;
@@ -90,6 +86,7 @@ public class MakeTransactionFragment extends Fragment {
     private Handler handler = new MyHandler(this);
     @Nullable private String password;
     private Listener mListener;
+    private ContentResolver contentResolver;
     private SignAndBroadcastTask signAndBroadcastTask;
     private CreateTransactionTask createTransactionTask;
     private WalletApplication application;
@@ -104,6 +101,7 @@ public class MakeTransactionFragment extends Fragment {
     private SendRequest request;
     private LoaderManager loaderManager;
     private WalletPocketHD sourceAccount;
+    @Nullable private ExchangeEntry exchangeEntry;
     @Nullable private Address tradeDepositAddress;
     @Nullable private Value tradeDepositAmount;
     @Nullable private Address tradeWithdrawAddress;
@@ -112,6 +110,7 @@ public class MakeTransactionFragment extends Fragment {
     @Nullable private Exception error;
 
     private CountDownTimer countDownTimer;
+
 
     public static MakeTransactionFragment newInstance(Bundle args) {
         MakeTransactionFragment fragment = new MakeTransactionFragment();
@@ -301,6 +300,7 @@ public class MakeTransactionFragment extends Fragment {
         super.onAttach(activity);
         try {
             mListener = (Listener) activity;
+            contentResolver = activity.getContentResolver();
             application = (WalletApplication) activity.getApplication();
             config = application.getConfiguration();
             loaderManager = getLoaderManager();
@@ -414,7 +414,7 @@ public class MakeTransactionFragment extends Fragment {
         /**
          * This method is called when a trade is started and no error occurred
          */
-        void onTradeDeposit(Address deposit);
+        void onTradeDeposit(ExchangeEntry exchangeEntry);
     }
 
     private final LoaderManager.LoaderCallbacks<Cursor> rateLoaderCallbacks = new LoaderManager.LoaderCallbacks<Cursor>() {
@@ -601,6 +601,13 @@ public class MakeTransactionFragment extends Fragment {
                     throw new Exception("Error broadcasting transaction: " + request.tx.getHashAsString());
                 }
                 transactionBroadcast = true;
+                if (isExchangeNeeded() && tradeDepositAddress != null && tradeDepositAmount != null) {
+                    exchangeEntry = new ExchangeEntry(tradeDepositAddress,
+                            tradeDepositAmount, request.tx.getHashAsString());
+                    Uri uri = ExchangeHistoryProvider.contentUri(application.getPackageName(),
+                            tradeDepositAddress);
+                    contentResolver.insert(uri, exchangeEntry.getContentValues());
+                }
                 handler.sendEmptyMessage(STOP_TRADE_TIMEOUT);
             }
             catch (Exception e) { error = e; }
@@ -612,8 +619,8 @@ public class MakeTransactionFragment extends Fragment {
             busyDialog.dismissAllowingStateLoss();
             if (mListener != null) {
                 mListener.onSignResult(error);
-                if (error == null && tradeDepositAddress != null) {
-                    mListener.onTradeDeposit(tradeDepositAddress);
+                if (error == null && exchangeEntry != null) {
+                    mListener.onTradeDeposit(exchangeEntry);
                 }
             }
         }

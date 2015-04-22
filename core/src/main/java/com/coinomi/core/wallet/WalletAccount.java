@@ -55,7 +55,7 @@ public interface WalletAccount extends TransactionBag, KeyBag, TransactionEventL
      */
     Address getRefundAddress();
 
-
+    Transaction getTransaction(String transactionId);
     Map<Sha256Hash, Transaction> getUnspentTransactions();
     Map<Sha256Hash, Transaction> getPendingTransactions();
     Map<Sha256Hash, Transaction> getTransactions();

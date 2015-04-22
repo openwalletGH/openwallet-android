@@ -2,38 +2,61 @@ package com.coinomi.wallet.ui;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.ContentResolver;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.Nullable;
+import android.support.annotation.NonNull;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.exchange.shapeshift.ShapeShift;
+import com.coinomi.core.exchange.shapeshift.data.ShapeShiftEmail;
 import com.coinomi.core.exchange.shapeshift.data.ShapeShiftException;
 import com.coinomi.core.exchange.shapeshift.data.ShapeShiftTxStatus;
-import com.coinomi.core.wallet.WalletPocketConnectivity;
+import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.wallet.Constants;
+import com.coinomi.wallet.ExchangeHistoryProvider;
+import com.coinomi.wallet.ExchangeHistoryProvider.ExchangeEntry;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.util.Fonts;
 import com.coinomi.wallet.util.WeakHandler;
 
 import org.bitcoinj.core.Address;
-import org.bitcoinj.core.Coin;
+import org.bitcoinj.core.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import static com.coinomi.core.Preconditions.checkNotNull;
+import static com.coinomi.wallet.util.UiUtils.setGone;
+import static com.coinomi.wallet.util.UiUtils.setInvisible;
+import static com.coinomi.wallet.util.UiUtils.setVisible;
 
 /**
  * @author John L. Jegutanis
@@ -41,11 +64,20 @@ import static com.coinomi.core.Preconditions.checkNotNull;
 public class TradeStatusFragment extends Fragment {
     private static final Logger log = LoggerFactory.getLogger(TradeStatusFragment.class);
 
-    private static final int UPDATE_STATUS = 0;
-    private static final int ERROR_MESSAGE = 1;
+    private static final int UPDATE_SHAPESHIFT_STATUS = 0;
+    private static final int UPDATE_STATUS = 1;
+    private static final int ERROR_MESSAGE = 2;
+
+    private static final int ID_STATUS_LOADER = 0;
+
     private static final long POLLING_MS = 3000;
 
+    private static final String ARG_SHOW_EXIT_BUTTON = "show_exit_button";
+
     private Listener mListener;
+    private ContentResolver contentResolver;
+    private LoaderManager loaderManager;
+    private TextView exchangeInfo;
     private TextView depositIcon;
     private ProgressBar depositProgress;
     private TextView depositText;
@@ -56,13 +88,16 @@ public class TradeStatusFragment extends Fragment {
     private TextView errorText;
     private Button viewTransaction;
     private Button emailReceipt;
+    private MenuItem actionDeleteMenu;
+    private boolean showExitButton;
 
-    private Address deposit;
-    private ShapeShiftTxStatus status;
+    private Uri statusUri;
+    private ExchangeEntry exchangeStatus;
     private StatusPollTask pollTask;
     private final Handler handler = new MyHandler(this);
     private Timer timer;
     private WalletApplication application;
+
 
     private static class StatusPollTask extends TimerTask {
         private final ShapeShift shapeShift;
@@ -81,7 +116,7 @@ public class TradeStatusFragment extends Fragment {
                 try {
                     log.info("Polling status for deposit: {}", depositAddress);
                     ShapeShiftTxStatus newStatus = shapeShift.getTxStatus(depositAddress);
-                    handler.sendMessage(handler.obtainMessage(UPDATE_STATUS, newStatus));
+                    handler.sendMessage(handler.obtainMessage(UPDATE_SHAPESHIFT_STATUS, newStatus));
                     break;
                 } catch (ShapeShiftException e) {
                     log.warn("Error occurred while polling", e);
@@ -100,24 +135,44 @@ public class TradeStatusFragment extends Fragment {
         @Override
         protected void weakHandleMessage(TradeStatusFragment ref, Message msg) {
             switch (msg.what) {
+                case UPDATE_SHAPESHIFT_STATUS:
+                    ref.updateShapeShiftStatus((ShapeShiftTxStatus) msg.obj);
+                    break;
                 case UPDATE_STATUS:
-                    ref.status = (ShapeShiftTxStatus) msg.obj;
-                    ref.updateView();
+                    ref.updateStatus((ExchangeEntry) msg.obj);
                     break;
                 case ERROR_MESSAGE:
                     ref.errorIcon.setVisibility(View.VISIBLE);
                     ref.errorText.setVisibility(View.VISIBLE);
-                    ref.errorText.setText(ref.getString(R.string.trade_status_failed, msg.obj));
+                    ref.errorText.setText(ref.getString(R.string.trade_status_failed_detail, msg.obj));
                     ref.stopPolling();
                     break;
             }
         }
     }
 
-    public static TradeStatusFragment newInstance(Address deposit) {
+    private void updateStatus(ExchangeEntry newStatus) {
+        exchangeStatus = checkNotNull(newStatus);
+        updateView();
+    }
+
+    private void updateShapeShiftStatus(ShapeShiftTxStatus shapeShiftTxStatus) {
+        ExchangeEntry newStatus = new ExchangeEntry(exchangeStatus, shapeShiftTxStatus);
+        // If updated status, save it
+        if (exchangeStatus.status != newStatus.status) {
+            contentResolver.update(statusUri, newStatus.getContentValues(), null, null);
+        }
+    }
+
+    public static TradeStatusFragment newInstance(ExchangeEntry exchangeEntry) {
+        return newInstance(exchangeEntry, false);
+    }
+
+    public static TradeStatusFragment newInstance(ExchangeEntry exchangeEntry, boolean showExitButton) {
         TradeStatusFragment fragment = new TradeStatusFragment();
         Bundle args = new Bundle();
-        args.putSerializable(Constants.ARG_ADDRESS, deposit);
+        args.putSerializable(Constants.ARG_EXCHANGE_ENTRY, exchangeEntry);
+        args.putBoolean(ARG_SHOW_EXIT_BUTTON, showExitButton);
         fragment.setArguments(args);
         return fragment;
     }
@@ -127,10 +182,20 @@ public class TradeStatusFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            deposit = (Address) getArguments().getSerializable(Constants.ARG_ADDRESS);
-        }
-        checkNotNull(deposit);
+        Bundle args = getArguments();
+        showExitButton = args.getBoolean(ARG_SHOW_EXIT_BUTTON, false);
+        exchangeStatus = (ExchangeEntry) args.getSerializable(Constants.ARG_EXCHANGE_ENTRY);
+        Address deposit = exchangeStatus.depositAddress;
+        statusUri = ExchangeHistoryProvider.contentUri(application.getPackageName(), deposit);
+        loaderManager.initLoader(ID_STATUS_LOADER, null, statusLoaderCallbacks);
+
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onDestroy() {
+        loaderManager.destroyLoader(ID_STATUS_LOADER);
+        super.onDestroy();
     }
 
     @Override
@@ -138,6 +203,7 @@ public class TradeStatusFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_trade_status, container, false);
 
+        exchangeInfo = (TextView) view.findViewById(R.id.exchange_status_info);
         depositIcon = (TextView) view.findViewById(R.id.trade_deposit_status_icon);
         depositProgress = (ProgressBar) view.findViewById(R.id.trade_deposit_status_progress);
         depositText = (TextView) view.findViewById(R.id.trade_deposit_status_text);
@@ -153,24 +219,18 @@ public class TradeStatusFragment extends Fragment {
         viewTransaction = (Button) view.findViewById(R.id.trade_view_transaction);
         emailReceipt = (Button) view.findViewById(R.id.trade_email_receipt);
 
-        view.findViewById(R.id.button_finish).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onFinishPressed();
-            }
-        });
+        if (showExitButton) {
+            view.findViewById(R.id.button_exit).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onExitPressed();
+                }
+            });
+        } else {
+            view.findViewById(R.id.button_exit).setVisibility(View.GONE);
+        }
 
-        depositIcon.setVisibility(View.GONE);
-        depositProgress.setVisibility(View.VISIBLE);
-        depositText.setVisibility(View.VISIBLE);
-        depositText.setText(R.string.trade_status_waiting_deposit);
-        exchangeIcon.setVisibility(View.GONE);
-        exchangeProgress.setVisibility(View.GONE);
-        exchangeText.setVisibility(View.GONE);
-        errorIcon.setVisibility(View.GONE);
-        errorText.setVisibility(View.GONE);
-        viewTransaction.setVisibility(View.GONE);
-        emailReceipt.setVisibility(View.GONE);
+        updateView();
 
         view.findViewById(R.id.powered_by_shapeshift).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -199,9 +259,9 @@ public class TradeStatusFragment extends Fragment {
     }
 
     private void startPolling() {
-        if (timer == null) {
+        if (timer == null && exchangeStatus.status != ExchangeEntry.STATUS_COMPLETE) {
             ShapeShift shapeShift = application.getShapeShift();
-            pollTask = new StatusPollTask(shapeShift, deposit, handler);
+            pollTask = new StatusPollTask(shapeShift, exchangeStatus.depositAddress, handler);
             timer = new Timer();
             timer.schedule(pollTask, 0, POLLING_MS);
         }
@@ -217,68 +277,142 @@ public class TradeStatusFragment extends Fragment {
         }
     }
 
-    public void onFinishPressed() {
+    public void onExitPressed() {
         stopPolling();
         if (mListener != null) {
             mListener.onFinish();
         }
     }
 
-    private void updateView() {
-        if (status != null && status.status != null) {
-            switch (status.status) {
-                case NO_DEPOSITS:
-                    depositIcon.setVisibility(View.GONE);
-                    depositProgress.setVisibility(View.VISIBLE);
-                    depositText.setVisibility(View.VISIBLE);
-                    depositText.setText(R.string.trade_status_waiting_deposit);
-                    exchangeIcon.setVisibility(View.GONE);
-                    exchangeProgress.setVisibility(View.GONE);
-                    exchangeText.setVisibility(View.GONE);
-                    errorIcon.setVisibility(View.GONE);
-                    errorText.setVisibility(View.GONE);
-                    viewTransaction.setVisibility(View.GONE);
-                    emailReceipt.setVisibility(View.GONE);
-                    break;
-                case RECEIVED:
-                    depositIcon.setVisibility(View.VISIBLE);
-                    depositProgress.setVisibility(View.GONE);
-                    depositText.setVisibility(View.VISIBLE);
-                    depositText.setText(getString(R.string.trade_status_received_deposit,
-                            status.incomingValue));
-                    exchangeIcon.setVisibility(View.GONE);
-                    exchangeProgress.setVisibility(View.VISIBLE);
-                    exchangeText.setVisibility(View.VISIBLE);
-                    exchangeText.setText(R.string.trade_status_waiting_trade);
-                    errorIcon.setVisibility(View.GONE);
-                    errorText.setVisibility(View.GONE);
-                    viewTransaction.setVisibility(View.GONE);
-                    emailReceipt.setVisibility(View.GONE);
-                    break;
-                case COMPLETE:
-                    depositIcon.setVisibility(View.VISIBLE);
-                    depositProgress.setVisibility(View.GONE);
-                    depositText.setVisibility(View.VISIBLE);
-                    depositText.setText(getString(R.string.trade_status_received_deposit,
-                            status.incomingValue));
-                    exchangeIcon.setVisibility(View.VISIBLE);
-                    exchangeProgress.setVisibility(View.GONE);
-                    exchangeText.setVisibility(View.VISIBLE);
-                    exchangeText.setText(getString(R.string.trade_status_complete,
-                            status.outgoingValue));
-                    errorIcon.setVisibility(View.GONE);
-                    errorText.setVisibility(View.GONE);
-                    viewTransaction.setVisibility(View.GONE); // TODO enable
-                    emailReceipt.setVisibility(View.GONE);
-                    stopPolling();
-                    break;
-                case FAILED:
-                    errorIcon.setVisibility(View.VISIBLE);
-                    errorText.setVisibility(View.VISIBLE);
-                    errorText.setText(getString(R.string.trade_status_failed, status.errorMessage));
-                    stopPolling();
-            }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.exchange_status, menu);
+        actionDeleteMenu = menu.findItem(R.id.action_delete);
+        updateView();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_delete:
+                new AlertDialog.Builder(getActivity())
+                        .setMessage(R.string.trade_status_delete_message)
+                        .setNegativeButton(R.string.button_cancel, null)
+                        .setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                contentResolver.delete(statusUri, null, null);
+                                onExitPressed();
+                            }
+                        })
+                        .create().show();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void updateView() {
+        switch (exchangeStatus.status) {
+            case ExchangeEntry.STATUS_INITIAL:
+                if (actionDeleteMenu != null) actionDeleteMenu.setVisible(false);
+                exchangeInfo.setText(R.string.trade_status_message);
+                setGone(depositIcon);
+                setVisible(depositProgress);
+                setVisible(depositText);
+                depositText.setText(R.string.trade_status_waiting_deposit);
+                setInvisible(exchangeIcon);
+                setGone(exchangeProgress);
+                setInvisible(exchangeText);
+                setGone(errorIcon);
+                setGone(errorText);
+                setInvisible(viewTransaction);
+                setInvisible(emailReceipt);
+                break;
+            case ExchangeEntry.STATUS_PROCESSING:
+                if (actionDeleteMenu != null) actionDeleteMenu.setVisible(false);
+                exchangeInfo.setText(R.string.trade_status_message);
+                setVisible(depositIcon);
+                setGone(depositProgress);
+                setVisible(depositText);
+                depositText.setText(getString(R.string.trade_status_received_deposit,
+                        exchangeStatus.depositAmount));
+                setGone(exchangeIcon);
+                setVisible(exchangeProgress);
+                setVisible(exchangeText);
+                exchangeText.setText(R.string.trade_status_waiting_trade);
+                setGone(errorIcon);
+                setGone(errorText);
+                setInvisible(viewTransaction);
+                setInvisible(emailReceipt);
+                break;
+            case ExchangeEntry.STATUS_COMPLETE:
+                if (actionDeleteMenu != null) actionDeleteMenu.setVisible(true);
+                exchangeInfo.setText(R.string.trade_status_complete_message);
+                setVisible(depositIcon);
+                setGone(depositProgress);
+                setVisible(depositText);
+                depositText.setText(getString(R.string.trade_status_received_deposit,
+                        exchangeStatus.depositAmount));
+                setVisible(exchangeIcon);
+                setGone(exchangeProgress);
+                setVisible(exchangeText);
+                exchangeText.setText(getString(R.string.trade_status_complete_detail,
+                        exchangeStatus.withdrawAmount));
+                setGone(errorIcon);
+                setGone(errorText);
+                updateViewTransaction();
+                updateEmailReceipt();
+                stopPolling();
+                break;
+            case ExchangeEntry.STATUS_FAILED:
+                if (actionDeleteMenu != null) actionDeleteMenu.setVisible(true);
+                setVisible(errorIcon);
+                setVisible(errorText);
+                errorText.setText(R.string.trade_status_failed);
+                stopPolling();
+        }
+    }
+
+    private void updateViewTransaction() {
+        setVisible(viewTransaction);
+        viewTransaction.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String accountId = null;
+                String txId = exchangeStatus.withdrawTransactionId;
+                CoinType withdrawType = (CoinType) exchangeStatus.withdrawAddress.getParameters();
+                List<WalletAccount> accounts = application.getAccounts(withdrawType);
+                for (WalletAccount account : accounts) {
+                    if (account.getTransaction(txId) != null) {
+                        accountId = account.getId();
+                        break;
+                    }
+                }
+                if (accountId != null && txId != null) {
+                    Intent intent = new Intent(getActivity(), TransactionDetailsActivity.class);
+                    intent.putExtra(Constants.ARG_ACCOUNT_ID, accountId);
+                    intent.putExtra(Constants.ARG_TRANSACTION_ID, txId);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(getActivity(), R.string.trade_status_tx_not_available,
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    private void updateEmailReceipt() {
+        // TODO enable
+        setInvisible(emailReceipt);
+//        setVisible(emailReceipt);
+//        emailReceipt.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                emailReceiptDialog.show(getFragmentManager(), null);
+//            }
+//        });
     }
 
     @Override
@@ -286,7 +420,9 @@ public class TradeStatusFragment extends Fragment {
         super.onAttach(activity);
         try {
             mListener = (Listener) activity;
+            contentResolver = activity.getContentResolver();
             application = (WalletApplication) activity.getApplication();
+            loaderManager = getLoaderManager();
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement " + TradeStatusFragment.Listener.class);
@@ -303,4 +439,44 @@ public class TradeStatusFragment extends Fragment {
         public void onFinish();
     }
 
+    private final LoaderCallbacks<Cursor> statusLoaderCallbacks = new LoaderCallbacks<Cursor>() {
+        @Override
+        public Loader<Cursor> onCreateLoader(final int id, final Bundle args) {
+            return new CursorLoader(application.getApplicationContext(), statusUri,
+                    null, null, null, null);
+        }
+
+        @Override
+        public void onLoadFinished(final Loader<Cursor> loader, final Cursor data) {
+            if (data != null && data.getCount() > 0) {
+                data.moveToFirst();
+                ExchangeEntry newStatus = ExchangeHistoryProvider.getExchangeEntry(data);
+                handler.sendMessage(handler.obtainMessage(UPDATE_STATUS, newStatus));
+            }
+        }
+
+        @Override public void onLoaderReset(final Loader<Cursor> loader) { }
+    };
+
+    private DialogFragment emailReceiptDialog = new DialogFragment() {
+        @Override @NonNull
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            final LayoutInflater inflater = LayoutInflater.from(getActivity());
+            final View view = inflater.inflate(R.layout.email_receipt_dialog, null);
+            final TextView emailView = (TextView) view.findViewById(R.id.email);
+
+            return new DialogBuilder(getActivity())
+                    .setTitle(R.string.email_receipt_title)
+                    .setView(view)
+                    .setNegativeButton(R.string.button_cancel, null)
+                    .setPositiveButton(R.string.button_add, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // TODO implement async task
+                            String email = emailView.getText().toString();
+//                            ShapeShiftEmail reply = application.getShapeShift().requestEmailReceipt(email, exchangeStatus.getShapeShiftTxStatus());
+                        }
+                    }).create();
+        }
+    };
 }
