@@ -134,6 +134,11 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
     }
 
     @Override
+    public boolean isType(WalletAccount other) {
+        return other != null && coinType.equals(other.getCoinType());
+    }
+
+    @Override
     public CoinType getCoinType() {
         return coinType;
     }

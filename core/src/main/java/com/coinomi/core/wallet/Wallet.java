@@ -235,6 +235,14 @@ final public class Wallet {
     private WalletPocketHD createAndAddAccount(CoinType coinType, @Nullable KeyParameter key) {
         checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
         checkNotNull(coinType, "Attempting to create a pocket for a null coin");
+
+        // TODO, currently we support a single account so return the existing account
+        List<WalletAccount> currentAccount = getAccounts(coinType);
+        if (currentAccount.size() > 0) {
+            return (WalletPocketHD) currentAccount.get(0);
+        }
+        // TODO ///////////////
+
         DeterministicHierarchy hierarchy;
         if (isEncrypted()) {
             hierarchy = new DeterministicHierarchy(masterKey.decrypt(getKeyCrypter(), key));

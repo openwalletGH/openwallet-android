@@ -143,6 +143,11 @@ public class ExchangeRateTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
+    public void zeroExchangeRate() throws Exception {
+        new ExchangeRateBase(oneBtc, LTC.value(0));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
     public void currencyCodeMismatch() throws Exception {
         ExchangeRateBase rate = new ExchangeRateBase(oneBtc, FiatValue.parse("EUR", "500"));
         rate.convert(FiatValue.parse("USD", "1"));

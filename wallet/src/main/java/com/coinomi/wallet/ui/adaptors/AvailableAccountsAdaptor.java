@@ -14,7 +14,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author John L. Jegutanis
@@ -55,6 +57,16 @@ public class AvailableAccountsAdaptor extends BaseAdapter {
             result = result && accountOrCoinType.equals(o);
             return result;
         }
+
+        public CoinType getType() {
+            if (accountOrCoinType instanceof CoinType) {
+                return (CoinType) accountOrCoinType;
+            } else if (accountOrCoinType instanceof WalletAccount) {
+                return ((WalletAccount) accountOrCoinType).getCoinType();
+            } else {
+                throw new IllegalStateException("No cointype available");
+            }
+        }
     }
 
     public AvailableAccountsAdaptor(final Context context) {
@@ -90,7 +102,7 @@ public class AvailableAccountsAdaptor extends BaseAdapter {
         notifyDataSetChanged();
     }
 
-    private static ImmutableList<Entry> createEntries(final List<WalletAccount> accounts,
+    private static List<Entry> createEntries(final List<WalletAccount> accounts,
                                                       final List<CoinType> validTypes,
                                                       final boolean includeTypes) {
         final ArrayList<CoinType> typesToAdd = Lists.newArrayList(validTypes);
@@ -111,6 +123,18 @@ public class AvailableAccountsAdaptor extends BaseAdapter {
         }
 
         return listBuilder.build();
+    }
+
+    public List<CoinType> getTypes() {
+        Set<CoinType> types = new HashSet<>();
+        for (AvailableAccountsAdaptor.Entry entry : entries) {
+            types.add(entry.getType());
+        }
+        return ImmutableList.copyOf(types);
+    }
+
+    public List<Entry> getEntries() {
+        return entries;
     }
 
     @Override

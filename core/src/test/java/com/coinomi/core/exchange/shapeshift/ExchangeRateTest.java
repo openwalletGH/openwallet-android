@@ -59,4 +59,9 @@ public class ExchangeRateTest {
         ShapeShiftExchangeRate rate = new ShapeShiftExchangeRate(DOGE, BTC, "5.1e-7", "0.0001");
         assertEquals(BTC.value("0"), rate.convert(DOGE.value("1")));
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void zeroExchangeRate() throws Exception {
+        new ShapeShiftExchangeRate(BTC, NBT, "0", "0.01");
+    }
 }

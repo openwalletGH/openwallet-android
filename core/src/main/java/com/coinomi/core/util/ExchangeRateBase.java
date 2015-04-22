@@ -25,7 +25,6 @@ import com.coinomi.core.coins.ValueType;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
@@ -36,14 +35,15 @@ import org.bitcoinj.core.Coin;
  */
 public class ExchangeRateBase implements ExchangeRate {
     private static final int RATE_SCALE = 10;
+    public static final String ZERO_RATE_ERROR_MESSAGE = "Exchange rate cannot be zero";
 
     public final Value value1;
     public final Value value2;
 
     /** Construct exchange rate. This amount of coin is worth that amount of fiat. */
     public ExchangeRateBase(Value value1, Value value2) {
-        this.value1 = value1;
-        this.value2 = value2;
+        this.value1 = checkNonZero(value1);
+        this.value2 = checkNonZero(value2);
     }
 
     public ExchangeRateBase(ValueType type1, ValueType type2, String rateString) {
@@ -63,6 +63,14 @@ public class ExchangeRateBase implements ExchangeRate {
             value1 = type1.oneCoin();
             value2 = Value.parse(type2, rate);
         }
+
+        checkNonZero(value1);
+        checkNonZero(value2);
+    }
+
+    private static Value checkNonZero(Value value) {
+        checkArgument(!value.isZero(), ZERO_RATE_ERROR_MESSAGE);
+        return value;
     }
 
     @Override

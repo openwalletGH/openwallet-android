@@ -44,14 +44,19 @@ import com.coinomi.wallet.util.Keyboard;
 import com.coinomi.wallet.util.ThrottlingWalletChangeListener;
 import com.coinomi.wallet.util.WeakHandler;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 import org.bitcoinj.utils.Threading;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.TreeSet;
 
 import javax.annotation.Nullable;
 
@@ -65,6 +70,8 @@ public class TradeSelectFragment extends Fragment {
     private static final int UPDATE_MARKET_ERROR = 1;
     private static final int UPDATE_WALLET = 2;
     private static final int VALIDATE_AMOUNT = 3;
+    private static final int INITIAL_TASK_ERROR = 4;
+    private static final int UPDATE_AVAILABLE_COINS = 5;
 
     private static final long POLLING_MS = 30000;
 
@@ -381,14 +388,43 @@ public class TradeSelectFragment extends Fragment {
         List<WalletAccount> allAccounts = application.getAllAccounts();
 
         sourceAdapter.update(allAccounts, supportedTypes, false);
-        destinationAdapter.update(allAccounts, supportedTypes, true);
+        List<CoinType> sourceTypes = sourceAdapter.getTypes();
+
+        // No supported source accounts found
+        if (sourceTypes.size() == 0) {
+            new AlertDialog.Builder(getActivity())
+                    .setTitle(R.string.trade_error)
+                    .setMessage(R.string.trade_error_no_supported_source_accounts)
+                    .setPositiveButton(R.string.button_ok, null)
+                    .create().show();
+            return;
+        }
 
         if (sourceSpinner.getSelectedItemPosition() == -1) {
             sourceSpinner.setSelection(0);
         }
+        CoinType sourceType =
+                ((AvailableAccountsAdaptor.Entry) sourceSpinner.getSelectedItem()).getType();
+
+        // If we have only one source type, remove it as a destination
+        if (sourceTypes.size() == 1) {
+            ArrayList<CoinType> typesWithoutSourceType = Lists.newArrayList(supportedTypes);
+            typesWithoutSourceType.remove(sourceType);
+            destinationAdapter.update(allAccounts, typesWithoutSourceType, true);
+        } else {
+            destinationAdapter.update(allAccounts, supportedTypes, true);
+        }
 
         if (destinationSpinner.getSelectedItemPosition() == -1) {
-            destinationSpinner.setSelection(1);
+            for (AvailableAccountsAdaptor.Entry entry : destinationAdapter.getEntries()) {
+                // Select the first item that is of a different type than the source
+                if (!sourceType.equals(entry.getType())) {
+                    int selectionIndex = destinationAdapter.getAccountOrTypePosition(
+                            entry.accountOrCoinType);
+                    destinationSpinner.setSelection(selectionIndex);
+                    break;
+                }
+            }
         }
     }
 
@@ -396,26 +432,20 @@ public class TradeSelectFragment extends Fragment {
      * Show a no connectivity error
      */
     private void showInitialTaskErrorDialog(String error) {
-        DialogBuilder builder;
+        if (getActivity() == null) {
+            return;
+        }
 
+        DialogBuilder builder;
         if (error == null) {
             builder = DialogBuilder.warn(getActivity(), R.string.trade_warn_no_connection_title);
             builder.setMessage(R.string.trade_warn_no_connection_message);
         } else {
             builder = DialogBuilder.warn(getActivity(), R.string.trade_error);
-            builder.setMessage(
-                    getString(R.string.trade_error_message, error));
+            builder.setMessage(R.string.trade_error_service_not_available);
         }
 
         builder.setNegativeButton(R.string.button_dismiss, null);
-//        builder.setNegativeButton(R.string.button_dismiss, new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//                if (listener != null) {
-//                    listener.onAbort();
-//                }
-//            }
-//        });
         builder.setPositiveButton(R.string.button_retry, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -518,7 +548,7 @@ public class TradeSelectFragment extends Fragment {
                     // If same account selected, do nothing
                     if (newSource.equals(sourceAccount)) return;
                     // If new source and destination are the same, swap accounts
-                    if (destinationAccount != null && destinationAccount.equals(newSource)) {
+                    if (destinationAccount != null && destinationAccount.isType(newSource)) {
                         // Swap accounts
                         setDestinationSpinner(sourceAccount);
                         setDestination(sourceAccount, false);
@@ -550,7 +580,7 @@ public class TradeSelectFragment extends Fragment {
                     // If same account selected, do nothing
                     if (newDestination.equals(destinationAccount)) return;
                     // If new destination and source are the same, swap accounts
-                    if (destinationAccount != null && sourceAccount.equals(newDestination)) {
+                    if (destinationAccount != null && sourceAccount.isType(newDestination)) {
                         // Swap accounts
                         setSourceSpinner(destinationAccount);
                         setSource(destinationAccount, false);
@@ -964,7 +994,7 @@ public class TradeSelectFragment extends Fragment {
                     ref.onMarketUpdate((ShapeShiftMarketInfo) msg.obj);
                     break;
                 case UPDATE_MARKET_ERROR:
-                    String errorMessage = ref.getString(R.string.trade_market_info_error,
+                    String errorMessage = ref.getString(R.string.trade_error_market_info,
                             ref.sourceAccount.getCoinType().getName(),
                             ref.destinationType.getName());
                     Toast.makeText(ref.getActivity(), errorMessage, Toast.LENGTH_LONG).show();
@@ -974,6 +1004,13 @@ public class TradeSelectFragment extends Fragment {
                     break;
                 case VALIDATE_AMOUNT:
                     ref.validateAmount((Boolean) msg.obj);
+                    break;
+                case INITIAL_TASK_ERROR:
+                    ref.showInitialTaskErrorDialog((String) msg.obj);
+                    break;
+                case UPDATE_AVAILABLE_COINS:
+                    ref.updateAvailableCoins((ShapeShiftCoins) msg.obj);
+                    ref.startMarketInfoTask();
                     break;
             }
         }
@@ -1009,14 +1046,13 @@ public class TradeSelectFragment extends Fragment {
             busyDialog.dismissAllowingStateLoss();
             if (error != null) {
                 log.warn("Could not get ShapeShift coins", error);
-                showInitialTaskErrorDialog(error.getMessage());
+                handler.sendMessage(handler.obtainMessage(INITIAL_TASK_ERROR, error.getMessage()));
             } else {
                 if (shapeShiftCoins.isError) {
                     log.warn("Could not get ShapeShift coins: {}", shapeShiftCoins.errorMessage);
-                    showInitialTaskErrorDialog(shapeShiftCoins.errorMessage);
+                    handler.sendMessage(handler.obtainMessage(INITIAL_TASK_ERROR, shapeShiftCoins.errorMessage));
                 } else {
-                    updateAvailableCoins(shapeShiftCoins);
-                    startMarketInfoTask();
+                    handler.sendMessage(handler.obtainMessage(UPDATE_AVAILABLE_COINS, shapeShiftCoins));
                 }
             }
         }

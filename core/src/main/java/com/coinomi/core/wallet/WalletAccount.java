@@ -78,4 +78,6 @@ public interface WalletAccount extends TransactionBag, KeyBag, TransactionEventL
     void addEventListener(WalletAccountEventListener listener);
     void addEventListener(WalletAccountEventListener listener, Executor executor);
     boolean removeEventListener(WalletAccountEventListener listener);
+
+    boolean isType(WalletAccount other);
 }

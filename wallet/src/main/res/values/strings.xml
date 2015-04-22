@@ -270,8 +270,10 @@
     <string name="trade_warn_no_account_found">You will be prompted to add a %1$s wallet</string>
     <string name="trade_warn_no_connection_title">No connection</string>
     <string name="trade_warn_no_connection_message">Internet connection is needed to exchange coins.</string>
-    <string name="trade_market_info_error">Could not get information about %1$s - %2$s pair</string>
     <string name="trade_error">Exchange error</string>
+    <string name="trade_error_no_supported_source_accounts">No supported accounts found</string>
+    <string name="trade_error_service_not_available">Service unavailable, please try again in a minute</string>
+    <string name="trade_error_market_info">Could not get information about %1$s - %2$s pair</string>
     <string name="trade_error_message">An error occurred while connecting to the exchange.\n\nTechnical details:\n\n<b>%1$s</b></string>
     <string name="trade_error_sign_tx_message">An error occurred while signing and broadcasting transaction.\n\nTechnical details:\n\n<b>%1$s</b></string>
     <string name="trade_error_max_limit">The supplied amount exceeds the limit of %1$s %2$s. Please use a smaller amount.</string>
