@@ -36,7 +36,6 @@ public class MessagesTest {
     final CoinType NBT = NuBitsMain.get();
     final CoinType PPC = PeercoinMain.get();
     final Value ONE_BTC = BTC.oneCoin();
-    final Value ONE_LTC = LTC.oneCoin();
 
     @Test
     public void testCoins() throws JSONException, ShapeShiftException {
@@ -616,6 +615,19 @@ public class MessagesTest {
                 "}");
         new ShapeShiftCoin(json);
     }
+
+    @Test(expected = ShapeShiftException.class)
+    public void testInvalidMarketInfo() throws JSONException, ShapeShiftException {
+        new ShapeShiftRate(new JSONObject(
+                "{" +
+                        "\"pair\" : \"btc_nbt\"," +
+                        "\"rate\" : \"0\"," +
+                        "\"minerFee\" : \"0.01\"," +
+                        "\"limit\" : \"0\"," +
+                        "\"minimum\" : 0" +
+                        "}"));
+    }
+
 
     @Test(expected = ShapeShiftException.class)
     public void testInvalidRate() throws ShapeShiftException {

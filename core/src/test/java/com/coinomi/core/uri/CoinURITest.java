@@ -103,7 +103,7 @@ public class CoinURITest {
         // Darkcoin
         goodAddress = new Address(DashMain.get(), hash160);
         goodAddressStr = goodAddress.toString();
-        assertEquals("darkcoin:" + goodAddressStr + "?amount=12.34&label=Hello&message=AMessage", CoinURI.convertToCoinURI(goodAddress, parseCoin(DashMain.get(), "12.34"), "Hello", "AMessage"));
+        assertEquals("dash:" + goodAddressStr + "?amount=12.34&label=Hello&message=AMessage", CoinURI.convertToCoinURI(goodAddress, parseCoin(DashMain.get(), "12.34"), "Hello", "AMessage"));
     }
 
     @Test
@@ -133,7 +133,7 @@ public class CoinURITest {
         // Darkcoin
         goodAddress = new Address(DashMain.get(), hash160);
         goodAddressStr = goodAddress.toString();
-        testObject = new CoinURI(DashMain.get(), "darkcoin:" + goodAddressStr + "?amount=12.34");
+        testObject = new CoinURI(DashMain.get(), "dash:" + goodAddressStr + "?amount=12.34");
         assertEquals("12.34", GenericUtils.formatCoinValue(DashMain.get(), testObject.getAmount()));
     }
 

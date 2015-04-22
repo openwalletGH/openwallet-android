@@ -282,7 +282,7 @@ public class WalletPocketHDTest {
         pocket.encrypt(crypter, aesKey);
         pocket.onConnection(getBlockchainConnection(type));
 
-        assertEquals(Coin.valueOf(11000000000l), pocket.getBalance(true));
+        assertEquals(type.value(11000000000l), pocket.getBalance(true));
 
         assertAllKeysEncrypted(pocket);
 
