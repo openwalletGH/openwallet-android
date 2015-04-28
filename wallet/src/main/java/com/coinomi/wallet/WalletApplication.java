@@ -16,22 +16,20 @@ import android.widget.Toast;
 
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.exchange.shapeshift.ShapeShift;
-import com.coinomi.core.network.ConnectivityHelper;
 import com.coinomi.core.util.HardwareSoftwareCompliance;
 import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.wallet.WalletAccount;
-import com.coinomi.core.wallet.WalletPocketHD;
 import com.coinomi.core.wallet.WalletProtobufSerializer;
 import com.coinomi.wallet.service.CoinService;
 import com.coinomi.wallet.service.CoinServiceImpl;
 import com.coinomi.wallet.util.Fonts;
 import com.coinomi.wallet.util.LinuxSecureRandom;
+import com.coinomi.wallet.util.NetworkUtils;
 import com.google.common.collect.ImmutableList;
 import com.squareup.okhttp.Cache;
 import com.squareup.okhttp.ConnectionSpec;
 import com.squareup.okhttp.OkHttpClient;
 
-import org.acra.ACRA;
 import org.acra.annotation.ReportsCrashes;
 import org.acra.sender.HttpSender;
 import org.bitcoinj.core.Address;
@@ -65,7 +63,6 @@ public class WalletApplication extends Application {
     private static final Logger log = LoggerFactory.getLogger(WalletApplication.class);
 
     private static HashMap<String, Typeface> typefaces;
-    private static String httpUserAgent;
     private Configuration config;
     private ActivityManager activityManager;
 
@@ -82,7 +79,6 @@ public class WalletApplication extends Application {
     private long lastStop;
 
     private ConnectivityManager connManager;
-    private OkHttpClient client;
     private ShapeShift shapeShift;
 
     @Override
@@ -100,8 +96,6 @@ public class WalletApplication extends Application {
         super.onCreate();
 
         packageInfo = packageInfoFromContext(this);
-
-        httpUserAgent = "Coinomi/" + packageInfo.versionName + " (Android)";
 
         config = new Configuration(PreferenceManager.getDefaultSharedPreferences(this));
         activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
@@ -142,22 +136,9 @@ public class WalletApplication extends Application {
         return activeInfo != null && activeInfo.isConnected();
     }
 
-    public OkHttpClient getHttpClient() {
-        if (client == null) {
-            client = new OkHttpClient();
-            client.setConnectionSpecs(Collections.singletonList(ConnectionSpec.MODERN_TLS));
-            client.setConnectTimeout(Constants.HTTP_TIMEOUT_MS, TimeUnit.MILLISECONDS);
-            // Setup cache
-            File cacheDir = new File(getCacheDir(), Constants.HTTP_CACHE_DIR);
-            Cache cache = new Cache(cacheDir, Constants.HTTP_CACHE_SIZE);
-            client.setCache(cache);
-        }
-        return client;
-    }
-
     public ShapeShift getShapeShift() {
         if (shapeShift == null) {
-            shapeShift = new ShapeShift(getHttpClient());
+            shapeShift = new ShapeShift(NetworkUtils.getHttpClient(getApplicationContext()));
         }
         return shapeShift;
     }
@@ -233,10 +214,6 @@ public class WalletApplication extends Application {
 
     public Configuration getConfiguration() {
         return config;
-    }
-
-    public static String httpUserAgent() {
-        return httpUserAgent;
     }
 
     /**

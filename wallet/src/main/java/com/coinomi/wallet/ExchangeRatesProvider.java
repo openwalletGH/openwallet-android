@@ -34,31 +34,26 @@ import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.FiatValue;
 import com.coinomi.core.coins.Value;
 import com.coinomi.core.util.ExchangeRateBase;
-import com.coinomi.wallet.util.Io;
-import com.google.common.base.Charsets;
+import com.coinomi.wallet.util.NetworkUtils;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.zip.GZIPInputStream;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import static com.coinomi.wallet.Constants.HTTP_TIMEOUT_MS;
 
 /**
  * @author Andreas Schildbach
@@ -94,7 +89,6 @@ public class ExchangeRatesProvider extends ContentProvider {
 
     private ConnectivityManager connManager;
     private Configuration config;
-    private String userAgent;
 
     private Map<String, ExchangeRate> localToCryptoRates = null;
     private long localToCryptoLastUpdated = 0;
@@ -115,9 +109,8 @@ public class ExchangeRatesProvider extends ContentProvider {
     public boolean onCreate() {
         final Context context = getContext();
 
-        connManager = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        connManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         config = new Configuration(PreferenceManager.getDefaultSharedPreferences(context));
-        userAgent = WalletApplication.httpUserAgent();
 
         lastLocalCurrency = config.getCachedExchangeLocalCurrency();
         if (lastLocalCurrency != null) {
@@ -193,7 +186,7 @@ public class ExchangeRatesProvider extends ContentProvider {
                 throw new RuntimeException(x); // Should not happen
             }
 
-            JSONObject newExchangeRatesJson = requestExchangeRatesJson(url, userAgent);
+            JSONObject newExchangeRatesJson = requestExchangeRatesJson(url);
             Map<String, ExchangeRate> newExchangeRates =
                     parseExchangeRates(newExchangeRatesJson, symbol, isLocalToCrypto);
 
@@ -280,60 +273,31 @@ public class ExchangeRatesProvider extends ContentProvider {
     }
 
     @Nullable
-    private JSONObject requestExchangeRatesJson(final URL url, final String userAgent) {
+    private JSONObject requestExchangeRatesJson(final URL url) {
         // Return null if no connection
         final NetworkInfo activeInfo = connManager.getActiveNetworkInfo();
         if (activeInfo == null || !activeInfo.isConnected()) return null;
 
         final long start = System.currentTimeMillis();
 
-        HttpURLConnection connection = null;
-        Reader reader = null;
+        OkHttpClient client = NetworkUtils.getHttpClient(getContext().getApplicationContext());
+        Request request = new Request.Builder().url(url).build();
 
         try {
-            connection = (HttpURLConnection) url.openConnection();
-
-            connection.setInstanceFollowRedirects(false);
-            connection.setConnectTimeout(HTTP_TIMEOUT_MS);
-            connection.setReadTimeout(HTTP_TIMEOUT_MS);
-            connection.addRequestProperty("User-Agent", userAgent);
-            connection.addRequestProperty("Accept-Encoding", "gzip");
-            connection.connect();
-
-            final int responseCode = connection.getResponseCode();
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                final String contentEncoding = connection.getContentEncoding();
-
-                InputStream is = new BufferedInputStream(connection.getInputStream(), 1024);
-                if ("gzip".equalsIgnoreCase(contentEncoding))
-                    is = new GZIPInputStream(is);
-
-                reader = new InputStreamReader(is, Charsets.UTF_8);
-                final StringBuilder content = new StringBuilder();
-                final long length = Io.copy(reader, content);
-
+            Response response = client.newCall(request).execute();
+            if (response.isSuccessful()) {
                 log.info("fetched exchange rates from {} ({}), {} chars, took {} ms", url,
-                        contentEncoding, length, System.currentTimeMillis() - start);
-
-                return new JSONObject(content.toString());
+                        System.currentTimeMillis() - start);
+                return new JSONObject(response.body().string());
             } else {
-                log.warn("http status {} when fetching exchange rates from {}", responseCode, url);
+                log.warn("Error HTTP code '{}' when fetching exchange rates from {}",
+                        response.code(), url);
             }
-        } catch (final Exception x) {
-            log.warn("problem fetching exchange rates from " + url, x);
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (final IOException x) {
-                    // swallow
-                }
-            }
-
-            if (connection != null)
-                connection.disconnect();
+        } catch (IOException e) {
+            log.warn("Error '{}' when fetching exchange rates from {}", e.getMessage(), url);
+        } catch (JSONException e) {
+            log.warn("Could not parse exchange rates JSON: {}", e.getMessage());
         }
-
         return null;
     }
 

@@ -113,8 +113,10 @@ public class MakeTransactionFragment extends Fragment {
     @Nullable private Value tradeWithdrawAmount;
     private boolean transactionBroadcast = false;
     @Nullable private Exception error;
+    private HashMap<String, ExchangeRate> localRates;
 
     private CountDownTimer countDownTimer;
+
 
 
     public static MakeTransactionFragment newInstance(Bundle args) {
@@ -251,6 +253,7 @@ public class MakeTransactionFragment extends Fragment {
                 txVisualizer.getOutputs().get(0).setSendLabel(getString(R.string.trade));
                 txVisualizer.hideAddresses(); // Hide exchange address
             }
+            updateLocalRates();
         }
     }
 
@@ -404,8 +407,6 @@ public class MakeTransactionFragment extends Fragment {
         transactionInfo.setText(message);
     }
 
-
-
     /**
      * Makes a call to ShapeShift about the time left for the trade
      *
@@ -429,18 +430,36 @@ public class MakeTransactionFragment extends Fragment {
         return null;
     }
 
+    private void updateLocalRates() {
+        if (localRates != null) {
+            if (txVisualizer != null && localRates.containsKey(sourceType.getSymbol())) {
+                txVisualizer.setExchangeRate(localRates.get(sourceType.getSymbol()));
+            }
+
+            if (tradeWithdrawAmount != null && localRates.containsKey(tradeWithdrawAmount.type.getSymbol())) {
+                ExchangeRate rate = localRates.get(tradeWithdrawAmount.type.getSymbol());
+                Value fiatAmount = rate.convert(tradeWithdrawAmount);
+                tradeWithdrawSendOutput.setAmountLocal(GenericUtils.formatFiatValue(fiatAmount));
+                tradeWithdrawSendOutput.setSymbolLocal(fiatAmount.type.getSymbol());
+            }
+        }
+    }
+
+    private void updateLocalRates(HashMap<String, ExchangeRate> rates) {
+        localRates = rates;
+        updateLocalRates();
+    }
+
 
     public interface Listener {
         void onSignResult(@Nullable Exception error, @Nullable ExchangeEntry exchange);
     }
 
     private final LoaderManager.LoaderCallbacks<Cursor> rateLoaderCallbacks = new LoaderManager.LoaderCallbacks<Cursor>() {
-        String coinSymbol;
 
         @Override
         public Loader<Cursor> onCreateLoader(final int id, final Bundle args) {
             String localSymbol = config.getExchangeCurrencyCode();
-            coinSymbol = sourceType.getSymbol();
             return new ExchangeRateLoader(getActivity(), config, localSymbol);
         }
 
@@ -454,16 +473,7 @@ public class MakeTransactionFragment extends Fragment {
                     rates.put(rate.currencyCodeId, rate.rate);
                 } while (data.moveToNext());
 
-                if (txVisualizer != null && rates.containsKey(coinSymbol)) {
-                    txVisualizer.setExchangeRate(rates.get(coinSymbol));
-                }
-
-                if (tradeWithdrawAmount != null && rates.containsKey(tradeWithdrawAmount.type.getSymbol())) {
-                    ExchangeRate rate = rates.get(tradeWithdrawAmount.type.getSymbol());
-                    Value fiatAmount = rate.convert(tradeWithdrawAmount);
-                    tradeWithdrawSendOutput.setAmountLocal(GenericUtils.formatFiatValue(fiatAmount));
-                    tradeWithdrawSendOutput.setSymbolLocal(fiatAmount.type.getSymbol());
-                }
+                updateLocalRates(rates);
             }
         }
 
