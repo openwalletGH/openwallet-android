@@ -853,15 +853,13 @@ public class TradeSelectFragment extends Fragment {
                         if (canCompare(lastBalance, depositAmount) &&
                                 depositAmount.compareTo(lastBalance) > 0) {
                             message = getString(R.string.amount_error_not_enough_money,
-                                    GenericUtils.formatValue(lastBalance),
-                                    lastBalance.type.getSymbol());
+                                    lastBalance.toFriendlyString());
                         }
 
-                        if (maximumDeposit != null && maximumDeposit.isOfType(depositAmount) &&
+                        if (canCompare(maximumDeposit, depositAmount) &&
                                 depositAmount.compareTo(maximumDeposit) > 0) {
                             message = getString(R.string.trade_error_max_limit,
-                                    GenericUtils.formatValue(maximumDeposit),
-                                    maximumDeposit.type.getSymbol());
+                                    maximumDeposit.toFriendlyString());
                         }
                     }
                     amountError.setText(message);
@@ -889,10 +887,6 @@ public class TradeSelectFragment extends Fragment {
     private void updateNextButtonState() {
 //        nextButton.setEnabled(everythingValid());
     }
-
-    /**
-     * Decide if should show errors in the UI.
-     */
 
     /**
      * Decide if should show errors in the UI.

@@ -35,6 +35,7 @@ import android.widget.Toast;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.FiatType;
 import com.coinomi.core.coins.Value;
+import com.coinomi.core.coins.ValueType;
 import com.coinomi.core.exchange.shapeshift.ShapeShift;
 import com.coinomi.core.exchange.shapeshift.data.ShapeShiftMarketInfo;
 import com.coinomi.core.uri.CoinURI;
@@ -137,7 +138,7 @@ public class SendFragment extends Fragment {
     private LoaderManager loaderManager;
     private ReceivingAddressViewAdapter sendToAddressViewAdapter;
     private Map<String, ExchangeRate> localRates = new HashMap<>();
-    private ShapeShiftMarketInfo lastMarketInfo;
+    private ShapeShiftMarketInfo marketInfo;
 
     Handler handler = new MyHandler(this);
 
@@ -310,6 +311,8 @@ public class SendFragment extends Fragment {
         resolver.unregisterContentObserver(addressBookObserver);
 
         amountCalculatorLink.setListener(null);
+
+        stopPolling();
 
         super.onPause();
     }
@@ -519,13 +522,52 @@ public class SendFragment extends Fragment {
     }
 
     private boolean isAmountValid(Value amount) {
-        boolean isValid = amount != null && amount.isPositive() && !amount.isDust();
-        if (isValid && canCompare(lastBalance, amount)) {
-            // Check if we have the amount
-            isValid = amount.compareTo(lastBalance) <= 0;
-        }
-        return isValid;
+        return amount != null && isAmountWithinLimits(amount);
     }
+
+    /**
+     * Check if amount is within the minimum and maximum deposit limits and if is dust or if is more
+     * money than currently in the wallet
+     */
+    private boolean isAmountWithinLimits(Value amount) {
+        boolean isWithinLimits = amount != null && amount.isPositive() && !amount.isDust();
+
+        // Check if within min & max deposit limits
+        if (isWithinLimits && marketInfo != null && canCompare(marketInfo.limit, amount)) {
+            isWithinLimits = amount.within(marketInfo.minimum, marketInfo.limit);
+        }
+
+        // Check if we have the amount
+        if (isWithinLimits && canCompare(lastBalance, amount)) {
+            isWithinLimits = amount.compareTo(lastBalance) <= 0;
+        }
+
+        return isWithinLimits;
+    }
+
+    /**
+     * Check if amount is smaller than the dust limit or if applicable, the minimum deposit.
+     */
+    private boolean isAmountTooSmall(Value amount) {
+        return amount.compareTo(getLowestAmount(amount.type)) < 0;
+    }
+
+    /**
+     * Get the lowest deposit or withdraw for the provided amount type
+     */
+    private Value getLowestAmount(ValueType type) {
+        Value min = type.minNonDust();
+        if (marketInfo != null) {
+            if (marketInfo.minimum.isOfType(min)) {
+                min = Value.max(marketInfo.minimum, min);
+            } else if (marketInfo.rate.canConvert(type, marketInfo.minimum.type)) {
+                min = Value.max(marketInfo.rate.convert(marketInfo.minimum), min);
+            }
+        }
+        return min;
+    }
+
+
 
     private boolean everythingValid() {
         return state == State.INPUT && isOutputsValid() && isAmountValid();
@@ -554,73 +596,6 @@ public class SendFragment extends Fragment {
         validateAmount(false);
     }
 
-//    /**
-//     * Validate amount and show errors if needed
-//     */
-//    private void validateAmount__(boolean isTyping) {
-//        Value depositAmount = amountCalculatorLink.getPrimaryAmount();
-//        Value withdrawAmount = amountCalculatorLink.getSecondaryAmount();
-//        Value requestedAmount = amountCalculatorLink.getRequestedAmount();
-//
-//        if (isAmountValid(depositAmount) && isAmountValid(withdrawAmount)) {
-//            sendAmount = requestedAmount;
-//            amountError.setVisibility(View.GONE);
-//            // Show warning that fees apply when entered the full amount inside the pocket
-//            if (lastBalance != null && lastBalance.isOfType(depositAmount) &&
-//                    lastBalance.compareTo(depositAmount) == 0) {
-//                amountWarning.setText(R.string.amount_warn_fees_apply);
-//                amountWarning.setVisibility(View.VISIBLE);
-//            } else {
-//                amountWarning.setVisibility(View.GONE);
-//            }
-//        } else {
-//            amountWarning.setVisibility(View.GONE);
-//            sendAmount = null;
-//            boolean showErrors = shouldShowErrors(isTyping, depositAmount) ||
-//                    shouldShowErrors(isTyping, withdrawAmount);
-//            // ignore printing errors for null and zero amounts
-//            if (showErrors) {
-//                if (depositAmount == null || withdrawAmount == null) {
-//                    amountError.setText(R.string.amount_error);
-//                } else if (depositAmount.isNegative() || withdrawAmount.isNegative()) {
-//                    amountError.setText(R.string.amount_error_negative);
-//                } else if (!isAmountWithinLimits(depositAmount) || !isAmountWithinLimits(withdrawAmount)) {
-//                    String message = getString(R.string.error_generic);
-//                    // If the amount is dust or lower than the deposit limit
-//                    if (isAmountTooSmall(depositAmount) || isAmountTooSmall(withdrawAmount)) {
-//                        Value minimumDeposit = getLowestAmount(depositAmount);
-//                        Value minimumWithdraw = getLowestAmount(withdrawAmount);
-//                        message = getString(R.string.trade_error_min_limit,
-//                                minimumDeposit.toFriendlyString(),
-//                                minimumWithdraw.toFriendlyString());
-//                    } else {
-//                        // If we have the amount
-//                        if (lastBalance != null && lastBalance.isOfType(depositAmount) &&
-//                                depositAmount.compareTo(lastBalance) > 0) {
-//                            message = getString(R.string.amount_error_not_enough_money,
-//                                    GenericUtils.formatValue(lastBalance),
-//                                    lastBalance.type.getSymbol());
-//                        }
-//
-//                        if (maximumDeposit != null && maximumDeposit.isOfType(depositAmount) &&
-//                                depositAmount.compareTo(maximumDeposit) > 0) {
-//                            message = getString(R.string.trade_error_max_limit,
-//                                    GenericUtils.formatValue(maximumDeposit),
-//                                    maximumDeposit.type.getSymbol());
-//                        }
-//                    }
-//                    amountError.setText(message);
-//                } else { // Should not happen, but show a generic error
-//                    amountError.setText(R.string.amount_error);
-//                }
-//                amountError.setVisibility(View.VISIBLE);
-//            } else {
-//                amountError.setVisibility(View.GONE);
-//            }
-//        }
-//        updateNextButtonState();
-//    }
-
     private void validateAmount(boolean isTyping) {
         Value amountParsed = amountCalculatorLink.getPrimaryAmount();
 
@@ -643,16 +618,28 @@ public class SendFragment extends Fragment {
                     amountError.setText(R.string.amount_error);
                 } else if (amountParsed.isNegative()) {
                     amountError.setText(R.string.amount_error_negative);
-//                } else if (amountParsed.compareTo(type.getMinNonDust()) < 0) {
-//                    String minAmount = GenericUtils.formatCoinValue(type, type.getMinNonDust());
-//                    String message = getResources().getString(R.string.amount_error_too_small,
-//                            minAmount, type.getSymbol());
-//                    amountError.setText(message);
-//                } else if (lastBalance != null && amountParsed.compareTo(lastBalance) > 0) {
-//                    String balance = GenericUtils.formatCoinValue(type, lastBalance);
-//                    String message = getResources().getString(R.string.amount_error_not_enough_money,
-//                            balance, type.getSymbol());
-//                    amountError.setText(message);
+                } else if (!isAmountWithinLimits(amountParsed)) {
+                    String message = getString(R.string.error_generic);
+                    // If the amount is dust or lower than the deposit limit
+                    if (isAmountTooSmall(amountParsed)) {
+                        Value minAmount = getLowestAmount(amountParsed.type);
+                        message = getString(R.string.amount_error_too_small,
+                                minAmount.toFriendlyString());
+                    } else {
+                        // If we have the amount
+                        if (canCompare(lastBalance, amountParsed) &&
+                                amountParsed.compareTo(lastBalance) > 0) {
+                            message = getString(R.string.amount_error_not_enough_money,
+                                    lastBalance.toFriendlyString());
+                        }
+
+                        if (marketInfo != null && canCompare(marketInfo.limit, amountParsed) &&
+                                amountParsed.compareTo(marketInfo.limit) > 0) {
+                            message = getString(R.string.trade_error_max_limit,
+                                    marketInfo.limit.toFriendlyString());
+                        }
+                    }
+                    amountError.setText(message);
                 } else { // Should not happen, but show a generic error
                     amountError.setText(R.string.amount_error);
                 }
@@ -667,14 +654,14 @@ public class SendFragment extends Fragment {
     /**
      * Decide if should show errors in the UI.
      */
-    private boolean shouldShowErrors(boolean isTyping, Value amountParsed) {
-        if (canCompare(amountParsed, lastBalance) && amountParsed.compareTo(lastBalance) >= 0) {
+    private boolean shouldShowErrors(boolean isTyping, Value amount) {
+        if (amount != null && !amount.isZero() && !isAmountWithinLimits(amount)) {
             return true;
         }
 
         if (isTyping) return false;
         if (amountCalculatorLink.isEmpty()) return false;
-        if (amountParsed != null && amountParsed.isZero()) return false;
+        if (amount != null && amount.isZero()) return false;
 
         return true;
     }
@@ -965,7 +952,7 @@ public class SendFragment extends Fragment {
     private void onMarketUpdate(ShapeShiftMarketInfo marketInfo) {
         if (address != null && marketInfo.isPair(pocket.getCoinType(),
                 (CoinType) address.getParameters())) {
-            lastMarketInfo = marketInfo;
+            this.marketInfo = marketInfo;
         }
     }
 

@@ -147,9 +147,9 @@
     <string name="amount_error_empty">Please enter an amount</string>
     <string name="amount_error_negative">Cannot send a negative amount</string>
     <string name="amount_error_decimal_places">Too many decimal places, try less than %1$d</string>
-    <string name="amount_error_too_small">The minimum amount is at least %1$s %2$s</string>
+    <string name="amount_error_too_small">The minimum amount is at least %1$s</string>
     <string name="amount_error_not_enough_money_plain">Not enough money</string>
-    <string name="amount_error_not_enough_money">Not enough money, current balance is %1$s %2$s</string>
+    <string name="amount_error_not_enough_money">Not enough money, current balance is %1$s</string>
     <string name="amount_warn_fees_apply">Slightly less will be sent because of fees</string>
 
     <!-- Set Password fragment -->
@@ -283,7 +283,7 @@
     <string name="trade_error_market_info">Could not get information about %1$s - %2$s pair</string>
     <string name="trade_error_message">An error occurred while connecting to the exchange.\n\nTechnical details:\n\n<b>%1$s</b></string>
     <string name="trade_error_sign_tx_message">An error occurred while signing and broadcasting transaction.\n\nTechnical details:\n\n<b>%1$s</b></string>
-    <string name="trade_error_max_limit">The supplied amount exceeds the limit of %1$s %2$s. Please use a smaller amount.</string>
+    <string name="trade_error_max_limit">The supplied amount exceeds the limit of %1$s. Please use a smaller amount.</string>
     <string name="trade_error_min_limit">The minimum amount is at least %1$s or %2$s</string>
 
     <!-- Exchange Status -->
