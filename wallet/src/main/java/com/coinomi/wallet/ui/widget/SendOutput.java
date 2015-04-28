@@ -10,14 +10,16 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.coinomi.core.util.GenericUtils;
+import com.coinomi.wallet.AddressBookProvider;
 import com.coinomi.wallet.R;
 
-import javax.annotation.Nullable;
+import org.bitcoinj.core.Address;
 
 /**
  * @author John L. Jegutanis
  */
 public class SendOutput extends LinearLayout {
+    private final Context context;
     private TextView sendTypeText;
     private TextView amount;
     private TextView symbol;
@@ -35,12 +37,14 @@ public class SendOutput extends LinearLayout {
 
     public SendOutput(Context context) {
         super(context);
+        this.context = context;
 
         inflateView(context);
     }
 
     public SendOutput(Context context, AttributeSet attrs) {
         super(context, attrs);
+        this.context = context;
 
         inflateView(context);
 
@@ -194,6 +198,12 @@ public class SendOutput extends LinearLayout {
     public void setLabelAndAddress(String label, String address) {
         this.label = label;
         this.address = address;
+        updateView();
+    }
+
+    public void setLabelAndAddress(Address address) {
+        this.label = AddressBookProvider.resolveLabel(context, address);
+        this.address = address.toString();
         updateView();
     }
 

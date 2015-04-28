@@ -281,6 +281,14 @@ public class WalletPocketHD extends TransactionWatcherWallet {
     }
 
     @Override
+    public boolean isAddressMine(Address address) {
+        return address != null && address.getParameters().equals(coinType) &&
+                (address.isP2SHAddress() ?
+                        isPayToScriptHashMine(address.getHash160()) :
+                        isPubKeyHashMine(address.getHash160()));
+    }
+
+    @Override
     public boolean isPubKeyHashMine(byte[] pubkeyHash) {
         return findKeyFromPubHash(pubkeyHash) != null;
     }

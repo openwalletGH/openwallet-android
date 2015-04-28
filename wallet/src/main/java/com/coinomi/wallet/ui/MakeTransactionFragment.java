@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
@@ -73,11 +74,14 @@ public class MakeTransactionFragment extends Fragment {
     private static final int TRADE_EXPIRED = 2;
     private static final int STOP_TRADE_TIMEOUT = 3;
 
-    private static final int SAFE_TIMEOUT_MARGIN = 30;
+    private static final int SAFE_TIMEOUT_MARGIN_SEC = 60;
 
     // Loader IDs
     private static final int ID_RATE_LOADER = 0;
 
+    private static final String TRANSACTION_BROADCAST = "transaction_broadcast";
+    private static final String ERROR = "error";
+    private static final String EXCHANGE_ENTRY = "exchange_entry";
     private static final String DEPOSIT_ADDRESS = "deposit_address";
     private static final String DEPOSIT_AMOUNT = "deposit_amount";
     private static final String WITHDRAW_ADDRESS = "withdraw_address";
@@ -95,6 +99,7 @@ public class MakeTransactionFragment extends Fragment {
     private TransactionAmountVisualizer txVisualizer;
     private SendOutput tradeWithdrawSendOutput;
     private Address sendToAddress;
+    private boolean sendingToAccount;
     @Nullable private Value sendAmount;
     private boolean emptyWallet;
     private CoinType sourceType;
@@ -144,11 +149,16 @@ public class MakeTransactionFragment extends Fragment {
                 String toAccountId = args.getString(ARG_SEND_TO_ACCOUNT_ID);
                 WalletPocketHD toAccount = (WalletPocketHD) checkNotNull(application.getAccount(toAccountId));
                 sendToAddress = toAccount.getReceiveAddress(config.isManualAddressManagement());
+                sendingToAccount = true;
             } else {
                 sendToAddress = (Address) checkNotNull(args.getSerializable(ARG_SEND_TO_ADDRESS));
+                sendingToAccount = false;
             }
 
             if (savedState != null) {
+                error = (Exception) savedState.getSerializable(ERROR);
+                transactionBroadcast = savedState.getBoolean(TRANSACTION_BROADCAST);
+                exchangeEntry = (ExchangeEntry) savedState.getSerializable(EXCHANGE_ENTRY);
                 tradeDepositAddress = (Address) savedState.getSerializable(DEPOSIT_ADDRESS);
                 tradeDepositAmount = (Value) savedState.getSerializable(DEPOSIT_AMOUNT);
                 tradeWithdrawAddress = (Address) savedState.getSerializable(WITHDRAW_ADDRESS);
@@ -159,7 +169,7 @@ public class MakeTransactionFragment extends Fragment {
         } catch (Exception e) {
             error = e;
             if (mListener != null) {
-                mListener.onSignResult(e);
+                mListener.onSignResult(e, null);
             }
         }
 
@@ -229,16 +239,17 @@ public class MakeTransactionFragment extends Fragment {
         if (request != null && txVisualizer != null) {
             txVisualizer.setTransaction(sourceAccount, request.tx);
             if (tradeWithdrawAmount != null && tradeWithdrawAddress != null) {
-//                String address = tradeWithdrawAddress.toString();
-//                CoinType type = (CoinType) tradeWithdrawAddress.getParameters();
-//                String label = AddressBookProvider.resolveLabel(getActivity(), type, address);
                 tradeWithdrawSendOutput.setVisibility(View.VISIBLE);
-                tradeWithdrawSendOutput.setSending(false);
-//                tradeWithdrawSendOutput.setLabelAndAddress(label, address);
+                if (sendingToAccount) {
+                    tradeWithdrawSendOutput.setSending(false);
+                } else {
+                    tradeWithdrawSendOutput.setSending(true);
+                    tradeWithdrawSendOutput.setLabelAndAddress(tradeWithdrawAddress);
+                }
                 tradeWithdrawSendOutput.setAmount(GenericUtils.formatValue(tradeWithdrawAmount));
                 tradeWithdrawSendOutput.setSymbol(tradeWithdrawAmount.type.getSymbol());
                 txVisualizer.getOutputs().get(0).setSendLabel(getString(R.string.trade));
-                txVisualizer.hideAddresses();
+                txVisualizer.hideAddresses(); // Hide exchange address
             }
         }
     }
@@ -248,7 +259,7 @@ public class MakeTransactionFragment extends Fragment {
     }
 
     private void maybeStartCreateTransaction() {
-        if (createTransactionTask == null && error == null) {
+        if (createTransactionTask == null && !transactionBroadcast && error == null) {
             createTransactionTask = new CreateTransactionTask();
             createTransactionTask.execute();
         }
@@ -279,15 +290,23 @@ public class MakeTransactionFragment extends Fragment {
     }
 
     private void maybeStartSignAndBroadcast() {
-        if (signAndBroadcastTask == null && request != null && error == null) {
+        if (signAndBroadcastTask == null && !transactionBroadcast && request != null && error == null) {
             signAndBroadcastTask = new SignAndBroadcastTask();
             signAndBroadcastTask.execute();
+        } else if (transactionBroadcast) {
+            Toast.makeText(getActivity(), R.string.tx_already_broadcast, Toast.LENGTH_SHORT).show();
+            if (mListener != null) {
+                mListener.onSignResult(error, exchangeEntry);
+            }
         }
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
+        outState.putBoolean(TRANSACTION_BROADCAST, transactionBroadcast);
+        outState.putSerializable(ERROR, error);
         if (isExchangeNeeded()) {
+            outState.putSerializable(EXCHANGE_ENTRY, exchangeEntry);
             outState.putSerializable(DEPOSIT_ADDRESS, tradeDepositAddress);
             outState.putSerializable(DEPOSIT_AMOUNT, tradeDepositAmount);
             outState.putSerializable(WITHDRAW_ADDRESS, tradeWithdrawAddress);
@@ -339,6 +358,9 @@ public class MakeTransactionFragment extends Fragment {
         if (countDownTimer != null) {
             countDownTimer.cancel();
             countDownTimer = null;
+            handler.removeMessages(START_TRADE_TIMEOUT);
+            handler.removeMessages(UPDATE_TRADE_TIMEOUT);
+            handler.removeMessages(TRADE_EXPIRED);
         }
     }
 
@@ -354,7 +376,7 @@ public class MakeTransactionFragment extends Fragment {
 
         if (mListener != null) {
             error = new Exception(errorString);
-            mListener.onSignResult(error);
+            mListener.onSignResult(error, null);
         }
     }
 
@@ -409,12 +431,7 @@ public class MakeTransactionFragment extends Fragment {
 
 
     public interface Listener {
-        void onSignResult(@Nullable Exception error);
-
-        /**
-         * This method is called when a trade is started and no error occurred
-         */
-        void onTradeDeposit(ExchangeEntry exchangeEntry);
+        void onSignResult(@Nullable Exception error, @Nullable ExchangeEntry exchange);
     }
 
     private final LoaderManager.LoaderCallbacks<Cursor> rateLoaderCallbacks = new LoaderManager.LoaderCallbacks<Cursor>() {
@@ -543,7 +560,7 @@ public class MakeTransactionFragment extends Fragment {
 
                         ShapeShiftTime time = getTimeLeftSync(shapeShift, tradeDepositAddress);
                         if (time != null && !time.isError) {
-                            int secondsLeft = time.secondsRemaining - SAFE_TIMEOUT_MARGIN;
+                            int secondsLeft = time.secondsRemaining - SAFE_TIMEOUT_MARGIN_SEC;
                             handler.sendMessage(handler.obtainMessage(
                                     START_TRADE_TIMEOUT, secondsLeft));
                         } else {
@@ -564,7 +581,7 @@ public class MakeTransactionFragment extends Fragment {
         protected void onPostExecute(Void aVoid) {
             if (busyDialog != null) busyDialog.dismissAllowingStateLoss();
             if (error != null && mListener != null) {
-                mListener.onSignResult(error);
+                mListener.onSignResult(error, null);
             } else if (error == null) {
                 showTransaction();
             } else {
@@ -618,10 +635,7 @@ public class MakeTransactionFragment extends Fragment {
         protected void onPostExecute(Exception error) {
             busyDialog.dismissAllowingStateLoss();
             if (mListener != null) {
-                mListener.onSignResult(error);
-                if (error == null && exchangeEntry != null) {
-                    mListener.onTradeDeposit(exchangeEntry);
-                }
+                mListener.onSignResult(error, exchangeEntry);
             }
         }
     }

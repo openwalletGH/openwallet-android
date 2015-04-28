@@ -18,6 +18,8 @@ package com.coinomi.core.coins;
  */
 
 
+import com.coinomi.core.util.GenericUtils;
+
 import static com.coinomi.core.coins.Value.*;
 
 import static org.junit.Assert.assertArrayEquals;
@@ -34,10 +36,39 @@ import java.math.BigDecimal;
 public class ValueTest {
     final CoinType BTC = BitcoinMain.get();
     final CoinType LTC = LitecoinMain.get();
+    final CoinType PPC = PeercoinMain.get();
     final CoinType NBT = NuBitsMain.get();
     final FiatType USD = FiatType.get("USD");
 
     ValueType[] types = {BTC, LTC, NBT, USD};
+
+    @Test
+    public void parseCoin() {
+        assertEquals(13370000, BTC.value("0.1337").value);
+        assertEquals(13370000, BTC.value(".1337").value);
+
+        // Bitcoin family
+        assertEquals(133700000, BTC.value("1.337").value);
+        assertEquals(133700, BTC.value("0.001337").value);
+
+        // Peercoin family
+        assertEquals(1337000, PPC.value("1.337").value);
+        assertEquals(1337, PPC.value("0.001337").value);
+
+        // NuBits family
+        assertEquals(13370, NBT.value("1.337").value);
+        assertEquals(13, NBT.value("0.0013").value);
+    }
+
+    @Test(expected = ArithmeticException.class)
+    public void parseCoinErrorBitcoin() {
+        BTC.value("3.141592653589793");
+    }
+
+    @Test(expected = ArithmeticException.class)
+    public void parseCoinErrorPeercoin() {
+        PPC.value("3.14159265");
+    }
 
     @Test
     public void testParseValue() {

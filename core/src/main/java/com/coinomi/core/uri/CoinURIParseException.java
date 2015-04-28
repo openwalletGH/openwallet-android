@@ -28,6 +28,10 @@ package com.coinomi.core.uri;
  * to the user other than as part of a "general failure to parse" response.</p>
  */
 public class CoinURIParseException extends Exception {
+    public CoinURIParseException(Throwable cause) {
+        super(cause);
+    }
+
     public CoinURIParseException(String s) {
         super(s);
     }

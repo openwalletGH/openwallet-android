@@ -1,15 +1,29 @@
 package com.coinomi.core.util;
 
 import com.coinomi.core.coins.BitcoinMain;
+import com.coinomi.core.coins.BlackcoinMain;
+import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.coins.DashMain;
+import com.coinomi.core.coins.DigitalcoinMain;
+import com.coinomi.core.coins.DogecoinMain;
+import com.coinomi.core.coins.FeathercoinMain;
+import com.coinomi.core.coins.LitecoinMain;
 import com.coinomi.core.coins.NuBitsMain;
 import com.coinomi.core.coins.NuSharesMain;
 import com.coinomi.core.coins.PeercoinMain;
 
+import org.bitcoinj.core.Address;
+import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.Coin;
+import org.bitcoinj.core.VersionedChecksummedBytes;
 import org.bitcoinj.utils.Fiat;
 import org.junit.Test;
 
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author John L. Jegutanis
@@ -17,31 +31,42 @@ import static org.junit.Assert.assertEquals;
 public class GenericUtilsTests {
 
     @Test
-    public void parseCoin() {
-        assertEquals(Coin.valueOf(13370000), GenericUtils.parseCoin(BitcoinMain.get(), "0.1337"));
-        assertEquals(Coin.valueOf(13370000), GenericUtils.parseCoin(BitcoinMain.get(), ".1337"));
+    public void getPossibleTypes() throws AddressFormatException {
+        List<CoinType> types = GenericUtils.getPossibleTypes("BPa5FmbZRGpmNfy4qaUzarXwSSFbJKFRMQ");
+        assertTrue(types.contains(BlackcoinMain.get()));
+        assertTrue(types.contains(NuBitsMain.get()));
+        assertTrue(GenericUtils.hasMultipleTypes("BPa5FmbZRGpmNfy4qaUzarXwSSFbJKFRMQ"));
 
-        // Bitcoin family
-        assertEquals(Coin.valueOf(133700000), GenericUtils.parseCoin(BitcoinMain.get(), "1.337"));
-        assertEquals(Coin.valueOf(133700), GenericUtils.parseCoin(BitcoinMain.get(), "0.001337"));
+        // Many coins share Bitcoin's multisig addresses...
+        types = GenericUtils.getPossibleTypes("3Lp1ZbdoDfZF21BLMBpctM6CrM6j4t2JyU");
+        assertTrue(types.contains(BitcoinMain.get()));
+        assertTrue(types.contains(LitecoinMain.get()));
+        assertTrue(types.contains(FeathercoinMain.get()));
+        assertTrue(types.contains(DigitalcoinMain.get()));
+        assertTrue(GenericUtils.hasMultipleTypes("3Lp1ZbdoDfZF21BLMBpctM6CrM6j4t2JyU"));
 
-        // Peercoin family
-        assertEquals(Coin.valueOf(1337000), GenericUtils.parseCoin(PeercoinMain.get(), "1.337"));
-        assertEquals(Coin.valueOf(1337), GenericUtils.parseCoin(PeercoinMain.get(), "0.001337"));
+        // Address method
+        Address address = new Address(BlackcoinMain.get(), "BPa5FmbZRGpmNfy4qaUzarXwSSFbJKFRMQ");
+        types = GenericUtils.getPossibleTypes(address);
+        assertTrue(types.contains(BlackcoinMain.get()));
+        assertTrue(types.contains(NuBitsMain.get()));
+        assertTrue(GenericUtils.hasMultipleTypes(address));
 
-        // NuBits family
-        assertEquals(Coin.valueOf(13370), GenericUtils.parseCoin(NuBitsMain.get(), "1.337"));
-        assertEquals(Coin.valueOf(13), GenericUtils.parseCoin(NuSharesMain.get(), "0.0013"));
+        // Classic Bitcoin addresses should have only one type
+        types = GenericUtils.getPossibleTypes("1AjnxP4frz7Nb4v2soLnhN2uV9UocqvaGH");
+        assertTrue(types.contains(BitcoinMain.get()));
+        assertTrue(types.size() == 1);
+        assertFalse(GenericUtils.hasMultipleTypes("1AjnxP4frz7Nb4v2soLnhN2uV9UocqvaGH"));
     }
 
-    @Test(expected = ArithmeticException.class)
-    public void parseCoinErrorBitcoin() {
-        GenericUtils.parseCoin(BitcoinMain.get(), "3.141592653589793");
+    @Test(expected = AddressFormatException.class)
+    public void getPossibleTypesInvalid() throws AddressFormatException {
+        GenericUtils.getPossibleTypes("");
     }
 
-    @Test(expected = ArithmeticException.class)
-    public void parseCoinErrorPeercoin() {
-        GenericUtils.parseCoin(PeercoinMain.get(), "3.14159265");
+    @Test(expected = AddressFormatException.class)
+    public void getPossibleTypesUnsupported() throws AddressFormatException {
+        GenericUtils.getPossibleTypes("2mwJoik9pimQHUN2zU56J7h8tCTWYoUhpCM"); // version byte 0xFF
     }
 
     @Test
@@ -93,4 +118,6 @@ public class GenericUtilsTests {
         assertEquals("1.00", GenericUtils.formatCoinValue(PeercoinMain.get(), Coin.valueOf(1000049), 4, 0));
         assertEquals("1.0001", GenericUtils.formatCoinValue(PeercoinMain.get(), Coin.valueOf(1000050), 4, 0));
     }
+
+
 }

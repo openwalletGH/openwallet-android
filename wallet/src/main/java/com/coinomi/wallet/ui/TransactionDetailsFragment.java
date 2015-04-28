@@ -24,6 +24,7 @@ import com.coinomi.wallet.util.ThrottlingWalletChangeListener;
 import com.coinomi.wallet.util.UiUtils;
 import com.coinomi.wallet.util.WeakHandler;
 
+import org.bitcoinj.core.Address;
 import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.TransactionConfidence;
@@ -126,9 +127,8 @@ public class TransactionDetailsFragment extends Fragment {
 
                     if (obj != null && obj instanceof TransactionOutput) {
                         TransactionOutput txo = (TransactionOutput) obj;
-                        String address = txo.getScriptPubKey().getToAddress(type).toString();
-                        UiUtils.startActionModeForAddress(address, type,
-                                getActivity(), getFragmentManager());
+                        Address address = txo.getScriptPubKey().getToAddress(type);
+                        UiUtils.startAddressActionMode(address, getActivity(), getFragmentManager());
                     }
                 }
             }

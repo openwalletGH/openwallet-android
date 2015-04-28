@@ -38,6 +38,7 @@ import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.tasks.AddCoinTask;
+import com.coinomi.wallet.tasks.MarketInfoPollTask;
 import com.coinomi.wallet.ui.adaptors.AvailableAccountsAdaptor;
 import com.coinomi.wallet.ui.widget.AmountEditView;
 import com.coinomi.wallet.util.Keyboard;
@@ -60,6 +61,8 @@ import java.util.TreeSet;
 
 import javax.annotation.Nullable;
 
+import static com.coinomi.core.coins.Value.canCompare;
+
 /**
  * @author John L. Jegutanis
  */
@@ -72,8 +75,6 @@ public class TradeSelectFragment extends Fragment {
     private static final int VALIDATE_AMOUNT = 3;
     private static final int INITIAL_TASK_ERROR = 4;
     private static final int UPDATE_AVAILABLE_COINS = 5;
-
-    private static final long POLLING_MS = 30000;
 
     // UI & misc
     private WalletApplication application;
@@ -98,7 +99,7 @@ public class TradeSelectFragment extends Fragment {
     private MarketInfoTask marketTask;
     private InitialCheckTask initialTask;
     private Timer timer;
-    private MarketInfoPollTask pollTask;
+    private MyMarketInfoPollTask pollTask;
     private AddCoinAndProceedTask addCoinAndProceedTask;
 
     // State
@@ -361,9 +362,9 @@ public class TradeSelectFragment extends Fragment {
     private void startPolling() {
         if (timer == null) {
             ShapeShift shapeShift = application.getShapeShift();
-            pollTask = new MarketInfoPollTask(handler, shapeShift, getPair());
+            pollTask = new MyMarketInfoPollTask(handler, shapeShift, getPair());
             timer = new Timer();
-            timer.schedule(pollTask, 0, POLLING_MS);
+            timer.schedule(pollTask, 0, Constants.RATE_UPDATE_FREQ_MS);
         }
     }
 
@@ -737,30 +738,6 @@ public class TradeSelectFragment extends Fragment {
         }
     }
 
-    /**
-     * Makes a call to ShapeShift about the market info of a pair. If case of a problem, it will
-     * retry 3 times and return null if there was an error.
-     *
-     * Note: do not call this from the main thread!
-     */
-    @Nullable
-    private static ShapeShiftMarketInfo getMarketInfoSync(ShapeShift shapeShift, String pair) {
-        // Try 3 times
-        for (int tries = 1; tries <= 3; tries++) {
-            try {
-                log.info("Polling market info for pair: {}", pair);
-                return shapeShift.getMarketInfo(pair);
-            } catch (Exception e) {
-                log.info("Will retry: {}", e.getMessage());
-                    /* ignore and retry, with linear backoff */
-                try {
-                    Thread.sleep(1000 * tries);
-                } catch (InterruptedException ie) { /*ignored*/ }
-            }
-        }
-        return null;
-    }
-
     private void updateBalance() {
         lastBalance = sourceAccount.getBalance(false);
     }
@@ -784,7 +761,7 @@ public class TradeSelectFragment extends Fragment {
         }
 
         // Check if we have the amount
-        if (isWithinLimits && lastBalance != null && lastBalance.isOfType(amount)) {
+        if (isWithinLimits && canCompare(lastBalance, amount)) {
             isWithinLimits = amount.compareTo(lastBalance) <= 0;
         }
 
@@ -845,8 +822,7 @@ public class TradeSelectFragment extends Fragment {
             sendAmount = requestedAmount;
             amountError.setVisibility(View.GONE);
             // Show warning that fees apply when entered the full amount inside the pocket
-            if (lastBalance != null && lastBalance.isOfType(depositAmount) &&
-                    lastBalance.compareTo(depositAmount) == 0) {
+            if (canCompare(lastBalance, depositAmount) && lastBalance.compareTo(depositAmount) == 0) {
                 amountWarning.setText(R.string.amount_warn_fees_apply);
                 amountWarning.setVisibility(View.VISIBLE);
             } else {
@@ -874,7 +850,7 @@ public class TradeSelectFragment extends Fragment {
                                 minimumWithdraw.toFriendlyString());
                     } else {
                         // If we have the amount
-                        if (lastBalance != null && lastBalance.isOfType(depositAmount) &&
+                        if (canCompare(lastBalance, depositAmount) &&
                                 depositAmount.compareTo(lastBalance) > 0) {
                             message = getString(R.string.amount_error_not_enough_money,
                                     GenericUtils.formatValue(lastBalance),
@@ -922,8 +898,7 @@ public class TradeSelectFragment extends Fragment {
      * Decide if should show errors in the UI.
      */
     private boolean shouldShowErrors(boolean isTyping, Value amountParsed) {
-        if (amountParsed != null && lastBalance != null &&
-                amountParsed.isOfType(lastBalance) && amountParsed.compareTo(lastBalance) >= 0) {
+        if (canCompare(amountParsed, lastBalance) && amountParsed.compareTo(lastBalance) >= 0) {
             return true;
         }
 
@@ -940,7 +915,6 @@ public class TradeSelectFragment extends Fragment {
 
     public interface Listener {
         void onMakeTrade(WalletAccount fromAccount, WalletAccount toAccount, Value amount);
-        void onAbort();
     }
 
 
@@ -1074,7 +1048,7 @@ public class TradeSelectFragment extends Fragment {
 
         @Override
         protected ShapeShiftMarketInfo doInBackground(Void... params) {
-            return getMarketInfoSync(shapeShift, pair);
+            return MarketInfoPollTask.getMarketInfoSync(shapeShift, pair);
         }
 
         @Override
@@ -1087,27 +1061,17 @@ public class TradeSelectFragment extends Fragment {
         }
     }
 
-    private static class MarketInfoPollTask extends TimerTask {
+    private static class MyMarketInfoPollTask extends MarketInfoPollTask {
         private final Handler handler;
-        private final ShapeShift shapeShift;
-        private String pair;
 
-        MarketInfoPollTask(Handler handler, ShapeShift shapeShift, String pair) {
-            this.shapeShift = shapeShift;
-            this.pair = pair;
+        MyMarketInfoPollTask(Handler handler, ShapeShift shapeShift, String pair) {
+            super(shapeShift, pair);
             this.handler = handler;
         }
 
-        void updatePair(String newPair) {
-            this.pair = newPair;
-        }
-
         @Override
-        public void run() {
-            ShapeShiftMarketInfo marketInfo = getMarketInfoSync(shapeShift, pair);
-            if (marketInfo != null) {
-                handler.sendMessage(handler.obtainMessage(UPDATE_MARKET, marketInfo));
-            }
+        public void onHandleMarketInfo(ShapeShiftMarketInfo marketInfo) {
+            handler.sendMessage(handler.obtainMessage(UPDATE_MARKET, marketInfo));
         }
     }
 

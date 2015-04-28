@@ -5,6 +5,7 @@ import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.params.Networks;
 
+import com.coinomi.core.util.GenericUtils;
 import com.google.common.collect.ImmutableList;
 
 import java.util.HashMap;
@@ -26,15 +27,17 @@ public enum CoinID {
     DASH_MAIN(DashMain.get()),
     NUSHARES_MAIN(NuSharesMain.get()),
     NUBITS_MAIN(NuBitsMain.get()),
-    NAMECOIN_MAIN(NamecoinMain.get()),
+//    NAMECOIN_MAIN(NamecoinMain.get()),
     FEATHERCOIN_MAIN(FeathercoinMain.get()),
     BLACKCOIN_MAIN(BlackcoinMain.get()),
     RUBYCOIN_MAIN(RubycoinMain.get()),
-    URO_MAIN(UroMain.get()),
+//    URO_MAIN(UroMain.get()),
     DIGITALCOIN_MAIN(DigitalcoinMain.get()),
     CANNACOIN_MAIN(CannacoinMain.get()),
-    DIGIBYTE_MAIN(DigibyteMain.get()),;
+//    DIGIBYTE_MAIN(DigibyteMain.get()),
+    ;
 
+    private static List<CoinType> types;
     private static HashMap<String, CoinType> idLookup = new HashMap<>();
     private static HashMap<String, CoinType> symbolLookup = new HashMap<>();
 
@@ -48,6 +51,7 @@ public enum CoinID {
             Networks.register(id.type);
         }
 
+        ImmutableList.Builder<CoinType> coinTypeBuilder = ImmutableList.builder();
         for (CoinID id : values()) {
             if (symbolLookup.containsKey(id.type.symbol)) {
                 throw new IllegalStateException(
@@ -60,7 +64,10 @@ public enum CoinID {
                         "Coin IDs must be unique, double found: " + id.type.getId());
             }
             idLookup.put(id.type.getId(), id.type);
+
+            coinTypeBuilder.add(id.type);
         }
+        types = coinTypeBuilder.build();
     }
 
     private final CoinType type;
@@ -79,7 +86,7 @@ public enum CoinID {
     }
 
     public static List<CoinType> getSupportedCoins() {
-        return ImmutableList.copyOf(idLookup.values());
+        return types;
     }
 
     public static CoinType typeFromId(String stringId) {
@@ -101,13 +108,8 @@ public enum CoinID {
         throw new IllegalArgumentException("Unsupported URI: " + input);
     }
 
-    public static CoinType typeFromAddress(String address) throws AddressFormatException {
-        NetworkParameters addressParams = new Address(null, address).getParameters();
-        if (addressParams instanceof CoinType) {
-            return (CoinType) addressParams;
-        } else {
-            throw new AddressFormatException("Unsupported address network: " + addressParams.getId());
-        }
+    public static List<CoinType> typesFromAddress(String address) throws AddressFormatException {
+        return GenericUtils.getPossibleTypes(address);
     }
 
     public static boolean isSymbolSupported(String symbol) {

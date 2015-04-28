@@ -2,6 +2,7 @@ package com.coinomi.wallet.ui;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -10,29 +11,40 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.view.ActionMode;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.uri.CoinURI;
 import com.coinomi.core.uri.CoinURIParseException;
-import com.coinomi.core.wallet.Wallet;
+import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
+import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.service.CoinService;
 import com.coinomi.wallet.service.CoinServiceImpl;
 import com.coinomi.wallet.tasks.CheckUpdateTask;
+import com.coinomi.wallet.ui.widget.CoinListItem;
 import com.coinomi.wallet.util.Keyboard;
 import com.coinomi.wallet.util.SystemUtils;
+import com.coinomi.wallet.util.UiUtils;
 import com.coinomi.wallet.util.WeakHandler;
 
+import org.bitcoinj.core.Address;
+import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,9 +55,10 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import static com.coinomi.wallet.ui.NavDrawerItemType.ITEM_SECTION_TITLE;
-import static com.coinomi.wallet.ui.NavDrawerItemType.ITEM_SEPARATOR;
 import static com.coinomi.wallet.ui.NavDrawerItemType.ITEM_COIN;
 import static com.coinomi.wallet.ui.NavDrawerItemType.ITEM_TRADE;
+import static com.coinomi.wallet.util.UiUtils.setGone;
+import static com.coinomi.wallet.util.UiUtils.setVisible;
 
 
 /**
@@ -84,27 +97,10 @@ final public class WalletActivity extends BaseWalletActivity implements
     private String currentAccountId;
     private Intent connectCoinIntent;
     private List<NavDrawerItem> navDrawerItems = new ArrayList<>();
-
+    private ActionMode lastActionMode;
     private final Handler handler = new MyHandler(this);
-    private static class MyHandler extends WeakHandler<WalletActivity> {
-        public MyHandler(WalletActivity ref) { super(ref); }
 
-        @Override
-        protected void weakHandleMessage(WalletActivity ref, Message msg) {
-            switch (msg.what) {
-                case TX_BROADCAST_OK:
-                    Toast.makeText(ref, ref.getString(R.string.sent_msg),
-                            Toast.LENGTH_LONG).show();
-                    ref.goToBalance();
-                    break;
-                case TX_BROADCAST_ERROR:
-                    Toast.makeText(ref, ref.getString(R.string.get_tx_broadcast_error),
-                            Toast.LENGTH_LONG).show();
-                    ref.goToBalance();
-                    break;
-            }
-        }
-    }
+    public WalletActivity() {}
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -156,6 +152,7 @@ final public class WalletActivity extends BaseWalletActivity implements
             @Override
             public void onPageSelected(int position) {
                 if (position == BALANCE) Keyboard.hideKeyboard(WalletActivity.this);
+                finishActionMode();
             }
 
             @Override public void onPageScrollStateChanged(int state) {}
@@ -342,24 +339,10 @@ final public class WalletActivity extends BaseWalletActivity implements
             public void run() {
                 if (requestCode == REQUEST_CODE_SCAN) {
                     if (resultCode == Activity.RESULT_OK) {
-                        final String input = intent.getStringExtra(ScanActivity.INTENT_EXTRA_RESULT);
-
                         try {
-                            final CoinURI coinUri = new CoinURI(input);
-                            CoinType scannedType = coinUri.getType();
-
-                            if (!Constants.SUPPORTED_COINS.contains(scannedType)) {
-                                String error = getResources().getString(R.string.unsupported_coin, scannedType.getName());
-                                throw new CoinURIParseException(error);
-                            } else if (!getWalletApplication().isAccountExists(scannedType)) {
-                                String error = getResources().getString(R.string.coin_not_added, scannedType.getName());
-                                throw new CoinURIParseException(error);
-                            }
-
-                            setSendFromCoin(coinUri);
-                        } catch (final CoinURIParseException e) {
-                            String error = getResources().getString(R.string.uri_error, e.getMessage());
-                            Toast.makeText(WalletActivity.this, error, Toast.LENGTH_LONG).show();
+                            processInput(intent.getStringExtra(ScanActivity.INTENT_EXTRA_RESULT));
+                        } catch (final Exception e) {
+                            showScanFailedMessage(e);
                         }
                     }
                 } else if (requestCode == ADD_COIN) {
@@ -374,25 +357,125 @@ final public class WalletActivity extends BaseWalletActivity implements
         });
     }
 
-    private void setSendFromCoin(final CoinURI coinUri) throws CoinURIParseException {
-        List<WalletAccount> accounts = getAccounts(coinUri.getType());
-        if (mViewPager != null && mNavigationDrawerFragment != null && accounts.size() > 0) {
-            final WalletAccount account;
-            if (accounts.size() > 1) {
-                //TODO show a dialog to select the correct account
-                Toast.makeText(this, "Selecting first account", Toast.LENGTH_SHORT).show();
+    private void showScanFailedMessage(Exception e) {
+        String error = getResources().getString(R.string.scan_error, e.getMessage());
+        Toast.makeText(this, error, Toast.LENGTH_LONG).show();
+    }
+
+    private void processInput(String input) throws CoinURIParseException, AddressFormatException {
+        try {
+            processUri(input);
+        } catch (final CoinURIParseException x) {
+            processAddress(input);
+        }
+    }
+
+    private void processUri(String input) throws CoinURIParseException {
+        CoinURI coinUri = new CoinURI(input);
+        CoinType scannedType = coinUri.getType();
+
+        if (!Constants.SUPPORTED_COINS.contains(scannedType)) {
+            String error = getResources().getString(R.string.unsupported_coin, scannedType.getName());
+            throw new CoinURIParseException(error);
+        }
+
+        List<WalletAccount> allAccounts = getAllAccounts();
+        List<WalletAccount> sendFromAccounts = getAccounts(coinUri.getType());
+        if (sendFromAccounts.size() == 1) {
+            setSendFromCoin(sendFromAccounts.get(0), coinUri);
+        } else if (allAccounts.size() == 1) {
+            setSendFromCoin(allAccounts.get(0), coinUri);
+        } else {
+            showPayWithDialog(coinUri);
+        }
+    }
+
+    private void processAddress(String addressStr) throws AddressFormatException, CoinURIParseException {
+        List<CoinType> possibleTypes = GenericUtils.getPossibleTypes(addressStr);
+        WalletAccount currentAccount = getAccount(currentAccountId);
+
+        if (currentAccount != null && possibleTypes.contains(currentAccount.getCoinType())) {
+            Address address = new Address(currentAccount.getCoinType(), addressStr);
+            processUri(CoinURI.convertToCoinURI(address, null, null, null));
+        } else if (possibleTypes.size() == 1) {
+            Address address = new Address(possibleTypes.get(0), addressStr);
+            processUri(CoinURI.convertToCoinURI(address, null, null, null));
+        } else {
+            // This address string could be more that one coin type so first check if this address
+            // comes from an account to determine the type.
+            List<WalletAccount> possibleAccounts = getAccounts(possibleTypes);
+            Address addressOfAccount = null;
+            for (WalletAccount account : possibleAccounts) {
+                Address testAddress = new Address(account.getCoinType(), addressStr);
+                if (account.isAddressMine(testAddress)) {
+                    addressOfAccount = testAddress;
+                    break;
+                }
             }
-            account = accounts.get(0);
+            if (addressOfAccount != null) {
+                // If address is from an account don't show a dialog.
+                processUri(CoinURI.convertToCoinURI(addressOfAccount, null, null, null));
+            } else {
+                // As a last resort let the use choose the correct coin type
+                showPayToDialog(addressStr);
+            }
+        }
+    }
+
+    private void showPayToDialog(String addressStr) {
+        if (selectCoinTypeDialog.getArguments() == null) {
+            selectCoinTypeDialog.setArguments(new Bundle());
+        }
+        selectCoinTypeDialog.getArguments().putString(Constants.ARG_ADDRESS_STRING, addressStr);
+        selectCoinTypeDialog.show(getSupportFragmentManager(), null);
+    }
+
+    SelectCoinTypeDialog selectCoinTypeDialog = new SelectCoinTypeDialog() {
+        // FIXME crash when this dialog being restored from saved state
+        @Override
+        public void onAddressSelected(Address selectedAddress) {
+            try {
+                processUri(CoinURI.convertToCoinURI(selectedAddress, null, null, null));
+            } catch (CoinURIParseException e) {
+                showScanFailedMessage(e);
+            }
+        }
+    };
+
+    private void showPayWithDialog(CoinURI uri) {
+        if (payWithDialog.getArguments() == null) {
+            payWithDialog.setArguments(new Bundle());
+        }
+        payWithDialog.getArguments().putString(Constants.ARG_URI, uri.toUriString());
+        payWithDialog.show(getSupportFragmentManager(), null);
+    }
+
+    PayWithDialog payWithDialog = new PayWithDialog() {
+        // FIXME crash when this dialog being restored from saved state
+        @Override
+        public void payWith(WalletAccount account, CoinURI uri) {
+            setSendFromCoin(account, uri);
+        }
+    };
+
+    private void setSendFromCoin(final WalletAccount account, final CoinURI coinUri) {
+        if (mViewPager != null && mNavigationDrawerFragment != null) {
             openPocket(account);
             mViewPager.setCurrentItem(SEND);
 
             for (Fragment fragment : getSupportFragmentManager().getFragments()) {
                 if (fragment instanceof SendFragment) {
-                    ((SendFragment) fragment)
-                            .updateStateFrom(coinUri.getAddress(), coinUri.getAmount(), coinUri.getLabel());
+                    try {
+                        ((SendFragment) fragment).updateStateFrom(coinUri);
+                    } catch (CoinURIParseException e) {
+                        showScanFailedMessage(e);
+                    }
                     break;
                 }
             }
+        } else {
+            // Should not happen
+            Toast.makeText(this, R.string.error_generic, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -473,6 +556,7 @@ final public class WalletActivity extends BaseWalletActivity implements
         if (!screenChanged) {
             super.onBackPressed();
         }
+        finishActionMode();
     }
 
     private boolean goToBalance() {
@@ -481,6 +565,38 @@ final public class WalletActivity extends BaseWalletActivity implements
             return true;
         }
         return false;
+    }
+
+    public void registerActionMode(ActionMode actionMode) {
+        finishActionMode();
+        lastActionMode = actionMode;
+    }
+
+    private void finishActionMode() {
+        if (lastActionMode != null) {
+            lastActionMode.finish();
+            lastActionMode = null;
+        }
+    }
+
+    private static class MyHandler extends WeakHandler<WalletActivity> {
+        public MyHandler(WalletActivity ref) { super(ref); }
+
+        @Override
+        protected void weakHandleMessage(WalletActivity ref, Message msg) {
+            switch (msg.what) {
+                case TX_BROADCAST_OK:
+                    Toast.makeText(ref, ref.getString(R.string.sent_msg),
+                            Toast.LENGTH_LONG).show();
+                    ref.goToBalance();
+                    break;
+                case TX_BROADCAST_ERROR:
+                    Toast.makeText(ref, ref.getString(R.string.get_tx_broadcast_error),
+                            Toast.LENGTH_LONG).show();
+                    ref.goToBalance();
+                    break;
+            }
+        }
     }
 
     private static class AppSectionsPagerAdapter extends FragmentStatePagerAdapter {

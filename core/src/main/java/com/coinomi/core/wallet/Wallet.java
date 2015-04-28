@@ -210,6 +210,27 @@ final public class Wallet {
         }
     }
 
+    /**
+     * Get accounts that watch a specific address. Returns empty list if no account exists
+     */
+    public List<WalletAccount> getAccounts(final Address address) {
+        lock.lock();
+        try {
+            ImmutableList.Builder<WalletAccount> builder = ImmutableList.builder();
+            CoinType type = (CoinType) address.getParameters();
+            if (isAccountExists(type)) {
+                for (WalletAccount account : accountsByType.get(type)) {
+                    if (account.isAddressMine(address)) {
+                        builder.add(account);
+                    }
+                }
+            }
+            return builder.build();
+        } finally {
+            lock.unlock();
+        }
+    }
+
     public List<WalletAccount> getAllAccounts() {
         lock.lock();
         try {

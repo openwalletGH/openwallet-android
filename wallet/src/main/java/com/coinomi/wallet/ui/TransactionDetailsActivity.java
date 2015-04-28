@@ -19,8 +19,5 @@ public class TransactionDetailsActivity extends BaseWalletActivity {
                     .commit();
 
         }
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(false);
     }
 }

@@ -20,16 +20,13 @@ package com.coinomi.core.uri;
 
 import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.coins.Value;
 import com.coinomi.core.util.GenericUtils;
 
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.AddressFormatException;
-import org.bitcoinj.core.Coin;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nullable;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -39,8 +36,9 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
+import javax.annotation.Nullable;
+
+import static com.coinomi.core.Preconditions.checkNotNull;
 
 /**
  * <p>Provides a standard implementation of a Bitcoin URI with support for the following:</p>
@@ -151,19 +149,8 @@ public class CoinURI {
                     throw new CoinURIParseException("Unsupported URI scheme: " + uri.getScheme());
                 }
             } else {
-                // Try to parse as address
-                try {
-                    params = CoinID.typeFromAddress(input);
-                } catch (AddressFormatException e) {
-                    throw new CoinURIParseException("Unrecognisable format: " + input);
-                }
+                throw new CoinURIParseException("Unrecognisable URI format: " + input);
             }
-        }
-
-        if (uri.getScheme() == null) {
-            // make input appear as a URI
-            input = params.getUriScheme() + ":" + input;
-            uri = getUri(input);
         }
 
         type = params;
@@ -244,7 +231,7 @@ public class CoinURI {
             if (FIELD_AMOUNT.equals(nameToken)) {
                 // Decode the amount (contains an optional decimal component to 8dp).
                 try {
-                    Coin amount = GenericUtils.parseCoin(type, valueToken);
+                    Value amount = checkNotNull(type).value(valueToken);
                     if (amount.signum() < 0) {
                         throw new OptionalFieldValidationException(String.format("'%s' Negative coins specified", valueToken));
                     }
@@ -310,8 +297,8 @@ public class CoinURI {
      * @return The amount name encoded using a pure integer value based at
      *         10,000,000 units is 1 BTC. May be null if no amount is specified
      */
-    public Coin getAmount() {
-        return (Coin) parameterMap.get(FIELD_AMOUNT);
+    public Value getAmount() {
+        return (Value) parameterMap.get(FIELD_AMOUNT);
     }
 
     /**
@@ -360,23 +347,16 @@ public class CoinURI {
         return builder.toString();
     }
 
-    // Address cannot give us
-    public static String convertToBitcoinURI(Address address, Coin amount, String label, String message) {
-        checkNotNull(address.getParameters());
-        checkState(address.getParameters() instanceof CoinType);
-        return convertToCoinURI(address, amount, label, message);
-    }
-
     /**
      * Simple coin URI builder using known good fields.
-     * 
+     *
      * @param address The coin address
      * @param amount The amount
      * @param label A label
      * @param message A message
      * @return A String containing the coin URI
      */
-    public static String convertToCoinURI(Address address, @Nullable Coin amount,
+    public static String convertToCoinURI(Address address, @Nullable Value amount,
                                           @Nullable String label, @Nullable String message) {
         checkNotNull(address);
 
@@ -432,5 +412,9 @@ public class CoinURI {
             // should not happen - UTF-8 is a valid encoding
             throw new RuntimeException(e);
         }
+    }
+
+    public String toUriString() {
+        return convertToCoinURI(getAddress(), getAmount(), getLabel(), getMessage());
     }
 }

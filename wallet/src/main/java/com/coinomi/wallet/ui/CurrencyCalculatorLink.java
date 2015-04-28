@@ -19,7 +19,6 @@ package com.coinomi.wallet.ui;
 
 import android.view.View;
 
-import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
 import com.coinomi.core.util.ExchangeRate;
 import com.coinomi.wallet.ui.widget.AmountEditView;
@@ -27,7 +26,6 @@ import com.coinomi.wallet.ui.widget.AmountEditView.Listener;
 
 import org.bitcoinj.core.Coin;
 
-import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -168,10 +166,10 @@ public final class CurrencyCalculatorLink {
 
         if (exchangeRate != null) {
             localAmountView.setEnabled(enabled);
-            localAmountView.setType(exchangeRate.getDestinationType());
+            localAmountView.resetType(exchangeRate.getDestinationType());
             localAmountView.setVisibility(View.VISIBLE);
 
-            coinAmountView.setType(exchangeRate.getSourceType());
+            coinAmountView.resetType(exchangeRate.getSourceType());
 
             if (exchangeDirection) {
                 final Value coinAmount = coinAmountView.getAmount();
@@ -235,10 +233,6 @@ public final class CurrencyCalculatorLink {
         coinAmountView.setAmount(amount, true);
 
         this.listener = listener;
-    }
-
-    public void setPrimaryAmount(CoinType type, Coin amount) {
-        setPrimaryAmount(Value.valueOf(type, amount));
     }
 
     public boolean isEmpty() {

@@ -25,6 +25,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -277,5 +278,13 @@ public class Value implements Monetary, Comparable<Value>, Serializable {
 
     public static Value min(Value value1, Value value2) {
         return value1.compareTo(value2) <= 0 ? value1 : value2;
+    }
+
+    public boolean canCompare(Value other) {
+        return canCompare(this, other);
+    }
+
+    public static boolean canCompare(@Nullable Value amount1, @Nullable Value amount2) {
+        return amount1 != null && amount2 != null && amount1.isOfType(amount2);
     }
 }

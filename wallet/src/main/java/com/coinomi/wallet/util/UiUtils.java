@@ -23,6 +23,7 @@ import com.coinomi.wallet.AddressBookProvider;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.ui.EditAddressBookEntryFragment;
 
+import org.bitcoinj.core.Address;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,55 +43,73 @@ public class UiUtils {
                 activity.getString(R.string.action_share)));
     }
 
-    static public void startActionModeForAddress(final String address,
-                                           final CoinType type,
-                                           final Activity activity,
-                                           final FragmentManager fragmentManager) {
-        if (!(activity instanceof ActionBarActivity)) {
-            log.warn("To show action mode, your activity must extend " + ActionBarActivity.class);
-            return;
+    public static class AddressActionModeCallback implements ActionMode.Callback {
+        private final Address address;
+        private final Context context;
+        private final FragmentManager fragmentManager;
+
+
+        public AddressActionModeCallback(final Address address,
+                                         final Context context,
+                                         final FragmentManager fragmentManager) {
+            this.address = address;
+            this.context = context;
+            this.fragmentManager = fragmentManager;
         }
 
-        ((ActionBarActivity) activity).startSupportActionMode(new ActionMode.Callback() {
-            @Override
-            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-                final MenuInflater inflater = mode.getMenuInflater();
-                inflater.inflate(R.menu.address_options, menu);
+        public Address getAddress() {
+            return address;
+        }
 
-                return true;
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            mode.getMenuInflater().inflate(R.menu.address_options, menu);
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            final String label = AddressBookProvider.resolveLabel(context, address);
+            mode.setTitle(label != null ? label : GenericUtils.addressSplitToGroups(address));
+            return true;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem menuItem) {
+            switch (menuItem.getItemId()) {
+                case R.id.action_edit_label:
+                    EditAddressBookEntryFragment.edit(fragmentManager, address);
+                    mode.finish();
+                    return true;
+                case R.id.action_copy:
+                    UiUtils.copy(context, address.toString());
+                    mode.finish();
+                    return true;
             }
 
-            @Override
-            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-                final String label = AddressBookProvider.resolveLabel(activity, type, address);
-                mode.setTitle(label != null ? label : GenericUtils.addressSplitToGroups(address));
-                return true;
-            }
+            return false;
+        }
 
-            @Override
-            public boolean onActionItemClicked(ActionMode mode, MenuItem menuItem) {
-                switch (menuItem.getItemId()) {
-                    case R.id.action_edit_label:
-                        EditAddressBookEntryFragment.edit(fragmentManager, type, address);
-                        mode.finish();
-                        return true;
-                    case R.id.action_copy:
-                        UiUtils.copy(activity, address);
-                        mode.finish();
-                        return true;
-                }
-
-                return false;
-            }
-
-            @Override
-            public void onDestroyActionMode(ActionMode actionMode) {
-            }
-        });
+        @Override public void onDestroyActionMode(ActionMode actionMode) { }
     }
 
-    public static void copy(Activity activity, String string) {
-        Object clipboardService = activity.getSystemService(Context.CLIPBOARD_SERVICE);
+    public static ActionMode startActionMode(final Activity activity, final ActionMode.Callback callback) {
+        if (activity == null || !(activity instanceof ActionBarActivity)) {
+            log.warn("To show action mode, your activity must extend " + ActionBarActivity.class);
+            return null;
+        }
+        return ((ActionBarActivity) activity).startSupportActionMode(callback);
+    }
+
+    public static ActionMode startAddressActionMode(final Address address,
+                                                    final Activity activity,
+                                                    final FragmentManager fragmentManager) {
+        return startActionMode(activity,
+                new AddressActionModeCallback(address, activity, fragmentManager));
+    }
+
+    public static void copy(Context context, String string) {
+        Object clipboardService = context.getSystemService(Context.CLIPBOARD_SERVICE);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             ClipboardManager clipboard = (ClipboardManager) clipboardService;
@@ -99,7 +118,7 @@ public class UiUtils {
             android.text.ClipboardManager clipboard = (android.text.ClipboardManager) clipboardService;
             clipboard.setText(string);
         }
-        Toast.makeText(activity, R.string.copied_to_clipboard, Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, R.string.copied_to_clipboard, Toast.LENGTH_SHORT).show();
     }
 
     public static void setVisible(View view) {

@@ -2,6 +2,7 @@ package com.coinomi.core.wallet;
 
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
+import com.coinomi.core.coins.ValueType;
 import com.coinomi.core.network.interfaces.ConnectionEventListener;
 import com.coinomi.core.network.interfaces.TransactionEventListener;
 
@@ -32,7 +33,7 @@ public interface WalletAccount extends TransactionBag, KeyBag, TransactionEventL
     boolean isNew();
 
     Value getBalance(boolean includeUnconfirmed);
-//    Value getSpendableBalance();
+    Value getSpendableBalance();
 
     void refresh();
 
@@ -80,4 +81,8 @@ public interface WalletAccount extends TransactionBag, KeyBag, TransactionEventL
     boolean removeEventListener(WalletAccountEventListener listener);
 
     boolean isType(WalletAccount other);
+    boolean isType(ValueType type);
+    boolean isType(Address address);
+
+    boolean isAddressMine(Address address);
 }

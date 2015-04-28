@@ -39,7 +39,6 @@ public class AmountEditView extends RelativeLayout {
 
     public static interface Listener {
         void changed();
-
         void focusChanged(final boolean hasFocus);
     }
 
@@ -60,6 +59,17 @@ public class AmountEditView extends RelativeLayout {
         symbol.setText(null);
         type = null;
         hint = null;
+    }
+
+    public boolean resetType(final ValueType newType) {
+        if (type == null || !type.equals(newType)) {
+            type = newType;
+            hint = null;
+            setFormat(newType.getMonetaryFormat());
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public void setFormat(final MonetaryFormat inputFormat) {

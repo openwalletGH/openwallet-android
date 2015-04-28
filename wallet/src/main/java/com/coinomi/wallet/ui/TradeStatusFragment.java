@@ -376,14 +376,21 @@ public class TradeStatusFragment extends Fragment {
     }
 
     private void updateViewTransaction() {
-        setVisible(viewTransaction);
+        final String txId = exchangeStatus.withdrawTransactionId;
+        final Address withdrawAddress = exchangeStatus.withdrawAddress;
+        final CoinType withdrawType = (CoinType) withdrawAddress.getParameters();
+        final List<WalletAccount> accounts = application.getAccounts(withdrawAddress);
+
+        if (accounts.size() > 0 || Constants.COINS_BLOCK_EXPLORERS.containsKey(withdrawType)) {
+            setVisible(viewTransaction);
+        } else {
+            setGone(viewTransaction);
+        }
+
         viewTransaction.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String accountId = null;
-                String txId = exchangeStatus.withdrawTransactionId;
-                CoinType withdrawType = (CoinType) exchangeStatus.withdrawAddress.getParameters();
-                List<WalletAccount> accounts = application.getAccounts(withdrawType);
                 for (WalletAccount account : accounts) {
                     if (account.getTransaction(txId) != null) {
                         accountId = account.getId();
@@ -396,8 +403,17 @@ public class TradeStatusFragment extends Fragment {
                     intent.putExtra(Constants.ARG_TRANSACTION_ID, txId);
                     startActivity(intent);
                 } else {
-                    Toast.makeText(getActivity(), R.string.trade_status_tx_not_available,
-                            Toast.LENGTH_SHORT).show();
+                    // Take to an external blockchain explorer
+                    if (Constants.COINS_BLOCK_EXPLORERS.containsKey(withdrawType)) {
+                        String url = String.format(Constants.COINS_BLOCK_EXPLORERS.get(withdrawType), txId);
+                        Intent i = new Intent(Intent.ACTION_VIEW);
+                        i.setData(Uri.parse(url));
+                        startActivity(i);
+                    } else {
+                        // Should not happen
+                        Toast.makeText(getActivity(), R.string.error_generic,
+                                Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         });

@@ -39,6 +39,8 @@ import com.coinomi.core.util.GenericUtils;
 import com.coinomi.wallet.AddressBookProvider;
 import com.coinomi.wallet.R;
 
+import org.bitcoinj.core.Address;
+
 /**
  * @author Andreas Schildbach
  * @author John L. Jegutanis
@@ -49,6 +51,10 @@ public final class EditAddressBookEntryFragment extends DialogFragment {
     private static final String KEY_COIN_ID = "coin_id";
     private static final String KEY_ADDRESS = "address";
     private static final String KEY_SUGGESTED_ADDRESS_LABEL = "suggested_address_label";
+
+    public static void edit(final FragmentManager fm, @Nonnull final Address address) {
+        edit(fm, (CoinType) address.getParameters(), address.toString(), null);
+    }
 
     public static void edit(final FragmentManager fm, @Nonnull CoinType type, @Nonnull final String address) {
         edit(fm, type, address, null);

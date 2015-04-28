@@ -34,6 +34,7 @@ import com.squareup.okhttp.OkHttpClient;
 import org.acra.ACRA;
 import org.acra.annotation.ReportsCrashes;
 import org.acra.sender.HttpSender;
+import org.bitcoinj.core.Address;
 import org.bitcoinj.crypto.MnemonicCode;
 import org.bitcoinj.store.UnreadableWalletException;
 import org.slf4j.Logger;
@@ -258,6 +259,23 @@ public class WalletApplication extends Application {
     public List<WalletAccount> getAccounts(CoinType type) {
         if (wallet != null) {
             return wallet.getAccounts(type);
+        } else {
+            return ImmutableList.of();
+        }
+    }
+
+
+    public List<WalletAccount> getAccounts(List<CoinType> types) {
+        if (wallet != null) {
+            return wallet.getAccounts(types);
+        } else {
+            return ImmutableList.of();
+        }
+    }
+
+    public List<WalletAccount> getAccounts(Address address) {
+        if (wallet != null) {
+            return wallet.getAccounts(address);
         } else {
             return ImmutableList.of();
         }

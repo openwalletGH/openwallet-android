@@ -9,12 +9,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.coinomi.core.coins.CoinType;
-import com.coinomi.core.coins.FiatType;
 import com.coinomi.core.coins.Value;
 import com.coinomi.core.util.GenericUtils;
-import com.coinomi.wallet.Constants;
+import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.wallet.ExchangeRatesProvider.ExchangeRate;
 import com.coinomi.wallet.R;
+import com.coinomi.wallet.util.WalletUtils;
 
 import org.bitcoinj.utils.Fiat;
 
@@ -39,10 +39,16 @@ public class CoinListItem extends LinearLayout implements Checkable {
         rateView = (Amount) findViewById(R.id.exchange_rate);
     }
 
+    public void setAccount(WalletAccount account) {
+        this.type = account.getCoinType();
+        title.setText(WalletUtils.getDescriptionOrCoinName(account));
+        icon.setImageResource(WalletUtils.getIconRes(account));
+    }
+
     public void setCoin(CoinType type) {
         this.type = type;
         title.setText(type.getName());
-        icon.setImageResource(Constants.COINS_ICONS.get(type));
+        icon.setImageResource(WalletUtils.getIconRes(type));
     }
 
     public void setExchangeRate(ExchangeRate exchangeRate) {

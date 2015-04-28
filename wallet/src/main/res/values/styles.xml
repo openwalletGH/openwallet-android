@@ -51,6 +51,10 @@
         <item name="android:textColorLink">@color/gray_87_text</item>
     </style>
 
+    <style name="NormalBoldText" parent="NormalText">
+        <item name="android:textStyle">bold</item>
+    </style>
+
     <style name="SecondaryText" parent="@android:style/TextAppearance">
         <item name="android:textColor">@color/gray_54_sec_text_icons</item>
     </style>

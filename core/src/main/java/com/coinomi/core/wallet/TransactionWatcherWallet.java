@@ -2,6 +2,7 @@ package com.coinomi.core.wallet;
 
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
+import com.coinomi.core.coins.ValueType;
 import com.coinomi.core.network.AddressStatus;
 import com.coinomi.core.network.BlockHeader;
 import com.coinomi.core.network.ServerClient;
@@ -136,6 +137,16 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
     @Override
     public boolean isType(WalletAccount other) {
         return other != null && coinType.equals(other.getCoinType());
+    }
+
+    @Override
+    public boolean isType(ValueType otherType) {
+        return otherType != null && coinType.equals(otherType);
+    }
+
+    @Override
+    public boolean isType(Address address) {
+        return address != null && coinType.equals(address.getParameters());
     }
 
     @Override
@@ -476,6 +487,11 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
         } finally {
             lock.unlock();
         }
+    }
+
+    @Override
+    public Value getSpendableBalance() {
+        return getBalance(false); // TODO
     }
 
     public Value getPendingBalance() {

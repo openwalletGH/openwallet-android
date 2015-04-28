@@ -15,6 +15,7 @@
     <string name="action_new_address">New address</string>
     <string name="action_swap_coins">Swap coins</string>
     <string name="action_delete">Delete</string>
+    <string name="action_change_address_type">Change address type</string>
 
     <!-- Errors -->
     <string name="error_generic">Error occurred while performing action</string>
@@ -42,6 +43,7 @@
     <string name="button_disagree">Disagree</string>
     <string name="button_add_coins">+ Coins</string>
     <string name="scan_qr_code">Scan QR code</string>
+    <string name="erase_address">Erase address</string>
     <string name="copied_to_clipboard">Copied to clipboard</string>
     <string name="wallet_title_request">receive</string>
     <string name="wallet_title_balance">balance</string>
@@ -102,6 +104,11 @@
     <string name="test_wallet_message">This is a test wallet, where you can send and receive testnet Bitcoins, Litecoin and Dogecoins.\n\nIf you want to use the wallet with real money please go to: <b>Settings > Restore wallet > Create a new wallet</b>.</string>
     <string name="wallet_update_title">New version available</string>
     <string name="wallet_update_message">A new version of Coinomi is available, it contains new features and fixes.</string>
+    <string name="pay_with">Send with</string>
+    <string name="exchange_and_pay_title">Exchange and send (beta)</string>
+
+    <!-- PayToDialog-->
+    <string name="pay_as">Send as</string>
 
     <!-- Balance fragment -->
     <string name="wallet_transactions_coinbase">mined</string>
@@ -133,9 +140,8 @@
     <string name="send_coins_error">Could not send coins: %1$s</string>
     <string name="pay_to_label">pay to</string>
     <string name="amount_to_send_label">amount</string>
-    <string name="uri_error">There was a problem decoding URI: %1$s</string>
+    <string name="scan_error">There was a problem scanning: %1$s</string>
     <string name="unsupported_coin">coin is not supported: %1$s</string>
-    <string name="coin_not_added">coin is supported but is not added: %1$s</string>
     <string name="address_error">The provided address is not valid.</string>
     <string name="amount_error">The provided amount is not valid</string>
     <string name="amount_error_empty">Please enter an amount</string>
@@ -173,6 +179,7 @@
     <string name="password_failed">The password entered is not valid.</string>
     <string name="sending_msg">Sending&#8230;</string>
     <string name="sent_msg">Sent! Please wait for transaction confirmation.</string>
+    <string name="tx_already_broadcast">Money already sent</string>
     <string name="trade_expired">Exchange expired</string>
     <string name="tx_confirm_timer_message">Please confirm this transaction in the next %1$s</string>
     <plurals name="tx_confirm_timer_minute">

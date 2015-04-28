@@ -6,39 +6,39 @@
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:paddingTop="@dimen/coin_list_row_padding_vertical"
-    android:paddingBottom="@dimen/coin_list_row_padding_vertical"
-    android:paddingEnd="@dimen/exchange_row_padding_horizontal"
-    android:paddingLeft="@dimen/exchange_row_padding_horizontal"
-    android:paddingRight="@dimen/exchange_row_padding_horizontal"
-    android:paddingStart="@dimen/exchange_row_padding_horizontal" >
+    android:paddingTop="@dimen/quarter_standard_margin"
+    android:paddingBottom="@dimen/quarter_standard_margin"
+    android:paddingEnd="@dimen/activity_horizontal_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingStart="@dimen/activity_horizontal_margin" >
 
     <ImageView
         android:id="@+id/item_icon"
         android:layout_width="@dimen/generic_icon_size"
         android:layout_height="@dimen/generic_icon_size"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:src="@drawable/ic_launcher" />
+        android:layout_marginEnd="@dimen/half_standard_margin"
+        android:layout_marginRight="@dimen/half_standard_margin"
+        tools:src="@drawable/bitcoin" />
 
     <TextView
         android:id="@+id/item_text"
         style="@style/NormalText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
+        android:layout_marginStart="@dimen/half_standard_margin"
+        android:layout_marginLeft="@dimen/half_standard_margin"
+        android:layout_marginEnd="@dimen/half_standard_margin"
+        android:layout_marginRight="@dimen/half_standard_margin"
         android:layout_weight="1"
-        tools:text="Coin name" />
+        tools:text="Bitcoin" />
 
     <com.coinomi.wallet.ui.widget.Amount
         android:id="@+id/exchange_rate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
+        android:layout_marginStart="@dimen/half_standard_margin"
+        android:layout_marginLeft="@dimen/half_standard_margin"
         coinomi:single_line="true" />
 
 </LinearLayout>

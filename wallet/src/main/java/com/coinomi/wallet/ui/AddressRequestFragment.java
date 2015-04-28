@@ -19,6 +19,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v7.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,6 +32,7 @@ import android.widget.Toast;
 
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.FiatType;
+import com.coinomi.core.coins.Value;
 import com.coinomi.core.uri.CoinURI;
 import com.coinomi.core.util.ExchangeRate;
 import com.coinomi.core.util.GenericUtils;
@@ -50,7 +52,6 @@ import com.coinomi.wallet.util.ThrottlingWalletChangeListener;
 import com.coinomi.wallet.util.WeakHandler;
 
 import org.bitcoinj.core.Address;
-import org.bitcoinj.core.Coin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,7 +74,7 @@ public class AddressRequestFragment extends Fragment {
 
     @Nullable private Address showAddress;
     private Address receiveAddress;
-    private Coin amount;
+    private Value amount;
     private String label;
     private String message;
 
@@ -89,11 +90,11 @@ public class AddressRequestFragment extends Fragment {
     private WalletPocketHD pocket;
     private int maxQrSize;
 
+    private final Handler handler = new MyHandler(this);
     private Configuration config;
     private ContentResolver resolver;
     private LoaderManager loaderManager;
 
-    private final Handler handler = new MyHandler(this);
     private static class MyHandler extends WeakHandler<AddressRequestFragment> {
         public MyHandler(AddressRequestFragment ref) { super(ref); }
 
@@ -217,8 +218,13 @@ public class AddressRequestFragment extends Fragment {
                 if (showAddress != null) {
                     receiveAddress =  showAddress;
                 }
-                UiUtils.startActionModeForAddress(receiveAddress.toString(), type,
-                        getActivity(), getFragmentManager());
+                Activity activity = getActivity();
+                ActionMode actionMode = UiUtils.startAddressActionMode(receiveAddress, activity,
+                        getFragmentManager());
+                // Hack to dismiss this action mode when back is pressed
+                if (activity != null && activity instanceof WalletActivity) {
+                    ((WalletActivity) activity).registerActionMode(actionMode);
+                }
             }
         };
     }
@@ -422,13 +428,13 @@ public class AddressRequestFragment extends Fragment {
     };
 
     private final AmountEditView.Listener amountsListener = new AmountEditView.Listener() {
-        boolean isValid(Coin amount) {
+        boolean isValid(Value amount) {
             return amount != null && amount.isPositive()
-                    && amount.compareTo(type.getMinNonDust()) >= 0;
+                    && amount.compareTo(type.minNonDust()) >= 0;
         }
 
         void checkAndUpdateAmount() {
-            Coin amountParsed = amountCalculatorLink.getPrimaryAmountCoin();
+            Value amountParsed = amountCalculatorLink.getPrimaryAmount();
             if (isValid(amountParsed)) {
                 amount = amountParsed;
             } else {
