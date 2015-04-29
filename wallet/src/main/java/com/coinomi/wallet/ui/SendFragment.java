@@ -79,6 +79,7 @@ import javax.annotation.Nullable;
 import static android.view.View.OnClickListener;
 import static com.coinomi.core.Preconditions.checkNotNull;
 import static com.coinomi.core.coins.Value.canCompare;
+import static com.coinomi.wallet.ExchangeRatesProvider.getRates;
 import static com.coinomi.wallet.util.UiUtils.setGone;
 import static com.coinomi.wallet.util.UiUtils.setVisible;
 
@@ -186,6 +187,11 @@ public class SendFragment extends Fragment {
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
 
+        String localSymbol = config.getExchangeCurrencyCode();
+        for (ExchangeRatesProvider.ExchangeRate rate : getRates(getActivity(), localSymbol)) {
+            localRates.put(rate.currencyCodeId, rate.rate);
+        }
+
         loaderManager.initLoader(ID_RATE_LOADER, null, rateLoaderCallbacks);
         loaderManager.initLoader(ID_RECEIVING_ADDRESS_LOADER, null, receivingAddressLoaderCallbacks);
     }
@@ -219,6 +225,7 @@ public class SendFragment extends Fragment {
 
         amountCalculatorLink = new CurrencyCalculatorLink(sendCoinAmountView, sendLocalAmountView);
         amountCalculatorLink.setExchangeDirection(config.getLastExchangeDirection());
+        amountCalculatorLink.setExchangeRate(getCurrentRate());
 
         addressError = (TextView) view.findViewById(R.id.address_error_message);
         addressError.setVisibility(View.GONE);

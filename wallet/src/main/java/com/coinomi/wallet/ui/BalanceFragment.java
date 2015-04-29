@@ -242,6 +242,8 @@ public class BalanceFragment extends Fragment implements WalletAccountEventListe
 
         connectionLabel = (TextView) view.findViewById(R.id.connection_label);
 
+        exchangeRate = ExchangeRatesProvider.getRate(
+                application.getApplicationContext(), type.getSymbol(), config.getExchangeCurrencyCode());
         // Subscribe and update the amount
         pocket.addEventListener(this);
         updateBalance(pocket.getBalance());

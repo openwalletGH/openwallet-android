@@ -35,6 +35,7 @@ import com.coinomi.core.coins.FiatValue;
 import com.coinomi.core.coins.Value;
 import com.coinomi.core.util.ExchangeRateBase;
 import com.coinomi.wallet.util.NetworkUtils;
+import com.google.common.collect.ImmutableList;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
@@ -144,6 +145,49 @@ public class ExchangeRatesProvider extends ContentProvider {
         final Uri.Builder uri = contentUri(packageName, offline);
         uri.appendPath("to-crypto").appendPath(localSymbol);
         return uri.build();
+    }
+
+    @Nullable
+    public static ExchangeRate getRate(final Context context,
+                                       @Nonnull final String coinSymbol,
+                                       @Nonnull String localSymbol) {
+        ExchangeRate rate = null;
+
+        if (context != null) {
+            final Uri uri = contentUriToCrypto(context.getPackageName(), localSymbol, true);
+            final Cursor cursor = context.getContentResolver().query(uri, null,
+                    ExchangeRatesProvider.KEY_CURRENCY_ID, new String[]{coinSymbol}, null);
+
+            if (cursor != null) {
+                if (cursor.moveToFirst()) {
+                    rate = getExchangeRate(cursor);
+                }
+                cursor.close();
+            }
+        }
+
+        return rate;
+    }
+
+    public static List<ExchangeRate> getRates(final Context context,
+                                              @Nonnull String localSymbol) {
+        ImmutableList.Builder<ExchangeRate> builder = ImmutableList.builder();
+
+        if (context != null) {
+            final Uri uri = contentUriToCrypto(context.getPackageName(), localSymbol, true);
+            final Cursor cursor = context.getContentResolver().query(uri, null, null,
+                    new String[]{null}, null);
+
+            if (cursor != null && cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                do {
+                    builder.add(getExchangeRate(cursor));
+                } while (cursor.moveToNext());
+                cursor.close();
+            }
+        }
+
+        return builder.build();
     }
 
     @Override

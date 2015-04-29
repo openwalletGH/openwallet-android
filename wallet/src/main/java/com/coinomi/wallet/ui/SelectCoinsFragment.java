@@ -32,6 +32,8 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.coinomi.wallet.ExchangeRatesProvider.getRates;
+
 /**
  * Fragment that restores a wallet
  */
@@ -77,6 +79,9 @@ public class SelectCoinsFragment extends Fragment {
         }
 
         adapter = new CoinExchangeListAdapter(activity, Constants.SUPPORTED_COINS);
+
+        String localSymbol = config.getExchangeCurrencyCode();
+        adapter.setExchangeRates(getRates(getActivity(), localSymbol));
         loaderManager.initLoader(ID_RATE_LOADER, null, rateLoaderCallbacks);
     }
 

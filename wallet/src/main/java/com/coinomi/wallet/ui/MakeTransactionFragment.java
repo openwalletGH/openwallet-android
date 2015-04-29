@@ -61,6 +61,7 @@ import static com.coinomi.wallet.Constants.ARG_EMPTY_WALLET;
 import static com.coinomi.wallet.Constants.ARG_SEND_TO_ACCOUNT_ID;
 import static com.coinomi.wallet.Constants.ARG_SEND_TO_ADDRESS;
 import static com.coinomi.wallet.Constants.ARG_SEND_VALUE;
+import static com.coinomi.wallet.ExchangeRatesProvider.getRates;
 
 /**
  * This fragment displays a busy message and makes the transaction in the background
@@ -113,7 +114,7 @@ public class MakeTransactionFragment extends Fragment {
     @Nullable private Value tradeWithdrawAmount;
     private boolean transactionBroadcast = false;
     @Nullable private Exception error;
-    private HashMap<String, ExchangeRate> localRates;
+    private HashMap<String, ExchangeRate> localRates = new HashMap<>();
 
     private CountDownTimer countDownTimer;
 
@@ -173,6 +174,11 @@ public class MakeTransactionFragment extends Fragment {
             if (mListener != null) {
                 mListener.onSignResult(e, null);
             }
+        }
+
+        String localSymbol = config.getExchangeCurrencyCode();
+        for (ExchangeRatesProvider.ExchangeRate rate : getRates(getActivity(), localSymbol)) {
+            localRates.put(rate.currencyCodeId, rate.rate);
         }
 
         loaderManager.initLoader(ID_RATE_LOADER, null, rateLoaderCallbacks);
