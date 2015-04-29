@@ -47,6 +47,7 @@ abstract public class BaseWalletActivity extends ActionBarActivity {
     public void replaceFragment(Fragment fragment, int container) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
         // Replace whatever is in the fragment_container view with this fragment,
         // and add the transaction to the back stack so the user can navigate back
         transaction.replace(container, fragment);

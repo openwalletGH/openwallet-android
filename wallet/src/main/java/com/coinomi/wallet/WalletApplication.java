@@ -26,9 +26,6 @@ import com.coinomi.wallet.util.Fonts;
 import com.coinomi.wallet.util.LinuxSecureRandom;
 import com.coinomi.wallet.util.NetworkUtils;
 import com.google.common.collect.ImmutableList;
-import com.squareup.okhttp.Cache;
-import com.squareup.okhttp.ConnectionSpec;
-import com.squareup.okhttp.OkHttpClient;
 
 import org.acra.annotation.ReportsCrashes;
 import org.acra.sender.HttpSender;
@@ -42,10 +39,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 

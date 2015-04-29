@@ -1,100 +1,92 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:coinomi="http://schemas.android.com/apk/res-auto"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.coinomi.wallet.ui.MakeTransactionFragment">
+    android:fillViewport="true">
 
-
-    <ScrollView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin">
+
+        <TextView
+            android:id="@+id/transaction_info"
+            style="@style/NormalText"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="0.2"
+            android:gravity="bottom"
+            tools:text="@string/tx_confirm_timer_message" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.8"
+            android:gravity="center_vertical"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/activity_vertical_margin"
+            android:paddingTop="@dimen/activity_vertical_margin">
+
+            <com.coinomi.wallet.ui.widget.TransactionAmountVisualizer
+                android:id="@+id/transaction_amount_visualizer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/standard_margin"
+                android:gravity="center_vertical" />
+
+            <com.coinomi.wallet.ui.widget.SendOutput
+                android:id="@+id/transaction_trade_withdraw"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginTop="@dimen/standard_margin" />
+
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingBottom="@dimen/activity_vertical_margin"
-            android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin"
-            android:paddingTop="@dimen/activity_vertical_margin">
+            android:orientation="vertical">
 
             <TextView
-                android:id="@+id/transaction_info"
+                android:id="@+id/enter_password_label"
                 android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_weight="0.2"
-                android:gravity="bottom"
-                tools:text="@string/tx_confirm_timer_message"
-                style="@style/NormalText" />
+                android:layout_height="wrap_content"
+                android:text="@string/enter_password"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="0.8"
-                android:paddingTop="@dimen/activity_vertical_margin"
-                android:paddingBottom="@dimen/activity_vertical_margin"
-                android:gravity="center_vertical"
-                android:orientation="vertical">
-
-                <com.coinomi.wallet.ui.widget.TransactionAmountVisualizer
-                    android:id="@+id/transaction_amount_visualizer"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/standard_margin"
-                    android:gravity="center_vertical" />
-
-                <com.coinomi.wallet.ui.widget.SendOutput
-                    android:id="@+id/transaction_trade_withdraw"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/standard_margin"
-                    android:layout_gravity="center_vertical" />
-
-            </LinearLayout>
-
-            <LinearLayout
+            <EditText
+                android:id="@+id/password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:ems="10"
+                android:inputType="textPassword" />
 
-                <TextView
-                    android:id="@+id/enter_password_label"
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="bottom">
+
+                <Button
+                    android:id="@+id/button_confirm"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/enter_password"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:text="@string/button_confirm" />
 
-                <EditText
-                    android:id="@+id/password"
-                    android:layout_width="match_parent"
+                <include
+                    layout="@layout/powered_by_shapeshift"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:ems="10"
-                    android:inputType="textPassword" />
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="bottom">
-
-                    <Button
-                        android:id="@+id/button_confirm"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_alignParentRight="true"
-                        android:text="@string/button_confirm" />
-
-                    <include
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentStart="true"
-                        android:layout_alignParentLeft="true"
-                        android:layout_alignBottom="@id/button_confirm"
-                        layout="@layout/powered_by_shapeshift"/>
-                </RelativeLayout>
-            </LinearLayout>
+                    android:layout_alignBottom="@id/button_confirm"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true" />
+            </RelativeLayout>
         </LinearLayout>
-    </ScrollView>
-</FrameLayout>
+    </LinearLayout>
+</ScrollView>

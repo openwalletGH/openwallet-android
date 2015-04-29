@@ -38,6 +38,7 @@ public class SignTransactionActivity extends AbstractWalletFragmentActivity
             finish();
         } else {
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
             transaction.replace(R.id.container, TradeStatusFragment.newInstance(exchange, true));
             transaction.commit();
         }

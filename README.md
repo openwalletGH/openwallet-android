@@ -79,6 +79,12 @@ For now test it manually by installing it `adb install -r wallet/wallet-release.
 
 ## Version history
 
+New in version 1.5.14
+- Added exchange history log
+- Can send alt-coins from bitcoin wallet and vise-versa
+- Make exchange rates appear faster in the UI
+- Fix rare crash when viewing the exchange status of Peercoin or NuBits
+
 New in version 1.5.13
 - Integrated exchange (beta)
 - Rebranding of Darkcoin to Dash

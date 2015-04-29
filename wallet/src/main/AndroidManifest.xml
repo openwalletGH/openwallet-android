@@ -81,7 +81,7 @@
             android:name="com.coinomi.wallet.ui.SignTransactionActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppThemeNoTitleBar"
-            android:windowSoftInputMode="adjustResize" >
+            android:windowSoftInputMode="stateHidden" >
         </activity>
         <activity
             android:name="com.coinomi.wallet.ui.ScanActivity"
