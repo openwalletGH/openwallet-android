@@ -121,7 +121,7 @@ public final class CurrencyCalculatorLink {
         } else if (exchangeRate != null) {
             final Value localAmount = localAmountView.getAmount();
             try {
-                return localAmount != null ? exchangeRate.convert(localAmount) : null;
+                return localAmount != null ? convertSafe(localAmount) : null;
             } catch (ArithmeticException x) {
                 return null;
             }
@@ -137,7 +137,7 @@ public final class CurrencyCalculatorLink {
         if (exchangeDirection) {
             final Value coinAmount = coinAmountView.getAmount();
             try {
-                return coinAmount != null ? exchangeRate.convert(coinAmount) : null;
+                return coinAmount != null ? convertSafe(coinAmount) : null;
             } catch (ArithmeticException x) {
                 return null;
             }
@@ -175,7 +175,7 @@ public final class CurrencyCalculatorLink {
                 final Value coinAmount = coinAmountView.getAmount();
                 if (coinAmount != null) {
                     localAmountView.setAmount(null, false);
-                    localAmountView.setHint(exchangeRate.convert(coinAmount));
+                    localAmountView.setHint(convertSafe(coinAmount));
                     coinAmountView.setHint(null);
                 }
             } else {
@@ -183,11 +183,7 @@ public final class CurrencyCalculatorLink {
                 if (localAmount != null) {
                     localAmountView.setHint(null);
                     coinAmountView.setAmount(null, false);
-                    try {
-                        coinAmountView.setHint(exchangeRate.convert(localAmount));
-                    } catch (final ArithmeticException x) {
-                        coinAmountView.setHint(null);
-                    }
+                    coinAmountView.setHint(convertSafe(localAmount));
                 }
             }
         } else {
@@ -195,6 +191,18 @@ public final class CurrencyCalculatorLink {
             localAmountView.setHint(null);
             localAmountView.setVisibility(View.INVISIBLE);
             coinAmountView.setHint(null);
+        }
+    }
+
+    /**
+     * Makes an exchange and in case of an error returns a null.
+     */
+    @Nullable
+    private Value convertSafe(Value amount) {
+        try {
+            return exchangeRate.convert(amount);
+        } catch (Exception e) {
+            return null;
         }
     }
 
@@ -222,7 +230,7 @@ public final class CurrencyCalculatorLink {
     public void setExchangeRateHints(@Nullable final Value primaryAmount) {
         if (exchangeRate != null) {
             coinAmountView.setHint(primaryAmount);
-            localAmountView.setHint(exchangeRate.convert(primaryAmount));
+            localAmountView.setHint(convertSafe(primaryAmount));
         }
     }
 
