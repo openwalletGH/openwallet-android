@@ -739,7 +739,7 @@ public class TradeSelectFragment extends Fragment {
     }
 
     private void updateBalance() {
-        lastBalance = sourceAccount.getBalance(false);
+        lastBalance = sourceAccount.getSpendableBalance();
     }
 
     private void onWalletUpdate() {

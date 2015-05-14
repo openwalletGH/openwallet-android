@@ -198,7 +198,7 @@ public class SendFragment extends Fragment {
 
     private void updateBalance() {
         if (pocket != null) {
-            lastBalance = pocket.getBalance(false);
+            lastBalance = pocket.getSpendableBalance();
         }
     }
 

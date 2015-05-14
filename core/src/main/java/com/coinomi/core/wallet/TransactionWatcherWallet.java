@@ -14,6 +14,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 import org.bitcoinj.core.Address;
+import org.bitcoinj.core.PeerAddress;
 import org.bitcoinj.core.ScriptException;
 import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.Transaction;
@@ -28,6 +29,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -376,6 +379,7 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
             lastBlockSeenTimeSecs = 0;
             unspent.clear();
             spent.clear();
+            // FIXME, the transactions sent from this wallet lose the Source.SELF property..
             pending.clear();
             dead.clear();
             transactions.clear();
@@ -472,11 +476,7 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
         }
     }
 
-    public Value getBalance() {
-        return getBalance(false);
-    }
-
-    public Value getBalance(boolean includeUnconfirmed) {
+    private Value getBalance(boolean includeUnconfirmed) {
         lock.lock();
         try {
 //            log.info("Get balance includeUnconfirmed = {}", includeUnconfirmed);
@@ -490,8 +490,33 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
     }
 
     @Override
+    public Value getUnconfirmedBalance() {
+        lock.lock();
+        try {
+            return getTxBalance(unspent.values(), true);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @Override
     public Value getSpendableBalance() {
-        return getBalance(false); // TODO
+        lock.lock();
+        try {
+            Value value = getTxBalance(unspent.values(), true);
+
+            for (Transaction pendingTx : pending.values()) {
+                // If sent from this wallet, it is spendable so apply to the balance
+                if (pendingTx.getConfidence().getSource() == TransactionConfidence.Source.SELF) {
+                    value = value.add(pendingTx.getValue(this));
+                }
+            }
+
+            checkState(!value.isNegative());
+            return value;
+        } finally {
+            lock.unlock();
+        }
     }
 
     public Value getPendingBalance() {
@@ -1038,6 +1063,12 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
         lock.lock();
         try {
             log.info("Transaction sent {}", tx);
+            // Add some fake addresses to make the TX spendable when pending
+            // TODO this is a hack to overcome a check in org.bitcoinj.wallet.DefaultCoinSelector:isSelectable()
+            try {
+                tx.getConfidence().markBroadcastBy(new PeerAddress(InetAddress.getByAddress(new byte[]{0x7f, 0, 0, 1}), 0));
+                tx.getConfidence().markBroadcastBy(new PeerAddress(InetAddress.getByAddress(new byte[]{0x7f, 0, 0, 2}), 0));
+            } catch (UnknownHostException e) { /* Swallow */ }
             //FIXME, when enabled it breaks the transactions connections and we get an incorrect coin balance
             addNewTransactionIfNeeded(tx);
         } finally {
@@ -1141,7 +1172,7 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
 
     void queueOnNewBalance() {
         checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
-        final Value balance = getBalance();
+        final Value balance = getSpendableBalance();
         final Value pendingBalance = getPendingBalance();
         for (final ListenerRegistration<WalletAccountEventListener> registration : listeners) {
             registration.executor.execute(new Runnable() {
