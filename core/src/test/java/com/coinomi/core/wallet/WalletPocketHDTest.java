@@ -189,7 +189,7 @@ public class WalletPocketHDTest {
         // 18 here is the key index, not issued keys count
         assertEquals(18, key.getChildNumber().num());
 
-        assertEquals(11000000000L, pocket.getBalance().value);
+        assertEquals(11000000000L, pocket.getSpendableBalance().value);
 
         // TODO added more tests to insure it uses the "holes" in the keychain
     }
@@ -202,7 +202,8 @@ public class WalletPocketHDTest {
 
         WalletPocketHD newPocket = new WalletPocketProtobufSerializer().readWallet(walletPocketProto, null);
 
-        assertEquals(pocket.getBalance().value, newPocket.getBalance().value);
+        assertEquals(pocket.getSpendableBalance().value, newPocket.getSpendableBalance().value);
+        assertEquals(pocket.getUnconfirmedBalance().value, newPocket.getUnconfirmedBalance().value);
 
         assertEquals(pocket.getCoinType(), newPocket.getCoinType());
         assertEquals(pocket.getDescription(), newPocket.getDescription());
@@ -282,7 +283,7 @@ public class WalletPocketHDTest {
         pocket.encrypt(crypter, aesKey);
         pocket.onConnection(getBlockchainConnection(type));
 
-        assertEquals(type.value(11000000000l), pocket.getBalance(true));
+        assertEquals(type.value(11000000000l), pocket.getSpendableBalance());
 
         assertAllKeysEncrypted(pocket);
 
@@ -335,7 +336,7 @@ public class WalletPocketHDTest {
 
         Address toAddr = new Address(type, "nUEkQ3LjH9m4ScbP6NGtnAdnnUsdtWv99Q");
 
-        long orgBalance = pocket.getBalance().value;
+        long orgBalance = pocket.getSpendableBalance().value;
         SendRequest sendRequest = pocket.sendCoinsOffline(toAddr, Coin.valueOf(AMOUNT_TO_SEND));
         sendRequest.shuffleOutputs = false;
         pocket.completeTx(sendRequest);

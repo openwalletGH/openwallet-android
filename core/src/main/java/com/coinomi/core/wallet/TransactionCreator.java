@@ -241,8 +241,18 @@ public class TransactionCreator {
     LinkedList<TransactionOutput> calculateAllSpendCandidates(boolean excludeImmatureCoinbases) {
         lock.lock();
         try {
+            ArrayList<Transaction> txCandidates =
+                    Lists.newArrayList(pocket.getUnspentTransactions().values());
+
+            // Can spend also pending own TXs
+            for (Transaction pendingTx : pocket.getPendingTransactions().values()) {
+                if (pendingTx.getConfidence().getSource() == TransactionConfidence.Source.SELF) {
+                    txCandidates.add(pendingTx);
+                }
+            }
+
             LinkedList<TransactionOutput> candidates = Lists.newLinkedList();
-            for (Transaction tx : pocket.getUnspentTransactions().values()) {
+            for (Transaction tx : txCandidates) {
                 // Do not try and spend coinbases that were mined too recently, the protocol forbids it.
                 if (excludeImmatureCoinbases && !tx.isMature()) continue;
                 for (TransactionOutput output : tx.getOutputs()) {

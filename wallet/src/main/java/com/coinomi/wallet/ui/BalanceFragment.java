@@ -246,7 +246,7 @@ public class BalanceFragment extends Fragment implements WalletAccountEventListe
                 application.getApplicationContext(), type.getSymbol(), config.getExchangeCurrencyCode());
         // Subscribe and update the amount
         pocket.addEventListener(this);
-        updateBalance(pocket.getBalance());
+        updateBalance(pocket.getSpendableBalance());
         setPending(pocket.getPendingBalance());
 
         return view;
