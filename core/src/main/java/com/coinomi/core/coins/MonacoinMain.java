@@ -1,7 +1,5 @@
 package com.coinomi.core.coins;
 
-import org.bitcoinj.core.Coin;
-
 /**
  * @author John L. Jegutanis
  */
@@ -17,12 +15,12 @@ public class MonacoinMain extends CoinType {
         name = "Monacoin";
         symbol = "MONA";
         uriScheme = "monacoin";
-        bip44Index = 12;
+        bip44Index = 22;
         unitExponent = 8;
-        // TODO set correct values
-        feePerKb = value(1);
-        minNonDust = value(1000);
-        throw new RuntimeException(name+" bip44Index " + bip44Index + "is not standardized");
+        feePerKb = value(100000);
+        minNonDust = value(1000); // 0.00001 MNC mininput
+        softDustLimit = value(100000); // 0.001 MONA
+        softDustPolicy = SoftDustPolicy.BASE_FEE_FOR_EACH_SOFT_DUST_TXO;
     }
 
     private static MonacoinMain instance = new MonacoinMain();
