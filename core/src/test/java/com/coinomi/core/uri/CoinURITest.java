@@ -24,6 +24,8 @@ import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.DashMain;
 import com.coinomi.core.coins.DogecoinMain;
 import com.coinomi.core.coins.LitecoinMain;
+import com.coinomi.core.coins.NuBitsMain;
+import com.coinomi.core.coins.NuSharesMain;
 import com.coinomi.core.coins.PeercoinMain;
 import com.coinomi.core.util.GenericUtils;
 
@@ -39,10 +41,13 @@ import static org.junit.Assert.*;
 public class CoinURITest {
     private CoinURI testObject = null;
     final CoinType BTC = BitcoinMain.get();
+    final CoinType BTC_TEST = BitcoinTest.get();
     final CoinType LTC = LitecoinMain.get();
     final CoinType DOGE = DogecoinMain.get();
     final CoinType PPC = PeercoinMain.get();
     final CoinType DASH = DashMain.get();
+    final CoinType NBT = NuBitsMain.get();
+    final CoinType NSR = NuSharesMain.get();
 
 
     private static final String MAINNET_GOOD_ADDRESS = "1KzTSfqjF2iKCduwz59nv2uqh1W2JsTxZH";
@@ -109,6 +114,33 @@ public class CoinURITest {
         goodAddress = new Address(DashMain.get(), hash160);
         goodAddressStr = goodAddress.toString();
         assertEquals("dash:" + goodAddressStr + "?amount=12.34&label=Hello&message=AMessage", CoinURI.convertToCoinURI(goodAddress, DASH.value("12.34"), "Hello", "AMessage"));
+    }
+
+    @Test
+    public void testSharedCoinURI() throws Exception {
+        byte[] hash160 = new Address(BitcoinMain.get(), MAINNET_GOOD_ADDRESS).getHash160();
+
+        // Bitcoin and Bitcoin Testnet
+        Address address = new Address(BTC, hash160);
+        testObject = new CoinURI(BTC.getUriScheme() + ":" + address);
+        assertEquals(BTC, testObject.getType());
+        assertEquals(address, testObject.getAddress());
+
+        Address addressTestnet = new Address(BTC_TEST, hash160);
+        testObject = new CoinURI(BTC_TEST.getUriScheme() + ":" + addressTestnet);
+        assertEquals(BTC_TEST, testObject.getType());
+        assertEquals(addressTestnet, testObject.getAddress());
+
+        // NuBits and NuShares
+        Address nuBitAddress = new Address(NBT, hash160);
+        testObject = new CoinURI(NBT.getUriScheme() + ":" + nuBitAddress);
+        assertEquals(NBT, testObject.getType());
+        assertEquals(nuBitAddress, testObject.getAddress());
+
+        Address nuSharesAddress = new Address(NSR, hash160);
+        testObject = new CoinURI(NSR.getUriScheme() + ":" + nuSharesAddress);
+        assertEquals(NSR, testObject.getType());
+        assertEquals(nuSharesAddress, testObject.getAddress());
     }
 
     @Test
@@ -311,7 +343,7 @@ public class CoinURITest {
         testObject = new CoinURI(BitcoinMain.get(), BitcoinMain.get().getUriScheme() + ":" + MAINNET_GOOD_ADDRESS
                 + "?amount=6543210&label=Hello%20World&message=Be%20well");
         assertEquals(
-                "CoinURI['amount'='6543210BTC','label'='Hello World','message'='Be well','address'='1KzTSfqjF2iKCduwz59nv2uqh1W2JsTxZH']",
+                "CoinURI['address'='1KzTSfqjF2iKCduwz59nv2uqh1W2JsTxZH','amount'='6543210BTC','label'='Hello World','message'='Be well']",
                 testObject.toString());
     }
 
@@ -405,7 +437,7 @@ public class CoinURITest {
         // Unknown not required field
         testObject = new CoinURI(BitcoinMain.get(), BitcoinMain.get().getUriScheme() + ":" + MAINNET_GOOD_ADDRESS
                 + "?aardvark=true");
-        assertEquals("CoinURI['aardvark'='true','address'='1KzTSfqjF2iKCduwz59nv2uqh1W2JsTxZH']", testObject.toString());
+        assertEquals("CoinURI['address'='1KzTSfqjF2iKCduwz59nv2uqh1W2JsTxZH','aardvark'='true']", testObject.toString());
 
         assertEquals("true", (String) testObject.getParameterByName("aardvark"));
 
@@ -460,6 +492,12 @@ public class CoinURITest {
         // Non-backwards compatible form ...
         CoinURI uri = new CoinURI(BitcoinTest.get(), "bitcoin:?r=https%3A%2F%2Fbitcoincore.org%2F%7Egavin%2Ff.php%3Fh%3Db0f02e7cea67f168e25ec9b9f9d584f9");
         assertEquals("https://bitcoincore.org/~gavin/f.php?h=b0f02e7cea67f168e25ec9b9f9d584f9", uri.getPaymentRequestUrl());
+        assertNull(uri.getAddress());
+
+        // Non-backwards compatible form ...
+        uri = new CoinURI("bitcoin:?r=https%3A%2F%2Fbitcoincore.org%2F%7Egavin%2Ff.php%3Fh%3Db0f02e7cea67f168e25ec9b9f9d584f9");
+        assertEquals("https://bitcoincore.org/~gavin/f.php?h=b0f02e7cea67f168e25ec9b9f9d584f9", uri.getPaymentRequestUrl());
+        assertEquals(BTC, uri.getType());
         assertNull(uri.getAddress());
     }
 }

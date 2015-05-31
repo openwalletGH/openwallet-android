@@ -22,6 +22,7 @@ import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
 import com.coinomi.core.util.GenericUtils;
+import com.google.common.collect.Lists;
 
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.AddressFormatException;
@@ -33,8 +34,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
@@ -116,15 +119,15 @@ public class CoinURI {
     /**
      * Constructs a new object by trying to parse the input as a valid coin URI.
      *
-     * @param params The network parameters that determine which network the URI is from, or null if you don't have
+     * @param uriType The network parameters that determine which network the URI is from, or null if you don't have
      *               any expectation about what network the URI is for and wish to check yourself.
      * @param input The raw URI data to be parsed (see class comments for accepted formats)
      *
      * @throws CoinURIParseException If the input fails coin URI syntax and semantic checks.
      */
-    public CoinURI(@Nullable CoinType params, String input) throws CoinURIParseException {
+    public CoinURI(@Nullable CoinType uriType, String input) throws CoinURIParseException {
         checkNotNull(input);
-        log.debug("Attempting to parse '{}' for {}", input, params == null ? "any" : params.getId());
+        log.debug("Attempting to parse '{}' for {}", input, uriType == null ? "any" : uriType.getId());
 
         // Attempt to form the URI (fail fast syntax checking to official standards).
         URI uri;
@@ -140,25 +143,29 @@ public class CoinURI {
         // the & (%26) in Tom and Jerry gets interpreted as a separator and the label then gets parsed
         // as 'Tom ' instead of 'Tom & Jerry')
         String schemeSpecificPart;
+        String uriScheme;
+        List<CoinType> possibleTypes;
 
-        if (params == null) {
+        if (uriType == null) {
             if (uri.getScheme() != null) {
                 try {
-                    params = CoinID.fromUri(input).getCoinType();
+                    possibleTypes = CoinID.fromUri(input);
+                    uriScheme = possibleTypes.get(0).getUriScheme();
                 } catch (IllegalArgumentException e) {
                     throw new CoinURIParseException("Unsupported URI scheme: " + uri.getScheme());
                 }
             } else {
                 throw new CoinURIParseException("Unrecognisable URI format: " + input);
             }
+        } else {
+            uriScheme = uriType.getUriScheme();
+            possibleTypes = Lists.newArrayList(uriType);
         }
 
-        type = params;
-
-        if (input.startsWith(params.getUriScheme()+"://")) {
-            schemeSpecificPart = input.substring((params.getUriScheme()+"://").length());
-        } else if (input.startsWith(params.getUriScheme()+":")) {
-            schemeSpecificPart = input.substring((params.getUriScheme()+":").length());
+        if (input.startsWith(uriScheme + "://")) {
+            schemeSpecificPart = input.substring((uriScheme + "://").length());
+        } else if (input.startsWith(uriScheme + ":")) {
+            schemeSpecificPart = input.substring((uriScheme + ":").length());
         } else {
             throw new CoinURIParseException("Unsupported URI scheme: " + uri.getScheme());
         }
@@ -166,7 +173,7 @@ public class CoinURI {
         // Split off the address from the rest of the query parameters.
         String[] addressSplitTokens = schemeSpecificPart.split("\\?");
         if (addressSplitTokens.length == 0)
-            throw new CoinURIParseException("No data found after the " + params.getUriScheme() + ": prefix");
+            throw new CoinURIParseException("No data found after the " + uriScheme + ": prefix");
         String addressToken = addressSplitTokens[0];  // may be empty!
 
         String[] nameValuePairTokens;
@@ -182,18 +189,31 @@ public class CoinURI {
             }
         }
 
-        // Attempt to parse the rest of the URI parameters.
-        parseParameters(addressToken, nameValuePairTokens);
-
+        // Parse the address if any and set type
         if (!addressToken.isEmpty()) {
-            // Attempt to parse the addressToken as a Bitcoin address for this network
-            try {
-                Address address = new Address(params, addressToken);
-                putWithValidation(FIELD_ADDRESS, address);
-            } catch (final AddressFormatException e) {
-                throw new CoinURIParseException("Bad address", e);
+            // Attempt to parse the addressToken as a possible type address
+            Address address = null;
+            for (CoinType possibleType : possibleTypes) {
+                try {
+                    address = new Address(possibleType, addressToken);
+                    putWithValidation(FIELD_ADDRESS, address);
+                    break;
+                } catch (final AddressFormatException e) {
+                    /* continue */
+                }
             }
+
+            if (address == null) {
+                throw new CoinURIParseException("Bad address: " + addressToken);
+            }
+            type = (CoinType) address.getParameters();
+        } else {
+            // TODO, currently we don't support URIs without an address
+            throw new CoinURIParseException("No address found");
         }
+
+        // Attempt to parse the rest of the URI parameters.
+        parseParameters(nameValuePairTokens);
 
         if (addressToken.isEmpty() && getPaymentRequestUrl() == null) {
             throw new CoinURIParseException("No address and no r= parameter found");
@@ -214,7 +234,7 @@ public class CoinURI {
      * @param nameValuePairTokens The tokens representing the name value pairs (assumed to be
      *                            separated by '=' e.g. 'amount=0.2')
      */
-    private void parseParameters(String addressToken, String[] nameValuePairTokens) throws CoinURIParseException {
+    private void parseParameters(String[] nameValuePairTokens) throws CoinURIParseException {
         // Attempt to decode the rest of the tokens into a parameter map.
         for (String nameValuePairToken : nameValuePairTokens) {
             final int sepIndex = nameValuePairToken.indexOf('=');

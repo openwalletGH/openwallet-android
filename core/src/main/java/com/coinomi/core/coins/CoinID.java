@@ -1,13 +1,13 @@
 package com.coinomi.core.coins;
 
-import org.bitcoinj.core.Address;
+import com.coinomi.core.util.GenericUtils;
+import com.google.common.collect.ImmutableList;
+
 import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.params.Networks;
 
-import com.coinomi.core.util.GenericUtils;
-import com.google.common.collect.ImmutableList;
-
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -41,6 +41,7 @@ public enum CoinID {
     private static List<CoinType> types;
     private static HashMap<String, CoinType> idLookup = new HashMap<>();
     private static HashMap<String, CoinType> symbolLookup = new HashMap<>();
+    private static HashMap<String, List<CoinType>> uriLookup = new HashMap<>();
 
     static {
         Set<NetworkParameters> bitcoinjNetworks = Networks.get();
@@ -65,6 +66,11 @@ public enum CoinID {
                         "Coin IDs must be unique, double found: " + id.type.getId());
             }
             idLookup.put(id.type.getId(), id.type);
+
+            if (!uriLookup.containsKey(id.type.uriScheme)) {
+                uriLookup.put(id.type.uriScheme, new ArrayList<CoinType>());
+            }
+            uriLookup.get(id.type.uriScheme).add(id.type);
 
             coinTypeBuilder.add(id.type);
         }
@@ -98,12 +104,10 @@ public enum CoinID {
         }
     }
 
-    public static CoinID fromUri(String input) {
-        for (CoinID id : values()) {
-            if (input.startsWith(id.getCoinType().getUriScheme() + "://")) {
-                return id;
-            } else if (input.startsWith(id.getCoinType().getUriScheme() + ":")) {
-                return id;
+    public static List<CoinType> fromUri(String input) {
+        for (String uri : uriLookup.keySet()) {
+            if (input.startsWith(uri + "://") || input.startsWith(uri + ":")) {
+                return uriLookup.get(uri);
             }
         }
         throw new IllegalArgumentException("Unsupported URI: " + input);
