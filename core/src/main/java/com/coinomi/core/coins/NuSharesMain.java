@@ -16,7 +16,7 @@ public class NuSharesMain extends CoinType {
 
         name = "NuShares";
         symbol = "NSR";
-        uriScheme = "nushares";
+        uriScheme = "nu";
         bip44Index = 11;
         unitExponent = 4;
         feePerKb = value(10000); // 1NSR, careful NuBits has 10000 units per coin

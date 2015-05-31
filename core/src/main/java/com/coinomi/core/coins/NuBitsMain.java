@@ -16,7 +16,7 @@ public class NuBitsMain extends CoinType {
 
         name = "NuBits";
         symbol = "NBT";
-        uriScheme = "nubits";
+        uriScheme = "nu";
         bip44Index = 12;
         unitExponent = 4;
         feePerKb = value(100); // 0.01NBT, careful NuBits has 10000 units per coin
