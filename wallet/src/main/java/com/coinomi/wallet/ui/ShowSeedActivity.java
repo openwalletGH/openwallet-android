@@ -12,7 +12,7 @@ public class ShowSeedActivity  extends BaseWalletActivity implements ShowSeedFra
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_settings);
+        setContentView(R.layout.activity_fragment_wrapper);
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()

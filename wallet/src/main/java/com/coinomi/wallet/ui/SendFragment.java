@@ -132,7 +132,7 @@ public class SendFragment extends Fragment {
     private CoinType sendAmountType;
     private WalletApplication application;
     private Listener listener;
-    private WalletPocketHD pocket;
+    private WalletAccount pocket;
     private Configuration config;
     private ContentResolver resolver;
     private NavigationDrawerFragment mNavigationDrawerFragment;
@@ -149,7 +149,7 @@ public class SendFragment extends Fragment {
 
     /**
      * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
+     * this fragment using the an account id.
      *
      * @param accountId the id of an account
      * @return A new instance of fragment WalletSendCoins.
@@ -162,6 +162,23 @@ public class SendFragment extends Fragment {
         return fragment;
     }
 
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using a URI.
+     *
+     * @param uri the payment uri
+     * @return A new instance of fragment WalletSendCoins.
+     */
+    public static SendFragment newInstance(Uri uri) {
+        SendFragment fragment = new SendFragment();
+        Bundle args = new Bundle();
+        args.putString(Constants.ARG_URI, uri.toString());
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+
+
     public SendFragment() {
         // Required empty public constructor
     }
@@ -169,9 +186,25 @@ public class SendFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            String accountId = checkNotNull(getArguments().getString(Constants.ARG_ACCOUNT_ID));
-            pocket = (WalletPocketHD) checkNotNull(application.getAccount(accountId));
+        Bundle args = getArguments();
+        if (args != null) {
+            if (args.containsKey(Constants.ARG_ACCOUNT_ID)) {
+                String accountId = args.getString(Constants.ARG_ACCOUNT_ID);
+                pocket = checkNotNull(application.getAccount(accountId));
+            }
+
+            if (args.containsKey(Constants.ARG_URI)) {
+                try {
+                    processUri(args.getString(Constants.ARG_URI));
+                } catch (CoinURIParseException e) {
+                    // TODO handle more elegantly
+                    Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            }
+            // TODO handle more elegantly
+            checkNotNull(pocket, "No account selected");
+        } else {
+            throw new RuntimeException("Must provide account ID or a payment URI");
         }
         sendAmountType = pocket.getCoinType();
 
@@ -194,6 +227,30 @@ public class SendFragment extends Fragment {
 
         loaderManager.initLoader(ID_RATE_LOADER, null, rateLoaderCallbacks);
         loaderManager.initLoader(ID_RECEIVING_ADDRESS_LOADER, null, receivingAddressLoaderCallbacks);
+    }
+
+    private void processUri(String uri) throws CoinURIParseException {
+        CoinURI coinUri = new CoinURI(uri);
+        CoinType scannedType = coinUri.getType();
+
+        if (!Constants.SUPPORTED_COINS.contains(scannedType)) {
+            String error = getResources().getString(R.string.unsupported_coin, scannedType.getName());
+            throw new CoinURIParseException(error);
+        }
+
+        setUri(coinUri);
+
+        if (pocket == null) {
+            List<WalletAccount> allAccounts = application.getAllAccounts();
+            List<WalletAccount> sendFromAccounts = application.getAccounts(coinUri.getType());
+            if (sendFromAccounts.size() == 1) {
+                pocket = sendFromAccounts.get(0);
+            } else if (allAccounts.size() == 1) {
+                pocket = allAccounts.get(0);
+            } else {
+                throw new CoinURIParseException("No default account found");
+            }
+        }
     }
 
     private void updateBalance() {
@@ -219,6 +276,7 @@ public class SendFragment extends Fragment {
 
         sendCoinAmountView = (AmountEditView) view.findViewById(R.id.send_coin_amount);
         sendCoinAmountView.resetType(sendAmountType);
+        if (sendAmount != null) sendCoinAmountView.setAmount(sendAmount, false);
 
         AmountEditView sendLocalAmountView = (AmountEditView) view.findViewById(R.id.send_local_amount);
         sendLocalAmountView.setFormat(FiatType.FRIENDLY_FORMAT);
@@ -465,14 +523,7 @@ public class SendFragment extends Fragment {
     }
 
     void updateStateFrom(CoinURI coinUri) throws CoinURIParseException {
-        setAddress(coinUri.getAddress(), false);
-        if (address == null) { // TODO when going to support the payment protocol, address could be null
-            throw new CoinURIParseException("missing address");
-        }
-
-        sendAmountType = (CoinType) address.getParameters();
-        sendAmount = coinUri.getAmount();
-        final String label = coinUri.getLabel();
+        setUri(coinUri);
 
         // delay these actions until fragment is resumed
         handler.post(new Runnable() {
@@ -486,6 +537,17 @@ public class SendFragment extends Fragment {
                 requestFocusFirst();
             }
         });
+    }
+
+    private void setUri(CoinURI coinUri) throws CoinURIParseException {
+        setAddress(coinUri.getAddress(), false);
+        if (address == null) { // TODO when going to support the payment protocol, address could be null
+            throw new CoinURIParseException("missing address");
+        }
+
+        sendAmountType = (CoinType) address.getParameters();
+        sendAmount = coinUri.getAmount();
+        final String label = coinUri.getLabel();
     }
 
     private void updateView() {
@@ -796,7 +858,7 @@ public class SendFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        if (!mNavigationDrawerFragment.isDrawerOpen()) {
+        if (mNavigationDrawerFragment != null && !mNavigationDrawerFragment.isDrawerOpen()) {
             // Only show items in the action bar relevant to this screen
             // if the drawer is not showing. Otherwise, let the drawer
             // decide what to show in the action bar.

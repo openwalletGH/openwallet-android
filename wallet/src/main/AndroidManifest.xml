@@ -66,6 +66,33 @@
             </intent-filter>
         </activity>
         <activity
+            android:name="com.coinomi.wallet.ui.SendActivity"
+            android:label="@string/send_coins_activity_title"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" >
+            <intent-filter android:label="@string/app_name" >
+                <action android:name="android.intent.action.VIEW" />
+
+                <data android:scheme="bitcoin" />
+                <data android:scheme="litecoin" />
+                <data android:scheme="dogecoin" />
+                <data android:scheme="peercoin" />
+                <data android:scheme="dash" />
+                <data android:scheme="nu" />
+                <data android:scheme="blackcoin" />
+                <data android:scheme="monacoin" />
+                <data android:scheme="reddcoin" />
+                <data android:scheme="rubycoin" />
+                <data android:scheme="digibyte" />
+                <data android:scheme="feathercoin" />
+                <data android:scheme="digitalcoin" />
+                <data android:scheme="cannacoin" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name="com.coinomi.wallet.ui.IntroActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppThemeNoTitleBar"

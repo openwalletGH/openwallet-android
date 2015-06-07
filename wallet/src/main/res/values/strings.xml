@@ -128,6 +128,9 @@
     <string name="view_previous_addresses">Previous addresses</string>
     <string name="too_many_unused_addresses">Too many unused addresses, try to use one of the previous addresses before creating a new one.</string>
 
+    <!-- Send Activity -->
+    <string name="send_coins_activity_title">Send coins</string>
+
     <!-- Send fragment -->
     <string name="send_coins_fragment_receiving_address_label">Pay to</string>
     <string name="send_coins_fragment_receiving_address_tip">type name or address</string>
