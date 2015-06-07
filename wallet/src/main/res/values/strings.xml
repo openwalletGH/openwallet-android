@@ -25,7 +25,7 @@
     <string name="button_ok">OK</string>
     <string name="button_next">Next</string>
     <string name="button_finish">Finish</string>
-    <string name="button_exit">Exit</string>
+    <string name="button_return">Return</string>
     <string name="button_confirm">Confirm</string>
     <string name="button_cancel">Cancel</string>
     <string name="button_dismiss">Dismiss</string>
@@ -105,10 +105,11 @@
     <string name="wallet_update_title">New version available</string>
     <string name="wallet_update_message">A new version of Coinomi is available, it contains new features and fixes.</string>
     <string name="pay_with">Send with</string>
-    <string name="exchange_and_pay_title">Exchange and send (beta)</string>
+    <string name="exchange_and_pay_title">Exchange and send</string>
 
     <!-- PayToDialog-->
-    <string name="pay_as">Send as</string>
+    <string name="ambiguous_address_title">Ambiguous address</string>
+    <string name="ambiguous_address_message">Please select the correct coin type</string>
 
     <!-- Balance fragment -->
     <string name="wallet_transactions_coinbase">mined</string>
@@ -270,7 +271,7 @@
 
     <!-- Exchange -->
 
-    <string name="title_activity_trade">Exchange (beta)</string>
+    <string name="title_activity_trade">Exchange</string>
     <string name="trade_info">Select the coins you wish to exchange.\nThe converted coins will be automatically added to your wallet.</string>
     <string name="trade_from_coin_label">exchange</string>
     <string name="trade_to_coin_label">receive</string>
@@ -279,9 +280,8 @@
     <string name="trade_warn_no_connection_message">Internet connection is needed to exchange coins.</string>
     <string name="trade_error">Exchange error</string>
     <string name="trade_error_no_supported_source_accounts">No supported accounts found</string>
-    <string name="trade_error_service_not_available">Service unavailable, please try again in a minute</string>
-    <string name="trade_error_market_info">Could not get information about %1$s - %2$s pair</string>
-    <string name="trade_error_message">An error occurred while connecting to the exchange.\n\nTechnical details:\n\n<b>%1$s</b></string>
+    <string name="trade_error_service_not_available">Service temporary unavailable, please try again in a minute</string>
+    <string name="trade_error_market_info">Service temporary unavailable.\nNo information about %1$s - %2$s pair</string>
     <string name="trade_error_sign_tx_message">An error occurred while signing and broadcasting transaction.\n\nTechnical details:\n\n<b>%1$s</b></string>
     <string name="trade_error_max_limit">The supplied amount exceeds the limit of %1$s. Please use a smaller amount.</string>
     <string name="trade_error_min_limit">The minimum amount is at least %1$s or %2$s</string>

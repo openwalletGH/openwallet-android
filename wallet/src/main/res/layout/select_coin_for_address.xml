@@ -5,6 +5,8 @@
     android:fillViewport="true"
     android:scrollbars="none" >
 
+
+
     <LinearLayout
         android:id="@+id/pay_as_layout"
         android:layout_width="match_parent"
@@ -14,6 +16,11 @@
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin"
         android:orientation="vertical" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/ambiguous_address_message"/>
 
     </LinearLayout>
 </ScrollView>

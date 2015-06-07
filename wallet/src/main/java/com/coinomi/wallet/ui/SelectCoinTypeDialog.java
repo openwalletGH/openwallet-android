@@ -68,7 +68,7 @@ abstract public class SelectCoinTypeDialog extends DialogFragment {
         }
         if (addressView != null) addressView.setPadding(0, 0, 0, 0); // remove padding from last one
 
-        return builder.setTitle(R.string.pay_as).setView(view).create();
+        return builder.setTitle(R.string.ambiguous_address_title).setView(view).create();
     }
 
     abstract public void onAddressSelected(Address address);
