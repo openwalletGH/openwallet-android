@@ -36,7 +36,7 @@ If you are attempting to build on a Lollipop emulator, please ensure that you ar
 Your contributions are very welcome, be it translations, extra features or new coins support. Just
 fork this repo and create a pull request with your changes.
 
-For new coins support read this [document](https://gist.github.com/erasmospunk/4dac398935e9dc86eed1).
+For new coins support read this [document](https://coinomi.com/AddingSupportForANewCurrency/).
 Generally you need:
 
 * Electrum-server support
