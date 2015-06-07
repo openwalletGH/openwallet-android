@@ -79,6 +79,13 @@ For now test it manually by installing it `adb install -r wallet/wallet-release.
 
 ## Version history
 
+New in version 1.5.15
+- Support payment URIs requests from browsers and other apps
+- Changed NuBits and NuShares URIs to "nu"
+- Added Monacoin and Digibyte
+- Added ability to spend own unconfirmed change funds
+- Usability tweaks and bug fixes
+
 New in version 1.5.14
 - Added exchange history log
 - Can send alt-coins from bitcoin wallet and vise-versa
