@@ -20,6 +20,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/standard_margin"
             android:text="@string/ambiguous_address_message"/>
 
     </LinearLayout>
