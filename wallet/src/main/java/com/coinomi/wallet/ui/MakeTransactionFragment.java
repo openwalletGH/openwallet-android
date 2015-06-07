@@ -3,6 +3,7 @@ package com.coinomi.wallet.ui;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
+import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
@@ -48,6 +49,7 @@ import com.coinomi.wallet.util.WeakHandler;
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.InsufficientMoneyException;
 import org.bitcoinj.crypto.KeyCrypter;
+import org.bitcoinj.crypto.KeyCrypterException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,6 +99,7 @@ public class MakeTransactionFragment extends Fragment {
     private WalletApplication application;
     private Configuration config;
     private TextView transactionInfo;
+    private EditText passwordView;
     private TransactionAmountVisualizer txVisualizer;
     private SendOutput tradeWithdrawSendOutput;
     private Address sendToAddress;
@@ -117,7 +120,6 @@ public class MakeTransactionFragment extends Fragment {
     private HashMap<String, ExchangeRate> localRates = new HashMap<>();
 
     private CountDownTimer countDownTimer;
-
 
 
     public static MakeTransactionFragment newInstance(Bundle args) {
@@ -200,7 +202,7 @@ public class MakeTransactionFragment extends Fragment {
         transactionInfo = (TextView) view.findViewById(R.id.transaction_info);
         transactionInfo.setVisibility(View.GONE);
 
-        final EditText passwordView = (EditText) view.findViewById(R.id.password);
+        passwordView = (EditText) view.findViewById(R.id.password);
         final TextView passwordLabelView = (TextView) view.findViewById(R.id.enter_password_label);
         if (sourceAccount.isEncrypted()) {
             passwordView.requestFocus();
@@ -648,10 +650,29 @@ public class MakeTransactionFragment extends Fragment {
             return error;
         }
 
-        protected void onPostExecute(Exception error) {
+        protected void onPostExecute(final Exception e) {
             busyDialog.dismissAllowingStateLoss();
-            if (mListener != null) {
-                mListener.onSignResult(error, exchangeEntry);
+            if (e instanceof KeyCrypterException) {
+                DialogBuilder.warn(getActivity(), R.string.unlocking_wallet_error_title)
+                        .setMessage(R.string.unlocking_wallet_error_detail)
+                        .setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                mListener.onSignResult(e, exchangeEntry);
+                            }
+                        })
+                        .setPositiveButton(R.string.button_retry, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                password = null;
+                                passwordView.setText(null);
+                                signAndBroadcastTask = null;
+                                error = null;
+                            }
+                        })
+                        .create().show();
+            } else if (mListener != null) {
+                mListener.onSignResult(e, exchangeEntry);
             }
         }
     }

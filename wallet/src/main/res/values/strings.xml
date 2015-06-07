@@ -52,8 +52,8 @@
     <string name="wallet_locked_message">Your wallet is locked</string>
     <string name="unlock_wallet_title">Unlock your wallet</string>
     <string name="unlocking_wallet_working">Unlocking your wallet&#8230;</string>
-    <string name="unlocking_wallet_error_title">Unlocking error</string>
-    <string name="unlocking_wallet_error_detail">Please check that your password is correct.\nIf this error persists try to restore your wallet.</string>
+    <string name="unlocking_wallet_error_title">Could not unlock your wallet</string>
+    <string name="unlocking_wallet_error_detail">Are you using the right password? Please make sure that you have entered the right password and if this error persists try to restore your wallet.</string>
     <string name="powered_by">Powered by</string>
 
     <!-- Nav drawer -->

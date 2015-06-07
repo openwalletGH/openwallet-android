@@ -3,6 +3,7 @@ package com.coinomi.wallet.ui;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +17,7 @@ import com.coinomi.wallet.R;
 abstract public class UnlockWalletDialog extends DialogFragment {
     private TextView passwordView;
 
+    @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         final LayoutInflater inflater = LayoutInflater.from(getActivity());

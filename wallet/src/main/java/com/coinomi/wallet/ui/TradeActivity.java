@@ -8,6 +8,8 @@ import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.ExchangeHistoryProvider.ExchangeEntry;
 import com.coinomi.wallet.R;
 
+import org.bitcoinj.crypto.KeyCrypterException;
+
 import javax.annotation.Nullable;
 
 
@@ -61,10 +63,13 @@ public class TradeActivity extends BaseWalletActivity implements
     public void onSignResult(@Nullable Exception error, ExchangeEntry exchangeEntry) {
         if (error != null) {
             getSupportFragmentManager().popBackStack();
-            DialogBuilder builder = DialogBuilder.warn(this, R.string.trade_error);
-            builder.setMessage(getString(R.string.trade_error_sign_tx_message, error.getMessage()));
-            builder.setPositiveButton(R.string.button_ok, null)
-            .create().show();
+            // Ignore wallet decryption errors
+            if (!(error instanceof KeyCrypterException)) {
+                DialogBuilder builder = DialogBuilder.warn(this, R.string.trade_error);
+                builder.setMessage(getString(R.string.trade_error_sign_tx_message, error.getMessage()));
+                builder.setPositiveButton(R.string.button_ok, null)
+                        .create().show();
+            }
         } else if (exchangeEntry != null) {
             getSupportFragmentManager().popBackStack();
             replaceFragment(TradeStatusFragment.newInstance(exchangeEntry, true), containerRes);

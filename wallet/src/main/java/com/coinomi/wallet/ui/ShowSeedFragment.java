@@ -222,7 +222,7 @@ public class ShowSeedFragment extends Fragment {
                 seedEncryptedLayout.setVisibility(View.VISIBLE);
                 DialogBuilder.warn(getActivity(), R.string.unlocking_wallet_error_title)
                         .setMessage(R.string.unlocking_wallet_error_detail)
-                        .setNegativeButton(R.string.button_dismiss, null)
+                        .setNegativeButton(R.string.button_cancel, null)
                         .setPositiveButton(R.string.button_retry, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
