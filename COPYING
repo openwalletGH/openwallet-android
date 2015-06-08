@@ -2,8 +2,12 @@
 
 An open source project https://github.com/Coinomi/coinomi-android
 
-Wallet module source code licenced under GNU General Public License 3
-Core module source code licenced under Apache License Version 2.0
+Wallet module source code licensed under:
+
+    - GNU General Public License 3
+    - Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
+
+Core module source code licensed under Apache License Version 2.0
 
 Uses Bitcoinj library http://bitcoinj.github.io/
 QR-code functionality by ZXing https://github.com/zxing/zxing
