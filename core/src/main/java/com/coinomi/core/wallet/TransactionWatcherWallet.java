@@ -14,12 +14,10 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 import org.bitcoinj.core.Address;
-import org.bitcoinj.core.PeerAddress;
 import org.bitcoinj.core.ScriptException;
 import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.TransactionConfidence;
-import org.bitcoinj.core.TransactionConfidence.Source;
 import org.bitcoinj.core.TransactionInput;
 import org.bitcoinj.core.TransactionOutput;
 import org.bitcoinj.core.Utils;
@@ -30,8 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -238,23 +234,6 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
                     break;
                 case PENDING:
                     checkState(pending.put(tx.getHash(), tx) == null);
-                    TransactionConfidence confidence = tx.getConfidence();
-                    // Add some fake addresses to make the TX spendable when pending
-                    // TODO this is a hack to overcome a check in org.bitcoinj.wallet.DefaultCoinSelector:isSelectable()
-                    if (confidence.numBroadcastPeers() < 2) {
-                        try {
-                            confidence.markBroadcastBy(new PeerAddress(
-                                    InetAddress.getByAddress(new byte[]{0x7f, 0, 0, 1}), 0));
-                            confidence.markBroadcastBy(new PeerAddress(
-                                    InetAddress.getByAddress(new byte[]{0x7f, 0, 0, 2}), 0));
-                        } catch (UnknownHostException e) { /* Swallow */ }
-                    }
-
-                    // Check if the transaction is ours.
-                    // TODO is it better to check the input sigs?
-                    if (confidence.getSource() != Source.SELF && tx.getValue(this).isNegative()) {
-                        confidence.setSource(Source.SELF);
-                    }
                     break;
                 case DEAD:
                     checkState(dead.put(tx.getHash(), tx) == null);
@@ -397,7 +376,6 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
             lastBlockSeenTimeSecs = 0;
             unspent.clear();
             spent.clear();
-            // FIXME, the transactions sent from this wallet lose the Source.SELF property..
             pending.clear();
             dead.clear();
             transactions.clear();
@@ -508,33 +486,33 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
     }
 
     @Override
-    public Value getUnconfirmedBalance() {
+    public Value getConfirmedBalance() {
         lock.lock();
         try {
-            return getTxBalance(unspent.values(), true);
+            return getBalance(false);
         } finally {
             lock.unlock();
         }
     }
 
     @Override
-    public Value getSpendableBalance() {
+    public Value getBalance() {
         lock.lock();
         try {
             Value value = getTxBalance(unspent.values(), true);
 
-            for (Transaction pendingTx : pending.values()) {
-                // If sent from this wallet, it is spendable so apply to the balance
-                if (pendingTx.getConfidence().getSource() == TransactionConfidence.Source.SELF) {
-                    value = value.add(pendingTx.getValue(this));
-                }
-            }
-
-            // FIXME when refreshing there could be temporary more send transactions so the balance
-            // FIXME becomes negative. This is a temporary solution.
-            if (value.isNegative()) {
-                value = coinType.value(0);
-            }
+//            for (Transaction pendingTx : pending.values()) {
+//                // If sent from this wallet, it is spendable so apply to the balance
+//                if (pendingTx.getConfidence().getSource() == TransactionConfidence.Source.SELF) {
+//                    value = value.add(pendingTx.getValue(this));
+//                }
+//            }
+//
+//            // FIXME when refreshing there could be temporary more send transactions so the balance
+//            // FIXME becomes negative. This is a temporary solution.
+//            if (value.isNegative()) {
+//                value = coinType.value(0);
+//            }
 
             checkState(!value.isNegative());
             return value;
@@ -790,8 +768,7 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
                 updatingStatus.queueHistoryTransactions(historyTxes);
                 fetchTransactions(historyTxes);
                 tryToApplyState(updatingStatus);
-            }
-            else {
+            } else {
                 log.info("Ignoring history tx call because no entry found or newer entry.");
             }
         }
@@ -1190,14 +1167,14 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
 
     void queueOnNewBalance() {
         checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
-        final Value balance = getSpendableBalance();
+        final Value balance = getBalance();
         final Value pendingBalance = getPendingBalance();
         for (final ListenerRegistration<WalletAccountEventListener> registration : listeners) {
             registration.executor.execute(new Runnable() {
                 @Override
                 public void run() {
                     registration.listener.onNewBalance(balance, pendingBalance);
-                    registration.listener.onPocketChanged(TransactionWatcherWallet.this);
+                    registration.listener.onWalletChanged(TransactionWatcherWallet.this);
                 }
             });
         }
@@ -1210,7 +1187,7 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
                 @Override
                 public void run() {
                     registration.listener.onNewBlock(TransactionWatcherWallet.this);
-                    registration.listener.onPocketChanged(TransactionWatcherWallet.this);
+                    registration.listener.onWalletChanged(TransactionWatcherWallet.this);
                 }
             });
         }
@@ -1223,6 +1200,7 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
                 @Override
                 public void run() {
                     registration.listener.onConnectivityStatus(connectivity);
+                    registration.listener.onWalletChanged(TransactionWatcherWallet.this);
                 }
             });
         }
@@ -1250,7 +1228,6 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
         }
     }
 
-
     public void addEventListener(WalletAccountEventListener listener) {
         addEventListener(listener, Threading.USER_THREAD);
     }
@@ -1263,8 +1240,8 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
         return ListenerRegistration.removeFromList(listener, listeners);
     }
 
-    public boolean isPending() {
-        return addressesPendingSubscription.isEmpty() && statusPendingUpdates.isEmpty() && fetchingTransactions.isEmpty();
+    public boolean isLoading() {
+        return !addressesPendingSubscription.isEmpty() || !statusPendingUpdates.isEmpty() || !fetchingTransactions.isEmpty();
     }
 
 
@@ -1308,11 +1285,10 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
         if (!isConnected()) {
             return WalletPocketConnectivity.DISCONNECTED;
         } else {
-            // If nothing pending, we are just CONNECTED
-            if (isPending()) {
+            if (isLoading()) {
+                // TODO support LOADING state, for now is just CONNECTED
                 return WalletPocketConnectivity.CONNECTED;
             } else {
-                // TODO support WORKING state, for now is just CONNECTED
                 return WalletPocketConnectivity.CONNECTED;
             }
         }

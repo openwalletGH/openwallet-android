@@ -1,6 +1,7 @@
 package com.coinomi.core.wallet;
 
 import com.coinomi.core.coins.CoinType;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 import org.bitcoinj.core.Address;
@@ -21,7 +22,6 @@ import org.bitcoinj.signers.TransactionSigner;
 import org.bitcoinj.wallet.CoinSelection;
 import org.bitcoinj.wallet.CoinSelector;
 import org.bitcoinj.wallet.DecryptingKeyBag;
-import org.bitcoinj.wallet.DefaultCoinSelector;
 import org.bitcoinj.wallet.KeyBag;
 import org.bitcoinj.wallet.RedeemData;
 import org.slf4j.Logger;
@@ -41,16 +41,22 @@ import static com.coinomi.core.Preconditions.checkState;
  */
 public class TransactionCreator {
     private static final Logger log = LoggerFactory.getLogger(TransactionCreator.class);
-    private final WalletAccount pocket;
+    private final WalletAccount account;
     private final CoinType coinType;
 
-    private final CoinSelector coinSelector = new DefaultCoinSelector();
+    private final CoinSelector coinSelector = new WalletCoinSelector();
     private final ReentrantLock lock; // TODO remove
 
-    public TransactionCreator(WalletPocketHD pocket) {
-        this.pocket = pocket;
-        lock = pocket.lock;
-        coinType = pocket.coinType;
+    public TransactionCreator(AbstractWallet account) {
+        this.account = account;
+        lock = account.lock;
+        coinType = account.coinType;
+    }
+
+    public TransactionCreator(AddressWallet account) {
+        this.account = account;
+        lock = account.lock;
+        coinType = account.coinType;
     }
 
     private static class FeeCalculation {
@@ -193,7 +199,7 @@ public class TransactionCreator {
             checkState(inputs.size() > 0);
             checkState(outputs.size() > 0);
 
-            KeyBag maybeDecryptingKeyBag = new DecryptingKeyBag(pocket, req.aesKey);
+            KeyBag maybeDecryptingKeyBag = new DecryptingKeyBag(account, req.aesKey);
 
             int numInputs = tx.getInputs().size();
             for (int i = 0; i < numInputs; i++) {
@@ -241,30 +247,23 @@ public class TransactionCreator {
     LinkedList<TransactionOutput> calculateAllSpendCandidates(boolean excludeImmatureCoinbases) {
         lock.lock();
         try {
-            ArrayList<Transaction> txCandidates =
-                    Lists.newArrayList(pocket.getUnspentTransactions().values());
-
-            // Can spend also pending own TXs
-            for (Transaction pendingTx : pocket.getPendingTransactions().values()) {
-                if (pendingTx.getConfidence().getSource() == TransactionConfidence.Source.SELF) {
-                    txCandidates.add(pendingTx);
-                }
-            }
-
             LinkedList<TransactionOutput> candidates = Lists.newLinkedList();
-            for (Transaction tx : txCandidates) {
+//            for (Transaction tx : Iterables.concat(account.getUnspentTransactions().values(),
+//                    account.getPendingTransactions().values())) {
+            for (Transaction tx : account.getUnspentTransactions().values()) {
                 // Do not try and spend coinbases that were mined too recently, the protocol forbids it.
                 if (excludeImmatureCoinbases && !tx.isMature()) continue;
                 for (TransactionOutput output : tx.getOutputs()) {
                     if (!output.isAvailableForSpending()) continue;
+                    if (!output.isMine(account)) continue;
                     candidates.add(output);
                 }
             }
 
             // If we have pending transactions, remove from candidates any future spent outputs
-            for (Transaction pendingTx : pocket.getPendingTransactions().values()) {
+            for (Transaction pendingTx : account.getPendingTransactions().values()) {
                 for (TransactionInput input : pendingTx.getInputs()) {
-                    Transaction tx = pocket.getTransactions().get(input.getOutpoint().getHash());
+                    Transaction tx = account.getTransactions().get(input.getOutpoint().getHash());
                     if (tx == null) continue;
                     TransactionOutput pendingSpentOutput = tx.getOutput((int) input.getOutpoint().getIndex());
                     candidates.remove(pendingSpentOutput);
@@ -386,7 +385,7 @@ public class TransactionCreator {
                 // back to us. The address comes either from the request or getChangeAddress() as a default.
                 Address changeAddress = req.changeAddress;
                 if (changeAddress == null)
-                    changeAddress = pocket.getChangeAddress();
+                    changeAddress = account.getChangeAddress();
                 changeOutput = new TransactionOutput(coinType, req.tx, change, changeAddress);
                 // If the change output would result in this transaction being rejected as dust, just drop the change and make it a fee
                 if (req.ensureMinRequiredFee && coinType.getMinNonDust().compareTo(change) >= 0) {
@@ -527,7 +526,7 @@ public class TransactionCreator {
                 ECKey key = null;
                 Script redeemScript = null;
                 if (script.isSentToAddress()) {
-                    key = pocket.findKeyFromPubHash(script.getPubKeyHash());
+                    key = account.findKeyFromPubHash(script.getPubKeyHash());
                     if (key == null) {
                         log.error("output.getIndex {}", output.getIndex());
                         log.error("output.getAddressFromP2SH {}", output.getAddressFromP2SH(coinType));

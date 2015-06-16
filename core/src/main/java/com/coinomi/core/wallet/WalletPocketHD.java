@@ -68,13 +68,10 @@ import static org.bitcoinj.wallet.KeyChain.KeyPurpose.REFUND;
  *
  *
  */
-public class WalletPocketHD extends TransactionWatcherWallet {
+public class WalletPocketHD extends AbstractWallet {
     private static final Logger log = LoggerFactory.getLogger(WalletPocketHD.class);
 
     private final TransactionCreator transactionCreator;
-
-    private final String id;
-    private String description;
 
     @VisibleForTesting SimpleHDKeyChain keys;
 
@@ -88,8 +85,7 @@ public class WalletPocketHD extends TransactionWatcherWallet {
     }
 
     WalletPocketHD(String id, SimpleHDKeyChain keys, CoinType coinType) {
-        super(checkNotNull(coinType));
-        this.id = id;
+        super(checkNotNull(coinType), id);
         this.keys = checkNotNull(keys);
         transactionCreator = new TransactionCreator(this);
     }
@@ -110,31 +106,6 @@ public class WalletPocketHD extends TransactionWatcherWallet {
         }
     }
 
-
-    @Override
-    public String getId() {
-        return id;
-    }
-
-    /**
-     * Set the description of the wallet.
-     * This is a Unicode encoding string typically entered by the user as descriptive text for the wallet.
-     */
-    @Override
-    public void setDescription(String description) {
-        lock.lock();
-        this.description = description;
-        lock.unlock();
-        walletSaveNow();
-    }
-
-    /**
-     * Get the description of the wallet. See {@link WalletPocketHD#setDescription(String))}
-     */
-    @Override
-    public String getDescription() {
-        return description;
-    }
 
     @Override
     public boolean equals(WalletAccount other) {

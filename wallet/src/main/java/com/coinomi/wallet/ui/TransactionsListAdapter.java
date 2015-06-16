@@ -39,7 +39,7 @@ import android.widget.TextView;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
 import com.coinomi.core.util.GenericUtils;
-import com.coinomi.core.wallet.WalletPocketHD;
+import com.coinomi.core.wallet.AbstractWallet;
 import com.coinomi.wallet.AddressBookProvider;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.ui.widget.CurrencyTextView;
@@ -58,7 +58,7 @@ import org.bitcoinj.core.TransactionConfidence.ConfidenceType;
 public class TransactionsListAdapter extends BaseAdapter {
     private final Context context;
     private final LayoutInflater inflater;
-    private final WalletPocketHD walletPocket;
+    private final AbstractWallet walletPocket;
 
     private final List<Transaction> transactions = new ArrayList<Transaction>();
     private final Resources res;
@@ -86,7 +86,7 @@ public class TransactionsListAdapter extends BaseAdapter {
 
     private static final int VIEW_TYPE_TRANSACTION = 0;
 
-    public TransactionsListAdapter(final Context context, @Nonnull final WalletPocketHD walletPocket) {
+    public TransactionsListAdapter(final Context context, @Nonnull final AbstractWallet walletPocket) {
         this.context = context;
         inflater = LayoutInflater.from(context);
 

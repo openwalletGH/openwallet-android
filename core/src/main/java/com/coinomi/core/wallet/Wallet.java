@@ -4,8 +4,6 @@ import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.protos.Protos;
 import com.coinomi.core.wallet.exceptions.NoSuchPocketException;
 import org.bitcoinj.core.Address;
-import org.bitcoinj.core.Coin;
-import org.bitcoinj.core.InsufficientMoneyException;
 import org.bitcoinj.crypto.DeterministicHierarchy;
 import org.bitcoinj.crypto.DeterministicKey;
 import org.bitcoinj.crypto.HDKeyDerivation;

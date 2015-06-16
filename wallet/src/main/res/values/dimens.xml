@@ -29,6 +29,8 @@
 
     <!-- Amount Widget -->
     <dimen name="amount_margin_top">16dp</dimen>
+    <!-- TODO enable for SmoothProgressBar-->
+    <!--<dimen name="amount_margin_top">8dp</dimen>-->
     <dimen name="amount_margin_bottom">4dp</dimen>
     <dimen name="amount_text_size_big">56sp</dimen>
     <dimen name="amount_text_size">32sp</dimen>
@@ -54,11 +56,12 @@
 
     <!-- Send fragment -->
 
-    <!-- Info fragment -->
+    <!-- Balance fragment -->
     <dimen name="history_label">24sp</dimen>
     <dimen name="history_empty">20sp</dimen>
     <dimen name="transaction_entry">18sp</dimen>
     <dimen name="transaction_pending">18sp</dimen>
+    <dimen name="balance_progress_bar_size">20dp</dimen>
 
     <!-- generic rows -->
     <dimen name="row_font_icon_margin">8dp</dimen>

@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- http://www.google.com/design/spec/style/color.html#color-ui-color-application -->
-    <color name="primary_500">#03A9F4</color>
     <color name="primary_100">#B3E5FC</color>
+    <color name="primary_500">#03A9F4</color>
+    <color name="primary_600">#039BE5</color>
+    <color name="primary_700">#0288D1</color>
+    <color name="primary_800">#0277BD</color>
     <color name="primary_900">#01579B</color>
     <color name="accent">#0091EA</color>
 
@@ -60,5 +63,12 @@
     <color name="scan_dot">#ff6600</color>
     <color name="scan_result_view">#b0000000</color>
     <color name="scan_result_dots">#c099cc00</color>
+
+    <!-- progress bar -->
+    <integer-array name="progress_bar_colors">
+        <item>@color/primary_600</item>
+        <item>@color/primary_700</item>
+        <item>@color/primary_800</item>
+    </integer-array>
 
 </resources>

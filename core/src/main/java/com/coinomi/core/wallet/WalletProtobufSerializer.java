@@ -97,7 +97,7 @@ public class WalletProtobufSerializer {
         // Add serialized pockets
         for (WalletAccount account : wallet.getAllAccounts()) {
             Protos.WalletPocket pocketProto;
-            if (account instanceof WalletPocketHD) {
+            if (account instanceof AbstractWallet) {
                 pocketProto = WalletPocketProtobufSerializer.toProtobuf((WalletPocketHD) account);
             } else {
                 throw new RuntimeException("Implement serialization for: " + account.getClass());
@@ -187,7 +187,7 @@ public class WalletProtobufSerializer {
 
         WalletPocketProtobufSerializer pocketSerializer = new WalletPocketProtobufSerializer();
         for (Protos.WalletPocket pocketProto : walletProto.getPocketsList()) {
-            WalletPocketHD pocket = pocketSerializer.readWallet(pocketProto, crypter);
+            AbstractWallet pocket = pocketSerializer.readWallet(pocketProto, crypter);
             wallet.addAccount(pocket);
         }
 

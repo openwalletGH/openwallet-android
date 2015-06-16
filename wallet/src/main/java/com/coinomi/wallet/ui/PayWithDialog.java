@@ -48,7 +48,7 @@ public abstract class PayWithDialog extends DialogFragment {
         ViewGroup typeAccounts = (ViewGroup) view.findViewById(R.id.pay_with_layout);
         boolean canSend = false;
         for (WalletAccount account : app.getAccounts(uri.getType())) {
-            if (account.getSpendableBalance().isPositive()) {
+            if (account.getBalance().isPositive()) {
                 addPayWithAccountRow(typeAccounts, account, uri);
                 canSend = true;
             }
@@ -63,7 +63,7 @@ public abstract class PayWithDialog extends DialogFragment {
         ViewGroup exchangeAccounts = (ViewGroup) view.findViewById(R.id.exchange_and_pay_layout);
         boolean canExchange = false;
         for (WalletAccount account : app.getAllAccounts()) {
-            if (!account.isType(type) && account.getSpendableBalance().isPositive()) {
+            if (!account.isType(type) && account.getBalance().isPositive()) {
                 addPayWithAccountRow(exchangeAccounts, account, uri);
                 canExchange = true;
             }

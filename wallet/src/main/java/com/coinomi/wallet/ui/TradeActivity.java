@@ -44,7 +44,7 @@ public class TradeActivity extends BaseWalletActivity implements
         if (amount.type.equals(fromAccount.getCoinType())) {
             // TODO set the empty wallet flag in the fragment
             // Decide if emptying wallet or not
-            Value lastBalance = fromAccount.getSpendableBalance();
+            Value lastBalance = fromAccount.getBalance();
             if (amount.compareTo(lastBalance) == 0) {
                 args.putSerializable(Constants.ARG_EMPTY_WALLET, true);
             } else {

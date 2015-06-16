@@ -31,7 +31,6 @@ import com.coinomi.core.exchange.shapeshift.data.ShapeShiftCoins;
 import com.coinomi.core.exchange.shapeshift.data.ShapeShiftException;
 import com.coinomi.core.exchange.shapeshift.data.ShapeShiftMarketInfo;
 import com.coinomi.core.util.ExchangeRate;
-import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.wallet.Constants;
@@ -52,12 +51,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.Timer;
-import java.util.TimerTask;
-import java.util.TreeSet;
 
 import javax.annotation.Nullable;
 
@@ -739,7 +734,7 @@ public class TradeSelectFragment extends Fragment {
     }
 
     private void updateBalance() {
-        lastBalance = sourceAccount.getSpendableBalance();
+        lastBalance = sourceAccount.getBalance();
     }
 
     private void onWalletUpdate() {

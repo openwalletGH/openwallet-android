@@ -19,7 +19,7 @@ public interface WalletAccountEventListener {
 
     void onTransactionBroadcastSuccess(WalletAccount pocket, Transaction tx);
 
-    void onPocketChanged(final WalletAccount pocket);
+    void onWalletChanged(final WalletAccount pocket);
 
-    void onConnectivityStatus(final WalletPocketConnectivity pocketConnectivity);
+    void onConnectivityStatus(WalletPocketConnectivity pocketConnectivity);
 }

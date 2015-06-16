@@ -32,8 +32,8 @@ public interface WalletAccount extends TransactionBag, KeyBag, TransactionEventL
 
     boolean isNew();
 
-    Value getUnconfirmedBalance();
-    Value getSpendableBalance();
+    Value getConfirmedBalance();
+    Value getBalance();
 
     void refresh();
 
@@ -85,4 +85,6 @@ public interface WalletAccount extends TransactionBag, KeyBag, TransactionEventL
     boolean isType(Address address);
 
     boolean isAddressMine(Address address);
+
+    boolean isLoading();
 }

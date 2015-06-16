@@ -10,7 +10,7 @@ import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
 import com.coinomi.core.util.ExchangeRate;
 import com.coinomi.core.util.GenericUtils;
-import com.coinomi.core.wallet.WalletPocketHD;
+import com.coinomi.core.wallet.AbstractWallet;
 import com.coinomi.wallet.AddressBookProvider;
 import com.coinomi.wallet.R;
 import com.google.common.collect.ImmutableList;
@@ -53,7 +53,7 @@ public class TransactionAmountVisualizer extends LinearLayout {
         }
     }
 
-    public void setTransaction(WalletPocketHD pocket, Transaction tx) {
+    public void setTransaction(AbstractWallet pocket, Transaction tx) {
         type = pocket.getCoinType();
         String symbol = type.getSymbol();
 

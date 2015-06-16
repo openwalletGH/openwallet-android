@@ -16,7 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.coinomi.core.coins.CoinType;
-import com.coinomi.core.wallet.WalletPocketHD;
+import com.coinomi.core.wallet.AbstractWallet;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
@@ -43,7 +43,7 @@ public class TransactionDetailsFragment extends Fragment {
 
     private Sha256Hash txId;
     private String accountId;
-    private WalletPocketHD pocket;
+    private AbstractWallet pocket;
     private CoinType type;
 
     private ListView outputRows;
@@ -76,7 +76,7 @@ public class TransactionDetailsFragment extends Fragment {
             accountId = getArguments().getString(Constants.ARG_ACCOUNT_ID);
         }
         // TODO
-        pocket = (WalletPocketHD) getWalletApplication().getAccount(accountId);
+        pocket = (AbstractWallet) getWalletApplication().getAccount(accountId);
         if (pocket == null) {
             Toast.makeText(getActivity(), R.string.no_such_pocket_error, Toast.LENGTH_LONG).show();
             return;
@@ -156,7 +156,7 @@ public class TransactionDetailsFragment extends Fragment {
         }
     }
 
-    private void showTxDetails(WalletPocketHD pocket, Transaction tx) {
+    private void showTxDetails(AbstractWallet pocket, Transaction tx) {
         TransactionConfidence confidence = tx.getConfidence();
         String txStatusText;
         switch (confidence.getConfidenceType()) {

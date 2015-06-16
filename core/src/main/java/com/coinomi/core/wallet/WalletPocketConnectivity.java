@@ -5,6 +5,6 @@ package com.coinomi.core.wallet;
  */
 public enum WalletPocketConnectivity {
     DISCONNECTED,
-    CONNECTED,
-    WORKING;
+    LOADING,
+    CONNECTED;
 }
