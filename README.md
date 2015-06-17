@@ -79,6 +79,10 @@ For now test it manually by installing it `adb install -r wallet/wallet-release.
 
 ## Version history
 
+New in version 1.5.16
+- Changed the way balance is calculated and added the possibility to spend unconfirmed transactions
+- Small optimizations when handling the QR code and transactions
+
 New in version 1.5.15
 - Support payment URIs requests from browsers and other apps
 - Changed NuBits and NuShares URIs to "nu"
