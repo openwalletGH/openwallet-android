@@ -105,7 +105,7 @@ public abstract class ThrottlingWalletChangeListener implements WalletAccountEve
     public abstract void onThrottledWalletChanged();
 
     @Override
-    public void onNewBalance(Value newBalance, Value pendingAmount) {
+    public void onNewBalance(Value newBalance) {
         if (coinsRelevant) relevant.set(true);
     }
 

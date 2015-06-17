@@ -32,7 +32,6 @@ public interface WalletAccount extends TransactionBag, KeyBag, TransactionEventL
 
     boolean isNew();
 
-    Value getConfirmedBalance();
     Value getBalance();
 
     void refresh();

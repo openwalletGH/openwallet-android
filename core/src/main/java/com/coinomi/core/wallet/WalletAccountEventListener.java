@@ -9,7 +9,7 @@ import org.bitcoinj.core.Transaction;
  */
 public interface WalletAccountEventListener {
 
-    void onNewBalance(Value newBalance, Value pendingAmount);
+    void onNewBalance(Value newBalance);
 
     void onNewBlock(WalletAccount pocket);
 

@@ -17,7 +17,7 @@ public interface BlockchainConnection {
     void subscribeToAddresses(List<Address> addresses,
                               TransactionEventListener listener);
 
-    void getUnspentTx(AddressStatus status, TransactionEventListener listener);
+//    void getUnspentTx(AddressStatus status, TransactionEventListener listener);
 
     void getHistoryTx(AddressStatus status, TransactionEventListener listener);
 

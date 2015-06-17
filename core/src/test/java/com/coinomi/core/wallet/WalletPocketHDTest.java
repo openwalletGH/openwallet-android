@@ -4,7 +4,6 @@ import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.DogecoinTest;
 import com.coinomi.core.network.AddressStatus;
 import com.coinomi.core.network.ServerClient.HistoryTx;
-import com.coinomi.core.network.ServerClient.UnspentTx;
 import com.coinomi.core.network.interfaces.BlockchainConnection;
 import com.coinomi.core.network.interfaces.TransactionEventListener;
 import com.coinomi.core.protos.Protos;
@@ -203,7 +202,6 @@ public class WalletPocketHDTest {
         WalletPocketHD newPocket = new WalletPocketProtobufSerializer().readWallet(walletPocketProto, null);
 
         assertEquals(pocket.getBalance().value, newPocket.getBalance().value);
-        assertEquals(pocket.getConfirmedBalance().value, newPocket.getConfirmedBalance().value);
 
         assertEquals(pocket.getCoinType(), newPocket.getCoinType());
         assertEquals(pocket.getDescription(), newPocket.getDescription());
@@ -373,16 +371,16 @@ public class WalletPocketHDTest {
         return status;
     }
 
-    private HashMap<Address, ArrayList<UnspentTx>> getDummyUTXs() throws AddressFormatException, JSONException {
-        HashMap<Address, ArrayList<UnspentTx>> utxs = new HashMap<Address, ArrayList<UnspentTx>>(40);
-
-        for (int i = 0; i < statuses.length; i++) {
-            List<UnspentTx> utxList = (List<UnspentTx>) UnspentTx.fromArray(new JSONArray(unspent[i]));
-            utxs.put(new Address(type, addresses.get(i)), Lists.newArrayList(utxList));
-        }
-
-        return utxs;
-    }
+//    private HashMap<Address, ArrayList<UnspentTx>> getDummyUTXs() throws AddressFormatException, JSONException {
+//        HashMap<Address, ArrayList<UnspentTx>> utxs = new HashMap<Address, ArrayList<UnspentTx>>(40);
+//
+//        for (int i = 0; i < statuses.length; i++) {
+//            List<UnspentTx> utxList = (List<UnspentTx>) UnspentTx.fromArray(new JSONArray(unspent[i]));
+//            utxs.put(new Address(type, addresses.get(i)), Lists.newArrayList(utxList));
+//        }
+//
+//        return utxs;
+//    }
 
     private HashMap<Address, ArrayList<HistoryTx>> getDummyHistoryTXs() throws AddressFormatException, JSONException {
         HashMap<Address, ArrayList<HistoryTx>> htxs = new HashMap<Address, ArrayList<HistoryTx>>(40);
@@ -408,7 +406,7 @@ public class WalletPocketHDTest {
 
     class MockBlockchainConnection implements BlockchainConnection {
         final HashMap<Address, AddressStatus> statuses;
-        final HashMap<Address, ArrayList<UnspentTx>> utxs;
+//        final HashMap<Address, ArrayList<UnspentTx>> utxs;
         final HashMap<Address, ArrayList<HistoryTx>> historyTxs;
         final HashMap<Sha256Hash, byte[]> rawTxs;
         private CoinType coinType;
@@ -416,7 +414,7 @@ public class WalletPocketHDTest {
         MockBlockchainConnection(CoinType coinType) throws Exception {
             this.coinType = coinType;
             statuses = getDummyStatuses();
-            utxs = getDummyUTXs();
+//            utxs = getDummyUTXs();
             historyTxs = getDummyHistoryTXs();
             rawTxs = getDummyRawTXs();
         }
@@ -437,14 +435,14 @@ public class WalletPocketHDTest {
             }
         }
 
-        @Override
-        public void getUnspentTx(AddressStatus status, TransactionEventListener listener) {
-            List<UnspentTx> utx = utxs.get(status.getAddress());
-            if (status == null) {
-                utx = ImmutableList.of();
-            }
-            listener.onUnspentTransactionUpdate(status, utx);
-        }
+//        @Override
+//        public void getUnspentTx(AddressStatus status, TransactionEventListener listener) {
+//            List<UnspentTx> utx = utxs.get(status.getAddress());
+//            if (status == null) {
+//                utx = ImmutableList.of();
+//            }
+//            listener.onUnspentTransactionUpdate(status, utx);
+//        }
 
         @Override
         public void getHistoryTx(AddressStatus status, TransactionEventListener listener) {
@@ -463,51 +461,51 @@ public class WalletPocketHDTest {
 
         @Override
         public void broadcastTx(Transaction tx, TransactionEventListener listener) {
-            List<AddressStatus> newStatuses = new ArrayList<AddressStatus>();
-            Random rand = new Random();
-            byte[] randBytes = new byte[32];
-            // Get spent outputs and modify statuses
-            for (TransactionInput txi : tx.getInputs()) {
-                UnspentTx unspentTx = new UnspentTx(
-                        txi.getOutpoint(), txi.getValue().value, 0);
-
-                for (Map.Entry<Address, ArrayList<UnspentTx>> entry : utxs.entrySet()) {
-                    if (entry.getValue().remove(unspentTx)) {
-                        rand.nextBytes(randBytes);
-                        AddressStatus newStatus = new AddressStatus(entry.getKey(), Utils.HEX.encode(randBytes));
-                        statuses.put(entry.getKey(), newStatus);
-                        newStatuses.add(newStatus);
-                    }
-                }
-            }
-
-            for (TransactionOutput txo : tx.getOutputs()) {
-                if (txo.getAddressFromP2PKHScript(coinType) != null) {
-                    Address address = txo.getAddressFromP2PKHScript(coinType);
-                    if (addresses.contains(address.toString())) {
-                        AddressStatus newStatus = new AddressStatus(address, tx.getHashAsString());
-                        statuses.put(address, newStatus);
-                        newStatuses.add(newStatus);
-                        if (!utxs.containsKey(address)) {
-                            utxs.put(address, new ArrayList<UnspentTx>());
-                        }
-                        ArrayList<UnspentTx> unspentTxs = utxs.get(address);
-                        unspentTxs.add(new UnspentTx(txo.getOutPointFor(),
-                                txo.getValue().value, 0));
-                        if (!historyTxs.containsKey(address)) {
-                            historyTxs.put(address, new ArrayList<HistoryTx>());
-                        }
-                        ArrayList<HistoryTx> historyTxes = historyTxs.get(address);
-                        historyTxes.add(new HistoryTx(txo.getOutPointFor(), 0));
-                    }
-                }
-            }
-
-            rawTxs.put(tx.getHash(), tx.bitcoinSerialize());
-
-            for (AddressStatus newStatus : newStatuses) {
-                listener.onAddressStatusUpdate(newStatus);
-            }
+//            List<AddressStatus> newStatuses = new ArrayList<AddressStatus>();
+//            Random rand = new Random();
+//            byte[] randBytes = new byte[32];
+//            // Get spent outputs and modify statuses
+//            for (TransactionInput txi : tx.getInputs()) {
+//                UnspentTx unspentTx = new UnspentTx(
+//                        txi.getOutpoint(), txi.getValue().value, 0);
+//
+//                for (Map.Entry<Address, ArrayList<UnspentTx>> entry : utxs.entrySet()) {
+//                    if (entry.getValue().remove(unspentTx)) {
+//                        rand.nextBytes(randBytes);
+//                        AddressStatus newStatus = new AddressStatus(entry.getKey(), Utils.HEX.encode(randBytes));
+//                        statuses.put(entry.getKey(), newStatus);
+//                        newStatuses.add(newStatus);
+//                    }
+//                }
+//            }
+//
+//            for (TransactionOutput txo : tx.getOutputs()) {
+//                if (txo.getAddressFromP2PKHScript(coinType) != null) {
+//                    Address address = txo.getAddressFromP2PKHScript(coinType);
+//                    if (addresses.contains(address.toString())) {
+//                        AddressStatus newStatus = new AddressStatus(address, tx.getHashAsString());
+//                        statuses.put(address, newStatus);
+//                        newStatuses.add(newStatus);
+//                        if (!utxs.containsKey(address)) {
+//                            utxs.put(address, new ArrayList<UnspentTx>());
+//                        }
+//                        ArrayList<UnspentTx> unspentTxs = utxs.get(address);
+//                        unspentTxs.add(new UnspentTx(txo.getOutPointFor(),
+//                                txo.getValue().value, 0));
+//                        if (!historyTxs.containsKey(address)) {
+//                            historyTxs.put(address, new ArrayList<HistoryTx>());
+//                        }
+//                        ArrayList<HistoryTx> historyTxes = historyTxs.get(address);
+//                        historyTxes.add(new HistoryTx(txo.getOutPointFor(), 0));
+//                    }
+//                }
+//            }
+//
+//            rawTxs.put(tx.getHash(), tx.bitcoinSerialize());
+//
+//            for (AddressStatus newStatus : newStatuses) {
+//                listener.onAddressStatusUpdate(newStatus);
+//            }
         }
 
         @Override

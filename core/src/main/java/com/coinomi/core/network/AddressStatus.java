@@ -20,9 +20,7 @@ final public class AddressStatus {
     @Nullable final String status;
 
     HashSet<ServerClient.HistoryTx> historyTransactions;
-    HashSet<ServerClient.UnspentTx> unspentTransactions;
     HashSet<Sha256Hash> allTransactions = new HashSet<Sha256Hash>();
-
 
     public AddressStatus(Address address, @Nullable String status) {
         this.address = address;
@@ -47,16 +45,6 @@ final public class AddressStatus {
         }
     }
 
-    /**
-     * Queue transactions that are going to be fetched
-     * @param txs
-     */
-    public void queueUnspentTransactions(List<ServerClient.UnspentTx> txs) {
-        if (unspentTransactions == null) {
-            unspentTransactions = (HashSet<ServerClient.UnspentTx>) fillTransactions(txs);
-        }
-    }
-
     private HashSet<? extends ServerClient.HistoryTx> fillTransactions(List<? extends ServerClient.HistoryTx> txs) {
         HashSet<? extends ServerClient.HistoryTx> txSet = Sets.newHashSet(txs);
         for (ServerClient.HistoryTx tx : txs) {
@@ -69,7 +57,7 @@ final public class AddressStatus {
      * Return true if history and unspent transactions are queued
      */
     public boolean isReady() {
-        return historyTransactions != null && unspentTransactions != null;
+        return historyTransactions != null;
     }
 
     /**
@@ -84,13 +72,6 @@ final public class AddressStatus {
      */
     public HashSet<ServerClient.HistoryTx> getHistoryTxs() {
         return historyTransactions;
-    }
-
-    /**
-     * Get unspent transactions info
-     */
-    public HashSet<ServerClient.UnspentTx> getUnspentTxs() {
-        return unspentTransactions;
     }
 
     @Override

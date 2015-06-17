@@ -1,14 +1,19 @@
 package com.coinomi.core.network;
 
-import com.coinomi.core.network.interfaces.BlockchainConnection;
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.network.interfaces.BlockchainConnection;
 import com.coinomi.core.network.interfaces.ConnectionEventListener;
 import com.coinomi.core.network.interfaces.TransactionEventListener;
-import com.coinomi.core.wallet.WalletPocketHD;
 import com.coinomi.stratumj.ServerAddress;
 import com.coinomi.stratumj.StratumClient;
 import com.coinomi.stratumj.messages.CallMessage;
 import com.coinomi.stratumj.messages.ResultMessage;
+import com.google.common.collect.ImmutableList;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.Service;
+
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.Sha256Hash;
@@ -17,12 +22,6 @@ import org.bitcoinj.core.TransactionOutPoint;
 import org.bitcoinj.core.Utils;
 import org.bitcoinj.utils.ListenerRegistration;
 import org.bitcoinj.utils.Threading;
-import com.google.common.collect.ImmutableList;
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.Service;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,7 +33,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -389,38 +387,6 @@ public class ServerClient implements BlockchainConnection {
     }
 
     @Override
-    public void getUnspentTx(final AddressStatus status, final TransactionEventListener listener) {
-        checkNotNull(stratumClient);
-
-        CallMessage message = new CallMessage("blockchain.address.listunspent",
-                Arrays.asList(status.getAddress().toString()));
-        final ListenableFuture<ResultMessage> result = stratumClient.call(message);
-
-        Futures.addCallback(result, new FutureCallback<ResultMessage>() {
-
-            @Override
-            public void onSuccess(ResultMessage result) {
-                JSONArray resTxs = result.getResult();
-                ImmutableList.Builder<UnspentTx> utxes = ImmutableList.builder();
-                try {
-                    for (int i = 0; i < resTxs.length(); i++) {
-                        utxes.add(new UnspentTx(resTxs.getJSONObject(i)));
-                    }
-                } catch (JSONException e) {
-                    onFailure(e);
-                    return;
-                }
-                listener.onUnspentTransactionUpdate(status, utxes.build());
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
-                log.error("Could not get reply for blockchain.address.listunspent", t);
-            }
-        }, Threading.USER_THREAD);
-    }
-
-    @Override
     public void getHistoryTx(final AddressStatus status, final TransactionEventListener listener) {
         checkNotNull(stratumClient);
 
@@ -592,69 +558,6 @@ public class ServerClient implements BlockchainConnection {
 
         public int getHeight() {
             return height;
-        }
-    }
-
-    public static class UnspentTx extends HistoryTx {
-        private int txPos;
-        private long value;
-
-        public UnspentTx(JSONObject json) throws JSONException {
-            super(json);
-            txPos = json.getInt("tx_pos");
-            value = json.getLong("value");
-        }
-
-        public UnspentTx(TransactionOutPoint txop, long value, int height) {
-            super(txop, height);
-            this.txPos = (int) txop.getIndex();
-            this.value = value;
-        }
-
-        public static List<? extends HistoryTx> fromArray(JSONArray jsonArray) throws JSONException {
-            ImmutableList.Builder<UnspentTx> list = ImmutableList.builder();
-            for (int i = 0; i < jsonArray.length(); i++) {
-                list.add(new UnspentTx(jsonArray.getJSONObject(i)));
-            }
-            return list.build();
-        }
-
-        public Sha256Hash getTxHash() {
-            return txHash;
-        }
-
-        public int getTxPos() {
-            return txPos;
-        }
-
-        public long getValue() {
-            return value;
-        }
-
-        public int getHeight() {
-            return height;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            UnspentTx unspentTx = (UnspentTx) o;
-
-            if (txPos != unspentTx.txPos) return false;
-            if (value != unspentTx.value) return false;
-            if (!txHash.equals(unspentTx.txHash)) return false;
-
-            return true;
-        }
-
-        @Override
-        public int hashCode() {
-            int result = txHash.hashCode();
-            result = 31 * result + txPos;
-            result = 31 * result + (int) (value ^ (value >>> 32));
-            return result;
         }
     }
 }

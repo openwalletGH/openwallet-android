@@ -248,9 +248,8 @@ public class TransactionCreator {
         lock.lock();
         try {
             LinkedList<TransactionOutput> candidates = Lists.newLinkedList();
-//            for (Transaction tx : Iterables.concat(account.getUnspentTransactions().values(),
-//                    account.getPendingTransactions().values())) {
-            for (Transaction tx : account.getUnspentTransactions().values()) {
+            for (Transaction tx : Iterables.concat(account.getUnspentTransactions().values(),
+                    account.getPendingTransactions().values())) {
                 // Do not try and spend coinbases that were mined too recently, the protocol forbids it.
                 if (excludeImmatureCoinbases && !tx.isMature()) continue;
                 for (TransactionOutput output : tx.getOutputs()) {
