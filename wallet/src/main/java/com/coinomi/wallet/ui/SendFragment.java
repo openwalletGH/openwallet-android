@@ -57,6 +57,7 @@ import com.coinomi.wallet.util.ThrottlingWalletChangeListener;
 import com.coinomi.wallet.util.UiUtils;
 import com.coinomi.wallet.util.WeakHandler;
 
+import org.acra.ACRA;
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.InsufficientMoneyException;
@@ -198,9 +199,13 @@ public class SendFragment extends Fragment {
                 } catch (CoinURIParseException e) {
                     // TODO handle more elegantly
                     Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_LONG).show();
+                    ACRA.getErrorReporter().handleException(e);
                 }
             }
-            // TODO handle more elegantly
+            if (pocket == null) {
+                List<WalletAccount> accounts = application.getAllAccounts();
+                if (accounts.size() > 0) pocket = accounts.get(0);
+            }
             checkNotNull(pocket, "No account selected");
         } else {
             throw new RuntimeException("Must provide account ID or a payment URI");
