@@ -89,6 +89,7 @@ public class AddressRequestFragment extends Fragment {
     private String accountId;
     private WalletPocketHD pocket;
     private int maxQrSize;
+    private String lastQrContent;
 
     private final Handler handler = new MyHandler(this);
     private Configuration config;
@@ -372,10 +373,19 @@ public class AddressRequestFragment extends Fragment {
 
         updateLabel();
 
-        // update qr-code
-        final String qrContent = CoinURI.convertToCoinURI(receiveAddress, amount, label, message);
-        Bitmap qrCodeBitmap = Qr.bitmap(qrContent, maxQrSize);
-        qrView.setImageBitmap(qrCodeBitmap);
+        updateQrCode(CoinURI.convertToCoinURI(receiveAddress, amount, label, message));
+    }
+
+    /**
+     * Update qr code if the content is different
+     * @param qrContent
+     */
+    private void updateQrCode(final String qrContent) {
+        if (lastQrContent == null || !lastQrContent.equals(qrContent)) {
+            Bitmap qrCodeBitmap = Qr.bitmap(qrContent, maxQrSize);
+            qrView.setImageBitmap(qrCodeBitmap);
+            lastQrContent = qrContent;
+        }
     }
 
     private void updateLabel() {
