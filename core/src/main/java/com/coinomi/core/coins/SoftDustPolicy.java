@@ -11,4 +11,6 @@ public enum SoftDustPolicy {
     // For example if a transaction qualify as free and it has a soft dust TXO, then this tx must
     // pay the base fee.
     AT_LEAST_BASE_FEE_IF_SOFT_DUST_TXO_PRESENT,
+    // Used in coins that don't have a soft dust detection
+    NO_POLICY,
 }

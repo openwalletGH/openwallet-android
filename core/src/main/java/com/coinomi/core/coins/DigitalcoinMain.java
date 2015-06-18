@@ -19,10 +19,11 @@ public class DigitalcoinMain extends CoinType {
         uriScheme = "digitalcoin";
         bip44Index = 18;
         unitExponent = 8;
-        feePerKb = value(10000); // 0.0001 DGC
-        minNonDust = value(1);
-        softDustLimit = value(1000000); // 0.01 DGC
-        softDustPolicy = SoftDustPolicy.BASE_FEE_FOR_EACH_SOFT_DUST_TXO;
+        feePerKb = value(5000000); // 0.05 DGC
+        feePolicy = FeePolicy.FLAT_FEE;
+        minNonDust = value(10920);
+        softDustLimit = minNonDust;
+        softDustPolicy = SoftDustPolicy.NO_POLICY;
     }
 
     private static DigitalcoinMain instance = new DigitalcoinMain();

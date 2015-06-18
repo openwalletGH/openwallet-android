@@ -20,9 +20,9 @@ public class PeercoinTest extends CoinType {
         bip44Index = 1;
         unitExponent = 6;
         feePerKb = value(10000); // 0.01PPC, careful Peercoin has 1000000 units per coin
-        minNonDust = value(1);
-        softDustLimit = value(10000); // 0.01PPC, careful Peercoin has 1000000 units per coin
-        softDustPolicy = SoftDustPolicy.AT_LEAST_BASE_FEE_IF_SOFT_DUST_TXO_PRESENT;
+        minNonDust = value(10000); // 0.01PPC
+        softDustLimit = minNonDust;
+        softDustPolicy = SoftDustPolicy.NO_POLICY;
     }
 
     private static PeercoinTest instance = new PeercoinTest();

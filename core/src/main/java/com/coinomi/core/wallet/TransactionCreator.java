@@ -1,6 +1,7 @@
 package com.coinomi.core.wallet;
 
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.coins.FeePolicy;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
@@ -299,7 +300,7 @@ public class TransactionCreator {
             resetTxInputs(req, originalInputs);
 
             Coin fees = req.fee == null ? Coin.ZERO : req.fee;
-            if (lastCalculatedSize > 0) {
+            if (lastCalculatedSize > 0 && coinType.getFeePolicy() == FeePolicy.FEE_PER_KB) {
                 // If the size is exactly 1000 bytes then we'll over-pay, but this should be rare.
                 fees = fees.add(req.feePerKb.multiply((lastCalculatedSize / 1000) + 1));
             } else {
@@ -309,12 +310,14 @@ public class TransactionCreator {
             if (numberOfSoftDustOutputs > 0) {
                 switch (coinType.getSoftDustPolicy()) {
                     case AT_LEAST_BASE_FEE_IF_SOFT_DUST_TXO_PRESENT:
-                        if (fees.compareTo(coinType.getFeePerKb()) < 0) {
-                            fees = coinType.getFeePerKb();
+                        if (fees.compareTo(req.feePerKb) < 0) {
+                            fees = req.feePerKb;
                         }
                         break;
                     case BASE_FEE_FOR_EACH_SOFT_DUST_TXO:
-                        fees = fees.add(coinType.getFeePerKb().multiply(numberOfSoftDustOutputs));
+                        fees = fees.add(req.feePerKb.multiply(numberOfSoftDustOutputs));
+                        break;
+                    case NO_POLICY:
                         break;
                     default:
                         throw new RuntimeException("Unknown soft dust policy: " + coinType.getSoftDustPolicy());
@@ -356,12 +359,12 @@ public class TransactionCreator {
 
                 switch (coinType.getSoftDustPolicy()) {
                     case AT_LEAST_BASE_FEE_IF_SOFT_DUST_TXO_PRESENT:
-                        if (fees.compareTo(coinType.getFeePerKb()) < 0) {
+                        if (fees.compareTo(req.feePerKb) < 0) {
                             // This solution may fit into category 2, but it may also be category 3, we'll check that later
                             eitherCategory2Or3 = true;
                             additionalValueForNextCategory = coinType.getSoftDustLimit();
                             // If the change is smaller than the fee we want to add, this will be negative
-                            change = change.subtract(coinType.getFeePerKb().subtract(fees));
+                            change = change.subtract(req.feePerKb.subtract(fees));
                         }
                         break;
                     case BASE_FEE_FOR_EACH_SOFT_DUST_TXO:
@@ -369,7 +372,9 @@ public class TransactionCreator {
                         eitherCategory2Or3 = true;
                         additionalValueForNextCategory = coinType.getSoftDustLimit();
                         // If the change is smaller than the fee we want to add, this will be negative
-                        change = change.subtract(coinType.getFeePerKb());
+                        change = change.subtract(req.feePerKb);
+                        break;
+                    case NO_POLICY:
                         break;
                     default:
                         throw new RuntimeException("Unknown soft dust policy: " + coinType.getSoftDustPolicy());
@@ -390,7 +395,7 @@ public class TransactionCreator {
                 if (req.ensureMinRequiredFee && coinType.getMinNonDust().compareTo(change) >= 0) {
                     // This solution definitely fits in category 3
                     isCategory3 = true;
-                    additionalValueForNextCategory = coinType.getFeePerKb().add(
+                    additionalValueForNextCategory = req.feePerKb.add(
                             coinType.getMinNonDust().add(Coin.SATOSHI));
                 } else {
                     size += changeOutput.bitcoinSerialize().length + VarInt.sizeOf(req.tx.getOutputs().size()) - VarInt.sizeOf(req.tx.getOutputs().size() - 1);
@@ -402,7 +407,7 @@ public class TransactionCreator {
                 if (eitherCategory2Or3) {
                     // This solution definitely fits in category 3 (we threw away change because it was smaller than MIN_TX_FEE)
                     isCategory3 = true;
-                    additionalValueForNextCategory = coinType.getFeePerKb().add(Coin.SATOSHI);
+                    additionalValueForNextCategory = req.feePerKb.add(Coin.SATOSHI);
                 }
             }
 
@@ -496,18 +501,30 @@ public class TransactionCreator {
         // Check if we need additional fee due to the transaction's size
         int size = tx.bitcoinSerialize().length;
         size += estimateBytesForSigning(coinSelection);
-        Coin fee = baseFee.add(feePerKb.multiply((size / 1000) + 1));
+        Coin fee;
+        switch (coinType.getFeePolicy()) {
+            case FEE_PER_KB:
+                fee = baseFee.add(feePerKb.multiply((size / 1000) + 1));
+                break;
+            case FLAT_FEE:
+                fee = baseFee.add(feePerKb);
+                break;
+            default:
+                throw new RuntimeException("Unknown fee policy: " + coinType.getFeePolicy());
+        }
         output.setValue(output.getValue().subtract(fee));
         // Check if we need additional fee due to the output's value
         if (output.getValue().compareTo(coinType.getSoftDustLimit()) < 0) {
             switch (coinType.getSoftDustPolicy()) {
                 case AT_LEAST_BASE_FEE_IF_SOFT_DUST_TXO_PRESENT:
-                    if (fee.compareTo(coinType.getFeePerKb()) < 0) {
-                        output.setValue(output.getValue().subtract(coinType.getFeePerKb().subtract(fee)));
+                    if (fee.compareTo(feePerKb) < 0) {
+                        output.setValue(output.getValue().subtract(feePerKb.subtract(fee)));
                     }
                     break;
                 case BASE_FEE_FOR_EACH_SOFT_DUST_TXO:
-                    output.setValue(output.getValue().subtract(coinType.getFeePerKb()));
+                    output.setValue(output.getValue().subtract(feePerKb));
+                    break;
+                case NO_POLICY:
                     break;
                 default:
                     throw new RuntimeException("Unknown soft dust policy: " + coinType.getSoftDustPolicy());

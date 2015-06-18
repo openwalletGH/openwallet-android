@@ -34,6 +34,7 @@ abstract public class CoinType extends NetworkParameters implements ValueType, S
     protected Value minNonDust;
     protected Value softDustLimit;
     protected SoftDustPolicy softDustPolicy;
+    protected FeePolicy feePolicy = FeePolicy.FEE_PER_KB;
 
     private transient MonetaryFormat friendlyFormat;
     private transient MonetaryFormat plainFormat;
@@ -92,6 +93,10 @@ abstract public class CoinType extends NetworkParameters implements ValueType, S
 
     public SoftDustPolicy getSoftDustPolicy() {
         return checkNotNull(softDustPolicy, "A coin failed to set a soft dust policy");
+    }
+
+    public FeePolicy getFeePolicy() {
+        return checkNotNull(feePolicy, "A coin failed to set a fee policy");
     }
 
     public List<ChildNumber> getBip44Path(int account) {
