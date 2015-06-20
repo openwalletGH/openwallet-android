@@ -23,6 +23,8 @@ import com.coinomi.core.coins.PeercoinMain;
 import com.coinomi.core.coins.ReddcoinMain;
 import com.coinomi.core.coins.RubycoinMain;
 import com.coinomi.core.coins.UroMain;
+import com.coinomi.core.coins.NeoscoinMain;
+//import com.coinomi.core.coins.NeoscoinTest;
 import com.coinomi.core.network.CoinAddress;
 import com.coinomi.stratumj.ServerAddress;
 import com.google.common.collect.ImmutableList;
@@ -136,7 +138,9 @@ public class Constants {
             new CoinAddress(MonacoinMain.get(),     new ServerAddress("mona-cce-1.coinomi.net", 5022),
                                                     new ServerAddress("mona-cce-2.coinomi.net", 5022)),
             new CoinAddress(DigibyteMain.get(),     new ServerAddress("dgb-cce-1.coinomi.net", 5023),
-                                                    new ServerAddress("dgb-cce-2.coinomi.net", 5023))
+                                                    new ServerAddress("dgb-cce-2.coinomi.net", 5023)),
+            new CoinAddress(NeoscoinMain.get(),     new ServerAddress("el1.neoscoin.com", 50005),
+                                                    new ServerAddress("electrum.infernopool.com", 50005))
     );
 
     public static final HashMap<CoinType, Integer> COINS_ICONS;
@@ -163,6 +167,7 @@ public class Constants {
         COINS_ICONS.put(CoinID.DIGITALCOIN_MAIN.getCoinType(), R.drawable.digitalcoin);
         COINS_ICONS.put(CoinID.CANNACOIN_MAIN.getCoinType(), R.drawable.cannacoin);
         COINS_ICONS.put(CoinID.DIGIBYTE_MAIN.getCoinType(), R.drawable.digibyte);
+        COINS_ICONS.put(CoinID.NEOSCOIN_MAIN.getCoinType(), R.drawable.neoscoin);
 
         COINS_BLOCK_EXPLORERS = new HashMap<CoinType, String>();
         COINS_BLOCK_EXPLORERS.put(CoinID.BITCOIN_MAIN.getCoinType(), "https://blockchain.info/tx/%s");
@@ -186,6 +191,7 @@ public class Constants {
         COINS_BLOCK_EXPLORERS.put(CoinID.DIGITALCOIN_MAIN.getCoinType(), "https://chainz.cryptoid.info/dgc/tx.dws?%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.CANNACOIN_MAIN.getCoinType(), "https://chainz.cryptoid.info/ccn/tx.dws?%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.DIGIBYTE_MAIN.getCoinType(), "https://digiexplorer.info/tx/%s");
+        COINS_BLOCK_EXPLORERS.put(CoinID.NEOSCOIN_MAIN.getCoinType(), "http://explorer.infernopool.com/tx/%s");
     }
 
     public static final CoinType DEFAULT_COIN = BitcoinMain.get();
@@ -214,6 +220,7 @@ public class Constants {
             CannacoinMain.get(),
             BitcoinTest.get(),
             LitecoinTest.get(),
-            DogecoinTest.get()
+            DogecoinTest.get(),
+            NeoscoinMain.get()
     );
 }
