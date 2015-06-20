@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name">Coinomi (dev)</string>
     <string name="app_package">com.coinomi.wallet.dev</string>
     <string name="action_scan_qr_code">Scan</string>
@@ -16,11 +15,9 @@
     <string name="action_swap_coins">Swap coins</string>
     <string name="action_delete">Delete</string>
     <string name="action_change_address_type">Change address type</string>
-
     <!-- Errors -->
     <string name="error_generic">Error occurred while performing action</string>
     <string name="error_could_not_read_wallet">Could not read wallet</string>
-
     <!-- Generic items -->
     <string name="button_ok">OK</string>
     <string name="button_next">Next</string>
@@ -32,7 +29,6 @@
     <string name="button_delete">Delete</string>
     <string name="button_add">Add</string>
     <string name="button_save">Save</string>
-    <string name="button_set">Set</string>
     <string name="button_remove">Remove</string>
     <string name="button_edit">Edit</string>
     <string name="button_send">Send</string>
@@ -55,39 +51,32 @@
     <string name="unlocking_wallet_error_title">Could not unlock your wallet</string>
     <string name="unlocking_wallet_error_detail">Are you using the right password? Please make sure that you have entered the right password and if this error persists try to restore your wallet.</string>
     <string name="powered_by">Powered by</string>
-
     <!-- Nav drawer -->
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="navigation_drawer_services">Services</string>
     <string name="navigation_drawer_wallet">Wallet</string>
-
-
     <!-- SendOutput widget -->
     <string name="fee">Transaction fee</string>
     <string name="send">Send</string>
     <string name="trade">Exchange</string>
     <string name="receive">Receive</string>
-
     <!-- Welcome fragment -->
     <string name="welcome_text">Welcome to Coinomi wallet</string>
     <string name="create_wallet">Create a new wallet</string>
     <string name="restore_wallet">Restore a wallet</string>
     <string name="test_wallet">Test wallet</string>
-
     <!-- Intro -->
     <string name="test_wallet_warning_title">Create a test wallet?</string>
     <string name="test_wallet_warning_message">If you create a new test wallet, your existing wallet will be lost unless you backed up you <i>recovery phrase</i>.</string>
     <string name="incompatible_device_warning_title">Incompatible device</string>
-    <string name="incompatible_device_warning_message">This device cannot perform certain cryptographic functions due to software or hardware bugs.\nThis could be solved with an update from the manufacturer.\n\nContact us if you have any questions: playstore@coinomi.com</string>
-
+    <string name="incompatible_device_warning_message">This device cannot perform certain cryptographic functions due to software or hardware bugs.\nThis could be solved with an update from the device manufacturer.\n\nContact us if you have any questions: support@coinomi.com</string>
     <!-- Recovery fragment -->
     <string name="seed_info">This is your <i>recovery phrase</i>, which is used to generate the keys for your wallet. Please write it down on a paper and keep it in a secure place, as you would with paper money. Anyone with access to it has access to the wallet\'s funds.\nIf you lose your recovery phrase, your wallet cannot be recovered.</string>
     <string name="seed_title">your recovery phrase</string>
     <string name="sample_seed">deliver broken make enrich core vendor ski help sock spy purse roast token jewel female</string>
     <string name="seed_regenerate_title">touch to generate a new recovery phrase</string>
     <string name="backed_up_seed">I have copied and stored my recovery phrase in a secure place.</string>
-
     <!-- Restore fragment -->
     <string name="restore_info">Please enter your recovery phrase:</string>
     <string name="restore_seed_protected">My recovery phrase is password protected</string>
@@ -99,18 +88,15 @@
     <string name="restore_error_mismatch">Recovery phrase entered does not match your recovery phrase.</string>
     <string name="restore_error">Could not verify your recovery phrase. %1$s</string>
     <string name="extra_entropy">Extra entropy</string>
-
     <!-- Wallet activity -->
-    <string name="test_wallet_message">This is a test wallet, where you can send and receive testnet Bitcoins, Litecoin and Dogecoins.\n\nIf you want to use the wallet with real money please go to: <b>Settings > Restore wallet > Create a new wallet</b>.</string>
+    <string name="test_wallet_message">This is a test wallet, where you can send and receive testnet Bitcoins, Litecoin and Dogecoins.\n\nIf you want to use the wallet with real money please go to: <b>Settings &gt; Restore wallet &gt; Create a new wallet</b>.</string>
     <string name="wallet_update_title">New version available</string>
     <string name="wallet_update_message">A new version of Coinomi is available, it contains new features and fixes.</string>
     <string name="pay_with">Send with</string>
     <string name="exchange_and_pay_title">Exchange and send</string>
-
     <!-- PayToDialog-->
     <string name="ambiguous_address_title">Ambiguous address</string>
     <string name="ambiguous_address_message">Please select the correct coin type</string>
-
     <!-- Balance fragment -->
     <string name="wallet_transactions_coinbase">mined</string>
     <string name="history_empty">No coins received so far!\n\nYou can get some through an exchange, trading and selling goods or services.</string>
@@ -120,17 +106,14 @@
     <string name="disconnected_label">No connection</string>
     <string name="no_wallet_pocket_selected">No wallet pocket selected</string>
     <string name="get_tx_broadcast_error">Error broadcasting transaction</string>
-
     <!-- Receive fragment -->
     <string name="receive_address_label">my address</string>
     <string name="create_new_address">Create a new address?</string>
     <string name="create_new_address_name">Name (optional)</string>
     <string name="view_previous_addresses">Previous addresses</string>
     <string name="too_many_unused_addresses">Too many unused addresses, try to use one of the previous addresses before creating a new one.</string>
-
     <!-- Send Activity -->
     <string name="send_coins_activity_title">Send coins</string>
-
     <!-- Send fragment -->
     <string name="send_coins_fragment_receiving_address_label">Pay to</string>
     <string name="send_coins_fragment_receiving_address_tip">type name or address</string>
@@ -155,7 +138,6 @@
     <string name="amount_error_not_enough_money_plain">Not enough money</string>
     <string name="amount_error_not_enough_money">Not enough money, current balance is %1$s</string>
     <string name="amount_warn_fees_apply">Slightly less will be sent because of fees</string>
-
     <!-- Set Password fragment -->
     <string name="set_password_info">Set a password to protect your wallet in everyday use.</string>
     <string name="set_password_seed_protect">Also protect my recovery phrase</string>
@@ -168,14 +150,11 @@
     <string name="password_error">Could not proceed, password errors detected.</string>
     <string name="password_skip_warn">By not setting a password, your wallet can be accessed without authorization.</string>
     <string name="password_wallet_recovery">To restore your wallet, please provide the same password you used when created the protected recovery phrase.\nIf you enter a different password a new empty wallet will be created.</string>
-
     <!-- FinalizeWalletRestorationFragment -->
     <string name="wallet_restoration">Please wait while your wallet is being restored</string>
     <string name="wallet_restoration_error">Could not restore your wallet.\n\n%1$s</string>
-
     <!-- PasswordConfirmationFragment -->
     <string name="enter_password">Enter your password</string>
-
     <!-- SignTransactionFragment -->
     <string name="contacting_exchange">Contacting exchange&#8230;</string>
     <string name="preparing_transaction">Please wait while your transaction is being prepared and sent.</string>
@@ -194,7 +173,6 @@
         <item quantity="one">%d second</item>
         <item quantity="other">%d seconds</item>
     </plurals>
-
     <!-- About Activity -->
     <string name="title_activity_about">About Coinomi</string>
     <string name="app_name_long">Coinomi for Android</string>
@@ -208,7 +186,6 @@
     <string name="about_credits_font_icons">Font-icons by Daniel Bruce\nhttp://www.entypo.com</string>
     <string name="about_credits_exchange_rates">Exchange rates provided by\nhttp://www.cryptocoincharts.info/\nhttps://bitcoinaverage.com/</string>
     <string name="about_coinomi_copyright">Coinomi 2014&#8211;2015</string>
-
     <!-- Add Coins -->
     <string name="title_activity_add_coins">Add coins</string>
     <string name="password_add_coin">You are about to create a %1$s pocket in your wallet.</string>
@@ -217,10 +194,8 @@
     <string name="add_coin_error">Error adding %1$s: %2$s</string>
     <string name="coin_already_added_title">%1$s already added</string>
     <string name="coin_already_added">Additional accounts are not yet supported</string>
-
     <!-- Transaction amount visualizer -->
     <string name="internal_transfer">Internal transfer</string>
-
     <!-- Transaction Details -->
     <string name="title_activity_transaction_details">Transaction details</string>
     <string name="sent">Sent</string>
@@ -235,35 +210,29 @@
     </plurals>
     <string name="status_pending">Waiting for transaction confirmation</string>
     <string name="status_unknown">Transaction status unknown</string>
-
     <!-- Exchange Rates -->
     <string name="title_activity_exchange_rates">Exchange rates</string>
     <string name="set_local_currency">Set %1$s as a local currency</string>
     <string name="exchange_rates_loading">Loading exchange rates</string>
     <string name="exchange_rates_load_error">Could not load exchange rates</string>
     <string name="exchange_rates_empty_search">Could not find exchange rate</string>
-
     <!-- Select Coins -->
     <string name="select_coins">Select the coins you wish to use with your wallet. You can add more later.</string>
-
     <!-- Previous Addresses -->
     <string name="title_activity_previous_addresses">My previous addresses</string>
     <string name="previous_addresses_used">Used address</string>
     <string name="previous_addresses_unused">Unused address</string>
-
     <!-- Edit Address Book Entry -->
     <string name="edit_address_book_entry_dialog_title_add">Add address</string>
     <string name="edit_address_book_entry_dialog_title_edit">Edit address</string>
     <string name="edit_address_book_entry_dialog_address_label">Address</string>
     <string name="edit_address_book_entry_dialog_label_label">Name</string>
-
     <!-- Settings -->
     <string name="title_activity_settings">Settings</string>
     <string name="pref_title_restore_wallet">Restore wallet</string>
     <string name="pref_title_exchange_rates">Exchange rates</string>
     <string name="pref_title_manual_receiving_addresses">Manual receiving addresses</string>
     <string name="pref_summary_manual_receiving_addresses">Do not automatically create a new address for every transaction</string>
-
     <!-- Show Seed -->
     <string name="title_activity_show_seed">Show recovery phrase</string>
     <string name="seed_not_available_title">No recovery phrase found</string>
@@ -271,9 +240,7 @@
     <string name="seed_encrypted_touch_to_decrypt">Touch to unlock</string>
     <string name="seed_working">Please wait&#8230;</string>
     <string name="seed_password_protected">This recovery phrase is password protected</string>
-
     <!-- Exchange -->
-
     <string name="title_activity_trade">Exchange</string>
     <string name="trade_info">Select the coins you wish to exchange.\nThe converted coins will be automatically added to your wallet.</string>
     <string name="trade_from_coin_label">exchange</string>
@@ -288,7 +255,6 @@
     <string name="trade_error_sign_tx_message">An error occurred while signing and broadcasting transaction.\n\nTechnical details:\n\n<b>%1$s</b></string>
     <string name="trade_error_max_limit">The supplied amount exceeds the limit of %1$s. Please use a smaller amount.</string>
     <string name="trade_error_min_limit">The minimum amount is at least %1$s or %2$s</string>
-
     <!-- Exchange Status -->
     <string name="title_activity_exchange_status">Exchange status</string>
     <string name="trade_status_message">Your order will complete shortly. You can exit this screen without affecting the exchange.</string>
@@ -305,17 +271,13 @@
     <string name="trade_status_failed">Exchange failed</string>
     <string name="trade_status_delete_message">Remove from history?</string>
     <string name="trade_status_tx_not_available">Transaction not found, try again in a few seconds</string>
-
     <!-- Email receipt dialog -->
     <string name="email_receipt_title">Email receipt</string>
     <string name="email_receipt_message">Receive an email for this exchange transaction</string>
-
     <!-- Exchange History -->
     <string name="title_activity_exchange_history">Exchange history</string>
     <string name="exchange_history_empty">No exchanges made</string>
-
     <!-- ShapeShift -->
     <string name="about_shapeshift_title">About ShapeShift.io</string>
     <string name="about_shapeshift_message">ShapeShift.io is an instant altcoin exchange that provides Bitcoin and altcoin conversion. The platform (available in both web and API flavors) represents the fastest, most efficient way to convert between Bitcoin and dozens of altcoins within the Bitcoin ecosystem. No account needed.</string>
-
 </resources>

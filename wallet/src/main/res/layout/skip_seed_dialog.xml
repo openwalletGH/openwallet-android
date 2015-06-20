@@ -24,7 +24,7 @@
             android:layout_marginBottom="@dimen/activity_vertical_margin"
             android:layout_marginTop="@dimen/activity_vertical_margin"
             android:gravity="center"
-            android:text="@string/sample_seed"
+            android:text="deliver broken make enrich core vendor ski help sock spy purse roast token jewel female"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="@color/primary_900" />
 

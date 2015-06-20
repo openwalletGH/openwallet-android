@@ -26,6 +26,6 @@
         style="@style/NormalText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:text="@string/sample_seed" />
+        tools:text="deliver broken make enrich core vendor ski help sock spy purse roast token jewel female" />
 
 </LinearLayout>
