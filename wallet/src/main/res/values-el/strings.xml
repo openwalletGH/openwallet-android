@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Coinomi (dev)</string>
+    <string name="app_package">com.coinomi.wallet.dev</string>
+    <string name="action_scan_qr_code">Σάρωση</string>
+    <string name="action_share">Διαμοιρασμός</string>
+    <string name="action_copy">Αντιγραφή</string>
+    <string name="action_edit_label">Επεξεργασία ετικέτας</string>
+    <string name="action_empty_wallet">Άδειασμα πορτοφολιού</string>
+    <string name="action_settings">Ρυθμίσεις</string>
+    <string name="action_about">Σχετικά</string>
+    <string name="action_refresh">Ανανέωση</string>
+    <string name="action_exchange_history">Ιστορικό συναλλαγών</string>
+    <string name="action_new_address">Νέα διεύθυνση</string>
+    <string name="action_swap_coins">Αντιστροφή νομισμάτων</string>
+    <string name="action_delete">Διαγραφή</string>
+    <string name="action_change_address_type">Αλλαγή τύπου διεύθυνσης</string>
+    <!-- Errors -->
+    <string name="error_generic">Παρουσιάστηκε κάποιο σφάλμα στη διαδικασία</string>
+    <string name="error_could_not_read_wallet">Το άνοιγμα του πορτοφολιού απέτυχε</string>
+    <!-- Generic items -->
+    <string name="button_ok">ΟΚ</string>
+    <string name="button_next">Επόμενο</string>
+    <string name="button_finish">Τέλος</string>
+    <string name="button_return">Επιστροφή</string>
+    <string name="button_confirm">Επιβεβαίωση</string>
+    <string name="button_cancel">Ακύρωση</string>
+    <string name="button_dismiss">Κλείσιμο</string>
+    <string name="button_delete">Διαγραφή</string>
+    <string name="button_add">Προσθήκη</string>
+    <string name="button_save">Αποθήκευση</string>
+    <string name="button_remove">Απομάκρυνση</string>
+    <string name="button_edit">Επεξεργασία</string>
+    <string name="button_send">Αποστολή</string>
+    <string name="button_skip">Παράλειψη</string>
+    <string name="button_retry">Επανάληψη</string>
+    <string name="button_download">Κατέβασμα</string>
+    <string name="button_agree">Συμφωνώ</string>
+    <string name="button_disagree">Διαφωνώ</string>
+    <string name="button_add_coins">+ Νομίσματα</string>
+    <string name="scan_qr_code">Σάρωση QR code</string>
+    <string name="erase_address">Διαγραφή διεύθυνσης</string>
+    <string name="copied_to_clipboard">Αντιγράφηκε στη μνήμη</string>
+    <string name="wallet_title_request">λήψη</string>
+    <string name="wallet_title_balance">υπόλοιπο</string>
+    <string name="wallet_title_send">αποστολή</string>
+    <string name="almost_equal_to">≈</string>
+    <string name="wallet_locked_message">Το πορτοφόλι σας είναι κλειδωμένο</string>
+    <string name="unlock_wallet_title">Ξεκλειδώστε το πορτοφόλι σας</string>
+    <string name="unlocking_wallet_working">Το πορτοφόλι σας ξεκλειδώνεται&#8230;</string>
+    <string name="unlocking_wallet_error_title">Το ξεκλείδωμα του πορτοφολιού σας απέτυχε</string>
+    <string name="unlocking_wallet_error_detail">Χρησιμοποιείτε το σωστό κωδικό; Παρακαλώ σιγουρευτείτε ότι έχετε εισάγει το σωστό κωδικό κι αν το σφάλμα επιμένει προσπαθήστε να ανακτήσετε το πορτοφόλι σας.</string>
+    <string name="powered_by">Powered by</string>
+    <!-- Nav drawer -->
+    <string name="navigation_drawer_open">Άνοιγμα πίνακα πλοήγησης</string>
+    <string name="navigation_drawer_close">Κλείσιμο πίνακα πλοήγησης</string>
+    <string name="navigation_drawer_services">Υπηρεσίες</string>
+    <string name="navigation_drawer_wallet">Πορτοφόλι</string>
+    <!-- SendOutput widget -->
+    <string name="fee">Έξοδα συναλλαγής</string>
+    <string name="send">Αποστολή</string>
+    <string name="trade">Μετατροπή</string>
+    <string name="receive">Λήψη</string>
+    <!-- Welcome fragment -->
+    <string name="welcome_text">Καλώς ήλθατε στο Coinomi</string>
+    <string name="create_wallet">Δημιουργία νέου πορτοφολιού</string>
+    <string name="restore_wallet">Ανάκτηση πορτοφολιού</string>
+    <string name="test_wallet">Δοκιμαστικό πορτοφόλι</string>
+    <!-- Intro -->
+    <string name="test_wallet_warning_title">Δημιουργία δοκιμαστικού πορτοφολιού;</string>
+    <string name="test_wallet_warning_message">Αν δημιουργήσετε ένα νέο δοκιμαστικό πορτοφόλι, το υπάρχον πορτοφόλι σας θα χαθεί εκτός αν έχετε ήδη αποθηκεύσει σε ασφαλές μέρος την <i>φράση ανάκτησής</i> σας.</string>
+    <string name="incompatible_device_warning_title">Μη συμβατή συσκευή</string>
+    <string name="incompatible_device_warning_message">Η συσκευή σας δεν μπορεί να εκτελέσει κάποιες κρυπτογραφικές μεθόδους λόγω ελαττωμάτων στο λογισμικό ή την ίδια τη συσκευή.\nΤο πρόβλημα θα μπόρεσε να λυθεί ύστερα από την ενημέρωση λογισμικού από τον κατασκευαστή της συσκευής.\n\nΠαρακαλώ επικοινωνήστε μαζί μας αν έχετε απορίες: support@coinomi.com</string>
+    <!-- Recovery fragment -->
+    <string name="seed_info">Αυτή είναι η <i>φράση ανάκτησής</i> σας, η οποία χρησιμοποιείτε για να παραχθούν τα κλειδιά για το πορτοφόλι σας. Παρακαλούμε σημειώστε την κάπου και αποθηκεύστε την σε ασφαλές μέρος, όπως ακριβώς θα κάνατε και με κάποια χαρτονομίσματα. Οποιοσδήποτε έχει πρόσβαση στην φράση ανάκτησης έχει αυτόματα και πλήρη πρόσβαση στα περιεχόμενα του πορτοφολιού σας.\nΑν χάσετε τη φράση ανάκτησης, το πορτοφόλι σας δεν θα μπορεί να ανακτηθεί.</string>
+    <string name="seed_title">η φράση ανάκτησης του πορτοφολιού σας</string>
+    <string name="sample_seed">deliver broken make enrich core vendor ski help sock spy purse roast token jewel female</string>
+    <string name="seed_regenerate_title">πιέστε για να παραχθεί μια νέα φράση ανάκτησης</string>
+    <string name="backed_up_seed">Έχω αντιγράψει και αποθηκεύσει σε ασφαλές μέρος τη φράση ανάκτησης μου.</string>
+    <!-- Restore fragment -->
+    <string name="restore_info">Παρακαλώ εισάγετε τη φράση ανάκτησής σας:</string>
+    <string name="restore_seed_protected">Η φράση ανάκτησης για το πορτοφόλι μου προστατεύεται από κωδικό</string>
+    <string name="restore_skip_title">Παράκαμψη επαλήθευσης</string>
+    <string name="restore_skip_info1">Παρακαλώ βεβαιωθείτε ότι η φράση ανάκτησης ταιριάζει με την εξής:</string>
+    <string name="restore_skip_info2">Δεν συνίσταται η παράλειψη της επαληθεύσεως, ώστε να εντοπιστούν τυχόν λάθη.</string>
+    <string name="restore_error_checksum">Η φράση ανάκτησης δεν είναι έγκυρη. Παρακαλώ βεβαιωθείτε πως όλες οι λέξεις έχουν αντιγραφεί σωστά.</string>
+    <string name="restore_error_words">Η φράση ανάκτησης εμπεριέχει μη έγκυρες λέξεις.</string>
+    <string name="restore_error_mismatch">Η φράση ανάκτησης που εισάγατε δεν ταιριάζει με τη φράση ανάκτησης του πορτοφολιού σας.</string>
+    <string name="restore_error">Η φράση ανάκτησής σας δεν μπόρεσε να επαληθευτεί. %1$s</string>
+    <string name="extra_entropy">Ενισχυμένη εντροπία</string>
+    <!-- Wallet activity -->
+    <string name="test_wallet_message">Το παρόν είναι ένα δοκιμαστικό πορτοφόλι, όπου μπορείτε να στείλετε και παραλάβετε δοκιμαστικά νομίσματα Bitcoin, Litecoin, Dogecoin κ.ά.\n\nΑν επιθυμείτε να χρησιμοποιήσετε το πορτοφόλι με αληθινά χρήματα παρακαλώ επιλέξτε: <b>Ρυθμίσεις &gt; Ανάκτηση πορτοφολιού &gt; Δημιουργία νέου πορτοφολιού</b>.</string>
+    <string name="wallet_update_title">Νέα έκδοση διαθέσιμη</string>
+    <string name="wallet_update_message">Μια νέα έκδοση του Coinomi η οποία εμπεριέχει νέες δυνατότητες και τυχόν διορθώσεις αδυναμιών είναι διαθέσιμη.</string>
+    <string name="pay_with">Αποστολή με</string>
+    <string name="exchange_and_pay_title">Μετατροπή και αποστολή</string>
+    <!-- PayToDialog-->
+    <string name="ambiguous_address_title">Δυσνόητη διεύθυνση</string>
+    <string name="ambiguous_address_message">Παρακαλώ επιλέξτε το σωστό τύπο νομίσματος</string>
+    <!-- Balance fragment -->
+    <string name="wallet_transactions_coinbase">από εξόρυξη (mined)</string>
+    <string name="history_empty">Το πορτοφόλι σας δεν περιέχει νομίσματα ακόμα!\n\nΜπορείτε να προμηθευτείτε μερικά νομίσματα μέσω κάποιου ανταλλακτηρίου είτε ανταλλάσσοντάς τα με αγαθά ή υπηρεσίες.</string>
+    <string name="sent_to">απεστάλησαν στο</string>
+    <string name="received_with">παρελήφθησαν από</string>
+    <string name="get_tx_info_error">Δεν μπόρεσαν να ανακτηθούν περαιτέρω πληροφορίες γι αυτή τη συναλλαγή</string>
+    <string name="disconnected_label">Μη διαθέσιμη σύνδεσή</string>
+    <string name="no_wallet_pocket_selected">Δεν έχει επιλεχθεί χαρτοφυλάκιο</string>
+    <string name="get_tx_broadcast_error">Σφάλμα κατά τη μετάδοση της συναλλαγής</string>
+    <!-- Receive fragment -->
+    <string name="receive_address_label">η διεύθυνσή μου</string>
+    <string name="create_new_address">Δημιουργία νέας διεύθυνσης;</string>
+    <string name="create_new_address_name">Περιγραφή (προαιρετικά)</string>
+    <string name="view_previous_addresses">Προηγούμενες διευθύνσεις</string>
+    <string name="too_many_unused_addresses">Εντοπίστηκαν πολλές αχρησιμοποίητες διευθύνσεις, προσπαθήστε να χρησιμοποιήσετε μία από τις υπάρχουσες αχρησιμοποίητες διευθύνσεις πριν δημιουργήσετε μία νέα.</string>
+    <!-- Send Activity -->
+    <string name="send_coins_activity_title">Αποστολή νομισμάτων</string>
+    <!-- Send fragment -->
+    <string name="send_coins_fragment_receiving_address_label">Πληρωμή σε</string>
+    <string name="send_coins_fragment_receiving_address_tip">εισάγετε όνομα ή διεύθυνση</string>
+    <string name="send_coins_fragment_receiving_address_error">Μη έγκυρη διεύθυνση!</string>
+    <string name="send_coins_fragment_amount_label">Ποσόν πληρωμής</string>
+    <string name="send_coins_fragment_button_send">Αποστολή</string>
+    <string name="send_coins_fragment_button_back">Επιστροφή</string>
+    <string name="send_coins_failed_msg">Αποτυχία!</string>
+    <string name="send_coins_error_network">Αποτυχία σύνδεσης στο νομισματικό δίκτυο</string>
+    <string name="send_coins_error_dust">Το ποσόν που προσπαθείτε να στείλετε είναι πολύ μικρό και θα απορριφθεί από το νομισματικό δίκτυο</string>
+    <string name="send_coins_error">Δεν μπόρεσαν να αποσταλούν τα νομίσματα: %1$s</string>
+    <string name="pay_to_label">πληρωμή σε</string>
+    <string name="amount_to_send_label">ποσόν</string>
+    <string name="scan_error">Παρουσιάστηκε κάποιο σφάλμα κατά τη σάρωση: %1$s</string>
+    <string name="unsupported_coin">μη υποστηριζόμενο νόμισμα: %1$s</string>
+    <string name="address_error">Μη έγκυρη διεύθυνση</string>
+    <string name="amount_error">Μη έγκυρο ποσό</string>
+    <string name="amount_error_empty">Παρακαλώ εισάγετε το ποσόν</string>
+    <string name="amount_error_negative">Το ποσόν πρέπει να είναι μεγαλύτερο του μηδενός</string>
+    <string name="amount_error_decimal_places">Υπερβολικά πολλά δεκαδικά ψηφία, παρακαλώ δοκιμάστε με λιγότερα από %1$d</string>
+    <string name="amount_error_too_small">Το ελάχιστο ποσόν είναι %1$s</string>
+    <string name="amount_error_not_enough_money_plain">Δεν υπάρχουν αρκετά χρήματα</string>
+    <string name="amount_error_not_enough_money">Δεν υπάρχουν αρκετά χρήματα, το υπόλοιπό σας είναι %1$s</string>
+    <string name="amount_warn_fees_apply">Θα αποσταλούν ελαχίστως λιγότερα λόγω εξόδων συναλλαγής</string>
+    <!-- Set Password fragment -->
+    <string name="set_password_info">Εισάγετε έναν κωδικό για να προστατέψετε το πορτοφόλι σας κατά την καθημερινή του χρήση.</string>
+    <string name="set_password_seed_protect">Επιθυμώ επίσης να προστατέψω τη φράση ανάκτησης του πορτοφολιού μου</string>
+    <string name="set_password_seed_protect_info">Ο κωδικός δεν μπορεί να αλλάξει μελλοντικά και θα χρειάζεται να εισάγεται κάθε φορά που θα ανακτάτε το πορτοφόλι σας με την φράση ανάκτησης.\nΠΡΟΣΟΧΗ: Αν ξεχάσετε τον κωδικό θα είναι αδύνατον να ανακτήσετε το πορτοφόλι σας!</string>
+    <string name="set_password1">Εισάγετε τον κωδικό σας</string>
+    <string name="set_password2">Εισάγετε ξανά τον κωδικό σας</string>
+    <string name="password_too_common_error">Ο κωδικός \"%1$s\" είναι πολύ κοινότοπος και δεν προσφέρει ουσιαστική ασφάλεια.</string>
+    <string name="password_too_short_error">Ο κωδικός είναι πολύ σύντομος, απαιτούνται τουλάχιστον %1$d χαρακτήρες.</string>
+    <string name="passwords_mismatch">Οι κωδικοί δεν ταιριάζουν</string>
+    <string name="password_error">Ακύρωση διαδικασίας, εντοπίστηκε σφάλμα σχετικό με τον κωδικό σας.</string>
+    <string name="password_skip_warn">Εάν δεν θέσετε κάποιον κωδικό οποιοσδήποτε μπορεί να αποκτήσει πρόσβαση στο πορτοφόλι σας χωρίς επιπλέον διαπιστεύσεις.</string>
+    <string name="password_wallet_recovery">Για να ανακτήσετε το πορτοφόλι σας, παρακαλώ εισάγετε τον ίδιο κωδικό που είχατε χρησιμοποιήσει όταν είχατε ασφαλίσει αρχικά την φράση ανάκτησης.\nΑν εισάγετε έναν διαφορετικό κωδικό, ένα νέο, άδειο πορτοφόλι θα δημιουργηθεί.</string>
+    <!-- FinalizeWalletRestorationFragment -->
+    <string name="wallet_restoration">Παρακαλώ περιμένετε ενόσω το πορτοφόλι σας ανακτάται</string>
+    <string name="wallet_restoration_error">Αποτυχία ανάκτησης του πορτοφολιού σας.\n\n%1$s</string>
+    <!-- PasswordConfirmationFragment -->
+    <string name="enter_password">Εισάγετε τον κωδικό σας</string>
+    <!-- SignTransactionFragment -->
+    <string name="contacting_exchange">Πραγματοποιείται επικοινωνία με το ανταλλακτήριο&#8230;</string>
+    <string name="preparing_transaction">Παρακαλώ περιμένετε ενόσω η συναλλαγή σας προετοιμάζεται και αποστέλλεται.</string>
+    <string name="no_such_pocket_error">Κάποιο σφάλμα παρουσιάστηκε στην πρόσβαση αυτού του χαρτοφυλακίου. Αν το πρόβλημα επιμένει δοκιμάστε να ανακτήσετε το πορτοφόλι με την φράση ανάκτησης.</string>
+    <string name="password_failed">Ο κωδικός που εισάγατε δεν είναι έγκυρος.</string>
+    <string name="sending_msg">Αποστολή&#8230;</string>
+    <string name="sent_msg">Απεστάλησαν! Παρακαλώ περιμένετε να επιβεβαιωθεί η συναλλαγή.</string>
+    <string name="tx_already_broadcast">Τα χρήματα έχουν ήδη σταλεί</string>
+    <string name="trade_expired">Το ανταλλακτήριο δεν είναι διαθέσιμο</string>
+    <string name="tx_confirm_timer_message">Παρακαλώ επιβεβαιώστε αυτή τη συναλλαγή μέσα στα επόμενα %1$s</string>
+    <plurals name="tx_confirm_timer_minute">
+        <item quantity="one">%s λεπτό</item>
+        <item quantity="other">%s λεπτά</item>
+    </plurals>
+    <plurals name="tx_confirm_timer_second">
+        <item quantity="one">%d δευτερόλεπτο</item>
+        <item quantity="other">%d δευτερόλεπτα</item>
+    </plurals>
+    <!-- About Activity -->
+    <string name="title_activity_about">Σχετικά με το Coinomi</string>
+    <string name="app_name_long">Coinomi για το λειτουργικό Android</string>
+    <string name="about_licence">Ένα πρόγραμμα ανοιχτού λογισμικού\nhttps://github.com/Coinomi/coinomi-android\nΟ πηγαίος κώδικας διατίθεται βάσει της άδειας GNU General Public License 3</string>
+    <string name="about_credits_nubits">Οι κεντρικοί εξυπηρετητές είναι μια προσφορά της NuBits\nhttps://nubits.com/</string>
+    <string name="about_credits_bitcoinj">Χρησιμοποιείται η βιβλιοθήκη Bitcoinj\nhttp://bitcoinj.github.io/</string>
+    <string name="about_credits_electrum">Χρησιμοποιείται λογισμικό του εξυπηρετητή Electrum\nhttps://electrum.org/</string>
+    <string name="about_credits_schildbach">Επηρεασμένο από τη δουλειά του Andreas Schildbach \nhttps://github.com/schildbach/bitcoin-wallet/</string>
+    <string name="about_credits_zxing">Λειτουργία QR-code από τον ZXing\nhttps://github.com/zxing/zxing</string>
+    <string name="about_credits_crypto_icons">Εικονίδια κρυπτονομισμάτων από τον Chris Shepherd\nhttps://github.com/shphrd/crypto-icons</string>
+    <string name="about_credits_font_icons">Εικονίδια φόντων από τον Daniel Bruce\nhttp://www.entypo.com</string>
+    <string name="about_credits_exchange_rates">Πάροχοι νομισματικών ισοτιμιών\nhttp://www.cryptocoincharts.info/\nhttps://bitcoinaverage.com/</string>
+    <string name="about_coinomi_copyright">Coinomi 2014&#8211;2015</string>
+    <!-- Add Coins -->
+    <string name="title_activity_add_coins">Προσθήκη νομισμάτων</string>
+    <string name="password_add_coin">Είστε ένα βήμα μακριά από τη δημιουργία ενός %1$s χαρτοφυλακίου στο πορτοφόλι σας.</string>
+    <string name="adding_coin_confirmation_title">Να προστεθεί το %1$s;</string>
+    <string name="adding_coin_working">Παρακαλώ περιμένετε ενόσω δημιουργείται ένα νέο χαρτοφυλάκιο για το %1$s</string>
+    <string name="add_coin_error">Σφάλμα προθήκης του %1$s: %2$s</string>
+    <string name="coin_already_added_title">Το %1$s έχει ήδη προστεθεί</string>
+    <string name="coin_already_added">Οι πολλαπλοί λογαριασμοί δεν υποστηρίζονται ακόμα</string>
+    <!-- Transaction amount visualizer -->
+    <string name="internal_transfer">Εσωτερική μεταφορά</string>
+    <!-- Transaction Details -->
+    <string name="title_activity_transaction_details">Λεπτομέρειες συναλλαγής</string>
+    <string name="sent">Απεστάλη</string>
+    <string name="received">Ελήφθη</string>
+    <string name="status_label">κατάσταση</string>
+    <string name="date_label">ημερομηνία</string>
+    <string name="transaction_id_label">κωδικός συναλλαγής</string>
+    <string name="view_at_a_blockchain_explorer_link">Προβολή σε blockchain explorer</string>
+    <plurals name="status_building">
+        <item quantity="one">%d επιβεβαίωση</item>
+        <item quantity="other">%d επιβεβαιώσεις</item>
+    </plurals>
+    <string name="status_pending">Αναμονή για επιβεβαίωση της συναλλαγής</string>
+    <string name="status_unknown">Άγνωστη κατάσταση της συναλλαγής</string>
+    <!-- Exchange Rates -->
+    <string name="title_activity_exchange_rates">Νομισματικές ισοτιμίες</string>
+    <string name="set_local_currency">Ορισμός του %1$s ως νόμισμα βάσης</string>
+    <string name="exchange_rates_loading">Φόρτωση νομισματικών ισοτιμιών</string>
+    <string name="exchange_rates_load_error">Η φόρτωση των ισοτιμιών απέτυχε</string>
+    <string name="exchange_rates_empty_search">Αποτυχία ευρέσεως νομισματικής ισοτιμίας</string>
+    <!-- Select Coins -->
+    <string name="select_coins">Επιλέξτε τα νομίσματα που επιθυμείτε να χρησιμοποιήσετε με το πορτοφόλι σας. Μπορείτε πάντα να προσθέσετε κι άλλα αργότερα.</string>
+    <!-- Previous Addresses -->
+    <string name="title_activity_previous_addresses">Οι προηγούμενες διευθύνσεις μου</string>
+    <string name="previous_addresses_used">Χρησιμοποιημένες διευθύνσεις</string>
+    <string name="previous_addresses_unused">Αχρησιμοποίητες διευθύνσεις</string>
+    <!-- Edit Address Book Entry -->
+    <string name="edit_address_book_entry_dialog_title_add">Προσθήκη διεύθυνσης</string>
+    <string name="edit_address_book_entry_dialog_title_edit">Επεξεργασία διεύθυνσης</string>
+    <string name="edit_address_book_entry_dialog_address_label">Διεύθυνση</string>
+    <string name="edit_address_book_entry_dialog_label_label">Περιγραφή</string>
+    <!-- Settings -->
+    <string name="title_activity_settings">Ρυθμίσεις</string>
+    <string name="pref_title_restore_wallet">Ανάκτηση πορτοφολιού</string>
+    <string name="pref_title_exchange_rates">Νομισματικές ισοτιμίες</string>
+    <string name="pref_title_manual_receiving_addresses">Προκαθορισμένη διεύθυνση λήψης</string>
+    <string name="pref_summary_manual_receiving_addresses">Απενεργοποίηση δημιουργίας νέας διεύθυνσης για κάθε συναλλαγή</string>
+    <!-- Show Seed -->
+    <string name="title_activity_show_seed">Αποκάλυψη φράσης ανάκτησης</string>
+    <string name="seed_not_available_title">Δεν βρέθηκε η φράση ανάκτησης</string>
+    <string name="seed_not_available">Η φράση ανάκτησης δεν έχει αποθηκευτεί σε αυτήν τη συσκευή.\nΠροσπαθήστε να ανακτήσετε το πορτοφόλι σας για να επιλυθεί αυτό.</string>
+    <string name="seed_encrypted_touch_to_decrypt">Ακουμπήστε για ξεκλείδωμα</string>
+    <string name="seed_working">Παρακαλώ περιμένετε&#8230;</string>
+    <string name="seed_password_protected">Αυτή η φράση ανάκτησης δεν προστατεύεται από κωδικό.</string>
+    <!-- Exchange -->
+    <string name="title_activity_trade">Ανταλλακτήριο</string>
+    <string name="trade_info">Επιλέξτε τα νομίσματα που επιθυμείτε να αλλάξετε.\nΤα νομίσματα θα προστεθούν αυτόματα στο πορτοφόλι σας μετά την μετατροπή.</string>
+    <string name="trade_from_coin_label">αποστολή</string>
+    <string name="trade_to_coin_label">λήψη</string>
+    <string name="trade_warn_no_account_found">Θα παραπεμφθείτε να προσθέσετε ένα %1$s πορτοφόλι</string>
+    <string name="trade_warn_no_connection_title">Δεν υπάρχει σύνδεση</string>
+    <string name="trade_warn_no_connection_message">Απαιτείται πρόσβαση στο διαδίκτυο για την μετατροπή των νομισμάτων.</string>
+    <string name="trade_error">Σφάλμα μετατροπής</string>
+    <string name="trade_error_no_supported_source_accounts">Δεν βρέθηκαν υποστηριζόμενοι λογαριασμοί</string>
+    <string name="trade_error_service_not_available">Η υπηρεσία είναι προσωρινά μη διαθέσιμη, παρακαλώ δοκιμάστε πάλι σε λίγα λεπτά</string>
+    <string name="trade_error_market_info">Η υπηρεσία είναι προσωρινά μη διαθέσιμη.\nΔεν υπάρχουν πληροφορίες για το νομισματικό ζεύγος %1$s - %2$s</string>
+    <string name="trade_error_sign_tx_message">Κάποιο σφάλμα παρουσιάστηκε κατά τη διάρκεια υπογραφής και μετάδοσης της συναλλαγής.\n\nΤεχνικές λεπτομέρειες:\n\n<b>%1$s</b></string>
+    <string name="trade_error_max_limit">Το ζητούμενο ποσόν ξεπερνάει το όριο των %1$s. Παρακαλώ χρησιμοποιήστε ένα μικρότερο ποσόν.</string>
+    <string name="trade_error_min_limit">Το ελάχιστο ποσόν είναι %1$s ή %2$s</string>
+    <!-- Exchange Status -->
+    <string name="title_activity_exchange_status">Κατάσταση ανταλλακτηρίου</string>
+    <string name="trade_status_message">Η συναλλαγή σας θα ολοκληρωθεί σύντομα. Μπορείτε να κλείσετε αυτόν το διάλογο χωρίς να επηρεαστεί η μετατροπή των νομισμάτων.</string>
+    <string name="trade_status_complete_message">Η συναλλαγή σας ολοκληρώθηκε με επιτυχία.</string>
+    <string name="trade_status_label">κατάσταση</string>
+    <string name="trade_status_waiting_deposit">Αναμονή για κατάθεση&#8230;</string>
+    <string name="trade_status_received_deposit">Παρελήφθη η κατάθεση των %1$s</string>
+    <string name="trade_status_waiting_trade">Αναμονή απάντησης από το ανταλλακτήριο&#8230;</string>
+    <string name="trade_status_complete_detail">Η μετατροπή ολοκληρώθηκε, απεστάλησαν %1$s</string>
+    <string name="trade_status_complete">Η μετατροπή των νομισμάτων ολοκληρώθηκε</string>
+    <string name="trade_status_view_transaction">Προβολή συναλλαγής</string>
+    <string name="trade_status_email_receipt">Αποστολή απόδειξης με ηλεκτρονικό ταχυδρομείο</string>
+    <string name="trade_status_failed_detail">Η μετατροπή απέτυχε: %1$s</string>
+    <string name="trade_status_failed">Η μετατροπή απέτυχε</string>
+    <string name="trade_status_delete_message">Διαγραφή από το ιστορικό;</string>
+    <string name="trade_status_tx_not_available">Η συναλλαγή δεν βρέθηκε, δοκιμάστε ξανά σε λίγα δευτερόλεπτα</string>
+    <!-- Email receipt dialog -->
+    <string name="email_receipt_title">Αποστολή απόδειξης</string>
+    <string name="email_receipt_message">Αποστολή ηλεκτρονικής απόδειξης για αυτήν τη συναλλαγή μετατροπής νομισμάτων</string>
+    <!-- Exchange History -->
+    <string name="title_activity_exchange_history">Ιστορικό συναλλαγών</string>
+    <string name="exchange_history_empty">Δεν έχουν πραγματοποιηθεί μετατροπές νομισμάτων</string>
+    <!-- ShapeShift -->
+    <string name="about_shapeshift_title">Σχετικά με την ShapeShift.io</string>
+    <string name="about_shapeshift_message">Η ShapeShift.io είναι ένα ανταλλακτήριο στιγμιαίας μετατροπής Bitcoin και άλλων νομισμάτων. Η πλατφόρμα (διαθέσιμη μέσω της ιστοσελίδας και του API) αντιπροσωπεύει τον πιο γρήγορο και αποδοτικό τρόπο για να μετατρέψετε μεταξύ Bitcoin και δεκάδων άλλων νομισμάτων. Δεν απαιτείται δημιουργία λογαριασμού.</string>
+</resources>
