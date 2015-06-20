@@ -36,6 +36,8 @@ public enum CoinID {
     DIGITALCOIN_MAIN(DigitalcoinMain.get()),
     CANNACOIN_MAIN(CannacoinMain.get()),
     DIGIBYTE_MAIN(DigibyteMain.get()),
+    NEOSCOIN_MAIN(NeoscoinMain.get()),
+    NEOSCOIN_TEST(NeoscoinTest.get())
     ;
 
     private static List<CoinType> types;
