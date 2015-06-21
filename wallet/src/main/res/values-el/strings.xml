@@ -69,10 +69,10 @@
     <string name="incompatible_device_warning_title">Μη συμβατή συσκευή</string>
     <string name="incompatible_device_warning_message">Η συσκευή σας δεν μπορεί να εκτελέσει κάποιες κρυπτογραφικές μεθόδους λόγω ελαττωμάτων στο λογισμικό ή την ίδια τη συσκευή.\nΤο πρόβλημα θα μπόρεσε να λυθεί ύστερα από την ενημέρωση λογισμικού από τον κατασκευαστή της συσκευής.\n\nΠαρακαλώ επικοινωνήστε μαζί μας αν έχετε απορίες: support@coinomi.com</string>
     <!-- Recovery fragment -->
-    <string name="seed_info">Αυτή είναι η <i>φράση ανάκτησής</i> σας, η οποία χρησιμοποιείτε για να παραχθούν τα κλειδιά για το πορτοφόλι σας. Παρακαλούμε σημειώστε την κάπου και αποθηκεύστε την σε ασφαλές μέρος, όπως ακριβώς θα κάνατε και με κάποια χαρτονομίσματα. Οποιοσδήποτε έχει πρόσβαση στην φράση ανάκτησης έχει αυτόματα και πλήρη πρόσβαση στα περιεχόμενα του πορτοφολιού σας.\nΑν χάσετε τη φράση ανάκτησης, το πορτοφόλι σας δεν θα μπορεί να ανακτηθεί.</string>
-    <string name="seed_title">η φράση ανάκτησης του πορτοφολιού σας</string>
-    <string name="seed_regenerate_title">πιέστε για να παραχθεί μια νέα φράση ανάκτησης</string>
-    <string name="backed_up_seed">Έχω αποθηκεύσει σε ασφαλές μέρος τη φράση ανάκτησης μου.</string>
+    <string name="seed_info">Αυτή είναι η <i>φράση ανάκτησής</i> σας, από την οποία παράγονται τα κλειδιά για το πορτοφόλι σας. Παρακαλούμε σημειώστε την κάπου και αποθηκεύστε την σε ασφαλές μέρος, όπως ακριβώς θα κάνατε με τα μετρητά σας. Οποιοσδήποτε έχει πρόσβαση στην φράση ανάκτησης έχει πλήρη πρόσβαση στα περιεχόμενα του πορτοφολιού.\nΑν χάσετε τη φράση ανάκτησης, το πορτοφόλι σας δεν θα μπορεί να ανακτηθεί.</string>
+    <string name="seed_title">η φράση ανάκτησης σας</string>
+    <string name="seed_regenerate_title">πιέστε για μια νέα φράση</string>
+    <string name="backed_up_seed">Έχω αποθηκεύσει σε ασφαλές μέρος τη φράση ανάκτησης μου</string>
     <!-- Restore fragment -->
     <string name="restore_info">Παρακαλώ εισάγετε τη φράση ανάκτησής σας:</string>
     <string name="restore_seed_protected">Η φράση ανάκτησης για το πορτοφόλι μου προστατεύεται από κωδικό</string>
@@ -227,7 +227,7 @@
     <string name="title_activity_settings">Ρυθμίσεις</string>
     <string name="pref_title_restore_wallet">Ανάκτηση πορτοφολιού</string>
     <string name="pref_title_exchange_rates">Νομισματικές ισοτιμίες</string>
-    <string name="pref_title_manual_receiving_addresses">Προκαθορισμένη διεύθυνση λήψης</string>
+    <string name="pref_title_manual_receiving_addresses">Προκαθορισμένες διεύθυνσεις</string>
     <string name="pref_summary_manual_receiving_addresses">Απενεργοποίηση δημιουργίας νέας διεύθυνσης για κάθε συναλλαγή</string>
     <!-- Show Seed -->
     <string name="title_activity_show_seed">Αποκάλυψη φράσης ανάκτησης</string>

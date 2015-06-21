@@ -72,7 +72,7 @@
     <string name="seed_info">This is your <i>recovery phrase</i>, which is used to generate the keys for your wallet. Please write it down on a paper and keep it in a secure place, as you would with paper money. Anyone with access to it has access to the wallet\'s funds.\nIf you lose your recovery phrase, your wallet cannot be recovered.</string>
     <string name="seed_title">your recovery phrase</string>
     <string name="seed_regenerate_title">touch to generate a new recovery phrase</string>
-    <string name="backed_up_seed">I have copied and stored my recovery phrase in a secure place.</string>
+    <string name="backed_up_seed">I have safely stored my recovery phrase</string>
     <!-- Restore fragment -->
     <string name="restore_info">Please enter your recovery phrase:</string>
     <string name="restore_seed_protected">My recovery phrase is password protected</string>
