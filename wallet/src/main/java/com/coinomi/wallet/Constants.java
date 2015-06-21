@@ -218,9 +218,9 @@ public class Constants {
             FeathercoinMain.get(),
             DigitalcoinMain.get(),
             CannacoinMain.get(),
+            NeoscoinMain.get(),
             BitcoinTest.get(),
             LitecoinTest.get(),
-            DogecoinTest.get(),
-            NeoscoinMain.get()
+            DogecoinTest.get()
     );
 }

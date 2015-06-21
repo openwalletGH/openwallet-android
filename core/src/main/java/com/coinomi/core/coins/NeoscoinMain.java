@@ -13,7 +13,7 @@ public class NeoscoinMain extends CoinType {
         spendableCoinbaseDepth = 100;
         dumpedPrivateKeyHeader = 128;
 
-        name = "Neoscoin";
+        name = "Neoscoin (beta)";
         symbol = "NEOS";
         uriScheme = "neoscoin";
         bip44Index = 25;
