@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Coinomi (dev)</string>
-    <string name="app_package">com.coinomi.wallet.dev</string>
     <string name="action_scan_qr_code">Σάρωση</string>
     <string name="action_share">Διαμοιρασμός</string>
     <string name="action_copy">Αντιγραφή</string>
@@ -44,13 +42,12 @@
     <string name="wallet_title_request">λήψη</string>
     <string name="wallet_title_balance">υπόλοιπο</string>
     <string name="wallet_title_send">αποστολή</string>
-    <string name="almost_equal_to">≈</string>
     <string name="wallet_locked_message">Το πορτοφόλι σας είναι κλειδωμένο</string>
     <string name="unlock_wallet_title">Ξεκλειδώστε το πορτοφόλι σας</string>
     <string name="unlocking_wallet_working">Το πορτοφόλι σας ξεκλειδώνεται&#8230;</string>
     <string name="unlocking_wallet_error_title">Το ξεκλείδωμα του πορτοφολιού σας απέτυχε</string>
     <string name="unlocking_wallet_error_detail">Χρησιμοποιείτε το σωστό κωδικό; Παρακαλώ σιγουρευτείτε ότι έχετε εισάγει το σωστό κωδικό κι αν το σφάλμα επιμένει προσπαθήστε να ανακτήσετε το πορτοφόλι σας.</string>
-    <string name="powered_by">Powered by</string>
+    <string name="powered_by">Παρέχεται από</string>
     <!-- Nav drawer -->
     <string name="navigation_drawer_open">Άνοιγμα πίνακα πλοήγησης</string>
     <string name="navigation_drawer_close">Κλείσιμο πίνακα πλοήγησης</string>
@@ -63,7 +60,7 @@
     <string name="receive">Λήψη</string>
     <!-- Welcome fragment -->
     <string name="welcome_text">Καλώς ήλθατε στο Coinomi</string>
-    <string name="create_wallet">Δημιουργία νέου πορτοφολιού</string>
+    <string name="create_wallet">Νέο πορτοφόλι</string>
     <string name="restore_wallet">Ανάκτηση πορτοφολιού</string>
     <string name="test_wallet">Δοκιμαστικό πορτοφόλι</string>
     <!-- Intro -->
@@ -74,9 +71,8 @@
     <!-- Recovery fragment -->
     <string name="seed_info">Αυτή είναι η <i>φράση ανάκτησής</i> σας, η οποία χρησιμοποιείτε για να παραχθούν τα κλειδιά για το πορτοφόλι σας. Παρακαλούμε σημειώστε την κάπου και αποθηκεύστε την σε ασφαλές μέρος, όπως ακριβώς θα κάνατε και με κάποια χαρτονομίσματα. Οποιοσδήποτε έχει πρόσβαση στην φράση ανάκτησης έχει αυτόματα και πλήρη πρόσβαση στα περιεχόμενα του πορτοφολιού σας.\nΑν χάσετε τη φράση ανάκτησης, το πορτοφόλι σας δεν θα μπορεί να ανακτηθεί.</string>
     <string name="seed_title">η φράση ανάκτησης του πορτοφολιού σας</string>
-    <string name="sample_seed">deliver broken make enrich core vendor ski help sock spy purse roast token jewel female</string>
     <string name="seed_regenerate_title">πιέστε για να παραχθεί μια νέα φράση ανάκτησης</string>
-    <string name="backed_up_seed">Έχω αντιγράψει και αποθηκεύσει σε ασφαλές μέρος τη φράση ανάκτησης μου.</string>
+    <string name="backed_up_seed">Έχω αποθηκεύσει σε ασφαλές μέρος τη φράση ανάκτησης μου.</string>
     <!-- Restore fragment -->
     <string name="restore_info">Παρακαλώ εισάγετε τη φράση ανάκτησής σας:</string>
     <string name="restore_seed_protected">Η φράση ανάκτησης για το πορτοφόλι μου προστατεύεται από κωδικό</string>
@@ -104,7 +100,7 @@
     <string name="received_with">παρελήφθησαν από</string>
     <string name="get_tx_info_error">Δεν μπόρεσαν να ανακτηθούν περαιτέρω πληροφορίες γι αυτή τη συναλλαγή</string>
     <string name="disconnected_label">Μη διαθέσιμη σύνδεσή</string>
-    <string name="no_wallet_pocket_selected">Δεν έχει επιλεχθεί χαρτοφυλάκιο</string>
+    <string name="no_wallet_pocket_selected">Δεν έχει επιλεχθεί λογαριασμός</string>
     <string name="get_tx_broadcast_error">Σφάλμα κατά τη μετάδοση της συναλλαγής</string>
     <!-- Receive fragment -->
     <string name="receive_address_label">η διεύθυνσή μου</string>
@@ -158,7 +154,7 @@
     <!-- SignTransactionFragment -->
     <string name="contacting_exchange">Πραγματοποιείται επικοινωνία με το ανταλλακτήριο&#8230;</string>
     <string name="preparing_transaction">Παρακαλώ περιμένετε ενόσω η συναλλαγή σας προετοιμάζεται και αποστέλλεται.</string>
-    <string name="no_such_pocket_error">Κάποιο σφάλμα παρουσιάστηκε στην πρόσβαση αυτού του χαρτοφυλακίου. Αν το πρόβλημα επιμένει δοκιμάστε να ανακτήσετε το πορτοφόλι με την φράση ανάκτησης.</string>
+    <string name="no_such_pocket_error">Κάποιο σφάλμα παρουσιάστηκε στην πρόσβαση αυτού του λογαριασμού. Αν το πρόβλημα επιμένει δοκιμάστε να ανακτήσετε το πορτοφόλι με την φράση ανάκτησης.</string>
     <string name="password_failed">Ο κωδικός που εισάγατε δεν είναι έγκυρος.</string>
     <string name="sending_msg">Αποστολή&#8230;</string>
     <string name="sent_msg">Απεστάλησαν! Παρακαλώ περιμένετε να επιβεβαιωθεί η συναλλαγή.</string>
@@ -188,9 +184,9 @@
     <string name="about_coinomi_copyright">Coinomi 2014&#8211;2015</string>
     <!-- Add Coins -->
     <string name="title_activity_add_coins">Προσθήκη νομισμάτων</string>
-    <string name="password_add_coin">Είστε ένα βήμα μακριά από τη δημιουργία ενός %1$s χαρτοφυλακίου στο πορτοφόλι σας.</string>
+    <string name="password_add_coin">Είστε ένα βήμα μακριά από τη δημιουργία ενός %1$s λογαριασμού στο πορτοφόλι σας.</string>
     <string name="adding_coin_confirmation_title">Να προστεθεί το %1$s;</string>
-    <string name="adding_coin_working">Παρακαλώ περιμένετε ενόσω δημιουργείται ένα νέο χαρτοφυλάκιο για το %1$s</string>
+    <string name="adding_coin_working">Παρακαλώ περιμένετε ενόσω δημιουργείται ένας νέος %1$s λογαριασμός</string>
     <string name="add_coin_error">Σφάλμα προθήκης του %1$s: %2$s</string>
     <string name="coin_already_added_title">Το %1$s έχει ήδη προστεθεί</string>
     <string name="coin_already_added">Οι πολλαπλοί λογαριασμοί δεν υποστηρίζονται ακόμα</string>
@@ -220,8 +216,8 @@
     <string name="select_coins">Επιλέξτε τα νομίσματα που επιθυμείτε να χρησιμοποιήσετε με το πορτοφόλι σας. Μπορείτε πάντα να προσθέσετε κι άλλα αργότερα.</string>
     <!-- Previous Addresses -->
     <string name="title_activity_previous_addresses">Οι προηγούμενες διευθύνσεις μου</string>
-    <string name="previous_addresses_used">Χρησιμοποιημένες διευθύνσεις</string>
-    <string name="previous_addresses_unused">Αχρησιμοποίητες διευθύνσεις</string>
+    <string name="previous_addresses_used">Χρησιμοποιημένη διευθύνση</string>
+    <string name="previous_addresses_unused">Αχρησιμοποίητη διευθύνση</string>
     <!-- Edit Address Book Entry -->
     <string name="edit_address_book_entry_dialog_title_add">Προσθήκη διεύθυνσης</string>
     <string name="edit_address_book_entry_dialog_title_edit">Επεξεργασία διεύθυνσης</string>

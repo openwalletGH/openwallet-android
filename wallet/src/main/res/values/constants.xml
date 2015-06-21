@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Coinomi (dev)</string>
+    <string name="app_package">com.coinomi.wallet.dev</string>
+    <string name="almost_equal_to">≈</string>
+</resources>

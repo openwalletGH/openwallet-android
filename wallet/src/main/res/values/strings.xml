@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Coinomi (dev)</string>
-    <string name="app_package">com.coinomi.wallet.dev</string>
     <string name="action_scan_qr_code">Scan</string>
     <string name="action_share">Share</string>
     <string name="action_copy">Copy</string>
@@ -44,7 +42,6 @@
     <string name="wallet_title_request">receive</string>
     <string name="wallet_title_balance">balance</string>
     <string name="wallet_title_send">send</string>
-    <string name="almost_equal_to">≈</string>
     <string name="wallet_locked_message">Your wallet is locked</string>
     <string name="unlock_wallet_title">Unlock your wallet</string>
     <string name="unlocking_wallet_working">Unlocking your wallet&#8230;</string>
@@ -74,7 +71,6 @@
     <!-- Recovery fragment -->
     <string name="seed_info">This is your <i>recovery phrase</i>, which is used to generate the keys for your wallet. Please write it down on a paper and keep it in a secure place, as you would with paper money. Anyone with access to it has access to the wallet\'s funds.\nIf you lose your recovery phrase, your wallet cannot be recovered.</string>
     <string name="seed_title">your recovery phrase</string>
-    <string name="sample_seed">deliver broken make enrich core vendor ski help sock spy purse roast token jewel female</string>
     <string name="seed_regenerate_title">touch to generate a new recovery phrase</string>
     <string name="backed_up_seed">I have copied and stored my recovery phrase in a secure place.</string>
     <!-- Restore fragment -->
@@ -104,7 +100,7 @@
     <string name="received_with">received with</string>
     <string name="get_tx_info_error">Could not get transaction information</string>
     <string name="disconnected_label">No connection</string>
-    <string name="no_wallet_pocket_selected">No wallet pocket selected</string>
+    <string name="no_wallet_pocket_selected">No wallet account selected</string>
     <string name="get_tx_broadcast_error">Error broadcasting transaction</string>
     <!-- Receive fragment -->
     <string name="receive_address_label">my address</string>
@@ -158,7 +154,7 @@
     <!-- SignTransactionFragment -->
     <string name="contacting_exchange">Contacting exchange&#8230;</string>
     <string name="preparing_transaction">Please wait while your transaction is being prepared and sent.</string>
-    <string name="no_such_pocket_error">An error occurred while accessing this wallet pocket. If the problem persists try to restore the wallet from the recovery phrase.</string>
+    <string name="no_such_pocket_error">An error occurred while accessing this wallet account. If the problem persists try to restore the wallet from the recovery phrase.</string>
     <string name="password_failed">The password entered is not valid.</string>
     <string name="sending_msg">Sending&#8230;</string>
     <string name="sent_msg">Sent! Please wait for transaction confirmation.</string>
@@ -188,9 +184,9 @@
     <string name="about_coinomi_copyright">Coinomi 2014&#8211;2015</string>
     <!-- Add Coins -->
     <string name="title_activity_add_coins">Add coins</string>
-    <string name="password_add_coin">You are about to create a %1$s pocket in your wallet.</string>
+    <string name="password_add_coin">You are about to create a %1$s account in your wallet.</string>
     <string name="adding_coin_confirmation_title">Add %1$s?</string>
-    <string name="adding_coin_working">Please wait while creating a new pocket for %1$s</string>
+    <string name="adding_coin_working">Please wait while creating a new %1$s account</string>
     <string name="add_coin_error">Error adding %1$s: %2$s</string>
     <string name="coin_already_added_title">%1$s already added</string>
     <string name="coin_already_added">Additional accounts are not yet supported</string>
