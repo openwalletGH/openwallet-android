@@ -250,7 +250,7 @@
     <string name="trade_error_market_info">Η υπηρεσία είναι προσωρινά μη διαθέσιμη.\nΔεν υπάρχουν πληροφορίες για το νομισματικό ζεύγος %1$s - %2$s</string>
     <string name="trade_error_sign_tx_message">Κάποιο σφάλμα παρουσιάστηκε κατά τη διάρκεια υπογραφής και μετάδοσης της συναλλαγής.\n\nΤεχνικές λεπτομέρειες:\n\n<b>%1$s</b></string>
     <string name="trade_error_max_limit">Το ζητούμενο ποσόν ξεπερνάει το όριο των %1$s. Παρακαλώ χρησιμοποιήστε ένα μικρότερο ποσόν.</string>
-    <string name="trade_error_min_limit">Το ελάχιστο ποσόν είναι %1$s ή %2$s</string>
+    <string name="trade_error_min_limit">Το ελάχιστο ποσόν είναι %1$s</string>
     <!-- Exchange Status -->
     <string name="title_activity_exchange_status">Κατάσταση ανταλλακτηρίου</string>
     <string name="trade_status_message">Η συναλλαγή σας θα ολοκληρωθεί σύντομα. Μπορείτε να κλείσετε αυτόν το διάλογο χωρίς να επηρεαστεί η μετατροπή των νομισμάτων.</string>

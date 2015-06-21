@@ -57,6 +57,7 @@ import java.util.Timer;
 import javax.annotation.Nullable;
 
 import static com.coinomi.core.coins.Value.canCompare;
+import static com.coinomi.core.coins.Value.max;
 
 /**
  * @author John L. Jegutanis
@@ -841,8 +842,8 @@ public class TradeSelectFragment extends Fragment {
                         Value minimumDeposit = getLowestAmount(depositAmount);
                         Value minimumWithdraw = getLowestAmount(withdrawAmount);
                         message = getString(R.string.trade_error_min_limit,
-                                minimumDeposit.toFriendlyString(),
-                                minimumWithdraw.toFriendlyString());
+                                minimumDeposit.toFriendlyString() + " (" + minimumWithdraw
+                                        .toFriendlyString() + ")");
                     } else {
                         // If we have the amount
                         if (canCompare(lastBalance, depositAmount) &&
@@ -853,8 +854,14 @@ public class TradeSelectFragment extends Fragment {
 
                         if (canCompare(maximumDeposit, depositAmount) &&
                                 depositAmount.compareTo(maximumDeposit) > 0) {
-                            message = getString(R.string.trade_error_max_limit,
-                                    maximumDeposit.toFriendlyString());
+
+                            String maxDepositString = maximumDeposit.toFriendlyString();
+                            if (lastRate != null &&
+                                    lastRate.canConvert(maximumDeposit.type, destinationType)) {
+                                maxDepositString += " (" + lastRate.convert(maximumDeposit)
+                                        .toFriendlyString() + ")";
+                            }
+                            message = getString(R.string.trade_error_max_limit, maxDepositString);
                         }
                     }
                     amountError.setText(message);
