@@ -49,7 +49,7 @@
     <string name="unlock_wallet_title">Unlock your wallet</string>
     <string name="unlocking_wallet_working">Unlocking your wallet&#8230;</string>
     <string name="unlocking_wallet_error_title">Could not unlock your wallet</string>
-    <string name="unlocking_wallet_error_detail">Are you using the right password? Please make sure that you have entered the right password and if this error persists try to restore your wallet.</string>
+    <string name="unlocking_wallet_error_detail">Are you using the correct password? Please make sure that your password was entered correctly. Attempt to restore using the recovery phrase if this error persists.</string>
     <string name="powered_by">Powered by</string>
     <!-- Nav drawer -->
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -157,7 +157,7 @@
     <!-- SignTransactionFragment -->
     <string name="contacting_exchange">Contacting exchange&#8230;</string>
     <string name="preparing_transaction">Please wait while your transaction is being prepared and sent.</string>
-    <string name="no_such_pocket_error">An error occurred while accessing this wallet account. If the problem persists try to restore the wallet from the recovery phrase.</string>
+    <string name="no_such_pocket_error">An error occurred while accessing this wallet account. If the problem persists, try restoring the wallet using the recovery phrase.</string>
     <string name="password_failed">The password entered is not valid.</string>
     <string name="sending_msg">Sending&#8230;</string>
     <string name="sent_msg">Sent! Please wait for transaction confirmation.</string>
