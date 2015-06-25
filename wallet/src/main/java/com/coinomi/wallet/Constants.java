@@ -139,8 +139,8 @@ public class Constants {
                                                     new ServerAddress("mona-cce-2.coinomi.net", 5022)),
             new CoinAddress(DigibyteMain.get(),     new ServerAddress("dgb-cce-1.coinomi.net", 5023),
                                                     new ServerAddress("dgb-cce-2.coinomi.net", 5023)),
-            new CoinAddress(NeoscoinMain.get(),     new ServerAddress("el1.neoscoin.com", 50005),
-                                                    new ServerAddress("electrum.infernopool.com", 50005))
+            new CoinAddress(NeoscoinMain.get(),     new ServerAddress("neos-cce-1.coinomi.net", 5027),
+                                                    new ServerAddress("neos-cce-2.coinomi.net", 5027))
     );
 
     public static final HashMap<CoinType, Integer> COINS_ICONS;
