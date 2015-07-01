@@ -521,8 +521,11 @@ public class TradeSelectFragment extends Fragment {
         if (amountCalculatorLink.isEmpty() && lastRate != null) {
             Value hintValue = sourceAccount.getCoinType().oneCoin();
             Value exchangedValue = lastRate.convert(hintValue);
-            // If hint value is too small, make it higher to get a no zero exchanged value
-            for (int tries = 8; tries > 0 && exchangedValue.isZero(); tries--) {
+            Value minerFee100 = marketInfo.rate.minerFee.multiply(100);
+            // If hint value is too small, make it higher to get a no zero exchanged value and
+            // at least 10 times higher than the miner fee
+            for (int tries = 8; tries > 0 &&
+                    (exchangedValue.isZero() || exchangedValue.compareTo(minerFee100) < 0); tries--) {
                 hintValue = hintValue.multiply(10);
                 exchangedValue = lastRate.convert(hintValue);
             }

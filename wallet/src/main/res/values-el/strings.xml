@@ -46,7 +46,7 @@
     <string name="unlock_wallet_title">Ξεκλειδώστε το πορτοφόλι σας</string>
     <string name="unlocking_wallet_working">Το πορτοφόλι σας ξεκλειδώνεται&#8230;</string>
     <string name="unlocking_wallet_error_title">Το ξεκλείδωμα του πορτοφολιού σας απέτυχε</string>
-    <string name="unlocking_wallet_error_detail">Χρησιμοποιείτε το σωστό κωδικό; Παρακαλώ σιγουρευτείτε ότι έχετε εισάγει το σωστό κωδικό κι αν το σφάλμα επιμένει προσπαθήστε να ανακτήσετε το πορτοφόλι σας.</string>
+    <string name="unlocking_wallet_error_detail">Χρησιμοποιείτε το σωστό κωδικό; Παρακαλώ σιγουρευτείτε ότι έχετε εισάγει το σωστό κωδικό. Αν το σφάλμα επιμένει προσπαθήστε να ανακτήσετε το πορτοφόλι σας.</string>
     <string name="powered_by">Παρέχεται από</string>
     <!-- Nav drawer -->
     <string name="navigation_drawer_open">Άνοιγμα πίνακα πλοήγησης</string>
@@ -235,10 +235,11 @@
     <string name="seed_not_available">Η φράση ανάκτησης δεν έχει αποθηκευτεί σε αυτήν τη συσκευή.\nΠροσπαθήστε να ανακτήσετε το πορτοφόλι σας για να επιλυθεί αυτό.</string>
     <string name="seed_encrypted_touch_to_decrypt">Ακουμπήστε για ξεκλείδωμα</string>
     <string name="seed_working">Παρακαλώ περιμένετε&#8230;</string>
-    <string name="seed_password_protected">Αυτή η φράση ανάκτησης δεν προστατεύεται από κωδικό.</string>
+    <string name="seed_password_protected">Αυτή η φράση ανάκτησης προστατεύεται από κωδικό.</string>
     <!-- Exchange -->
     <string name="title_activity_trade">Ανταλλακτήριο</string>
     <string name="trade_info">Επιλέξτε τα νομίσματα που επιθυμείτε να αλλάξετε.\nΤα νομίσματα θα προστεθούν αυτόματα στο πορτοφόλι σας μετά την μετατροπή.</string>
+    <string name="trade_info_rates">Η ισοτιμία εμπεριέχει έξοδα συναλλαγής παρακρατούμενα από την ShapeShift.io</string>
     <string name="trade_from_coin_label">αποστολή</string>
     <string name="trade_to_coin_label">λήψη</string>
     <string name="trade_warn_no_account_found">Θα παραπεμφθείτε να προσθέσετε ένα %1$s πορτοφόλι</string>

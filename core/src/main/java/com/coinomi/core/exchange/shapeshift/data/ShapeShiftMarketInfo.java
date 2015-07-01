@@ -18,7 +18,7 @@ import static com.coinomi.core.Preconditions.checkState;
  * @author John L. Jegutanis
  */
 public class ShapeShiftMarketInfo  extends ShapeShiftPairBase {
-    public final ExchangeRate rate;
+    public final ShapeShiftExchangeRate rate;
     public final Value limit;
     public final Value minimum;
 
