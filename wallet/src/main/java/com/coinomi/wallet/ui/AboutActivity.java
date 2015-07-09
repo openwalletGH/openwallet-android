@@ -5,6 +5,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.coinomi.wallet.R;
+import com.coinomi.wallet.util.Fonts;
 
 public class AboutActivity extends BaseWalletActivity {
 
@@ -23,5 +24,7 @@ public class AboutActivity extends BaseWalletActivity {
         } else {
             version.setVisibility(View.INVISIBLE);
         }
+
+        Fonts.setTypeface(findViewById(R.id.translation_globe), Fonts.Font.COINOMI_FONT_ICONS);
     }
 }

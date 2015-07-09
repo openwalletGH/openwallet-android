@@ -79,6 +79,36 @@
                 android:text="@string/about_credits_nubits" />
         </LinearLayout>
 
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:paddingTop="16dp">
+            <TextView
+                android:id="@+id/translation_globe"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/NormalText"
+                android:paddingRight="8dp"
+                android:paddingEnd="8dp"
+                android:text="@string/font_icon_language"
+                tools:text="A#"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/NormalText"
+                android:text="@string/about_credits_translations" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/NormalText"
+            android:autoLink="web"
+            android:text="@string/about_credits_translations_credits" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
