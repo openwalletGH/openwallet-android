@@ -186,7 +186,7 @@
     <string name="about_credits_crypto_icons">Crypto-icons by Chris Shepherd\nhttps://github.com/shphrd/crypto-icons</string>
     <string name="about_credits_font_icons">Font-icons by Daniel Bruce\nhttp://www.entypo.com</string>
     <string name="about_credits_exchange_rates">Exchange rates provided by\nhttp://www.cryptocoincharts.info/\nhttps://bitcoinaverage.com/</string>
-    <string name="about_coinomi_copyright">Coinomi 2014&#8211;2015</string>
+    <string name="about_coinomi_copyright" translatable="false">Coinomi 2014&#8211;2015</string>
     <!-- Add Coins -->
     <string name="title_activity_add_coins">Add coins</string>
     <string name="password_add_coin">You are about to create a %1$s account in your wallet.</string>
