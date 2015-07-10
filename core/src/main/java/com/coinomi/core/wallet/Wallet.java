@@ -1,8 +1,17 @@
 package com.coinomi.core.wallet;
 
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.coins.families.BitFamily;
+import com.coinomi.core.coins.families.CoinFamily;
+import com.coinomi.core.coins.families.NxtFamily;
 import com.coinomi.core.protos.Protos;
 import com.coinomi.core.wallet.exceptions.NoSuchPocketException;
+import com.coinomi.core.wallet.families.nxt.NxtFamilyWallet;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+
 import org.bitcoinj.core.Address;
 import org.bitcoinj.crypto.DeterministicHierarchy;
 import org.bitcoinj.crypto.DeterministicKey;
@@ -13,11 +22,6 @@ import org.bitcoinj.crypto.MnemonicException;
 import org.bitcoinj.store.UnreadableWalletException;
 import org.bitcoinj.utils.Threading;
 import org.bitcoinj.wallet.DeterministicSeed;
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.crypto.params.KeyParameter;
@@ -39,6 +43,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.GuardedBy;
 
+import static com.coinomi.core.CoreUtils.bytesToMnemonic;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
@@ -63,6 +68,10 @@ final public class Wallet {
     private final static int ACCOUNT_ZERO = 0;
 
     private int version;
+
+    public Wallet(String mnemonic) throws MnemonicException {
+        this(Wallet.parseMnemonic(mnemonic), null);
+    }
 
     public Wallet(List<String> mnemonic) throws MnemonicException {
         this(mnemonic, null);
@@ -96,14 +105,8 @@ final public class Wallet {
         SecureRandom sr = new SecureRandom();
         sr.nextBytes(entropy);
 
-        List<String> mnemonic;
-        try {
-            mnemonic = MnemonicCode.INSTANCE.toMnemonic(entropy);
-        } catch (MnemonicException.MnemonicLengthException e) {
-            throw new RuntimeException(e); // should not happen, we have 16bytes of entropy
-        }
 
-        return mnemonic;
+        return bytesToMnemonic(entropy);
     }
 
     public static String generateMnemonicString(int entropyBitsSize) {
@@ -132,7 +135,7 @@ final public class Wallet {
             ImmutableList.Builder<WalletAccount> newAccounts = ImmutableList.builder();
             for (CoinType coin : coins) {
                 log.info("Creating coin pocket for {}", coin);
-                WalletPocketHD newAccount = createAndAddAccount(coin, key);
+                WalletAccount newAccount = createAndAddAccount(coin, key);
                 if (generateAllKeys) {
                     newAccount.maybeInitializeAllKeys();
                 }
@@ -251,14 +254,14 @@ final public class Wallet {
     /**
      * Generate and add a new BIP44 account for a specific coin type
      */
-    private WalletPocketHD createAndAddAccount(CoinType coinType, @Nullable KeyParameter key) {
+    private WalletAccount createAndAddAccount(CoinType coinType, @Nullable KeyParameter key) {
         checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
         checkNotNull(coinType, "Attempting to create a pocket for a null coin");
 
         // TODO, currently we support a single account so return the existing account
         List<WalletAccount> currentAccount = getAccounts(coinType);
         if (currentAccount.size() > 0) {
-            return (WalletPocketHD) currentAccount.get(0);
+            return currentAccount.get(0);
         }
         // TODO ///////////////
 
@@ -270,7 +273,19 @@ final public class Wallet {
         }
         int newIndex = getLastAccountIndex(coinType) + 1;
         DeterministicKey rootKey = hierarchy.get(coinType.getBip44Path(newIndex), false, true);
-        WalletPocketHD newPocket = new WalletPocketHD(rootKey, coinType, getKeyCrypter(), key);
+
+        CoinFamily family = coinType.getFamily();
+        WalletAccount newPocket;
+
+        if (family instanceof BitFamily) {
+            newPocket = new WalletPocketHD(rootKey, coinType, getKeyCrypter(), key);
+        } else if (family instanceof NxtFamily) {
+            newPocket = new NxtFamilyWallet(rootKey, coinType, getKeyCrypter(), key);
+        } else {
+            throw new RuntimeException("Unknown family: " + family.getClass().getName());
+        }
+
+
         if (isEncrypted() && !newPocket.isEncrypted()) {
             newPocket.encrypt(getKeyCrypter(), key);
         }
@@ -697,6 +712,15 @@ final public class Wallet {
         } catch (UnsupportedEncodingException e) {
             throw new UnreadableWalletException(e.toString());
         }
+    }
+
+    public static ArrayList<String> parseMnemonic(String mnemonicString) {
+        ArrayList<String> seedWords = new ArrayList<>();
+        for (String word : mnemonicString.trim().split(" ")) {
+            if (word.isEmpty()) continue;
+            seedWords.add(word);
+        }
+        return seedWords;
     }
 
     // TODO

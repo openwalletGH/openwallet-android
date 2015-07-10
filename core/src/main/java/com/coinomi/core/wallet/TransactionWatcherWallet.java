@@ -160,10 +160,12 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
         return unspent.size() + spent.size() + pending.size() == 0;
     }
 
+    @Override
     public void setWallet(Wallet wallet) {
         this.wallet = wallet;
     }
 
+    @Override
     public Wallet getWallet() {
         return wallet;
     }

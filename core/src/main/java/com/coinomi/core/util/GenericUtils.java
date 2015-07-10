@@ -196,8 +196,10 @@ public class GenericUtils {
         ImmutableList.Builder<CoinType> builder = ImmutableList.builder();
         int version = parsed.getVersion();
         for (CoinType type : CoinID.getSupportedCoins()) {
-            if (type.getAddressHeader() == version || type.getP2SHHeader() == version) {
-                builder.add(type);
+            for (int typeVersion : type.getAcceptableAddressCodes()) {
+                if (typeVersion == version) {
+                    builder.add(type);
+                }
             }
         }
         List<CoinType> possibleTypes = builder.build();

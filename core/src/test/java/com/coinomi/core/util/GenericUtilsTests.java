@@ -55,7 +55,7 @@ public class GenericUtilsTests {
         // Classic Bitcoin addresses should have only one type
         types = GenericUtils.getPossibleTypes("1AjnxP4frz7Nb4v2soLnhN2uV9UocqvaGH");
         assertTrue(types.contains(BitcoinMain.get()));
-        assertTrue(types.size() == 1);
+        assertEquals(1, types.size());
         assertFalse(GenericUtils.hasMultipleTypes("1AjnxP4frz7Nb4v2soLnhN2uV9UocqvaGH"));
     }
 

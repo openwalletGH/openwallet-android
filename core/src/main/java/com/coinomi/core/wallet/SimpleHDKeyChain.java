@@ -440,6 +440,10 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
         }
     }
 
+    public DeterministicKey getRootKey() {
+        return rootKey;
+    }
+
     /**
      * Returns number of leaf keys used including both internal and external paths. This may be fewer than the number
      * that have been deserialized or held in memory, because of the lookahead zone.

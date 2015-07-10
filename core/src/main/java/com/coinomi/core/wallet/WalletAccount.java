@@ -27,7 +27,7 @@ public interface WalletAccount extends TransactionBag, KeyBag, TransactionEventL
     String getId();
     String getDescription();
     void setDescription(String description);
-
+    byte[] getPublicKey();
     CoinType getCoinType();
 
     boolean isNew();
@@ -38,22 +38,43 @@ public interface WalletAccount extends TransactionBag, KeyBag, TransactionEventL
 
     boolean isConnected();
     WalletPocketConnectivity getConnectivityStatus();
+
     /**
      * Returns the address used for change outputs. Note: this will probably go away in future.
      */
-    Address getChangeAddress();
+    AbstractAddress getChangeAddress();
 
     /**
-     * Get current receive address, does not mark it as used
+     * Get current receive address, does not mark it as used.
      */
-    Address getReceiveAddress();
+    AbstractAddress getReceiveAddress();
 
     /**
      * Get current refund address, does not mark it as used.
      *
      * Notice: This address could be the same as the current receive address
      */
-    Address getRefundAddress();
+    AbstractAddress getRefundAddress();
+
+    /**
+     * Returns the address used for change outputs. Note: this will probably go away in future.
+     */
+    @Deprecated
+    Address getChangeBitAddress();
+
+    /**
+     * Get current receive address, does not mark it as used.
+     */
+    @Deprecated
+    Address getReceiveBitAddress();
+
+    /**
+     * Get current refund address, does not mark it as used.
+     *
+     * Notice: This address could be the same as the current receive address
+     */
+    @Deprecated
+    Address getRefundBitAddress();
 
     Transaction getTransaction(String transactionId);
     Map<Sha256Hash, Transaction> getUnspentTransactions();
@@ -64,6 +85,9 @@ public interface WalletAccount extends TransactionBag, KeyBag, TransactionEventL
     void markAddressAsUsed(Address address);
 
     void setWallet(Wallet wallet);
+
+    Wallet getWallet();
+
     void walletSaveLater();
     void walletSaveNow();
 
@@ -86,4 +110,11 @@ public interface WalletAccount extends TransactionBag, KeyBag, TransactionEventL
     boolean isAddressMine(Address address);
 
     boolean isLoading();
+
+    void maybeInitializeAllKeys();
+
+    byte[] getPrivateKeyBytes();
+
+    String getPublicKeyMnemonic();
+    String getPrivateKeyMnemonic();
 }

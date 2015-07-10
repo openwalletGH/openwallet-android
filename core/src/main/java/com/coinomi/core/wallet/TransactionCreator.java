@@ -54,12 +54,6 @@ public class TransactionCreator {
         coinType = account.coinType;
     }
 
-    public TransactionCreator(AddressWallet account) {
-        this.account = account;
-        lock = account.lock;
-        coinType = account.coinType;
-    }
-
     private static class FeeCalculation {
         CoinSelection bestCoinSelection;
         TransactionOutput bestChangeOutput;
@@ -386,10 +380,10 @@ public class TransactionCreator {
             if (change.signum() > 0) {
                 // The value of the inputs is greater than what we want to send. Just like in real life then,
                 // we need to take back some coins ... this is called "change". Add another output that sends the change
-                // back to us. The address comes either from the request or getChangeAddress() as a default.
+                // back to us. The address comes either from the request or getChangeBitAddress() as a default.
                 Address changeAddress = req.changeAddress;
                 if (changeAddress == null)
-                    changeAddress = account.getChangeAddress();
+                    changeAddress = account.getChangeBitAddress();
                 changeOutput = new TransactionOutput(coinType, req.tx, change, changeAddress);
                 // If the change output would result in this transaction being rejected as dust, just drop the change and make it a fee
                 if (req.ensureMinRequiredFee && coinType.getMinNonDust().compareTo(change) >= 0) {

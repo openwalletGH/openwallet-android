@@ -1,6 +1,7 @@
 package com.coinomi.core.wallet;
 
 import com.coinomi.core.coins.CoinType;
+import com.google.common.annotations.VisibleForTesting;
 
 /**
  * @author John L. Jegutanis
@@ -8,6 +9,9 @@ import com.coinomi.core.coins.CoinType;
 public abstract class AbstractWallet extends TransactionWatcherWallet {
     protected final String id;
     private String description;
+
+    @VisibleForTesting
+    protected SimpleHDKeyChain keys;
 
     public AbstractWallet(CoinType coinType, String id) {
         super(coinType);

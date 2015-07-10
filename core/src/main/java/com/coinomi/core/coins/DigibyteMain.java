@@ -1,6 +1,6 @@
 package com.coinomi.core.coins;
 
-import org.bitcoinj.core.Coin;
+import com.coinomi.core.coins.families.BitFamily;
 
 /**
  * @author Digibyte
@@ -15,6 +15,7 @@ public class DigibyteMain extends CoinType {
         spendableCoinbaseDepth = 100;
         dumpedPrivateKeyHeader = 128;
 
+        family = BitFamily.get();
         name = "Digibyte (beta)";
         symbol = "DGB";
         uriScheme = "digibyte";

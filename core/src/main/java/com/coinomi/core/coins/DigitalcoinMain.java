@@ -1,6 +1,6 @@
 package com.coinomi.core.coins;
 
-import org.bitcoinj.core.Coin;
+import com.coinomi.core.coins.families.BitFamily;
 
 /**
  * @author FuzzyHobbit
@@ -14,6 +14,7 @@ public class DigitalcoinMain extends CoinType {
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 5;
 
+        family = BitFamily.get();
         name = "Digitalcoin";
         symbol = "DGC";
         uriScheme = "digitalcoin";

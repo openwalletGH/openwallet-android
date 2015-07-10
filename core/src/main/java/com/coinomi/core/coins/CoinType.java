@@ -1,6 +1,7 @@
 package com.coinomi.core.coins;
 
 
+import com.coinomi.core.coins.families.CoinFamily;
 import com.coinomi.core.util.MonetaryFormat;
 
 import org.bitcoinj.core.Address;
@@ -25,11 +26,13 @@ abstract public class CoinType extends NetworkParameters implements ValueType, S
 
     private static final String BIP_44_KEY_PATH = "44H/%dH/%dH";
 
+    protected CoinFamily family;
     protected String name;
     protected String symbol;
     protected String uriScheme;
     protected Integer bip44Index;
     protected Integer unitExponent;
+    protected String addressPrefix = "";
     protected Value feePerKb;
     protected Value minNonDust;
     protected Value softDustLimit;
@@ -39,6 +42,11 @@ abstract public class CoinType extends NetworkParameters implements ValueType, S
     private transient MonetaryFormat friendlyFormat;
     private transient MonetaryFormat plainFormat;
     private transient Value oneCoin;
+
+    @Override
+    public CoinFamily getFamily() {
+        return checkNotNull(family, "A coin failed to set a coin family");
+    }
 
     @Override
     public String getName() {
@@ -102,6 +110,13 @@ abstract public class CoinType extends NetworkParameters implements ValueType, S
     public List<ChildNumber> getBip44Path(int account) {
         String path = String.format(BIP_44_KEY_PATH, bip44Index, account);
         return HDUtils.parsePath(path);
+    }
+
+    /**
+        Return an address prefix like NXT- or BURST-, otherwise and empty string
+     */
+    public String getAddressPrefix() {
+        return addressPrefix;
     }
 
     public Address address(String addressStr) throws AddressFormatException {

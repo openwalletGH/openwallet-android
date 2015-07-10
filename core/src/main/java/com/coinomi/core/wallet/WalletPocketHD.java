@@ -18,6 +18,7 @@
 
 package com.coinomi.core.wallet;
 
+import com.coinomi.core.CoreUtils;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.network.interfaces.ConnectionEventListener;
 import com.coinomi.core.network.interfaces.TransactionEventListener;
@@ -72,8 +73,6 @@ public class WalletPocketHD extends AbstractWallet {
     private static final Logger log = LoggerFactory.getLogger(WalletPocketHD.class);
 
     private final TransactionCreator transactionCreator;
-
-    @VisibleForTesting SimpleHDKeyChain keys;
 
     public WalletPocketHD(DeterministicKey rootKey, CoinType coinType,
                           @Nullable KeyCrypter keyCrypter, @Nullable KeyParameter key) {
@@ -360,21 +359,41 @@ public class WalletPocketHD extends AbstractWallet {
         return null;
     }
 
+    @Override
+    public byte[] getPublicKey() {
+        return keys.getRootKey().getPubKey();
+    }
+
+    @Override
+    public AbstractAddress getChangeAddress() {
+        throw new RuntimeException("Not implemented");
+    }
+
+    @Override
+    public AbstractAddress getReceiveAddress() {
+        throw new RuntimeException("Not implemented");
+    }
+
+    @Override
+    public AbstractAddress getRefundAddress() {
+        throw new RuntimeException("Not implemented");
+    }
+
     /** {@inheritDoc} */
     @Override
-    public Address getChangeAddress() {
+    public Address getChangeBitAddress() {
         return currentAddress(CHANGE);
     }
 
     /** {@inheritDoc} */
     @Override
-    public Address getReceiveAddress() {
+    public Address getReceiveBitAddress() {
         return currentAddress(RECEIVE_FUNDS);
     }
 
     /** {@inheritDoc} */
     @Override
-    public Address getRefundAddress() {
+    public Address getRefundBitAddress() {
         return currentAddress(REFUND);
     }
 
@@ -556,7 +575,8 @@ public class WalletPocketHD extends AbstractWallet {
     @VisibleForTesting Address currentAddress(SimpleHDKeyChain.KeyPurpose purpose) {
         lock.lock();
         try {
-            return keys.getCurrentUnusedKey(purpose).toAddress(coinType);
+
+            return (Address) CoreUtils.currentAddress(coinType, keys, purpose);
         } finally {
             lock.unlock();
             subscribeIfNeeded();
@@ -567,13 +587,30 @@ public class WalletPocketHD extends AbstractWallet {
      * Used to force keys creation, could take long time to complete so use it in a background
      * thread.
      */
-    @VisibleForTesting void maybeInitializeAllKeys() {
+    @VisibleForTesting
+    public void maybeInitializeAllKeys() {
         lock.lock();
         try {
             keys.maybeLookAhead();
         } finally {
             lock.unlock();
         }
+    }
+
+
+    @Override
+    public byte[] getPrivateKeyBytes() {
+        return keys.getRootKey().getPrivKeyBytes();
+    }
+
+    @Override
+    public String getPublicKeyMnemonic() {
+        throw new RuntimeException("Not implemented");
+    }
+
+    @Override
+    public String getPrivateKeyMnemonic() {
+        throw new RuntimeException("Not implemented");
     }
 
     public List<Address> getActiveAddresses() {

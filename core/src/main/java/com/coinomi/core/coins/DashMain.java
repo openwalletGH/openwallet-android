@@ -1,5 +1,7 @@
 package com.coinomi.core.coins;
 
+import com.coinomi.core.coins.families.BitFamily;
+
 /**
  * @author John L. Jegutanis
  */
@@ -12,6 +14,7 @@ public class DashMain extends CoinType {
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 100;
 
+        family = BitFamily.get();
         name = "Dash";
         symbol = "DASH";
         uriScheme = "dash"; // TODO add multi uri, darkcoin

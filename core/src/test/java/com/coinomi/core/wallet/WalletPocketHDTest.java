@@ -14,8 +14,6 @@ import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.Transaction;
-import org.bitcoinj.core.TransactionInput;
-import org.bitcoinj.core.TransactionOutput;
 import org.bitcoinj.core.Utils;
 import org.bitcoinj.crypto.DeterministicHierarchy;
 import org.bitcoinj.crypto.DeterministicKey;
@@ -41,8 +39,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -85,7 +81,7 @@ public class WalletPocketHDTest {
 
     @Test
     public void issuedKeys() throws Bip44KeyLookAheadExceededException {
-        LinkedList<Address> issuedAddresses = new LinkedList<Address>();
+        List<Address> issuedAddresses = new ArrayList<>();
         assertEquals(0, pocket.getIssuedReceiveAddresses().size());
         assertEquals(0, pocket.keys.getNumIssuedExternalKeys());
 
@@ -177,7 +173,7 @@ public class WalletPocketHDTest {
         assertEquals(67, pocket.addressesStatus.size());
         assertEquals(67, pocket.addressesSubscribed.size());
 
-        Address receiveAddr = pocket.getReceiveAddress();
+        Address receiveAddr = pocket.getReceiveBitAddress();
         // This key is not issued
         assertEquals(18, pocket.keys.getNumIssuedExternalKeys());
         assertEquals(67, pocket.addressesStatus.size());
