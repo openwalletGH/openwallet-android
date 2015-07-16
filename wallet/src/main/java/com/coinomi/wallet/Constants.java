@@ -21,6 +21,7 @@ import com.coinomi.core.coins.NamecoinMain;
 import com.coinomi.core.coins.NuBitsMain;
 import com.coinomi.core.coins.NuSharesMain;
 import com.coinomi.core.coins.PeercoinMain;
+import com.coinomi.core.coins.NovacoinMain;
 import com.coinomi.core.coins.ReddcoinMain;
 import com.coinomi.core.coins.RubycoinMain;
 import com.coinomi.core.coins.UroMain;
@@ -148,6 +149,9 @@ public class Constants {
                                                     new ServerAddress("neos-cce-2.coinomi.net", 5027)),
             new CoinAddress(VertcoinMain.get(),     new ServerAddress("vtc-cce-1.coinomi.net", 5028),
                                                     new ServerAddress("vtc-cce-2.coinomi.net", 5028)),
+            new CoinAddress(NovacoinMain.get(),     new ServerAddress("node.novacoin.karelia.pro", 40001),
+                                                    new ServerAddress("178.22.51.250", 40001),
+                                                    new ServerAddress("185.61.38.40", 40001)),
             new CoinAddress(JumbucksMain.get(),     new ServerAddress("jbs-cce-1.coinomi.net", 5029),
                                                     new ServerAddress("jbs-cce-2.coinomi.net", 5029)),
             new CoinAddress(VpncoinMain.get(),      new ServerAddress("vpn-cce-1.coinomi.net", 5032),
@@ -182,6 +186,7 @@ public class Constants {
         COINS_ICONS.put(CoinID.VERTCOIN_MAIN.getCoinType(), R.drawable.vertcoin);
         COINS_ICONS.put(CoinID.JUMBUCKS_MAIN.getCoinType(), R.drawable.jumbucks);
         COINS_ICONS.put(CoinID.VPNCOIN_MAIN.getCoinType(), R.drawable.vpncoin);
+        COINS_ICONS.put(CoinID.NOVACOIN_MAIN.getCoinType(), R.drawable.novacoin);
 
         COINS_BLOCK_EXPLORERS = new HashMap<CoinType, String>();
         COINS_BLOCK_EXPLORERS.put(CoinID.BITCOIN_MAIN.getCoinType(), "https://blockchain.info/tx/%s");
@@ -209,6 +214,7 @@ public class Constants {
         COINS_BLOCK_EXPLORERS.put(CoinID.VERTCOIN_MAIN.getCoinType(), "https://bitinfocharts.com/vertcoin/tx/%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.JUMBUCKS_MAIN.getCoinType(), "http://explorer.getjumbucks.com/tx/%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.VPNCOIN_MAIN.getCoinType(), "https://blockexperts.com/vpn/tx/%s");
+        COINS_BLOCK_EXPLORERS.put(CoinID.NOVACOIN_MAIN.getCoinType(), "http://explorer.novaco.in/tx/%s");
     }
 
     public static final CoinType DEFAULT_COIN = BitcoinMain.get();
@@ -240,6 +246,7 @@ public class Constants {
             JumbucksMain.get(),
             NeoscoinMain.get(),
             CannacoinMain.get(),
+            NovacoinMain.get(),
             BitcoinTest.get(),
             LitecoinTest.get(),
             DogecoinTest.get()
