@@ -25,7 +25,7 @@ import com.coinomi.core.coins.ReddcoinMain;
 import com.coinomi.core.coins.RubycoinMain;
 import com.coinomi.core.coins.UroMain;
 import com.coinomi.core.coins.NeoscoinMain;
-//import com.coinomi.core.coins.NeoscoinTest;
+import com.coinomi.core.coins.JumbucksMain;
 import com.coinomi.core.coins.VertcoinMain;
 import com.coinomi.core.network.CoinAddress;
 import com.coinomi.stratumj.ServerAddress;
@@ -146,7 +146,9 @@ public class Constants {
             new CoinAddress(NeoscoinMain.get(),     new ServerAddress("neos-cce-1.coinomi.net", 5027),
                                                     new ServerAddress("neos-cce-2.coinomi.net", 5027)),
             new CoinAddress(VertcoinMain.get(),     new ServerAddress("vtc-cce-1.coinomi.net", 5028),
-                                                    new ServerAddress("vtc-cce-2.coinomi.net", 5028))
+                                                    new ServerAddress("vtc-cce-2.coinomi.net", 5028)),
+            new CoinAddress(JumbucksMain.get(),     new ServerAddress("jbs-cce-1.coinomi.net", 5029),
+                                                    new ServerAddress("jbs-cce-2.coinomi.net", 5029))
     );
 
     public static final HashMap<CoinType, Integer> COINS_ICONS;
@@ -175,6 +177,7 @@ public class Constants {
         COINS_ICONS.put(CoinID.DIGIBYTE_MAIN.getCoinType(), R.drawable.digibyte);
         COINS_ICONS.put(CoinID.NEOSCOIN_MAIN.getCoinType(), R.drawable.neoscoin);
         COINS_ICONS.put(CoinID.VERTCOIN_MAIN.getCoinType(), R.drawable.vertcoin);
+        COINS_ICONS.put(CoinID.JUMBUCKS_MAIN.getCoinType(), R.drawable.jumbucks);
 
         COINS_BLOCK_EXPLORERS = new HashMap<CoinType, String>();
         COINS_BLOCK_EXPLORERS.put(CoinID.BITCOIN_MAIN.getCoinType(), "https://blockchain.info/tx/%s");
@@ -200,6 +203,7 @@ public class Constants {
         COINS_BLOCK_EXPLORERS.put(CoinID.DIGIBYTE_MAIN.getCoinType(), "https://digiexplorer.info/tx/%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.NEOSCOIN_MAIN.getCoinType(), "http://explorer.infernopool.com/tx/%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.VERTCOIN_MAIN.getCoinType(), "https://bitinfocharts.com/vertcoin/tx/%s");
+        COINS_BLOCK_EXPLORERS.put(CoinID.JUMBUCKS_MAIN.getCoinType(), "http://explorer.getjumbucks.com/tx/%s");
     }
 
     public static final CoinType DEFAULT_COIN = BitcoinMain.get();
@@ -229,6 +233,7 @@ public class Constants {
             DigitalcoinMain.get(),
             CannacoinMain.get(),
             NeoscoinMain.get(),
+            JumbucksMain.get(),
             BitcoinTest.get(),
             LitecoinTest.get(),
             DogecoinTest.get()
