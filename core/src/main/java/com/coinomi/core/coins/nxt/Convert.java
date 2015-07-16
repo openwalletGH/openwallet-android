@@ -115,8 +115,10 @@ public final class Convert {
         }
         account = account.toUpperCase();
         if (account.startsWith("NXT-")) {
+            return Crypto.rsDecode(account.substring(4));
+        } else if (account.startsWith("BURST-")) {
             return Crypto.rsDecode(account.substring(6));
-        } else {
+        }  else {
             return parseUnsignedLong(account);
         }
     }
@@ -140,12 +142,20 @@ public final class Convert {
         return bigInteger.longValue();
     }
 
-    public static long fromEpochTime(int epochTime) {
-        return epochTime * 1000L + Constants.EPOCH_BEGINNING - 500L;
+    public static long fromNXTEpochTime(int epochTime) {
+        return epochTime * 1000L + Constants.NXT_EPOCH_BEGINNING - 500L;
     }
 
-    public static int toEpochTime(long currentTime) {
-        return (int)((currentTime - Constants.EPOCH_BEGINNING + 500) / 1000);
+    public static long fromBurstEpochTime(int epochTime) {
+        return epochTime * 1000l + Constants.BURST_EPOCH_BEGINNING - 500L;
+    }
+
+    public static int toNxtEpochTime(long currentTime) {
+        return (int)((currentTime - Constants.NXT_EPOCH_BEGINNING + 500) / 1000);
+    }
+
+    public static int toBurstEpochTime(long currentTime) {
+        return (int)((currentTime - Constants.BURST_EPOCH_BEGINNING + 500) / 1000);
     }
 
     public static String emptyToNull(String s) {
@@ -273,6 +283,60 @@ public final class Convert {
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
+    }
+
+    // overflow checking based on https://www.securecoding.cert.org/confluence/display/java/NUM00-J.+Detect+or+prevent+integer+overflow
+    public static long safeAdd(long left, long right)
+            throws ArithmeticException {
+        if (right > 0 ? left > Long.MAX_VALUE - right
+                : left < Long.MIN_VALUE - right) {
+            throw new ArithmeticException("Integer overflow");
+        }
+        return left + right;
+    }
+
+    public static long safeSubtract(long left, long right)
+            throws ArithmeticException {
+        if (right > 0 ? left < Long.MIN_VALUE + right
+                : left > Long.MAX_VALUE + right) {
+            throw new ArithmeticException("Integer overflow");
+        }
+        return left - right;
+    }
+
+    public static long safeMultiply(long left, long right)
+            throws ArithmeticException {
+        if (right > 0 ? left > Long.MAX_VALUE/right
+                || left < Long.MIN_VALUE/right
+                : (right < -1 ? left > Long.MIN_VALUE/right
+                || left < Long.MAX_VALUE/right
+                : right == -1
+                && left == Long.MIN_VALUE) ) {
+            throw new ArithmeticException("Integer overflow");
+        }
+        return left * right;
+    }
+
+    public static long safeDivide(long left, long right)
+            throws ArithmeticException {
+        if ((left == Long.MIN_VALUE) && (right == -1)) {
+            throw new ArithmeticException("Integer overflow");
+        }
+        return left / right;
+    }
+
+    public static long safeNegate(long a) throws ArithmeticException {
+        if (a == Long.MIN_VALUE) {
+            throw new ArithmeticException("Integer overflow");
+        }
+        return -a;
+    }
+
+    public static long safeAbs(long a) throws ArithmeticException {
+        if (a == Long.MIN_VALUE) {
+            throw new ArithmeticException("Integer overflow");
+        }
+        return Math.abs(a);
     }
 
 }

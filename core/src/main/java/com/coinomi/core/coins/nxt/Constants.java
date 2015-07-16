@@ -29,13 +29,13 @@ public final class Constants {
     public static final long MAX_BALANCE_NXT = 1000000000;
     public static final long ONE_NXT = 100000000;
     public static final long MAX_BALANCE_NQT = MAX_BALANCE_NXT * ONE_NXT;
-    public static final long INITIAL_BASE_TARGET = 153722867;
-    public static final long MAX_BASE_TARGET = MAX_BALANCE_NXT * INITIAL_BASE_TARGET;
+    //public static final long INITIAL_BASE_TARGET = 153722867;
+    //public static final long MAX_BASE_TARGET = MAX_BALANCE_NXT * INITIAL_BASE_TARGET;
 //    public static final int MAX_ROLLBACK = Math.max(Nxt.getIntProperty("nxt.maxRollback"), 720);
 //    public static final int GUARANTEED_BALANCE_CONFIRMATIONS = isTestnet ? Nxt.getIntProperty("nxt.testnetGuaranteedBalanceConfirmations", 1440) : 1440;
 //    public static final int LEASING_DELAY = isTestnet ? Nxt.getIntProperty("nxt.testnetLeasingDelay", 1440) : 1440;
 
-    public static final int MAX_TIMEDRIFT = 15; // allow up to 15 s clock difference
+    //public static final int MAX_TIMEDRIFT = 15; // allow up to 15 s clock difference
 //    public static final int FORGING_DELAY = Nxt.getIntProperty("nxt.forgingDelay");
 //    public static final int FORGING_SPEEDUP = Nxt.getIntProperty("nxt.forgingSpeedup");
 
@@ -115,22 +115,22 @@ public final class Constants {
     public static final int MAX_TAGGED_DATA_FILENAME_LENGTH = 100;
     public static final int MAX_TAGGED_DATA_DATA_LENGTH = 42 * 1024;
 
-    public static final int ALIAS_SYSTEM_BLOCK = 22000;
+    /*public static final int ALIAS_SYSTEM_BLOCK = 22000;
     public static final int TRANSPARENT_FORGING_BLOCK = 30000;
     public static final int ARBITRARY_MESSAGES_BLOCK = 40000;
     public static final int TRANSPARENT_FORGING_BLOCK_2 = 47000;
     public static final int TRANSPARENT_FORGING_BLOCK_3 = 51000;
     public static final int TRANSPARENT_FORGING_BLOCK_4 = 64000;
-    public static final int TRANSPARENT_FORGING_BLOCK_5 = 67000;
+    public static final int TRANSPARENT_FORGING_BLOCK_5 = 67000;*/
 //    public static final int TRANSPARENT_FORGING_BLOCK_6 = isTestnet ? 75000 : 130000;
-    public static final int TRANSPARENT_FORGING_BLOCK_7 = Integer.MAX_VALUE;
+    //public static final int TRANSPARENT_FORGING_BLOCK_7 = Integer.MAX_VALUE;
 //    public static final int TRANSPARENT_FORGING_BLOCK_8 = isTestnet ? 78000 : 215000;
 //    public static final int NQT_BLOCK = isTestnet ? 76500 : 132000;
 //    public static final int FRACTIONAL_BLOCK = isTestnet ? NQT_BLOCK : 134000;
 //    public static final int ASSET_EXCHANGE_BLOCK = isTestnet ? NQT_BLOCK : 135000;
 //    public static final int REFERENCED_TRANSACTION_FULL_HASH_BLOCK = isTestnet ? NQT_BLOCK : 140000;
 //    public static final int REFERENCED_TRANSACTION_FULL_HASH_BLOCK_TIMESTAMP = isTestnet ? 13031352 : 15134204;
-    public static final int MAX_REFERENCED_TRANSACTION_TIMESPAN = 60 * 1440 * 60;
+    //public static final int MAX_REFERENCED_TRANSACTION_TIMESPAN = 60 * 1440 * 60;
 //    public static final int DIGITAL_GOODS_STORE_BLOCK = isTestnet ? 77341 : 213000;
 //    public static final int MONETARY_SYSTEM_BLOCK = isTestnet ? 150000 : 330000;
 //    public static final int VOTING_SYSTEM_BLOCK = isTestnet ? 220000 : 445000;
@@ -142,7 +142,7 @@ public final class Constants {
 
 //    static final long UNCONFIRMED_POOL_DEPOSIT_NQT = (isTestnet ? 50 : 100) * ONE_NXT;
 
-    public static final long EPOCH_BEGINNING;
+    public static final long NXT_EPOCH_BEGINNING;
     static {
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
         calendar.set(Calendar.YEAR, 2013);
@@ -152,7 +152,20 @@ public final class Constants {
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
-        EPOCH_BEGINNING = calendar.getTimeInMillis();
+        NXT_EPOCH_BEGINNING = calendar.getTimeInMillis();
+    }
+
+    public static final long BURST_EPOCH_BEGINNING;
+    static {
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        calendar.set(Calendar.YEAR, 2014);
+        calendar.set(Calendar.MONTH, Calendar.AUGUST);
+        calendar.set(Calendar.DAY_OF_MONTH, 11);
+        calendar.set(Calendar.HOUR_OF_DAY, 2);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        BURST_EPOCH_BEGINNING = calendar.getTimeInMillis();
     }
 
     public static final String ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyz";
