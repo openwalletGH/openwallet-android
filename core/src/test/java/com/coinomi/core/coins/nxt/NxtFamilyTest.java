@@ -59,7 +59,7 @@ public class NxtFamilyTest {
     }
 
     @Test
-    public void testNxtTransaction() throws NxtException.NotValidException {
+    public void testNxtTransaction() throws NxtException.ValidationException {
         //old way
         //NxtTransaction tx = new NxtTransaction(nxtPublicKey, recipient, 500000000L);
         //byte[] signedTxBytes = tx.getSignedTxBytes(nxtSecret);
@@ -67,14 +67,14 @@ public class NxtFamilyTest {
         //new way
 
         byte version = 1;
-        Long amountNQT = 100000000L;
-        Long feeNQT = 100000000L;
+        long amountNQT = 100000000L;
+        long feeNQT = 100000000L;
         int timestamp = Convert.toNxtEpochTime(System.currentTimeMillis()); // different for nxt and burst
         short deadline = 1440;
-        Long recipientLong = Convert.parseAccountId(recipient);
+        long recipientLong = Convert.parseAccountId(recipient);
 
-        TransactionImpl.BuilderImpl builder = new TransactionImpl.BuilderImpl(version, nxtPublicKey, amountNQT, feeNQT, timestamp,
-                deadline, (Attachment.AbstractAttachment)Attachment.ORDINARY_PAYMENT);
+        TransactionImpl.BuilderImpl builder = new TransactionImpl.BuilderImpl(version, nxtPublicKey,
+                amountNQT, feeNQT, timestamp, deadline, Attachment.ORDINARY_PAYMENT);
         if (version > 0) {
             builder.ecBlockHeight(0);
             builder.ecBlockId(0L);
@@ -84,13 +84,23 @@ public class NxtFamilyTest {
 
         }
         Transaction transaction = builder.recipientId(recipientLong).build();
-        transaction.sign( nxtSecret );
+        transaction.sign(nxtSecret);
         byte[] txBytes = transaction.getBytes();
-        System.out.println(Convert.toHexString(txBytes));
+
+        Transaction parsedTx = TransactionImpl.parseTransaction(txBytes);
+        assertEquals(Attachment.ORDINARY_PAYMENT, parsedTx.getAttachment());
+        assertEquals(deadline, parsedTx.getDeadline());
+        assertEquals(timestamp, parsedTx.getTimestamp());
+        assertEquals(nxtAccountId, parsedTx.getSenderId());
+        assertArrayEquals(nxtPublicKey, parsedTx.getSenderPublicKey());
+        assertEquals(amountNQT, parsedTx.getAmountNQT());
+        assertEquals(feeNQT, parsedTx.getFeeNQT());
+        assertEquals(recipientLong, parsedTx.getRecipientId());
+        // TODO check signature
     }
 
     @Test
-    public void testNxtMessageTransaction() throws NxtException.NotValidException {
+    public void testNxtMessageTransaction() throws NxtException.ValidationException {
 
         byte version = 1;
         Long amountNQT = 0L;
@@ -117,7 +127,11 @@ public class NxtFamilyTest {
         Transaction transaction = builder.recipientId(recipientLong).build();
         transaction.sign( nxtSecret );
         byte[] txBytes = transaction.getBytes();
-        System.out.println(Convert.toHexString(txBytes));
+
+        Transaction parsedTx = TransactionImpl.parseTransaction(txBytes);
+        // TODO add asserts
+
+//        System.out.println(Convert.toHexString(txBytes));
     }
 
     // TODO add private key tests for Burst
