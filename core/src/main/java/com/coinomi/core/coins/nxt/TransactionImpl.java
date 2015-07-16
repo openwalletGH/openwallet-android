@@ -205,7 +205,7 @@ public final class TransactionImpl implements Transaction {
         this.senderId = builder.senderId;
         this.blockTimestamp = builder.blockTimestamp;
         this.fullHash = builder.fullHash;
-		this.ecBlockHeight = builder.ecBlockHeight;
+        this.ecBlockHeight = builder.ecBlockHeight;
         this.ecBlockId = builder.ecBlockId;
 
         List<Appendix.AbstractAppendix> list = new ArrayList<>();
@@ -233,7 +233,7 @@ public final class TransactionImpl implements Transaction {
         int effectiveHeight = (height < Integer.MAX_VALUE ? height : 350000);//Nxt.getBlockchain().getHeight());
         long minimumFeeNQT = type.minimumFeeNQT(effectiveHeight, appendagesSize);
         if(type == null || type.isSigned()) {
-        	if (builder.feeNQT > 0 && builder.feeNQT < minimumFeeNQT) {
+            if (builder.feeNQT > 0 && builder.feeNQT < minimumFeeNQT) {
                 throw new NxtException.NotValidException(String.format("Requested fee %d less than the minimum fee %d",
                         builder.feeNQT, minimumFeeNQT));
             }
@@ -244,18 +244,18 @@ public final class TransactionImpl implements Transaction {
             }
         }
         else {
-        	feeNQT = builder.feeNQT;
+            feeNQT = builder.feeNQT;
         }
 
-		if(type == null || type.isSigned()) {
-			if (deadline < 1
-					|| feeNQT > Constants.MAX_BALANCE_NQT
-					|| amountNQT < 0
-					|| amountNQT > Constants.MAX_BALANCE_NQT
-					|| type == null) {
-				throw new NxtException.NotValidException("Invalid transaction parameters:\n type: " + type + ", timestamp: " + timestamp
-						+ ", deadline: " + deadline + ", fee: " + feeNQT + ", amount: " + amountNQT);
-			}
+        if(type == null || type.isSigned()) {
+            if (deadline < 1
+                    || feeNQT > Constants.MAX_BALANCE_NQT
+                    || amountNQT < 0
+                    || amountNQT > Constants.MAX_BALANCE_NQT
+                    || type == null) {
+                throw new NxtException.NotValidException("Invalid transaction parameters:\n type: " + type + ", timestamp: " + timestamp
+                        + ", deadline: " + deadline + ", fee: " + feeNQT + ", amount: " + amountNQT);
+            }
         }
 
         if (attachment == null || type != attachment.getTransactionType()) {
@@ -428,7 +428,7 @@ public final class TransactionImpl implements Transaction {
     }
     
     public long getGenesisId(){
-    	return 1739068987193023818L; // nxt id;
+        return 1739068987193023818L; // nxt id;
     }
 
     @Override
@@ -604,7 +604,7 @@ public final class TransactionImpl implements Transaction {
             byte version = versionValue == null ? 0 : versionValue.byteValue();
             JSONObject attachmentData = (JSONObject) transactionData.get("attachment");
             if(attachmentData == null) {
-            	attachmentData = new JSONObject();
+                attachmentData = new JSONObject();
             }
 
             TransactionType transactionType = TransactionType.findTransactionType(type, subtype);

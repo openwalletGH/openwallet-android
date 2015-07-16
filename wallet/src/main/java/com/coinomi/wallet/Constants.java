@@ -20,6 +20,7 @@ import com.coinomi.core.coins.MonacoinMain;
 import com.coinomi.core.coins.NamecoinMain;
 import com.coinomi.core.coins.NuBitsMain;
 import com.coinomi.core.coins.NuSharesMain;
+import com.coinomi.core.coins.NxtMain;
 import com.coinomi.core.coins.PeercoinMain;
 import com.coinomi.core.coins.ReddcoinMain;
 import com.coinomi.core.coins.RubycoinMain;
@@ -175,6 +176,7 @@ public class Constants {
         COINS_ICONS.put(CoinID.DIGIBYTE_MAIN.getCoinType(), R.drawable.digibyte);
         COINS_ICONS.put(CoinID.NEOSCOIN_MAIN.getCoinType(), R.drawable.neoscoin);
         COINS_ICONS.put(CoinID.VERTCOIN_MAIN.getCoinType(), R.drawable.vertcoin);
+        COINS_ICONS.put(CoinID.NXT_MAIN.getCoinType(), R.drawable.nxt);
 
         COINS_BLOCK_EXPLORERS = new HashMap<CoinType, String>();
         COINS_BLOCK_EXPLORERS.put(CoinID.BITCOIN_MAIN.getCoinType(), "https://blockchain.info/tx/%s");
@@ -214,6 +216,7 @@ public class Constants {
             BitcoinMain.get(),
             DogecoinMain.get(),
             LitecoinMain.get(),
+            NxtMain.get(),
             NuBitsMain.get(),
             PeercoinMain.get(),
             DashMain.get(),

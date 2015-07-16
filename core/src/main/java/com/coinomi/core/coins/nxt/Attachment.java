@@ -91,18 +91,18 @@ public interface Attachment extends Appendix {
 
     /*public static final EmptyAttachment AT_PAYMENT = new EmptyAttachment() {
 
-		@Override
-		public TransactionType getTransactionType() {
-			return TransactionType.AutomatedTransactions.AT_PAYMENT; 
-		}
+        @Override
+        public TransactionType getTransactionType() {
+            return TransactionType.AutomatedTransactions.AT_PAYMENT;
+        }
 
-		@Override
-		String getAppendixName() {
-			return "AT Payment";
-		}
-		
-		
-	};*/
+        @Override
+        String getAppendixName() {
+            return "AT Payment";
+        }
+
+
+    };*/
     
     public final static class MessagingAliasAssignment extends AbstractAttachment {
 
@@ -1516,19 +1516,19 @@ public interface Attachment extends Appendix {
     }
     
    /* public final static class BurstMiningRewardRecipientAssignment extends AbstractAttachment {
-    	
-    	BurstMiningRewardRecipientAssignment(ByteBuffer buffer, byte transactionVersion) {
-    		super(buffer, transactionVersion);
-    	}
-    	
-    	BurstMiningRewardRecipientAssignment(JSONObject attachmentData) {
-    		super(attachmentData);
-    	}
-    	
-    	public BurstMiningRewardRecipientAssignment() {
-    	}
-    	
-    	@Override
+
+        BurstMiningRewardRecipientAssignment(ByteBuffer buffer, byte transactionVersion) {
+            super(buffer, transactionVersion);
+        }
+
+        BurstMiningRewardRecipientAssignment(JSONObject attachmentData) {
+            super(attachmentData);
+        }
+
+        public BurstMiningRewardRecipientAssignment() {
+        }
+
+        @Override
         String getAppendixName() {
             return "RewardRecipientAssignment";
         }

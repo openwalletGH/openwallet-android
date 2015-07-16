@@ -34,7 +34,7 @@ public interface Appendix {
         }
 
         AbstractAppendix() {
-        	this.version = (byte)(1);
+            this.version = (byte)(1);
         }
 
         abstract String getAppendixName();
