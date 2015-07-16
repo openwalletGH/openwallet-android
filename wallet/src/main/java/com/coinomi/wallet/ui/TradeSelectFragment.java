@@ -417,7 +417,7 @@ public class TradeSelectFragment extends Fragment {
             typesWithoutSourceType.remove(sourceType);
             destinationAdapter.update(allAccounts, typesWithoutSourceType, true);
         } else {
-            destinationAdapter.update(allAccounts, supportedTypes, true);
+            destinationAdapter.update(allAccounts, supportedTypes, false);
         }
 
         if (destinationSpinner.getSelectedItemPosition() == -1) {
