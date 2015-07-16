@@ -162,11 +162,9 @@
     <string name="trade_expired">両替の有効期限が切れました</string>
     <string name="tx_confirm_timer_message">%1$s後にこのトランザクションを確認してください</string>
     <plurals name="tx_confirm_timer_minute">
-        <item quantity="one">%s 分</item>
         <item quantity="other">%s 分</item>
     </plurals>
     <plurals name="tx_confirm_timer_second">
-        <item quantity="one">%d 秒</item>
         <item quantity="other">%d 秒</item>
     </plurals>
     <!-- About Activity -->
@@ -174,6 +172,7 @@
     <string name="app_name_long">Coinomi for Android</string>
     <string name="about_licence">オープンソース・プロジェクト\nhttps://github.com/Coinomi/coinomi-android\nソースコードはGNU General Public License 3のもとでライセンスされています</string>
     <string name="about_credits_nubits">サーバのインフラはNuBits - 世界初の安定したデジタル通貨 - の寄付により成り立っています\nhttps://nubits.com/</string>
+    <string name="about_credits_translations">翻訳提供者:</string>
     <string name="about_credits_bitcoinj">Bitcoinjライブラリを使用しています\nhttp://bitcoinj.github.io/</string>
     <string name="about_credits_electrum">Electrumのサーバソフトウェアを使用しています\nhttps://electrum.org/</string>
     <string name="about_credits_schildbach">Andreas Schildbach氏の影響を受けています\nhttps://github.com/schildbach/bitcoin-wallet/</string>
@@ -181,7 +180,6 @@
     <string name="about_credits_crypto_icons">暗号通貨のアイコンはChris Shepherd氏によるものです\nhttps://github.com/shphrd/crypto-icons</string>
     <string name="about_credits_font_icons">フォントのアイコンはDaniel Bruce氏によるものです\nhttp://www.entypo.com</string>
     <string name="about_credits_exchange_rates">為替レートは以下により提供されています\nhttp://www.cryptocoincharts.info/\nhttps://bitcoinaverage.com/</string>
-    <string name="about_coinomi_copyright">Coinomi 2014&#8211;2015</string>
     <!-- Add Coins -->
     <string name="title_activity_add_coins">コインを追加する</string>
     <string name="password_add_coin">ウォレットの中に %1$s のアカウントを作成しようとしています。</string>
@@ -201,7 +199,6 @@
     <string name="transaction_id_label">トランザクションID</string>
     <string name="view_at_a_blockchain_explorer_link">ブロックエクスプローラで確認する</string>
     <plurals name="status_building">
-        <item quantity="one">%d 検証</item>
         <item quantity="other">%d 検証</item>
     </plurals>
     <string name="status_pending">トランザクションの検証を待っています</string>
