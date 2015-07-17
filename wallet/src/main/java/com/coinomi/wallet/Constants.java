@@ -5,6 +5,7 @@ import android.text.format.DateUtils;
 import com.coinomi.core.coins.BitcoinMain;
 import com.coinomi.core.coins.BitcoinTest;
 import com.coinomi.core.coins.BlackcoinMain;
+import com.coinomi.core.coins.BurstMain;
 import com.coinomi.core.coins.CannacoinMain;
 import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
@@ -179,6 +180,7 @@ public class Constants {
         COINS_ICONS.put(CoinID.NEOSCOIN_MAIN.getCoinType(), R.drawable.neoscoin);
         COINS_ICONS.put(CoinID.VERTCOIN_MAIN.getCoinType(), R.drawable.vertcoin);
         COINS_ICONS.put(CoinID.NXT_MAIN.getCoinType(), R.drawable.nxt);
+        COINS_ICONS.put(CoinID.BURST_MAIN.getCoinType(), R.drawable.burst);
         COINS_ICONS.put(CoinID.JUMBUCKS_MAIN.getCoinType(), R.drawable.jumbucks);
 
         COINS_BLOCK_EXPLORERS = new HashMap<CoinType, String>();
@@ -229,6 +231,7 @@ public class Constants {
             MonacoinMain.get(),
             NuSharesMain.get(),
             VertcoinMain.get(),
+            BurstMain.get(),
             FeathercoinMain.get(),
             RubycoinMain.get(),
             ReddcoinMain.get(),

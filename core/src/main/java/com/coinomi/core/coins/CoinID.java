@@ -39,6 +39,7 @@ public enum CoinID {
     NEOSCOIN_MAIN(NeoscoinMain.get()),
     VERTCOIN_MAIN(VertcoinMain.get()),
     NXT_MAIN(NxtMain.get()),
+    BURST_MAIN(BurstMain.get()),
     JUMBUCKS_MAIN(JumbucksMain.get()),
     ;
 
