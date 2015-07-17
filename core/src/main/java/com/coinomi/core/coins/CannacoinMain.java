@@ -16,7 +16,7 @@ public class CannacoinMain extends CoinType {
         dumpedPrivateKeyHeader = 189;
         transactionVersion = 2;
 
-        family = BitFamily.get();
+        family = ReddcoinMain.get();
         name = "Cannacoin";
         symbol = "CCN";
         uriScheme = "cannacoin";

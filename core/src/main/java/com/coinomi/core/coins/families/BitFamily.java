@@ -10,4 +10,14 @@ final public class BitFamily implements CoinFamily {
     public static synchronized CoinFamily get() {
         return instance;
     }
+
+    @Override
+    public String toString() {
+        return "bitcoin";
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj != null && obj instanceof BitFamily && toString().equals(obj.toString());
+    }
 }

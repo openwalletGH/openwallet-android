@@ -17,6 +17,7 @@ import java.util.List;
 
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * @author John L. Jegutanis
@@ -26,7 +27,6 @@ abstract public class CoinType extends NetworkParameters implements ValueType, S
 
     private static final String BIP_44_KEY_PATH = "44H/%dH/%dH";
 
-    protected CoinFamily family;
     protected String name;
     protected String symbol;
     protected String uriScheme;
@@ -45,7 +45,9 @@ abstract public class CoinType extends NetworkParameters implements ValueType, S
 
     @Override
     public CoinFamily getFamily() {
-        return checkNotNull(family, "A coin failed to set a coin family");
+        checkState(family instanceof CoinFamily, "Coin family must implement the " +
+                CoinFamily.class + " interface");
+        return (CoinFamily) checkNotNull(family, "A coin failed to set a coin family");
     }
 
     @Override

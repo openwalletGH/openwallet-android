@@ -1,6 +1,6 @@
 package com.coinomi.core.coins;
 
-import com.coinomi.core.coins.families.BitFamily;
+import com.coinomi.core.coins.families.PeerFamily;
 
 /**
  * @author John L. Jegutanis
@@ -14,7 +14,7 @@ public class BlackcoinMain extends CoinType {
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 500;
 
-        family = BitFamily.get();
+        family = PeerFamily.get();
         name = "Blackcoin";
         symbol = "BLK";
         uriScheme = "blackcoin";

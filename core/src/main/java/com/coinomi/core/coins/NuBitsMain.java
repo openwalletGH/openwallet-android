@@ -1,6 +1,6 @@
 package com.coinomi.core.coins;
 
-import com.coinomi.core.coins.families.BitFamily;
+import com.coinomi.core.coins.families.NubitsFamily;
 
 /**
  * @author John L. Jegutanis
@@ -14,7 +14,7 @@ public class NuBitsMain extends CoinType {
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         tokenId = 0x42;
 
-        family = BitFamily.get();
+        family = NubitsFamily.get();
         name = "NuBits";
         symbol = "NBT";
         uriScheme = "nu";

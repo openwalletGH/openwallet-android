@@ -1,8 +1,6 @@
 package com.coinomi.core.coins;
 
-import com.coinomi.core.coins.families.BitFamily;
-
-import org.bitcoinj.core.Coin;
+import com.coinomi.core.coins.families.PeerFamily;
 
 /**
  * @author FuzzyHobbit
@@ -16,7 +14,7 @@ public class RubycoinMain extends CoinType {
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 50;
 
-        family = BitFamily.get();
+        family = PeerFamily.get();
         name = "Rubycoin";
         symbol = "RBY";
         uriScheme = "rubycoin";

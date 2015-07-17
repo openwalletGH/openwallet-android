@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_scan_qr_code">スキャン</string>
+    <string name="action_share">シェア</string>
+    <string name="action_copy">コピー</string>
+    <string name="action_edit_label">ラベル編集</string>
+    <string name="action_empty_wallet">ウォレットを空にする</string>
+    <string name="action_settings">設定</string>
+    <string name="action_about">Coinomiについて</string>
+    <string name="action_refresh">更新</string>
+    <string name="action_exchange_history">両替履歴</string>
+    <string name="action_new_address">新しいアドレス</string>
+    <string name="action_swap_coins">コインを交換</string>
+    <string name="action_delete">削除</string>
+    <string name="action_change_address_type">アドレスタイプ変更</string>
+    <!-- Errors -->
+    <string name="error_generic">アクションを実行中にエラーが発生しました</string>
+    <string name="error_could_not_read_wallet">ウォレットを読み込めませんでした</string>
+    <!-- Generic items -->
+    <string name="button_ok">OK</string>
+    <string name="button_next">次へ</string>
+    <string name="button_finish">完了</string>
+    <string name="button_return">戻る</string>
+    <string name="button_confirm">確認</string>
+    <string name="button_cancel">キャンセル</string>
+    <string name="button_dismiss">却下</string>
+    <string name="button_delete">削除</string>
+    <string name="button_add">追加</string>
+    <string name="button_save">保存</string>
+    <string name="button_remove">削除</string>
+    <string name="button_edit">編集</string>
+    <string name="button_send">送る</string>
+    <string name="button_skip">スキップ</string>
+    <string name="button_retry">再試行</string>
+    <string name="button_download">ダウンロード</string>
+    <string name="button_agree">了解</string>
+    <string name="button_disagree">拒否</string>
+    <string name="button_add_coins">コイン追加</string>
+    <string name="scan_qr_code">QRコードをスキャン</string>
+    <string name="erase_address">アドレスを削除</string>
+    <string name="copied_to_clipboard">クリップボードにコピーされました</string>
+    <string name="wallet_title_request">受け取る</string>
+    <string name="wallet_title_balance">残高</string>
+    <string name="wallet_title_send">送る</string>
+    <string name="wallet_locked_message">ウォレットはロックされています</string>
+    <string name="unlock_wallet_title">ウォレットのロックを解除する</string>
+    <string name="unlocking_wallet_working">ウォレットのロックを解除しています&#8230;</string>
+    <string name="unlocking_wallet_error_title">ウォレットのロックを解除できませんでした</string>
+    <string name="unlocking_wallet_error_detail">パスワードは正しいですか？パスワードが正しく入力されていることをご確認ください。何度やってもこのエラーが表示されてしまう場合には、復元フレーズを用いた復旧をお試しください。</string>
+    <string name="powered_by">Powered by</string>
+    <!-- Nav drawer -->
+    <string name="navigation_drawer_open">ナビゲーション・ドロワーを開く</string>
+    <string name="navigation_drawer_close">ナビゲーション・ドロワーを閉じる</string>
+    <string name="navigation_drawer_services">サービス</string>
+    <string name="navigation_drawer_wallet">ウォレット</string>
+    <!-- SendOutput widget -->
+    <string name="fee">トランザクション手数料</string>
+    <string name="send">送る</string>
+    <string name="trade">両替</string>
+    <string name="receive">受け取る</string>
+    <!-- Welcome fragment -->
+    <string name="welcome_text">Coinomiウォレットへようこそ</string>
+    <string name="create_wallet">新しいウォレットを作成する</string>
+    <string name="restore_wallet">ウォレットを復旧する</string>
+    <string name="test_wallet">ウォレットをテストする</string>
+    <!-- Intro -->
+    <string name="test_wallet_warning_title">テストウォレットを作成しますか？</string>
+    <string name="test_wallet_warning_message">新しいテストウォレットを作成すると、<i>復元フレーズ</i>をバックアップしていない場合には既存のウォレットは失われてしまいます。</string>
+    <string name="incompatible_device_warning_title">互換性のない端末</string>
+    <string name="incompatible_device_warning_message">この端末はソフトウェアもしくはハードウェアのバグにより、いくつかの暗号機能を実行できません。\nこれは端末の製造元によるアップデートにより解決できるかもしれません。\n\n何かご質問があれば support@coinomi.com までお問い合わせください。</string>
+    <!-- Recovery fragment -->
+    <string name="seed_info">これはウォレットの秘密鍵を生成するのに利用される<i>復元フレーズ</i>です。紙に書きとめたうえで、紙幣と同様に安全な場所に保管をしておいてください。この復元フレーズを知ることができる人は誰でもウォレットの残高にアクセスできます。復元フレーズを紛失してしまった場合には、ウォレットの復旧はできなくなります。</string>
+    <string name="seed_title">復元フレーズ</string>
+    <string name="seed_regenerate_title">タッチして新しい復元フレーズを生成する</string>
+    <string name="backed_up_seed">私は復元フレーズを安全な場所に保管しました</string>
+    <!-- Restore fragment -->
+    <string name="restore_info">復元フレーズを入力してください：</string>
+    <string name="restore_seed_protected">この復元フレーズにはパスワードがかかっています</string>
+    <string name="restore_skip_title">検証のスキップ</string>
+    <string name="restore_skip_info1">復元フレーズが以下のものに合致するか確認してください：</string>
+    <string name="restore_skip_info2">スペルミスを発見できますので、検証のスキップは推奨されません。</string>
+    <string name="restore_error_checksum">復元フレーズが正しくありません。スペルミスがないかご確認ください。</string>
+    <string name="restore_error_words">復元フレーズに認識できない単語が含まれています。</string>
+    <string name="restore_error_mismatch">入力された復元フレーズは、正しい復元フレーズに一致しません。</string>
+    <string name="restore_error">復元フレーズの検証に失敗しました。%1$s</string>
+    <string name="extra_entropy">追加のエントロピー</string>
+    <!-- Wallet activity -->
+    <string name="test_wallet_message">これはテストウォレットです。テストネットのBitcoin、Litecoin、Dogecoinを送ったり受け取ったりできます。\n\n本物のおかねを扱うことのできるウォレットを使いたい場合には、<b>設定 &gt; ウォレットを復旧する &gt; 新しいウォレットを作成する</b>を選択してください。</string>
+    <string name="wallet_update_title">新しいバージョンが利用可能です。</string>
+    <string name="wallet_update_message">新しいバージョンのCoinomiが利用可能です。これには新しい機能やバグ修正が含まれます。</string>
+    <string name="pay_with">次のもので送金する：</string>
+    <string name="exchange_and_pay_title">両替と送金</string>
+    <!-- PayToDialog-->
+    <string name="ambiguous_address_title">曖昧なアドレス</string>
+    <string name="ambiguous_address_message">正しいコインタイプを選択してください</string>
+    <!-- Balance fragment -->
+    <string name="wallet_transactions_coinbase">採掘された</string>
+    <string name="history_empty">コインの受け取り履歴は\nありません！\n\n交換所やトレード経由、もしくは品物やサービスを売ったりしてコインを入手しましょう。</string>
+    <string name="sent_to">送り先</string>
+    <string name="received_with">受け取り元</string>
+    <string name="get_tx_info_error">トランザクションの情報を取得できませんでした</string>
+    <string name="disconnected_label">接続なし</string>
+    <string name="no_wallet_pocket_selected">ウォレットのアカウントが選択されていません</string>
+    <string name="get_tx_broadcast_error">トランザクションのブロードキャストに失敗しました</string>
+    <!-- Receive fragment -->
+    <string name="receive_address_label">自分のアドレス</string>
+    <string name="create_new_address">新しいアドレスを作成しますか？</string>
+    <string name="create_new_address_name">ラベル (オプション)</string>
+    <string name="view_previous_addresses">以前のアドレス</string>
+    <string name="too_many_unused_addresses">未使用のアドレスが多すぎます。新しいアドレスを作成する前に、以前のアドレスのうちどれかひとつを使用してみてください。</string>
+    <!-- Send Activity -->
+    <string name="send_coins_activity_title">コインを送る</string>
+    <!-- Send fragment -->
+    <string name="send_coins_fragment_receiving_address_label">支払い先</string>
+    <string name="send_coins_fragment_receiving_address_tip">ラベルかアドレスを入力</string>
+    <string name="send_coins_fragment_receiving_address_error">無効なアドレスです！</string>
+    <string name="send_coins_fragment_amount_label">支払い金額</string>
+    <string name="send_coins_fragment_button_send">送る</string>
+    <string name="send_coins_fragment_button_back">戻る</string>
+    <string name="send_coins_failed_msg">失敗しました！</string>
+    <string name="send_coins_error_network">コインのネットワークに接続できませんでした</string>
+    <string name="send_coins_error_dust">送金額が小さすぎるため、ネットワークから拒否されてしまう可能性があります</string>
+    <string name="send_coins_error">コインを送れませんでした: %1$s</string>
+    <string name="pay_to_label">支払い先</string>
+    <string name="amount_to_send_label">金額</string>
+    <string name="scan_error">スキャン中に問題が発生しました: %1$s</string>
+    <string name="unsupported_coin">コインはサポートされていません: %1$s</string>
+    <string name="address_error">入力されたアドレスは無効です。</string>
+    <string name="amount_error">入力された金額は無効です</string>
+    <string name="amount_error_empty">金額を入力してください</string>
+    <string name="amount_error_negative">負の金額を送ることはできません</string>
+    <string name="amount_error_decimal_places">小数の桁数が多すぎます。%1$d以下で指定してください</string>
+    <string name="amount_error_too_small">最小の送金額は %1$s です</string>
+    <string name="amount_error_not_enough_money_plain">おかねが足りません</string>
+    <string name="amount_error_not_enough_money">おかねが足りません。現在の残高は %1$s です</string>
+    <string name="amount_warn_fees_apply">手数料のために、実際の送金額はわずかに少なくなります</string>
+    <!-- Set Password fragment -->
+    <string name="set_password_info">日々の利用の際にウォレットを守るため、パスワードを設定します。</string>
+    <string name="set_password_seed_protect">復元フレーズにもパスワードをかける</string>
+    <string name="set_password_seed_protect_info">パスワードは変更不可能になり、復元フレーズを用いてウォレットを復旧する際にはパスワードが必要となります。\n警告：パスワードを忘れた場合にはウォレットの復旧は不可能となります！</string>
+    <string name="set_password1">パスワードを入力してください</string>
+    <string name="set_password2">パスワードをもう一度入力してください</string>
+    <string name="password_too_common_error">パスワード \"%1$s\" は一般的なため、安全ではありません。</string>
+    <string name="password_too_short_error">パスワードが短すぎます。最低でも %1$d 文字以上にしてください。</string>
+    <string name="passwords_mismatch">パスワードが一致しません</string>
+    <string name="password_error">パスワードに関するエラーを検知したため、処理を継続できません。</string>
+    <string name="password_skip_warn">パスワードを設定しないと、認証なしでウォレットにアクセスできるようになります。</string>
+    <string name="password_wallet_recovery">ウォレットを復旧するためには、保護された復元フレーズを作成した際に用いたパスワードと全く同じものを入力してください。\n異なるパスワードを入力した場合には、新しい空のウォレットが作成されます。</string>
+    <!-- FinalizeWalletRestorationFragment -->
+    <string name="wallet_restoration">ウォレットが復旧されるまでしばらくお待ちください</string>
+    <string name="wallet_restoration_error">ウォレットを復旧できませんでした。\n\n%1$s</string>
+    <!-- PasswordConfirmationFragment -->
+    <string name="enter_password">パスワードを入力してください</string>
+    <!-- SignTransactionFragment -->
+    <string name="contacting_exchange">両替所に接続しています&#8230;</string>
+    <string name="preparing_transaction">トランザクションの準備と送信をしています。しばらくお待ちください。</string>
+    <string name="no_such_pocket_error">ウォレットアカウントへのアクセスの際にエラーが発生しました。問題が継続する場合には、復元フレーズを用いてウォレットを復旧してください。</string>
+    <string name="password_failed">入力されたパスワードが正しくありません。</string>
+    <string name="sending_msg">送信しています&#8230;</string>
+    <string name="sent_msg">送信しました！トランザクションが検証されるまでしばらくお待ちください。</string>
+    <string name="tx_already_broadcast">おかねは既に送られています</string>
+    <string name="trade_expired">両替の有効期限が切れました</string>
+    <string name="tx_confirm_timer_message">%1$s後にこのトランザクションを確認してください</string>
+    <plurals name="tx_confirm_timer_minute">
+        <item quantity="other">%s 分</item>
+    </plurals>
+    <plurals name="tx_confirm_timer_second">
+        <item quantity="other">%d 秒</item>
+    </plurals>
+    <!-- About Activity -->
+    <string name="title_activity_about">Coinomiについて</string>
+    <string name="app_name_long">Coinomi for Android</string>
+    <string name="about_licence">オープンソース・プロジェクト\nhttps://github.com/Coinomi/coinomi-android\nソースコードはGNU General Public License 3のもとでライセンスされています</string>
+    <string name="about_credits_nubits">サーバのインフラはNuBits - 世界初の安定したデジタル通貨 - の寄付により成り立っています\nhttps://nubits.com/</string>
+    <string name="about_credits_translations">翻訳提供者:</string>
+    <string name="about_credits_bitcoinj">Bitcoinjライブラリを使用しています\nhttp://bitcoinj.github.io/</string>
+    <string name="about_credits_electrum">Electrumのサーバソフトウェアを使用しています\nhttps://electrum.org/</string>
+    <string name="about_credits_schildbach">Andreas Schildbach氏の影響を受けています\nhttps://github.com/schildbach/bitcoin-wallet/</string>
+    <string name="about_credits_zxing">QRコードの機能はZXing氏によるものです\nhttps://github.com/zxing/zxing</string>
+    <string name="about_credits_crypto_icons">暗号通貨のアイコンはChris Shepherd氏によるものです\nhttps://github.com/shphrd/crypto-icons</string>
+    <string name="about_credits_font_icons">フォントのアイコンはDaniel Bruce氏によるものです\nhttp://www.entypo.com</string>
+    <string name="about_credits_exchange_rates">為替レートは以下により提供されています\nhttp://www.cryptocoincharts.info/\nhttps://bitcoinaverage.com/</string>
+    <!-- Add Coins -->
+    <string name="title_activity_add_coins">コインを追加する</string>
+    <string name="password_add_coin">ウォレットの中に %1$s のアカウントを作成しようとしています。</string>
+    <string name="adding_coin_confirmation_title">%1$s を追加しますか？</string>
+    <string name="adding_coin_working">新しい %1$s のアカウントを追加しています。しばらくお待ちください</string>
+    <string name="add_coin_error">%1$s を追加する際にエラーが発生しました: %2$s</string>
+    <string name="coin_already_added_title">%1$s は既に追加されています</string>
+    <string name="coin_already_added">追加のアカウントは現在のところサポートされていません</string>
+    <!-- Transaction amount visualizer -->
+    <string name="internal_transfer">ウォレット内部の送金</string>
+    <!-- Transaction Details -->
+    <string name="title_activity_transaction_details">トランザクション詳細</string>
+    <string name="sent">送金額</string>
+    <string name="received">受取額</string>
+    <string name="status_label">状態</string>
+    <string name="date_label">日付</string>
+    <string name="transaction_id_label">トランザクションID</string>
+    <string name="view_at_a_blockchain_explorer_link">ブロックエクスプローラで確認する</string>
+    <plurals name="status_building">
+        <item quantity="other">%d 検証</item>
+    </plurals>
+    <string name="status_pending">トランザクションの検証を待っています</string>
+    <string name="status_unknown">トランザクションの状態は未知です</string>
+    <!-- Exchange Rates -->
+    <string name="title_activity_exchange_rates">為替レート</string>
+    <string name="set_local_currency">%1$s を標準の通貨として設定しました</string>
+    <string name="exchange_rates_loading">為替レートを読み込んでいます</string>
+    <string name="exchange_rates_load_error">為替レートを読み込めませんでした</string>
+    <string name="exchange_rates_empty_search">為替レートが見つかりませんでした</string>
+    <!-- Select Coins -->
+    <string name="select_coins">ウォレットで利用したいコインを選択してください。後ほど追加することもできます。</string>
+    <!-- Previous Addresses -->
+    <string name="title_activity_previous_addresses">以前のアドレス</string>
+    <string name="previous_addresses_used">使用済みアドレス</string>
+    <string name="previous_addresses_unused">未使用アドレス</string>
+    <!-- Edit Address Book Entry -->
+    <string name="edit_address_book_entry_dialog_title_add">アドレスを追加する</string>
+    <string name="edit_address_book_entry_dialog_title_edit">アドレスを編集する</string>
+    <string name="edit_address_book_entry_dialog_address_label">アドレス</string>
+    <string name="edit_address_book_entry_dialog_label_label">ラベル</string>
+    <!-- Settings -->
+    <string name="title_activity_settings">設定</string>
+    <string name="pref_title_restore_wallet">ウォレットを復旧する</string>
+    <string name="pref_title_exchange_rates">為替レート</string>
+    <string name="pref_title_manual_receiving_addresses">手動の受け取りアドレス</string>
+    <string name="pref_summary_manual_receiving_addresses">トランザクションごとに自動的に新しいアドレスを作成しない</string>
+    <!-- Show Seed -->
+    <string name="title_activity_show_seed">復元フレーズを表示する</string>
+    <string name="seed_not_available_title">復元フレーズが見つかりませんでした</string>
+    <string name="seed_not_available">復元フレーズはこのデバイスに保存されていません。\nこの問題を解決するためには、ウォレットの復旧を行ってください。</string>
+    <string name="seed_encrypted_touch_to_decrypt">タッチしてアンロックする</string>
+    <string name="seed_working">お待ちください&#8230;</string>
+    <string name="seed_password_protected">この復元フレーズはパスワードにより保護されています</string>
+    <!-- Exchange -->
+    <string name="title_activity_trade">両替所</string>
+    <string name="trade_info">両替を行いたいコインを選択してください。\n両替されたコインは自動的にウォレットに追加されます。</string>
+    <string name="trade_info_rates">表示されているレートにはShapeShift.ioによって差し引かれるトランザクション手数料が含まれています</string>
+    <string name="trade_from_coin_label">支払うコイン</string>
+    <string name="trade_to_coin_label">受け取るコイン</string>
+    <string name="trade_warn_no_account_found">%1$s のウォレットを追加する手続を開始します</string>
+    <string name="trade_warn_no_connection_title">接続がありません</string>
+    <string name="trade_warn_no_connection_message">コインを両替するためにはインターネット接続が必要です。</string>
+    <string name="trade_error">両替エラー</string>
+    <string name="trade_error_no_supported_source_accounts">サポートされているアカウントがみつかりません</string>
+    <string name="trade_error_service_not_available">サービスが一時的に利用できません。数分後に再度お試しください</string>
+    <string name="trade_error_market_info">サービスが一時的に利用できません。\n%1$s - %2$s のペアに関する情報が見つかりません</string>
+    <string name="trade_error_sign_tx_message">トランザクションの署名とブロードキャストを行う際にエラーが発生しました。\n\n技術的な詳細:\n\n<b>%1$s</b></string>
+    <string name="trade_error_max_limit">与えられた金額は %1$s の上限を超えています。より小さな額を入力してください。</string>
+    <string name="trade_error_min_limit">最小の金額は少なくとも %1$s です</string>
+    <!-- Exchange Status -->
+    <string name="title_activity_exchange_status">両替ステータス</string>
+    <string name="trade_status_message">注文はすぐに完了します。両替には影響ありませんので、このスクリーンを閉じても構いません。</string>
+    <string name="trade_status_complete_message">注文は正常に完了しました。</string>
+    <string name="trade_status_label">状態</string>
+    <string name="trade_status_waiting_deposit">入金を待っています&#8230;</string>
+    <string name="trade_status_received_deposit">%1$s の受け取りを確認しました</string>
+    <string name="trade_status_waiting_trade">両替を待っています&#8230;</string>
+    <string name="trade_status_complete_detail">両替が完了しました。%1$s を送金しました</string>
+    <string name="trade_status_complete">両替が完了しました</string>
+    <string name="trade_status_view_transaction">トランザクションを見る</string>
+    <string name="trade_status_email_receipt">レシートメール</string>
+    <string name="trade_status_failed_detail">両替に失敗しました: %1$s</string>
+    <string name="trade_status_failed">両替に失敗しました</string>
+    <string name="trade_status_delete_message">履歴から削除しますか？</string>
+    <string name="trade_status_tx_not_available">トランザクションが見つかりませんでした。数秒後に再度お試しください</string>
+    <!-- Email receipt dialog -->
+    <string name="email_receipt_title">レシートメール</string>
+    <string name="email_receipt_message">この両替トランザクションに対するメールを受け取る</string>
+    <!-- Exchange History -->
+    <string name="title_activity_exchange_history">両替履歴</string>
+    <string name="exchange_history_empty">両替は一度も行っていません</string>
+    <!-- ShapeShift -->
+    <string name="about_shapeshift_title">ShapeShift.ioについて</string>
+    <string name="about_shapeshift_message">ShapeShift.ioは、Bitcoinとオルトコインの変換サービスを提供する、即時オルトコイン両替所です。Bitcoinの生態系の中で、Bitcoinと数多のオルトコインの変換を行う、最も高速で、最も効率的なプラットフォーム（ウェブおよびAPI経由で利用可能）の代表格です。アカウントの作成は必要ありません。</string>
+</resources>

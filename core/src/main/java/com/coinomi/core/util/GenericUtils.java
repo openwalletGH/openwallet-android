@@ -9,7 +9,6 @@ import com.google.common.collect.ImmutableList;
 
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.AddressFormatException;
-import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.Monetary;
 import org.bitcoinj.core.VersionedChecksummedBytes;
 
@@ -196,9 +195,10 @@ public class GenericUtils {
         ImmutableList.Builder<CoinType> builder = ImmutableList.builder();
         int version = parsed.getVersion();
         for (CoinType type : CoinID.getSupportedCoins()) {
-            for (int typeVersion : type.getAcceptableAddressCodes()) {
-                if (typeVersion == version) {
+            for (int addressCode : type.getAcceptableAddressCodes()) {
+                if (addressCode == version) {
                     builder.add(type);
+                    break;
                 }
             }
         }

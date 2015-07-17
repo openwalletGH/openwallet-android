@@ -1,8 +1,6 @@
 package com.coinomi.core.coins;
 
-import com.coinomi.core.coins.families.BitFamily;
-
-import org.bitcoinj.core.Coin;
+import com.coinomi.core.coins.families.ReddFamily;
 
 /**
  * @author John L. Jegutanis
@@ -18,7 +16,7 @@ public class ReddcoinMain extends CoinType {
         dumpedPrivateKeyHeader = 189;
         transactionVersion = 2;
 
-        family = BitFamily.get();
+        family = ReddFamily.get();
         name = "Reddcoin";
         symbol = "RDD";
         uriScheme = "reddcoin";

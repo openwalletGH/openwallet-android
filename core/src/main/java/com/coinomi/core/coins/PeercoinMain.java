@@ -1,8 +1,6 @@
 package com.coinomi.core.coins;
 
-import com.coinomi.core.coins.families.BitFamily;
-
-import org.bitcoinj.core.Coin;
+import com.coinomi.core.coins.families.PeerFamily;
 
 /**
  * @author John L. Jegutanis
@@ -16,7 +14,7 @@ public class PeercoinMain extends CoinType {
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 500;
 
-        family = BitFamily.get();
+        family = PeerFamily.get();
         name = "Peercoin";
         symbol = "PPC";
         uriScheme = "peercoin"; // TODO verify, could be ppcoin?

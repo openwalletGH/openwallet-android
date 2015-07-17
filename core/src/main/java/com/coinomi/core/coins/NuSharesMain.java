@@ -1,8 +1,6 @@
 package com.coinomi.core.coins;
 
-import com.coinomi.core.coins.families.BitFamily;
-
-import org.bitcoinj.core.Coin;
+import com.coinomi.core.coins.families.NubitsFamily;
 
 /**
  * @author John L. Jegutanis
@@ -16,7 +14,7 @@ public class NuSharesMain extends CoinType {
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         tokenId = 0x53;
 
-        family = BitFamily.get();
+        family = NubitsFamily.get();
         name = "NuShares";
         symbol = "NSR";
         uriScheme = "nu";

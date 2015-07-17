@@ -2,8 +2,6 @@ package com.coinomi.core.coins;
 
 import com.coinomi.core.coins.families.BitFamily;
 
-import org.bitcoinj.core.Coin;
-
 /**
  * @author John L. Jegutanis
  */
