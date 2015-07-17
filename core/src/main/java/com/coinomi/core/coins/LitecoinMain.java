@@ -1,6 +1,6 @@
 package com.coinomi.core.coins;
 
-import org.bitcoinj.core.Coin;
+import com.coinomi.core.coins.families.BitFamily;
 
 /**
  * @author John L. Jegutanis
@@ -15,6 +15,7 @@ public class LitecoinMain extends CoinType {
         spendableCoinbaseDepth = 100;
         dumpedPrivateKeyHeader = 176;
 
+        family = BitFamily.get();
         name = "Litecoin";
         symbol = "LTC";
         uriScheme = "litecoin";

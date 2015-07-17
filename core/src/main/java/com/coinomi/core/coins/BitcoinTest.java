@@ -1,6 +1,6 @@
 package com.coinomi.core.coins;
 
-import org.bitcoinj.core.Coin;
+import com.coinomi.core.coins.families.BitFamily;
 
 /**
  * @author John L. Jegutanis
@@ -15,6 +15,7 @@ public class BitcoinTest extends CoinType {
         spendableCoinbaseDepth = 100;
         dumpedPrivateKeyHeader = 239;
 
+        family = BitFamily.get();
         name = "Bitcoin Test";
         symbol = "BTCt";
         uriScheme = "bitcoin";

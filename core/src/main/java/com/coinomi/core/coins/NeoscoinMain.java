@@ -1,5 +1,7 @@
 package com.coinomi.core.coins;
 
+import com.coinomi.core.coins.families.BitFamily;
+
 /**
  * @author John L. Jegutanis
  */
@@ -13,6 +15,7 @@ public class NeoscoinMain extends CoinType {
         spendableCoinbaseDepth = 100;
         dumpedPrivateKeyHeader = 128;
 
+        family = BitFamily.get();
         name = "Neoscoin (beta)";
         symbol = "NEOS";
         uriScheme = "neoscoin";

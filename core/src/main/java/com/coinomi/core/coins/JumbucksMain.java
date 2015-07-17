@@ -1,6 +1,6 @@
 package com.coinomi.core.coins;
 
-import org.bitcoinj.core.Coin;
+import com.coinomi.core.coins.families.PeerFamily;
 
 /**
  * @author Julian Yap
@@ -14,6 +14,7 @@ public class JumbucksMain extends CoinType {
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 500;
 
+        family = PeerFamily.get();
         name = "Jumbucks";
         symbol = "JBS";
         uriScheme = "jumbucks";

@@ -1,5 +1,7 @@
 package com.coinomi.core.coins;
 
+import com.coinomi.core.coins.families.BitFamily;
+
 /**
  * @author John L. Jegutanis
  */
@@ -12,6 +14,7 @@ public class MonacoinMain extends CoinType {
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 100;
 
+        family = BitFamily.get();
         name = "Monacoin";
         symbol = "MONA";
         uriScheme = "monacoin";

@@ -1,6 +1,6 @@
 package com.coinomi.core.coins;
 
-import org.bitcoinj.core.Coin;
+import com.coinomi.core.coins.families.BitFamily;
 
 /**
  * @author John L. Jegutanis
@@ -14,6 +14,7 @@ public class DogecoinTest extends CoinType {
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 240; // COINBASE_MATURITY_NEW
 
+        family = BitFamily.get();
         name = "Dogecoin Test";
         symbol = "DOGEt";
         uriScheme = "dogecoin";

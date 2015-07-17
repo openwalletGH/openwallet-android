@@ -1,6 +1,6 @@
 package com.coinomi.core.coins;
 
-import org.bitcoinj.core.Coin;
+import com.coinomi.core.coins.families.BitFamily;
 
 /**
  * @author John L. Jegutanis
@@ -14,6 +14,7 @@ public class NamecoinMain extends CoinType {
         acceptableAddressCodes = new int[] { addressHeader};
         spendableCoinbaseDepth = 100;
 
+        family = BitFamily.get();
         name = "Namecoin (beta)";
         symbol = "NMC";
         uriScheme = "namecoin";
