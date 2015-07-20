@@ -1,5 +1,6 @@
 package com.coinomi.core.wallet;
 
+import com.coinomi.core.coins.BitcoinMain;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.DogecoinTest;
 import com.coinomi.core.network.AddressStatus;
@@ -50,6 +51,7 @@ import static org.junit.Assert.assertTrue;
  * @author John L. Jegutanis
  */
 public class WalletPocketHDTest {
+    final CoinType BTC = BitcoinMain.get();
     static final List<String> MNEMONIC = ImmutableList.of("citizen", "fever", "scale", "nurse", "brief", "round", "ski", "fiction", "car", "fitness", "pluck", "act");
     static final byte[] aesKeyBytes = {0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7};
     private static final long AMOUNT_TO_SEND = 2700000000L;
@@ -155,6 +157,53 @@ public class WalletPocketHDTest {
 
         // Receive and change addresses
         assertEquals(13, pocket.getUsedAddresses().size());
+    }
+
+    private Transaction send(Coin value, WalletPocketHD w1, WalletPocketHD w2) throws Exception {
+        SendRequest req;
+        req = w1.sendCoinsOffline(w2.getReceiveAddress(), value);
+        req.feePerKb = Coin.ZERO;
+        w1.completeAndSignTx(req);
+        byte[] txBytes = req.tx.bitcoinSerialize();
+        w1.addNewTransactionIfNeeded(new Transaction(w1.getCoinType(), txBytes));
+        w2.addNewTransactionIfNeeded(new Transaction(w1.getCoinType(), txBytes));
+
+        return req.tx;
+    }
+
+    @Test
+    public void testSendingAndBalances() throws Exception {
+        DeterministicHierarchy h = new DeterministicHierarchy(masterKey);
+        WalletPocketHD account1 = new WalletPocketHD(h.get(BTC.getBip44Path(0), false, true), BTC, null, null);
+        WalletPocketHD account2 = new WalletPocketHD(h.get(BTC.getBip44Path(1), false, true), BTC, null, null);
+        WalletPocketHD account3 = new WalletPocketHD(h.get(BTC.getBip44Path(2), false, true), BTC, null, null);
+
+        Transaction tx = new Transaction(BTC);
+        tx.addOutput(BTC.oneCoin().toCoin(), account1.getReceiveAddress());
+        account1.addNewTransactionIfNeeded(tx);
+
+        assertEquals(BTC.value("1"), account1.getBalance());
+        assertEquals(BTC.value("0"), account2.getBalance());
+        assertEquals(BTC.value("0"), account3.getBalance());
+
+        send(Coin.CENT.multiply(5), account1, account2);
+
+        assertEquals(BTC.value("0.95"), account1.getBalance());
+        assertEquals(BTC.value("0.05"), account2.getBalance());
+        assertEquals(BTC.value("0"), account3.getBalance());
+
+        send(Coin.CENT.multiply(7), account1, account3);
+
+        assertEquals(BTC.value("0.88"), account1.getBalance());
+        assertEquals(BTC.value("0.05"), account2.getBalance());
+        assertEquals(BTC.value("0.07"), account3.getBalance());
+
+
+        send(Coin.CENT.multiply(3), account2, account3);
+
+        assertEquals(BTC.value("0.88"), account1.getBalance());
+        assertEquals(BTC.value("0.02"), account2.getBalance());
+        assertEquals(BTC.value("0.1"), account3.getBalance());
     }
 
     @Test
