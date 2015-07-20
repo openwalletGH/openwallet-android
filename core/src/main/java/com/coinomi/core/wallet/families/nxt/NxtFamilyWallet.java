@@ -50,7 +50,6 @@ public class NxtFamilyWallet implements WalletAccount {
     @Nullable private transient Wallet wallet = null;
 
     public NxtFamilyWallet(DeterministicKey key, CoinType type, KeyCrypter crypter, KeyParameter encKey) {
-        String secret = getMnemonicToString(bytesToMnemonic(key.getPrivKeyBytes()));
         rootKey = new NxtFamilyKey(key);
         address = new NxtFamilyAddress(type, key);
         this.type = type;
@@ -92,7 +91,6 @@ public class NxtFamilyWallet implements WalletAccount {
     public String getPrivateKeyMnemonic() {
         return rootKey.getMnemonic();
     }
-
 
     @Override
     public CoinType getCoinType() {

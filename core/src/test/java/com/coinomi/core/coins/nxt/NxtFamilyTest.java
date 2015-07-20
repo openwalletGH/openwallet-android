@@ -5,22 +5,19 @@ package com.coinomi.core.coins.nxt;
  */
 
 import com.coinomi.core.coins.NxtMain;
+import com.coinomi.core.coins.nxt.Appendix.EncryptedMessage;
 import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.wallet.families.nxt.NxtFamilyAddress;
 import com.coinomi.core.wallet.families.nxt.NxtFamilyWallet;
-import com.coinomi.core.coins.nxt.Appendix.EncryptedMessage;
-
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.fail;
 
 import org.bitcoinj.crypto.MnemonicException;
 import org.junit.Test;
 import org.spongycastle.util.encoders.Hex;
 
 import java.io.UnsupportedEncodingException;
+
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 public class NxtFamilyTest {
     String recoveryPhrase = "heavy virus hollow shrug shadow double dwarf affair novel weird image prize frame anxiety wait";
