@@ -898,16 +898,20 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
         return getTransaction(txHash) != null || fetchingTransactions.contains(txHash);
     }
 
-    private void addNewTransactionIfNeeded(Transaction tx) {
-        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
+    @VisibleForTesting
+    void addNewTransactionIfNeeded(Transaction tx) {
+        lock.lock();
+        try {
+            // If was fetching this tx, remove it
+            fetchingTransactions.remove(tx.getHash());
 
-        // If was fetching this tx, remove it
-        fetchingTransactions.remove(tx.getHash());
-
-        // This tx not in wallet, add it
-        if (getTransaction(tx.getHash()) == null) {
-            tx.getConfidence().setConfidenceType(TransactionConfidence.ConfidenceType.PENDING);
-            addWalletTransaction(WalletTransaction.Pool.PENDING, tx, true);
+            // This tx not in wallet, add it
+            if (getTransaction(tx.getHash()) == null) {
+                tx.getConfidence().setConfidenceType(TransactionConfidence.ConfidenceType.PENDING);
+                addWalletTransaction(WalletTransaction.Pool.PENDING, tx, true);
+            }
+        } finally {
+            lock.unlock();
         }
     }
 
