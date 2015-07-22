@@ -476,7 +476,7 @@ public final class TransactionImpl implements Transaction {
         }
     }
 
-    static TransactionImpl parseTransaction(byte[] bytes) throws NxtException.ValidationException {
+    public static TransactionImpl parseTransaction(byte[] bytes) throws NxtException.ValidationException {
         try {
             ByteBuffer buffer = ByteBuffer.wrap(bytes);
             buffer.order(ByteOrder.LITTLE_ENDIAN);

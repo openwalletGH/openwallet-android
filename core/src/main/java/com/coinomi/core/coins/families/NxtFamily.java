@@ -8,6 +8,7 @@ import static com.coinomi.core.Preconditions.checkNotNull;
  * Coins that belong to this family are: NXT, Burst, etc
  */
 final public class NxtFamily implements CoinFamily {
+    public static final short DEFAULT_DEADLINE = 1440;
     protected static NxtFamily instance = new NxtFamily();
     public static synchronized CoinFamily get() {
         return instance;

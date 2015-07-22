@@ -8,9 +8,15 @@ import com.coinomi.core.coins.NxtMain;
 import com.coinomi.core.coins.nxt.Appendix.EncryptedMessage;
 import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.wallet.families.nxt.NxtFamilyAddress;
+import com.coinomi.core.wallet.families.nxt.NxtFamilyKey;
 import com.coinomi.core.wallet.families.nxt.NxtFamilyWallet;
 
+import org.bitcoinj.crypto.DeterministicHierarchy;
+import org.bitcoinj.crypto.DeterministicKey;
+import org.bitcoinj.crypto.HDKeyDerivation;
 import org.bitcoinj.crypto.MnemonicException;
+import org.bitcoinj.store.UnreadableWalletException;
+import org.bitcoinj.wallet.DeterministicSeed;
 import org.junit.Test;
 import org.spongycastle.util.encoders.Hex;
 
@@ -23,7 +29,7 @@ public class NxtFamilyTest {
     String recoveryPhrase = "heavy virus hollow shrug shadow double dwarf affair novel weird image prize frame anxiety wait";
     String nxtSecret = "check federal prize adapt pumpkin renew toilet flip candy leopard reform leaf venture hammer amateur rack coyote hover under clog pitch cash begin issue";
     String nxtRsAddress = "NXT-BE3N-2KJX-ZMQJ-4GW4P";
-    long nxtAccountId = Convert.parseAccountId("3065700120828096564");
+    long nxtAccountId = Convert.parseAccountId(NxtMain.get(), "3065700120828096564");
     byte[] nxtPublicKey = Hex.decode("195df5f2e4d826fd512d3748eb2c47a9a0d59cdd18b6a0f3b4717381b8f9ac59");
 
     String recipient = "NXT-RZ9H-H2XD-WTR3-B4WN2";
@@ -41,16 +47,19 @@ public class NxtFamilyTest {
     }
 
     @Test
-    public void testHDAccountNxt() throws MnemonicException {
-        Wallet wallet = new Wallet(recoveryPhrase);
-        NxtFamilyWallet account = (NxtFamilyWallet) wallet.createAccount(NxtMain.get(), true, null);
-        String secret = account.getPrivateKeyMnemonic();
-        byte[] pub = account.getPublicKey();
+    public void testHDAccountNxt() throws MnemonicException, UnreadableWalletException {
+        DeterministicSeed seed = new DeterministicSeed(recoveryPhrase, null, "", 0);
+        DeterministicKey masterKey = HDKeyDerivation.createMasterPrivateKey(seed.getSeedBytes());
+        DeterministicHierarchy hierarchy = new DeterministicHierarchy(masterKey);
+        DeterministicKey entropy = hierarchy.get(NxtMain.get().getBip44Path(0), false, true);
+
+        NxtFamilyKey nxtKey = new NxtFamilyKey(entropy, null, null);
+        String secret = nxtKey.getPrivateKeyMnemonic();
+        byte[] pub = nxtKey.getPublicKey();
+        NxtFamilyAddress address = new NxtFamilyAddress(NxtMain.get(), pub);
 
         assertEquals(nxtSecret, secret);
-        assertEquals(nxtRsAddress, account.getPublicKeyMnemonic());
         assertArrayEquals(nxtPublicKey, pub);
-        NxtFamilyAddress address = (NxtFamilyAddress) account.getReceiveAddress();
         assertEquals(nxtRsAddress, address.toString());
         assertEquals(nxtAccountId, address.getAccountId());
     }
@@ -68,7 +77,7 @@ public class NxtFamilyTest {
         long feeNQT = 100000000L;
         int timestamp = Convert.toNxtEpochTime(System.currentTimeMillis()); // different for nxt and burst
         short deadline = 1440;
-        long recipientLong = Convert.parseAccountId(recipient);
+        long recipientLong = Convert.parseAccountId(NxtMain.get(), recipient);
 
         TransactionImpl.BuilderImpl builder = new TransactionImpl.BuilderImpl(version, nxtPublicKey,
                 amountNQT, feeNQT, timestamp, deadline, Attachment.ORDINARY_PAYMENT);
@@ -104,7 +113,7 @@ public class NxtFamilyTest {
         Long feeNQT = 100000000L;
         int timestamp = Convert.toNxtEpochTime(System.currentTimeMillis()); // different for nxt and burst
         short deadline = 1440;
-        Long recipientLong = Convert.parseAccountId(recipient);
+        Long recipientLong = Convert.parseAccountId(NxtMain.get(), recipient);
         EncryptedData data = EncryptedData.encrypt(Convert.toBytes("test text"), Crypto.getPrivateKey(nxtSecret), recipientPublicKey);
 
         Appendix.EncryptedMessage msg = new EncryptedMessage(data, true);

@@ -287,7 +287,7 @@ public class MakeTransactionFragment extends Fragment {
             sendRequest = SendRequest.to(sendTo, checkNotNull(amount).toCoin());
         }
         sendRequest.signInputs = false;
-        sourceAccount.completeTx(sendRequest);
+        sourceAccount.completeTransaction(sendRequest);
 
         return sendRequest;
     }

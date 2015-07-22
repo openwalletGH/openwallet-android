@@ -32,7 +32,7 @@ abstract public class CoinType extends NetworkParameters implements ValueType, S
     protected String uriScheme;
     protected Integer bip44Index;
     protected Integer unitExponent;
-    protected String addressPrefix = "";
+    protected String addressPrefix;
     protected Value feePerKb;
     protected Value minNonDust;
     protected Value softDustLimit;
@@ -45,9 +45,8 @@ abstract public class CoinType extends NetworkParameters implements ValueType, S
 
     @Override
     public CoinFamily getFamily() {
-        checkState(family instanceof CoinFamily, "Coin family must implement the " +
-                CoinFamily.class + " interface");
-        return (CoinFamily) checkNotNull(family, "A coin failed to set a coin family");
+        // TODO improve
+        return (CoinFamily) family;
     }
 
     @Override
@@ -118,7 +117,7 @@ abstract public class CoinType extends NetworkParameters implements ValueType, S
         Return an address prefix like NXT- or BURST-, otherwise and empty string
      */
     public String getAddressPrefix() {
-        return addressPrefix;
+        return checkNotNull(addressPrefix, "A coin failed to set the address prefix");
     }
 
     public Address address(String addressStr) throws AddressFormatException {

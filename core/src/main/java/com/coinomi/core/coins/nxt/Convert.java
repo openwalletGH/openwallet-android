@@ -20,6 +20,7 @@ package com.coinomi.core.coins.nxt;
 //import nxt.NxtException;
 
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.coins.families.NxtFamily;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -32,6 +33,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 public final class Convert {
 
@@ -109,28 +112,22 @@ public final class Convert {
         }
     }
 
-    public static long parseAccountId(String account) {
+    public static long parseAccountId(CoinType type, String account) {
+        checkArgument(type.getFamily().equals(NxtFamily.get()), "Unexpected type for an account");
         if (account == null) {
             return 0;
         }
         account = account.toUpperCase();
-        if (account.startsWith("NXT-")) {
-            return Crypto.rsDecode(account.substring(4));
-        } else if (account.startsWith("BURST-")) {
-            return Crypto.rsDecode(account.substring(6));
-        }  else {
+
+        if (account.startsWith(type.getAddressPrefix())) {
+            return Crypto.rsDecode(account.substring(type.getAddressPrefix().length()));
+        } else {
             return parseUnsignedLong(account);
         }
     }
 
-//    public static String rsAccount(long accountId) {
-//        return "NXT-" + Crypto.rsEncode(accountId);
-//    }
-
     public static String rsAccount(CoinType type, long accountId) {
-        if (type.getAddressPrefix().isEmpty()) {
-            throw new RuntimeException("NXT family coin did not set address prefix");
-        }
+        checkArgument(type.getFamily().equals(NxtFamily.get()), "Family must be Nxt");
         return type.getAddressPrefix() + Crypto.rsEncode(accountId);
     }
 

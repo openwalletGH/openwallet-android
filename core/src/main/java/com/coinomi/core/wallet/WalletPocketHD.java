@@ -18,11 +18,9 @@
 
 package com.coinomi.core.wallet;
 
-import com.coinomi.core.CoreUtils;
 import com.coinomi.core.coins.CoinType;
-import com.coinomi.core.network.interfaces.ConnectionEventListener;
-import com.coinomi.core.network.interfaces.TransactionEventListener;
 import com.coinomi.core.protos.Protos;
+import com.coinomi.core.util.KeyUtils;
 import com.coinomi.core.wallet.exceptions.Bip44KeyLookAheadExceededException;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
@@ -31,19 +29,14 @@ import org.bitcoinj.core.Address;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.InsufficientMoneyException;
-import org.bitcoinj.core.Sha256Hash;
-import org.bitcoinj.core.Transaction;
 import org.bitcoinj.crypto.DeterministicKey;
 import org.bitcoinj.crypto.KeyCrypter;
 import org.bitcoinj.script.Script;
-import org.bitcoinj.utils.Threading;
 import org.bitcoinj.wallet.RedeemData;
-import org.bitcoinj.wallet.WalletTransaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.crypto.params.KeyParameter;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -51,17 +44,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Executor;
-import java.util.concurrent.locks.ReentrantLock;
 
 import javax.annotation.Nullable;
 
-import static org.bitcoinj.wallet.KeyChain.KeyPurpose.RECEIVE_FUNDS;
-import static org.bitcoinj.wallet.KeyChain.KeyPurpose.CHANGE;
-
-import static com.coinomi.core.Preconditions.checkArgument;
 import static com.coinomi.core.Preconditions.checkNotNull;
 import static com.coinomi.core.Preconditions.checkState;
+import static org.bitcoinj.wallet.KeyChain.KeyPurpose.CHANGE;
+import static org.bitcoinj.wallet.KeyChain.KeyPurpose.RECEIVE_FUNDS;
 import static org.bitcoinj.wallet.KeyChain.KeyPurpose.REFUND;
 
 /**
@@ -69,10 +58,13 @@ import static org.bitcoinj.wallet.KeyChain.KeyPurpose.REFUND;
  *
  *
  */
-public class WalletPocketHD extends AbstractWallet {
+public class WalletPocketHD extends TransactionWatcherWallet {
     private static final Logger log = LoggerFactory.getLogger(WalletPocketHD.class);
 
     private final TransactionCreator transactionCreator;
+
+    @VisibleForTesting
+    protected SimpleHDKeyChain keys;
 
     public WalletPocketHD(DeterministicKey rootKey, CoinType coinType,
                           @Nullable KeyCrypter keyCrypter, @Nullable KeyParameter key) {
@@ -80,7 +72,7 @@ public class WalletPocketHD extends AbstractWallet {
     }
 
     WalletPocketHD(SimpleHDKeyChain keys, CoinType coinType) {
-        this(keys.getId(coinType.getId()), keys, coinType);
+        this(KeyUtils.getPublicKeyId(coinType, keys.getRootKey().getPubKey()), keys, coinType);
     }
 
     WalletPocketHD(String id, SimpleHDKeyChain keys, CoinType coinType) {
@@ -89,9 +81,11 @@ public class WalletPocketHD extends AbstractWallet {
         transactionCreator = new TransactionCreator(this);
     }
 
-    /******************************************************************************************************************/
-
-    //region Vending transactions and other internal state
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Region vending transactions and other internal state
+    //
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * Get the BIP44 index of this account
@@ -113,11 +107,11 @@ public class WalletPocketHD extends AbstractWallet {
                 getCoinType().equals(other.getCoinType());
     }
 
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////
     //
     // Serialization support
     //
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
     List<Protos.Key> serializeKeychainToProtobuf() {
         lock.lock();
@@ -137,11 +131,11 @@ public class WalletPocketHD extends AbstractWallet {
         }
     }
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////
     //
     // Encryption support
     //
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
 
     @Override
@@ -212,16 +206,16 @@ public class WalletPocketHD extends AbstractWallet {
         }
     }
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////
     //
     // Transaction signing support
     //
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * Sends coins to the given address but does not broadcast the resulting pending transaction.
      */
-    public SendRequest sendCoinsOffline(Address address, Coin amount) throws InsufficientMoneyException {
+    public SendRequest sendCoinsOffline(Address address, Coin amount) throws WalletAccountException {
         return sendCoinsOffline(address, amount, (KeyParameter) null);
     }
 
@@ -229,7 +223,7 @@ public class WalletPocketHD extends AbstractWallet {
      * {@link #sendCoinsOffline(Address, Coin)}
      */
     public SendRequest sendCoinsOffline(Address address, Coin amount, @Nullable String password)
-            throws InsufficientMoneyException {
+            throws WalletAccountException {
         KeyParameter key = null;
         if (password != null) {
             checkState(isEncrypted());
@@ -242,7 +236,7 @@ public class WalletPocketHD extends AbstractWallet {
      * {@link #sendCoinsOffline(Address, Coin)}
      */
     public SendRequest sendCoinsOffline(Address address, Coin amount, @Nullable KeyParameter aesKey)
-            throws InsufficientMoneyException {
+            throws WalletAccountException {
         checkState(address.getParameters() instanceof CoinType);
         SendRequest request = SendRequest.to(address, amount);
         request.aesKey = aesKey;
@@ -252,7 +246,7 @@ public class WalletPocketHD extends AbstractWallet {
 
     @Override
     public boolean isAddressMine(Address address) {
-        return address != null && address.getParameters().equals(coinType) &&
+        return address != null && address.getParameters().equals(type) &&
                 (address.isP2SHAddress() ?
                         isPayToScriptHashMine(address.getHash160()) :
                         isPubKeyHashMine(address.getHash160()));
@@ -280,26 +274,21 @@ public class WalletPocketHD extends AbstractWallet {
         return false;
     }
 
-    public void completeAndSignTx(SendRequest request) throws InsufficientMoneyException {
-        if (request.completed) {
-            signTransaction(request);
-        } else {
-            completeTx(request);
-        }
-    }
-
     /**
      * Given a spend request containing an incomplete transaction, makes it valid by adding outputs and signed inputs
      * according to the instructions in the request. The transaction in the request is modified by this method.
      *
      * @param req a SendRequest that contains the incomplete transaction and details for how to make it valid.
-     * @throws InsufficientMoneyException if the request could not be completed due to not enough balance.
+     * @throws WalletAccount.WalletAccountException if the request could not be completed due to not enough balance.
      * @throws IllegalArgumentException if you try and complete the same SendRequest twice
      */
-    public void completeTx(SendRequest req) throws InsufficientMoneyException {
+    @Override
+    public void completeTransaction(SendRequest req) throws WalletAccountException {
         lock.lock();
         try {
             transactionCreator.completeTx(req);
+        } catch (InsufficientMoneyException e) {
+            throw new WalletAccountException(e);
         } finally {
             lock.unlock();
         }
@@ -311,6 +300,7 @@ public class WalletPocketHD extends AbstractWallet {
      * <p>Actual signing is done by pluggable {@link org.bitcoinj.signers.LocalTransactionSigner}
      * and it's not guaranteed that transaction will be complete in the end.</p>
      */
+    @Override
     public void signTransaction(SendRequest req) {
         lock.lock();
         try {
@@ -414,7 +404,7 @@ public class WalletPocketHD extends AbstractWallet {
         try {
             DeterministicKey lastUsedKey = keys.getLastIssuedKey(purpose);
             if (lastUsedKey != null) {
-                return lastUsedKey.toAddress(coinType);
+                return lastUsedKey.toAddress(type);
             } else {
                 return null;
             }
@@ -528,7 +518,7 @@ public class WalletPocketHD extends AbstractWallet {
             Collections.sort(issuedKeys, HD_KEY_COMPARATOR);
 
             for (ECKey key : issuedKeys) {
-                receiveAddresses.add(key.toAddress(coinType));
+                receiveAddresses.add(key.toAddress(type));
             }
             return receiveAddresses;
         } finally {
@@ -575,8 +565,7 @@ public class WalletPocketHD extends AbstractWallet {
     @VisibleForTesting Address currentAddress(SimpleHDKeyChain.KeyPurpose purpose) {
         lock.lock();
         try {
-
-            return (Address) CoreUtils.currentAddress(coinType, keys, purpose);
+            return keys.getCurrentUnusedKey(purpose).toAddress(type);
         } finally {
             lock.unlock();
             subscribeIfNeeded();
@@ -597,12 +586,6 @@ public class WalletPocketHD extends AbstractWallet {
         }
     }
 
-
-    @Override
-    public byte[] getPrivateKeyBytes() {
-        return keys.getRootKey().getPrivKeyBytes();
-    }
-
     @Override
     public String getPublicKeyMnemonic() {
         throw new RuntimeException("Not implemented");
@@ -616,7 +599,7 @@ public class WalletPocketHD extends AbstractWallet {
     public List<Address> getActiveAddresses() {
         ImmutableList.Builder<Address> activeAddresses = ImmutableList.builder();
         for (DeterministicKey key : keys.getActiveKeys()) {
-            activeAddresses.add(key.toAddress(coinType));
+            activeAddresses.add(key.toAddress(type));
         }
         return activeAddresses.build();
     }
@@ -627,6 +610,6 @@ public class WalletPocketHD extends AbstractWallet {
 
     @Override
     public String toString() {
-        return WalletPocketHD.class.getSimpleName() + " " + id.substring(0, 4)+ " " + coinType;
+        return WalletPocketHD.class.getSimpleName() + " " + id.substring(0, 4)+ " " + type;
     }
 }

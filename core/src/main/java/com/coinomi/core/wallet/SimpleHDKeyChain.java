@@ -21,6 +21,8 @@ import org.bitcoinj.wallet.EncryptableKeyChain;
 import org.bitcoinj.wallet.KeyBag;
 import org.bitcoinj.wallet.KeyChainEventListener;
 import org.bitcoinj.wallet.RedeemData;
+
+import com.coinomi.core.util.KeyUtils;
 import com.google.common.collect.ImmutableList;
 import com.google.protobuf.ByteString;
 
@@ -555,12 +557,12 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
                     throw new UnreadableWalletException("Deterministic key missing extra data: " + key.toString());
 
                 if (chain == null) {
-                    DeterministicKey rootKey = getDeterministicKey(key, null, crypter);
+                    DeterministicKey rootKey = KeyUtils.getDeterministicKey(key, null, crypter);
                     chain = new SimpleHDKeyChain(rootKey, crypter);
                     chain.lookaheadSize = LAZY_CALCULATE_LOOKAHEAD;
                     rootTreeSize = rootKey.getPath().size();
                 }
-                LinkedList<ChildNumber> path = newLinkedList(getKeyProtoPath(key));
+                LinkedList<ChildNumber> path = newLinkedList(KeyUtils.getKeyProtoPath(key));
                 // Find the parent key assuming this is not the root key, and not an account key for a watching chain.
                 DeterministicKey parent = null;
                 if (path.size() > rootTreeSize) {
@@ -568,7 +570,7 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
                     parent = chain.hierarchy.get(path, false, false);
                     path.add(index);
                 }
-                DeterministicKey detkey = getDeterministicKey(key, parent, crypter);
+                DeterministicKey detkey = KeyUtils.getDeterministicKey(key, parent, crypter);
                 if (log.isDebugEnabled()) {
                     log.debug("Deserializing: DETERMINISTIC_KEY: {}", detkey);
                 }
@@ -603,49 +605,9 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
         return chain;
     }
 
-    public static DeterministicKey getDeterministicKey(Protos.Key key,
-                                                       @Nullable DeterministicKey parent,
-                                                       @Nullable KeyCrypter crypter) {
-        // Deserialize the path through the tree.
-        final ImmutableList<ChildNumber> immutablePath = getKeyProtoPath(key);
-        // Deserialize the public key.
-        ECPoint pubkey = ECKey.CURVE.getCurve().decodePoint(key.getPublicKey().toByteArray());
-        // Deserialize the chain code.
-        byte[] chainCode = key.getDeterministicKey().getChainCode().toByteArray();
-
-        DeterministicKey detkey;
-        if (key.hasSecretBytes()) {
-            // Not encrypted: private key is available.
-            final BigInteger priv = new BigInteger(1, key.getSecretBytes().toByteArray());
-            detkey = new DeterministicKey(immutablePath, chainCode, pubkey, priv, parent);
-        } else {
-            if (key.hasEncryptedData()) {
-                Protos.EncryptedData proto = key.getEncryptedData();
-                EncryptedData data = new EncryptedData(proto.getInitialisationVector().toByteArray(),
-                        proto.getEncryptedPrivateKey().toByteArray());
-                checkNotNull(crypter, "Encountered an encrypted key but no key crypter provided");
-                detkey = new DeterministicKey(immutablePath, chainCode, crypter, pubkey, data, parent);
-            } else {
-                // No secret key bytes and key is not encrypted: either a watching key or private key bytes
-                // will be rederived on the fly from the parent.
-                checkNotNull(parent, "Watching keys are not supported at the moment.");
-                detkey = new DeterministicKey(immutablePath, chainCode, pubkey, null, parent);
-            }
-        }
-        return detkey;
-    }
-
-    private static ImmutableList<ChildNumber> getKeyProtoPath(Protos.Key key) {
-        ImmutableList.Builder<ChildNumber> pathBuilder = ImmutableList.builder();
-        for (int i : key.getDeterministicKey().getPathList()) {
-            pathBuilder.add(new ChildNumber(i));
-        }
-        return pathBuilder.build();
-    }
-
     @Override
     public List<org.bitcoinj.wallet.Protos.Key> serializeToProtobuf() {
-        throw new RuntimeException("Not implemented. Use HDKeyChain.toProtobuf() instead.");
+        throw new RuntimeException("Not implemented. Use toProtobuf() method instead.");
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -977,21 +939,6 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
 
     public int getAccountIndex() {
         return rootKey.getChildNumber().num();
-    }
-
-    public String getId() {
-        return getId("");
-    }
-
-    public String getId(String salt) {
-        try {
-            MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
-            sha256.update(salt.getBytes());
-            byte[] hash = sha256.digest(rootKey.getPubKey());
-            return Utils.HEX.encode(hash);
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);  // Cannot happen.
-        }
     }
 }
 

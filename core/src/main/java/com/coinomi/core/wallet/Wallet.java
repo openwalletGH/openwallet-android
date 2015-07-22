@@ -1,5 +1,6 @@
 package com.coinomi.core.wallet;
 
+import com.coinomi.core.CoreUtils;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.families.BitFamily;
 import com.coinomi.core.coins.families.CoinFamily;
@@ -70,7 +71,7 @@ final public class Wallet {
     private int version;
 
     public Wallet(String mnemonic) throws MnemonicException {
-        this(Wallet.parseMnemonic(mnemonic), null);
+        this(CoreUtils.parseMnemonic(mnemonic), null);
     }
 
     public Wallet(List<String> mnemonic) throws MnemonicException {
@@ -121,6 +122,10 @@ final public class Wallet {
             sb.append(' ');
         }
         return sb.toString();
+    }
+
+    public WalletAccount createAccount(CoinType coin, @Nullable KeyParameter key) {
+        return createAccount(coin, false, key);
     }
 
     public WalletAccount createAccount(CoinType coin, boolean generateAllKeys,
@@ -285,7 +290,6 @@ final public class Wallet {
             throw new RuntimeException("Unknown family: " + family.getClass().getName());
         }
 
-
         if (isEncrypted() && !newPocket.isEncrypted()) {
             newPocket.encrypt(getKeyCrypter(), key);
         }
@@ -426,7 +430,7 @@ final public class Wallet {
 //            if (request.completed) {
 //                pocket.signTransaction(request);
 //            } else {
-//                pocket.completeTx(request);
+//                pocket.completeTransaction(request);
 //            }
 //        } else {
 //            throwNoSuchPocket(request.type);
@@ -712,15 +716,6 @@ final public class Wallet {
         } catch (UnsupportedEncodingException e) {
             throw new UnreadableWalletException(e.toString());
         }
-    }
-
-    public static ArrayList<String> parseMnemonic(String mnemonicString) {
-        ArrayList<String> seedWords = new ArrayList<>();
-        for (String word : mnemonicString.trim().split(" ")) {
-            if (word.isEmpty()) continue;
-            seedWords.add(word);
-        }
-        return seedWords;
     }
 
     // TODO

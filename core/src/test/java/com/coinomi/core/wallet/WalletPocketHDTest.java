@@ -38,7 +38,6 @@ import org.spongycastle.crypto.params.KeyParameter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -70,6 +69,11 @@ public class WalletPocketHDTest {
 
         pocket = new WalletPocketHD(rootKey, type, null, null);
         pocket.keys.setLookaheadSize(20);
+    }
+
+    @Test
+    public void testId() throws Exception {
+        assertEquals("8747886e9a77fe2a1588df3168b867648434d6d339b0b448793ae1db8f283f41", pocket.getId());
     }
 
     @Test
@@ -161,7 +165,7 @@ public class WalletPocketHDTest {
 
     private Transaction send(Coin value, WalletPocketHD w1, WalletPocketHD w2) throws Exception {
         SendRequest req;
-        req = w1.sendCoinsOffline(w2.getReceiveAddress(), value);
+        req = w1.sendCoinsOffline(w2.getReceiveBitAddress(), value);
         req.feePerKb = Coin.ZERO;
         w1.completeAndSignTx(req);
         byte[] txBytes = req.tx.bitcoinSerialize();
@@ -179,7 +183,7 @@ public class WalletPocketHDTest {
         WalletPocketHD account3 = new WalletPocketHD(h.get(BTC.getBip44Path(2), false, true), BTC, null, null);
 
         Transaction tx = new Transaction(BTC);
-        tx.addOutput(BTC.oneCoin().toCoin(), account1.getReceiveAddress());
+        tx.addOutput(BTC.oneCoin().toCoin(), account1.getReceiveBitAddress());
         account1.addNewTransactionIfNeeded(tx);
 
         assertEquals(BTC.value("1"), account1.getBalance());
@@ -369,7 +373,7 @@ public class WalletPocketHDTest {
         assertNotNull(softDust);
         // Send a soft dust
         SendRequest sendRequest = pocket.sendCoinsOffline(toAddr, softDust.subtract(Coin.SATOSHI));
-        pocket.completeTx(sendRequest);
+        pocket.completeTransaction(sendRequest);
         assertEquals(type.getFeePerKb().multiply(2), sendRequest.tx.getFee());
     }
 
@@ -382,7 +386,7 @@ public class WalletPocketHDTest {
         long orgBalance = pocket.getBalance().value;
         SendRequest sendRequest = pocket.sendCoinsOffline(toAddr, Coin.valueOf(AMOUNT_TO_SEND));
         sendRequest.shuffleOutputs = false;
-        pocket.completeTx(sendRequest);
+        pocket.completeTransaction(sendRequest);
         Transaction tx = sendRequest.tx;
         assertEquals(expectedTx, Utils.HEX.encode(tx.bitcoinSerialize()));
 

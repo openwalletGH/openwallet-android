@@ -3,10 +3,13 @@ package com.coinomi.core.wallet;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
 import com.coinomi.core.coins.ValueType;
+import com.coinomi.core.coins.nxt.NxtException;
 import com.coinomi.core.network.interfaces.ConnectionEventListener;
 import com.coinomi.core.network.interfaces.TransactionEventListener;
+import com.coinomi.core.wallet.families.nxt.NxtFamilyAddress;
 
 import org.bitcoinj.core.Address;
+import org.bitcoinj.core.InsufficientMoneyException;
 import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.TransactionBag;
@@ -19,10 +22,28 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
 
+import javax.annotation.Nullable;
+
 /**
  * @author John L. Jegutanis
  */
 public interface WalletAccount extends TransactionBag, KeyBag, TransactionEventListener, ConnectionEventListener, Serializable {
+    class WalletAccountException extends Exception {
+        public WalletAccountException(Throwable cause) {
+            super(cause);
+        }
+
+        public WalletAccountException(String message, Throwable cause) {
+            super(message, cause);
+        }
+
+        public WalletAccountException(String message) {
+            super(message);
+        }
+
+        public WalletAccountException() {
+        }
+    }
 
     String getId();
     String getDescription();
@@ -113,8 +134,10 @@ public interface WalletAccount extends TransactionBag, KeyBag, TransactionEventL
 
     void maybeInitializeAllKeys();
 
-    byte[] getPrivateKeyBytes();
-
     String getPublicKeyMnemonic();
     String getPrivateKeyMnemonic();
+
+    void completeAndSignTx(SendRequest request) throws WalletAccountException;
+    void completeTransaction(SendRequest request) throws WalletAccountException;
+    void signTransaction(SendRequest request);
 }

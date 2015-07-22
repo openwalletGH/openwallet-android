@@ -51,7 +51,7 @@ public class TransactionCreator {
     public TransactionCreator(AbstractWallet account) {
         this.account = account;
         lock = account.lock;
-        coinType = account.coinType;
+        coinType = account.type;
     }
 
     private static class FeeCalculation {
@@ -70,7 +70,7 @@ public class TransactionCreator {
     void completeTx(SendRequest req) throws InsufficientMoneyException {
         lock.lock();
         try {
-            checkArgument(!req.completed, "Given SendRequest has already been completed.");
+            checkArgument(!req.isCompleted(), "Given SendRequest has already been completed.");
             // Calculate the amount of value we need to import.
             Coin value = Coin.ZERO;
             for (TransactionOutput output : req.tx.getOutputs()) {
@@ -171,7 +171,7 @@ public class TransactionCreator {
             // transaction lists more appropriately, especially when the wallet starts to generate transactions itself
             // for internal purposes.
             req.tx.setPurpose(Transaction.Purpose.USER_PAYMENT);
-            req.completed = true;
+            req.setCompleted(true);
             req.fee = calculatedFee;
             log.info("  completed: {}", req.tx);
         } finally {

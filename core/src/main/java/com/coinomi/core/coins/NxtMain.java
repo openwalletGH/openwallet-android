@@ -16,7 +16,9 @@ public class NxtMain extends CoinType {
         uriScheme = "nxt";
         bip44Index = 29;
         unitExponent = 8;
+        feePerKb = oneCoin();
         addressPrefix = "NXT-";
+        feePolicy = FeePolicy.FLAT_FEE;
     }
 
     private static NxtMain instance = new NxtMain();

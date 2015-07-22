@@ -1,29 +1,43 @@
 package com.coinomi.core.wallet.families.nxt;
 
-import com.coinomi.core.CoreUtils;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.nxt.Account;
 import com.coinomi.core.coins.nxt.Convert;
-import com.coinomi.core.coins.nxt.Crypto;
 import com.coinomi.core.wallet.AbstractAddress;
 
-import org.bitcoinj.crypto.DeterministicKey;
-
-import static com.coinomi.core.CoreUtils.bytesToMnemonic;
-import static com.coinomi.core.CoreUtils.getMnemonicToString;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * @author John L. Jegutanis
  */
-public class NxtFamilyAddress implements AbstractAddress {
+final public class NxtFamilyAddress implements AbstractAddress {
+    private final CoinType type;
+    private final byte[] publicKey;
     private final long accountId;
     private final String rsAccount;
 
-    public NxtFamilyAddress(CoinType type, DeterministicKey key) {
-        String secret = getMnemonicToString(bytesToMnemonic(key.getPrivKeyBytes()));
-        byte[] pubKey = Crypto.getPublicKey(secret);
+    public NxtFamilyAddress(CoinType type, byte[] pubKey) {
+        this.type = type;
+        publicKey = pubKey;
         accountId = Account.getId(pubKey);
         rsAccount = Convert.rsAccount(type, accountId);
+    }
+
+    public NxtFamilyAddress(CoinType type, long accountId, String rsAccount) {
+        this.type = type;
+        publicKey = null;
+        this. accountId = accountId;
+        this.rsAccount = rsAccount;
+    }
+
+    public CoinType getType() {
+        return type;
+    }
+
+    @Nullable
+    public byte[] getPublicKey() {
+        return publicKey;
     }
 
     public long getAccountId() {

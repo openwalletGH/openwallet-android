@@ -51,11 +51,9 @@ public final class Crypto {
     public static byte[] getPublicKey(String secretPhrase) {
         byte[] publicKey = new byte[32];
         Curve25519.keygen(publicKey, null, Crypto.sha256().digest(Convert.toBytes(secretPhrase)));
-        /*
-            if (! Curve25519.isCanonicalPublicKey(publicKey)) {
-                throw new RuntimeException("Public key not canonical");
-            }
-            */
+        if (! Curve25519.isCanonicalPublicKey(publicKey)) {
+            throw new RuntimeException("Public key not canonical");
+        }
         return publicKey;
     }
 
@@ -94,13 +92,10 @@ public final class Crypto {
         System.arraycopy(v, 0, signature, 0, 32);
         System.arraycopy(h, 0, signature, 32, 32);
 
-        /*
-            if (!Curve25519.isCanonicalSignature(signature)) {
-                throw new RuntimeException("Signature not canonical");
-            }
-            */
+        if (!Curve25519.isCanonicalSignature(signature)) {
+            throw new RuntimeException("Signature not canonical");
+        }
         return signature;
-
     }
 
     public static boolean verify(byte[] signature, byte[] message, byte[] publicKey, boolean enforceCanonical) {

@@ -19,7 +19,6 @@ import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.TransactionConfidence;
 import org.bitcoinj.core.TransactionInput;
-import org.bitcoinj.core.TransactionOutPoint;
 import org.bitcoinj.core.TransactionOutput;
 import org.bitcoinj.core.Utils;
 import org.bitcoinj.utils.ListenerRegistration;
@@ -30,7 +29,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -40,7 +38,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executor;
-import java.util.concurrent.locks.ReentrantLock;
 
 import javax.annotation.Nullable;
 
@@ -50,13 +47,10 @@ import static com.coinomi.core.Preconditions.checkState;
 /**
  * @author John L. Jegutanis
  */
-abstract public class TransactionWatcherWallet implements WalletAccount {
+abstract public class TransactionWatcherWallet extends AbstractWallet { //implements WalletAccount {
     private static final Logger log = LoggerFactory.getLogger(TransactionWatcherWallet.class);
 
     private final static int TX_DEPTH_SAVE_THRESHOLD = 4;
-
-    final ReentrantLock lock = Threading.lock("TransactionWatcherWallet");
-    protected final CoinType coinType;
 
     @Nullable private Sha256Hash lastBlockSeenHash;
     private int lastBlockSeenHeight = -1;
@@ -120,8 +114,8 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
     };
 
     // Constructor
-    public TransactionWatcherWallet(CoinType coinType) {
-        this.coinType = coinType;
+    public TransactionWatcherWallet(CoinType coinType, String id) {
+        super(coinType, id);
         addressesStatus = new HashMap<Address, String>();
         addressesSubscribed = new ArrayList<Address>();
         addressesPendingSubscription = new ArrayList<Address>();
@@ -137,22 +131,22 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
 
     @Override
     public boolean isType(WalletAccount other) {
-        return other != null && coinType.equals(other.getCoinType());
+        return other != null && type.equals(other.getCoinType());
     }
 
     @Override
     public boolean isType(ValueType otherType) {
-        return otherType != null && coinType.equals(otherType);
+        return otherType != null && type.equals(otherType);
     }
 
     @Override
     public boolean isType(Address address) {
-        return address != null && coinType.equals(address.getParameters());
+        return address != null && type.equals(address.getParameters());
     }
 
     @Override
     public CoinType getCoinType() {
-        return coinType;
+        return type;
     }
 
     @Override
@@ -373,7 +367,7 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
     public void refresh() {
         lock.lock();
         try {
-            log.info("Refreshing wallet pocket {}", coinType);
+            log.info("Refreshing wallet pocket {}", type);
             lastBlockSeenHash = null;
             lastBlockSeenHeight = -1;
             lastBlockSeenTimeSecs = 0;
@@ -488,7 +482,7 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
     Value getTxBalance(Iterable<Transaction> txs, boolean toMe) {
         lock.lock();
         try {
-            Value value = coinType.value(0);
+            Value value = type.value(0);
             for (Transaction tx : txs) {
                 if (toMe) {
                     value = value.add(tx.getValueSentToMe(this, false));
@@ -640,7 +634,7 @@ abstract public class TransactionWatcherWallet implements WalletAccount {
 
     @Override
     public void onNewBlock(BlockHeader header) {
-        log.info("Got a {} block: {}", coinType.getName(), header.getBlockHeight());
+        log.info("Got a {} block: {}", type.getName(), header.getBlockHeight());
         boolean shouldSave = false;
         lock.lock();
         try {

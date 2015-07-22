@@ -9,6 +9,10 @@ import org.bitcoinj.crypto.KeyCrypterException;
 import org.bitcoinj.crypto.KeyCrypterScrypt;
 import org.bitcoinj.store.UnreadableWalletException;
 import org.bitcoinj.wallet.DeterministicSeed;
+
+import com.coinomi.core.util.KeyUtils;
+import com.coinomi.core.wallet.families.nxt.NxtFamilyWallet;
+import com.coinomi.core.wallet.families.nxt.NxtFamilyWalletProtobufSerializer;
 import com.google.common.base.Splitter;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.TextFormat;
@@ -59,7 +63,7 @@ public class WalletProtobufSerializer {
 
         // Set the seed if exists
         if (wallet.getSeed() != null) {
-            Protos.Key.Builder mnemonicEntry = SimpleKeyChain.serializeEncryptableItem(wallet.getSeed());
+            Protos.Key.Builder mnemonicEntry = KeyUtils.serializeEncryptableItem(wallet.getSeed());
             mnemonicEntry.setType(Protos.Key.Type.DETERMINISTIC_MNEMONIC);
             walletBuilder.setSeed(mnemonicEntry.build());
         }
@@ -99,6 +103,8 @@ public class WalletProtobufSerializer {
             Protos.WalletPocket pocketProto;
             if (account instanceof AbstractWallet) {
                 pocketProto = WalletPocketProtobufSerializer.toProtobuf((WalletPocketHD) account);
+            } else if (account instanceof NxtFamilyWallet) {
+                pocketProto = NxtFamilyWalletProtobufSerializer.toProtobuf((NxtFamilyWallet) account);
             } else {
                 throw new RuntimeException("Implement serialization for: " + account.getClass());
             }
@@ -110,7 +116,7 @@ public class WalletProtobufSerializer {
 
     private static Protos.Key getMasterKeyProto(Wallet wallet) {
         DeterministicKey key = wallet.getMasterKey();
-        Protos.Key.Builder proto = SimpleKeyChain.serializeKey(key);
+        Protos.Key.Builder proto = KeyUtils.serializeKey(key);
         proto.setType(Protos.Key.Type.DETERMINISTIC_KEY);
         final Protos.DeterministicKey.Builder detKey = proto.getDeterministicKeyBuilder();
         detKey.setChainCode(ByteString.copyFrom(key.getChainCode()));
@@ -176,8 +182,7 @@ public class WalletProtobufSerializer {
         }
 
         DeterministicKey masterKey =
-                SimpleHDKeyChain.getDeterministicKey(walletProto.getMasterKey(), null, crypter);
-
+                KeyUtils.getDeterministicKey(walletProto.getMasterKey(), null, crypter);
 
         Wallet wallet = new Wallet(masterKey, seed);
 

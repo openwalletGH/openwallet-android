@@ -191,10 +191,28 @@ public class GenericUtils {
      * Throws an AddressFormatException if the string is not a valid address or not supported.
      */
     public static List<CoinType> getPossibleTypes(String addressStr) throws AddressFormatException {
-        VersionedChecksummedBytes parsed = new VersionedChecksummedBytes(addressStr) { };
         ImmutableList.Builder<CoinType> builder = ImmutableList.builder();
+        tryBitcoinFamilyAddresses(addressStr, builder);
+        List<CoinType> possibleTypes = builder.build();
+        if (possibleTypes.size() == 0) {
+            throw new AddressFormatException("Unsupported address: " + addressStr);
+        }
+        return builder.build();
+    }
+
+    /**
+     * Tries to parse the addressStr as a Bitcoin style address and find potential compatible coin types
+     * @param addressStr possible bitcoin type address
+     * @param builder for the types list
+     */
+    private static void tryBitcoinFamilyAddresses(final String addressStr, ImmutableList.Builder<CoinType> builder) {
+        VersionedChecksummedBytes parsed;
+        try {
+            parsed = new VersionedChecksummedBytes(addressStr) { };
+        } catch (AddressFormatException e) { return; }
         int version = parsed.getVersion();
         for (CoinType type : CoinID.getSupportedCoins()) {
+            if (type.getAcceptableAddressCodes() == null) continue;
             for (int addressCode : type.getAcceptableAddressCodes()) {
                 if (addressCode == version) {
                     builder.add(type);
@@ -202,11 +220,6 @@ public class GenericUtils {
                 }
             }
         }
-        List<CoinType> possibleTypes = builder.build();
-        if (possibleTypes.size() == 0) {
-            throw new AddressFormatException("Unsupported address: " + addressStr);
-        }
-        return builder.build();
     }
 
     public static List<CoinType> getPossibleTypes(Address address) throws AddressFormatException {

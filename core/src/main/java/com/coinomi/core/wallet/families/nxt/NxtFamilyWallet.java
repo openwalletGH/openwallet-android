@@ -1,16 +1,24 @@
 package com.coinomi.core.wallet.families.nxt;
 
+import com.coinomi.core.Preconditions;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
 import com.coinomi.core.coins.ValueType;
-import com.coinomi.core.coins.nxt.Account;
+import com.coinomi.core.coins.nxt.Appendix;
+import com.coinomi.core.coins.nxt.Attachment;
 import com.coinomi.core.coins.nxt.Convert;
-import com.coinomi.core.coins.nxt.Crypto;
+import com.coinomi.core.coins.nxt.NxtException;
+import com.coinomi.core.coins.nxt.Transaction;
+import com.coinomi.core.coins.nxt.TransactionImpl;
 import com.coinomi.core.network.AddressStatus;
 import com.coinomi.core.network.BlockHeader;
 import com.coinomi.core.network.ServerClient;
 import com.coinomi.core.network.interfaces.BlockchainConnection;
+import com.coinomi.core.protos.Protos;
+import com.coinomi.core.util.KeyUtils;
 import com.coinomi.core.wallet.AbstractAddress;
+import com.coinomi.core.wallet.AbstractWallet;
+import com.coinomi.core.wallet.SendRequest;
 import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.core.wallet.WalletAccountEventListener;
@@ -18,13 +26,15 @@ import com.coinomi.core.wallet.WalletPocketConnectivity;
 
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.ECKey;
+import org.bitcoinj.core.InsufficientMoneyException;
 import org.bitcoinj.core.Sha256Hash;
-import org.bitcoinj.core.Transaction;
 import org.bitcoinj.crypto.DeterministicKey;
 import org.bitcoinj.crypto.KeyCrypter;
 import org.bitcoinj.script.Script;
 import org.bitcoinj.wallet.RedeemData;
 import org.bitcoinj.wallet.WalletTransaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.spongycastle.crypto.params.KeyParameter;
 
 import java.util.List;
@@ -33,28 +43,40 @@ import java.util.concurrent.Executor;
 
 import javax.annotation.Nullable;
 
-import static com.coinomi.core.CoreUtils.bytesToMnemonic;
-import static com.coinomi.core.CoreUtils.bytesToMnemonicString;
-import static com.coinomi.core.CoreUtils.getMnemonicToString;
+import static com.coinomi.core.Preconditions.checkNotNull;
+import static com.coinomi.core.Preconditions.checkState;
+import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * @author John L. Jegutanis
  */
-public class NxtFamilyWallet implements WalletAccount {
+final public class NxtFamilyWallet extends AbstractWallet {
+    private static final Logger log = LoggerFactory.getLogger(NxtFamilyWallet.class);
+
     NxtFamilyKey rootKey;
-    private final CoinType type;
-    private final KeyCrypter crypter;
-    private final KeyParameter encKey;
     private final NxtFamilyAddress address;
     // Wallet that this account belongs
     @Nullable private transient Wallet wallet = null;
+    private int lastEcBlockHeight;
+    private long lastEcBlockId;
 
-    public NxtFamilyWallet(DeterministicKey key, CoinType type, KeyCrypter crypter, KeyParameter encKey) {
-        rootKey = new NxtFamilyKey(key);
-        address = new NxtFamilyAddress(type, key);
-        this.type = type;
-        this.crypter = crypter;
-        this.encKey = encKey;
+    public NxtFamilyWallet(DeterministicKey entropy, CoinType type) {
+        this(entropy, type, null, null);
+    }
+
+    public NxtFamilyWallet(DeterministicKey entropy, CoinType type,
+                           @Nullable KeyCrypter keyCrypter, @Nullable KeyParameter key) {
+        this(new NxtFamilyKey(entropy, keyCrypter, key), type);
+    }
+
+    public NxtFamilyWallet(NxtFamilyKey key, CoinType type) {
+        this(KeyUtils.getPublicKeyId(type, key.getPublicKey()), key, type);
+    }
+
+    public NxtFamilyWallet(String id, NxtFamilyKey key, CoinType type) {
+        super(type, id);
+        rootKey = key;
+        address = new NxtFamilyAddress(type, key.getPublicKey());
     }
 
     @Override
@@ -74,12 +96,7 @@ public class NxtFamilyWallet implements WalletAccount {
 
     @Override
     public byte[] getPublicKey() {
-        return rootKey.getPublicKeyBytes();
-    }
-
-    @Override
-    public byte[] getPrivateKeyBytes() {
-        return rootKey.getPrivKeyBytes();
+        return rootKey.getPublicKey();
     }
 
     @Override
@@ -89,12 +106,41 @@ public class NxtFamilyWallet implements WalletAccount {
 
     @Override
     public String getPrivateKeyMnemonic() {
-        return rootKey.getMnemonic();
+        return rootKey.getPrivateKeyMnemonic();
     }
 
     @Override
-    public CoinType getCoinType() {
-        return type;
+    public void completeTransaction(SendRequest request) throws WalletAccountException {
+        checkArgument(!request.isCompleted(), "Given SendRequest has already been completed.");
+
+        if (request.type.getTransactionVersion() > 0) {
+            request.nxtTxBuilder.ecBlockHeight(getLastEcBlockHeight());
+            request.nxtTxBuilder.ecBlockId(getLastEcBlockId());
+        }
+
+        // TODO check if the destination public key was announced and if so, remove it from the tx:
+        // request.nxtTxBuilder.publicKeyAnnouncement(null);
+
+        try {
+            request.nxtTx = request.nxtTxBuilder.build();
+        } catch (NxtException.NotValidException e) {
+            throw new WalletAccount.WalletAccountException(e);
+        }
+        request.setCompleted(true);
+    }
+
+    @Override
+    public void signTransaction(SendRequest request) {
+        checkArgument(request.isCompleted(), "Send request is not completed");
+        checkArgument(request.nxtTx != null, "No transaction found in send request");
+        String nxtSecret;
+        if (rootKey.isEncrypted()) {
+            checkArgument(request.aesKey != null, "Wallet is encrypted but no decryption key provided");
+            nxtSecret = rootKey.toDecrypted(request.aesKey).getPrivateKeyMnemonic();
+        } else {
+            nxtSecret = rootKey.getPrivateKeyMnemonic();
+        }
+        request.nxtTx.sign(nxtSecret);
     }
 
     @Override
@@ -153,22 +199,22 @@ public class NxtFamilyWallet implements WalletAccount {
     }
 
     @Override
-    public Transaction getTransaction(String transactionId) {
+    public org.bitcoinj.core.Transaction getTransaction(String transactionId) {
         throw new RuntimeException("Not implemented");
     }
 
     @Override
-    public Map<Sha256Hash, Transaction> getUnspentTransactions() {
+    public Map<Sha256Hash, org.bitcoinj.core.Transaction> getUnspentTransactions() {
         throw new RuntimeException("Not implemented");
     }
 
     @Override
-    public Map<Sha256Hash, Transaction> getPendingTransactions() {
+    public Map<Sha256Hash, org.bitcoinj.core.Transaction> getPendingTransactions() {
         throw new RuntimeException("Not implemented");
     }
 
     @Override
-    public Map<Sha256Hash, Transaction> getTransactions() {
+    public Map<Sha256Hash, org.bitcoinj.core.Transaction> getTransactions() {
         throw new RuntimeException("Not implemented");
     }
 
@@ -202,6 +248,27 @@ public class NxtFamilyWallet implements WalletAccount {
         throw new RuntimeException("Not implemented");
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Serialization support
+    //
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    List<Protos.Key> serializeKeychainToProtobuf() {
+        lock.lock();
+        try {
+            return rootKey.toProtobuf();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Encryption support
+    //
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
     @Override
     public boolean isEncryptable() {
         throw new RuntimeException("Not implemented");
@@ -226,6 +293,51 @@ public class NxtFamilyWallet implements WalletAccount {
     public void decrypt(KeyParameter aesKey) {
         throw new RuntimeException("Not implemented");
     }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Transaction signing support
+    //
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Sends coins to the given address but does not broadcast the resulting pending transaction.
+     */
+    public SendRequest sendCoinsOffline(NxtFamilyAddress address, Value amount) throws WalletAccountException {
+        return sendCoinsOffline(address, amount, (KeyParameter) null);
+    }
+
+    /**
+     * {@link #sendCoinsOffline(NxtFamilyAddress, Value)}
+     */
+    public SendRequest sendCoinsOffline(NxtFamilyAddress address, Value amount, @Nullable String password)
+            throws WalletAccountException {
+        KeyParameter key = null;
+        if (password != null) {
+            checkState(isEncrypted());
+            key = checkNotNull(getKeyCrypter()).deriveKey(password);
+        }
+        return sendCoinsOffline(address, amount, key);
+    }
+
+    /**
+     * {@link #sendCoinsOffline(NxtFamilyAddress, Value)}
+     */
+    public SendRequest sendCoinsOffline(NxtFamilyAddress address, Value amount, @Nullable KeyParameter aesKey)
+            throws WalletAccountException {
+        SendRequest request = SendRequest.to(this, address, amount);
+        request.aesKey = aesKey;
+
+        return request;
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Other stuff TODO implement
+    //
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
 
     @Override
     public boolean equals(WalletAccount otherAccount) {
@@ -324,7 +436,7 @@ public class NxtFamilyWallet implements WalletAccount {
     }
 
     @Override
-    public Map<Sha256Hash, Transaction> getTransactionPool(WalletTransaction.Pool pool) {
+    public Map<Sha256Hash, org.bitcoinj.core.Transaction> getTransactionPool(WalletTransaction.Pool pool) {
         throw new RuntimeException("Not implemented");
     }
 
@@ -344,17 +456,33 @@ public class NxtFamilyWallet implements WalletAccount {
     }
 
     @Override
-    public void onTransactionUpdate(Transaction tx) {
+    public void onTransactionUpdate(org.bitcoinj.core.Transaction tx) {
         throw new RuntimeException("Not implemented");
     }
 
     @Override
-    public void onTransactionBroadcast(Transaction transaction) {
+    public void onTransactionBroadcast(org.bitcoinj.core.Transaction transaction) {
         throw new RuntimeException("Not implemented");
     }
 
     @Override
-    public void onTransactionBroadcastError(Transaction tx) {
+    public void onTransactionBroadcastError(org.bitcoinj.core.Transaction tx) {
         throw new RuntimeException("Not implemented");
+    }
+
+    public int getLastEcBlockHeight() {
+        return lastEcBlockHeight;
+    }
+
+    public void setLastEcBlockHeight(int lastEcBlockHeight) {
+        this.lastEcBlockHeight = lastEcBlockHeight;
+    }
+
+    public long getLastEcBlockId() {
+        return lastEcBlockId;
+    }
+
+    public void setLastEcBlockId(long lastEcBlockId) {
+        this.lastEcBlockId = lastEcBlockId;
     }
 }

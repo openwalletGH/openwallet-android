@@ -23,6 +23,15 @@ import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.Wallet.MissingSigsMode;
 import org.bitcoinj.wallet.CoinSelector;
+
+import com.coinomi.core.coins.Value;
+import com.coinomi.core.coins.families.NxtFamily;
+import com.coinomi.core.coins.nxt.Appendix;
+import com.coinomi.core.coins.nxt.Attachment;
+import com.coinomi.core.coins.nxt.Convert;
+import com.coinomi.core.coins.nxt.NxtException;
+import com.coinomi.core.coins.nxt.TransactionImpl;
+import com.coinomi.core.wallet.families.nxt.NxtFamilyAddress;
 import com.google.common.base.Objects;
 import com.google.common.base.Objects.ToStringHelper;
 
@@ -31,6 +40,7 @@ import org.spongycastle.crypto.params.KeyParameter;
 import java.io.Serializable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * A SendRequest gives the wallet information about precisely how to send money to a recipient or set of recipients.
@@ -56,10 +66,13 @@ public class SendRequest implements Serializable{
      *
      * <p>If there are already inputs to the transaction, make sure their out point has a connected output,
      * otherwise their value will be added to fee.  Also ensure they are either signed or are spendable by a wallet
-     * key, otherwise the behavior of {@link WalletPocketHD#completeTx(SendRequest)} is undefined (likely
+     * key, otherwise the behavior of {@link WalletPocketHD#completeTransaction(SendRequest)} is undefined (likely
      * RuntimeException).</p>
      */
+    // TODO unify and make abstract
     public Transaction tx;
+    public com.coinomi.core.coins.nxt.Transaction nxtTx;
+    public com.coinomi.core.coins.nxt.TransactionImpl.BuilderImpl nxtTxBuilder;
 
     /**
      * When emptyWallet is set, all coins selected by the coin selector are sent to the first output in tx
@@ -73,6 +86,7 @@ public class SendRequest implements Serializable{
      * don't really control as it depends on who sent you money), and the value being sent somewhere else. The
      * change address should be selected from this wallet, normally. <b>If null this will be chosen for you.</b>
      */
+    // TODO change to AbstractAddress. Only valid for Bitcoin
     public Address changeAddress = null;
 
     /**
@@ -89,7 +103,8 @@ public class SendRequest implements Serializable{
      * <p>You might also consider adding a {@link SendRequest#feePerKb} to set the fee per kb of transaction size
      * (rounded down to the nearest kb) as that is how transactions are sorted when added to a block by miners.</p>
      */
-    public Coin fee = null;
+    // TODO change to Value
+    public Coin fee;
 
     /**
      * <p>A transaction can have a fee attached, which is defined as the difference between the input values
@@ -105,6 +120,7 @@ public class SendRequest implements Serializable{
      *
      * <p>You might also consider using a {@link SendRequest#fee} to set the fee added for the first kb of size.</p>
      */
+    // TODO change to Value
     public Coin feePerKb;
 
     /**
@@ -151,9 +167,16 @@ public class SendRequest implements Serializable{
      */
     transient public MissingSigsMode missingSigsMode = MissingSigsMode.THROW;
 
+    public boolean isCompleted() {
+        return completed;
+    }
 
-    // Tracks if this has been passed to wallet.completeTx already: just a safety check.
-    boolean completed;
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
+    }
+
+    // Tracks if this has been passed to wallet.completeTransaction already: just a safety check.
+    private boolean completed;
 
     private SendRequest() {}
 
@@ -163,16 +186,57 @@ public class SendRequest implements Serializable{
      * <p>Be very careful when value is smaller than {@link Transaction#MIN_NONDUST_OUTPUT} as the transaction will
      * likely be rejected by the network in this case.</p>
      */
-    public static SendRequest to(Address destination, Coin value) {
+
+    // TODO combine the following function methods -> SendRequest to(AbstractAddress destination, Value amount) {
+    public static SendRequest to(Address destination, Coin amount) {
         SendRequest req = new SendRequest();
         checkNotNull(destination.getParameters(), "Address is for an unknown network");
         req.type = (CoinType) destination.getParameters();
-        req.feePerKb = req.type.getFeePerKb();
+        req.feePerKb = req.type.feePerKb().toCoin();
+        req.fee = req.type.value(0).toCoin();
         req.tx = new Transaction(req.type);
-        req.tx.addOutput(value, destination);
+        req.tx.addOutput(amount, destination);
         return req;
     }
 
+    public static SendRequest to(WalletAccount from, NxtFamilyAddress destination, Value amount) {
+        SendRequest req = new SendRequest();
+        req.type = destination.getType();
+        switch (req.type.getFeePolicy()) {
+            case FLAT_FEE:
+                req.feePerKb = req.type.value(0).toCoin();
+                req.fee = req.type.feePerKb().toCoin();
+                break;
+            case FEE_PER_KB:
+                req.feePerKb = req.type.feePerKb().toCoin();
+                req.fee = req.type.value(0).toCoin();
+                break;
+            default:
+                throw new RuntimeException("Unknown fee policy: " + req.type.getFeePolicy());
+        }
+
+        byte version = (byte) req.type.getTransactionVersion();
+        int timestamp = Convert.toNxtEpochTime(System.currentTimeMillis());
+
+        TransactionImpl.BuilderImpl builder = new TransactionImpl.BuilderImpl(version,
+                from.getPublicKey(), amount.value, req.fee.value, timestamp,
+                NxtFamily.DEFAULT_DEADLINE, Attachment.ORDINARY_PAYMENT);
+
+        builder.recipientId(destination.getAccountId());
+
+        // TODO extra check, query the server if the public key announcement is actually needed
+        if (destination.getPublicKey() != null) {
+            Appendix.PublicKeyAnnouncement publicKeyAnnouncement
+                    = new Appendix.PublicKeyAnnouncement(destination.getPublicKey());
+            builder.publicKeyAnnouncement(publicKeyAnnouncement);
+        }
+
+        req.nxtTxBuilder = builder;
+
+        return req;
+    }
+
+    // TODO implement a universal method for Bitcoin and NXT that uses AbstractAddress destination
     public static SendRequest emptyWallet(Address destination) {
         SendRequest req = new SendRequest();
         checkNotNull(destination.getParameters(), "Address is for an unknown network");

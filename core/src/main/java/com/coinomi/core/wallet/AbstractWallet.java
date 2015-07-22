@@ -1,26 +1,34 @@
 package com.coinomi.core.wallet;
 
 import com.coinomi.core.coins.CoinType;
-import com.google.common.annotations.VisibleForTesting;
+
+import org.bitcoinj.core.InsufficientMoneyException;
+import org.bitcoinj.utils.Threading;
+
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author John L. Jegutanis
  */
-public abstract class AbstractWallet extends TransactionWatcherWallet {
+public abstract class AbstractWallet implements WalletAccount { //extends TransactionWatcherWallet {
     protected final String id;
-    private String description;
-
-    @VisibleForTesting
-    protected SimpleHDKeyChain keys;
+    protected String description;
+    protected final CoinType type;
+    protected final ReentrantLock lock = Threading.lock("AbstractWallet");
 
     public AbstractWallet(CoinType coinType, String id) {
-        super(coinType);
+        this.type = coinType;
         this.id = id;
     }
 
     @Override
     public String getId() {
         return id;
+    }
+
+    @Override
+    public CoinType getCoinType() {
+        return type;
     }
 
     /**
@@ -41,5 +49,14 @@ public abstract class AbstractWallet extends TransactionWatcherWallet {
     @Override
     public String getDescription() {
         return description;
+    }
+
+    @Override
+    public void completeAndSignTx(SendRequest request) throws WalletAccountException {
+        if (request.isCompleted()) {
+            signTransaction(request);
+        } else {
+            completeTransaction(request);
+        }
     }
 }
