@@ -39,6 +39,7 @@ public enum CoinID {
     NEOSCOIN_MAIN(NeoscoinMain.get()),
     VERTCOIN_MAIN(VertcoinMain.get()),
     JUMBUCKS_MAIN(JumbucksMain.get()),
+    VPNCOIN_MAIN(VpncoinMain.get()),
     ;
 
     private static List<CoinType> types;
