@@ -21,6 +21,7 @@ import com.coinomi.core.coins.NamecoinMain;
 import com.coinomi.core.coins.NuBitsMain;
 import com.coinomi.core.coins.NuSharesMain;
 import com.coinomi.core.coins.PeercoinMain;
+import com.coinomi.core.coins.ParkbyteMain;
 import com.coinomi.core.coins.ReddcoinMain;
 import com.coinomi.core.coins.RubycoinMain;
 import com.coinomi.core.coins.UroMain;
@@ -114,6 +115,8 @@ public class Constants {
                                                     new ServerAddress("ltc-testnet-cce-2.coinomi.net", 15002)),
             new CoinAddress(PeercoinMain.get(),     new ServerAddress("ppc-cce-1.coinomi.net", 5004),
                                                     new ServerAddress("ppc-cce-2.coinomi.net", 5004)),
+            new CoinAddress(ParkbyteMain.get(),     new ServerAddress("electrum-pkb.net", 50001),
+                                                    new ServerAddress("electrum.eu1.parkbyte.com", 50001)),
             new CoinAddress(NuSharesMain.get(),     new ServerAddress("nsr-cce-1.coinomi.net", 5011),
                                                     new ServerAddress("nsr-cce-2.coinomi.net", 5011)),
             new CoinAddress(NuBitsMain.get(),       new ServerAddress("nbt-cce-1.coinomi.net", 5012),
@@ -162,6 +165,7 @@ public class Constants {
         COINS_ICONS.put(CoinID.LITECOIN_MAIN.getCoinType(), R.drawable.litecoin);
         COINS_ICONS.put(CoinID.LITECOIN_TEST.getCoinType(), R.drawable.litecoin_test);
         COINS_ICONS.put(CoinID.PEERCOIN_MAIN.getCoinType(), R.drawable.peercoin);
+        COINS_ICONS.put(CoinID.PARKBYTE_MAIN.getCoinType(), R.drawable.parkbyte);
         COINS_ICONS.put(CoinID.DASH_MAIN.getCoinType(), R.drawable.dash);
         COINS_ICONS.put(CoinID.REDDCOIN_MAIN.getCoinType(), R.drawable.reddcoin);
         COINS_ICONS.put(CoinID.NUSHARES_MAIN.getCoinType(), R.drawable.nushares);
@@ -187,6 +191,7 @@ public class Constants {
         COINS_BLOCK_EXPLORERS.put(CoinID.LITECOIN_MAIN.getCoinType(), "http://ltc.blockr.io/tx/info/%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.LITECOIN_TEST.getCoinType(), "https://chain.so/tx/LTCTEST/%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.PEERCOIN_MAIN.getCoinType(), "http://ppc.blockr.io/tx/info/%s");
+        COINS_BLOCK_EXPLORERS.put(CoinID.PARKBYTE_MAIN.getCoinType(), "https://chainz.cryptoid.info/pkb/tx.dws?%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.DASH_MAIN.getCoinType(), "https://bitinfocharts.com/darkcoin/tx/%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.NUSHARES_MAIN.getCoinType(), "http://blockexplorer.nu/transactions/%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.NUBITS_MAIN.getCoinType(), "http://blockexplorer.nu/transactions/%s");
@@ -220,6 +225,7 @@ public class Constants {
             LitecoinMain.get(),
             NuBitsMain.get(),
             PeercoinMain.get(),
+            ParkbyteMain.get(),
             DashMain.get(),
             NamecoinMain.get(),
             BlackcoinMain.get(),
