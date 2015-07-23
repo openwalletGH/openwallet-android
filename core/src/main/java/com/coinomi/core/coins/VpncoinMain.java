@@ -16,10 +16,10 @@ public class VpncoinMain extends CoinType {
         spendableCoinbaseDepth = 100;
 
         family = VpncoinFamily.get();
-        name = "Vpncoin";
+        name = "Vpncoin (beta)";
         symbol = "VPN";
         uriScheme = "vpncoin";
-        bip44Index = 31; // TODO change and register
+        bip44Index = 33;
         unitExponent = 8;
         feePerKb = value(10000); // 0.0001VPN
         minNonDust = value(1); // 0.00000001VPN

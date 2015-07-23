@@ -150,8 +150,8 @@ public class Constants {
                                                     new ServerAddress("vtc-cce-2.coinomi.net", 5028)),
             new CoinAddress(JumbucksMain.get(),     new ServerAddress("jbs-cce-1.coinomi.net", 5029),
                                                     new ServerAddress("jbs-cce-2.coinomi.net", 5029)),
-            // TODO set correct URLs
-            new CoinAddress(VpncoinMain.get(),      new ServerAddress("archimedes.coinomi.net", 5032))
+            new CoinAddress(VpncoinMain.get(),      new ServerAddress("vpn-cce-1.coinomi.net", 5032),
+                                                    new ServerAddress("vpn-cce-2.coinomi.net", 5032))
     );
 
     public static final HashMap<CoinType, Integer> COINS_ICONS;
@@ -181,7 +181,7 @@ public class Constants {
         COINS_ICONS.put(CoinID.NEOSCOIN_MAIN.getCoinType(), R.drawable.neoscoin);
         COINS_ICONS.put(CoinID.VERTCOIN_MAIN.getCoinType(), R.drawable.vertcoin);
         COINS_ICONS.put(CoinID.JUMBUCKS_MAIN.getCoinType(), R.drawable.jumbucks);
-        COINS_ICONS.put(CoinID.VPNCOIN_MAIN.getCoinType(), 0); // TODO ADD ICON
+        COINS_ICONS.put(CoinID.VPNCOIN_MAIN.getCoinType(), R.drawable.vpncoin);
 
         COINS_BLOCK_EXPLORERS = new HashMap<CoinType, String>();
         COINS_BLOCK_EXPLORERS.put(CoinID.BITCOIN_MAIN.getCoinType(), "https://blockchain.info/tx/%s");
@@ -230,9 +230,9 @@ public class Constants {
             BlackcoinMain.get(),
             MonacoinMain.get(),
             NuSharesMain.get(),
+            VpncoinMain.get(),
             VertcoinMain.get(),
             FeathercoinMain.get(),
-            VpncoinMain.get(),
             RubycoinMain.get(),
             ReddcoinMain.get(),
             DigibyteMain.get(),
