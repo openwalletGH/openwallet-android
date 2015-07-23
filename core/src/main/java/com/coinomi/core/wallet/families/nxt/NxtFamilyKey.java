@@ -160,6 +160,7 @@ final public class NxtFamilyKey implements EncryptableKeyChain, KeyBag, Serializ
 
         // NTX key
         Protos.Key.Builder publicKeyProto = Protos.Key.newBuilder();
+        publicKeyProto.setType(Protos.Key.Type.ORIGINAL);
         publicKeyProto.setPublicKey(ByteString.copyFrom(publicKey));
         entries.add(publicKeyProto);
 
@@ -186,7 +187,7 @@ final public class NxtFamilyKey implements EncryptableKeyChain, KeyBag, Serializ
         Protos.Key entropyProto = keys.get(0);
         DeterministicKey entropyKey = KeyUtils.getDeterministicKey(entropyProto, null, crypter);
 
-        Protos.Key publicKeyProto = keys.get(0);
+        Protos.Key publicKeyProto = keys.get(1);
         if (publicKeyProto.getType() != Protos.Key.Type.ORIGINAL) {
             throw new UnreadableWalletException("Unexpected type for NXT public key: " +
                     publicKeyProto.getType());
