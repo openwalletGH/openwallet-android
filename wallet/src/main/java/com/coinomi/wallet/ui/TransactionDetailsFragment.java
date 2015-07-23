@@ -41,7 +41,7 @@ public class TransactionDetailsFragment extends Fragment {
 
     private static final int UPDATE_VIEW = 0;
 
-    private Sha256Hash txId;
+    private String txId;
     private String accountId;
     private AbstractWallet pocket;
     private CoinType type;
@@ -108,10 +108,7 @@ public class TransactionDetailsFragment extends Fragment {
         adapter = new TransactionAmountVisualizerAdapter(inflater.getContext(), pocket);
         outputRows.setAdapter(adapter);
 
-        String txIdString = getArguments().getString(Constants.ARG_TRANSACTION_ID);
-        if (txIdString != null) {
-            txId = new Sha256Hash(txIdString);
-        }
+        txId = getArguments().getString(Constants.ARG_TRANSACTION_ID);
 
         updateView();
 

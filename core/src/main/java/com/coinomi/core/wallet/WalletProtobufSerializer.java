@@ -101,7 +101,7 @@ public class WalletProtobufSerializer {
         // Add serialized pockets
         for (WalletAccount account : wallet.getAllAccounts()) {
             Protos.WalletPocket pocketProto;
-            if (account instanceof AbstractWallet) {
+            if (account instanceof WalletPocketHD) {
                 pocketProto = WalletPocketProtobufSerializer.toProtobuf((WalletPocketHD) account);
             } else if (account instanceof NxtFamilyWallet) {
                 pocketProto = NxtFamilyWalletProtobufSerializer.toProtobuf((NxtFamilyWallet) account);

@@ -19,6 +19,7 @@ import android.widget.ImageButton;
 import android.widget.MultiAutoCompleteTextView;
 import android.widget.TextView;
 
+import com.coinomi.core.CoreUtils;
 import com.coinomi.core.wallet.Wallet;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
@@ -201,7 +202,7 @@ public class RestoreFragment extends Fragment {
 
     private boolean verifyMnemonic(String seedText) {
         log.info("Verifying seed");
-        ArrayList<String> seedWords = Wallet.parseMnemonic(seedText);
+        ArrayList<String> seedWords = CoreUtils.parseMnemonic(seedText);
         boolean isValid = false;
         try {
             MnemonicCode.INSTANCE.check(seedWords);

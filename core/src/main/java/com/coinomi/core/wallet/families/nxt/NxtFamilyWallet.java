@@ -80,21 +80,6 @@ final public class NxtFamilyWallet extends AbstractWallet {
     }
 
     @Override
-    public String getId() {
-        return Convert.toUnsignedLong(address.getAccountId());
-    }
-
-    @Override
-    public String getDescription() {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public void setDescription(String description) {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
     public byte[] getPublicKey() {
         return rootKey.getPublicKey();
     }

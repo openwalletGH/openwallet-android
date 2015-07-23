@@ -14,6 +14,7 @@ import com.coinomi.core.coins.nxt.EncryptedData;
 import com.coinomi.core.coins.nxt.NxtException;
 import com.coinomi.core.coins.nxt.Transaction;
 import com.coinomi.core.coins.nxt.TransactionImpl;
+import com.coinomi.core.protos.Protos;
 import com.coinomi.core.wallet.SendRequest;
 import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.wallet.WalletAccount;
@@ -34,6 +35,7 @@ import org.spongycastle.crypto.params.KeyParameter;
 import org.spongycastle.util.encoders.Hex;
 
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -65,6 +67,17 @@ public class NxtFamilyWalletTest {
         wallet = new Wallet(recoveryPhrase);
         nxtAccount = (NxtFamilyWallet)wallet.createAccount(NXT, null);
         otherAccount = new NxtFamilyWallet(hierarchy.get(NXT.getBip44Path(1), false, true), NXT);
+    }
+
+    @Test
+    public void serializeUnencryptedNormal() throws Exception {
+        List<Protos.Key> keys = nxtAccount.serializeKeychainToProtobuf();
+
+        NxtFamilyKey nxtKey = NxtFamilyKey.fromProtobuf(keys);
+
+        NxtFamilyWallet newWallet;
+        newWallet = new NxtFamilyWallet(nxtKey, NXT);
+
     }
 
 

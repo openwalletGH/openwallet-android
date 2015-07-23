@@ -186,7 +186,8 @@ public class BalanceFragment extends Fragment implements LoaderCallbacks<List<Tr
 
         emptyPocketMessage = header.findViewById(R.id.history_empty);
         // Hide empty message if have some transaction history
-        if (pocket.getTransactions(false).size() > 0) {
+//        if (pocket.getTransactions(false).size() > 0) {
+        if (pocket.getTransactions().size() > 0) {
             emptyPocketMessage.setVisibility(View.GONE);
         }
 
@@ -416,7 +417,8 @@ public class BalanceFragment extends Fragment implements LoaderCallbacks<List<Tr
 
         @Override
         public List<Transaction> loadInBackground() {
-            final List<Transaction> filteredTransactions = Lists.newArrayList(walletPocket.getTransactions(true));
+//            final List<Transaction> filteredTransactions = Lists.newArrayList(walletPocket.getTransactions(true));
+            final List<Transaction> filteredTransactions = Lists.newArrayList(walletPocket.getTransactions().values());
 
             Collections.sort(filteredTransactions, TRANSACTION_COMPARATOR);
 

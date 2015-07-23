@@ -33,6 +33,7 @@ import com.coinomi.core.util.ExchangeRate;
 import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.SendRequest;
 import com.coinomi.core.wallet.Wallet;
+import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.core.wallet.WalletPocketHD;
 import com.coinomi.core.wallet.exceptions.NoSuchPocketException;
 import com.coinomi.wallet.Configuration;
@@ -278,7 +279,7 @@ public class MakeTransactionFragment extends Fragment {
 
     private SendRequest generateSendRequest(Address sendTo,
                                             boolean emptyWallet, @Nullable Value amount)
-            throws InsufficientMoneyException {
+            throws WalletAccount.WalletAccountException {
 
         SendRequest sendRequest;
         if (emptyWallet) {

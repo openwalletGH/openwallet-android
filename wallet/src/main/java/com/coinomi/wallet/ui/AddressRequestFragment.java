@@ -33,9 +33,12 @@ import android.widget.Toast;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.FiatType;
 import com.coinomi.core.coins.Value;
+import com.coinomi.core.coins.families.BitFamily;
 import com.coinomi.core.uri.CoinURI;
 import com.coinomi.core.util.ExchangeRate;
 import com.coinomi.core.util.GenericUtils;
+import com.coinomi.core.wallet.TransactionWatcherWallet;
+import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.core.wallet.WalletPocketHD;
 import com.coinomi.core.wallet.exceptions.Bip44KeyLookAheadExceededException;
 import com.coinomi.wallet.AddressBookProvider;
@@ -87,7 +90,7 @@ public class AddressRequestFragment extends Fragment {
 
     private NavigationDrawerFragment mNavigationDrawerFragment;
     private String accountId;
-    private WalletPocketHD pocket;
+    private WalletAccount pocket;
     private int maxQrSize;
     private String lastQrContent;
 
@@ -152,7 +155,7 @@ public class AddressRequestFragment extends Fragment {
             }
         }
         // TODO
-        pocket = (WalletPocketHD) checkNotNull(walletApplication.getAccount(accountId));
+        pocket = checkNotNull(walletApplication.getAccount(accountId));
         if (pocket == null) {
             Toast.makeText(getActivity(), R.string.no_such_pocket_error, Toast.LENGTH_LONG).show();
             return;
@@ -309,43 +312,51 @@ public class AddressRequestFragment extends Fragment {
                 }
             };
 
-            if (pocket.canCreateFreshReceiveAddress()) {
-                final LayoutInflater inflater = LayoutInflater.from(getActivity());
-                final View view = inflater.inflate(R.layout.new_address_dialog, null);
-                final TextView viewLabel = (TextView) view.findViewById(R.id.new_address_label);
+            if (pocket instanceof WalletPocketHD) {
+                final WalletPocketHD pocketHD = (WalletPocketHD) pocket;
+                if (pocketHD.canCreateFreshReceiveAddress()) {
+                    final LayoutInflater inflater = LayoutInflater.from(getActivity());
+                    final View view = inflater.inflate(R.layout.new_address_dialog, null);
+                    final TextView viewLabel = (TextView) view.findViewById(R.id.new_address_label);
 
-                final DialogBuilder builder = new DialogBuilder(getActivity());
-                builder.setTitle(R.string.create_new_address);
-                builder.setView(view);
-                builder.setNegativeButton(R.string.button_cancel, dismissListener);
-                builder.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        try {
-                            Address newAddress = pocket.getFreshReceiveAddress(
-                                    config.isManualAddressManagement());
-                            final String newLabel = viewLabel.getText().toString().trim();
+                    final DialogBuilder builder = new DialogBuilder(getActivity());
+                    builder.setTitle(R.string.create_new_address);
+                    builder.setView(view);
+                    builder.setNegativeButton(R.string.button_cancel, dismissListener);
+                    builder.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            try {
+                                Address newAddress = pocketHD.getFreshReceiveAddress(
+                                        config.isManualAddressManagement());
+                                final String newLabel = viewLabel.getText().toString().trim();
 
-                            if (!newLabel.isEmpty()) {
-                                final Uri uri =
-                                        AddressBookProvider.contentUri(getActivity().getPackageName(), type)
-                                                .buildUpon().appendPath(newAddress.toString()).build();
-                                final ContentValues values = new ContentValues();
-                                values.put(AddressBookProvider.KEY_LABEL, newLabel);
-                                resolver.insert(uri, values);
+                                if (!newLabel.isEmpty()) {
+                                    final Uri uri =
+                                            AddressBookProvider.contentUri(getActivity().getPackageName(), type)
+                                                    .buildUpon().appendPath(newAddress.toString()).build();
+                                    final ContentValues values = new ContentValues();
+                                    values.put(AddressBookProvider.KEY_LABEL, newLabel);
+                                    resolver.insert(uri, values);
+                                }
+                                updateView();
+                            } catch (Bip44KeyLookAheadExceededException e) {
+                                // Should not happen as we already checked if we can create a new address
+                                Toast.makeText(getActivity(), R.string.too_many_unused_addresses, Toast.LENGTH_LONG).show();
                             }
-                            updateView();
-                        } catch (Bip44KeyLookAheadExceededException e) {
-                            // Should not happen as we already checked if we can create a new address
-                            Toast.makeText(getActivity(), R.string.too_many_unused_addresses, Toast.LENGTH_LONG).show();
+                            dismissAllowingStateLoss();
                         }
-                        dismissAllowingStateLoss();
-                    }
-                });
-                dialog = builder.create();
+                    });
+                    dialog = builder.create();
+                } else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setMessage(R.string.too_many_unused_addresses)
+                            .setPositiveButton(R.string.button_ok, dismissListener);
+                    dialog = builder.create();
+                }
             } else {
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder.setMessage(R.string.too_many_unused_addresses)
+                builder.setMessage(R.string.error_generic)
                         .setPositiveButton(R.string.button_ok, dismissListener);
                 dialog = builder.create();
             }
@@ -359,7 +370,7 @@ public class AddressRequestFragment extends Fragment {
         if (showAddress != null) {
             receiveAddress =  showAddress;
         } else {
-            receiveAddress = pocket.getReceiveAddress(config.isManualAddressManagement());
+            receiveAddress = pocket.getReceiveAddress();
         }
 
         // Don't show previous addresses link if we are showing a specific address
