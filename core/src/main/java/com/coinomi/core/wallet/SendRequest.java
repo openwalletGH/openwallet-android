@@ -17,6 +17,7 @@
 package com.coinomi.core.wallet;
 
 
+import com.coinomi.core.coins.BurstMain;
 import com.coinomi.core.coins.CoinType;
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.Coin;
@@ -24,6 +25,7 @@ import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.Wallet.MissingSigsMode;
 import org.bitcoinj.wallet.CoinSelector;
 
+import com.coinomi.core.coins.NxtMain;
 import com.coinomi.core.coins.Value;
 import com.coinomi.core.coins.families.NxtFamily;
 import com.coinomi.core.coins.nxt.Appendix;
@@ -216,7 +218,14 @@ public class SendRequest implements Serializable{
         }
 
         byte version = (byte) req.type.getTransactionVersion();
-        int timestamp = Convert.toNxtEpochTime(System.currentTimeMillis());
+        int timestamp;
+        if (req.type.equals(NxtMain.get())) {
+            timestamp = Convert.toNxtEpochTime(System.currentTimeMillis());
+        } else if (req.type.equals(BurstMain.get())){
+            timestamp = Convert.toBurstEpochTime(System.currentTimeMillis());
+        } else {
+            throw new RuntimeException("Unexpected NXT family type: " + req.type.toString());
+        }
 
         TransactionImpl.BuilderImpl builder = new TransactionImpl.BuilderImpl(version,
                 from.getPublicKey(), amount.value, req.fee.value, timestamp,
