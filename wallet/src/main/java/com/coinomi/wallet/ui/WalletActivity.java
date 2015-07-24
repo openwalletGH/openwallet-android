@@ -363,6 +363,7 @@ final public class WalletActivity extends BaseWalletActivity implements
     }
 
     private void processInput(String input) throws CoinURIParseException, AddressFormatException {
+        input = input.trim();
         try {
             processUri(input);
         } catch (final CoinURIParseException x) {
