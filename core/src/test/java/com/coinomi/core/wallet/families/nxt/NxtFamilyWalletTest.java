@@ -14,6 +14,7 @@ import com.coinomi.core.coins.nxt.EncryptedData;
 import com.coinomi.core.coins.nxt.NxtException;
 import com.coinomi.core.coins.nxt.Transaction;
 import com.coinomi.core.coins.nxt.TransactionImpl;
+import com.coinomi.core.protos.Protos;
 import com.coinomi.core.wallet.SendRequest;
 import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.wallet.WalletAccount;
@@ -34,6 +35,7 @@ import org.spongycastle.crypto.params.KeyParameter;
 import org.spongycastle.util.encoders.Hex;
 
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -111,4 +113,38 @@ public class NxtFamilyWalletTest {
         assertEquals(destination.getAccountId(), parsedTx.getRecipientId());
         // TODO check signature
     }
+
+    @Test
+    public void testSerializeKeychainToProtobuf() throws UnreadableWalletException
+    {
+        List<Protos.Key> keys = nxtAccount.serializeKeychainToProtobuf();
+
+        NxtFamilyKey newKey = NxtFamilyKey.fromProtobuf(keys);
+
+        NxtFamilyWallet newWallet = new NxtFamilyWallet(newKey, NXT);
+
+        assertEquals(Convert.toHexString(nxtAccount.getPublicKey()), Convert.toHexString(newWallet.getPublicKey()));
+        assertEquals(nxtAccount.getPublicKeyMnemonic(), newWallet.getPublicKeyMnemonic());
+        assertEquals(nxtAccount.getId(), newWallet.getId());
+
+    }
+
+    @Test
+    public void testEncryptedNxtFamilyKey() throws UnreadableWalletException
+    {
+        nxtAccount.encrypt(crypter, aesKey);
+
+        List<Protos.Key> keys = nxtAccount.serializeKeychainToProtobuf();
+
+        NxtFamilyKey newKey = NxtFamilyKey.fromProtobuf(keys, crypter);
+
+        NxtFamilyWallet newWallet = new NxtFamilyWallet(newKey, NXT);
+
+        assertEquals(Convert.toHexString(nxtAccount.getPublicKey()), Convert.toHexString(newWallet.getPublicKey()));
+        assertEquals(nxtAccount.getPublicKeyMnemonic(), newWallet.getPublicKeyMnemonic());
+        assertEquals(nxtAccount.getId(), newWallet.getId());
+        
+    }
+
+
 }

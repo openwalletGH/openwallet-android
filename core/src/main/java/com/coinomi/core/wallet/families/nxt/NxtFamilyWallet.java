@@ -271,22 +271,40 @@ final public class NxtFamilyWallet extends AbstractWallet {
 
     @Override
     public boolean isEncryptable() {
-        throw new RuntimeException("Not implemented");
+        return true;
     }
 
     @Override
     public boolean isEncrypted() {
-        throw new RuntimeException("Not implemented");
+        lock.lock();
+        try {
+            return rootKey.isEncrypted();
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override
     public KeyCrypter getKeyCrypter() {
-        throw new RuntimeException("Not implemented");
+        lock.lock();
+        try {
+            return rootKey.getKeyCrypter();
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override
     public void encrypt(KeyCrypter keyCrypter, KeyParameter aesKey) {
-        throw new RuntimeException("Not implemented");
+        checkNotNull(keyCrypter);
+        checkNotNull(aesKey);
+
+        lock.lock();
+        try {
+            this.rootKey = this.rootKey.toEncrypted(keyCrypter, aesKey);
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override
