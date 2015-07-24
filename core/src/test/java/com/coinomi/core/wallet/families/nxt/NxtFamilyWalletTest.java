@@ -124,4 +124,38 @@ public class NxtFamilyWalletTest {
         assertEquals(destination.getAccountId(), parsedTx.getRecipientId());
         // TODO check signature
     }
+
+    @Test
+    public void testSerializeKeychainToProtobuf() throws UnreadableWalletException
+    {
+        List<Protos.Key> keys = nxtAccount.serializeKeychainToProtobuf();
+
+        NxtFamilyKey newKey = NxtFamilyKey.fromProtobuf(keys);
+
+        NxtFamilyWallet newWallet = new NxtFamilyWallet(newKey, NXT);
+
+        assertEquals(Convert.toHexString(nxtAccount.getPublicKey()), Convert.toHexString(newWallet.getPublicKey()));
+        assertEquals(nxtAccount.getPublicKeyMnemonic(), newWallet.getPublicKeyMnemonic());
+        assertEquals(nxtAccount.getId(), newWallet.getId());
+
+    }
+
+    @Test
+    public void testEncryptedNxtFamilyKey() throws UnreadableWalletException
+    {
+        nxtAccount.encrypt(crypter, aesKey);
+
+        List<Protos.Key> keys = nxtAccount.serializeKeychainToProtobuf();
+
+        NxtFamilyKey newKey = NxtFamilyKey.fromProtobuf(keys, crypter);
+
+        NxtFamilyWallet newWallet = new NxtFamilyWallet(newKey, NXT);
+
+        assertEquals(Convert.toHexString(nxtAccount.getPublicKey()), Convert.toHexString(newWallet.getPublicKey()));
+        assertEquals(nxtAccount.getPublicKeyMnemonic(), newWallet.getPublicKeyMnemonic());
+        assertEquals(nxtAccount.getId(), newWallet.getId());
+        
+    }
+
+
 }
