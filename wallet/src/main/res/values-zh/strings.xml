@@ -65,6 +65,7 @@
     <string name="test_wallet">测试钱包</string>
     <!-- Intro -->
     <string name="test_wallet_warning_title">创建测试钱包？</string>
+    <string name="test_wallet_warning_message">如果您创建一个新的测试的钱包，您现有的钱包就会丢失，除非你备份你<i>恢复短语</i>。</string>
     <string name="incompatible_device_warning_title">设备不匹配</string>
     <string name="incompatible_device_warning_message">由于软件或硬件原因，此设备无法执行某些加密功能。\n可以通过设备生产商发布的更新来解决。\n\n如果有任何疑问，欢迎和我们联系：support@coinomi.com</string>
     <!-- Recovery fragment -->
@@ -151,6 +152,7 @@
     <!-- PasswordConfirmationFragment -->
     <string name="enter_password">输入密码</string>
     <!-- SignTransactionFragment -->
+    <string name="contacting_exchange">联系交流&#8230;</string>
     <string name="preparing_transaction">你的交易正被发送中，请等候。</string>
     <string name="no_such_pocket_error">与钱包通讯时出错。如此问题重复出现，请重新恢复钱包。</string>
     <string name="password_failed">输入的密码无效。</string>
@@ -222,6 +224,7 @@
     <string name="pref_title_manual_receiving_addresses">手工接收地址</string>
     <string name="pref_summary_manual_receiving_addresses">不要为每一个交易都自动创建地址</string>
     <!-- Show Seed -->
+    <string name="title_activity_show_seed">出现复苏短语</string>
     <string name="seed_not_available_title">没有找到恢复密码</string>
     <string name="seed_not_available">你的恢复密码没有保存在这个设备上。\n尝试恢复钱包以解决这个问题。</string>
     <string name="seed_encrypted_touch_to_decrypt">触摸以解锁</string>
