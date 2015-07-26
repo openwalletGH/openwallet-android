@@ -75,7 +75,7 @@
     <string name="backed_up_seed">私は復元フレーズを安全な場所に保管しました</string>
     <!-- Restore fragment -->
     <string name="restore_info">復元フレーズを入力してください：</string>
-    <string name="restore_seed_protected">この復元フレーズにはパスワードがかかっています</string>
+    <string name="restore_seed_protected">この復元フレーズにはパスワードがかかっています (BIP39)</string>
     <string name="restore_skip_title">検証のスキップ</string>
     <string name="restore_skip_info1">復元フレーズが以下のものに合致するか確認してください：</string>
     <string name="restore_skip_info2">スペルミスを発見できますので、検証のスキップは推奨されません。</string>
@@ -136,7 +136,7 @@
     <string name="amount_warn_fees_apply">手数料のために、実際の送金額はわずかに少なくなります</string>
     <!-- Set Password fragment -->
     <string name="set_password_info">日々の利用の際にウォレットを守るため、パスワードを設定します。</string>
-    <string name="set_password_seed_protect">復元フレーズにもパスワードをかける</string>
+    <string name="set_password_seed_protect">復元フレーズにもパスワードをかける (BIP39)</string>
     <string name="set_password_seed_protect_info">パスワードは変更不可能になり、復元フレーズを用いてウォレットを復旧する際にはパスワードが必要となります。\n警告：パスワードを忘れた場合にはウォレットの復旧は不可能となります！</string>
     <string name="set_password1">パスワードを入力してください</string>
     <string name="set_password2">パスワードをもう一度入力してください</string>
@@ -232,7 +232,7 @@
     <string name="seed_not_available">復元フレーズはこのデバイスに保存されていません。\nこの問題を解決するためには、ウォレットの復旧を行ってください。</string>
     <string name="seed_encrypted_touch_to_decrypt">タッチしてアンロックする</string>
     <string name="seed_working">お待ちください&#8230;</string>
-    <string name="seed_password_protected">この復元フレーズはパスワードにより保護されています</string>
+    <string name="seed_password_protected">この復元フレーズはパスワードにより保護されています (BIP39)</string>
     <!-- Exchange -->
     <string name="title_activity_trade">両替所</string>
     <string name="trade_info">両替を行いたいコインを選択してください。\n両替されたコインは自動的にウォレットに追加されます。</string>

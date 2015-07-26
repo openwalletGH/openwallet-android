@@ -49,8 +49,8 @@ public class Constants {
     public static final int SEED_ENTROPY_EXTRA = 256;
 
     public static final String ARG_SEED = "seed";
-    public static final String ARG_SEED_PROTECT = "seed_protect";
     public static final String ARG_PASSWORD = "password";
+    public static final String ARG_SEED_PASSWORD = "seed_password";
     public static final String ARG_EMPTY_WALLET = "empty_wallet";
     public static final String ARG_SEND_TO_ADDRESS = "send_to_address";
     public static final String ARG_SEND_TO_COIN_TYPE = "send_to_coin_type";

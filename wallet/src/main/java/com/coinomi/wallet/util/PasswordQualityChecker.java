@@ -22,7 +22,7 @@ import java.util.Set;
  */
 public class PasswordQualityChecker {
     private static final Logger log = LoggerFactory.getLogger(PasswordQualityChecker.class);
-    public static final int DEFAULT_MIN_PASSWORD_LENGTH = 8;
+    public static final int DEFAULT_MIN_PASSWORD_LENGTH = 10;
     private static final String COMMON_PASSWORDS_TXT = "common_passwords.txt";
     private final HashSet<String> passwordList;
     private final int minPasswordLength;
@@ -33,11 +33,10 @@ public class PasswordQualityChecker {
 
     public PasswordQualityChecker(Context context, int minPassLength) {
         this.minPasswordLength = minPassLength;
-        this.passwordList = new HashSet<String>(10000);
+        this.passwordList = new HashSet<>(10000);
 
-        InputStream stream = null;
         try {
-            stream = context.getAssets().open(COMMON_PASSWORDS_TXT);
+            InputStream stream = context.getAssets().open(COMMON_PASSWORDS_TXT);
             BufferedReader br = new BufferedReader(new InputStreamReader(stream, "UTF-8"));
             String word;
             while ((word = br.readLine()) != null) {

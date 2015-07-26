@@ -28,6 +28,8 @@ import org.spongycastle.crypto.params.KeyParameter;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 /**
  * Fragment that restores a wallet
  */
@@ -36,7 +38,7 @@ public class FinalizeWalletRestorationFragment extends Fragment {
 
     private String seed;
     private String password;
-    private boolean seedProtect;
+    @Nullable private String seedPassword = null;
     private List<CoinType> coinsToCreate;
     private boolean isTestWallet;
 
@@ -62,7 +64,7 @@ public class FinalizeWalletRestorationFragment extends Fragment {
             Bundle args = getArguments();
             seed = args.getString(Constants.ARG_SEED);
             password = args.getString(Constants.ARG_PASSWORD);
-            seedProtect = args.getBoolean(Constants.ARG_SEED_PROTECT);
+            seedPassword = args.getString(Constants.ARG_SEED_PASSWORD);
             isTestWallet = args.getBoolean(Constants.ARG_TEST_WALLET, false);
             coinsToCreate = getCoinsTypes(args);
 
@@ -115,12 +117,7 @@ public class FinalizeWalletRestorationFragment extends Fragment {
 
             Wallet wallet = null;
             try {
-                if (seedProtect) {
-                    wallet = new Wallet(seedWords, password);
-                } else {
-                    wallet = new Wallet(seedWords);
-                }
-
+                wallet = new Wallet(seedWords, seedPassword);
                 KeyParameter aesKey = null;
                 if (password != null && !password.isEmpty()) {
                     KeyCrypterScrypt crypter = new KeyCrypterScrypt();

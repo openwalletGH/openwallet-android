@@ -78,7 +78,7 @@
     <string name="backed_up_seed">I have safely stored my recovery phrase</string>
     <!-- Restore fragment -->
     <string name="restore_info">Please enter your recovery phrase:</string>
-    <string name="restore_seed_protected">My recovery phrase is password protected</string>
+    <string name="restore_seed_protected">My recovery phrase is protected (BIP39)</string>
     <string name="restore_skip_title">Skipping verification</string>
     <string name="restore_skip_info1">Please make sure that your recovery phrase matches the following:</string>
     <string name="restore_skip_info2">It is recommended not to skip verification, so that any misspellings could be detected.</string>
@@ -139,7 +139,7 @@
     <string name="amount_warn_fees_apply">Slightly less will be sent because of fees</string>
     <!-- Set Password fragment -->
     <string name="set_password_info">Set a password to protect your wallet in everyday use.</string>
-    <string name="set_password_seed_protect">Also protect my recovery phrase</string>
+    <string name="set_password_seed_protect">Also protect my recovery phrase (BIP39)</string>
     <string name="set_password_seed_protect_info">The password becomes permanent and it is needed when restoring your wallet with the recovery phrase.\nWARNING: If you forget your password it will be impossible to restore your wallet!</string>
     <string name="set_password1">Type your password</string>
     <string name="set_password2">Re-type your password</string>
@@ -240,7 +240,7 @@
     <string name="seed_not_available">Your recovery phrase is not saved on this device.\nTry restoring your wallet to solve this.</string>
     <string name="seed_encrypted_touch_to_decrypt">Touch to unlock</string>
     <string name="seed_working">Please wait&#8230;</string>
-    <string name="seed_password_protected">This recovery phrase is password protected</string>
+    <string name="seed_password_protected">This recovery phrase is password protected (BIP39)</string>
     <!-- Exchange -->
     <string name="title_activity_trade">Exchange</string>
     <string name="trade_info">Select the coins you wish to exchange.\nThe converted coins will be automatically added to your wallet.</string>
