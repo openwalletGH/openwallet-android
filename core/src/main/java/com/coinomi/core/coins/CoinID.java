@@ -22,6 +22,7 @@ public enum CoinID {
     LITECOIN_TEST(LitecoinTest.get()),
     DOGECOIN_MAIN(DogecoinMain.get()),
     DOGECOIN_TEST(DogecoinTest.get()),
+    CANADAECOIN_MAIN(CanadaeCoinMain.get()),
     REDDCOIN_MAIN(ReddcoinMain.get()),
     PEERCOIN_MAIN(PeercoinMain.get()),
     DASH_MAIN(DashMain.get()),
