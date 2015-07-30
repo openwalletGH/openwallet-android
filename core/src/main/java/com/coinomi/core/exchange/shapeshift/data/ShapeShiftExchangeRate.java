@@ -67,7 +67,7 @@ public class ShapeShiftExchangeRate extends ExchangeRateBase {
             if (converted.type.equals(minerFee.type)) {
                 fee = minerFee.negate(); // Miner fee is removed from withdraw value
             } else { // Withdrawal -> deposit
-                fee =  convertValue(minerFee); // Miner fee is added to the deposit value
+                fee = convertValue(minerFee); // Miner fee is added to the deposit value
             }
             converted = converted.add(fee);
 

@@ -484,17 +484,10 @@ public class SendFragment extends Fragment {
     public void onActivityResult(final int requestCode, final int resultCode, final Intent intent) {
         if (requestCode == REQUEST_CODE_SCAN) {
             if (resultCode == Activity.RESULT_OK) {
-                final String input = intent.getStringExtra(ScanActivity.INTENT_EXTRA_RESULT);
-                try {
-                    updateStateFrom(new CoinURI(input));
-                } catch (final CoinURIParseException x) {
-                    try {
-                        parseAddress(input);
-                        updateView();
-                    } catch (AddressFormatException e) {
-                        String error = getResources().getString(R.string.scan_error, input);
-                        Toast.makeText(getActivity(), error, Toast.LENGTH_LONG).show();
-                    }
+                String input = intent.getStringExtra(ScanActivity.INTENT_EXTRA_RESULT);
+                if (!processInput(input)) {
+                    String error = getResources().getString(R.string.scan_error, input);
+                    Toast.makeText(getActivity(), error, Toast.LENGTH_LONG).show();
                 }
             }
         } else if (requestCode == SIGN_TRANSACTION) {
@@ -522,6 +515,22 @@ public class SendFragment extends Fragment {
                     }
                     if (listener != null) listener.onTransactionBroadcastFailure(pocket, null);
                 }
+            }
+        }
+    }
+
+    private boolean processInput(String input) {
+        input = input.trim();
+        try {
+            updateStateFrom(new CoinURI(input));
+            return true;
+        } catch (final CoinURIParseException x) {
+            try {
+                parseAddress(input);
+                updateView();
+                return true;
+            } catch (AddressFormatException e) {
+                return false;
             }
         }
     }
@@ -768,21 +777,6 @@ public class SendFragment extends Fragment {
                 }
             }
             updateView();
-        }
-    }
-
-    private boolean processInput(String input) {
-        try {
-            updateStateFrom(new CoinURI(input));
-            return true;
-        } catch (final CoinURIParseException x) {
-            try {
-                parseAddress(input);
-                updateView();
-                return true;
-            } catch (AddressFormatException e) {
-                return false;
-            }
         }
     }
 

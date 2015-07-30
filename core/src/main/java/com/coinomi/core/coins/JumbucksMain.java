@@ -15,7 +15,7 @@ public class JumbucksMain extends CoinType {
         spendableCoinbaseDepth = 500;
 
         family = PeerFamily.get();
-        name = "Jumbucks";
+        name = "Jumbucks (beta)";
         symbol = "JBS";
         uriScheme = "jumbucks";
         bip44Index = 26;

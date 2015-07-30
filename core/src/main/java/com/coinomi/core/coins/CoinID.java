@@ -41,6 +41,7 @@ public enum CoinID {
     NXT_MAIN(NxtMain.get()),
     BURST_MAIN(BurstMain.get()),
     JUMBUCKS_MAIN(JumbucksMain.get()),
+    VPNCOIN_MAIN(VpncoinMain.get()),
     ;
 
     private static List<CoinType> types;

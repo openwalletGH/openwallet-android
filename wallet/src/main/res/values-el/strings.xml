@@ -75,7 +75,7 @@
     <string name="backed_up_seed">Έχω αποθηκεύσει σε ασφαλές μέρος τη φράση ανάκτησης μου</string>
     <!-- Restore fragment -->
     <string name="restore_info">Παρακαλώ εισάγετε τη φράση ανάκτησής σας:</string>
-    <string name="restore_seed_protected">Η φράση ανάκτησης για το πορτοφόλι μου προστατεύεται από κωδικό</string>
+    <string name="restore_seed_protected">Η φράση ανάκτησης είναι προστατευμένη (BIP39)</string>
     <string name="restore_skip_title">Παράκαμψη επαλήθευσης</string>
     <string name="restore_skip_info1">Παρακαλώ βεβαιωθείτε ότι η φράση ανάκτησης ταιριάζει με την εξής:</string>
     <string name="restore_skip_info2">Δεν συνίσταται η παράλειψη της επαληθεύσεως, ώστε να εντοπιστούν τυχόν λάθη.</string>
@@ -136,7 +136,7 @@
     <string name="amount_warn_fees_apply">Θα αποσταλούν ελαχίστως λιγότερα λόγω εξόδων συναλλαγής</string>
     <!-- Set Password fragment -->
     <string name="set_password_info">Εισάγετε έναν κωδικό για να προστατέψετε το πορτοφόλι σας κατά την καθημερινή του χρήση.</string>
-    <string name="set_password_seed_protect">Επιθυμώ επίσης να προστατέψω τη φράση ανάκτησης του πορτοφολιού μου</string>
+    <string name="set_password_seed_protect">Επιθυμώ επίσης να προστατέψω τη φράση ανάκτησης μου (BIP39)</string>
     <string name="set_password_seed_protect_info">Ο κωδικός δεν μπορεί να αλλάξει μελλοντικά και θα χρειάζεται να εισάγεται κάθε φορά που θα ανακτάτε το πορτοφόλι σας με την φράση ανάκτησης.\nΠΡΟΣΟΧΗ: Αν ξεχάσετε τον κωδικό θα είναι αδύνατον να ανακτήσετε το πορτοφόλι σας!</string>
     <string name="set_password1">Εισάγετε τον κωδικό σας</string>
     <string name="set_password2">Εισάγετε ξανά τον κωδικό σας</string>
@@ -235,7 +235,7 @@
     <string name="seed_not_available">Η φράση ανάκτησης δεν έχει αποθηκευτεί σε αυτήν τη συσκευή.\nΠροσπαθήστε να ανακτήσετε το πορτοφόλι σας για να επιλυθεί αυτό.</string>
     <string name="seed_encrypted_touch_to_decrypt">Ακουμπήστε για ξεκλείδωμα</string>
     <string name="seed_working">Παρακαλώ περιμένετε&#8230;</string>
-    <string name="seed_password_protected">Αυτή η φράση ανάκτησης προστατεύεται από κωδικό.</string>
+    <string name="seed_password_protected">Αυτή η φράση ανάκτησης προστατεύεται από κωδικό (BIP39)</string>
     <!-- Exchange -->
     <string name="title_activity_trade">Ανταλλακτήριο</string>
     <string name="trade_info">Επιλέξτε τα νομίσματα που επιθυμείτε να αλλάξετε.\nΤα νομίσματα θα προστεθούν αυτόματα στο πορτοφόλι σας μετά την μετατροπή.</string>
