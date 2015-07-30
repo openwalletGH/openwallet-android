@@ -45,7 +45,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class Constants {
 
-    public static final int SEED_ENTROPY_DEFAULT = 160;
+    public static final int SEED_ENTROPY_DEFAULT = 192;
     public static final int SEED_ENTROPY_EXTRA = 256;
 
     public static final String ARG_SEED = "seed";
