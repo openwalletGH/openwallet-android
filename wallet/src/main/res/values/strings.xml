@@ -244,7 +244,7 @@
     <!-- Exchange -->
     <string name="title_activity_trade">Exchange</string>
     <string name="trade_info">Select the coins you wish to exchange.\nThe converted coins will be automatically added to your wallet.</string>
-    <string name="trade_info_rates">The given rate includes transaction fees withheld by ShapeShift.io</string>
+    <string name="trade_info_rates">Given rate includes ShapeShift.io transaction fee</string>
     <string name="trade_from_coin_label">exchange</string>
     <string name="trade_to_coin_label">receive</string>
     <string name="trade_warn_no_account_found">You will be prompted to add a %1$s wallet</string>
