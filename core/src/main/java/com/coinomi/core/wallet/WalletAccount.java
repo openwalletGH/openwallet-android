@@ -5,6 +5,10 @@ import com.coinomi.core.coins.Value;
 import com.coinomi.core.coins.ValueType;
 import com.coinomi.core.network.interfaces.ConnectionEventListener;
 import com.coinomi.core.network.interfaces.TransactionEventListener;
+import com.coinomi.core.wallet.exceptions.AddressMalformedException;
+import com.coinomi.core.wallet.exceptions.InvalidMessageSignature;
+import com.coinomi.core.wallet.exceptions.MissingPrivateKeyException;
+import com.coinomi.core.wallet.exceptions.KeyIsEncryptedException;
 
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.Sha256Hash;
@@ -19,10 +23,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
 
+import javax.annotation.Nullable;
+
 /**
  * @author John L. Jegutanis
  */
-public interface WalletAccount extends TransactionBag, KeyBag, TransactionEventListener, ConnectionEventListener, Serializable {
+public interface WalletAccount extends TransactionBag, KeyBag, TransactionEventListener,
+        ConnectionEventListener, Serializable {
 
     String getId();
     String getDescription();
@@ -86,4 +93,7 @@ public interface WalletAccount extends TransactionBag, KeyBag, TransactionEventL
     boolean isAddressMine(Address address);
 
     boolean isLoading();
+
+    void signMessage(SignedMessage unsignedMessage, @Nullable KeyParameter aesKey);
+    void verifyMessage(SignedMessage signedMessage);
 }

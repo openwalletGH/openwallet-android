@@ -204,6 +204,12 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" >
         </activity>
+        <activity
+            android:name="com.coinomi.wallet.ui.SignVerifyMessageActivity"
+            android:label="@string/title_activity_sign_verify_message"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" >
+        </activity>
 
         <provider
             android:name="com.coinomi.wallet.ExchangeRatesProvider"

@@ -17,6 +17,7 @@ import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -320,6 +321,8 @@ public class BalanceFragment extends Fragment implements LoaderCallbacks<List<Tr
             // if the drawer is not showing. Otherwise, let the drawer
             // decide what to show in the action bar.
             inflater.inflate(R.menu.balance, menu);
+            // Disable sign/verify for coins that don't support it
+            menu.findItem(R.id.action_sign_verify_message).setVisible(type.canSignVerifyMessages());
         }
     }
 

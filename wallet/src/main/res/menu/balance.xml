@@ -12,4 +12,9 @@
         android:title="@string/action_refresh"
         app:showAsAction="never" />
 
+    <item android:id="@+id/action_sign_verify_message"
+        android:title="@string/action_sign_verify_message"
+        android:visible="false"
+        app:showAsAction="never" />
+
 </menu>

@@ -2,6 +2,7 @@ package com.coinomi.core.coins;
 
 
 import com.coinomi.core.util.MonetaryFormat;
+import com.google.common.base.Charsets;
 
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.AddressFormatException;
@@ -35,6 +36,7 @@ abstract public class CoinType extends NetworkParameters implements ValueType, S
     protected Value softDustLimit;
     protected SoftDustPolicy softDustPolicy;
     protected FeePolicy feePolicy = FeePolicy.FEE_PER_KB;
+    protected byte[] messageHeader;
 
     private transient MonetaryFormat friendlyFormat;
     private transient MonetaryFormat plainFormat;
@@ -97,6 +99,18 @@ abstract public class CoinType extends NetworkParameters implements ValueType, S
 
     public FeePolicy getFeePolicy() {
         return checkNotNull(feePolicy, "A coin failed to set a fee policy");
+    }
+
+    public byte[] getMessageHeader() {
+        return checkNotNull(messageHeader, "A coin failed to set signed message header bytes");
+    }
+
+    public boolean canSignVerifyMessages() {
+        return messageHeader != null;
+    }
+
+    protected byte[] toBytes(String str) {
+        return str.getBytes(Charsets.UTF_8);
     }
 
     public List<ChildNumber> getBip44Path(int account) {

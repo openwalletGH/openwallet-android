@@ -1,6 +1,10 @@
 package com.coinomi.core.wallet;
 
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.wallet.exceptions.AddressMalformedException;
+import com.coinomi.core.wallet.exceptions.InvalidMessageSignature;
+import com.coinomi.core.wallet.exceptions.KeyIsEncryptedException;
+import com.coinomi.core.wallet.exceptions.MissingPrivateKeyException;
 
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.ECKey;
@@ -89,6 +93,14 @@ public class AddressWallet extends AbstractWallet {
     @Override
     public boolean isAddressMine(Address address) {
         return false;
+    }
+
+    @Override
+    public void signMessage(SignedMessage unsignedMessage, @Nullable KeyParameter aesKey) {
+    }
+
+    @Override
+    public void verifyMessage(SignedMessage signedMessage) {
     }
 
     @Nullable
