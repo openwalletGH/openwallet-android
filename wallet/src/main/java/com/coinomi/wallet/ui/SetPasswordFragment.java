@@ -34,7 +34,6 @@ public class SetPasswordFragment extends Fragment {
     private static final Logger log = LoggerFactory.getLogger(SetPasswordFragment.class);
 
     private Listener mListener;
-    private boolean isSeedProtected = false;
     private boolean isPasswordGood;
     private boolean isPasswordsMatch;
     private PasswordQualityChecker passwordQualityChecker;
@@ -43,17 +42,8 @@ public class SetPasswordFragment extends Fragment {
     private TextView errorPassword;
     private TextView errorPasswordsMismatch;
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param seed a valid seed mnemonic
-     * @return A new instance of fragment SetPasswordFragment.
-     */
-    public static SetPasswordFragment newInstance(String seed) {
+    public static SetPasswordFragment newInstance(Bundle args) {
         SetPasswordFragment fragment = new SetPasswordFragment();
-        Bundle args = new Bundle();
-        args.putString(Constants.ARG_SEED, seed);
         fragment.setArguments(args);
         return fragment;
     }
@@ -104,23 +94,6 @@ public class SetPasswordFragment extends Fragment {
                     clearError(errorPasswordsMismatch);
                 } else {
                     checkPasswordsMatch();
-                }
-            }
-        });
-
-        // Seed protect option
-        final TextView seedProtectInfo = (TextView) view.findViewById(R.id.seed_protect_info);
-        seedProtectInfo.setVisibility(View.GONE);
-
-        final CheckBox seedProtect = (CheckBox) view.findViewById(R.id.seed_protect);
-        seedProtect.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                isSeedProtected = isChecked;
-                if (isChecked) {
-                    seedProtectInfo.setVisibility(View.VISIBLE);
-                } else {
-                    seedProtectInfo.setVisibility(View.GONE);
                 }
             }
         });
@@ -178,7 +151,6 @@ public class SetPasswordFragment extends Fragment {
                 if (isPasswordGood && isPasswordsMatch) {
                     Bundle args = getArguments();
                     args.putString(Constants.ARG_PASSWORD, password1.getText().toString());
-                    args.putBoolean(Constants.ARG_SEED_PROTECT, isSeedProtected);
                     mListener.onPasswordSet(args);
                 } else {
                     Toast.makeText(SetPasswordFragment.this.getActivity(),
@@ -265,6 +237,6 @@ public class SetPasswordFragment extends Fragment {
     }
 
     public interface Listener {
-        public void onPasswordSet(Bundle args);
+        void onPasswordSet(Bundle args);
     }
 }

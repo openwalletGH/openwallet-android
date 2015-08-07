@@ -19,6 +19,7 @@ import com.coinomi.core.util.KeyUtils;
 import com.coinomi.core.wallet.AbstractAddress;
 import com.coinomi.core.wallet.AbstractWallet;
 import com.coinomi.core.wallet.SendRequest;
+import com.coinomi.core.wallet.SignedMessage;
 import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.core.wallet.WalletAccountEventListener;
@@ -126,6 +127,16 @@ final public class NxtFamilyWallet extends AbstractWallet {
             nxtSecret = rootKey.getPrivateKeyMnemonic();
         }
         request.nxtTx.sign(nxtSecret);
+    }
+
+    @Override
+    public void signMessage(SignedMessage unsignedMessage, @Nullable KeyParameter aesKey) {
+        throw new RuntimeException("Not implemented");
+    }
+
+    @Override
+    public void verifyMessage(SignedMessage signedMessage) {
+        throw new RuntimeException("Not implemented");
     }
 
     @Override

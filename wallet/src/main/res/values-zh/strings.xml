@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_scan_qr_code">扫描</string>
+    <string name="action_share">分享</string>
+    <string name="action_copy">复制</string>
+    <string name="action_edit_label">编辑标签</string>
+    <string name="action_empty_wallet">空钱包</string>
+    <string name="action_settings">设置</string>
+    <string name="action_about">关于</string>
+    <string name="action_refresh">刷新</string>
+    <string name="action_exchange_history">交易历史</string>
+    <string name="action_new_address">新地址</string>
+    <string name="action_swap_coins">换币</string>
+    <string name="action_delete">删除</string>
+    <string name="action_change_address_type">更改地址类型</string>
+    <!-- Errors -->
+    <string name="error_generic">执行指令时出错</string>
+    <string name="error_could_not_read_wallet">无法读取钱包</string>
+    <!-- Generic items -->
+    <string name="button_ok">OK</string>
+    <string name="button_next">下一个</string>
+    <string name="button_finish">结束</string>
+    <string name="button_return">返回</string>
+    <string name="button_confirm">确认</string>
+    <string name="button_cancel">取消</string>
+    <string name="button_dismiss">取消</string>
+    <string name="button_delete">删除</string>
+    <string name="button_add">添加</string>
+    <string name="button_save">保存</string>
+    <string name="button_remove">移除</string>
+    <string name="button_edit">编辑</string>
+    <string name="button_send">发送</string>
+    <string name="button_skip">跳过</string>
+    <string name="button_retry">重试</string>
+    <string name="button_download">下载</string>
+    <string name="button_agree">同意</string>
+    <string name="button_disagree">否定</string>
+    <string name="button_add_coins">+币</string>
+    <string name="scan_qr_code">扫描二维码</string>
+    <string name="erase_address">擦除地址</string>
+    <string name="copied_to_clipboard">复制到剪贴板</string>
+    <string name="wallet_title_request">接收</string>
+    <string name="wallet_title_balance">余额</string>
+    <string name="wallet_title_send">发送</string>
+    <string name="wallet_locked_message">钱包已加密</string>
+    <string name="unlock_wallet_title">解密钱包</string>
+    <string name="unlocking_wallet_working">解密钱包&#8230;</string>
+    <string name="unlocking_wallet_error_title">无法解密钱包</string>
+    <string name="unlocking_wallet_error_detail">密码是否正确？请确认输入正确。如果问题没有解决请考虑使用复原密码.</string>
+    <string name="powered_by">技术支持：</string>
+    <!-- Nav drawer -->
+    <string name="navigation_drawer_open">打开导航条</string>
+    <string name="navigation_drawer_close">关闭导航条</string>
+    <string name="navigation_drawer_services">服务</string>
+    <string name="navigation_drawer_wallet">钱包</string>
+    <!-- SendOutput widget -->
+    <string name="fee">交易手续费</string>
+    <string name="send">发送</string>
+    <string name="trade">交易所</string>
+    <string name="receive">接收</string>
+    <!-- Welcome fragment -->
+    <string name="welcome_text">欢迎使用Coinomi钱包</string>
+    <string name="create_wallet">创建新钱包</string>
+    <string name="restore_wallet">恢复钱包</string>
+    <string name="test_wallet">测试钱包</string>
+    <!-- Intro -->
+    <string name="test_wallet_warning_title">创建测试钱包？</string>
+    <string name="test_wallet_warning_message">如果您创建一个新的测试的钱包，您现有的钱包就会丢失，除非你备份你<i>恢复短语</i>。</string>
+    <string name="incompatible_device_warning_title">设备不匹配</string>
+    <string name="incompatible_device_warning_message">由于软件或硬件原因，此设备无法执行某些加密功能。\n可以通过设备生产商发布的更新来解决。\n\n如果有任何疑问，欢迎和我们联系：support@coinomi.com</string>
+    <!-- Recovery fragment -->
+    <string name="seed_info">这是你的<i>恢复种子密码</i>，请将其记录在纸上并妥善保管，请注意任何得到这张纸的人就能够控制相应钱包内的资金。\n如果你丢失这个密码，我们没有办法恢复你的钱包。</string>
+    <string name="seed_title">你的种子密码</string>
+    <string name="seed_regenerate_title">触屏生成新密码</string>
+    <string name="backed_up_seed">我已经抄下密码并保管在一个安全地方。</string>
+    <!-- Restore fragment -->
+    <string name="restore_info">请输入你的恢复种子：</string>
+    <string name="restore_seed_protected">种子受密码保护 (BIP39)</string>
+    <string name="restore_skip_title">跳过验证</string>
+    <string name="restore_skip_info1">确保你的种子与下列相符：</string>
+    <string name="restore_skip_info2">推荐不要跳过验证，这样就可以侦测到拼写错误。</string>
+    <string name="restore_error_checksum">种子无效，检查是否有拼写错误。</string>
+    <string name="restore_error_words">种子包括无法辨认的单词。</string>
+    <string name="restore_error_mismatch">输入的种子不正确。</string>
+    <string name="restore_error">无法验证种子。 %1$s</string>
+    <string name="extra_entropy">额外函数</string>
+    <!-- Wallet activity -->
+    <string name="test_wallet_message">此为测试钱包，你可以发送及接受测试网络上的比特币、莱特币及狗狗币。\n\n如果你想使用主网上的币，请移步: <b>设置 &gt; 恢复钱包 &gt; 创建新钱包</b>.</string>
+    <string name="wallet_update_title">新版本可供更新</string>
+    <string name="wallet_update_message">有新版本的Coinomi，其中包含新功能及修复bug.</string>
+    <string name="pay_with">用发送</string>
+    <string name="exchange_and_pay_title">换成并发送</string>
+    <!-- PayToDialog-->
+    <string name="ambiguous_address_title">地址不明确</string>
+    <string name="ambiguous_address_message">请选择正确的币种</string>
+    <!-- Balance fragment -->
+    <string name="wallet_transactions_coinbase">已挖矿</string>
+    <string name="history_empty">目前未收到币！\n\n可以从交易所购买，或出售商品、服务或出售劳务。</string>
+    <string name="sent_to">发送至</string>
+    <string name="received_with">接收</string>
+    <string name="get_tx_info_error">无法获取交易信息</string>
+    <string name="disconnected_label">无法联网</string>
+    <string name="no_wallet_pocket_selected">尚未选择钱包帐号</string>
+    <string name="get_tx_broadcast_error">广播交易时出错</string>
+    <!-- Receive fragment -->
+    <string name="receive_address_label">我的地址</string>
+    <string name="create_new_address">创建新地址吗？</string>
+    <string name="create_new_address_name">别名（可选）</string>
+    <string name="view_previous_addresses">前一地址</string>
+    <string name="too_many_unused_addresses">未用地址太多，请在创建新地址前使用之前创建的地址。</string>
+    <!-- Send Activity -->
+    <string name="send_coins_activity_title">发送</string>
+    <!-- Send fragment -->
+    <string name="send_coins_fragment_receiving_address_label">支付给</string>
+    <string name="send_coins_fragment_receiving_address_tip">输入姓名或地址</string>
+    <string name="send_coins_fragment_receiving_address_error">无效比特币地址！</string>
+    <string name="send_coins_fragment_amount_label">将支付的金额</string>
+    <string name="send_coins_fragment_button_send">发送</string>
+    <string name="send_coins_fragment_button_back">返回</string>
+    <string name="send_coins_failed_msg">失败！</string>
+    <string name="send_coins_error_network">无法连接到网络</string>
+    <string name="send_coins_error_dust">发送金额太小，会被网络拒绝。</string>
+    <string name="send_coins_error">无法发送：%1$s</string>
+    <string name="pay_to_label">支付给</string>
+    <string name="amount_to_send_label">金额</string>
+    <string name="scan_error">扫描时出现错误： %1$s</string>
+    <string name="unsupported_coin">不支持的币种：%1$s</string>
+    <string name="address_error">输入的地址无效。</string>
+    <string name="amount_error">输入的金额无效。</string>
+    <string name="amount_error_empty">请输入金额</string>
+    <string name="amount_error_negative">无法发送负数金额。</string>
+    <string name="amount_error_decimal_places">太多小数点，尝试少于 %1$d</string>
+    <string name="amount_error_too_small">最低金额不少于 %1$s %2$s</string>
+    <string name="amount_error_not_enough_money_plain">余额不足</string>
+    <string name="amount_error_not_enough_money">余额不足，目前余额为%1$s</string>
+    <string name="amount_warn_fees_apply">因手续费实际发送的数量会稍微少一些。</string>
+    <!-- Set Password fragment -->
+    <string name="set_password_info">设置密码保护你的钱包。</string>
+    <string name="set_password_seed_protect">同时也保护种子。 (BIP39)</string>
+    <string name="set_password_seed_protect_info">密码是永久性的，而且在恢复钱包时也要用到。\n警告：如果密码丢失，则无法恢复钱包！</string>
+    <string name="set_password1">输入密码</string>
+    <string name="set_password2">再次输入密码</string>
+    <string name="password_too_common_error">密码\"%1$s\" 太常见，不安全。</string>
+    <string name="password_too_short_error">密码长度太短，至少需要 %1$d 字符。</string>
+    <string name="passwords_mismatch">密码不符。</string>
+    <string name="password_error">无法继续，侦测到密码错误。</string>
+    <string name="password_skip_warn">如果没有设置密码，任何人都可随意支配你钱包的余额。</string>
+    <string name="password_wallet_recovery">恢复钱包时，请提供创建保护种子时使用的密码。\n如果你输入一个新密码，会创建一个新的空钱包。</string>
+    <!-- FinalizeWalletRestorationFragment -->
+    <string name="wallet_restoration">在恢复钱包时请耐心等候。</string>
+    <string name="wallet_restoration_error">无法恢复钱包。\n\n%1$s</string>
+    <!-- PasswordConfirmationFragment -->
+    <string name="enter_password">输入密码</string>
+    <!-- SignTransactionFragment -->
+    <string name="contacting_exchange">联系交流&#8230;</string>
+    <string name="preparing_transaction">你的交易正被发送中，请等候。</string>
+    <string name="no_such_pocket_error">与钱包通讯时出错。如此问题重复出现，请重新恢复钱包。</string>
+    <string name="password_failed">输入的密码无效。</string>
+    <string name="sending_msg">发送中&#8230;</string>
+    <string name="sent_msg">已发送！等待确认中。</string>
+    <string name="tx_already_broadcast">已发送资金</string>
+    <string name="trade_expired">交易过期</string>
+    <string name="tx_confirm_timer_message">" 请在以下时间内确认交易：%1$s"</string>
+    <plurals name="tx_confirm_timer_minute">
+        <item quantity="other">%s 分钟</item>
+    </plurals>
+    <!-- About Activity -->
+    <string name="title_activity_about">关于我们</string>
+    <string name="app_name_long">安卓版</string>
+    <string name="about_licence">开源项目\nhttps://github.com/Coinomi/coinomi-android\n源码基于 GNU普通公众许可3开源</string>
+    <string name="about_credits_nubits">服务器由Nubits提供-NBT是世界上首个价格稳定的数字货币\nhttps://nubits.com/</string>
+    <string name="about_credits_translations">翻译者：</string>
+    <string name="about_credits_bitcoinj">使用Bitcoinj库\nhttp://bitcoinj.github.io/</string>
+    <string name="about_credits_electrum">使用Electrum 服务器软件\nhttps://electrum.org/</string>
+    <string name="about_credits_schildbach">" Andreas Schildbach有贡献\nhttps://github.com/schildbach/bitcoin-wallet/"</string>
+    <string name="about_credits_zxing">QR-code由 ZXing开发\nhttps://github.com/zxing/zxing</string>
+    <string name="about_credits_crypto_icons">图标由 Chris Shepherd设计 \nhttps://github.com/shphrd/crypto-icons</string>
+    <string name="about_credits_font_icons">字体图标 由 Daniel Bruce设计 \nFont-icons by Daniel Bruce</string>
+    <string name="about_credits_exchange_rates">交易汇率由以下网站提供：\nhttp://www.cryptocoincharts.info/\nhttps://bitcoinaverage.com/</string>
+    <!-- Add Coins -->
+    <string name="title_activity_add_coins">添加币种</string>
+    <string name="password_add_coin">你即将在钱包中 创建%1$s 地址。</string>
+    <string name="adding_coin_confirmation_title">添加 %1$s?</string>
+    <string name="adding_coin_working">在创建%1$s 帐号时，请等待。</string>
+    <string name="add_coin_error">添加 %1$s: %2$s 时出错。</string>
+    <string name="coin_already_added_title">%1$s 已添加。</string>
+    <string name="coin_already_added">尚未支持多余帐号。</string>
+    <!-- Transaction amount visualizer -->
+    <string name="internal_transfer">内部转移</string>
+    <!-- Transaction Details -->
+    <string name="title_activity_transaction_details">交易细节</string>
+    <string name="sent">已发送</string>
+    <string name="received">已接收</string>
+    <string name="status_label">状态</string>
+    <string name="date_label">日期</string>
+    <string name="transaction_id_label">交易ID</string>
+    <string name="view_at_a_blockchain_explorer_link">在区块浏览中查看</string>
+    <plurals name="status_building">
+        <item quantity="other">%d 确认</item>
+    </plurals>
+    <string name="status_pending">等待交易确认</string>
+    <string name="status_unknown">交易状态未知</string>
+    <!-- Exchange Rates -->
+    <string name="title_activity_exchange_rates">兑换汇率</string>
+    <string name="set_local_currency">设置 %1$s 为本地货币。</string>
+    <string name="exchange_rates_loading">载入兑换汇率</string>
+    <string name="exchange_rates_load_error">无法加载兑换汇率</string>
+    <string name="exchange_rates_empty_search">无法找到兑换汇率</string>
+    <!-- Select Coins -->
+    <string name="select_coins">选择将何币种加入你的钱包，也可随后添加。</string>
+    <!-- Previous Addresses -->
+    <string name="title_activity_previous_addresses">我之前的地址</string>
+    <string name="previous_addresses_used">用过的地址</string>
+    <string name="previous_addresses_unused">未用过的地址</string>
+    <!-- Edit Address Book Entry -->
+    <string name="edit_address_book_entry_dialog_title_add">添加地址</string>
+    <string name="edit_address_book_entry_dialog_title_edit">编辑地址</string>
+    <string name="edit_address_book_entry_dialog_address_label">地址</string>
+    <string name="edit_address_book_entry_dialog_label_label">名称</string>
+    <!-- Settings -->
+    <string name="title_activity_settings">设置</string>
+    <string name="pref_title_restore_wallet">恢复钱包</string>
+    <string name="pref_title_exchange_rates">兑换汇率</string>
+    <string name="pref_title_manual_receiving_addresses">手工接收地址</string>
+    <string name="pref_summary_manual_receiving_addresses">不要为每一个交易都自动创建地址</string>
+    <!-- Show Seed -->
+    <string name="title_activity_show_seed">出现复苏短语</string>
+    <string name="seed_not_available_title">没有找到恢复密码</string>
+    <string name="seed_not_available">你的恢复密码没有保存在这个设备上。\n尝试恢复钱包以解决这个问题。</string>
+    <string name="seed_encrypted_touch_to_decrypt">触摸以解锁</string>
+    <string name="seed_working">请等待&#8230;</string>
+    <string name="seed_password_protected">恢复密码有加密保护 (BIP39)</string>
+    <!-- Exchange -->
+    <string name="title_activity_trade">兑换</string>
+    <string name="trade_info">选择要兑换的币种。\n换到的币将自动添加到你的钱包。</string>
+    <string name="trade_info_rates">汇率已经包括ShapeShift.io扣除的交易手续费</string>
+    <string name="trade_from_coin_label">兑换</string>
+    <string name="trade_to_coin_label">接收</string>
+    <string name="trade_warn_no_account_found">你会被提示添加一个 %1$s 钱包</string>
+    <string name="trade_warn_no_connection_title">没有互联网联接</string>
+    <string name="trade_warn_no_connection_message">兑换币需要联网。</string>
+    <string name="trade_error">兑换出错</string>
+    <string name="trade_error_no_supported_source_accounts">没有找到支持的帐户</string>
+    <string name="trade_error_service_not_available">服务暂时中断，请稍后再试</string>
+    <string name="trade_error_market_info">服务暂时中断\n没有关于 %1$s - %2$s 交易对的信息</string>
+    <string name="trade_error_sign_tx_message">签署及广播交易时出错。\n\n技术细节：\n\n<b>%1$s</b></string>
+    <string name="trade_error_max_limit">金额超过 %1$s的限制，请减少金额。</string>
+    <string name="trade_error_min_limit">最低金额至少为%1$s。</string>
+    <!-- Exchange Status -->
+    <string name="title_activity_exchange_status">交易状态</string>
+    <string name="trade_status_message">你的订单会很快完成。退出本窗口不会影响交易。</string>
+    <string name="trade_status_complete_message">交易已经成功完成。</string>
+    <string name="trade_status_label">状态</string>
+    <string name="trade_status_waiting_deposit">等待充值&#8230;</string>
+    <string name="trade_status_received_deposit">已经收到 %1$s 的充值</string>
+    <string name="trade_status_waiting_trade">等待交易&#8230;</string>
+    <string name="trade_status_complete_detail">交易完成，已发送 %1$s</string>
+    <string name="trade_status_complete">交易完成</string>
+    <string name="trade_status_view_transaction">查看交易</string>
+    <string name="trade_status_email_receipt">邮件收条</string>
+    <string name="trade_status_failed_detail">交易失败： %1$s</string>
+    <string name="trade_status_failed">交易失败</string>
+    <string name="trade_status_delete_message">从历史中删除？</string>
+    <string name="trade_status_tx_not_available">没有找到交易，请稍后再试。</string>
+    <!-- Email receipt dialog -->
+    <string name="email_receipt_title">邮件收条</string>
+    <string name="email_receipt_message">接收一封关于此交易的邮件</string>
+    <!-- Exchange History -->
+    <string name="title_activity_exchange_history">交易历史</string>
+    <string name="exchange_history_empty">没有交易</string>
+    <!-- ShapeShift -->
+    <string name="about_shapeshift_title">关于shapeshift.io</string>
+    <string name="about_shapeshift_message">shapeshift.io是一个即时加密货币交易所，提供比特币与竞争币的即时兑换。此平台（可通过网页及API交易）采用了比特币与竞争币之间最快且最有效的兑换方式，无需注册即可使用。</string>
+</resources>

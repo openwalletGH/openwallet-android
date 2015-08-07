@@ -87,6 +87,12 @@
                 <data android:scheme="feathercoin" />
                 <data android:scheme="digitalcoin" />
                 <data android:scheme="cannacoin" />
+                <data android:scheme="digibyte" />
+                <data android:scheme="jumbucks" />
+                <data android:scheme="namecoin" />
+                <data android:scheme="neoscoin" />
+                <data android:scheme="vertcoin" />
+                <data android:scheme="vpncoin" />
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
@@ -195,6 +201,12 @@
         <activity
             android:name="com.coinomi.wallet.ui.TradeStatusActivity"
             android:label="@string/title_activity_exchange_status"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" >
+        </activity>
+        <activity
+            android:name="com.coinomi.wallet.ui.SignVerifyMessageActivity"
+            android:label="@string/title_activity_sign_verify_message"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" >
         </activity>

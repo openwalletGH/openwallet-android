@@ -28,8 +28,8 @@ public class SeedFragment extends Fragment {
     private static final Logger log = LoggerFactory.getLogger(SeedFragment.class);
 
     private WelcomeFragment.Listener mListener;
-    private String seed;
     private boolean hasExtraEntropy = false;
+    private TextView mnemonicView;
 
     public SeedFragment() {
     }
@@ -50,21 +50,21 @@ public class SeedFragment extends Fragment {
             public void onClick(View v) {
                 log.info("Clicked restore wallet");
                 if (mListener != null) {
-                    mListener.onSeedCreated(seed);
+                    mListener.onSeedCreated(mnemonicView.getText().toString());
                 }
             }
         });
         buttonNext.setEnabled(false);
 
-        final TextView mnemonicView = (TextView) view.findViewById(R.id.seed);
-        setSeed(mnemonicView);
+        mnemonicView = (TextView) view.findViewById(R.id.seed);
+        generateNewMnemonic();
 
         // Touch the seed icon to generate extra long seed
         seedFontIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 hasExtraEntropy = !hasExtraEntropy; // toggle
-                generateNewSeed(mnemonicView);
+                generateNewMnemonic();
                 if (hasExtraEntropy) {
                     Toast.makeText(getActivity(), R.string.extra_entropy, Toast.LENGTH_SHORT).show();
                 }
@@ -82,7 +82,7 @@ public class SeedFragment extends Fragment {
         View.OnClickListener generateNewSeedListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                generateNewSeed(mnemonicView);
+                generateNewMnemonic();
             }
         };
 
@@ -92,13 +92,15 @@ public class SeedFragment extends Fragment {
         return view;
     }
 
-    private void generateNewSeed(TextView mnemonicView) {
-        log.info("Clicked generate a new seed");
+    private void generateNewMnemonic() {
+        log.info("Clicked generate a new mnemonic");
+        String mnemonic;
         if (hasExtraEntropy) {
-            generateMnemonic(mnemonicView, Constants.SEED_ENTROPY_EXTRA);
+            mnemonic = Wallet.generateMnemonicString(Constants.SEED_ENTROPY_EXTRA);
         } else {
-            generateMnemonic(mnemonicView, Constants.SEED_ENTROPY_DEFAULT);
+            mnemonic = Wallet.generateMnemonicString(Constants.SEED_ENTROPY_DEFAULT);
         }
+        mnemonicView.setText(mnemonic);
     }
 
     @Override
@@ -110,29 +112,11 @@ public class SeedFragment extends Fragment {
             throw new ClassCastException(activity.toString()
                     + " must implement WelcomeFragment.OnFragmentInteractionListener");
         }
-        seed = createSeed(Constants.SEED_ENTROPY_DEFAULT);
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
-    }
-
-    private static String createSeed(int entropySize) {
-        return Wallet.generateMnemonicString(entropySize);
-    }
-
-    private void setSeed(TextView textView) {
-        if (seed != null) {
-            textView.setText(seed);
-        } else {
-            generateNewSeed(textView);
-        }
-    }
-
-    private void generateMnemonic(TextView textView, int entropySize) {
-        seed = createSeed(entropySize);
-        textView.setText(seed);
     }
 }

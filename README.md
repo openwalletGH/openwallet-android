@@ -51,7 +51,7 @@ To release the app follow the steps.
 
 1) Change the following:
 
-* in constants.xml app_name string to "Coinomi" and app_package to com.coinomi.wallet
+* in strings.xml app_name string to "Coinomi" and app_package to com.coinomi.wallet
 * in build.gradle the package from "com.coinomi.wallet.dev" to "com.coinomi.wallet"
 * in AndroidManifest.xml the android:icon to "ic_launcher" and all "com.coinomi.wallet.dev.*"  to "com.coinomi.wallet.*"
 * remove all ic_launcher_dev icons with `rm wallet/src/main/res/drawable*/ic_launcher_dev.png`
@@ -78,6 +78,12 @@ For now test it manually by installing it `adb install -r wallet/wallet-release.
 
 
 ## Version history
+
+New in version 1.5.18
+- Can set an amount in receive screen
+- Added Chinese and Japanese translations
+- Updated the recovery phrase creation procedure
+- Added coins: Namecoin, Vpncoin, Vertcoin, Jumbucks, Neoscoin
 
 New in version 1.5.17
 - Added Greek translation

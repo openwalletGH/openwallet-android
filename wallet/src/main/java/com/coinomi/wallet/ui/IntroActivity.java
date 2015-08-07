@@ -10,7 +10,6 @@ import com.coinomi.core.wallet.Wallet;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 
-
 public class IntroActivity extends AbstractWalletFragmentActivity
         implements WelcomeFragment.Listener, PasswordConfirmationFragment.Listener,
         SetPasswordFragment.Listener, SelectCoinsFragment.Listener {
@@ -87,7 +86,6 @@ public class IntroActivity extends AbstractWalletFragmentActivity
     private void makeTestWallet() {
         Bundle args = new Bundle();
         args.putString(Constants.ARG_SEED, Wallet.generateMnemonicString(Constants.SEED_ENTROPY_DEFAULT));
-        args.putBoolean(Constants.ARG_SEED_PROTECT, false);
         args.putString(Constants.ARG_PASSWORD, null);
         args.putStringArrayList(Constants.ARG_MULTIPLE_COIN_IDS, Constants.DEFAULT_TEST_COIN_IDS);
         args.putBoolean(Constants.ARG_TEST_WALLET, true);
@@ -101,22 +99,8 @@ public class IntroActivity extends AbstractWalletFragmentActivity
     }
 
     @Override
-    public void onNewSeedVerified(String seed) {
-        replaceFragment(SetPasswordFragment.newInstance(seed));
-    }
-
-    @Override
-    public void onExistingSeedVerified(String seed, boolean isSeedProtected) {
-        Bundle args = new Bundle();
-        args.putString(Constants.ARG_SEED, seed);
-        args.putBoolean(Constants.ARG_SEED_PROTECT, isSeedProtected);
-        if (isSeedProtected) {
-            replaceFragment(PasswordConfirmationFragment.newInstance(
-                    getResources().getString(R.string.password_wallet_recovery), args));
-        } else {
-            replaceFragment(PasswordConfirmationFragment.newInstance(
-                    getResources().getString(R.string.set_password_info), args));
-        }
+    public void onSeedVerified(Bundle args) {
+        replaceFragment(SetPasswordFragment.newInstance(args));
     }
 
     @Override

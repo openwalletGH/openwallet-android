@@ -1,6 +1,7 @@
 package com.coinomi.core.coins;
 
 import com.coinomi.core.coins.families.BitFamily;
+import com.coinomi.core.coins.families.ReddFamily;
 
 /**
  * @author FuzzyHobbit
@@ -16,7 +17,7 @@ public class CannacoinMain extends CoinType {
         dumpedPrivateKeyHeader = 189;
         transactionVersion = 2;
 
-        family = ReddcoinMain.get();
+        family = ReddFamily.get();
         name = "Cannacoin";
         symbol = "CCN";
         uriScheme = "cannacoin";

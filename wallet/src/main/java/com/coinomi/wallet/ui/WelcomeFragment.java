@@ -96,12 +96,11 @@ public class WelcomeFragment extends Fragment {
     }
 
     public interface Listener {
-        public void onCreateNewWallet();
-        public void onRestoreWallet();
-        public void onTestWallet();
-        public void onSeedCreated(String seed);
-        public void onNewSeedVerified(String seed);
-        public void onExistingSeedVerified(String seed, boolean isSeedProtected);
+        void onCreateNewWallet();
+        void onRestoreWallet();
+        void onTestWallet();
+        void onSeedCreated(String seed);
+        void onSeedVerified(Bundle args);
     }
 
 }
