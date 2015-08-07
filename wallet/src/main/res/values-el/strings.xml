@@ -239,7 +239,7 @@
     <!-- Exchange -->
     <string name="title_activity_trade">Ανταλλακτήριο</string>
     <string name="trade_info">Επιλέξτε τα νομίσματα που επιθυμείτε να αλλάξετε.\nΤα νομίσματα θα προστεθούν αυτόματα στο πορτοφόλι σας μετά την μετατροπή.</string>
-    <string name="trade_info_rates">Η ισοτιμία εμπεριέχει έξοδα συναλλαγής παρακρατούμενα από την ShapeShift.io</string>
+    <string name="trade_info_rates">Η ισοτιμία εμπεριέχει έξοδα συναλλαγής της ShapeShift.io</string>
     <string name="trade_from_coin_label">αποστολή</string>
     <string name="trade_to_coin_label">λήψη</string>
     <string name="trade_warn_no_account_found">Θα παραπεμφθείτε να προσθέσετε ένα %1$s πορτοφόλι</string>

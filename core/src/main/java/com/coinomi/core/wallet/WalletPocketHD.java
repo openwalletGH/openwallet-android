@@ -26,6 +26,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 
 import org.bitcoinj.core.Address;
+import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.InsufficientMoneyException;
@@ -37,7 +38,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.crypto.params.KeyParameter;
 
+import java.security.SignatureException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -250,6 +253,56 @@ public class WalletPocketHD extends TransactionWatcherWallet {
                 (address.isP2SHAddress() ?
                         isPayToScriptHashMine(address.getHash160()) :
                         isPubKeyHashMine(address.getHash160()));
+    }
+
+    @Override
+    public void signMessage(SignedMessage unsignedMessage, @Nullable KeyParameter aesKey) {
+        String message = unsignedMessage.message;
+        lock.lock();
+        try {
+            ECKey key;
+            try {
+                Address address = new Address(type, unsignedMessage.getAddress());
+                key = findKeyFromPubHash(address.getHash160());
+            } catch (AddressFormatException e) {
+                unsignedMessage.status = SignedMessage.Status.AddressMalformed;
+                return;
+            }
+
+            if (key == null) {
+                unsignedMessage.status = SignedMessage.Status.MissingPrivateKey;
+                return;
+            }
+
+            try {
+                unsignedMessage.signature =
+                        key.signMessage(type.getMessageHeader(), message, aesKey);
+                unsignedMessage.status = SignedMessage.Status.SignedOK;
+            } catch (ECKey.KeyIsEncryptedException e) {
+                unsignedMessage.status = SignedMessage.Status.KeyIsEncrypted;
+            } catch (ECKey.MissingPrivateKeyException e) {
+                unsignedMessage.status = SignedMessage.Status.MissingPrivateKey;
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @Override
+    public void verifyMessage(SignedMessage signedMessage) {
+        try {
+            ECKey pubKey = ECKey.signedMessageToKey(signedMessage.message, signedMessage.signature);
+            byte[] expectedPubKeyHash = new Address(null, signedMessage.address).getHash160();
+            if (Arrays.equals(expectedPubKeyHash, pubKey.getPubKeyHash())) {
+                signedMessage.status = SignedMessage.Status.VerifiedOK;
+            } else {
+                signedMessage.status = SignedMessage.Status.InvalidSigningAddress;
+            }
+        } catch (SignatureException e) {
+            signedMessage.status = SignedMessage.Status.InvalidMessageSignature;
+        } catch (AddressFormatException e) {
+            signedMessage.status = SignedMessage.Status.AddressMalformed;
+        }
     }
 
     @Override

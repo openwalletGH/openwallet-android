@@ -75,6 +75,10 @@
         <item name="android:textColor">@color/fg_warning</item>
     </style>
 
+    <style name="OkText" parent="">
+        <item name="android:textColor">@color/fg_ok</item>
+    </style>
+
     <style name="SeedText" parent="">
         <item name="android:textColor">@color/primary_500</item>
         <item name="android:textSize">@dimen/seed_text_size</item>
