@@ -154,6 +154,8 @@
     <string name="password_wallet_recovery">To restore your wallet, please provide the same password you used when created the protected recovery phrase.\nIf you enter a different password a new empty wallet will be created.</string>
     <!-- FinalizeWalletRestorationFragment -->
     <string name="wallet_restoration">Please wait while your wallet is being restored</string>
+    <string name="wallet_restoration_master_key">Creating master key</string>
+    <string name="wallet_restoration_coin">Creating key for %1$s</string>
     <string name="wallet_restoration_error">Could not restore your wallet.\n\n%1$s</string>
     <!-- PasswordConfirmationFragment -->
     <string name="enter_password">Enter your password</string>

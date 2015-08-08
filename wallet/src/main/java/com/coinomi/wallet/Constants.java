@@ -70,7 +70,7 @@ public class Constants {
     public static final String ARG_URI = "test_wallet";
 
     public static final String WALLET_FILENAME_PROTOBUF = "wallet";
-    public static final long WALLET_WRITE_DELAY = 3;
+    public static final long WALLET_WRITE_DELAY = 5;
     public static final TimeUnit WALLET_WRITE_DELAY_UNIT = TimeUnit.SECONDS;
 
     public static final long STOP_SERVICE_AFTER_IDLE_SECS = 30 * 60; // 30 mins
