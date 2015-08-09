@@ -384,6 +384,14 @@ public class TradeSelectFragment extends Fragment {
         List<CoinType> supportedTypes = getSupportedTypes(availableCoins.availableCoinTypes);
         List<WalletAccount> allAccounts = application.getAllAccounts();
 
+        // put current active account on index 0 so it is our default source
+        WalletAccount activeAccount = application.getAccount(application.getConfiguration().getLastAccountId());
+        if (activeAccount != null) {
+            allAccounts = new ArrayList<>(allAccounts);
+            allAccounts.remove(activeAccount);
+            allAccounts.add(0, activeAccount);
+        }
+
         sourceAdapter.update(allAccounts, supportedTypes, false);
         List<CoinType> sourceTypes = sourceAdapter.getTypes();
 
@@ -409,7 +417,7 @@ public class TradeSelectFragment extends Fragment {
             typesWithoutSourceType.remove(sourceType);
             destinationAdapter.update(allAccounts, typesWithoutSourceType, true);
         } else {
-            destinationAdapter.update(allAccounts, supportedTypes, true);
+            destinationAdapter.update(allAccounts, supportedTypes, false);
         }
 
         if (destinationSpinner.getSelectedItemPosition() == -1) {
