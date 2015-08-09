@@ -297,4 +297,9 @@
     <string name="message_signed">Message signed</string>
     <string name="message_verified">Message verified</string>
     <string name="message_verification_failed">Message verification failed</string>
+    <!-- Messages -->
+    <string name="tx_message_add">Add message</string>
+    <string name="tx_message_from">from</string>
+    <string name="tx_message_subject">subject</string>
+    <string name="tx_message">message</string>
 </resources>
