@@ -123,18 +123,17 @@ public class TradeSelectFragment extends Fragment {
         setHasOptionsMenu(true);
 
         // Select some default coins
-        List<WalletAccount> accounts = application.getAllAccounts();
-        sourceAccount = accounts.get(0);
-        if (accounts.size() > 1) {
-            destinationAccount = accounts.get(1);
-            destinationType = destinationAccount.getCoinType();
-        } else {
-            // Find a destination coin that is different than the source coin
-            for (CoinType type : Constants.SUPPORTED_COINS) {
-                if (type.equals(sourceAccount.getCoinType())) continue;
-                destinationType = type;
-                break;
-            }
+        sourceAccount = application.getAccount(application.getConfiguration().getLastAccountId());
+        if (sourceAccount == null) {
+            List<WalletAccount> accounts = application.getAllAccounts();
+            sourceAccount = accounts.get(0);
+        }
+
+        // Find a destination coin that is different than the source coin
+        for (CoinType type : Constants.SUPPORTED_COINS) {
+            if (type.equals(sourceAccount.getCoinType())) continue;
+            destinationType = type;
+            break;
         }
 
         updateBalance();
@@ -384,14 +383,6 @@ public class TradeSelectFragment extends Fragment {
         List<CoinType> supportedTypes = getSupportedTypes(availableCoins.availableCoinTypes);
         List<WalletAccount> allAccounts = application.getAllAccounts();
 
-        // put current active account on index 0 so it is our default source
-        WalletAccount activeAccount = application.getAccount(application.getConfiguration().getLastAccountId());
-        if (activeAccount != null) {
-            allAccounts = new ArrayList<>(allAccounts);
-            allAccounts.remove(activeAccount);
-            allAccounts.add(0, activeAccount);
-        }
-
         sourceAdapter.update(allAccounts, supportedTypes, false);
         List<CoinType> sourceTypes = sourceAdapter.getTypes();
 
@@ -406,7 +397,11 @@ public class TradeSelectFragment extends Fragment {
         }
 
         if (sourceSpinner.getSelectedItemPosition() == -1) {
-            sourceSpinner.setSelection(0);
+            if (sourceAccount != null && sourceAdapter.getAccountOrTypePosition(sourceAccount) != -1) {
+                sourceSpinner.setSelection(sourceAdapter.getAccountOrTypePosition(sourceAccount));
+            } else {
+                sourceSpinner.setSelection(0);
+            }
         }
         CoinType sourceType =
                 ((AvailableAccountsAdaptor.Entry) sourceSpinner.getSelectedItem()).getType();
@@ -417,7 +412,7 @@ public class TradeSelectFragment extends Fragment {
             typesWithoutSourceType.remove(sourceType);
             destinationAdapter.update(allAccounts, typesWithoutSourceType, true);
         } else {
-            destinationAdapter.update(allAccounts, supportedTypes, false);
+            destinationAdapter.update(allAccounts, supportedTypes, true);
         }
 
         if (destinationSpinner.getSelectedItemPosition() == -1) {
