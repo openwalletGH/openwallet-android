@@ -17,7 +17,7 @@ public class SignTransactionActivity extends AbstractWalletFragmentActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sign_transaction);
+        setContentView(R.layout.activity_fragment_wrapper);
 
         if (savedInstanceState == null) {
             Fragment fragment = MakeTransactionFragment.newInstance(getIntent().getExtras());

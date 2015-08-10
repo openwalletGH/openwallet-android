@@ -11,7 +11,7 @@ public class ExchangeHistoryActivity extends BaseWalletActivity {
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_exchange_history);
+        setContentView(R.layout.activity_fragment_wrapper);
 
         if (savedInstanceState == null) {
             ExchangeHistoryFragment fragment = new ExchangeHistoryFragment();

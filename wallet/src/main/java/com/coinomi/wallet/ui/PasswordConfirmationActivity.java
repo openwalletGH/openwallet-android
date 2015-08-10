@@ -15,7 +15,7 @@ public class PasswordConfirmationActivity extends AbstractWalletFragmentActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_intro);
+        setContentView(R.layout.activity_fragment_wrapper);
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
