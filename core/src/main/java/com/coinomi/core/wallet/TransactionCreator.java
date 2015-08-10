@@ -54,12 +54,6 @@ public class TransactionCreator {
         coinType = account.coinType;
     }
 
-    public TransactionCreator(AddressWallet account) {
-        this.account = account;
-        lock = account.lock;
-        coinType = account.coinType;
-    }
-
     private static class FeeCalculation {
         CoinSelection bestCoinSelection;
         TransactionOutput bestChangeOutput;

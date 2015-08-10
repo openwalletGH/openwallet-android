@@ -230,7 +230,7 @@
     <string name="title_activity_show_seed">復元フレーズを表示する</string>
     <string name="seed_not_available_title">復元フレーズが見つかりませんでした</string>
     <string name="seed_not_available">復元フレーズはこのデバイスに保存されていません。\nこの問題を解決するためには、ウォレットの復旧を行ってください。</string>
-    <string name="seed_encrypted_touch_to_decrypt">タッチしてアンロックする</string>
+    <string name="touch_to_decrypt_wallet">タッチしてアンロックする</string>
     <string name="seed_working">お待ちください&#8230;</string>
     <string name="seed_password_protected">この復元フレーズはパスワードにより保護されています (BIP39)</string>
     <!-- Exchange -->

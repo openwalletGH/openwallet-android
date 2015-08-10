@@ -242,7 +242,7 @@
     <string name="title_activity_show_seed">Показать восстанавливающую фразу</string>
     <string name="seed_not_available_title">Не найдена восстанавливающая фраза</string>
     <string name="seed_not_available">Ваша восстанавливающая фраза не сохранена на этом устройстве.\nПопробуйте восстановить Ваш кошелёк , чтобы исправить это.</string>
-    <string name="seed_encrypted_touch_to_decrypt">Дотроньтесь для разблокировки</string>
+    <string name="touch_to_decrypt_wallet">Дотроньтесь для разблокировки</string>
     <string name="seed_working">Пожалуйста подождите &#8230;</string>
     <string name="seed_password_protected">Эта восстанавливающая фраза защищена паролем (BIP39)</string>
     <!-- Exchange -->

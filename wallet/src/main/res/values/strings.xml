@@ -12,6 +12,7 @@
     <string name="action_about">About</string>
     <string name="action_refresh">Refresh</string>
     <string name="action_sign_verify_message">Sign/verify message</string>
+    <string name="action_account_details">Account details</string>
     <string name="action_exchange_history">Exchange history</string>
     <string name="action_new_address">New address</string>
     <string name="action_swap_coins">Swap coins</string>
@@ -243,9 +244,10 @@
     <string name="title_activity_show_seed">Show recovery phrase</string>
     <string name="seed_not_available_title">No recovery phrase found</string>
     <string name="seed_not_available">Your recovery phrase is not saved on this device.\nTry restoring your wallet to solve this.</string>
-    <string name="seed_encrypted_touch_to_decrypt">Touch to unlock</string>
     <string name="seed_working">Please wait&#8230;</string>
     <string name="seed_password_protected">This recovery phrase is password protected (BIP39)</string>
+    <!-- Wallet locked -->
+    <string name="touch_to_decrypt_wallet">Touch to unlock</string>
     <!-- Exchange -->
     <string name="title_activity_trade">Exchange</string>
     <string name="trade_info">Select the coins you wish to exchange.\nThe converted coins will be automatically added to your wallet.</string>
@@ -298,8 +300,17 @@
     <string name="message_verified">Message verified</string>
     <string name="message_verification_failed">Message verification failed</string>
     <!-- Messages -->
+    <string name="tx_message_public_add">Add public message</string>
+    <string name="tx_message_private_add">Add private message</string>
     <string name="tx_message_add">Add message</string>
     <string name="tx_message_from">from</string>
     <string name="tx_message_subject">subject</string>
     <string name="tx_message">message</string>
+    <!-- Account details -->
+    <string name="title_activity_account_details">Account details</string>
+    <string name="account_description_label">description</string>
+    <string name="account_public_key_label">public key</string>
+    <string name="account_public_key_warning">Sharing your public key will allow anybody to view your balance and transaction history.</string>
+    <string name="account_private_key_label">private key</string>
+    <string name="account_private_key_warning">The private key allows you to send coins from this account. It is not necessary to backup this key as it is derived from your <i>recovery phrase</i></string>
 </resources>

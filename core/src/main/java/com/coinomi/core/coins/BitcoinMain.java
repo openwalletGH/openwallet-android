@@ -25,7 +25,7 @@ public class BitcoinMain extends CoinType {
         minNonDust = value(5460);
         softDustLimit = value(1000000); // 0.01 BTC
         softDustPolicy = SoftDustPolicy.AT_LEAST_BASE_FEE_IF_SOFT_DUST_TXO_PRESENT;
-//        messageHeader = toBytes("Bitcoin Signed Message:\n");
+        messageHeader = toBytes("Bitcoin Signed Message:\n");
     }
 
     private static BitcoinMain instance = new BitcoinMain();

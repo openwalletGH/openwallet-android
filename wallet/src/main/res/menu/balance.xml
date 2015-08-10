@@ -17,4 +17,7 @@
         android:visible="false"
         app:showAsAction="never" />
 
+    <item android:id="@+id/action_account_details"
+        android:title="@string/action_account_details"
+        app:showAsAction="never" />
 </menu>

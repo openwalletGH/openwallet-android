@@ -29,6 +29,7 @@ import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.InsufficientMoneyException;
+import org.bitcoinj.crypto.ChildNumber;
 import org.bitcoinj.crypto.DeterministicKey;
 import org.bitcoinj.crypto.KeyCrypter;
 import org.bitcoinj.script.Script;
@@ -300,6 +301,15 @@ public class WalletPocketHD extends AbstractWallet {
         } catch (AddressFormatException e) {
             signedMessage.status = SignedMessage.Status.AddressMalformed;
         }
+    }
+
+    @Override
+    public String getPublicKeySerialized() {
+        // Change the path of the key to match the BIP32 paths i.e. 0H/<account index>H
+        DeterministicKey key = keys.getWatchingKey();
+        ImmutableList<ChildNumber> path = ImmutableList.of(key.getChildNumber());
+        key = new DeterministicKey(path, key.getChainCode(), key.getPubKeyPoint(), null, null);
+        return key.serializePubB58();
     }
 
     @Override

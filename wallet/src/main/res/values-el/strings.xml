@@ -233,7 +233,7 @@
     <string name="title_activity_show_seed">Αποκάλυψη φράσης ανάκτησης</string>
     <string name="seed_not_available_title">Δεν βρέθηκε η φράση ανάκτησης</string>
     <string name="seed_not_available">Η φράση ανάκτησης δεν έχει αποθηκευτεί σε αυτήν τη συσκευή.\nΠροσπαθήστε να ανακτήσετε το πορτοφόλι σας για να επιλυθεί αυτό.</string>
-    <string name="seed_encrypted_touch_to_decrypt">Ακουμπήστε για ξεκλείδωμα</string>
+    <string name="touch_to_decrypt_wallet">Ακουμπήστε για ξεκλείδωμα</string>
     <string name="seed_working">Παρακαλώ περιμένετε&#8230;</string>
     <string name="seed_password_protected">Αυτή η φράση ανάκτησης προστατεύεται από κωδικό (BIP39)</string>
     <!-- Exchange -->

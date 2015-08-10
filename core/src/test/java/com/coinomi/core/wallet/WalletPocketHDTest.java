@@ -3,6 +3,7 @@ package com.coinomi.core.wallet;
 import com.coinomi.core.coins.BitcoinMain;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.DogecoinTest;
+import com.coinomi.core.coins.MonacoinMain;
 import com.coinomi.core.coins.NuBitsMain;
 import com.coinomi.core.coins.VpncoinMain;
 import com.coinomi.core.network.AddressStatus;
@@ -10,14 +11,23 @@ import com.coinomi.core.network.ServerClient.HistoryTx;
 import com.coinomi.core.network.interfaces.BlockchainConnection;
 import com.coinomi.core.network.interfaces.TransactionEventListener;
 import com.coinomi.core.protos.Protos;
+import com.coinomi.core.wallet.exceptions.AddressMalformedException;
+import com.coinomi.core.wallet.exceptions.Bip44KeyLookAheadExceededException;
+import com.coinomi.core.wallet.exceptions.KeyIsEncryptedException;
+import com.coinomi.core.wallet.exceptions.MissingPrivateKeyException;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.AddressFormatException;
+import org.bitcoinj.core.Base58;
 import org.bitcoinj.core.ChildMessage;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.Utils;
+import org.bitcoinj.crypto.ChildNumber;
 import org.bitcoinj.crypto.DeterministicHierarchy;
 import org.bitcoinj.crypto.DeterministicKey;
 import org.bitcoinj.crypto.HDKeyDerivation;
@@ -26,20 +36,14 @@ import org.bitcoinj.crypto.KeyCrypterScrypt;
 import org.bitcoinj.store.UnreadableWalletException;
 import org.bitcoinj.utils.BriefLogFormatter;
 import org.bitcoinj.wallet.DeterministicSeed;
-
-import com.coinomi.core.wallet.exceptions.AddressMalformedException;
-import com.coinomi.core.wallet.exceptions.Bip44KeyLookAheadExceededException;
-import com.coinomi.core.wallet.exceptions.KeyIsEncryptedException;
-import com.coinomi.core.wallet.exceptions.MissingPrivateKeyException;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-
 import org.bitcoinj.wallet.KeyChain;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.junit.Before;
 import org.junit.Test;
 import org.spongycastle.crypto.params.KeyParameter;
+import org.spongycastle.util.encoders.Base64;
+import org.spongycastle.util.encoders.Hex;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -48,13 +52,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import static org.bitcoinj.core.Utils.doubleDigest;
+import static org.bitcoinj.core.Utils.HEX;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -98,6 +101,24 @@ public class WalletPocketHDTest {
 
         pocket = new WalletPocketHD(rootKey, DOGE, null, null);
         pocket.keys.setLookaheadSize(20);
+    }
+
+    @Test
+    public void xpubWallet() {
+        String xpub = "xpub67tVq9TLPPoaHVSiYu8mqahm3eztTPUts6JUftNq3pZF1PJwjknrTqQhjc2qRGd6vS8wANu7mLnqkiUzFZ1xZsAZoUMi8o6icMhzGCAhcSW";
+        DeterministicKey key = DeterministicKey.deserializeB58(null, xpub);
+        WalletPocketHD account = new WalletPocketHD(key, BTC, null, null);
+        assertEquals("1KUDsEDqSBAgxubSEWszoA9xscNRRCmujM", account.getReceiveAddress().toString());
+        account = new WalletPocketHD(key, NBT, null, null);
+        assertEquals("BNvJUwg3BgkbQk5br1CxvHxdcDp1EC3saE", account.getReceiveAddress().toString());
+    }
+
+    @Test
+    public void xpubWalletSerialized() throws Exception {
+        WalletPocketHD account = new WalletPocketHD(rootKey, BTC, null, null);
+        Protos.WalletPocket proto = account.toProtobuf();
+        WalletPocketHD newAccount = new WalletPocketProtobufSerializer().readWallet(proto, null);
+        assertEquals(account.getPublicKeySerialized(), newAccount.getPublicKeySerialized());
     }
 
     @Test
@@ -885,5 +906,5 @@ public class WalletPocketHDTest {
             {"81a1f0f8242d5e71e65ff9e8ec51e8e85d641b607d7f691c1770d4f25918ebd7", "010000000141c217dfea3a1d8d6a06e9d3daf75b292581f652256d73a7891e5dc9c7ee3cca000000006a47304402205cce451228f98fece9645052546b82c2b2d425a4889b03999001fababfc7f4690220583b2189faef07d6b0191c788301cfab1b3f47ffe2c403d632b92c6dde27e14f012102d26e423c9da9ff4a7bf6b756b2dafb75cca34fbd34f64c4c3b77c37179c5bba2ffffffff0100ca9a3b000000001976a914dc40fbbc8caa1f7617d275aec9a3a14ce8d8652188ac00000000"}
     };
 
-    String expectedTx = "01000000039f79b1953195fe490a8036b9b1c735cb0c7efb1474700bd6e2778a3e27da74ef010000006a473044022006e44424f56393c9f1bdd02c2d9a3d42bda1955ebc1ebdf5067b202df284afe302207e2dc6b5ad99059c58c1c32e540419ad44816f3005d859baaef3a2e9718e0d0e0121033daee143740ae505dd588be89f659b34ba30f587bcebece11d72ec7a115bc41bffffffff9f79b1953195fe490a8036b9b1c735cb0c7efb1474700bd6e2778a3e27da74ef040000006b483045022100a1911352fac69365d0fbd1a2b5a37adc5ed43fbf91133b6c597d92281229703102206756b65b25435b1e8aceffe34693087760cbee45aa8dea010ff94321bbdcc6c7012103c956c491833b8f1ebfde275cd7d5660824c53efe215f9956356b85f6c86031ffffffffffd7eb1859f2d470171c697f7d601b645de8e851ece8f95fe6715e2d24f8f0a181000000006b483045022100b7e64ea240c3d9080801ca90891d54acd4a2ee52e402a8b9513699b38fd81dba0220136627bb760db2eee9f7cd71d6d2a8df9ab5049b336ebf495f07ccf0f324a5bb01210392ed3b840c8474f8b6b57e71d9a60fbf75adea6fc68d8985330e8d782b80621fffffffff0200bbeea0000000001976a914007d5355731b44e274eb495a26f4c33a734ee3eb88ac00c2eb0b000000001976a914392d52419e94e237f0d5817de1c9e21d09b515a688ac00000000";
+    String expectedTx = "01000000039f79b1953195fe490a8036b9b1c735cb0c7efb1474700bd6e2778a3e27da74ef040000006b483045022100ec1ede06eb8ef3e0e7afead274c86cd505f7f88d0077db86aee4f38b11b304150220329ade48f5881ad923c7acc98004c84982fb2440cbac7778e30c95da254f2f9a012103c956c491833b8f1ebfde275cd7d5660824c53efe215f9956356b85f6c86031ffffffffff9f79b1953195fe490a8036b9b1c735cb0c7efb1474700bd6e2778a3e27da74ef010000006a47304402207700077df150a7796f950784eeb0d7e38e7e144cba051cab01002ca4d23167ed02204e460a31805e014b0f312202e5d7c35da62b4a2f209c8b16cdc977a9a8f7128b0121033daee143740ae505dd588be89f659b34ba30f587bcebece11d72ec7a115bc41bffffffffd7eb1859f2d470171c697f7d601b645de8e851ece8f95fe6715e2d24f8f0a181000000006a4730440220710c679f4e4024d8df8c5178106cb50db232b793c49327f5c73a70c8f4c2a17e0220693410baf65a82aad63bf961bf1d2687cf085f8560bf38e14b9efabd9663554d01210392ed3b840c8474f8b6b57e71d9a60fbf75adea6fc68d8985330e8d782b80621fffffffff0200bbeea0000000001976a914007d5355731b44e274eb495a26f4c33a734ee3eb88ac00c2eb0b000000001976a914392d52419e94e237f0d5817de1c9e21d09b515a688ac00000000";
 }

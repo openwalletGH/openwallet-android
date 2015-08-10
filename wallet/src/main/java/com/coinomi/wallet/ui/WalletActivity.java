@@ -511,6 +511,9 @@ final public class WalletActivity extends BaseWalletActivity implements
         } else if (id == R.id.action_sign_verify_message) {
             signVerifyMessage();
             return true;
+        } else if (id == R.id.action_account_details) {
+            accountDetails();
+            return true;
         } else if (id == R.id.action_about) {
             startActivity(new Intent(WalletActivity.this, AboutActivity.class));
             return true;
@@ -533,6 +536,16 @@ final public class WalletActivity extends BaseWalletActivity implements
     void signVerifyMessage() {
         if (isAccountExists(currentAccountId)) {
             Intent intent = new Intent(this, SignVerifyMessageActivity.class);
+            intent.putExtra(Constants.ARG_ACCOUNT_ID, currentAccountId);
+            startActivity(intent);
+        } else {
+            Toast.makeText(this, R.string.no_wallet_pocket_selected, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    void accountDetails() {
+        if (isAccountExists(currentAccountId)) {
+            Intent intent = new Intent(this, AccountDetailsActivity.class);
             intent.putExtra(Constants.ARG_ACCOUNT_ID, currentAccountId);
             startActivity(intent);
         } else {

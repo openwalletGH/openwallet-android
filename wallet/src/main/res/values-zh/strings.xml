@@ -227,7 +227,7 @@
     <string name="title_activity_show_seed">出现复苏短语</string>
     <string name="seed_not_available_title">没有找到恢复密码</string>
     <string name="seed_not_available">你的恢复密码没有保存在这个设备上。\n尝试恢复钱包以解决这个问题。</string>
-    <string name="seed_encrypted_touch_to_decrypt">触摸以解锁</string>
+    <string name="touch_to_decrypt_wallet">触摸以解锁</string>
     <string name="seed_working">请等待&#8230;</string>
     <string name="seed_password_protected">恢复密码有加密保护 (BIP39)</string>
     <!-- Exchange -->

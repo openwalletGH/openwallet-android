@@ -225,7 +225,7 @@ public class WalletApplication extends Application {
     }
 
     @Nullable
-    public WalletAccount getAccount(String accountId) {
+    public WalletAccount getAccount(@Nullable String accountId) {
         if (wallet != null) {
             return wallet.getAccount(accountId);
         } else {
