@@ -109,8 +109,7 @@ abstract public class CoinType extends NetworkParameters implements ValueType, S
     }
 
     public boolean canSignVerifyMessages() {
-//        return signedMessageHeader != null; TODO enable
-        return false;
+        return signedMessageHeader != null;
     }
 
     public boolean canHandleMessages() {

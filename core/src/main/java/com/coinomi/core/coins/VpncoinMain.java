@@ -28,6 +28,7 @@ public class VpncoinMain extends CoinType {
         minNonDust = value(1); // 0.00000001VPN
         softDustLimit = value(1000000); // 0.01VPN
         softDustPolicy = SoftDustPolicy.AT_LEAST_BASE_FEE_IF_SOFT_DUST_TXO_PRESENT;
+        signedMessageHeader = toBytes("VpnCoin Signed Message:\n");
     }
 
     @Override
