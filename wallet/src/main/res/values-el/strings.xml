@@ -8,6 +8,8 @@
     <string name="action_settings">Ρυθμίσεις</string>
     <string name="action_about">Σχετικά</string>
     <string name="action_refresh">Ανανέωση</string>
+    <string name="action_sign_verify_message">Υπογραφή/επαλήθευση μηνύματος</string>
+    <string name="action_account_details">Λεπτομέρειες λογαριασμού</string>
     <string name="action_exchange_history">Ιστορικό συναλλαγών</string>
     <string name="action_new_address">Νέα διεύθυνση</string>
     <string name="action_swap_coins">Αντιστροφή νομισμάτων</string>
@@ -30,6 +32,8 @@
     <string name="button_remove">Απομάκρυνση</string>
     <string name="button_edit">Επεξεργασία</string>
     <string name="button_send">Αποστολή</string>
+    <string name="button_sign">Υπογραφή</string>
+    <string name="button_verify">Επαλήθευση</string>
     <string name="button_skip">Παράλειψη</string>
     <string name="button_retry">Επανάληψη</string>
     <string name="button_download">Κατέβασμα</string>
@@ -54,10 +58,10 @@
     <string name="navigation_drawer_services">Υπηρεσίες</string>
     <string name="navigation_drawer_wallet">Πορτοφόλι</string>
     <!-- SendOutput widget -->
-    <string name="fee">Έξοδα συναλλαγής</string>
-    <string name="send">Αποστολή</string>
-    <string name="trade">Μετατροπή</string>
-    <string name="receive">Λήψη</string>
+    <string name="fee">έξοδα συναλλαγής</string>
+    <string name="send">αποστολή</string>
+    <string name="trade">μετατροπή</string>
+    <string name="receive">λήψη</string>
     <!-- Welcome fragment -->
     <string name="welcome_text">Καλώς ήλθατε στο Coinomi</string>
     <string name="create_wallet">Νέο πορτοφόλι</string>
@@ -148,6 +152,8 @@
     <string name="password_wallet_recovery">Για να ανακτήσετε το πορτοφόλι σας, παρακαλώ εισάγετε τον ίδιο κωδικό που είχατε χρησιμοποιήσει όταν είχατε ασφαλίσει αρχικά την φράση ανάκτησης.\nΑν εισάγετε έναν διαφορετικό κωδικό, ένα νέο, άδειο πορτοφόλι θα δημιουργηθεί.</string>
     <!-- FinalizeWalletRestorationFragment -->
     <string name="wallet_restoration">Παρακαλώ περιμένετε ενόσω το πορτοφόλι σας ανακτάται</string>
+    <string name="wallet_restoration_master_key">Δημιουργία κύριου κλειδιού</string>
+    <string name="wallet_restoration_coin">Δημιουργία κλειδιού για %1$s</string>
     <string name="wallet_restoration_error">Αποτυχία ανάκτησης του πορτοφολιού σας.\n\n%1$s</string>
     <!-- PasswordConfirmationFragment -->
     <string name="enter_password">Εισάγετε τον κωδικό σας</string>
@@ -233,9 +239,10 @@
     <string name="title_activity_show_seed">Αποκάλυψη φράσης ανάκτησης</string>
     <string name="seed_not_available_title">Δεν βρέθηκε η φράση ανάκτησης</string>
     <string name="seed_not_available">Η φράση ανάκτησης δεν έχει αποθηκευτεί σε αυτήν τη συσκευή.\nΠροσπαθήστε να ανακτήσετε το πορτοφόλι σας για να επιλυθεί αυτό.</string>
-    <string name="touch_to_decrypt_wallet">Ακουμπήστε για ξεκλείδωμα</string>
     <string name="seed_working">Παρακαλώ περιμένετε&#8230;</string>
     <string name="seed_password_protected">Αυτή η φράση ανάκτησης προστατεύεται από κωδικό (BIP39)</string>
+    <!-- Wallet locked -->
+    <string name="touch_to_decrypt_wallet">Ακουμπήστε για ξεκλείδωμα</string>
     <!-- Exchange -->
     <string name="title_activity_trade">Ανταλλακτήριο</string>
     <string name="trade_info">Επιλέξτε τα νομίσματα που επιθυμείτε να αλλάξετε.\nΤα νομίσματα θα προστεθούν αυτόματα στο πορτοφόλι σας μετά την μετατροπή.</string>
@@ -277,4 +284,31 @@
     <!-- ShapeShift -->
     <string name="about_shapeshift_title">Σχετικά με την ShapeShift.io</string>
     <string name="about_shapeshift_message">Η ShapeShift.io είναι ένα ανταλλακτήριο στιγμιαίας μετατροπής Bitcoin και άλλων νομισμάτων. Η πλατφόρμα (διαθέσιμη μέσω της ιστοσελίδας και του API) αντιπροσωπεύει τον πιο γρήγορο και αποδοτικό τρόπο για να μετατρέψετε μεταξύ Bitcoin και δεκάδων άλλων νομισμάτων. Δεν απαιτείται δημιουργία λογαριασμού.</string>
+    <!-- Sign Message -->
+    <string name="title_activity_sign_verify_message">Υπογραφή/επαλήθευση μηνύματος</string>
+    <string name="signing_info">Μπορείτε να υπογράψετε ή να επαληθεύσετε ένα μήνυμα χρησιμοποιώντας μία διεύθυνση</string>
+    <string name="signing_address_label">υπογραφούσα διεύθυνση</string>
+    <string name="address_not_found_error">Η διεύθυνση που εισάγατε δεν ανήκει σε αυτόν τον λογαριασμό</string>
+    <string name="message_to_sign_label">μήνυμα</string>
+    <string name="signature_label">υπογραφή</string>
+    <string name="message_signed">Το μήνυμα υπεγράφη</string>
+    <string name="message_verified">Το μήνυμα επαληθεύτηκε</string>
+    <string name="message_verification_failed">Η επαλήθευση του μηνύματος απέτυχε</string>
+    <!-- Messages -->
+    <string name="tx_message_public">δημόσιο μήνυμα</string>
+    <string name="tx_message_private">προσωπικό μήνυμα</string>
+    <string name="tx_message_public_add">Προσθήκη δημοσίου μηνύματος</string>
+    <string name="tx_message_private_add">Προσθήκη προσωπικού μηνύματος</string>
+    <string name="tx_message_public_remove">Διαγραφή δημοσίου μηνύματος</string>
+    <string name="tx_message_private_remove">Διαγραφή προσωπικού μηνύματος</string>
+    <string name="tx_message_from">από</string>
+    <string name="tx_message_subject">θέμα</string>
+    <string name="tx_message">μήνυμα</string>
+    <!-- Account details -->
+    <string name="title_activity_account_details">Λεπτομέρειες λογαριασμού</string>
+    <string name="account_description_label">περιγραφή</string>
+    <string name="account_public_key_label">δημόσιο κλειδί</string>
+    <string name="account_public_key_warning">Μοιράζοντας το δημόσιο κλειδί σας επιτρέπετε στον καθένα να δει το υπόλοιπο του λογαριασμού σας όπως και το ιστορικό των συναλλαγών σας</string>
+    <string name="account_private_key_label">ιδιωτικό κλειδί</string>
+    <string name="account_private_key_warning">Το ιδιωτικό κλειδί επιτρέπει την αποστολή νομισμάτων από αυτόν τον λογαριασμό. Δεν χρειάζεται να αποθηκεύσετε αυτό το κλειδί, αφού προκύπτει από την <i>φράση ανάκτησης</i> του πορτοφολιού σας</string>
 </resources>
