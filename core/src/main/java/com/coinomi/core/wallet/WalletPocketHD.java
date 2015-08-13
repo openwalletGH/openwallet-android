@@ -274,7 +274,7 @@ public class WalletPocketHD extends AbstractWallet {
 
             try {
                 unsignedMessage.signature =
-                        key.signMessage(coinType.getMessageHeader(), message, aesKey);
+                        key.signMessage(coinType.getSignedMessageHeader(), message, aesKey);
                 unsignedMessage.status = SignedMessage.Status.SignedOK;
             } catch (ECKey.KeyIsEncryptedException e) {
                 unsignedMessage.status = SignedMessage.Status.KeyIsEncrypted;

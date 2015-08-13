@@ -61,10 +61,10 @@
     <string name="navigation_drawer_services">Services</string>
     <string name="navigation_drawer_wallet">Wallet</string>
     <!-- SendOutput widget -->
-    <string name="fee">Transaction fee</string>
-    <string name="send">Send</string>
-    <string name="trade">Exchange</string>
-    <string name="receive">Receive</string>
+    <string name="fee">transaction fee</string>
+    <string name="send">send</string>
+    <string name="trade">exchange</string>
+    <string name="receive">receive</string>
     <!-- Welcome fragment -->
     <string name="welcome_text">Welcome to Coinomi wallet</string>
     <string name="create_wallet">Create a new wallet</string>
@@ -300,9 +300,12 @@
     <string name="message_verified">Message verified</string>
     <string name="message_verification_failed">Message verification failed</string>
     <!-- Messages -->
+    <string name="tx_message_public">public message</string>
+    <string name="tx_message_private">private message</string>
     <string name="tx_message_public_add">Add public message</string>
     <string name="tx_message_private_add">Add private message</string>
-    <string name="tx_message_add">Add message</string>
+    <string name="tx_message_public_remove">Remove public message</string>
+    <string name="tx_message_private_remove">Remove private message</string>
     <string name="tx_message_from">from</string>
     <string name="tx_message_subject">subject</string>
     <string name="tx_message">message</string>

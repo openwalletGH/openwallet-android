@@ -29,6 +29,7 @@ import com.coinomi.core.exchange.shapeshift.data.ShapeShiftAmountTx;
 import com.coinomi.core.exchange.shapeshift.data.ShapeShiftMarketInfo;
 import com.coinomi.core.exchange.shapeshift.data.ShapeShiftNormalTx;
 import com.coinomi.core.exchange.shapeshift.data.ShapeShiftTime;
+import com.coinomi.core.messages.TxMessage;
 import com.coinomi.core.util.ExchangeRate;
 import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.SendRequest;
@@ -63,6 +64,7 @@ import static com.coinomi.wallet.Constants.ARG_EMPTY_WALLET;
 import static com.coinomi.wallet.Constants.ARG_SEND_TO_ACCOUNT_ID;
 import static com.coinomi.wallet.Constants.ARG_SEND_TO_ADDRESS;
 import static com.coinomi.wallet.Constants.ARG_SEND_VALUE;
+import static com.coinomi.wallet.Constants.ARG_TX_MESSAGE;
 import static com.coinomi.wallet.ExchangeRatesProvider.getRates;
 
 /**
@@ -115,12 +117,12 @@ public class MakeTransactionFragment extends Fragment {
     @Nullable private Value tradeDepositAmount;
     @Nullable private Address tradeWithdrawAddress;
     @Nullable private Value tradeWithdrawAmount;
+    @Nullable private TxMessage txMessage;
     private boolean transactionBroadcast = false;
     @Nullable private Exception error;
     private HashMap<String, ExchangeRate> localRates = new HashMap<>();
 
     private CountDownTimer countDownTimer;
-
 
     public static MakeTransactionFragment newInstance(Bundle args) {
         MakeTransactionFragment fragment = new MakeTransactionFragment();
@@ -159,6 +161,8 @@ public class MakeTransactionFragment extends Fragment {
                 sendToAddress = (Address) checkNotNull(args.getSerializable(ARG_SEND_TO_ADDRESS));
                 sendingToAccount = false;
             }
+
+            txMessage = (TxMessage) args.getSerializable(ARG_TX_MESSAGE);
 
             if (savedState != null) {
                 error = (Exception) savedState.getSerializable(ERROR);
@@ -277,7 +281,8 @@ public class MakeTransactionFragment extends Fragment {
     }
 
     private SendRequest generateSendRequest(Address sendTo,
-                                            boolean emptyWallet, @Nullable Value amount)
+                                            boolean emptyWallet, @Nullable Value amount,
+                                            @Nullable TxMessage txMessage)
             throws InsufficientMoneyException {
 
         SendRequest sendRequest;
@@ -286,6 +291,7 @@ public class MakeTransactionFragment extends Fragment {
         } else {
             sendRequest = SendRequest.to(sendTo, checkNotNull(amount).toCoin());
         }
+        sendRequest.txMessage = txMessage;
         sendRequest.signInputs = false;
         sourceAccount.completeTx(sendRequest);
 
@@ -555,7 +561,8 @@ public class MakeTransactionFragment extends Fragment {
                             // set tradeWithdrawAmount after we generate the send tx
                         }
 
-                        request = generateSendRequest(tradeDepositAddress, isEmptyWallet(), tradeDepositAmount);
+                        request = generateSendRequest(tradeDepositAddress, isEmptyWallet(),
+                                tradeDepositAmount, txMessage);
 
                         // The amountSending could be equal to sendAmount or the actual amount if
                         // emptying the wallet
@@ -584,10 +591,12 @@ public class MakeTransactionFragment extends Fragment {
                         } else {
                             throw new Exception(time == null ? "Error getting trade expiration time" : time.errorMessage);
                         }
-                        request = generateSendRequest(tradeDepositAddress, false, tradeDepositAmount);
+                        request = generateSendRequest(tradeDepositAddress, false,
+                                tradeDepositAmount, txMessage);
                     }
                 } else {
-                    request = generateSendRequest(sendToAddress, isEmptyWallet(), sendAmount);
+                    request = generateSendRequest(sendToAddress, isEmptyWallet(),
+                            sendAmount, txMessage);
                 }
             } catch (Exception e) {
                 error = e;

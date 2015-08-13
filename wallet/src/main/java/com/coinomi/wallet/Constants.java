@@ -56,6 +56,7 @@ public class Constants {
     public static final String ARG_SEND_TO_COIN_TYPE = "send_to_coin_type";
     public static final String ARG_SEND_TO_ACCOUNT_ID = "send_to_account_id";
     public static final String ARG_SEND_VALUE = "send_value";
+    public static final String ARG_TX_MESSAGE = "tx_message";
     public static final String ARG_COIN_ID = "coin_id";
     public static final String ARG_ACCOUNT_ID = "account_id";
     public static final String ARG_MULTIPLE_COIN_IDS = "multiple_coin_ids";

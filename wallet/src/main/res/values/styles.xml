@@ -153,6 +153,9 @@
     <style name="TransactionRowConfidenceFontIcon" parent="SecondaryText">
         <item name="android:textSize">@dimen/transaction_row_confirmations_font_icon_size</item>
     </style>
+    <style name="TransactionRowMessageFontIcon" parent="SecondaryText">
+        <item name="android:textSize">@dimen/transaction_row_message_font_icon_size</item>
+    </style>
     <style name="TransactionRowDirectionText" parent="SecondaryText">
         <item name="android:textSize">@dimen/transaction_row_text_size_direction_text</item>
     </style>
