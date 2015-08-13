@@ -79,6 +79,15 @@ For now test it manually by installing it `adb install -r wallet/wallet-release.
 
 ## Version history
 
+New in version 1.5.19
+- Possibility to sign and verify messages
+- Account details screen to view the public key
+- Transaction messages in Vpncoin
+- Russian translation
+- Some UI optimizations
+- Bug fixes
+- Increase the default size of the recovery phrase
+
 New in version 1.5.18
 - Can set an amount in receive screen
 - Added Chinese and Japanese translations
