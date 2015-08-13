@@ -19,7 +19,7 @@ public class VpncoinMain extends CoinType {
         spendableCoinbaseDepth = 100;
 
         family = VpncoinFamily.get();
-        name = "Vpncoin (beta)";
+        name = "Vpncoin";
         symbol = "VPN";
         uriScheme = "vpncoin";
         bip44Index = 33;
