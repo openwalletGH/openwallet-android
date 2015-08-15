@@ -313,7 +313,9 @@
     <string name="title_activity_account_details">Account details</string>
     <string name="account_description_label">description</string>
     <string name="account_public_key_label">public key</string>
+    <string name="account_extended_public_key_label">extended public key</string>
     <string name="account_public_key_warning">Sharing your public key will allow anybody to view your balance and transaction history.</string>
     <string name="account_private_key_label">private key</string>
+    <string name="account_extended_private_key_label">extended private key</string>
     <string name="account_private_key_warning">The private key allows you to send coins from this account. It is not necessary to backup this key as it is derived from your <i>recovery phrase</i></string>
 </resources>
