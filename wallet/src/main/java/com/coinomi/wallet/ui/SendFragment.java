@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
@@ -27,6 +28,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FilterQueryProvider;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -38,6 +40,8 @@ import com.coinomi.core.coins.Value;
 import com.coinomi.core.coins.ValueType;
 import com.coinomi.core.exchange.shapeshift.ShapeShift;
 import com.coinomi.core.exchange.shapeshift.data.ShapeShiftMarketInfo;
+import com.coinomi.core.messages.MessageFactory;
+import com.coinomi.core.messages.TxMessage;
 import com.coinomi.core.uri.CoinURI;
 import com.coinomi.core.uri.CoinURIParseException;
 import com.coinomi.core.util.ExchangeRate;
@@ -76,7 +80,9 @@ import java.util.Timer;
 
 import javax.annotation.Nullable;
 
+import static android.view.View.GONE;
 import static android.view.View.OnClickListener;
+import static android.view.View.VISIBLE;
 import static com.coinomi.core.Preconditions.checkNotNull;
 import static com.coinomi.core.coins.Value.canCompare;
 import static com.coinomi.wallet.ExchangeRatesProvider.getRates;
@@ -110,6 +116,8 @@ public class SendFragment extends Fragment {
     private static final String STATE_AMOUNT = "amount";
     private static final String STATE_AMOUNT_TYPE = "amount_type";
 
+    Handler handler = new MyHandler(this);
+
     @Nullable private Value lastBalance; // TODO setup wallet watcher for the latest balance
     private AutoCompleteTextView sendToAddressView;
     private AddressView sendToStaticAddressView;
@@ -120,6 +128,10 @@ public class SendFragment extends Fragment {
     private TextView amountWarning;
     private ImageButton scanQrCodeButton;
     private ImageButton eraseAddressButton;
+    private Button txMessageButton;
+    private TextView txMessageLabel;
+    private EditText txMessageView;
+    private TextView txMessageCounter;
     private Button sendConfirmButton;
     private Timer timer;
     private MyMarketInfoPollTask pollTask;
@@ -130,6 +142,9 @@ public class SendFragment extends Fragment {
     private boolean addressTypeCanChange;
     private Value sendAmount;
     private CoinType sendAmountType;
+    private MessageFactory messageFactory;
+    private boolean isTxMessageAdded;
+    private boolean isTxMessageValid;
     private WalletApplication application;
     private Listener listener;
     private WalletAccount pocket;
@@ -140,8 +155,6 @@ public class SendFragment extends Fragment {
     private ReceivingAddressViewAdapter sendToAddressViewAdapter;
     private Map<String, ExchangeRate> localRates = new HashMap<>();
     private ShapeShiftMarketInfo marketInfo;
-
-    Handler handler = new MyHandler(this);
 
     private enum State {
         INPUT, PREPARATION, SENDING, SENT, FAILED
@@ -205,12 +218,23 @@ public class SendFragment extends Fragment {
             if (pocket == null) {
                 List<WalletAccount> accounts = application.getAllAccounts();
                 if (accounts.size() > 0) pocket = accounts.get(0);
+                if (pocket == null) {
+                    ACRA.getErrorReporter().putCustomData("wallet-exists",
+                            application.getWallet() == null ? "no" : "yes");
+                    Toast.makeText(getActivity(), R.string.no_such_pocket_error,
+                            Toast.LENGTH_LONG).show();
+                    getActivity().finish();
+                    return;
+                }
             }
             checkNotNull(pocket, "No account selected");
         } else {
             throw new RuntimeException("Must provide account ID or a payment URI");
         }
+
         sendAmountType = pocket.getCoinType();
+
+        messageFactory = pocket.getCoinType().getMessagesFactory();
 
         if (savedInstanceState != null) {
             address = (Address) savedInstanceState.getSerializable(STATE_ADDRESS);
@@ -313,6 +337,15 @@ public class SendFragment extends Fragment {
             }
         });
 
+        txMessageButton = (Button) view.findViewById(R.id.tx_message_add_remove);
+        txMessageLabel = (TextView) view.findViewById(R.id.tx_message_label);
+        txMessageView = (EditText) view.findViewById(R.id.tx_message);
+        txMessageCounter = (TextView) view.findViewById(R.id.tx_message_counter);
+
+        if (pocket != null && pocket.getCoinType().canHandleMessages()) {
+            enableTxMessage(view);
+        }
+
         sendConfirmButton = (Button) view.findViewById(R.id.send_confirm);
         sendConfirmButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -327,6 +360,91 @@ public class SendFragment extends Fragment {
         });
 
         return view;
+    }
+
+    private void enableTxMessage(View view) {
+        if (messageFactory == null) return;
+
+        txMessageButton.setVisibility(View.VISIBLE);
+        txMessageButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isTxMessageAdded) { // if tx message added, remove it
+                    hideTxMessage();
+                } else { // else show tx message fields
+                    showTxMessage();
+                }
+            }
+        });
+
+        final int maxMessageLength = messageFactory.maxMessageSize();
+        final int messageLengthThreshold = (int) (maxMessageLength * .8); // 80% full
+        final int txMessageCounterPaddingOriginal = txMessageView.getPaddingBottom();
+        final int txMessageCounterPadding =
+                getResources().getDimensionPixelSize(R.dimen.tx_message_counter_padding);
+        final int colorWarn = getResources().getColor(R.color.fg_warning);
+        final int colorError = getResources().getColor(R.color.fg_error);
+
+        // This listener checks the length of the message and displays a counter if it passes a
+        // threshold or the max size. It also changes the bottom padding of the message field
+        // to accommodate the counter.
+        txMessageView.addTextChangedListener(new EditViewListener() {
+            @Override public void afterTextChanged(final Editable s) {
+                int length = s.length();
+                boolean isTxMessageValidNow = true;
+                if (length < messageLengthThreshold) {
+                    if (txMessageCounter.getVisibility() != GONE) {
+                        txMessageCounter.setVisibility(GONE);
+                        txMessageView.setPadding(0, 0, 0, txMessageCounterPaddingOriginal);
+                    }
+                } else {
+                    int remaining = maxMessageLength - s.length();
+                    if (txMessageCounter.getVisibility() != VISIBLE) {
+                        txMessageCounter.setVisibility(VISIBLE);
+                        txMessageView.setPadding(0, 0, 0, txMessageCounterPadding);
+                    }
+                    txMessageCounter.setText(Integer.toString(remaining));
+                    if (length <= maxMessageLength) {
+                        txMessageCounter.setTextColor(colorWarn);
+                    } else {
+                        isTxMessageValidNow = false;
+                        txMessageCounter.setTextColor(colorError);
+                    }
+                }
+                // Update view only if the message validity changed
+                if (isTxMessageValid != isTxMessageValidNow) {
+                    isTxMessageValid = isTxMessageValidNow;
+                    updateView();
+                }
+            }
+
+            @Override public void onFocusChange(final View v, final boolean hasFocus) {
+                if (!hasFocus) {
+                    validateTxMessage();
+                }
+            }
+        });
+    }
+
+    private void showTxMessage() {
+        if (messageFactory != null) {
+            txMessageButton.setText(R.string.tx_message_public_remove);
+            txMessageLabel.setVisibility(View.VISIBLE);
+            txMessageView.setVisibility(View.VISIBLE);
+            isTxMessageAdded = true;
+            isTxMessageValid = true; // Initially the empty message is valid, even if it is ignored
+        }
+    }
+
+    private void hideTxMessage() {
+        if (messageFactory != null) {
+            txMessageButton.setText(R.string.tx_message_public_add);
+            txMessageLabel.setVisibility(View.GONE);
+            txMessageView.setText(null);
+            txMessageView.setVisibility(View.GONE);
+            isTxMessageAdded = false;
+            isTxMessageValid = false;
+        }
     }
 
     private void clearAddress(boolean clearTextField) {
@@ -442,17 +560,30 @@ public class SendFragment extends Fragment {
             log.error("Unexpected validity failure.");
             validateAmount();
             validateAddress();
+            validateTxMessage();
             return;
         }
         state = State.PREPARATION;
         updateView();
         if (application.getWallet() != null) {
-            onMakeTransaction(address, sendAmount);
+            onMakeTransaction(address, sendAmount, getTxMessage());
         }
-        reset();
     }
 
-    public void onMakeTransaction(Address toAddress, Value amount) {
+    @Nullable
+    private TxMessage getTxMessage() {
+        if (isTxMessageAdded && messageFactory != null && txMessageView.getText().length() != 0) {
+            String message = txMessageView.getText().toString();
+            try {
+                return messageFactory.createPublicMessage(message);
+            } catch (Exception e) { // Should not happen
+                ACRA.getErrorReporter().handleSilentException(e);
+            }
+        }
+        return null;
+    }
+
+    public void onMakeTransaction(Address toAddress, Value amount, @Nullable TxMessage txMessage) {
         Intent intent = new Intent(getActivity(), SignTransactionActivity.class);
 
         // Decide if emptying wallet or not
@@ -463,12 +594,15 @@ public class SendFragment extends Fragment {
         }
         intent.putExtra(Constants.ARG_ACCOUNT_ID, pocket.getId());
         intent.putExtra(Constants.ARG_SEND_TO_ADDRESS, toAddress);
+        if (txMessage != null) intent.putExtra(Constants.ARG_TX_MESSAGE, txMessage);
 
         startActivityForResult(intent, SIGN_TRANSACTION);
+        state = State.INPUT;
     }
 
-    private void reset() {
+    public void reset() {
         clearAddress(true);
+        hideTxMessage();
         sendToAddressView.setVisibility(View.VISIBLE);
         sendToStaticAddressView.setVisibility(View.GONE);
         amountCalculatorLink.setPrimaryAmount(null);
@@ -595,6 +729,10 @@ public class SendFragment extends Fragment {
         eraseAddressButton.setEnabled(state == State.INPUT);
     }
 
+    private boolean isTxMessageValid() {
+        return isTxMessageAdded && isTxMessageValid;
+    }
+
     private boolean isOutputsValid() {
         return address != null;
     }
@@ -652,7 +790,8 @@ public class SendFragment extends Fragment {
 
 
     private boolean everythingValid() {
-        return state == State.INPUT && isOutputsValid() && isAmountValid();
+        return state == State.INPUT && isOutputsValid() && isAmountValid() &&
+                (!isTxMessageAdded || isTxMessageValid());
     }
 
     private void requestFocusFirst() {
@@ -662,6 +801,8 @@ public class SendFragment extends Fragment {
             amountCalculatorLink.requestFocus();
             // FIXME causes problems in older Androids
 //            Keyboard.focusAndShowKeyboard(sendAmountView, getActivity());
+        } else if (isTxMessageAdded && !isTxMessageValid()) {
+            txMessageView.requestFocus();
         } else if (everythingValid()) {
             sendConfirmButton.requestFocus();
         } else {
@@ -672,6 +813,14 @@ public class SendFragment extends Fragment {
     private void validateEverything() {
         validateAddress();
         validateAmount();
+        validateTxMessage();
+    }
+
+    private void validateTxMessage() {
+        if (isTxMessageAdded && messageFactory != null && txMessageView != null) {
+            isTxMessageValid = txMessageView.getText().length() <= messageFactory.maxMessageSize();
+            updateView();
+        }
     }
 
     private void validateAmount() {

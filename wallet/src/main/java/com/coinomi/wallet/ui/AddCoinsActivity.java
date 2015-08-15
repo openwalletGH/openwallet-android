@@ -34,7 +34,7 @@ public class AddCoinsActivity extends BaseWalletActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_coins);
+        setContentView(R.layout.activity_fragment_wrapper);
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.container, new SelectCoinsFragment())

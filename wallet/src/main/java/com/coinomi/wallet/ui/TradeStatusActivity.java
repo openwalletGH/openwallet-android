@@ -18,7 +18,7 @@ public class TradeStatusActivity extends BaseWalletActivity implements TradeStat
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_trade_status);
+        setContentView(R.layout.activity_fragment_wrapper);
 
         if (savedInstanceState == null) {
             Fragment fragment = new TradeStatusFragment();

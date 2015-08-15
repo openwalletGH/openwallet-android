@@ -2,7 +2,6 @@ package com.coinomi.wallet.ui;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -11,19 +10,14 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.view.ActionMode;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.coinomi.core.coins.CoinType;
@@ -33,14 +27,11 @@ import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
-import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.service.CoinService;
 import com.coinomi.wallet.service.CoinServiceImpl;
 import com.coinomi.wallet.tasks.CheckUpdateTask;
-import com.coinomi.wallet.ui.widget.CoinListItem;
 import com.coinomi.wallet.util.Keyboard;
 import com.coinomi.wallet.util.SystemUtils;
-import com.coinomi.wallet.util.UiUtils;
 import com.coinomi.wallet.util.WeakHandler;
 
 import org.bitcoinj.core.Address;
@@ -54,11 +45,9 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import static com.coinomi.wallet.ui.NavDrawerItemType.ITEM_SECTION_TITLE;
 import static com.coinomi.wallet.ui.NavDrawerItemType.ITEM_COIN;
+import static com.coinomi.wallet.ui.NavDrawerItemType.ITEM_SECTION_TITLE;
 import static com.coinomi.wallet.ui.NavDrawerItemType.ITEM_TRADE;
-import static com.coinomi.wallet.util.UiUtils.setGone;
-import static com.coinomi.wallet.util.UiUtils.setVisible;
 
 
 /**
@@ -94,6 +83,7 @@ final public class WalletActivity extends BaseWalletActivity implements
      * For SharedPreferences, used to check if first launch ever.
      */
     private ViewPager mViewPager;
+    private AppSectionsPagerAdapter pagerAdapter;
     private String currentAccountId;
     private Intent connectCoinIntent;
     private List<NavDrawerItem> navDrawerItems = new ArrayList<>();
@@ -251,8 +241,8 @@ final public class WalletActivity extends BaseWalletActivity implements
             currentAccountId = account.getId();
             CoinType type = account.getCoinType();
             mTitle = type.getName();
-            AppSectionsPagerAdapter adapter = new AppSectionsPagerAdapter(this, account);
-            mViewPager.setAdapter(adapter);
+            pagerAdapter = new AppSectionsPagerAdapter(this, account);
+            mViewPager.setAdapter(pagerAdapter);
             mViewPager.setCurrentItem(BALANCE);
             mViewPager.getAdapter().notifyDataSetChanged();
             getWalletApplication().getConfiguration().touchLastAccountId(currentAccountId);
@@ -464,15 +454,10 @@ final public class WalletActivity extends BaseWalletActivity implements
             openPocket(account);
             mViewPager.setCurrentItem(SEND);
 
-            for (Fragment fragment : getSupportFragmentManager().getFragments()) {
-                if (fragment instanceof SendFragment) {
-                    try {
-                        ((SendFragment) fragment).updateStateFrom(coinUri);
-                    } catch (CoinURIParseException e) {
-                        showScanFailedMessage(e);
-                    }
-                    break;
-                }
+            try {
+                ((SendFragment) pagerAdapter.getItem(SEND)).updateStateFrom(coinUri);
+            } catch (CoinURIParseException e) {
+                showScanFailedMessage(e);
             }
         } else {
             // Should not happen
@@ -511,6 +496,9 @@ final public class WalletActivity extends BaseWalletActivity implements
         } else if (id == R.id.action_sign_verify_message) {
             signVerifyMessage();
             return true;
+        } else if (id == R.id.action_account_details) {
+            accountDetails();
+            return true;
         } else if (id == R.id.action_about) {
             startActivity(new Intent(WalletActivity.this, AboutActivity.class));
             return true;
@@ -533,6 +521,16 @@ final public class WalletActivity extends BaseWalletActivity implements
     void signVerifyMessage() {
         if (isAccountExists(currentAccountId)) {
             Intent intent = new Intent(this, SignVerifyMessageActivity.class);
+            intent.putExtra(Constants.ARG_ACCOUNT_ID, currentAccountId);
+            startActivity(intent);
+        } else {
+            Toast.makeText(this, R.string.no_wallet_pocket_selected, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    void accountDetails() {
+        if (isAccountExists(currentAccountId)) {
+            Intent intent = new Intent(this, AccountDetailsActivity.class);
             intent.putExtra(Constants.ARG_ACCOUNT_ID, currentAccountId);
             startActivity(intent);
         } else {
@@ -581,6 +579,22 @@ final public class WalletActivity extends BaseWalletActivity implements
         return false;
     }
 
+    private boolean resetSend() {
+        if (pagerAdapter != null) {
+            ((SendFragment) pagerAdapter.getItem(SEND)).reset();
+            return true;
+        }
+        return false;
+    }
+
+    private boolean goToSend() {
+        if (mViewPager != null && mViewPager.getCurrentItem() != SEND) {
+            mViewPager.setCurrentItem(SEND);
+            return true;
+        }
+        return false;
+    }
+
     public void registerActionMode(ActionMode actionMode) {
         finishActionMode();
         lastActionMode = actionMode;
@@ -603,11 +617,12 @@ final public class WalletActivity extends BaseWalletActivity implements
                     Toast.makeText(ref, ref.getString(R.string.sent_msg),
                             Toast.LENGTH_LONG).show();
                     ref.goToBalance();
+                    ref.resetSend();
                     break;
                 case TX_BROADCAST_ERROR:
                     Toast.makeText(ref, ref.getString(R.string.get_tx_broadcast_error),
                             Toast.LENGTH_LONG).show();
-                    ref.goToBalance();
+                    ref.goToSend();
                     break;
             }
         }

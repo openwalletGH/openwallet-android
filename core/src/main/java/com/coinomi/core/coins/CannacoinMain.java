@@ -27,6 +27,7 @@ public class CannacoinMain extends CoinType {
         minNonDust = value(1000000);
         softDustLimit = value(100000000);
         softDustPolicy = SoftDustPolicy.BASE_FEE_FOR_EACH_SOFT_DUST_TXO;
+        signedMessageHeader = toBytes("Cannacoin Signed Message:\n");
     }
 
     private static CannacoinMain instance = new CannacoinMain();

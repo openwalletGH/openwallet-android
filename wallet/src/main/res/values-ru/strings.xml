@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_scan_qr_code">Сканировать</string>
+    <string name="action_share">Поделиться</string>
+    <string name="action_copy">Копировать</string>
+    <string name="action_edit_label">Редактировать метку</string>
+    <string name="action_empty_wallet">"Опустошить кошелек "</string>
+    <string name="action_settings">Настройки</string>
+    <string name="action_about">О программе</string>
+    <string name="action_refresh">Обновить</string>
+    <string name="action_sign_verify_message">Подписать/проверить сообщение</string>
+    <string name="action_exchange_history">История обменов</string>
+    <string name="action_new_address">Новый адрес</string>
+    <string name="action_swap_coins">Обменять монеты</string>
+    <string name="action_delete">Удалить</string>
+    <string name="action_change_address_type">Изменить тип адреса</string>
+    <!-- Errors -->
+    <string name="error_generic">При выполнении задачи произошла ошибка</string>
+    <string name="error_could_not_read_wallet">Открытие кошелька не удалось</string>
+    <!-- Generic items -->
+    <string name="button_ok">ОК</string>
+    <string name="button_next">Дальше</string>
+    <string name="button_finish">Завершить</string>
+    <string name="button_return">Назад</string>
+    <string name="button_confirm">Подтвердить</string>
+    <string name="button_cancel">Отмена</string>
+    <string name="button_dismiss">Отклонить</string>
+    <string name="button_delete">Удалить</string>
+    <string name="button_add">Добавить</string>
+    <string name="button_save">Сохранить</string>
+    <string name="button_remove">Удалить</string>
+    <string name="button_edit">Редактировать</string>
+    <string name="button_send">Отправить</string>
+    <string name="button_sign">Подписать</string>
+    <string name="button_verify">Проверить</string>
+    <string name="button_skip">Пропустить</string>
+    <string name="button_retry">Повторить</string>
+    <string name="button_download">Скачать</string>
+    <string name="button_agree">Согласен</string>
+    <string name="button_disagree">Не согласен</string>
+    <string name="button_add_coins">Добавить кошелек</string>
+    <string name="scan_qr_code">Отсканировать QR-код</string>
+    <string name="erase_address">Удалить адрес</string>
+    <string name="copied_to_clipboard">Скопировано в буфер обмена</string>
+    <string name="wallet_title_request">получить</string>
+    <string name="wallet_title_balance">баланс</string>
+    <string name="wallet_title_send">отправить</string>
+    <string name="wallet_locked_message">Ваш кошелёк заблокирован</string>
+    <string name="unlock_wallet_title">Разблокировать Ваш кошелёк</string>
+    <string name="unlocking_wallet_working">Ваш кошелёк разблокируется&#8230;</string>
+    <string name="unlocking_wallet_error_title">Не удалось разблокировать Ваш кошелёк</string>
+    <string name="unlocking_wallet_error_detail">Вы ввели правильный пароль? Пожалуйста, удостоверьтесь, что пароль был введен без ошибок. Попытайтесь восстановить используя восстанавливающую фразу, если ошибка сохранится.</string>
+    <string name="powered_by">Поддерживается</string>
+    <!-- Nav drawer -->
+    <string name="navigation_drawer_open">Открыть боковое меню</string>
+    <string name="navigation_drawer_close">Закрыть боковое меню</string>
+    <string name="navigation_drawer_services">Сервис</string>
+    <string name="navigation_drawer_wallet">Кошелёк</string>
+    <!-- SendOutput widget -->
+    <string name="fee">Налог на транзакцию</string>
+    <string name="send">Отправить</string>
+    <string name="trade">Обмен</string>
+    <string name="receive">Получить</string>
+    <!-- Welcome fragment -->
+    <string name="welcome_text">Добро пожаловать в Coinomi</string>
+    <string name="create_wallet">Создать новый кошелёк</string>
+    <string name="restore_wallet">Восстановить кошелёк</string>
+    <string name="test_wallet">Тестовый кошелёк</string>
+    <!-- Intro -->
+    <string name="test_wallet_warning_title">Создать тестовый кошелёк?</string>
+    <string name="test_wallet_warning_message">Если Вы создадите новый тестовый кошелёк , Ваш существующий кошелёк исчезнет , но лишь в том случае, если Вы не сделали копию Вашей <i>восстанавливающей фразы</i></string>
+    <string name="incompatible_device_warning_title">Устройство не поддерживается</string>
+    <string name="incompatible_device_warning_message">Ваш аппарат не может осуществить некоторые криптографические операции по причине дефектов в операционной системе или в самом аппарате.\nЭту проблему может решить обновление ПО от производителя устройства.\n\nПожалуйста, обратитесь к нам , если у Вас есть вопросы : support@coinomi.com</string>
+    <!-- Recovery fragment -->
+    <string name="seed_info">Это Ваша <i>восстанавливающая фраза</i>, которая используется при генерации ключей к Вашему кошельку. Пожалуйста, запишите её где-то на бумаге и храните в безопасном месте, также как Вы храните бумажные деньги. Любой у кого есть доступ к фразе, также имеет доступ к накоплениям Вашего кошелька.\nЕсли Вы потеряли Вашу восстанавливающую фразу, мы не сможем восстановить Ваш кошелёк.</string>
+    <string name="seed_title">Ваша восстанавливающая фраза</string>
+    <string name="seed_regenerate_title">нажмите, что бы сгенерировать новую восстанавливающую фразу</string>
+    <string name="backed_up_seed">Я сохранил восстанавливающую фразу в безопасном месте</string>
+    <!-- Restore fragment -->
+    <string name="restore_info">Пожалуйста введите Вашу восстанавливающую фразу:</string>
+    <string name="restore_seed_protected">Моя восстанавливающая фраза защищена (BIP39)</string>
+    <string name="restore_skip_title">Пропустить проверку</string>
+    <string name="restore_skip_info1">Пожалуйста удостоверитесь, что Ваша восстанавливающая фраза совпадает с этой :</string>
+    <string name="restore_skip_info2">Мы рекомендуем не пропускать проверку, что бы не допустить ошибок.</string>
+    <string name="restore_error_checksum">Не правильная восстанавливающая фраза. Убедитесь в правильности ввода.</string>
+    <string name="restore_error_words">Восстанавливающая фраза содержит нераспознаваемые слова.</string>
+    <string name="restore_error_mismatch">Введенная Вами восстанавливающая фраза не совпадает с восстанавливающей фразой вашего кошелька.</string>
+    <string name="restore_error">Не удалось проверить Вашу восстанавливающую фразу. %1$s</string>
+    <string name="extra_entropy">Усиленная энтропия</string>
+    <!-- Wallet activity -->
+    <string name="test_wallet_message">Это тестовый кошелек, где Вы можете отправлять и получать Bitcoin, Litecoin, Dogecoin используя testnet.\n\nЕсли Вы хотите использовать кошелёк с настоящими деньгами, пожалуйста зайдите в: <b>Настройки &gt; Восстановить кошелёк &gt; Создать новый кошелёк</b>.</string>
+    <string name="wallet_update_title">Доступна новая версия</string>
+    <string name="wallet_update_message">Доступна новая версия Coinomi, она содержит новые функции и исправления.</string>
+    <string name="pay_with">Отправить используя</string>
+    <string name="exchange_and_pay_title">Обменять и отправить</string>
+    <!-- PayToDialog-->
+    <string name="ambiguous_address_title">Сомнительный адрес</string>
+    <string name="ambiguous_address_message">Пожалуйста выберите нужный тип монет</string>
+    <!-- Balance fragment -->
+    <string name="wallet_transactions_coinbase">добытые посредством майнинга</string>
+    <string name="history_empty">Ваш кошелёк ещё не содержит монет!\n\nМожно приобрести немного монет посредством обмена или меняя их на товары и услуги.</string>
+    <string name="sent_to">Отправили</string>
+    <string name="received_with">Получили от</string>
+    <string name="get_tx_info_error">Невозможно получить информацию о транзакции</string>
+    <string name="disconnected_label">Отсутствует подключение</string>
+    <string name="no_wallet_pocket_selected">Кошелёк не выбран</string>
+    <string name="get_tx_broadcast_error">Ошибка при передаче транзакции</string>
+    <!-- Receive fragment -->
+    <string name="receive_address_label">мой адрес</string>
+    <string name="create_new_address">Создать новый адрес?</string>
+    <string name="create_new_address_name">Имя (по желанию)</string>
+    <string name="view_previous_addresses">Предыдущие адреса</string>
+    <string name="too_many_unused_addresses">Слишком много неиспользованных адресов, попробуйте попользоваться одним из предыдущих адресов перед тем как создавать новый.</string>
+    <!-- Send Activity -->
+    <string name="send_coins_activity_title">Отправить монеты</string>
+    <!-- Send fragment -->
+    <string name="send_coins_fragment_receiving_address_label">Оплатить</string>
+    <string name="send_coins_fragment_receiving_address_tip">введите имя или адрес</string>
+    <string name="send_coins_fragment_receiving_address_error">Неверный Bitcoin Адрес!</string>
+    <string name="send_coins_fragment_amount_label">Сумма оплаты</string>
+    <string name="send_coins_fragment_button_send">Отправить</string>
+    <string name="send_coins_fragment_button_back">Назад</string>
+    <string name="send_coins_failed_msg">Неудача!</string>
+    <string name="send_coins_error_network">Невозможно подключится к валютной сети</string>
+    <string name="send_coins_error_dust">Сумма которую Вы пытаетесь отправить очень мала и будет отторгнута валютной сетью.</string>
+    <string name="send_coins_error">Невозможно отправить монеты: %1$s</string>
+    <string name="pay_to_label">отправить</string>
+    <string name="amount_to_send_label">сумма</string>
+    <string name="scan_error">Ошибка при сканировании: %1$s</string>
+    <string name="unsupported_coin">Данные тип монет не поддерживаются: %1$s</string>
+    <string name="address_error">Введен не верный адрес.</string>
+    <string name="amount_error">Введена не верная сумма</string>
+    <string name="amount_error_empty">Пожалуйста, введите сумму</string>
+    <string name="amount_error_negative">Сумма должна быть больше нуля</string>
+    <string name="amount_error_decimal_places">Слишком много знаков после запятой, попробуйте меньше чем %1$d</string>
+    <string name="amount_error_too_small">Минимальная сумма %1$s</string>
+    <string name="amount_error_not_enough_money_plain">Недостаточно денег</string>
+    <string name="amount_error_not_enough_money">Недостаточно денег, Ваш текущий баланс %1$s</string>
+    <string name="amount_warn_fees_apply">Будет отправлено немного меньше по причине оплаты налогов</string>
+    <!-- Set Password fragment -->
+    <string name="set_password_info">Установите пароль для защиты Вашего кошелька в ежедневном применении.</string>
+    <string name="set_password_seed_protect">Желаю также защитить мою восстанавливающую фразу (BIP39)</string>
+    <string name="set_password_seed_protect_info">Пароль не будет меняться в будущем и его нужно будет вводить каждый раз когда Вы восстанавливаете Ваш кошелёк восстанавливающей фразой.\nВнимание: Если Вы забудете пароль, восстановить Ваш кошелёк будет не возможно!</string>
+    <string name="set_password1">Введите Ваш пароль</string>
+    <string name="set_password2">Введите Ваш пароль еще раз</string>
+    <string name="password_too_common_error">Пароль \"%1$s\" слишком простой и не гарантирует Вам надежной защиты.</string>
+    <string name="password_too_short_error">Пароль слишком короткий, требуется, как минимум, %1$d символов.</string>
+    <string name="passwords_mismatch">Пароли не совпадают</string>
+    <string name="password_error">Дальнейшее выполнение невозможно, обнаружены ошибки в пароле.</string>
+    <string name="password_skip_warn">Не устанавливая пароль, доступ к Вашему кошельку может быть получен кем-угодно, без подтверждения личности.</string>
+    <string name="password_wallet_recovery">Чтобы восстановить Ваш кошелёк, пожалуйста, введите тот же пароль, что был использован при создании защищенной восстанавливающей фразы.\nЕсли Вы введёте другой пароль, будет создан новый пустой кошелёк.</string>
+    <!-- FinalizeWalletRestorationFragment -->
+    <string name="wallet_restoration">Пожалуйста, подождите, Ваш кошелёк восстанавливается</string>
+    <string name="wallet_restoration_error">Невозможно восстановить Ваш кошелёк.\n\n%1$s</string>
+    <!-- PasswordConfirmationFragment -->
+    <string name="enter_password">Введите Ваш пароль</string>
+    <!-- SignTransactionFragment -->
+    <string name="contacting_exchange">Подключаемся к сервису обмена&#8230;</string>
+    <string name="preparing_transaction">Пожалуйста, подождите пока Ваша транзакция будет подготовлена и отправлена.</string>
+    <string name="no_such_pocket_error">При попытке доступа к кошельку произошла ошибка. Если проблема останется, попробуйте восстановить кошелёк используя восстанавливающую фразу.</string>
+    <string name="password_failed">Введен не верный пароль.</string>
+    <string name="sending_msg">Отправка&#8230;</string>
+    <string name="sent_msg">Отправлено! Пожалуйста, подождите подтверждения успешного завершения транзакции.</string>
+    <string name="tx_already_broadcast">Деньги уже были отправлены</string>
+    <string name="trade_expired">Сервис обмена не доступен</string>
+    <string name="tx_confirm_timer_message">Пожалуйста, подтвердите этот обмен в следующие %1$s</string>
+    <plurals name="tx_confirm_timer_minute">
+        <item quantity="one">%s минута</item>
+        <item quantity="other">%s минут</item>
+        <item quantity="few">%s минуты</item>
+        <item quantity="many">%s минут</item>
+    </plurals>
+    <plurals name="tx_confirm_timer_second">
+        <item quantity="one">%d секунда</item>
+        <item quantity="other">%d секунд</item>
+        <item quantity="few">%d секунды</item>
+        <item quantity="many">%d секунд</item>
+    </plurals>
+    <!-- About Activity -->
+    <string name="title_activity_about">О Coinomi</string>
+    <string name="app_name_long">Coinomi для Android</string>
+    <string name="about_licence">Программа с открытым исходным кодом\nhttps://github.com/Coinomi/coinomi-android\nИсходный код открыт на основе лицензии GNU General Public License 3</string>
+    <string name="about_credits_nubits">Инфраструктура серверов предоставлена NuBits - Первой Всемирной Стабильной Цифровой Валютой \nhttps://nubits.com/</string>
+    <string name="about_credits_translations">Переводы выполнили:</string>
+    <string name="about_credits_bitcoinj">Используется библиотека Bitcoinj\nhttp://bitcoinj.github.io/</string>
+    <string name="about_credits_electrum">Используется серверное ПО от Electrum\nhttps://electrum.org/</string>
+    <string name="about_credits_schildbach">Под влиянием работы Andreas Schildbach\nhttps://github.com/schildbach/bitcoin-wallet/</string>
+    <string name="about_credits_zxing">QR-код сканер от ZXing\nhttps://github.com/zxing/zxing</string>
+    <string name="about_credits_crypto_icons">Иконки криптовалюты от Chris Shepherd\nhttps://github.com/shphrd/crypto-icons</string>
+    <string name="about_credits_font_icons">Пиктограммы от Daniel Bruce\nhttp://www.entypo.com</string>
+    <string name="about_credits_exchange_rates">Курсы валют предоставлены \nhttp://www.cryptocoincharts.info/\nhttps://bitcoinaverage.com/</string>
+    <!-- Add Coins -->
+    <string name="title_activity_add_coins">Добавить монеты</string>
+    <string name="password_add_coin">Вы собираетесь создать %1$s счёт в Вашем кошельке.</string>
+    <string name="adding_coin_confirmation_title">Добавить %1$s?</string>
+    <string name="adding_coin_working">Пожалуйста подождите пока создаётся новый %1$s счёт</string>
+    <string name="add_coin_error">Ошибка добавления %1$s: %2$s</string>
+    <string name="coin_already_added_title">%1$s уже добавлен</string>
+    <string name="coin_already_added">Дополнительные учетные записи пока не поддерживаются</string>
+    <!-- Transaction amount visualizer -->
+    <string name="internal_transfer">Внутренний перевод</string>
+    <!-- Transaction Details -->
+    <string name="title_activity_transaction_details">Детали транзакции</string>
+    <string name="sent">Отправлено</string>
+    <string name="received">Получено</string>
+    <string name="status_label">состояние</string>
+    <string name="date_label">дата</string>
+    <string name="transaction_id_label">id транзакции</string>
+    <string name="view_at_a_blockchain_explorer_link">Просмотреть на blockchain explorer</string>
+    <plurals name="status_building">
+        <item quantity="one">%d подтверждение</item>
+        <item quantity="other">%d подтверждениям</item>
+        <item quantity="few">%d подтверждения</item>
+        <item quantity="many">%d подтверждений</item>
+    </plurals>
+    <string name="status_pending">Ожидание подтверждения транзакции</string>
+    <string name="status_unknown">Состояние транзакции неизвестно</string>
+    <!-- Exchange Rates -->
+    <string name="title_activity_exchange_rates">Курсы валют</string>
+    <string name="set_local_currency">Установить %1$s в качестве местной валюты</string>
+    <string name="exchange_rates_loading">Загрузка курсов валют</string>
+    <string name="exchange_rates_load_error">Не удалось загрузить курсы валют</string>
+    <string name="exchange_rates_empty_search">Невозможно найти обменный курс</string>
+    <!-- Select Coins -->
+    <string name="select_coins">Выберите валюту , которую желаете употребить в Вашем кошельке. Вы всегда можете добавить и другие позже.</string>
+    <!-- Previous Addresses -->
+    <string name="title_activity_previous_addresses">Мои предыдущие адреса</string>
+    <string name="previous_addresses_used">Использованный адрес</string>
+    <string name="previous_addresses_unused">Неиспользованный адрес</string>
+    <!-- Edit Address Book Entry -->
+    <string name="edit_address_book_entry_dialog_title_add">Добавить адрес</string>
+    <string name="edit_address_book_entry_dialog_title_edit">Редактировать адрес</string>
+    <string name="edit_address_book_entry_dialog_address_label">Адрес</string>
+    <string name="edit_address_book_entry_dialog_label_label">Имя</string>
+    <!-- Settings -->
+    <string name="title_activity_settings">Настройки</string>
+    <string name="pref_title_restore_wallet">Восстановить кошелёк</string>
+    <string name="pref_title_exchange_rates">Курсы валют</string>
+    <string name="pref_title_manual_receiving_addresses">Ручное получение адреса</string>
+    <string name="pref_summary_manual_receiving_addresses">Не создавать автоматически новый адрес для каждой транзакции</string>
+    <!-- Show Seed -->
+    <string name="title_activity_show_seed">Показать восстанавливающую фразу</string>
+    <string name="seed_not_available_title">Не найдена восстанавливающая фраза</string>
+    <string name="seed_not_available">Ваша восстанавливающая фраза не сохранена на этом устройстве.\nПопробуйте восстановить Ваш кошелёк , чтобы исправить это.</string>
+    <string name="touch_to_decrypt_wallet">Дотроньтесь для разблокировки</string>
+    <string name="seed_working">Пожалуйста подождите &#8230;</string>
+    <string name="seed_password_protected">Эта восстанавливающая фраза защищена паролем (BIP39)</string>
+    <!-- Exchange -->
+    <string name="title_activity_trade">Обменять</string>
+    <string name="trade_info">Выберите валюту которую желаете обменять.\nПосле обмена валюта автоматически добавится в Ваш кошелёк.</string>
+    <string name="trade_info_rates">Предоставленный курс включает в себя налоги на транзакцию ShapeShift.io</string>
+    <string name="trade_from_coin_label">обменять</string>
+    <string name="trade_to_coin_label">получить</string>
+    <string name="trade_warn_no_account_found">Вам будет предложено добавить %1$s кошелёк</string>
+    <string name="trade_warn_no_connection_title">Отсутствует подключение</string>
+    <string name="trade_warn_no_connection_message">Необходимо подключение к сети интернет для обмена валюты.</string>
+    <string name="trade_error">Ошибка при обмене</string>
+    <string name="trade_error_no_supported_source_accounts">Не найдено поддерживаемых кошельков</string>
+    <string name="trade_error_service_not_available">Сервис временно не доступен, пожалуйста попробуйте снова через несколько минут</string>
+    <string name="trade_error_market_info">Сервис временно не доступен.\nНет информации о валютной паре %1$s - %2$s</string>
+    <string name="trade_error_sign_tx_message">Произошла какая-то ошибка при процедуре подписи и передачи обмена.\n\nТехнические детали:\n\n<b>%1$s</b></string>
+    <string name="trade_error_max_limit">Введенная сумма превышает лимит  %1$s. Пожалуйста воспользуйтесь меньшей суммой.</string>
+    <string name="trade_error_min_limit">Минимальная сумма %1$s</string>
+    <!-- Exchange Status -->
+    <string name="title_activity_exchange_status">Состояние обмена</string>
+    <string name="trade_status_message">Ваша транзакция скоро будет завершена. Можете закрыть этот диалог без риска повлиять на процесс обмена.</string>
+    <string name="trade_status_complete_message">Ваша транзакция успешно завершена.</string>
+    <string name="trade_status_label">состояние</string>
+    <string name="trade_status_waiting_deposit">Ожидание депозита&#8230;</string>
+    <string name="trade_status_received_deposit">Получен депозит %1$s</string>
+    <string name="trade_status_waiting_trade">Ожидание обмена&#8230;</string>
+    <string name="trade_status_complete_detail">Обмен завершен, отправлено %1$s</string>
+    <string name="trade_status_complete">Обмен завершен</string>
+    <string name="trade_status_view_transaction">Просмотреть транзакцию</string>
+    <string name="trade_status_email_receipt">Почтовое подтверждение</string>
+    <string name="trade_status_failed_detail">Обмен не выполнен: %1$s</string>
+    <string name="trade_status_failed">Обмен не выполнен</string>
+    <string name="trade_status_delete_message">Удалить из истории?</string>
+    <string name="trade_status_tx_not_available">Транзакции не обнаружены, попробуйте снова через несколько секунд</string>
+    <!-- Email receipt dialog -->
+    <string name="email_receipt_title">Почтовое подтверждение</string>
+    <string name="email_receipt_message">Получить почтовое подтверждение для данной обменной операции</string>
+    <!-- Exchange History -->
+    <string name="title_activity_exchange_history">История обменов</string>
+    <string name="exchange_history_empty">Обмен валюты еще не производился</string>
+    <!-- ShapeShift -->
+    <string name="about_shapeshift_title">О ShapeShift.io</string>
+    <string name="about_shapeshift_message">ShapeShift.io это сервис, обеспечивающий  моментальный обмен между Bitcoin и другими криптовалютами. Платформа (доступна в браузерной и API версиях) предоставляет самый быстрый и эффективный метод обмена между Bitcoin и множеством альтернативных криптовалют. Аккаунт не требуется.</string>
+    <!-- Sign Message -->
+    <string name="title_activity_sign_verify_message">Подписать/проверить сообщение</string>
+    <string name="signing_info">Вы можете подписать или проверить сообщение используя адрес.</string>
+    <string name="signing_address_label">адрес подписи</string>
+    <string name="address_not_found_error">Введенный в этом аккаунте адрес не обнаружен.</string>
+    <string name="message_to_sign_label">сообщение</string>
+    <string name="signature_label">подпись</string>
+    <string name="message_signed">Сообщение подписано</string>
+    <string name="message_verified">Сообщение проверенно</string>
+    <string name="message_verification_failed">Проверка сообщения не удалась</string>
+</resources>

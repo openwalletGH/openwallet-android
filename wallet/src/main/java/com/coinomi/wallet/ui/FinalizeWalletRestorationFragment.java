@@ -1,14 +1,15 @@
 package com.coinomi.wallet.ui;
 
-
-
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.coinomi.core.coins.CoinID;
@@ -18,6 +19,7 @@ import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.service.CoinService;
+import com.coinomi.wallet.util.WeakHandler;
 
 import org.bitcoinj.crypto.KeyCrypterScrypt;
 
@@ -36,19 +38,24 @@ import javax.annotation.Nullable;
 public class FinalizeWalletRestorationFragment extends Fragment {
     private static final Logger log = LoggerFactory.getLogger(FinalizeWalletRestorationFragment.class);
 
-    private String seed;
-    private String password;
-    @Nullable private String seedPassword = null;
-    private List<CoinType> coinsToCreate;
+    private static final int RESTORE_STATUS_UPDATE = 0;
+    private static final int RESTORE_FINISHED = 1;
+
+    private final Handler handler = new MyHandler(this);
+
     private boolean isTestWallet;
 
-    private WalletFromSeedTask walletFromSeedTask;
+    // FIXME: Ugly hack to keep a reference to the task even if the fragment is recreated
+    private static WalletFromSeedTask walletFromSeedTask;
+    private TextView status;
+
 
     /**
      * Get a fragment instance.
      */
     public static Fragment newInstance(Bundle args) {
         FinalizeWalletRestorationFragment fragment = new FinalizeWalletRestorationFragment();
+        fragment.setRetainInstance(true);
         fragment.setArguments(args);
         return fragment;
     }
@@ -60,23 +67,45 @@ public class FinalizeWalletRestorationFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        WalletApplication app = getWalletApplication();
         if (getArguments() != null) {
             Bundle args = getArguments();
-            seed = args.getString(Constants.ARG_SEED);
-            password = args.getString(Constants.ARG_PASSWORD);
-            seedPassword = args.getString(Constants.ARG_SEED_PASSWORD);
+            String seed = args.getString(Constants.ARG_SEED);
+            String password = args.getString(Constants.ARG_PASSWORD);
+            String seedPassword = args.getString(Constants.ARG_SEED_PASSWORD);
             isTestWallet = args.getBoolean(Constants.ARG_TEST_WALLET, false);
-            coinsToCreate = getCoinsTypes(args);
+            List<CoinType> coinsToCreate = getCoinsTypes(args);
 
-            walletFromSeedTask = new WalletFromSeedTask();
-            walletFromSeedTask.execute();
+            if (walletFromSeedTask == null) {
+                walletFromSeedTask = new WalletFromSeedTask(handler, app, coinsToCreate, seed, password, seedPassword);
+                walletFromSeedTask.execute();
+            } else {
+                switch (walletFromSeedTask.getStatus()) {
+                    case FINISHED:
+                        handler.sendEmptyMessage(RESTORE_FINISHED);
+                        break;
+                    case RUNNING:
+                    case PENDING:
+                        walletFromSeedTask.handler = handler;
+                }
+            }
         }
     }
 
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_finalize_wallet_restoration, container, false);
+        status = (TextView) view.findViewById(R.id.restoration_status);
+        return view;
+    }
+
     private List<CoinType> getCoinsTypes(Bundle args) {
-        if (args.containsKey(Constants.ARG_MULTIPLE_COIN_IDS)) {
+        ArrayList<String> coinIds = args.getStringArrayList(Constants.ARG_MULTIPLE_COIN_IDS);
+        if (coinIds != null) {
             List<CoinType> coinTypes = new ArrayList<CoinType>();
-            for (String id : args.getStringArrayList(Constants.ARG_MULTIPLE_COIN_IDS)) {
+            for (String id : coinIds) {
                 coinTypes.add(CoinID.typeFromId(id));
             }
             return coinTypes;
@@ -85,38 +114,39 @@ public class FinalizeWalletRestorationFragment extends Fragment {
         }
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_finalize_wallet_restoration, container, false);
-    }
-
     WalletApplication getWalletApplication() {
         return (WalletApplication) getActivity().getApplication();
     }
 
-    private class WalletFromSeedTask extends AsyncTask<Bundle, Void, Wallet> {
-        private Dialogs.ProgressDialogFragment verifyDialog;
-        private String errorMessage = "";
+    static class WalletFromSeedTask extends AsyncTask<Void, String, Wallet> {
+        Wallet wallet;
+        String errorMessage = "";
+        private final String seed;
+        private final String password;
+        @Nullable private final String seedPassword;
+        Handler handler;
+        private final WalletApplication walletApplication;
+        private final List<CoinType> coinsToCreate;
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            verifyDialog = Dialogs.ProgressDialogFragment.newInstance(
-                    getResources().getString(R.string.wallet_restoration));
-            verifyDialog.show(getFragmentManager(), null);
+        public WalletFromSeedTask(Handler handler, WalletApplication walletApplication, List<CoinType> coinsToCreate, String seed, String password, @Nullable String seedPassword) {
+            this.handler = handler;
+            this.walletApplication = walletApplication;
+            this.coinsToCreate = coinsToCreate;
+            this.seed = seed;
+            this.password = password;
+            this.seedPassword = seedPassword;
         }
 
-        protected Wallet doInBackground(Bundle... params) {
+        protected Wallet doInBackground(Void... params) {
             ArrayList<String> seedWords = new ArrayList<String>();
             for (String word : seed.trim().split(" ")) {
                 if (word.isEmpty()) continue;
                 seedWords.add(word);
             }
 
-            Wallet wallet = null;
             try {
+                this.publishProgress("");
+                walletApplication.setEmptyWallet();
                 wallet = new Wallet(seedWords, seedPassword);
                 KeyParameter aesKey = null;
                 if (password != null && !password.isEmpty()) {
@@ -125,10 +155,14 @@ public class FinalizeWalletRestorationFragment extends Fragment {
                     wallet.encrypt(crypter, aesKey);
                 }
 
-                wallet.createAccounts(coinsToCreate, true, aesKey);
-                getWalletApplication().setWallet(wallet);
-                getWalletApplication().saveWalletNow();
-                getWalletApplication().startBlockchainService(CoinService.ServiceMode.RESET_WALLET);
+                for (CoinType type : coinsToCreate) {
+                    this.publishProgress(type.getName());
+                    wallet.createAccount(type, false, aesKey);
+                }
+
+                walletApplication.setWallet(wallet);
+                walletApplication.saveWalletNow();
+                walletApplication.startBlockchainService(CoinService.ServiceMode.RESET_WALLET);
             } catch (Exception e) {
                 log.error("Error creating a wallet", e);
                 errorMessage = e.getMessage();
@@ -136,23 +170,50 @@ public class FinalizeWalletRestorationFragment extends Fragment {
             return wallet;
         }
 
+        @Override
+        protected void onProgressUpdate(String... values) {
+            handler.sendMessage(handler.obtainMessage(RESTORE_STATUS_UPDATE, values[0]));
+        }
+
         protected void onPostExecute(Wallet wallet) {
-            verifyDialog.dismissAllowingStateLoss();
-            if (wallet != null) {
-                startWalletActivity();
-            }
-            else {
-                showErrorAndStartIntroActivity(
-                        getResources().getString(R.string.wallet_restoration_error, errorMessage));
+            handler.sendEmptyMessage(RESTORE_FINISHED);
+        }
+    }
+
+    private static class MyHandler extends WeakHandler<FinalizeWalletRestorationFragment> {
+        public MyHandler(FinalizeWalletRestorationFragment ref) { super(ref); }
+
+        @Override
+        protected void weakHandleMessage(FinalizeWalletRestorationFragment ref, Message msg) {
+            switch (msg.what) {
+                case RESTORE_STATUS_UPDATE:
+                    String workingOn = (String) msg.obj;
+                    if (workingOn.isEmpty()) {
+                        ref.status.setText(ref.getString(R.string.wallet_restoration_master_key));
+                    } else {
+                        ref.status.setText(ref.getString(R.string.wallet_restoration_coin, workingOn));
+                    }
+                    break;
+                case RESTORE_FINISHED:
+                    WalletFromSeedTask task = walletFromSeedTask;
+                    walletFromSeedTask = null;
+                    if (task.wallet != null) {
+                        ref.startWalletActivity();
+                    } else {
+                        String errorMessage = ref.getResources().getString(
+                                R.string.wallet_restoration_error, task.errorMessage);
+                        ref.showErrorAndStartIntroActivity(errorMessage);
+                    }
             }
         }
     }
 
-    private void startWalletActivity() {
+    public void startWalletActivity() {
         Intent intent = new Intent(getActivity(), WalletActivity.class);
         intent.putExtra(Constants.ARG_TEST_WALLET, isTestWallet);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
+        getActivity().finish();
     }
 
     private void showErrorAndStartIntroActivity(String errorMessage) {

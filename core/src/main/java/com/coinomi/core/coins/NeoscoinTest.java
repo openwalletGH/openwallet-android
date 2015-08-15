@@ -25,6 +25,7 @@ public class NeoscoinTest extends CoinType {
         minNonDust = value(5460);
         softDustLimit = value(1000000); // 0.01 NEOS
         softDustPolicy = SoftDustPolicy.AT_LEAST_BASE_FEE_IF_SOFT_DUST_TXO_PRESENT;
+        signedMessageHeader = toBytes("NeosCoin Signed Message:\n");
     }
 
     private static NeoscoinTest instance = new NeoscoinTest();

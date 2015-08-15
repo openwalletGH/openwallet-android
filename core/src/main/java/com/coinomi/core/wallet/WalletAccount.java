@@ -130,4 +130,6 @@ public interface WalletAccount extends TransactionBag, KeyBag, TransactionEventL
 
     void signMessage(SignedMessage unsignedMessage, @Nullable KeyParameter aesKey);
     void verifyMessage(SignedMessage signedMessage);
+
+    String getPublicKeySerialized();
 }

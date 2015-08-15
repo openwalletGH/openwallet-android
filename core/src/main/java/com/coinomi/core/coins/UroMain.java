@@ -26,6 +26,7 @@ public class UroMain extends CoinType {
         minNonDust = value(1000); // 0.00001 URO mininput
         softDustLimit = value(100000); // 0.001 URO
         softDustPolicy = SoftDustPolicy.BASE_FEE_FOR_EACH_SOFT_DUST_TXO;
+        signedMessageHeader = toBytes("Uro Signed Message:\n");
     }
 
     private static UroMain instance = new UroMain();

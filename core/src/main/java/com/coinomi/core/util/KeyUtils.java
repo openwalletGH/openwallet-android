@@ -12,7 +12,7 @@ import org.bitcoinj.crypto.DeterministicKey;
 import org.bitcoinj.crypto.EncryptableItem;
 import org.bitcoinj.crypto.EncryptedData;
 import org.bitcoinj.crypto.KeyCrypter;
-import org.spongycastle.math.ec.ECPoint;
+import org.bitcoinj.crypto.LazyECPoint;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -69,7 +69,7 @@ public class KeyUtils {
         // Deserialize the path through the tree.
         final ImmutableList<ChildNumber> immutablePath = getKeyProtoPath(key);
         // Deserialize the public key.
-        ECPoint pubkey = ECKey.CURVE.getCurve().decodePoint(key.getPublicKey().toByteArray());
+        LazyECPoint pubkey = new LazyECPoint(ECKey.CURVE.getCurve(), key.getPublicKey().toByteArray());
         // Deserialize the chain code.
         byte[] chainCode = key.getDeterministicKey().getChainCode().toByteArray();
 

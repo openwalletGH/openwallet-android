@@ -155,6 +155,11 @@ final public class NxtFamilyWallet extends AbstractWallet {
     }
 
     @Override
+    public String getPublicKeySerialized() {
+        throw new RuntimeException("Not implemented");
+    }
+
+    @Override
     public boolean isNew() {
         throw new RuntimeException("Not implemented");
     }

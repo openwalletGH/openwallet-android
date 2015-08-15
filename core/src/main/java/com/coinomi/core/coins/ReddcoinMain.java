@@ -26,6 +26,7 @@ public class ReddcoinMain extends CoinType {
         minNonDust = value(1000000);   // 0.01 RDD mininput
         softDustLimit = value(100000000); // 1 RDD
         softDustPolicy = SoftDustPolicy.BASE_FEE_FOR_EACH_SOFT_DUST_TXO;
+        signedMessageHeader = toBytes("Reddcoin Signed Message:\n");
     }
 
     private static ReddcoinMain instance = new ReddcoinMain();

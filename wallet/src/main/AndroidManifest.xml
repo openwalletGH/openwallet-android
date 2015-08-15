@@ -210,6 +210,12 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" >
         </activity>
+        <activity
+            android:name="com.coinomi.wallet.ui.AccountDetailsActivity"
+            android:label="@string/title_activity_account_details"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" >
+        </activity>
 
         <provider
             android:name="com.coinomi.wallet.ExchangeRatesProvider"

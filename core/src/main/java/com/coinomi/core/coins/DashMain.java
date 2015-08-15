@@ -24,6 +24,7 @@ public class DashMain extends CoinType {
         minNonDust = value(1000); // 0.00001 DASH mininput
         softDustLimit = value(100000); // 0.001 DASH
         softDustPolicy = SoftDustPolicy.BASE_FEE_FOR_EACH_SOFT_DUST_TXO;
+        signedMessageHeader = toBytes("DarkCoin Signed Message:\n");
     }
 
     private static DashMain instance = new DashMain();
