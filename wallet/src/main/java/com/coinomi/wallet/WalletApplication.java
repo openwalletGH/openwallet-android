@@ -27,6 +27,7 @@ import com.coinomi.wallet.util.LinuxSecureRandom;
 import com.coinomi.wallet.util.NetworkUtils;
 import com.google.common.collect.ImmutableList;
 
+import org.acra.ACRA;
 import org.acra.annotation.ReportsCrashes;
 import org.acra.sender.HttpSender;
 import org.bitcoinj.core.Address;
@@ -80,7 +81,10 @@ public class WalletApplication extends Application {
     public void onCreate() {
 //        ACRA.init(this);
 
+        config = new Configuration(PreferenceManager.getDefaultSharedPreferences(this));
+
         new LinuxSecureRandom(); // init proper random number generator
+        performComplianceTests();
 
         initLogging();
 
@@ -92,7 +96,7 @@ public class WalletApplication extends Application {
 
         packageInfo = packageInfoFromContext(this);
 
-        config = new Configuration(PreferenceManager.getDefaultSharedPreferences(this));
+
         activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
 
         coinServiceIntent = new Intent(this, CoinServiceImpl.class);
@@ -107,14 +111,13 @@ public class WalletApplication extends Application {
         if (MnemonicCode.INSTANCE == null) {
             try {
                 MnemonicCode.INSTANCE = new MnemonicCode();
-            } catch (Exception e) {
-                log.error("Could not set MnemonicCode.INSTANCE", e);
+            } catch (IOException e) {
+                throw new RuntimeException("Could not set MnemonicCode.INSTANCE", e);
             }
         }
 
         config.updateLastVersionCode(packageInfo.versionCode);
 
-        performComplianceTests();
 
         connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
@@ -144,6 +147,8 @@ public class WalletApplication extends Application {
     private void performComplianceTests() {
         if (!HardwareSoftwareCompliance.isEllipticCurveCryptographyCompliant()) {
             config.setDeviceCompatible(false);
+            ACRA.getErrorReporter().handleSilentException(
+                    new Exception("Device failed EllipticCurveCryptographyCompliant test"));
         }
     }
 
@@ -220,7 +225,7 @@ public class WalletApplication extends Application {
     }
 
     @Nullable
-    public WalletAccount getAccount(String accountId) {
+    public WalletAccount getAccount(@Nullable String accountId) {
         if (wallet != null) {
             return wallet.getAccount(accountId);
         } else {
@@ -276,22 +281,24 @@ public class WalletApplication extends Application {
      * Check if accounts exists for the spesific coin type
      */
     public boolean isAccountExists(CoinType type) {
-        if (wallet != null) {
-            return wallet.isAccountExists(type);
-        } else {
-            return false;
-        }
+        return wallet != null && wallet.isAccountExists(type);
     }
 
-    public void setWallet(Wallet wallet) {
+    public void setEmptyWallet() {
+        setWallet(null);
+    }
+
+    public void setWallet(@Nullable Wallet wallet) {
         // Disable auto-save of the previous wallet if exists, so it doesn't override the new one
         if (this.wallet != null) {
             this.wallet.shutdownAutosaveAndWait();
         }
 
         this.wallet = wallet;
-        this.wallet.autosaveToFile(walletFile,
-                Constants.WALLET_WRITE_DELAY, Constants.WALLET_WRITE_DELAY_UNIT, null);
+        if (this.wallet != null) {
+            this.wallet.autosaveToFile(walletFile, Constants.WALLET_WRITE_DELAY,
+                    Constants.WALLET_WRITE_DELAY_UNIT, null);
+        }
     }
 
     private void loadWallet() {
@@ -306,12 +313,11 @@ public class WalletApplication extends Application {
                 setWallet(WalletProtobufSerializer.readWallet(walletStream));
 
                 log.info("wallet loaded from: '" + walletFile + "', took " + (System.currentTimeMillis() - start) + "ms");
-            } catch (final FileNotFoundException x) {
-                log.error("problem loading wallet", x);
+            } catch (final FileNotFoundException e) {
                 Toast.makeText(WalletApplication.this, R.string.error_could_not_read_wallet, Toast.LENGTH_LONG).show();
-            } catch (final UnreadableWalletException x) {
-                log.error("problem loading wallet", x);
-
+                ACRA.getErrorReporter().handleException(e);
+            } catch (final UnreadableWalletException e) {
+                ACRA.getErrorReporter().handleException(e);
                 Toast.makeText(WalletApplication.this, R.string.error_could_not_read_wallet, Toast.LENGTH_LONG).show();
             } finally {
                 if (walletStream != null) {

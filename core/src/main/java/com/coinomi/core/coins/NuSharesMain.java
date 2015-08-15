@@ -24,6 +24,7 @@ public class NuSharesMain extends CoinType {
         minNonDust = value(10000); // 1NSR
         softDustLimit = minNonDust;
         softDustPolicy = SoftDustPolicy.NO_POLICY;
+        signedMessageHeader = toBytes("Nu Signed Message:\n");
     }
 
     private static NuSharesMain instance = new NuSharesMain();

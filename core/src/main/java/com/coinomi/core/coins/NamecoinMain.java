@@ -15,7 +15,7 @@ public class NamecoinMain extends CoinType {
         spendableCoinbaseDepth = 100;
 
         family = BitFamily.get();
-        name = "Namecoin (beta)";
+        name = "Namecoin";
         symbol = "NMC";
         uriScheme = "namecoin";
         bip44Index = 7;
@@ -24,6 +24,7 @@ public class NamecoinMain extends CoinType {
         minNonDust = value(10000); // 0.0001 NMC mininput
         softDustLimit = value(1000000); // 0.01 NMC
         softDustPolicy = SoftDustPolicy.BASE_FEE_FOR_EACH_SOFT_DUST_TXO;
+        signedMessageHeader = toBytes("Bitcoin Signed Message:\n");
     }
 
     private static NamecoinMain instance = new NamecoinMain();

@@ -21,7 +21,7 @@ public class PreviousAddressesActivity extends BaseWalletActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_previous_addresses);
+        setContentView(R.layout.activity_fragment_wrapper);
 
         if (savedInstanceState == null) {
             addressesList = new PreviousAddressesFragment();

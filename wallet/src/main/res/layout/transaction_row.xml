@@ -47,7 +47,20 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:gravity="bottom">
+
+            <TextView
+                android:id="@+id/transaction_row_message_font_icon"
+                style="@style/TransactionRowMessageFontIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="@dimen/quarter_standard_margin"
+                android:layout_marginEnd="@dimen/quarter_standard_margin"
+                android:text="@string/font_icon_mail"
+                android:visibility="gone"
+                tools:visibility="visible"
+                tools:text="M" />
 
             <TextView
                 android:id="@+id/transaction_row_direction_text"
@@ -66,7 +79,7 @@
                 <!--android:layout_gravity="center_vertical"-->
                 <!--android:layout_weight="1"-->
                 <!--android:gravity="end"-->
-                <!--android:text="13:37, Sep 15" />-->
+                <!--tools:text="13:37, Sep 15" />-->
 
         </LinearLayout>
 

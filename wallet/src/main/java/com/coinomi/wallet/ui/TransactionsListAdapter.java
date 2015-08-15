@@ -38,14 +38,18 @@ import android.widget.TextView;
 
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
+import com.coinomi.core.coins.VpncoinMain;
+import com.coinomi.core.messages.MessageFactory;
 import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.AbstractWallet;
+import com.coinomi.core.wallet.families.vpncoin.VpncoinTxMessage;
 import com.coinomi.wallet.AddressBookProvider;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.ui.widget.CurrencyTextView;
 import com.coinomi.wallet.util.Fonts;
 import com.coinomi.wallet.util.WalletUtils;
 
+import org.acra.ACRA;
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.Transaction;
@@ -202,6 +206,8 @@ public class TransactionsListAdapter extends BaseAdapter {
         Fonts.setTypeface(rowDirectionFontIcon, Fonts.Font.COINOMI_FONT_ICONS);
         final TextView rowConfirmationsFontIcon = (TextView) row.findViewById(R.id.transaction_row_confirmations_font_icon);
         Fonts.setTypeface(rowConfirmationsFontIcon, Fonts.Font.COINOMI_FONT_ICONS);
+        final TextView rowMessageFontIcon = (TextView) row.findViewById(R.id.transaction_row_message_font_icon);
+        Fonts.setTypeface(rowMessageFontIcon, Fonts.Font.COINOMI_FONT_ICONS);
         // TODO implement date
 //        final TextView rowDate = (TextView) row.findViewById(R.id.transaction_row_time);
         final TextView rowLabel = (TextView) row.findViewById(R.id.transaction_row_label);
@@ -328,6 +334,24 @@ public class TransactionsListAdapter extends BaseAdapter {
         // value
         rowValue.setAlwaysSigned(true);
         rowValue.setAmount(Value.valueOf(type, value));
+
+        // Show message label
+        if (type.canHandleMessages()) {
+            MessageFactory factory = type.getMessagesFactory();
+            try {
+                // TODO not efficient, should parse the message and save it to a database
+                if (factory != null && factory.extractPublicMessage(tx) != null) {
+                    rowMessageFontIcon.setVisibility(View.VISIBLE);
+                } else {
+                    rowMessageFontIcon.setVisibility(View.GONE);
+                }
+            } catch (Exception e) {
+                rowMessageFontIcon.setVisibility(View.GONE);
+                ACRA.getErrorReporter().handleSilentException(e);
+            }
+        } else {
+            rowMessageFontIcon.setVisibility(View.GONE);
+        }
     }
 
     private String resolveLabel(@Nonnull final String address) {

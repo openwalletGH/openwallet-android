@@ -25,6 +25,7 @@ public class DigibyteMain extends CoinType {
         minNonDust = value(5460);
         softDustLimit = value(100000);
         softDustPolicy = SoftDustPolicy.BASE_FEE_FOR_EACH_SOFT_DUST_TXO;
+        signedMessageHeader = toBytes("DigiByte Signed Message:\n");
     }
 
     private static DigibyteMain instance = new DigibyteMain();

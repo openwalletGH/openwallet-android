@@ -5,9 +5,11 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
+import com.coinomi.core.messages.TxMessage;
 import com.coinomi.core.util.ExchangeRate;
 import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.AbstractWallet;
@@ -21,6 +23,8 @@ import org.bitcoinj.core.TransactionOutput;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import static com.coinomi.core.Preconditions.checkState;
 
 /**
@@ -30,6 +34,8 @@ public class TransactionAmountVisualizer extends LinearLayout {
 
     private final SendOutput output;
     private final SendOutput fee;
+    private final TextView txMessageLabel;
+    private final TextView txMessage;
     private Coin outputAmount;
     private Coin feeAmount;
     private boolean isSending;
@@ -46,6 +52,8 @@ public class TransactionAmountVisualizer extends LinearLayout {
         output.setVisibility(View.GONE);
         fee = (SendOutput) findViewById(R.id.transaction_fee);
         fee.setVisibility(View.GONE);
+        txMessageLabel = (TextView) findViewById(R.id.tx_message_label);
+        txMessage = (TextView) findViewById(R.id.tx_message);
 
         if (isInEditMode()) {
             output.setVisibility(View.VISIBLE);
@@ -91,6 +99,27 @@ public class TransactionAmountVisualizer extends LinearLayout {
             fee.setVisibility(View.VISIBLE);
             fee.setAmount(GenericUtils.formatCoinValue(type, feeAmount));
             fee.setSymbol(symbol);
+        }
+
+        if (type.canHandleMessages()) {
+            setMessage(type.getMessagesFactory().extractPublicMessage(tx));
+        }
+    }
+
+    private void setMessage(@Nullable TxMessage message) {
+        if (message != null) {
+            switch (message.getType()) {
+                case PRIVATE:
+                    txMessageLabel.setText(R.string.tx_message_private);
+                    break;
+                case PUBLIC:
+                    txMessageLabel.setText(R.string.tx_message_public);
+                    break;
+            }
+            txMessageLabel.setVisibility(VISIBLE);
+
+            txMessage.setText(message.toString());
+            txMessage.setVisibility(VISIBLE);
         }
     }
 

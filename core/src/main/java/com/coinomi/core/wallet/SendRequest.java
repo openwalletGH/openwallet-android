@@ -19,30 +19,28 @@ package com.coinomi.core.wallet;
 
 import com.coinomi.core.coins.BurstMain;
 import com.coinomi.core.coins.CoinType;
-import org.bitcoinj.core.Address;
-import org.bitcoinj.core.Coin;
-import org.bitcoinj.core.Transaction;
-import org.bitcoinj.core.Wallet.MissingSigsMode;
-import org.bitcoinj.wallet.CoinSelector;
-
 import com.coinomi.core.coins.NxtMain;
 import com.coinomi.core.coins.Value;
 import com.coinomi.core.coins.families.NxtFamily;
 import com.coinomi.core.coins.nxt.Appendix;
 import com.coinomi.core.coins.nxt.Attachment;
 import com.coinomi.core.coins.nxt.Convert;
-import com.coinomi.core.coins.nxt.NxtException;
 import com.coinomi.core.coins.nxt.TransactionImpl;
+import com.coinomi.core.messages.TxMessage;
 import com.coinomi.core.wallet.families.nxt.NxtFamilyAddress;
 import com.google.common.base.Objects;
 import com.google.common.base.Objects.ToStringHelper;
 
+import org.bitcoinj.core.Address;
+import org.bitcoinj.core.Coin;
+import org.bitcoinj.core.Transaction;
+import org.bitcoinj.core.Wallet.MissingSigsMode;
+import org.bitcoinj.wallet.CoinSelector;
 import org.spongycastle.crypto.params.KeyParameter;
 
 import java.io.Serializable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 /**
  * A SendRequest gives the wallet information about precisely how to send money to a recipient or set of recipients.
@@ -176,6 +174,13 @@ public class SendRequest implements Serializable{
     public void setCompleted(boolean completed) {
         this.completed = completed;
     }
+
+    /**
+     * Attaches a message to the transaction. There is no guarantee that the coin supports messages
+     * or that the recipient will ultimately get them or if the message will be recorded to on the
+     * blockchain i.e. Bitcoin, Litecoin messages could be stored on a public server
+     */
+    public TxMessage txMessage;
 
     // Tracks if this has been passed to wallet.completeTransaction already: just a safety check.
     private boolean completed;
