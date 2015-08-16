@@ -268,7 +268,11 @@ public class AddressRequestFragment extends Fragment {
             } else {
                 inflater.inflate(R.menu.request_single_address, menu);
             }
-            menu.findItem(R.id.action_new_address).setVisible(pocket.canCreateNewAddresses());
+
+            MenuItem newAddressItem = menu.findItem(R.id.action_new_address);
+            if (newAddressItem != null) {
+                newAddressItem.setVisible(pocket.canCreateNewAddresses());
+            }
         }
     }
 
