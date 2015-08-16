@@ -1,4 +1,4 @@
-package com.coinomi.core.wallet.exceptions;
+package com.coinomi.core.exceptions;
 
 /**
  * @author John L. Jegutanis

@@ -5,7 +5,7 @@ import com.coinomi.core.coins.families.BitFamily;
 /**
  * @author John L. Jegutanis
  */
-public class PrimecoinMain extends CoinType {
+public class PrimecoinMain extends BitFamily {
     private PrimecoinMain() {
         id = "primecoin.main";
 
@@ -14,7 +14,6 @@ public class PrimecoinMain extends CoinType {
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 3000;
 
-        family = BitFamily.get();
         name = "Primecoin";
         symbol = "XPM";
         uriScheme = "primecoin";
@@ -28,7 +27,7 @@ public class PrimecoinMain extends CoinType {
     }
 
     private static PrimecoinMain instance = new PrimecoinMain();
-    public static synchronized PrimecoinMain get() {
+    public static synchronized CoinType get() {
         return instance;
     }
 }

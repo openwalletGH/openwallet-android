@@ -5,7 +5,7 @@ import com.coinomi.core.coins.families.BitFamily;
 /**
  * @author John L. Jegutanis
  */
-public class NeoscoinMain extends CoinType {
+public class NeoscoinMain extends BitFamily {
     private NeoscoinMain() {
         id = "neoscoin.main";
 
@@ -15,7 +15,6 @@ public class NeoscoinMain extends CoinType {
         spendableCoinbaseDepth = 100;
         dumpedPrivateKeyHeader = 128;
 
-        family = BitFamily.get();
         name = "Neoscoin";
         symbol = "NEOS";
         uriScheme = "neoscoin";
@@ -29,7 +28,7 @@ public class NeoscoinMain extends CoinType {
     }
 
     private static NeoscoinMain instance = new NeoscoinMain();
-    public static synchronized NeoscoinMain get() {
+    public static synchronized CoinType get() {
         return instance;
     }
 }

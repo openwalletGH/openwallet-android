@@ -7,7 +7,7 @@ import org.bitcoinj.core.Coin;
 /**
  * @author FuzzyHobbit
  */
-public class UroMain extends CoinType {
+public class UroMain extends BitFamily {
     private UroMain() {
         id = "uro.main";
 
@@ -16,7 +16,6 @@ public class UroMain extends CoinType {
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 20;
 
-        family = BitFamily.get();
         name = "Uro";
         symbol = "URO";
         uriScheme = "uro";
@@ -30,7 +29,7 @@ public class UroMain extends CoinType {
     }
 
     private static UroMain instance = new UroMain();
-    public static synchronized UroMain get() {
+    public static synchronized CoinType get() {
         return instance;
     }
 }

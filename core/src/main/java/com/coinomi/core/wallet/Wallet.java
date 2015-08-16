@@ -2,18 +2,14 @@ package com.coinomi.core.wallet;
 
 import com.coinomi.core.CoreUtils;
 import com.coinomi.core.coins.CoinType;
-import com.coinomi.core.coins.families.BitFamily;
-import com.coinomi.core.coins.families.CoinFamily;
-import com.coinomi.core.coins.families.NxtFamily;
+import com.coinomi.core.exceptions.NoSuchPocketException;
 import com.coinomi.core.protos.Protos;
-import com.coinomi.core.wallet.exceptions.NoSuchPocketException;
 import com.coinomi.core.wallet.families.nxt.NxtFamilyWallet;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
-import org.bitcoinj.core.Address;
 import org.bitcoinj.crypto.DeterministicHierarchy;
 import org.bitcoinj.crypto.DeterministicKey;
 import org.bitcoinj.crypto.HDKeyDerivation;
@@ -219,11 +215,11 @@ final public class Wallet {
     /**
      * Get accounts that watch a specific address. Returns empty list if no account exists
      */
-    public List<WalletAccount> getAccounts(final Address address) {
+    public List<WalletAccount> getAccounts(final AbstractAddress address) {
         lock.lock();
         try {
             ImmutableList.Builder<WalletAccount> builder = ImmutableList.builder();
-            CoinType type = (CoinType) address.getParameters();
+            CoinType type = address.getType();
             if (isAccountExists(type)) {
                 for (WalletAccount account : accountsByType.get(type)) {
                     if (account.isAddressMine(address)) {
@@ -279,15 +275,23 @@ final public class Wallet {
         int newIndex = getLastAccountIndex(coinType) + 1;
         DeterministicKey rootKey = hierarchy.get(coinType.getBip44Path(newIndex), false, true);
 
-        CoinFamily family = coinType.getFamily();
+//        CoinFamily family = coinType.getFamily();
         WalletAccount newPocket;
 
-        if (family instanceof BitFamily) {
-            newPocket = new WalletPocketHD(rootKey, coinType, getKeyCrypter(), key);
-        } else if (family instanceof NxtFamily) {
-            newPocket = new NxtFamilyWallet(rootKey, coinType, getKeyCrypter(), key);
-        } else {
-            throw new RuntimeException("Unknown family: " + family.getClass().getName());
+        switch (coinType.getFamilyEnum()) {
+            case NXT:
+                newPocket = new NxtFamilyWallet(rootKey, coinType, getKeyCrypter(), key);
+                break;
+            case BITCOIN:
+            case NUBITS:
+            case PEERCOIN:
+            case REDDCOIN:
+            case VPNCOIN:
+                newPocket = new WalletPocketHD(rootKey, coinType, getKeyCrypter(), key);
+                break;
+            default:
+            case FIAT:
+                throw new RuntimeException("Unsupported family: " + coinType.getFamilyEnum());
         }
 
         if (isEncrypted() && !newPocket.isEncrypted()) {
@@ -316,7 +320,7 @@ final public class Wallet {
         return lastIndex;
     }
 
-    /* package */ void addAccount(WalletAccount pocket) {
+    public void addAccount(WalletAccount pocket) {
         lock.lock();
         try {
             String id = pocket.getId();
@@ -404,42 +408,6 @@ final public class Wallet {
         } finally {
             lock.unlock();
         }
-    }
-
-//    public SendRequest sendCoinsOffline(Address address, Coin amount)
-//            throws InsufficientMoneyException, NoSuchPocketException {
-//        return sendCoinsOffline(address, amount, null);
-//    }
-//
-//    public SendRequest sendCoinsOffline(Address address, Coin amount, @Nullable String password)
-//            throws InsufficientMoneyException, NoSuchPocketException {
-//        CoinType type = (CoinType) address.getParameters();
-//        WalletPocketHD pocket = getPocket(type);
-//        SendRequest request = null;
-//        if (pocket != null) {
-//            request = pocket.sendCoinsOffline(address, amount, password);
-//        } else {
-//            throwNoSuchPocket(type);
-//        }
-//        return request;
-//    }
-//
-//    public void completeAndSignTx(SendRequest request) throws InsufficientMoneyException, NoSuchPocketException {
-//        WalletPocketHD pocket = getPocket(request.type);
-//        if (pocket != null) {
-//            if (request.completed) {
-//                pocket.signTransaction(request);
-//            } else {
-//                pocket.completeTransaction(request);
-//            }
-//        } else {
-//            throwNoSuchPocket(request.type);
-//        }
-//    }
-
-    private void throwNoSuchPocket(CoinType type) throws NoSuchPocketException {
-        throw new NoSuchPocketException("Tried to send from pocket " + type.getName() +
-                " but no such pocket in wallet.");
     }
 
     public void setVersion(int version) {

@@ -1,12 +1,10 @@
 package com.coinomi.core.network;
 
-import org.bitcoinj.core.Address;
-import org.bitcoinj.core.Sha256Hash;
-import org.bitcoinj.core.Transaction;
+import com.coinomi.core.wallet.AbstractAddress;
 import com.google.common.collect.Sets;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import org.bitcoinj.core.Sha256Hash;
+
 import java.util.HashSet;
 import java.util.List;
 
@@ -16,18 +14,18 @@ import javax.annotation.Nullable;
  * @author John L. Jegutanis
  */
 final public class AddressStatus {
-    final Address address;
+    final AbstractAddress address;
     @Nullable final String status;
 
     HashSet<ServerClient.HistoryTx> historyTransactions;
     HashSet<Sha256Hash> allTransactions = new HashSet<Sha256Hash>();
 
-    public AddressStatus(Address address, @Nullable String status) {
+    public AddressStatus(AbstractAddress address, @Nullable String status) {
         this.address = address;
         this.status = status;
     }
 
-    public Address getAddress() {
+    public AbstractAddress getAddress() {
         return address;
     }
 
@@ -37,7 +35,6 @@ final public class AddressStatus {
 
     /**
      * Queue transactions that are going to be fetched
-     * @param txs
      */
     public void queueHistoryTransactions(List<ServerClient.HistoryTx> txs) {
         if (historyTransactions == null) {

@@ -1,8 +1,8 @@
 package com.coinomi.core.network.interfaces;
 
 import com.coinomi.core.network.AddressStatus;
+import com.coinomi.core.wallet.AbstractAddress;
 
-import org.bitcoinj.core.Address;
 import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.Transaction;
 
@@ -14,7 +14,7 @@ import java.util.List;
 public interface BlockchainConnection {
     void subscribeToBlockchain(final TransactionEventListener listener);
 
-    void subscribeToAddresses(List<Address> addresses,
+    void subscribeToAddresses(List<AbstractAddress> addresses,
                               TransactionEventListener listener);
 
 //    void getUnspentTx(AddressStatus status, TransactionEventListener listener);

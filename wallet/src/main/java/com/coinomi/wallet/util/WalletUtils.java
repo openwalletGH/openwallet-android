@@ -27,11 +27,12 @@ import android.text.style.StyleSpan;
 import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.util.Currencies;
+import com.coinomi.core.wallet.AbstractAddress;
 import com.coinomi.core.wallet.AbstractWallet;
 import com.coinomi.core.wallet.WalletAccount;
+import com.coinomi.core.wallet.families.bitcoin.BitAddress;
 import com.coinomi.wallet.Constants;
 
-import org.bitcoinj.core.Address;
 import org.bitcoinj.core.ScriptException;
 import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.Transaction;
@@ -50,6 +51,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import static com.coinomi.core.Preconditions.checkState;
+import static com.coinomi.core.util.AddressUtils.fromScript;
 
 /**
  * @author Andreas Schildbach
@@ -109,24 +111,25 @@ public class WalletUtils {
     }
 
     @CheckForNull
-    public static List<Address> getSendToAddress(@Nonnull final Transaction tx, @Nonnull final AbstractWallet pocket) {
+    public static List<AbstractAddress> getSendToAddress(@Nonnull final Transaction tx, @Nonnull final AbstractWallet pocket) {
         return getToAddresses(tx, pocket, false);
     }
 
 
     @CheckForNull
-    public static List<Address> getReceivedWithAddress(@Nonnull final Transaction tx, @Nonnull final AbstractWallet pocket) {
+    public static List<AbstractAddress> getReceivedWithAddress(@Nonnull final Transaction tx, @Nonnull final AbstractWallet pocket) {
         return getToAddresses(tx, pocket, true);
     }
 
     @CheckForNull
-    private static List<Address> getToAddresses(@Nonnull final Transaction tx,
+    private static List<AbstractAddress> getToAddresses(@Nonnull final Transaction tx,
                                                 @Nonnull final AbstractWallet pocket, boolean toMe) {
-        List<Address> addresses = new ArrayList<Address>();
+        List<AbstractAddress> addresses = new ArrayList<>();
         for (final TransactionOutput output : tx.getOutputs()) {
             try {
                 if (output.isMine(pocket) == toMe) {
-                    addresses.add(output.getScriptPubKey().getToAddress(pocket.getCoinType()));
+                    BitAddress address = fromScript(pocket.getCoinType(), output.getScriptPubKey());
+                    addresses.add(address);
                 }
             } catch (final ScriptException x) { /* ignore this output */ }
         }

@@ -17,9 +17,6 @@ package com.coinomi.wallet.ui;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.ContentResolver;
@@ -36,10 +33,12 @@ import android.widget.TextView;
 import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.util.GenericUtils;
+import com.coinomi.core.wallet.AbstractAddress;
 import com.coinomi.wallet.AddressBookProvider;
 import com.coinomi.wallet.R;
 
-import org.bitcoinj.core.Address;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * @author Andreas Schildbach
@@ -52,25 +51,31 @@ public final class EditAddressBookEntryFragment extends DialogFragment {
     private static final String KEY_ADDRESS = "address";
     private static final String KEY_SUGGESTED_ADDRESS_LABEL = "suggested_address_label";
 
-    public static void edit(final FragmentManager fm, @Nonnull final Address address) {
-        edit(fm, (CoinType) address.getParameters(), address.toString(), null);
+    public static void edit(final FragmentManager fm, @Nonnull final AbstractAddress address) {
+        edit(fm, address.getType(), address, null);
     }
 
-    public static void edit(final FragmentManager fm, @Nonnull CoinType type, @Nonnull final String address) {
+    public static void edit(final FragmentManager fm, @Nonnull CoinType type,
+                            @Nonnull final AbstractAddress address) {
         edit(fm, type, address, null);
     }
 
-    public static void edit(final FragmentManager fm, @Nonnull CoinType type, @Nonnull final String address, @Nullable final String suggestedAddressLabel) {
-        final DialogFragment newFragment = EditAddressBookEntryFragment.instance(type, address, suggestedAddressLabel);
+    public static void edit(final FragmentManager fm, @Nonnull CoinType type,
+                            @Nonnull final AbstractAddress address,
+                            @Nullable final String suggestedAddressLabel) {
+        final DialogFragment newFragment =
+                EditAddressBookEntryFragment.instance(type, address, suggestedAddressLabel);
         newFragment.show(fm, FRAGMENT_TAG);
     }
 
-    private static EditAddressBookEntryFragment instance(@Nonnull CoinType type, @Nonnull final String address, @Nullable final String suggestedAddressLabel) {
+    private static EditAddressBookEntryFragment instance(@Nonnull CoinType type,
+                                                         @Nonnull final AbstractAddress address,
+                                                         @Nullable final String suggestedAddressLabel) {
         final EditAddressBookEntryFragment fragment = new EditAddressBookEntryFragment();
 
         final Bundle args = new Bundle();
         args.putString(KEY_COIN_ID, type.getId());
-        args.putString(KEY_ADDRESS, address);
+        args.putSerializable(KEY_ADDRESS, address);
         args.putString(KEY_SUGGESTED_ADDRESS_LABEL, suggestedAddressLabel);
         fragment.setArguments(args);
 
@@ -92,15 +97,15 @@ public final class EditAddressBookEntryFragment extends DialogFragment {
     public Dialog onCreateDialog(final Bundle savedInstanceState) {
         final Bundle args = getArguments();
         final CoinType type = CoinID.typeFromId(args.getString(KEY_COIN_ID));
-        final String address = args.getString(KEY_ADDRESS);
+        final AbstractAddress address = (AbstractAddress) args.getSerializable(KEY_ADDRESS);
         final String suggestedAddressLabel = args.getString(KEY_SUGGESTED_ADDRESS_LABEL);
 
         final LayoutInflater inflater = LayoutInflater.from(activity);
 
         final Uri uri = AddressBookProvider.contentUri(activity.getPackageName(), type)
-                .buildUpon().appendPath(address).build();
+                .buildUpon().appendPath(address.toString()).build();
 
-        final String label = AddressBookProvider.resolveLabel(activity, type, address);
+        final String label = AddressBookProvider.resolveLabel(activity, address);
 
         final boolean isAdd = label == null;
 

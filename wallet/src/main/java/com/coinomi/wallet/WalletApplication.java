@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.exchange.shapeshift.ShapeShift;
 import com.coinomi.core.util.HardwareSoftwareCompliance;
+import com.coinomi.core.wallet.AbstractAddress;
 import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.core.wallet.WalletProtobufSerializer;
@@ -30,7 +31,6 @@ import com.google.common.collect.ImmutableList;
 import org.acra.ACRA;
 import org.acra.annotation.ReportsCrashes;
 import org.acra.sender.HttpSender;
-import org.bitcoinj.core.Address;
 import org.bitcoinj.crypto.MnemonicCode;
 import org.bitcoinj.store.UnreadableWalletException;
 import org.slf4j.Logger;
@@ -250,7 +250,7 @@ public class WalletApplication extends Application {
         }
     }
 
-    public List<WalletAccount> getAccounts(Address address) {
+    public List<WalletAccount> getAccounts(AbstractAddress address) {
         if (wallet != null) {
             return wallet.getAccounts(address);
         } else {

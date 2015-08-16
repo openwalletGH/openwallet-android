@@ -3,9 +3,10 @@ package com.coinomi.core.wallet.families.nxt;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.nxt.Account;
 import com.coinomi.core.coins.nxt.Convert;
+import com.coinomi.core.coins.nxt.Crypto;
 import com.coinomi.core.wallet.AbstractAddress;
+import com.coinomi.core.exceptions.AddressMalformedException;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -31,8 +32,14 @@ final public class NxtFamilyAddress implements AbstractAddress {
         this.rsAccount = rsAccount;
     }
 
-    public CoinType getType() {
-        return type;
+    public static NxtFamilyAddress fromString(CoinType type, String address)
+            throws AddressMalformedException {
+        try {
+            return new NxtFamilyAddress(type,
+                    Crypto.rsDecode(address.replace(type.getAddressPrefix(), "")), address);
+        } catch (Exception e) {
+            throw new AddressMalformedException(e);
+        }
     }
 
     @Nullable
@@ -49,7 +56,17 @@ final public class NxtFamilyAddress implements AbstractAddress {
     }
 
     @Override
+    public CoinType getType() {
+        return type;
+    }
+
+    @Override
     public String toString() {
         return getRsAccount();
+    }
+
+    @Override
+    public long getId() {
+        return accountId;
     }
 }

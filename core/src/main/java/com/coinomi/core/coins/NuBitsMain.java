@@ -1,11 +1,11 @@
 package com.coinomi.core.coins;
 
-import com.coinomi.core.coins.families.NubitsFamily;
+import com.coinomi.core.coins.families.NuFamily;
 
 /**
  * @author John L. Jegutanis
  */
-public class NuBitsMain extends CoinType {
+public class NuBitsMain extends NuFamily {
     private NuBitsMain() {
         id = "nubits.main";
 
@@ -14,7 +14,6 @@ public class NuBitsMain extends CoinType {
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         tokenId = 0x42;
 
-        family = NubitsFamily.get();
         name = "NuBits";
         symbol = "NBT";
         uriScheme = "nu";
@@ -28,7 +27,7 @@ public class NuBitsMain extends CoinType {
     }
 
     private static NuBitsMain instance = new NuBitsMain();
-    public static synchronized NuBitsMain get() {
+    public static synchronized CoinType get() {
         return instance;
     }
 }

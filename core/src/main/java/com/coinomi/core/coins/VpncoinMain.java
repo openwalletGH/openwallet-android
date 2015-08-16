@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 /**
  * @author John L. Jegutanis
  */
-public class VpncoinMain extends CoinType {
+public class VpncoinMain extends VpncoinFamily {
     private VpncoinMain() {
         id = "vpncoin.main";
 
@@ -18,7 +18,6 @@ public class VpncoinMain extends CoinType {
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 100;
 
-        family = VpncoinFamily.get();
         name = "Vpncoin";
         symbol = "VPN";
         uriScheme = "vpncoin";
@@ -31,14 +30,8 @@ public class VpncoinMain extends CoinType {
         signedMessageHeader = toBytes("VpnCoin Signed Message:\n");
     }
 
-    @Override
-    @Nullable
-    public MessageFactory getMessagesFactory() {
-        return VpncoinTxMessage.getFactory();
-    }
-
     private static VpncoinMain instance = new VpncoinMain();
-    public static synchronized VpncoinMain get() {
+    public static synchronized CoinType get() {
         return instance;
     }
 }

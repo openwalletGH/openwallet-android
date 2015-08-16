@@ -32,11 +32,12 @@ import com.coinomi.core.exchange.shapeshift.data.ShapeShiftTime;
 import com.coinomi.core.messages.TxMessage;
 import com.coinomi.core.util.ExchangeRate;
 import com.coinomi.core.util.GenericUtils;
+import com.coinomi.core.wallet.AbstractAddress;
 import com.coinomi.core.wallet.SendRequest;
 import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.core.wallet.WalletPocketHD;
-import com.coinomi.core.wallet.exceptions.NoSuchPocketException;
+import com.coinomi.core.exceptions.NoSuchPocketException;
 import com.coinomi.wallet.Configuration;
 import com.coinomi.wallet.ExchangeHistoryProvider;
 import com.coinomi.wallet.ExchangeHistoryProvider.ExchangeEntry;
@@ -48,7 +49,6 @@ import com.coinomi.wallet.ui.widget.TransactionAmountVisualizer;
 import com.coinomi.wallet.util.Keyboard;
 import com.coinomi.wallet.util.WeakHandler;
 
-import org.bitcoinj.core.Address;
 import org.bitcoinj.crypto.KeyCrypter;
 import org.bitcoinj.crypto.KeyCrypterException;
 import org.slf4j.Logger;
@@ -104,7 +104,7 @@ public class MakeTransactionFragment extends Fragment {
     private EditText passwordView;
     private TransactionAmountVisualizer txVisualizer;
     private SendOutput tradeWithdrawSendOutput;
-    private Address sendToAddress;
+    private AbstractAddress sendToAddress;
     private boolean sendingToAccount;
     @Nullable private Value sendAmount;
     private boolean emptyWallet;
@@ -113,9 +113,9 @@ public class MakeTransactionFragment extends Fragment {
     private LoaderManager loaderManager;
     private WalletPocketHD sourceAccount;
     @Nullable private ExchangeEntry exchangeEntry;
-    @Nullable private Address tradeDepositAddress;
+    @Nullable private AbstractAddress tradeDepositAddress;
     @Nullable private Value tradeDepositAmount;
-    @Nullable private Address tradeWithdrawAddress;
+    @Nullable private AbstractAddress tradeWithdrawAddress;
     @Nullable private Value tradeWithdrawAmount;
     @Nullable private TxMessage txMessage;
     private boolean transactionBroadcast = false;
@@ -158,7 +158,7 @@ public class MakeTransactionFragment extends Fragment {
                 sendToAddress = toAccount.getReceiveAddress(config.isManualAddressManagement());
                 sendingToAccount = true;
             } else {
-                sendToAddress = (Address) checkNotNull(args.getSerializable(ARG_SEND_TO_ADDRESS));
+                sendToAddress = (AbstractAddress) checkNotNull(args.getSerializable(ARG_SEND_TO_ADDRESS));
                 sendingToAccount = false;
             }
 
@@ -168,9 +168,9 @@ public class MakeTransactionFragment extends Fragment {
                 error = (Exception) savedState.getSerializable(ERROR);
                 transactionBroadcast = savedState.getBoolean(TRANSACTION_BROADCAST);
                 exchangeEntry = (ExchangeEntry) savedState.getSerializable(EXCHANGE_ENTRY);
-                tradeDepositAddress = (Address) savedState.getSerializable(DEPOSIT_ADDRESS);
+                tradeDepositAddress = (AbstractAddress) savedState.getSerializable(DEPOSIT_ADDRESS);
                 tradeDepositAmount = (Value) savedState.getSerializable(DEPOSIT_AMOUNT);
-                tradeWithdrawAddress = (Address) savedState.getSerializable(WITHDRAW_ADDRESS);
+                tradeWithdrawAddress = (AbstractAddress) savedState.getSerializable(WITHDRAW_ADDRESS);
                 tradeWithdrawAmount = (Value) savedState.getSerializable(WITHDRAW_AMOUNT);
             }
 
@@ -270,7 +270,7 @@ public class MakeTransactionFragment extends Fragment {
     }
 
     boolean isExchangeNeeded() {
-        return !sourceAccount.getCoinType().equals(sendToAddress.getParameters());
+        return !sourceAccount.getCoinType().equals(sendToAddress.getType());
     }
 
     private void maybeStartCreateTransaction() {
@@ -280,7 +280,7 @@ public class MakeTransactionFragment extends Fragment {
         }
     }
 
-    private SendRequest generateSendRequest(Address sendTo, boolean emptyWallet,
+    private SendRequest generateSendRequest(AbstractAddress sendTo, boolean emptyWallet,
                                             @Nullable Value amount, @Nullable TxMessage txMessage)
             throws WalletAccount.WalletAccountException {
 
@@ -426,7 +426,7 @@ public class MakeTransactionFragment extends Fragment {
      * Note: do not call this from the main thread!
      */
     @Nullable
-    private static ShapeShiftTime getTimeLeftSync(ShapeShift shapeShift, Address address) {
+    private static ShapeShiftTime getTimeLeftSync(ShapeShift shapeShift, AbstractAddress address) {
         // Try 3 times
         for (int tries = 1; tries <= 3; tries++) {
             try {
@@ -539,13 +539,13 @@ public class MakeTransactionFragment extends Fragment {
                 if (isExchangeNeeded()) {
 
                     ShapeShift shapeShift = application.getShapeShift();
-                    Address refundAddress =
+                    AbstractAddress refundAddress =
                             sourceAccount.getRefundAddress(config.isManualAddressManagement());
 
                     // If emptying wallet or the amount is the same type as the source account
                     if (isSendingFromSourceAccount()) {
                         ShapeShiftMarketInfo marketInfo = shapeShift.getMarketInfo(
-                                sourceType, (CoinType) sendToAddress.getParameters());
+                                sourceType, sendToAddress.getType());
 
                         // If no values set, make the call
                         if (tradeDepositAddress == null || tradeDepositAmount == null ||

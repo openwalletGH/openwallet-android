@@ -5,7 +5,7 @@ import com.coinomi.core.coins.families.BitFamily;
 /**
  * @author John L. Jegutanis
  */
-public class VertcoinMain extends CoinType {
+public class VertcoinMain extends BitFamily {
     private VertcoinMain() {
         id = "vertcoin.main";
 
@@ -14,7 +14,6 @@ public class VertcoinMain extends CoinType {
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 100;
 
-        family = BitFamily.get();
         name = "Vertcoin";
         symbol = "VTC";
         uriScheme = "vertcoin";
@@ -28,7 +27,7 @@ public class VertcoinMain extends CoinType {
     }
 
     private static VertcoinMain instance = new VertcoinMain();
-    public static synchronized VertcoinMain get() {
+    public static synchronized CoinType get() {
         return instance;
     }
 }

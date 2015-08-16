@@ -2,7 +2,6 @@ package com.coinomi.core.wallet;
 
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
-import com.coinomi.core.coins.ValueType;
 import com.coinomi.core.network.AddressStatus;
 import com.coinomi.core.network.BlockHeader;
 import com.coinomi.core.network.ServerClient;
@@ -13,7 +12,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
-import org.bitcoinj.core.Address;
 import org.bitcoinj.core.ScriptException;
 import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.Transaction;
@@ -60,11 +58,11 @@ abstract public class TransactionWatcherWallet extends AbstractWallet { //implem
     // different status for a particular address this means that there are new transactions for that
     // address and we have to fetch them. The status String could be null when an address is unused.
     @VisibleForTesting
-    final HashMap<Address, String> addressesStatus;
+    final HashMap<AbstractAddress, String> addressesStatus;
 
-    @VisibleForTesting final transient ArrayList<Address> addressesSubscribed;
-    @VisibleForTesting final transient ArrayList<Address> addressesPendingSubscription;
-    @VisibleForTesting final transient HashMap<Address, AddressStatus> statusPendingUpdates;
+    @VisibleForTesting final transient ArrayList<AbstractAddress> addressesSubscribed;
+    @VisibleForTesting final transient ArrayList<AbstractAddress> addressesPendingSubscription;
+    @VisibleForTesting final transient HashMap<AbstractAddress, AddressStatus> statusPendingUpdates;
     @VisibleForTesting final transient HashSet<Sha256Hash> fetchingTransactions;
 
     // The various pools below give quick access to wallet-relevant transactions by the state they're in:
@@ -116,32 +114,17 @@ abstract public class TransactionWatcherWallet extends AbstractWallet { //implem
     // Constructor
     public TransactionWatcherWallet(CoinType coinType, String id) {
         super(coinType, id);
-        addressesStatus = new HashMap<Address, String>();
-        addressesSubscribed = new ArrayList<Address>();
-        addressesPendingSubscription = new ArrayList<Address>();
-        statusPendingUpdates = new HashMap<Address, AddressStatus>();
-        fetchingTransactions = new HashSet<Sha256Hash>();
-        unspent = new HashMap<Sha256Hash, Transaction>();
-        spent = new HashMap<Sha256Hash, Transaction>();
-        pending = new HashMap<Sha256Hash, Transaction>();
-        dead = new HashMap<Sha256Hash, Transaction>();
-        transactions = new HashMap<Sha256Hash, Transaction>();
-        listeners = new CopyOnWriteArrayList<ListenerRegistration<WalletAccountEventListener>>();
-    }
-
-    @Override
-    public boolean isType(WalletAccount other) {
-        return other != null && type.equals(other.getCoinType());
-    }
-
-    @Override
-    public boolean isType(ValueType otherType) {
-        return otherType != null && type.equals(otherType);
-    }
-
-    @Override
-    public boolean isType(Address address) {
-        return address != null && type.equals(address.getParameters());
+        addressesStatus = new HashMap<>();
+        addressesSubscribed = new ArrayList<>();
+        addressesPendingSubscription = new ArrayList<>();
+        statusPendingUpdates = new HashMap<>();
+        fetchingTransactions = new HashSet<>();
+        unspent = new HashMap<>();
+        spent = new HashMap<>();
+        pending = new HashMap<>();
+        dead = new HashMap<>();
+        transactions = new HashMap<>();
+        listeners = new CopyOnWriteArrayList<>();
     }
 
     @Override
@@ -215,8 +198,6 @@ abstract public class TransactionWatcherWallet extends AbstractWallet { //implem
 
     /**
      * Just adds the transaction to a pool without doing anything else
-     * @param pool
-     * @param tx
      */
     private void simpleAddTransaction(WalletTransaction.Pool pool, Transaction tx) {
         lock.lock();
@@ -346,7 +327,7 @@ abstract public class TransactionWatcherWallet extends AbstractWallet { //implem
     public HashMap<Sha256Hash, Transaction> getTransactions(HashSet<Sha256Hash> hashes) {
         lock.lock();
         try {
-            HashMap<Sha256Hash, Transaction> txs = new HashMap<Sha256Hash, Transaction>();
+            HashMap<Sha256Hash, Transaction> txs = new HashMap<>();
             for (Sha256Hash hash : hashes) {
                 if (transactions.containsKey(hash)) {
                     txs.put(hash, transactions.get(hash));
@@ -508,10 +489,11 @@ abstract public class TransactionWatcherWallet extends AbstractWallet { //implem
         try {
             // If current address is updating
             if (statusPendingUpdates.containsKey(status.getAddress())) {
-                AddressStatus updatingStatus = statusPendingUpdates.get(status.getAddress());
+                AddressStatus updatingAddressStatus = statusPendingUpdates.get(status.getAddress());
+                String updatingStatus = updatingAddressStatus.getStatus();
 
                 // If the same status is updating, don't update again
-                if (updatingStatus.getStatus().equals(status.getStatus())) {
+                if (updatingStatus != null && updatingStatus.equals(status.getStatus())) {
                     return false;
                 } else { // Status is newer, so replace the updating status
                     statusPendingUpdates.put(status.getAddress(), status);
@@ -548,7 +530,7 @@ abstract public class TransactionWatcherWallet extends AbstractWallet { //implem
     private boolean isAddressStatusChanged(AddressStatus addressStatus) {
         lock.lock();
         try {
-            Address address = addressStatus.getAddress();
+            AbstractAddress address = addressStatus.getAddress();
             String newStatus = addressStatus.getStatus();
             if (addressesStatus.containsKey(address)) {
                 String previousStatus = addressesStatus.get(address);
@@ -575,7 +557,7 @@ abstract public class TransactionWatcherWallet extends AbstractWallet { //implem
     }
 
     @Nullable
-    public AddressStatus getAddressStatus(Address address) {
+    public AddressStatus getAddressStatus(AbstractAddress address) {
         lock.lock();
         try {
             if (addressesStatus.containsKey(address)) {
@@ -594,7 +576,7 @@ abstract public class TransactionWatcherWallet extends AbstractWallet { //implem
         lock.lock();
         try {
             ArrayList<AddressStatus> statuses = new ArrayList<AddressStatus>(addressesStatus.size());
-            for (Map.Entry<Address, String> status : addressesStatus.entrySet()) {
+            for (Map.Entry<AbstractAddress, String> status : addressesStatus.entrySet()) {
                 statuses.add(new AddressStatus(status.getKey(), status.getValue()));
             }
             return statuses;
@@ -607,9 +589,9 @@ abstract public class TransactionWatcherWallet extends AbstractWallet { //implem
     /**
      * Returns all the addresses that are not currently watched
      */
-    @VisibleForTesting List<Address> getAddressesToWatch() {
-        ImmutableList.Builder<Address> addressesToWatch = ImmutableList.builder();
-        for (Address address : getActiveAddresses()) {
+    @VisibleForTesting List<AbstractAddress> getAddressesToWatch() {
+        ImmutableList.Builder<AbstractAddress> addressesToWatch = ImmutableList.builder();
+        for (AbstractAddress address : getActiveAddresses()) {
             // If address not already subscribed or pending subscription
             if (!addressesSubscribed.contains(address) && !addressesPendingSubscription.contains(address)) {
                 addressesToWatch.add(address);
@@ -618,7 +600,7 @@ abstract public class TransactionWatcherWallet extends AbstractWallet { //implem
         return addressesToWatch.build();
     }
 
-    private void confirmAddressSubscription(Address address) {
+    private void confirmAddressSubscription(AbstractAddress address) {
         lock.lock();
         try {
             if (addressesPendingSubscription.contains(address)) {
@@ -973,7 +955,7 @@ abstract public class TransactionWatcherWallet extends AbstractWallet { //implem
         lock.lock();
         try {
             if (blockchainConnection != null) {
-                List<Address> addressesToWatch = getAddressesToWatch();
+                List<AbstractAddress> addressesToWatch = getAddressesToWatch();
                 if (addressesToWatch.size() > 0) {
                     addressesPendingSubscription.addAll(addressesToWatch);
                     blockchainConnection.subscribeToAddresses(addressesToWatch, this);
@@ -1143,19 +1125,6 @@ abstract public class TransactionWatcherWallet extends AbstractWallet { //implem
 
     public boolean isConnected() {
         return blockchainConnection != null;
-    }
-
-    public WalletPocketConnectivity getConnectivityStatus() {
-        if (!isConnected()) {
-            return WalletPocketConnectivity.DISCONNECTED;
-        } else {
-            if (isLoading()) {
-                // TODO support LOADING state, for now is just CONNECTED
-                return WalletPocketConnectivity.CONNECTED;
-            } else {
-                return WalletPocketConnectivity.CONNECTED;
-            }
-        }
     }
 
     @Override

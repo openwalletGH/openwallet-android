@@ -3,26 +3,24 @@ package com.coinomi.core.exchange.shapeshift.data;
 import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
+import com.coinomi.core.exceptions.AddressMalformedException;
+import com.coinomi.core.wallet.AbstractAddress;
 
-import org.bitcoinj.core.Address;
-import org.bitcoinj.core.AddressFormatException;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.math.RoundingMode;
 
 /**
  * @author John L. Jegutanis
  */
 public class ShapeShiftTxStatus extends ShapeShiftBase {
     public final Status status;
-    public final Address address;
-    public final Address withdraw;
+    public final AbstractAddress address;
+    public final AbstractAddress withdraw;
     public final Value incomingValue;
     public final Value outgoingValue;
     public final String transactionId;
 
-    public static enum Status {
+    public enum Status {
         NO_DEPOSITS, RECEIVED, COMPLETE, FAILED, UNKNOWN
     }
 
@@ -47,7 +45,7 @@ public class ShapeShiftTxStatus extends ShapeShiftBase {
                     case "received":
                         status = Status.RECEIVED;
                         inType = CoinID.typeFromSymbol(data.getString("incomingType"));
-                        address = new Address(inType, data.getString("address"));
+                        address = inType.newAddress(data.getString("address"));
                         withdraw = null;
                         incomingValue = parseValueRound(inType, data.getString("incomingCoin"));
                         outgoingValue = null;
@@ -57,8 +55,8 @@ public class ShapeShiftTxStatus extends ShapeShiftBase {
                         status = Status.COMPLETE;
                         inType = CoinID.typeFromSymbol(data.getString("incomingType"));
                         outType = CoinID.typeFromSymbol(data.getString("outgoingType"));
-                        address = new Address(inType, data.getString("address"));
-                        withdraw = new Address(outType, data.getString("withdraw"));
+                        address = inType.newAddress(data.getString("address"));
+                        withdraw = outType.newAddress(data.getString("withdraw"));
                         incomingValue = parseValueRound(inType, data.getString("incomingCoin"));
                         outgoingValue = parseValueRound(outType, data.getString("outgoingCoin"));
                         transactionId = data.getString("transaction");
@@ -81,7 +79,7 @@ public class ShapeShiftTxStatus extends ShapeShiftBase {
                 }
             } catch (JSONException e) {
                 throw new ShapeShiftException("Could not parse object", e);
-            } catch (AddressFormatException e) {
+            } catch (AddressMalformedException e) {
                 throw new ShapeShiftException("Could not parse address", e);
             }
         } else {
@@ -96,7 +94,7 @@ public class ShapeShiftTxStatus extends ShapeShiftBase {
         }
     }
 
-    public ShapeShiftTxStatus(ShapeShiftTxStatus reply, Address address) {
+    public ShapeShiftTxStatus(ShapeShiftTxStatus reply, AbstractAddress address) {
         super(reply.errorMessage);
         status = reply.status;
         this.address = address;
@@ -106,7 +104,7 @@ public class ShapeShiftTxStatus extends ShapeShiftBase {
         transactionId = reply.transactionId;
     }
 
-    public ShapeShiftTxStatus(Status status, Address address, Address withdraw,
+    public ShapeShiftTxStatus(Status status, AbstractAddress address, AbstractAddress withdraw,
                               Value incomingValue, Value outgoingValue, String transactionId) {
         super((String) null);
         this.status = status;

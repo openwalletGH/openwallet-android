@@ -6,7 +6,6 @@ import com.coinomi.core.coins.ValueType;
 import com.coinomi.core.network.interfaces.ConnectionEventListener;
 import com.coinomi.core.network.interfaces.TransactionEventListener;
 
-import org.bitcoinj.core.Address;
 import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.TransactionBag;
@@ -45,6 +44,7 @@ public interface WalletAccount extends TransactionBag, KeyBag, TransactionEventL
     void refresh();
 
     boolean isConnected();
+    boolean isLoading();
     WalletPocketConnectivity getConnectivityStatus();
 
     /**
@@ -65,32 +65,22 @@ public interface WalletAccount extends TransactionBag, KeyBag, TransactionEventL
     AbstractAddress getRefundAddress();
 
     /**
-     * Returns the address used for change outputs. Note: this will probably go away in future.
+     * Returns true if this wallet has previously used addresses
      */
-    @Deprecated
-    Address getChangeBitAddress();
+    boolean hasUsedAddresses();
 
     /**
-     * Get current receive address, does not mark it as used.
+     * Returns true if this wallet can create new addresses
      */
-    @Deprecated
-    Address getReceiveBitAddress();
-
-    /**
-     * Get current refund address, does not mark it as used.
-     *
-     * Notice: This address could be the same as the current receive address
-     */
-    @Deprecated
-    Address getRefundBitAddress();
+    boolean canCreateNewAddresses();
 
     Transaction getTransaction(String transactionId);
     Map<Sha256Hash, Transaction> getUnspentTransactions();
     Map<Sha256Hash, Transaction> getPendingTransactions();
     Map<Sha256Hash, Transaction> getTransactions();
 
-    List<Address> getActiveAddresses();
-    void markAddressAsUsed(Address address);
+    List<AbstractAddress> getActiveAddresses();
+    void markAddressAsUsed(AbstractAddress address);
 
     void setWallet(Wallet wallet);
 
@@ -113,11 +103,9 @@ public interface WalletAccount extends TransactionBag, KeyBag, TransactionEventL
 
     boolean isType(WalletAccount other);
     boolean isType(ValueType type);
-    boolean isType(Address address);
+    boolean isType(AbstractAddress address);
 
-    boolean isAddressMine(Address address);
-
-    boolean isLoading();
+    boolean isAddressMine(AbstractAddress address);
 
     void maybeInitializeAllKeys();
 

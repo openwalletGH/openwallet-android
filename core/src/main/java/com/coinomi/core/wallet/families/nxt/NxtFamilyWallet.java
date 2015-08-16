@@ -1,15 +1,8 @@
 package com.coinomi.core.wallet.families.nxt;
 
-import com.coinomi.core.Preconditions;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
-import com.coinomi.core.coins.ValueType;
-import com.coinomi.core.coins.nxt.Appendix;
-import com.coinomi.core.coins.nxt.Attachment;
-import com.coinomi.core.coins.nxt.Convert;
 import com.coinomi.core.coins.nxt.NxtException;
-import com.coinomi.core.coins.nxt.Transaction;
-import com.coinomi.core.coins.nxt.TransactionImpl;
 import com.coinomi.core.network.AddressStatus;
 import com.coinomi.core.network.BlockHeader;
 import com.coinomi.core.network.ServerClient;
@@ -23,11 +16,9 @@ import com.coinomi.core.wallet.SignedMessage;
 import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.core.wallet.WalletAccountEventListener;
-import com.coinomi.core.wallet.WalletPocketConnectivity;
+import com.google.common.collect.ImmutableList;
 
-import org.bitcoinj.core.Address;
 import org.bitcoinj.core.ECKey;
-import org.bitcoinj.core.InsufficientMoneyException;
 import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.crypto.DeterministicKey;
 import org.bitcoinj.crypto.KeyCrypter;
@@ -38,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.crypto.params.KeyParameter;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
@@ -56,10 +48,11 @@ final public class NxtFamilyWallet extends AbstractWallet {
 
     NxtFamilyKey rootKey;
     private final NxtFamilyAddress address;
-    // Wallet that this account belongs
-    @Nullable private transient Wallet wallet = null;
+    private Value balance;
     private int lastEcBlockHeight;
     private long lastEcBlockId;
+    // Wallet that this account belongs
+    @Nullable private transient Wallet wallet = null;
 
     public NxtFamilyWallet(DeterministicKey entropy, CoinType type) {
         this(entropy, type, null, null);
@@ -78,6 +71,7 @@ final public class NxtFamilyWallet extends AbstractWallet {
         super(type, id);
         rootKey = key;
         address = new NxtFamilyAddress(type, key.getPublicKey());
+        balance = type.value(0);
     }
 
     @Override
@@ -93,6 +87,22 @@ final public class NxtFamilyWallet extends AbstractWallet {
     @Override
     public String getPrivateKeyMnemonic() {
         return rootKey.getPrivateKeyMnemonic();
+    }
+
+    public int getLastEcBlockHeight() {
+        return lastEcBlockHeight;
+    }
+
+    public void setLastEcBlockHeight(int lastEcBlockHeight) {
+        this.lastEcBlockHeight = lastEcBlockHeight;
+    }
+
+    public long getLastEcBlockId() {
+        return lastEcBlockId;
+    }
+
+    public void setLastEcBlockId(long lastEcBlockId) {
+        this.lastEcBlockId = lastEcBlockId;
     }
 
     @Override
@@ -146,12 +156,13 @@ final public class NxtFamilyWallet extends AbstractWallet {
 
     @Override
     public boolean isNew() {
-        throw new RuntimeException("Not implemented");
+        // TODO implement, how can we check if this account is new?
+        return true;
     }
 
     @Override
     public Value getBalance() {
-        throw new RuntimeException("Not implemented");
+        return balance;
     }
 
     @Override
@@ -161,17 +172,19 @@ final public class NxtFamilyWallet extends AbstractWallet {
 
     @Override
     public boolean isConnected() {
-        throw new RuntimeException("Not implemented");
+//        TODO implement
+        return false;
     }
 
     @Override
-    public WalletPocketConnectivity getConnectivityStatus() {
-        throw new RuntimeException("Not implemented");
+    public boolean isLoading() {
+//        TODO implement
+        return false;
     }
 
     @Override
     public AbstractAddress getChangeAddress() {
-        throw new RuntimeException("Not implemented");
+        return address;
     }
 
     @Override
@@ -181,22 +194,17 @@ final public class NxtFamilyWallet extends AbstractWallet {
 
     @Override
     public AbstractAddress getRefundAddress() {
-        throw new RuntimeException("Not implemented");
+        return address;
     }
 
     @Override
-    public Address getChangeBitAddress() {
-        throw new RuntimeException("Not implemented");
+    public boolean hasUsedAddresses() {
+        return false;
     }
 
     @Override
-    public Address getReceiveBitAddress() {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public Address getRefundBitAddress() {
-        throw new RuntimeException("Not implemented");
+    public boolean canCreateNewAddresses() {
+        return false;
     }
 
     @Override
@@ -216,18 +224,16 @@ final public class NxtFamilyWallet extends AbstractWallet {
 
     @Override
     public Map<Sha256Hash, org.bitcoinj.core.Transaction> getTransactions() {
-        throw new RuntimeException("Not implemented");
+        return new HashMap<>(); // TODO implement with Abstract Transactions
     }
 
     @Override
-    public List<Address> getActiveAddresses() {
-        throw new RuntimeException("Not implemented");
+    public List<AbstractAddress> getActiveAddresses() {
+        return ImmutableList.of((AbstractAddress) address);
     }
 
     @Override
-    public void markAddressAsUsed(Address address) {
-        throw new RuntimeException("Not implemented");
-    }
+    public void markAddressAsUsed(AbstractAddress address) { /* does not apply */ }
 
     @Override
     public void setWallet(Wallet wallet) {
@@ -357,50 +363,25 @@ final public class NxtFamilyWallet extends AbstractWallet {
     //
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-    @Override
-    public boolean equals(WalletAccount otherAccount) {
-        throw new RuntimeException("Not implemented");
-    }
-
     @Override
     public void addEventListener(WalletAccountEventListener listener) {
-        throw new RuntimeException("Not implemented");
+        // TODO implement
     }
 
     @Override
     public void addEventListener(WalletAccountEventListener listener, Executor executor) {
-        throw new RuntimeException("Not implemented");
+        // TODO implement
     }
 
     @Override
     public boolean removeEventListener(WalletAccountEventListener listener) {
-        throw new RuntimeException("Not implemented");
+        // TODO implement
+        return false;
     }
 
     @Override
-    public boolean isType(WalletAccount other) {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public boolean isType(ValueType type) {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public boolean isType(Address address) {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public boolean isAddressMine(Address address) {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public boolean isLoading() {
-        throw new RuntimeException("Not implemented");
+    public boolean isAddressMine(AbstractAddress address) {
+        return false;
     }
 
     @Override
@@ -487,21 +468,5 @@ final public class NxtFamilyWallet extends AbstractWallet {
     @Override
     public void onTransactionBroadcastError(org.bitcoinj.core.Transaction tx) {
         throw new RuntimeException("Not implemented");
-    }
-
-    public int getLastEcBlockHeight() {
-        return lastEcBlockHeight;
-    }
-
-    public void setLastEcBlockHeight(int lastEcBlockHeight) {
-        this.lastEcBlockHeight = lastEcBlockHeight;
-    }
-
-    public long getLastEcBlockId() {
-        return lastEcBlockId;
-    }
-
-    public void setLastEcBlockId(long lastEcBlockId) {
-        this.lastEcBlockId = lastEcBlockId;
     }
 }

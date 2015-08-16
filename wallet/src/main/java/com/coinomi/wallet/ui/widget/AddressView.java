@@ -10,13 +10,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.util.GenericUtils;
+import com.coinomi.core.wallet.AbstractAddress;
 import com.coinomi.wallet.AddressBookProvider;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.util.WalletUtils;
-
-import org.bitcoinj.core.Address;
 
 /**
  * @author John L. Jegutanis
@@ -28,7 +26,7 @@ public class AddressView extends LinearLayout {
 
     private boolean isMultiLine;
     private boolean isIconShown;
-    private Address address;
+    private AbstractAddress address;
 
     public AddressView(Context context) {
         super(context);
@@ -58,7 +56,7 @@ public class AddressView extends LinearLayout {
         addressView = (TextView) findViewById(R.id.address);
     }
 
-    public void setAddressAndLabel(Address address) {
+    public void setAddressAndLabel(AbstractAddress address) {
         this.address = address;
         updateView();
     }
@@ -79,23 +77,23 @@ public class AddressView extends LinearLayout {
             addressLabelView.setText(label);
             addressLabelView.setTypeface(Typeface.DEFAULT);
             addressView.setText(
-                    GenericUtils.addressSplitToGroups(address.toString()));
+                    GenericUtils.addressSplitToGroups(address));
             addressView.setVisibility(View.VISIBLE);
         } else {
             if (isMultiLine) {
                 addressLabelView.setText(
-                        GenericUtils.addressSplitToGroupsMultiline(address.toString()));
+                        GenericUtils.addressSplitToGroupsMultiline(address));
             } else {
                 addressLabelView.setText(
-                        GenericUtils.addressSplitToGroups(address.toString()));
+                        GenericUtils.addressSplitToGroups(address));
             }
             addressLabelView.setTypeface(Typeface.MONOSPACE);
             addressView.setVisibility(View.GONE);
         }
         if (isIconShown) {
             iconView.setVisibility(VISIBLE);
-            iconView.setContentDescription(((CoinType) address.getParameters()).getName());
-            iconView.setImageResource(WalletUtils.getIconRes((CoinType) address.getParameters()));
+            iconView.setContentDescription((address.getType()).getName());
+            iconView.setImageResource(WalletUtils.getIconRes(address.getType()));
         } else {
             iconView.setVisibility(GONE);
         }

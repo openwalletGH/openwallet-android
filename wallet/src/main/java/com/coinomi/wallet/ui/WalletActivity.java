@@ -21,9 +21,11 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.exceptions.AddressMalformedException;
 import com.coinomi.core.uri.CoinURI;
 import com.coinomi.core.uri.CoinURIParseException;
 import com.coinomi.core.util.GenericUtils;
+import com.coinomi.core.wallet.AbstractAddress;
 import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
@@ -34,8 +36,6 @@ import com.coinomi.wallet.util.Keyboard;
 import com.coinomi.wallet.util.SystemUtils;
 import com.coinomi.wallet.util.WeakHandler;
 
-import org.bitcoinj.core.Address;
-import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -352,7 +352,7 @@ final public class WalletActivity extends BaseWalletActivity implements
         Toast.makeText(this, error, Toast.LENGTH_LONG).show();
     }
 
-    private void processInput(String input) throws CoinURIParseException, AddressFormatException {
+    private void processInput(String input) throws CoinURIParseException, AddressMalformedException {
         input = input.trim();
         try {
             processUri(input);
@@ -381,23 +381,23 @@ final public class WalletActivity extends BaseWalletActivity implements
         }
     }
 
-    private void processAddress(String addressStr) throws AddressFormatException, CoinURIParseException {
+    private void processAddress(String addressStr) throws CoinURIParseException, AddressMalformedException {
         List<CoinType> possibleTypes = GenericUtils.getPossibleTypes(addressStr);
         WalletAccount currentAccount = getAccount(currentAccountId);
 
         if (currentAccount != null && possibleTypes.contains(currentAccount.getCoinType())) {
-            Address address = new Address(currentAccount.getCoinType(), addressStr);
+            AbstractAddress address = currentAccount.getCoinType().newAddress(addressStr);
             processUri(CoinURI.convertToCoinURI(address, null, null, null));
         } else if (possibleTypes.size() == 1) {
-            Address address = new Address(possibleTypes.get(0), addressStr);
+            AbstractAddress address = possibleTypes.get(0).newAddress(addressStr);
             processUri(CoinURI.convertToCoinURI(address, null, null, null));
         } else {
             // This address string could be more that one coin type so first check if this address
             // comes from an account to determine the type.
             List<WalletAccount> possibleAccounts = getAccounts(possibleTypes);
-            Address addressOfAccount = null;
+            AbstractAddress addressOfAccount = null;
             for (WalletAccount account : possibleAccounts) {
-                Address testAddress = new Address(account.getCoinType(), addressStr);
+                AbstractAddress testAddress = account.getCoinType().newAddress(addressStr);
                 if (account.isAddressMine(testAddress)) {
                     addressOfAccount = testAddress;
                     break;
@@ -424,7 +424,7 @@ final public class WalletActivity extends BaseWalletActivity implements
     SelectCoinTypeDialog selectCoinTypeDialog = new SelectCoinTypeDialog() {
         // FIXME crash when this dialog being restored from saved state
         @Override
-        public void onAddressSelected(Address selectedAddress) {
+        public void onAddressSelected(AbstractAddress selectedAddress) {
             try {
                 processUri(CoinURI.convertToCoinURI(selectedAddress, null, null, null));
             } catch (CoinURIParseException e) {

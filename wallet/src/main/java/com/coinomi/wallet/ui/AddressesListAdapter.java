@@ -28,13 +28,12 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.coinomi.core.util.GenericUtils;
+import com.coinomi.core.wallet.AbstractAddress;
 import com.coinomi.core.wallet.AbstractWallet;
 import com.coinomi.wallet.AddressBookProvider;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.util.Fonts;
 import com.coinomi.wallet.util.WalletUtils;
-
-import org.bitcoinj.core.Address;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -56,10 +55,10 @@ public class AddressesListAdapter extends BaseAdapter {
     private final Resources res;
 
     private final AbstractWallet pocket;
-    private final List<Address> addresses = new ArrayList<Address>();
-    private final Set<Address> usedAddresses = new HashSet<Address>();
+    private final List<AbstractAddress> addresses = new ArrayList<>();
+    private final Set<AbstractAddress> usedAddresses = new HashSet<>();
 
-    private final Map<String, String> labelCache = new HashMap<String, String>();
+    private final Map<AbstractAddress, String> labelCache = new HashMap<>();
     private final static Object CACHE_NULL_MARKER = "";
 
     public AddressesListAdapter(final Context context, @Nonnull final AbstractWallet walletPocket) {
@@ -77,7 +76,8 @@ public class AddressesListAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
-    public void replace(@Nonnull final Collection<Address> addresses, Set<Address> usedAddresses) {
+    public void replace(@Nonnull final Collection<AbstractAddress> addresses,
+                        Set<AbstractAddress> usedAddresses) {
         this.addresses.clear();
         this.addresses.addAll(addresses);
         this.usedAddresses.clear();
@@ -97,7 +97,7 @@ public class AddressesListAdapter extends BaseAdapter {
     }
 
     @Override
-    public Address getItem(final int position) {
+    public AbstractAddress getItem(final int position) {
         if (position == addresses.size()) {
             return null;
         }
@@ -111,7 +111,7 @@ public class AddressesListAdapter extends BaseAdapter {
             return 0;
         }
 
-        return WalletUtils.longHash(addresses.get(position).getHash160());
+        return addresses.get(position).getId();
     }
 
     @Override
@@ -125,24 +125,24 @@ public class AddressesListAdapter extends BaseAdapter {
             row = inflater.inflate(R.layout.address_row, null);
         }
 
-        final Address address = getItem(position);
+        final AbstractAddress address = getItem(position);
         bindView(row, address);
 
         return row;
     }
 
-    public void bindView(@Nonnull final View row, @Nonnull final Address address) {
+    public void bindView(@Nonnull final View row, @Nonnull final AbstractAddress address) {
         TextView addressLabel = (TextView) row.findViewById(R.id.address_row_label);
         TextView addressRaw = (TextView) row.findViewById(R.id.address_row_address);
 
-        String label = resolveLabel(address.toString());
+        String label = resolveLabel(address);
 
         if (label != null) {
             addressLabel.setText(label);
             addressLabel.setTypeface(Typeface.DEFAULT);
-            addressRaw.setText(GenericUtils.addressSplitToGroups(address.toString()));
+            addressRaw.setText(GenericUtils.addressSplitToGroups(address));
         } else {
-            addressLabel.setText(GenericUtils.addressSplitToGroups(address.toString()));
+            addressLabel.setText(GenericUtils.addressSplitToGroups(address));
             addressLabel.setTypeface(Typeface.MONOSPACE);
             addressRaw.setVisibility(View.GONE);
         }
@@ -162,10 +162,10 @@ public class AddressesListAdapter extends BaseAdapter {
         }
     }
 
-    private String resolveLabel(@Nonnull final String address) {
+    private String resolveLabel(@Nonnull final AbstractAddress address) {
         final String cachedLabel = labelCache.get(address);
         if (cachedLabel == null) {
-            final String label = AddressBookProvider.resolveLabel(context, pocket.getCoinType(), address);
+            final String label = AddressBookProvider.resolveLabel(context, address);
             if (label != null) {
                 labelCache.put(address, label);
             } else {

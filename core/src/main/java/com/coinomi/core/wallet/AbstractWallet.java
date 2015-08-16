@@ -1,8 +1,9 @@
 package com.coinomi.core.wallet;
 
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.coins.ValueType;
+import com.coinomi.core.util.TypeUtils;
 
-import org.bitcoinj.core.InsufficientMoneyException;
 import org.bitcoinj.utils.Threading;
 
 import java.util.concurrent.locks.ReentrantLock;
@@ -10,7 +11,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * @author John L. Jegutanis
  */
-public abstract class AbstractWallet implements WalletAccount { //extends TransactionWatcherWallet {
+public abstract class AbstractWallet implements WalletAccount {
     protected final String id;
     protected String description;
     protected final CoinType type;
@@ -58,5 +59,40 @@ public abstract class AbstractWallet implements WalletAccount { //extends Transa
         } else {
             completeTransaction(request);
         }
+    }
+
+    @Override
+    public boolean isType(WalletAccount other) {
+        return TypeUtils.is(type, other);
+    }
+
+    @Override
+    public boolean isType(ValueType otherType) {
+        return TypeUtils.is(type, otherType);
+    }
+
+    @Override
+    public boolean isType(AbstractAddress address) {
+        return TypeUtils.is(type, address);
+    }
+
+    public WalletPocketConnectivity getConnectivityStatus() {
+        if (!isConnected()) {
+            return WalletPocketConnectivity.DISCONNECTED;
+        } else {
+            if (isLoading()) {
+                // TODO support LOADING state, for now is just CONNECTED
+                return WalletPocketConnectivity.CONNECTED;
+            } else {
+                return WalletPocketConnectivity.CONNECTED;
+            }
+        }
+    }
+
+    @Override
+    public boolean equals(WalletAccount other) {
+        return other != null &&
+                getId().equals(other.getId()) &&
+                getCoinType().equals(other.getCoinType());
     }
 }

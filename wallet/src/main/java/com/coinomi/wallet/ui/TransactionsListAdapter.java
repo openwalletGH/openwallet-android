@@ -18,14 +18,6 @@ package com.coinomi.wallet.ui;
  */
 
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Nonnull;
-
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -38,11 +30,10 @@ import android.widget.TextView;
 
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
-import com.coinomi.core.coins.VpncoinMain;
 import com.coinomi.core.messages.MessageFactory;
 import com.coinomi.core.util.GenericUtils;
+import com.coinomi.core.wallet.AbstractAddress;
 import com.coinomi.core.wallet.AbstractWallet;
-import com.coinomi.core.wallet.families.vpncoin.VpncoinTxMessage;
 import com.coinomi.wallet.AddressBookProvider;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.ui.widget.CurrencyTextView;
@@ -50,11 +41,18 @@ import com.coinomi.wallet.util.Fonts;
 import com.coinomi.wallet.util.WalletUtils;
 
 import org.acra.ACRA;
-import org.bitcoinj.core.Address;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.TransactionConfidence;
 import org.bitcoinj.core.TransactionConfidence.ConfidenceType;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Nonnull;
 
 /**
  * @author Andreas Schildbach
@@ -82,7 +80,7 @@ public class TransactionsListAdapter extends BaseAdapter {
     private final String receivedWithTitle;
     private final String fontIconReceivedWith;
 
-    private final Map<String, String> labelCache = new HashMap<String, String>();
+    private final Map<AbstractAddress, String> labelCache = new HashMap<>();
     private final static Object CACHE_NULL_MARKER = "";
 
     private static final String CONFIDENCE_SYMBOL_DEAD = "\u271D"; // latin cross
@@ -288,23 +286,23 @@ public class TransactionsListAdapter extends BaseAdapter {
 //        rowDate.setText(time != null ? (DateUtils.getRelativeTimeSpanString(context, time.getTime())) : null);
 
         // address - label
-        final Address address;
+        final AbstractAddress address;
         final String label;
 
         if (sent) {
             // we send payment to those addresses
-            List<Address> sentTo = WalletUtils.getSendToAddress(tx, walletPocket);
+            List<AbstractAddress> sentTo = WalletUtils.getSendToAddress(tx, walletPocket);
             // For now show only the first address
             address = sentTo.size() == 0 ? null : sentTo.get(0);
         } else {
             // received with those addresses
-            List<Address> receivedWith = WalletUtils.getReceivedWithAddress(tx, walletPocket);
+            List<AbstractAddress> receivedWith = WalletUtils.getReceivedWithAddress(tx, walletPocket);
             // Should be one
             address = receivedWith.size() == 0 ? null : receivedWith.get(0);
         }
 
         if (address != null) {
-            label = resolveLabel(address.toString());
+            label = resolveLabel(address);
         } else {
             if (sent) {
                 // If no address found, assume it is an internal transfer
@@ -317,13 +315,13 @@ public class TransactionsListAdapter extends BaseAdapter {
         if (label != null) {
             rowLabel.setText(label);
             if (address != null) {
-                rowAddress.setText(GenericUtils.addressSplitToGroups(address.toString()));
+                rowAddress.setText(GenericUtils.addressSplitToGroups(address));
                 rowAddress.setVisibility(View.VISIBLE);
             } else {
                 rowAddress.setVisibility(View.GONE);
             }
         } else if (address != null) {
-            rowLabel.setText(GenericUtils.addressSplitToGroups(address.toString()));
+            rowLabel.setText(GenericUtils.addressSplitToGroups(address));
             rowAddress.setVisibility(View.GONE);
         } else {
             rowLabel.setText("???"); // should not happen
@@ -354,10 +352,10 @@ public class TransactionsListAdapter extends BaseAdapter {
         }
     }
 
-    private String resolveLabel(@Nonnull final String address) {
+    private String resolveLabel(@Nonnull final AbstractAddress address) {
         final String cachedLabel = labelCache.get(address);
         if (cachedLabel == null) {
-            final String label = AddressBookProvider.resolveLabel(context, walletPocket.getCoinType(), address);
+            final String label = AddressBookProvider.resolveLabel(context, address);
             if (label != null) {
                 labelCache.put(address, label);
             } else {

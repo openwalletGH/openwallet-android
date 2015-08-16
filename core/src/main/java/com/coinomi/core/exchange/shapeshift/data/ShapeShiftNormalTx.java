@@ -1,10 +1,9 @@
 package com.coinomi.core.exchange.shapeshift.data;
 
 import com.coinomi.core.coins.CoinID;
-import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.exchange.shapeshift.ShapeShift;
+import com.coinomi.core.wallet.AbstractAddress;
 
-import org.bitcoinj.core.Address;
 import org.json.JSONObject;
 
 /**
@@ -12,19 +11,18 @@ import org.json.JSONObject;
  */
 public class ShapeShiftNormalTx extends ShapeShiftBase {
     public final String pair;
-    public final Address deposit;
-    public final Address withdrawal;
+    public final AbstractAddress deposit;
+    public final AbstractAddress withdrawal;
 
     public ShapeShiftNormalTx(JSONObject data) throws ShapeShiftException {
         super(data);
         if (!isError) {
             try {
-                deposit = new Address(CoinID.typeFromSymbol(data.getString("depositType")),
-                        data.getString("deposit"));
-                withdrawal = new Address(CoinID.typeFromSymbol(data.getString("withdrawalType")),
-                        data.getString("withdrawal"));
-                pair = ShapeShift.getPair((CoinType)deposit.getParameters(),
-                        (CoinType)withdrawal.getParameters());
+                deposit = CoinID.typeFromSymbol(data.getString("depositType")).
+                        newAddress(data.getString("deposit"));
+                withdrawal = CoinID.typeFromSymbol(data.getString("withdrawalType")).
+                        newAddress(data.getString("withdrawal"));
+                pair = ShapeShift.getPair(deposit.getType(), withdrawal.getType());
             } catch (Exception e) {
                 throw new ShapeShiftException("Could not parse object", e);
             }

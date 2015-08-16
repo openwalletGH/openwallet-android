@@ -5,7 +5,7 @@ import com.coinomi.core.coins.families.BitFamily;
 /**
  * @author John L. Jegutanis
  */
-public class FeathercoinMain extends CoinType {
+public class FeathercoinMain extends BitFamily {
     private FeathercoinMain() {
         id = "feathercoin.main";
 
@@ -15,7 +15,6 @@ public class FeathercoinMain extends CoinType {
         spendableCoinbaseDepth = 100;
         dumpedPrivateKeyHeader = 142;
 
-        family = BitFamily.get();
         name = "Feathercoin";
         symbol = "FTC";
         uriScheme = "feathercoin";
@@ -29,7 +28,7 @@ public class FeathercoinMain extends CoinType {
     }
 
     private static FeathercoinMain instance = new FeathercoinMain();
-    public static synchronized FeathercoinMain get() {
+    public static synchronized CoinType get() {
         return instance;
     }
 }

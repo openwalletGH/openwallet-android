@@ -33,14 +33,13 @@ import android.widget.Toast;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.FiatType;
 import com.coinomi.core.coins.Value;
-import com.coinomi.core.coins.families.BitFamily;
+import com.coinomi.core.exceptions.Bip44KeyLookAheadExceededException;
 import com.coinomi.core.uri.CoinURI;
 import com.coinomi.core.util.ExchangeRate;
 import com.coinomi.core.util.GenericUtils;
-import com.coinomi.core.wallet.TransactionWatcherWallet;
+import com.coinomi.core.wallet.AbstractAddress;
 import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.core.wallet.WalletPocketHD;
-import com.coinomi.core.wallet.exceptions.Bip44KeyLookAheadExceededException;
 import com.coinomi.wallet.AddressBookProvider;
 import com.coinomi.wallet.Configuration;
 import com.coinomi.wallet.Constants;
@@ -50,11 +49,10 @@ import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.ui.widget.AmountEditView;
 import com.coinomi.wallet.util.LayoutUtils;
 import com.coinomi.wallet.util.Qr;
-import com.coinomi.wallet.util.UiUtils;
 import com.coinomi.wallet.util.ThrottlingWalletChangeListener;
+import com.coinomi.wallet.util.UiUtils;
 import com.coinomi.wallet.util.WeakHandler;
 
-import org.bitcoinj.core.Address;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,8 +73,8 @@ public class AddressRequestFragment extends Fragment {
     // Loader IDs
     private static final int ID_RATE_LOADER = 0;
 
-    @Nullable private Address showAddress;
-    private Address receiveAddress;
+    @Nullable private AbstractAddress showAddress;
+    private AbstractAddress receiveAddress;
     private Value amount;
     private String label;
     private String message;
@@ -131,7 +129,8 @@ public class AddressRequestFragment extends Fragment {
         return newInstance(accountId, null);
     }
 
-    public static AddressRequestFragment newInstance(String accountId, @Nullable Address showAddress) {
+    public static AddressRequestFragment newInstance(String accountId,
+                                                     @Nullable AbstractAddress showAddress) {
         Bundle args = new Bundle();
         args.putString(Constants.ARG_ACCOUNT_ID, accountId);
         if (showAddress != null) {
@@ -151,7 +150,7 @@ public class AddressRequestFragment extends Fragment {
         if (args != null) {
             accountId = args.getString(Constants.ARG_ACCOUNT_ID);
             if (args.containsKey(Constants.ARG_ADDRESS)) {
-                showAddress = (Address) args.getSerializable(Constants.ARG_ADDRESS);
+                showAddress = (AbstractAddress) args.getSerializable(Constants.ARG_ADDRESS);
             }
         }
         // TODO
@@ -269,6 +268,7 @@ public class AddressRequestFragment extends Fragment {
             } else {
                 inflater.inflate(R.menu.request_single_address, menu);
             }
+            menu.findItem(R.id.action_new_address).setVisible(pocket.canCreateNewAddresses());
         }
     }
 
@@ -285,7 +285,7 @@ public class AddressRequestFragment extends Fragment {
                 createNewAddressDialog.show(getFragmentManager(), null);
                 return true;
             case R.id.action_edit_label:
-                EditAddressBookEntryFragment.edit(getFragmentManager(), type, receiveAddress.toString());
+                EditAddressBookEntryFragment.edit(getFragmentManager(), type, receiveAddress);
                 return true;
             default:
                 // Not one of ours. Perform default menu processing
@@ -312,6 +312,7 @@ public class AddressRequestFragment extends Fragment {
                 }
             };
 
+            // Only WalletPocketHD can create new addresses
             if (pocket instanceof WalletPocketHD) {
                 final WalletPocketHD pocketHD = (WalletPocketHD) pocket;
                 if (pocketHD.canCreateFreshReceiveAddress()) {
@@ -327,7 +328,7 @@ public class AddressRequestFragment extends Fragment {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             try {
-                                Address newAddress = pocketHD.getFreshReceiveAddress(
+                                AbstractAddress newAddress = pocketHD.getFreshReceiveAddress(
                                         config.isManualAddressManagement());
                                 final String newLabel = viewLabel.getText().toString().trim();
 
@@ -374,7 +375,7 @@ public class AddressRequestFragment extends Fragment {
         }
 
         // Don't show previous addresses link if we are showing a specific address
-        if (showAddress == null && pocket.getNumberIssuedReceiveAddresses() != 0) {
+        if (showAddress == null && pocket.hasUsedAddresses()) {
             previousAddressesLink.setVisibility(View.VISIBLE);
         } else {
             previousAddressesLink.setVisibility(View.GONE);
@@ -400,16 +401,16 @@ public class AddressRequestFragment extends Fragment {
     }
 
     private void updateLabel() {
-        label = resolveLabel(receiveAddress.toString());
+        label = resolveLabel(receiveAddress);
         if (label != null) {
             addressLabelView.setText(label);
             addressLabelView.setTypeface(Typeface.DEFAULT);
             addressView.setText(
-                    GenericUtils.addressSplitToGroups(receiveAddress.toString()));
+                    GenericUtils.addressSplitToGroups(receiveAddress));
             addressView.setVisibility(View.VISIBLE);
         } else {
             addressLabelView.setText(
-                    GenericUtils.addressSplitToGroupsMultiline(receiveAddress.toString()));
+                    GenericUtils.addressSplitToGroupsMultiline(receiveAddress));
             addressLabelView.setTypeface(Typeface.MONOSPACE);
             addressView.setVisibility(View.GONE);
         }
@@ -422,8 +423,8 @@ public class AddressRequestFragment extends Fragment {
         }
     };
 
-    private String resolveLabel(@Nonnull final String address) {
-        return AddressBookProvider.resolveLabel(getActivity(), type, address);
+    private String resolveLabel(@Nonnull final AbstractAddress address) {
+        return AddressBookProvider.resolveLabel(getActivity(), address);
     }
 
     private final LoaderManager.LoaderCallbacks<Cursor> rateLoaderCallbacks = new LoaderManager.LoaderCallbacks<Cursor>() {

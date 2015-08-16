@@ -5,7 +5,7 @@ import com.coinomi.core.coins.families.BitFamily;
 /**
  * @author FuzzyHobbit
  */
-public class DigitalcoinMain extends CoinType {
+public class DigitalcoinMain extends BitFamily {
     private DigitalcoinMain() {
         id = "digitalcoin.main";
 
@@ -14,7 +14,6 @@ public class DigitalcoinMain extends CoinType {
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 5;
 
-        family = BitFamily.get();
         name = "Digitalcoin";
         symbol = "DGC";
         uriScheme = "digitalcoin";
@@ -29,7 +28,7 @@ public class DigitalcoinMain extends CoinType {
     }
 
     private static DigitalcoinMain instance = new DigitalcoinMain();
-    public static synchronized DigitalcoinMain get() {
+    public static synchronized CoinType get() {
         return instance;
     }
 }

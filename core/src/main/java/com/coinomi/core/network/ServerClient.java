@@ -4,6 +4,8 @@ import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.network.interfaces.BlockchainConnection;
 import com.coinomi.core.network.interfaces.ConnectionEventListener;
 import com.coinomi.core.network.interfaces.TransactionEventListener;
+import com.coinomi.core.wallet.AbstractAddress;
+import com.coinomi.core.wallet.families.bitcoin.BitAddress;
 import com.coinomi.stratumj.ServerAddress;
 import com.coinomi.stratumj.StratumClient;
 import com.coinomi.stratumj.messages.CallMessage;
@@ -14,7 +16,6 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.Service;
 
-import org.bitcoinj.core.Address;
 import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.Transaction;
@@ -327,7 +328,7 @@ public class ServerClient implements BlockchainConnection {
     }
 
     @Override
-    public void subscribeToAddresses(List<Address> addresses, final TransactionEventListener listener) {
+    public void subscribeToAddresses(List<AbstractAddress> addresses, final TransactionEventListener listener) {
         checkNotNull(stratumClient);
 
         CallMessage callMessage = new CallMessage("blockchain.address.subscribe", (List)null);
@@ -337,7 +338,7 @@ public class ServerClient implements BlockchainConnection {
             @Override
             public void handle(CallMessage message) {
                 try {
-                    Address address = new Address(type, message.getParams().getString(0));
+                    AbstractAddress address = new BitAddress(type, message.getParams().getString(0));
                     AddressStatus status;
                     if (message.getParams().isNull(1)) {
                         status = new AddressStatus(address, null);
@@ -354,7 +355,7 @@ public class ServerClient implements BlockchainConnection {
             }
         };
 
-        for (final Address address : addresses) {
+        for (final AbstractAddress address : addresses) {
             log.info("Going to subscribe to {}", address);
             callMessage.setParam(address.toString());
 

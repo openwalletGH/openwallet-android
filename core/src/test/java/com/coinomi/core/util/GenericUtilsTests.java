@@ -3,20 +3,15 @@ package com.coinomi.core.util;
 import com.coinomi.core.coins.BitcoinMain;
 import com.coinomi.core.coins.BlackcoinMain;
 import com.coinomi.core.coins.CoinType;
-import com.coinomi.core.coins.DashMain;
 import com.coinomi.core.coins.DigitalcoinMain;
-import com.coinomi.core.coins.DogecoinMain;
 import com.coinomi.core.coins.FeathercoinMain;
 import com.coinomi.core.coins.LitecoinMain;
 import com.coinomi.core.coins.NuBitsMain;
-import com.coinomi.core.coins.NuSharesMain;
 import com.coinomi.core.coins.PeercoinMain;
+import com.coinomi.core.exceptions.AddressMalformedException;
+import com.coinomi.core.wallet.AbstractAddress;
 
-import org.bitcoinj.core.Address;
-import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.Coin;
-import org.bitcoinj.core.VersionedChecksummedBytes;
-import org.bitcoinj.utils.Fiat;
 import org.junit.Test;
 
 import java.util.List;
@@ -31,7 +26,7 @@ import static org.junit.Assert.assertTrue;
 public class GenericUtilsTests {
 
     @Test
-    public void getPossibleTypes() throws AddressFormatException {
+    public void getPossibleTypes() throws AddressMalformedException {
         List<CoinType> types = GenericUtils.getPossibleTypes("BPa5FmbZRGpmNfy4qaUzarXwSSFbJKFRMQ");
         assertTrue(types.contains(BlackcoinMain.get()));
         assertTrue(types.contains(NuBitsMain.get()));
@@ -46,7 +41,7 @@ public class GenericUtilsTests {
         assertTrue(GenericUtils.hasMultipleTypes("3Lp1ZbdoDfZF21BLMBpctM6CrM6j4t2JyU"));
 
         // Address method
-        Address address = new Address(BlackcoinMain.get(), "BPa5FmbZRGpmNfy4qaUzarXwSSFbJKFRMQ");
+        AbstractAddress address = BlackcoinMain.get().newAddress("BPa5FmbZRGpmNfy4qaUzarXwSSFbJKFRMQ");
         types = GenericUtils.getPossibleTypes(address);
         assertTrue(types.contains(BlackcoinMain.get()));
         assertTrue(types.contains(NuBitsMain.get()));
@@ -59,13 +54,13 @@ public class GenericUtilsTests {
         assertFalse(GenericUtils.hasMultipleTypes("1AjnxP4frz7Nb4v2soLnhN2uV9UocqvaGH"));
     }
 
-    @Test(expected = AddressFormatException.class)
-    public void getPossibleTypesInvalid() throws AddressFormatException {
+    @Test(expected = AddressMalformedException.class)
+    public void getPossibleTypesInvalid() throws AddressMalformedException {
         GenericUtils.getPossibleTypes("");
     }
 
-    @Test(expected = AddressFormatException.class)
-    public void getPossibleTypesUnsupported() throws AddressFormatException {
+    @Test(expected = AddressMalformedException.class)
+    public void getPossibleTypesUnsupported() throws AddressMalformedException {
         GenericUtils.getPossibleTypes("2mwJoik9pimQHUN2zU56J7h8tCTWYoUhpCM"); // version byte 0xFF
     }
 

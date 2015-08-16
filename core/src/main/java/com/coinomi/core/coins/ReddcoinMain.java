@@ -5,7 +5,7 @@ import com.coinomi.core.coins.families.ReddFamily;
 /**
  * @author John L. Jegutanis
  */
-public class ReddcoinMain extends CoinType {
+public class ReddcoinMain extends ReddFamily {
     private ReddcoinMain() {
         id = "reddcoin.main";
 
@@ -16,7 +16,6 @@ public class ReddcoinMain extends CoinType {
         dumpedPrivateKeyHeader = 189;
         transactionVersion = 2;
 
-        family = ReddFamily.get();
         name = "Reddcoin";
         symbol = "RDD";
         uriScheme = "reddcoin";
@@ -30,7 +29,7 @@ public class ReddcoinMain extends CoinType {
     }
 
     private static ReddcoinMain instance = new ReddcoinMain();
-    public static synchronized ReddcoinMain get() {
+    public static synchronized CoinType get() {
         return instance;
     }
 }

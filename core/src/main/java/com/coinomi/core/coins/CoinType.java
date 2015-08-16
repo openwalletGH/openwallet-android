@@ -1,13 +1,13 @@
 package com.coinomi.core.coins;
 
 
-import com.coinomi.core.coins.families.CoinFamily;
+import com.coinomi.core.coins.families.Families;
+import com.coinomi.core.exceptions.AddressMalformedException;
 import com.coinomi.core.messages.MessageFactory;
 import com.coinomi.core.util.MonetaryFormat;
+import com.coinomi.core.wallet.AbstractAddress;
 import com.google.common.base.Charsets;
 
-import org.bitcoinj.core.Address;
-import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.crypto.ChildNumber;
@@ -17,11 +17,9 @@ import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.List;
 
-
 import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 /**
  * @author John L. Jegutanis
@@ -48,10 +46,8 @@ abstract public class CoinType extends NetworkParameters implements ValueType, S
     private transient MonetaryFormat plainFormat;
     private transient Value oneCoin;
 
-    @Override
-    public CoinFamily getFamily() {
-        // TODO improve
-        return (CoinFamily) family;
+    public Families getFamilyEnum() {
+        return (Families) family;
     }
 
     @Override
@@ -146,9 +142,7 @@ abstract public class CoinType extends NetworkParameters implements ValueType, S
         return checkNotNull(addressPrefix, "A coin failed to set the address prefix");
     }
 
-    public Address address(String addressStr) throws AddressFormatException {
-        return new Address(this, addressStr);
-    }
+    public abstract AbstractAddress newAddress(String addressStr) throws AddressMalformedException;
 
     /**
      * Returns a 1 coin of this type with the correct amount of units (satoshis)

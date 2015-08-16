@@ -5,7 +5,7 @@ import com.coinomi.core.coins.families.PeerFamily;
 /**
  * @author John L. Jegutanis
  */
-public class PeercoinTest extends CoinType {
+public class PeercoinTest extends PeerFamily {
     private PeercoinTest() {
         id = "peercoin.test";
 
@@ -14,7 +14,6 @@ public class PeercoinTest extends CoinType {
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 500;
 
-        family = PeerFamily.get();
         name = "Peercoin Test";
         symbol = "PPCt";
         uriScheme = "peercoin"; // TODO verify, could be ppcoin?
@@ -28,7 +27,7 @@ public class PeercoinTest extends CoinType {
     }
 
     private static PeercoinTest instance = new PeercoinTest();
-    public static synchronized PeercoinTest get() {
+    public static synchronized CoinType get() {
         return instance;
     }
 }

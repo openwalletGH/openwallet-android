@@ -5,7 +5,7 @@ import com.coinomi.core.coins.families.BitFamily;
 /**
  * @author John L. Jegutanis
  */
-public class BitcoinMain extends CoinType {
+public class BitcoinMain extends BitFamily {
     private BitcoinMain() {
         id = "bitcoin.main";
 
@@ -15,7 +15,6 @@ public class BitcoinMain extends CoinType {
         spendableCoinbaseDepth = 100;
         dumpedPrivateKeyHeader = 128;
 
-        family = BitFamily.get();
         name = "Bitcoin";
         symbol = "BTC";
         uriScheme = "bitcoin";
@@ -29,7 +28,7 @@ public class BitcoinMain extends CoinType {
     }
 
     private static BitcoinMain instance = new BitcoinMain();
-    public static synchronized BitcoinMain get() {
+    public static synchronized CoinType get() {
         return instance;
     }
 }

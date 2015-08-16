@@ -386,9 +386,9 @@ public class TransactionCreator {
                 // The value of the inputs is greater than what we want to send. Just like in real life then,
                 // we need to take back some coins ... this is called "change". Add another output that sends the change
                 // back to us. The address comes either from the request or getChangeBitAddress() as a default.
-                Address changeAddress = req.changeAddress;
+                Address changeAddress = (Address) req.changeAddress;
                 if (changeAddress == null)
-                    changeAddress = account.getChangeBitAddress();
+                    changeAddress = (Address) account.getChangeAddress();
                 changeOutput = new TransactionOutput(coinType, req.tx, change, changeAddress);
                 // If the change output would result in this transaction being rejected as dust, just drop the change and make it a fee
                 if (req.ensureMinRequiredFee && coinType.getMinNonDust().compareTo(change) >= 0) {

@@ -16,11 +16,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.coinomi.core.coins.CoinType;
-import com.coinomi.core.coins.VpncoinMain;
 import com.coinomi.core.messages.MessageFactory;
 import com.coinomi.core.messages.TxMessage;
+import com.coinomi.core.util.AddressUtils;
 import com.coinomi.core.wallet.AbstractWallet;
-import com.coinomi.core.wallet.families.vpncoin.VpncoinTxMessage;
+import com.coinomi.core.wallet.families.bitcoin.BitAddress;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
@@ -29,8 +29,6 @@ import com.coinomi.wallet.util.UiUtils;
 import com.coinomi.wallet.util.WeakHandler;
 
 import org.acra.ACRA;
-import org.bitcoinj.core.Address;
-import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.TransactionConfidence;
 import org.bitcoinj.core.TransactionOutput;
@@ -134,7 +132,7 @@ public class TransactionDetailsFragment extends Fragment {
 
                     if (obj != null && obj instanceof TransactionOutput) {
                         TransactionOutput txo = (TransactionOutput) obj;
-                        Address address = txo.getScriptPubKey().getToAddress(type);
+                        BitAddress address = AddressUtils.fromScript(type, txo.getScriptPubKey());
                         UiUtils.startAddressActionMode(address, getActivity(), getFragmentManager());
                     }
                 }

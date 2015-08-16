@@ -27,11 +27,11 @@ import com.coinomi.core.coins.nxt.Attachment;
 import com.coinomi.core.coins.nxt.Convert;
 import com.coinomi.core.coins.nxt.TransactionImpl;
 import com.coinomi.core.messages.TxMessage;
+import com.coinomi.core.wallet.families.bitcoin.BitAddress;
 import com.coinomi.core.wallet.families.nxt.NxtFamilyAddress;
 import com.google.common.base.Objects;
 import com.google.common.base.Objects.ToStringHelper;
 
-import org.bitcoinj.core.Address;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.Wallet.MissingSigsMode;
@@ -40,6 +40,7 @@ import org.spongycastle.crypto.params.KeyParameter;
 
 import java.io.Serializable;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -86,8 +87,7 @@ public class SendRequest implements Serializable{
      * don't really control as it depends on who sent you money), and the value being sent somewhere else. The
      * change address should be selected from this wallet, normally. <b>If null this will be chosen for you.</b>
      */
-    // TODO change to AbstractAddress. Only valid for Bitcoin
-    public Address changeAddress = null;
+    public AbstractAddress changeAddress = null;
 
     /**
      * <p>A transaction can have a fee attached, which is defined as the difference between the input values
@@ -195,14 +195,30 @@ public class SendRequest implements Serializable{
      */
 
     // TODO combine the following function methods -> SendRequest to(AbstractAddress destination, Value amount) {
-    public static SendRequest to(Address destination, Coin amount) {
+    public static SendRequest to(AbstractAddress destination, Coin amount) {
         SendRequest req = new SendRequest();
-        checkNotNull(destination.getParameters(), "Address is for an unknown network");
-        req.type = (CoinType) destination.getParameters();
+        req.type = destination.getType();
+        checkNotNull(req.type, "Address is for an unknown network");
+        switch (req.type.getFamilyEnum()) {
+            case NXT:
+                throw new RuntimeException("Not implemented");
+
+            case BITCOIN:
+            case NUBITS:
+            case PEERCOIN:
+            case REDDCOIN:
+            case VPNCOIN:
+                break;
+            default:
+            case FIAT:
+                throw new RuntimeException("Unsupported family: " + req.type.getFamily());
+        }
+
+
         req.feePerKb = req.type.feePerKb().toCoin();
         req.fee = req.type.value(0).toCoin();
         req.tx = new Transaction(req.type);
-        req.tx.addOutput(amount, destination);
+        req.tx.addOutput(amount, (BitAddress) destination);
         return req;
     }
 
@@ -251,13 +267,28 @@ public class SendRequest implements Serializable{
     }
 
     // TODO implement a universal method for Bitcoin and NXT that uses AbstractAddress destination
-    public static SendRequest emptyWallet(Address destination) {
+    public static SendRequest emptyWallet(AbstractAddress destination) {
         SendRequest req = new SendRequest();
-        checkNotNull(destination.getParameters(), "Address is for an unknown network");
-        req.type = (CoinType) destination.getParameters();
+        req.type = destination.getType();
+        checkNotNull(req.type, "Address is for an unknown network");
+        switch (req.type.getFamilyEnum()) {
+            case NXT:
+                throw new RuntimeException("Not implemented");
+
+            case BITCOIN:
+            case NUBITS:
+            case PEERCOIN:
+            case REDDCOIN:
+            case VPNCOIN:
+                break;
+            default:
+            case FIAT:
+                throw new RuntimeException("Unsupported family: " + req.type.getFamily());
+        }
+
         req.feePerKb = req.type.getFeePerKb();
         req.tx = new Transaction(req.type);
-        req.tx.addOutput(Coin.ZERO, destination);
+        req.tx.addOutput(Coin.ZERO, (BitAddress) destination);
         req.emptyWallet = true;
         return req;
     }

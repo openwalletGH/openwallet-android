@@ -41,8 +41,9 @@ public class WalletTest {
 
         wallet = new Wallet(MNEMONIC);
 
-        wallet.createAccounts(ImmutableList.of(BitcoinMain.get(),
-                LitecoinMain.get(), DogecoinMain.get()), true, aesKey);
+        ImmutableList<CoinType> typesToCreate = ImmutableList.of(BitcoinMain.get(),
+                LitecoinMain.get(), DogecoinMain.get());
+        wallet.createAccounts(typesToCreate, true, aesKey);
     }
 
     @Test

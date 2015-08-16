@@ -21,11 +21,11 @@ package com.coinomi.core.wallet;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.protos.Protos;
 import com.coinomi.core.util.KeyUtils;
-import com.coinomi.core.wallet.exceptions.Bip44KeyLookAheadExceededException;
+import com.coinomi.core.exceptions.Bip44KeyLookAheadExceededException;
+import com.coinomi.core.wallet.families.bitcoin.BitAddress;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 
-import org.bitcoinj.core.Address;
 import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.ECKey;
@@ -51,8 +51,11 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
+import static com.coinomi.core.Preconditions.checkArgument;
 import static com.coinomi.core.Preconditions.checkNotNull;
 import static com.coinomi.core.Preconditions.checkState;
+import static com.coinomi.core.util.AddressUtils.getHash160;
+import static com.coinomi.core.util.AddressUtils.isP2SHAddress;
 import static org.bitcoinj.wallet.KeyChain.KeyPurpose.CHANGE;
 import static org.bitcoinj.wallet.KeyChain.KeyPurpose.RECEIVE_FUNDS;
 import static org.bitcoinj.wallet.KeyChain.KeyPurpose.REFUND;
@@ -101,14 +104,6 @@ public class WalletPocketHD extends TransactionWatcherWallet {
         } finally {
             lock.unlock();
         }
-    }
-
-
-    @Override
-    public boolean equals(WalletAccount other) {
-        return other != null &&
-                getId().equals(other.getId()) &&
-                getCoinType().equals(other.getCoinType());
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -219,14 +214,14 @@ public class WalletPocketHD extends TransactionWatcherWallet {
     /**
      * Sends coins to the given address but does not broadcast the resulting pending transaction.
      */
-    public SendRequest sendCoinsOffline(Address address, Coin amount) throws WalletAccountException {
+    public SendRequest sendCoinsOffline(BitAddress address, Coin amount) throws WalletAccountException {
         return sendCoinsOffline(address, amount, (KeyParameter) null);
     }
 
     /**
-     * {@link #sendCoinsOffline(Address, Coin)}
+     * {@link #sendCoinsOffline(BitAddress, Coin)}
      */
-    public SendRequest sendCoinsOffline(Address address, Coin amount, @Nullable String password)
+    public SendRequest sendCoinsOffline(BitAddress address, Coin amount, @Nullable String password)
             throws WalletAccountException {
         KeyParameter key = null;
         if (password != null) {
@@ -237,9 +232,9 @@ public class WalletPocketHD extends TransactionWatcherWallet {
     }
 
     /**
-     * {@link #sendCoinsOffline(Address, Coin)}
+     * {@link #sendCoinsOffline(BitAddress, Coin)}
      */
-    public SendRequest sendCoinsOffline(Address address, Coin amount, @Nullable KeyParameter aesKey)
+    public SendRequest sendCoinsOffline(BitAddress address, Coin amount, @Nullable KeyParameter aesKey)
             throws WalletAccountException {
         checkState(address.getParameters() instanceof CoinType);
         SendRequest request = SendRequest.to(address, amount);
@@ -249,11 +244,11 @@ public class WalletPocketHD extends TransactionWatcherWallet {
     }
 
     @Override
-    public boolean isAddressMine(Address address) {
-        return address != null && address.getParameters().equals(type) &&
-                (address.isP2SHAddress() ?
-                        isPayToScriptHashMine(address.getHash160()) :
-                        isPubKeyHashMine(address.getHash160()));
+    public boolean isAddressMine(AbstractAddress address) {
+        return address != null && address.getType().equals(type) &&
+                (isP2SHAddress(address) ?
+                        isPayToScriptHashMine(getHash160(address)) :
+                        isPubKeyHashMine(getHash160(address)));
     }
 
     @Override
@@ -263,7 +258,7 @@ public class WalletPocketHD extends TransactionWatcherWallet {
         try {
             ECKey key;
             try {
-                Address address = new Address(type, unsignedMessage.getAddress());
+                BitAddress address = new BitAddress(type, unsignedMessage.getAddress());
                 key = findKeyFromPubHash(address.getHash160());
             } catch (AddressFormatException e) {
                 unsignedMessage.status = SignedMessage.Status.AddressMalformed;
@@ -293,7 +288,7 @@ public class WalletPocketHD extends TransactionWatcherWallet {
     public void verifyMessage(SignedMessage signedMessage) {
         try {
             ECKey pubKey = ECKey.signedMessageToKey(signedMessage.message, signedMessage.signature);
-            byte[] expectedPubKeyHash = new Address(null, signedMessage.address).getHash160();
+            byte[] expectedPubKeyHash = new BitAddress(null, signedMessage.address).getHash160();
             if (Arrays.equals(expectedPubKeyHash, pubKey.getPubKeyHash())) {
                 signedMessage.status = SignedMessage.Status.VerifiedOK;
             } else {
@@ -418,43 +413,35 @@ public class WalletPocketHD extends TransactionWatcherWallet {
     }
 
     @Override
-    public AbstractAddress getChangeAddress() {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public AbstractAddress getReceiveAddress() {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public AbstractAddress getRefundAddress() {
-        throw new RuntimeException("Not implemented");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Address getChangeBitAddress() {
+    public BitAddress getChangeAddress() {
         return currentAddress(CHANGE);
     }
 
-    /** {@inheritDoc} */
     @Override
-    public Address getReceiveBitAddress() {
+    public BitAddress getReceiveAddress() {
         return currentAddress(RECEIVE_FUNDS);
     }
 
-    /** {@inheritDoc} */
     @Override
-    public Address getRefundBitAddress() {
+    public BitAddress getRefundAddress() {
         return currentAddress(REFUND);
     }
 
-    public Address getReceiveAddress(boolean isManualAddressManagement) {
+    @Override
+    public boolean hasUsedAddresses() {
+        return getNumberIssuedReceiveAddresses() != 0;
+    }
+
+    @Override
+    public boolean canCreateNewAddresses() {
+        return true;
+    }
+
+    public BitAddress getReceiveAddress(boolean isManualAddressManagement) {
         return getAddress(RECEIVE_FUNDS, isManualAddressManagement);
     }
 
-    public Address getRefundAddress(boolean isManualAddressManagement) {
+    public BitAddress getRefundAddress(boolean isManualAddressManagement) {
         return getAddress(REFUND, isManualAddressManagement);
     }
 
@@ -462,12 +449,12 @@ public class WalletPocketHD extends TransactionWatcherWallet {
      * Get the last used receiving address
      */
     @Nullable
-    public Address getLastUsedAddress(SimpleHDKeyChain.KeyPurpose purpose) {
+    public BitAddress getLastUsedAddress(SimpleHDKeyChain.KeyPurpose purpose) {
         lock.lock();
         try {
             DeterministicKey lastUsedKey = keys.getLastIssuedKey(purpose);
             if (lastUsedKey != null) {
-                return lastUsedKey.toAddress(type);
+                return BitAddress.fromKey(type, lastUsedKey);
             } else {
                 return null;
             }
@@ -489,9 +476,9 @@ public class WalletPocketHD extends TransactionWatcherWallet {
             if (!addressesStatus.isEmpty()) {
                 int lastUsedKeyIndex = 0;
                 // Find the last used key index
-                for (Map.Entry<Address, String> entry : addressesStatus.entrySet()) {
+                for (Map.Entry<AbstractAddress, String> entry : addressesStatus.entrySet()) {
                     if (entry.getValue() == null) continue;
-                    DeterministicKey usedKey = keys.findKeyFromPubHash(entry.getKey().getHash160());
+                    DeterministicKey usedKey = keys.findKeyFromPubHash(getHash160(entry.getKey()));
                     if (usedKey != null && keys.isExternal(usedKey) && usedKey.getChildNumber().num() > lastUsedKeyIndex) {
                         lastUsedKeyIndex = usedKey.getChildNumber().num();
                     }
@@ -513,7 +500,7 @@ public class WalletPocketHD extends TransactionWatcherWallet {
      * {@link Bip44KeyLookAheadExceededException} if we requested too many addresses that
      * exceed the BIP44 look ahead threshold.
      */
-    public Address getFreshReceiveAddress() throws Bip44KeyLookAheadExceededException {
+    public BitAddress getFreshReceiveAddress() throws Bip44KeyLookAheadExceededException {
         lock.lock();
         try {
             if (!canCreateFreshReceiveAddress()) {
@@ -527,11 +514,12 @@ public class WalletPocketHD extends TransactionWatcherWallet {
         }
     }
 
-    public Address getFreshReceiveAddress(boolean isManualAddressManagement) throws Bip44KeyLookAheadExceededException {
+    public BitAddress getFreshReceiveAddress(boolean isManualAddressManagement)
+            throws Bip44KeyLookAheadExceededException {
         lock.lock();
         try {
-            Address newAddress = null;
-            Address freshAddress = getFreshReceiveAddress();
+            BitAddress newAddress = null;
+            BitAddress freshAddress = getFreshReceiveAddress();
             if (isManualAddressManagement) {
                 newAddress = getLastUsedAddress(RECEIVE_FUNDS);
             }
@@ -572,16 +560,16 @@ public class WalletPocketHD extends TransactionWatcherWallet {
      * Returns a list of addresses that have been issued.
      * The list is sorted in descending chronological order: older in the end
      */
-    public List<Address> getIssuedReceiveAddresses() {
+    public List<AbstractAddress> getIssuedReceiveAddresses() {
         lock.lock();
         try {
             ArrayList<DeterministicKey> issuedKeys = keys.getIssuedExternalKeys();
-            ArrayList<Address> receiveAddresses = new ArrayList<Address>();
+            ArrayList<AbstractAddress> receiveAddresses = new ArrayList<>();
 
             Collections.sort(issuedKeys, HD_KEY_COMPARATOR);
 
             for (ECKey key : issuedKeys) {
-                receiveAddresses.add(key.toAddress(type));
+                receiveAddresses.add(BitAddress.fromKey(type, key));
             }
             return receiveAddresses;
         } finally {
@@ -592,14 +580,14 @@ public class WalletPocketHD extends TransactionWatcherWallet {
     /**
      * Get the currently used receiving and change addresses
      */
-    public Set<Address> getUsedAddresses() {
+    public Set<AbstractAddress> getUsedAddresses() {
         lock.lock();
         try {
-            HashSet<Address> usedAddresses = new HashSet<Address>();
+            HashSet<AbstractAddress> usedAddresses = new HashSet<>();
 
-            for (Map.Entry<Address, String> entry : addressesStatus.entrySet()) {
+            for (Map.Entry<AbstractAddress, String> entry : addressesStatus.entrySet()) {
                 if (entry.getValue() != null) {
-                    usedAddresses.add(entry.getKey());
+                    usedAddresses.add((BitAddress) entry.getKey());
                 }
             }
 
@@ -609,9 +597,9 @@ public class WalletPocketHD extends TransactionWatcherWallet {
         }
     }
 
-    public Address getAddress(SimpleHDKeyChain.KeyPurpose purpose,
+    public BitAddress getAddress(SimpleHDKeyChain.KeyPurpose purpose,
                               boolean isManualAddressManagement) {
-        Address receiveAddress = null;
+        BitAddress receiveAddress = null;
         if (isManualAddressManagement) {
             receiveAddress = getLastUsedAddress(purpose);
         }
@@ -625,10 +613,10 @@ public class WalletPocketHD extends TransactionWatcherWallet {
     /**
      * Get the currently latest unused address by purpose.
      */
-    @VisibleForTesting Address currentAddress(SimpleHDKeyChain.KeyPurpose purpose) {
+    @VisibleForTesting BitAddress currentAddress(SimpleHDKeyChain.KeyPurpose purpose) {
         lock.lock();
         try {
-            return keys.getCurrentUnusedKey(purpose).toAddress(type);
+            return BitAddress.fromKey(type, keys.getCurrentUnusedKey(purpose));
         } finally {
             lock.unlock();
             subscribeIfNeeded();
@@ -659,15 +647,27 @@ public class WalletPocketHD extends TransactionWatcherWallet {
         throw new RuntimeException("Not implemented");
     }
 
-    public List<Address> getActiveAddresses() {
-        ImmutableList.Builder<Address> activeAddresses = ImmutableList.builder();
+    @Override
+    public List<AbstractAddress> getActiveAddresses() {
+        ImmutableList.Builder<AbstractAddress> activeAddresses = ImmutableList.builder();
         for (DeterministicKey key : keys.getActiveKeys()) {
-            activeAddresses.add(key.toAddress(type));
+            activeAddresses.add(BitAddress.fromKey(type, key));
         }
         return activeAddresses.build();
     }
 
-    public void markAddressAsUsed(Address address) {
+    @Override
+    public void markAddressAsUsed(AbstractAddress address) {
+        checkArgument(address.getType().equals(type), "Wrong address type");
+        if (address instanceof BitAddress) {
+            markAddressAsUsed((BitAddress)address);
+        } else {
+            throw new IllegalArgumentException("Wrong address class");
+        }
+
+    }
+
+    public void markAddressAsUsed(BitAddress address) {
         keys.markPubHashAsUsed(address.getHash160());
     }
 

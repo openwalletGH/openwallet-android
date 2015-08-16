@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.coinomi.core.wallet.AbstractAddress;
 import com.coinomi.core.wallet.SignedMessage;
 import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.wallet.Constants;
@@ -20,7 +21,6 @@ import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.tasks.SignVerifyMessageTask;
 
-import org.bitcoinj.core.Address;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +28,6 @@ import javax.annotation.Nullable;
 
 import static android.view.View.OnClickListener;
 import static com.coinomi.core.Preconditions.checkNotNull;
-import static com.coinomi.core.Preconditions.checkState;
 
 /**
  * Fragment that prepares a transaction
@@ -94,7 +93,7 @@ public class SignVerifyMessageFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_sign_message, container, false);
 
         signingAddressView = (AutoCompleteTextView) view.findViewById(R.id.signing_address);
-        ArrayAdapter<Address> adapter = new ArrayAdapter<>(getActivity(), R.layout.item_simple,
+        ArrayAdapter<AbstractAddress> adapter = new ArrayAdapter<>(getActivity(), R.layout.item_simple,
                 pocket.getActiveAddresses());
         signingAddressView.setAdapter(adapter);
 

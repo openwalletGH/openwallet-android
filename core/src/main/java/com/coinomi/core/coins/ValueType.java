@@ -1,6 +1,6 @@
 package com.coinomi.core.coins;
 
-import com.coinomi.core.coins.families.CoinFamily;
+import com.coinomi.core.coins.families.Families;
 import com.coinomi.core.util.MonetaryFormat;
 
 import org.bitcoinj.core.Coin;
@@ -11,7 +11,7 @@ import java.io.Serializable;
  * @author John L. Jegutanis
  */
 public interface ValueType extends Serializable {
-    CoinFamily getFamily();
+    Families getFamilyEnum();
     String getName();
     String getSymbol();
     int getUnitExponent();

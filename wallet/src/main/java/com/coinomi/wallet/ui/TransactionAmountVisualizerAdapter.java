@@ -7,9 +7,9 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.util.AddressUtils;
 import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.AbstractWallet;
-import com.coinomi.wallet.AddressBookProvider;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.ui.widget.SendOutput;
 
@@ -121,9 +121,7 @@ public class TransactionAmountVisualizerAdapter extends BaseAdapter {
             Coin outputAmount = txo.getValue();
             output.setAmount(GenericUtils.formatCoinValue(type, outputAmount));
             output.setSymbol(symbol);
-            String address = txo.getScriptPubKey().getToAddress(type).toString();
-            output.setLabelAndAddress(
-                    AddressBookProvider.resolveLabel(context, type, address), address);
+            output.setLabelAndAddress(AddressUtils.fromScript(type, txo.getScriptPubKey()));
             output.setSending(isSending);
         }
 

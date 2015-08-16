@@ -5,7 +5,7 @@ import com.coinomi.core.coins.families.BitFamily;
 /**
  * @author John L. Jegutanis
  */
-public class LitecoinTest extends CoinType {
+public class LitecoinTest extends BitFamily {
     private LitecoinTest() {
         id = "litecoin.test";
 
@@ -14,7 +14,6 @@ public class LitecoinTest extends CoinType {
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 100;
 
-        family = BitFamily.get();
         name = "Litecoin Test";
         symbol = "LTCt";
         uriScheme = "litecoin";
@@ -28,7 +27,7 @@ public class LitecoinTest extends CoinType {
     }
 
     private static LitecoinTest instance = new LitecoinTest();
-    public static synchronized LitecoinTest get() {
+    public static synchronized CoinType get() {
         return instance;
     }
 }

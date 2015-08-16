@@ -5,7 +5,7 @@ import com.coinomi.core.coins.families.BitFamily;
 /**
  * @author John L. Jegutanis
  */
-public class DogecoinMain extends CoinType {
+public class DogecoinMain extends BitFamily {
     private DogecoinMain() {
         id = "dogecoin.main";
 
@@ -14,7 +14,6 @@ public class DogecoinMain extends CoinType {
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 240; // COINBASE_MATURITY_NEW
 
-        family = BitFamily.get();
         name = "Dogecoin";
         symbol = "DOGE";
         uriScheme = "dogecoin";
@@ -28,7 +27,7 @@ public class DogecoinMain extends CoinType {
     }
 
     private static DogecoinMain instance = new DogecoinMain();
-    public static synchronized DogecoinMain get() {
+    public static synchronized CoinType get() {
         return instance;
     }
 }

@@ -5,7 +5,7 @@ import com.coinomi.core.coins.families.PeerFamily;
 /**
  * @author FuzzyHobbit
  */
-public class RubycoinMain extends CoinType {
+public class RubycoinMain extends PeerFamily {
     private RubycoinMain() {
         id = "rubycoin.main";
 
@@ -14,7 +14,6 @@ public class RubycoinMain extends CoinType {
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 50;
 
-        family = PeerFamily.get();
         name = "Rubycoin";
         symbol = "RBY";
         uriScheme = "rubycoin";
@@ -28,7 +27,7 @@ public class RubycoinMain extends CoinType {
     }
 
     private static RubycoinMain instance = new RubycoinMain();
-    public static synchronized RubycoinMain get() {
+    public static synchronized CoinType get() {
         return instance;
     }
 }

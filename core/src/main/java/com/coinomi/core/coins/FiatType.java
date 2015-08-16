@@ -1,7 +1,6 @@
 package com.coinomi.core.coins;
 
-import com.coinomi.core.coins.families.CoinFamily;
-import com.coinomi.core.coins.families.FiatFamily;
+import com.coinomi.core.coins.families.Families;
 import com.coinomi.core.util.Currencies;
 import com.coinomi.core.util.MonetaryFormat;
 
@@ -44,8 +43,8 @@ public class FiatType implements ValueType {
     }
 
     @Override
-    public CoinFamily getFamily() {
-        return FiatFamily.get();
+    public Families getFamilyEnum() {
+        return Families.FIAT;
     }
 
     @Override

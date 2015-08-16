@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
@@ -34,10 +33,13 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.FiatType;
 import com.coinomi.core.coins.Value;
 import com.coinomi.core.coins.ValueType;
+import com.coinomi.core.exceptions.AddressMalformedException;
+import com.coinomi.core.exceptions.NoSuchPocketException;
 import com.coinomi.core.exchange.shapeshift.ShapeShift;
 import com.coinomi.core.exchange.shapeshift.data.ShapeShiftMarketInfo;
 import com.coinomi.core.messages.MessageFactory;
@@ -46,8 +48,8 @@ import com.coinomi.core.uri.CoinURI;
 import com.coinomi.core.uri.CoinURIParseException;
 import com.coinomi.core.util.ExchangeRate;
 import com.coinomi.core.util.GenericUtils;
+import com.coinomi.core.wallet.AbstractAddress;
 import com.coinomi.core.wallet.WalletAccount;
-import com.coinomi.core.wallet.exceptions.NoSuchPocketException;
 import com.coinomi.wallet.AddressBookProvider;
 import com.coinomi.wallet.Configuration;
 import com.coinomi.wallet.Constants;
@@ -62,8 +64,6 @@ import com.coinomi.wallet.util.UiUtils;
 import com.coinomi.wallet.util.WeakHandler;
 
 import org.acra.ACRA;
-import org.bitcoinj.core.Address;
-import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.InsufficientMoneyException;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.Wallet;
@@ -138,7 +138,7 @@ public class SendFragment extends Fragment {
     private ActionMode actionMode;
 
     private State state = State.INPUT;
-    private Address address;
+    private AbstractAddress address;
     private boolean addressTypeCanChange;
     private Value sendAmount;
     private CoinType sendAmountType;
@@ -237,7 +237,7 @@ public class SendFragment extends Fragment {
         messageFactory = pocket.getCoinType().getMessagesFactory();
 
         if (savedInstanceState != null) {
-            address = (Address) savedInstanceState.getSerializable(STATE_ADDRESS);
+            address = (AbstractAddress) savedInstanceState.getSerializable(STATE_ADDRESS);
             addressTypeCanChange = savedInstanceState.getBoolean(STATE_ADDRESS_CAN_CHANGE_TYPE);
             sendAmount = (Value) savedInstanceState.getSerializable(STATE_AMOUNT);
             sendAmountType = (CoinType) savedInstanceState.getSerializable(STATE_AMOUNT_TYPE);
@@ -454,7 +454,7 @@ public class SendFragment extends Fragment {
         addressTypeCanChange = false;
     }
 
-    private void setAddress(Address address, boolean typeCanChange) {
+    private void setAddress(AbstractAddress address, boolean typeCanChange) {
         this.address = address;
         this.addressTypeCanChange = typeCanChange;
     }
@@ -514,7 +514,7 @@ public class SendFragment extends Fragment {
 
     private void startOrStopMarketRatePolling() {
         if (address != null && !pocket.isType(address)) {
-            String pair = ShapeShift.getPair(pocket.getCoinType(), (CoinType) address.getParameters());
+            String pair = ShapeShift.getPair(pocket.getCoinType(), address.getType());
             if (timer == null) {
                 startPolling(pair);
             } else {
@@ -583,7 +583,7 @@ public class SendFragment extends Fragment {
         return null;
     }
 
-    public void onMakeTransaction(Address toAddress, Value amount, @Nullable TxMessage txMessage) {
+    public void onMakeTransaction(AbstractAddress toAddress, Value amount, @Nullable TxMessage txMessage) {
         Intent intent = new Intent(getActivity(), SignTransactionActivity.class);
 
         // Decide if emptying wallet or not
@@ -663,7 +663,7 @@ public class SendFragment extends Fragment {
                 parseAddress(input);
                 updateView();
                 return true;
-            } catch (AddressFormatException e) {
+            } catch (AddressMalformedException e) {
                 return false;
             }
         }
@@ -692,7 +692,7 @@ public class SendFragment extends Fragment {
             throw new CoinURIParseException("missing address");
         }
 
-        sendAmountType = (CoinType) address.getParameters();
+        sendAmountType = address.getType();
         sendAmount = coinUri.getAmount();
         final String label = coinUri.getLabel();
     }
@@ -917,7 +917,7 @@ public class SendFragment extends Fragment {
                     clearAddress(false);
                 }
                 addressError.setVisibility(View.GONE);
-            } catch (final AddressFormatException x) {
+            } catch (final AddressMalformedException x) {
                 // could not decode address at all
                 if (!isTyping) {
                     clearAddress(false);
@@ -938,21 +938,21 @@ public class SendFragment extends Fragment {
         sendToAddressView.setOnFocusChangeListener(receivingAddressListener);
     }
 
-    private void parseAddress(String addressStr) throws AddressFormatException {
+    private void parseAddress(String addressStr) throws AddressMalformedException {
         List<CoinType> possibleTypes = GenericUtils.getPossibleTypes(addressStr);
         if (possibleTypes.contains(pocket.getCoinType())) {
-            setAddress(new Address(pocket.getCoinType(), addressStr), true);
+            setAddress(pocket.getCoinType().newAddress(addressStr), true);
             sendAmountType = pocket.getCoinType();
         } else if (possibleTypes.size() == 1) {
-            setAddress(new Address(possibleTypes.get(0), addressStr), true);
+            setAddress(possibleTypes.get(0).newAddress(addressStr), true);
             sendAmountType = possibleTypes.get(0);
         } else {
             // This address string could be more that one coin type so first check if this address
             // comes from an account to determine the type.
             List<WalletAccount> possibleAccounts = application.getAccounts(possibleTypes);
-            Address addressOfAccount = null;
+            AbstractAddress addressOfAccount = null;
             for (WalletAccount account : possibleAccounts) {
-                Address testAddress = new Address(account.getCoinType(), addressStr);
+                AbstractAddress testAddress = account.getCoinType().newAddress(addressStr);
                 if (account.isAddressMine(testAddress)) {
                     addressOfAccount = testAddress;
                     break;
@@ -963,7 +963,7 @@ public class SendFragment extends Fragment {
                 // If address is from an account don't show a dialog. The type should not change as
                 // we know 100% that is correct one
                 setAddress(addressOfAccount, false);
-                sendAmountType = (CoinType) addressOfAccount.getParameters();
+                sendAmountType = addressOfAccount.getType();
             } else {
                 // As a last resort let the use choose the correct coin type
                 showPayToDialog(addressStr);
@@ -983,9 +983,9 @@ public class SendFragment extends Fragment {
     SelectCoinTypeDialog selectCoinTypeDialog = new SelectCoinTypeDialog() {
         // FIXME crash when this dialog being restored from saved state
         @Override
-        public void onAddressSelected(Address selectedAddress) {
+        public void onAddressSelected(AbstractAddress selectedAddress) {
             setAddress(selectedAddress, true);
-            sendAmountType = (CoinType) selectedAddress.getParameters();
+            sendAmountType = selectedAddress.getType();
             updateView();
         }
     };
@@ -1166,8 +1166,7 @@ public class SendFragment extends Fragment {
      * Note: if the current pair is different that the marketInfo pair, do nothing
      */
     private void onMarketUpdate(ShapeShiftMarketInfo marketInfo) {
-        if (address != null && marketInfo.isPair(pocket.getCoinType(),
-                (CoinType) address.getParameters())) {
+        if (address != null && marketInfo.isPair(pocket.getCoinType(), address.getType())) {
             this.marketInfo = marketInfo;
         }
     }
@@ -1244,13 +1243,21 @@ public class SendFragment extends Fragment {
         @Override
         public void bindView(final View view, final Context context, final Cursor cursor) {
             final String label = cursor.getString(cursor.getColumnIndexOrThrow(AddressBookProvider.KEY_LABEL));
-            final String address = cursor.getString(cursor.getColumnIndexOrThrow(AddressBookProvider.KEY_ADDRESS));
+            final String coinId = cursor.getString(cursor.getColumnIndexOrThrow(AddressBookProvider.KEY_COIN_ID));
+            final String addressStr = cursor.getString(cursor.getColumnIndexOrThrow(AddressBookProvider.KEY_ADDRESS));
+
+            CoinType type = CoinID.typeFromId(coinId);
 
             final ViewGroup viewGroup = (ViewGroup) view;
             final TextView labelView = (TextView) viewGroup.findViewById(R.id.address_book_row_label);
             labelView.setText(label);
             final TextView addressView = (TextView) viewGroup.findViewById(R.id.address_book_row_address);
-            addressView.setText(GenericUtils.addressSplitToGroupsMultiline(address));
+            try {
+                addressView.setText(GenericUtils.addressSplitToGroupsMultiline(type.newAddress(addressStr)));
+            } catch (AddressMalformedException e) {
+                ACRA.getErrorReporter().handleSilentException(e);
+                addressView.setText(addressStr);
+            }
         }
 
         @Override

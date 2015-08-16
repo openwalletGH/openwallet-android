@@ -16,11 +16,11 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.coinomi.core.util.GenericUtils;
+import com.coinomi.core.wallet.AbstractAddress;
 import com.coinomi.wallet.AddressBookProvider;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.ui.EditAddressBookEntryFragment;
 
-import org.bitcoinj.core.Address;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,7 +77,7 @@ public class UiUtils {
         return ((ActionBarActivity) activity).startSupportActionMode(callback);
     }
 
-    public static ActionMode startAddressActionMode(final Address address,
+    public static ActionMode startAddressActionMode(final AbstractAddress address,
                                                     final Activity activity,
                                                     final FragmentManager fragmentManager) {
         return startActionMode(activity,
@@ -92,12 +92,12 @@ public class UiUtils {
 
 
     public static class AddressActionModeCallback implements ActionMode.Callback {
-        private final Address address;
+        private final AbstractAddress address;
         private final Context context;
         private final FragmentManager fragmentManager;
 
 
-        public AddressActionModeCallback(final Address address,
+        public AddressActionModeCallback(final AbstractAddress address,
                                          final Context context,
                                          final FragmentManager fragmentManager) {
             this.address = address;
@@ -105,7 +105,7 @@ public class UiUtils {
             this.fragmentManager = fragmentManager;
         }
 
-        public Address getAddress() {
+        public AbstractAddress getAddress() {
             return address;
         }
 

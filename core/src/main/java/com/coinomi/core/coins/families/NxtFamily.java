@@ -1,26 +1,25 @@
 package com.coinomi.core.coins.families;
 
-import static com.coinomi.core.Preconditions.checkNotNull;
+import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.exceptions.AddressMalformedException;
+import com.coinomi.core.wallet.AbstractAddress;
+import com.coinomi.core.wallet.families.nxt.NxtFamilyAddress;
+
 
 /**
  * @author John L. Jegutanis
  *
  * Coins that belong to this family are: NXT, Burst, etc
  */
-final public class NxtFamily implements CoinFamily {
+public abstract class NxtFamily extends CoinType {
     public static final short DEFAULT_DEADLINE = 1440;
-    protected static NxtFamily instance = new NxtFamily();
-    public static synchronized CoinFamily get() {
-        return instance;
+
+    {
+        family = Families.NXT;
     }
 
     @Override
-    public String toString() {
-        return "nxt";
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return obj != null && obj instanceof NxtFamily && toString().equals(obj.toString());
+    public AbstractAddress newAddress(String addressStr) throws AddressMalformedException {
+        return NxtFamilyAddress.fromString(this, addressStr);
     }
 }

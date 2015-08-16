@@ -1,9 +1,9 @@
 package com.coinomi.core.coins;
 
+import com.coinomi.core.exceptions.AddressMalformedException;
 import com.coinomi.core.util.GenericUtils;
 import com.google.common.collect.ImmutableList;
 
-import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.params.Networks;
 
@@ -118,7 +118,7 @@ public enum CoinID {
         throw new IllegalArgumentException("Unsupported URI: " + input);
     }
 
-    public static List<CoinType> typesFromAddress(String address) throws AddressFormatException {
+    public static List<CoinType> typesFromAddress(String address) throws AddressMalformedException {
         return GenericUtils.getPossibleTypes(address);
     }
 

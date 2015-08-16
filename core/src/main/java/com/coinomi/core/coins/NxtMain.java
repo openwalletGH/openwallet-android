@@ -5,12 +5,11 @@ import com.coinomi.core.coins.families.NxtFamily;
 /**
  * @author John L. Jegutanis
  */
-public class NxtMain extends CoinType {
+public class NxtMain extends NxtFamily {
 
     private NxtMain() {
         id = "nxt.main";
 
-        family = NxtFamily.get();
         name = "NXT";
         symbol = "NXT";
         uriScheme = "nxt";
@@ -22,7 +21,7 @@ public class NxtMain extends CoinType {
     }
 
     private static NxtMain instance = new NxtMain();
-    public static synchronized NxtMain get() {
+    public static synchronized CoinType get() {
         return instance;
     }
 }

@@ -1,6 +1,15 @@
 package com.coinomi.core.wallet;
 
+import com.coinomi.core.coins.CoinID;
+import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.protos.Protos;
+import com.coinomi.core.util.KeyUtils;
+import com.coinomi.core.wallet.families.nxt.NxtFamilyWallet;
+import com.coinomi.core.wallet.families.nxt.NxtFamilyWalletProtobufSerializer;
+import com.google.common.base.Splitter;
+import com.google.protobuf.ByteString;
+import com.google.protobuf.TextFormat;
+
 import org.bitcoinj.crypto.ChildNumber;
 import org.bitcoinj.crypto.DeterministicKey;
 import org.bitcoinj.crypto.EncryptedData;
@@ -9,13 +18,6 @@ import org.bitcoinj.crypto.KeyCrypterException;
 import org.bitcoinj.crypto.KeyCrypterScrypt;
 import org.bitcoinj.store.UnreadableWalletException;
 import org.bitcoinj.wallet.DeterministicSeed;
-
-import com.coinomi.core.util.KeyUtils;
-import com.coinomi.core.wallet.families.nxt.NxtFamilyWallet;
-import com.coinomi.core.wallet.families.nxt.NxtFamilyWalletProtobufSerializer;
-import com.google.common.base.Splitter;
-import com.google.protobuf.ByteString;
-import com.google.protobuf.TextFormat;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -191,12 +193,40 @@ public class WalletProtobufSerializer {
         }
 
         WalletPocketProtobufSerializer pocketSerializer = new WalletPocketProtobufSerializer();
+        NxtFamilyWalletProtobufSerializer nxtPocketSerializer = new NxtFamilyWalletProtobufSerializer();
         for (Protos.WalletPocket pocketProto : walletProto.getPocketsList()) {
-            AbstractWallet pocket = pocketSerializer.readWallet(pocketProto, crypter);
+            CoinType type = getType(pocketProto);
+            AbstractWallet pocket;
+
+            switch (type.getFamilyEnum()) {
+                case NXT:
+                    pocket = nxtPocketSerializer.readWallet(pocketProto, crypter);
+                    break;
+                case BITCOIN:
+                case NUBITS:
+                case PEERCOIN:
+                case REDDCOIN:
+                case VPNCOIN:
+                    pocket = pocketSerializer.readWallet(pocketProto, crypter);
+                    break;
+                default:
+                case FIAT:
+                    throw new UnreadableWalletException("Unsupported family " + type.getFamily());
+            }
+
             wallet.addAccount(pocket);
         }
 
         return wallet;
+    }
+
+    private static CoinType getType(Protos.WalletPocket proto) throws UnreadableWalletException {
+        try {
+            return CoinID.typeFromId(proto.getNetworkIdentifier());
+        } catch (IllegalArgumentException e) {
+            throw new UnreadableWalletException("Unknown network parameters ID " +
+                    proto.getNetworkIdentifier());
+        }
     }
 
     private static KeyCrypter getKeyCrypter(Protos.Wallet walletProto) {

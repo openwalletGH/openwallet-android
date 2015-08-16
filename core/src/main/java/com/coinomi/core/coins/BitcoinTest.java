@@ -5,7 +5,7 @@ import com.coinomi.core.coins.families.BitFamily;
 /**
  * @author John L. Jegutanis
  */
-public class BitcoinTest extends CoinType {
+public class BitcoinTest extends BitFamily {
     private BitcoinTest() {
         id = "bitcoin.test";
 
@@ -15,7 +15,6 @@ public class BitcoinTest extends CoinType {
         spendableCoinbaseDepth = 100;
         dumpedPrivateKeyHeader = 239;
 
-        family = BitFamily.get();
         name = "Bitcoin Test";
         symbol = "BTCt";
         uriScheme = "bitcoin";
@@ -29,7 +28,7 @@ public class BitcoinTest extends CoinType {
     }
 
     private static BitcoinTest instance = new BitcoinTest();
-    public static synchronized BitcoinTest get() {
+    public static synchronized CoinType get() {
         return instance;
     }
 }

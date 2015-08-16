@@ -27,8 +27,7 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
 import com.coinomi.core.coins.CoinType;
-
-import org.bitcoinj.core.Address;
+import com.coinomi.core.wallet.AbstractAddress;
 
 import java.util.List;
 
@@ -62,16 +61,12 @@ public class AddressBookProvider extends ContentProvider {
         return Uri.parse("content://" + packageName + '.' + DATABASE_TABLE + "/" + coinId);
     }
 
-    public static String resolveLabel(final Context context, final Address address) {
-        return resolveLabel(context, (CoinType) address.getParameters(), address.toString());
-    }
-
-    public static String resolveLabel(final Context context, @Nonnull CoinType type,
-                                      @Nonnull final String address) {
+    public static String resolveLabel(final Context context, final AbstractAddress address) {
         String label = null;
 
         if (context != null) {
-            final Uri uri = contentUri(context.getPackageName(), type).buildUpon().appendPath(address).build();
+            final Uri uri = contentUri(context.getPackageName(), address.getType())
+                    .buildUpon().appendPath(address.toString()).build();
             final Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
 
             if (cursor != null) {

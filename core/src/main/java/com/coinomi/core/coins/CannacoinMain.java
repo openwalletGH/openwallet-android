@@ -6,7 +6,7 @@ import com.coinomi.core.coins.families.ReddFamily;
 /**
  * @author FuzzyHobbit
  */
-public class CannacoinMain extends CoinType {
+public class CannacoinMain extends ReddFamily {
     private CannacoinMain() {
         id = "cannacoin.main";
 
@@ -17,7 +17,6 @@ public class CannacoinMain extends CoinType {
         dumpedPrivateKeyHeader = 189;
         transactionVersion = 2;
 
-        family = ReddFamily.get();
         name = "Cannacoin";
         symbol = "CCN";
         uriScheme = "cannacoin";
@@ -31,7 +30,7 @@ public class CannacoinMain extends CoinType {
     }
 
     private static CannacoinMain instance = new CannacoinMain();
-    public static synchronized CannacoinMain get() {
+    public static synchronized CoinType get() {
         return instance;
     }
 }

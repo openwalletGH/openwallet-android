@@ -1,11 +1,11 @@
 package com.coinomi.core.coins;
 
-import com.coinomi.core.coins.families.NubitsFamily;
+import com.coinomi.core.coins.families.NuFamily;
 
 /**
  * @author John L. Jegutanis
  */
-public class NuSharesMain extends CoinType {
+public class NuSharesMain extends NuFamily {
     private NuSharesMain() {
         id = "nushares.main";
 
@@ -14,7 +14,6 @@ public class NuSharesMain extends CoinType {
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         tokenId = 0x53;
 
-        family = NubitsFamily.get();
         name = "NuShares";
         symbol = "NSR";
         uriScheme = "nu";
@@ -28,7 +27,7 @@ public class NuSharesMain extends CoinType {
     }
 
     private static NuSharesMain instance = new NuSharesMain();
-    public static synchronized NuSharesMain get() {
+    public static synchronized CoinType get() {
         return instance;
     }
 }

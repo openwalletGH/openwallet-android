@@ -10,10 +10,11 @@ import android.widget.TextView;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
 import com.coinomi.core.messages.TxMessage;
+import com.coinomi.core.util.AddressUtils;
 import com.coinomi.core.util.ExchangeRate;
 import com.coinomi.core.util.GenericUtils;
+import com.coinomi.core.wallet.AbstractAddress;
 import com.coinomi.core.wallet.AbstractWallet;
-import com.coinomi.wallet.AddressBookProvider;
 import com.coinomi.wallet.R;
 import com.google.common.collect.ImmutableList;
 
@@ -24,8 +25,6 @@ import org.bitcoinj.core.TransactionOutput;
 import java.util.List;
 
 import javax.annotation.Nullable;
-
-import static com.coinomi.core.Preconditions.checkState;
 
 /**
  * @author John L. Jegutanis
@@ -40,7 +39,7 @@ public class TransactionAmountVisualizer extends LinearLayout {
     private Coin feeAmount;
     private boolean isSending;
 
-    private String address;
+    private AbstractAddress address;
     private CoinType type;
 
     public TransactionAmountVisualizer(Context context, AttributeSet attrs) {
@@ -82,9 +81,8 @@ public class TransactionAmountVisualizer extends LinearLayout {
             outputAmount = txo.getValue();
             output.setAmount(GenericUtils.formatCoinValue(type, outputAmount));
             output.setSymbol(symbol);
-            address = txo.getScriptPubKey().getToAddress(type).toString();
-            output.setLabelAndAddress(
-                    AddressBookProvider.resolveLabel(getContext(), type, address), address);
+            address = AddressUtils.fromScript(type, txo.getScriptPubKey());
+            output.setLabelAndAddress(address);
             break; // TODO remove when supporting more than one output
         }
 
@@ -146,8 +144,7 @@ public class TransactionAmountVisualizer extends LinearLayout {
     }
 
     public void resetLabels() {
-        output.setLabelAndAddress(
-                AddressBookProvider.resolveLabel(getContext(), type, address), address);
+        output.setLabelAndAddress(address);
     }
 
     public List<SendOutput> getOutputs() {

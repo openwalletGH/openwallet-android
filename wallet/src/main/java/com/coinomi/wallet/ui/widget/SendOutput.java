@@ -10,10 +10,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.coinomi.core.util.GenericUtils;
+import com.coinomi.core.wallet.AbstractAddress;
 import com.coinomi.wallet.AddressBookProvider;
 import com.coinomi.wallet.R;
-
-import org.bitcoinj.core.Address;
 
 /**
  * @author John L. Jegutanis
@@ -28,7 +27,7 @@ public class SendOutput extends LinearLayout {
     private TextView addressLabelView;
     private TextView addressView;
 
-    private String address;
+    private AbstractAddress address;
     private String label;
     private boolean isSending;
     private String sendLabel;
@@ -92,7 +91,7 @@ public class SendOutput extends LinearLayout {
         this.symbolLocal.setVisibility(VISIBLE);
     }
 
-    public void setAddress(String address) {
+    public void setAddress(AbstractAddress address) {
         this.address = address;
         updateView();
     }
@@ -195,15 +194,9 @@ public class SendOutput extends LinearLayout {
         updateDirectionLabels();
     }
 
-    public void setLabelAndAddress(String label, String address) {
-        this.label = label;
-        this.address = address;
-        updateView();
-    }
-
-    public void setLabelAndAddress(Address address) {
+    public void setLabelAndAddress(AbstractAddress address) {
         this.label = AddressBookProvider.resolveLabel(context, address);
-        this.address = address.toString();
+        this.address = address;
         updateView();
     }
 

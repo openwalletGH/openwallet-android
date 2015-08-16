@@ -5,7 +5,7 @@ import com.coinomi.core.coins.families.BitFamily;
 /**
  * @author Digibyte
  */
-public class DigibyteMain extends CoinType {
+public class DigibyteMain extends BitFamily {
     private DigibyteMain() {
         id = "digibyte.main";
 
@@ -15,7 +15,6 @@ public class DigibyteMain extends CoinType {
         spendableCoinbaseDepth = 100;
         dumpedPrivateKeyHeader = 128;
 
-        family = BitFamily.get();
         name = "Digibyte (beta)";
         symbol = "DGB";
         uriScheme = "digibyte";
@@ -29,7 +28,7 @@ public class DigibyteMain extends CoinType {
     }
 
     private static DigibyteMain instance = new DigibyteMain();
-    public static synchronized DigibyteMain get() {
+    public static synchronized CoinType get() {
         return instance;
     }
 }

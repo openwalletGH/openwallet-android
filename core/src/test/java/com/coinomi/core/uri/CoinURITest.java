@@ -28,15 +28,19 @@ import com.coinomi.core.coins.NuBitsMain;
 import com.coinomi.core.coins.NuSharesMain;
 import com.coinomi.core.coins.PeercoinMain;
 import com.coinomi.core.util.GenericUtils;
+import com.coinomi.core.wallet.families.bitcoin.BitAddress;
 
-import org.bitcoinj.core.Address;
 import org.bitcoinj.core.Coin;
-
 import org.junit.Test;
 
 import java.io.UnsupportedEncodingException;
 
-import static org.junit.Assert.*;
+import static com.coinomi.core.util.AddressUtils.getHash160;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class CoinURITest {
     private CoinURI testObject = null;
@@ -54,7 +58,7 @@ public class CoinURITest {
 
     @Test
     public void testConvertToCoinURI() throws Exception {
-        Address goodAddress = new Address(BitcoinMain.get(), MAINNET_GOOD_ADDRESS);
+        BitAddress goodAddress = new BitAddress(BitcoinMain.get(), MAINNET_GOOD_ADDRESS);
         
         // simple example
         assertEquals("bitcoin:" + MAINNET_GOOD_ADDRESS + "?amount=12.34&label=Hello&message=AMessage", CoinURI.convertToCoinURI(goodAddress, BTC.value("12.34"), "Hello", "AMessage"));
@@ -91,53 +95,53 @@ public class CoinURITest {
 
     @Test
     public void testAltChainsConvertToCoinURI() throws Exception {
-        byte[] hash160 = new Address(BitcoinMain.get(), MAINNET_GOOD_ADDRESS).getHash160();
+        byte[] hash160 = new BitAddress(BitcoinMain.get(), MAINNET_GOOD_ADDRESS).getHash160();
         String goodAddressStr;
-        Address goodAddress;
+        BitAddress goodAddress;
 
         // Litecoin
-        goodAddress = new Address(LitecoinMain.get(), hash160);
+        goodAddress = new BitAddress(LitecoinMain.get(), hash160);
         goodAddressStr = goodAddress.toString();
         assertEquals("litecoin:" + goodAddressStr + "?amount=12.34&label=Hello&message=AMessage", CoinURI.convertToCoinURI(goodAddress, LTC.value("12.34"), "Hello", "AMessage"));
 
         // Dogecoin
-        goodAddress = new Address(DogecoinMain.get(), hash160);
+        goodAddress = new BitAddress(DogecoinMain.get(), hash160);
         goodAddressStr = goodAddress.toString();
         assertEquals("dogecoin:" + goodAddressStr + "?amount=12.34&label=Hello&message=AMessage", CoinURI.convertToCoinURI(goodAddress, DOGE.value("12.34"), "Hello", "AMessage"));
 
         // Peercoin
-        goodAddress = new Address(PeercoinMain.get(), hash160);
+        goodAddress = new BitAddress(PeercoinMain.get(), hash160);
         goodAddressStr = goodAddress.toString();
         assertEquals("peercoin:" + goodAddressStr + "?amount=12.34&label=Hello&message=AMessage", CoinURI.convertToCoinURI(goodAddress, PPC.value("12.34"), "Hello", "AMessage"));
 
         // Darkcoin
-        goodAddress = new Address(DashMain.get(), hash160);
+        goodAddress = new BitAddress(DashMain.get(), hash160);
         goodAddressStr = goodAddress.toString();
         assertEquals("dash:" + goodAddressStr + "?amount=12.34&label=Hello&message=AMessage", CoinURI.convertToCoinURI(goodAddress, DASH.value("12.34"), "Hello", "AMessage"));
     }
 
     @Test
     public void testSharedCoinURI() throws Exception {
-        byte[] hash160 = new Address(BitcoinMain.get(), MAINNET_GOOD_ADDRESS).getHash160();
+        byte[] hash160 = new BitAddress(BitcoinMain.get(), MAINNET_GOOD_ADDRESS).getHash160();
 
         // Bitcoin and Bitcoin Testnet
-        Address address = new Address(BTC, hash160);
+        BitAddress address = new BitAddress(BTC, hash160);
         testObject = new CoinURI(BTC.getUriScheme() + ":" + address);
         assertEquals(BTC, testObject.getType());
         assertEquals(address, testObject.getAddress());
 
-        Address addressTestnet = new Address(BTC_TEST, hash160);
+        BitAddress addressTestnet = new BitAddress(BTC_TEST, hash160);
         testObject = new CoinURI(BTC_TEST.getUriScheme() + ":" + addressTestnet);
         assertEquals(BTC_TEST, testObject.getType());
         assertEquals(addressTestnet, testObject.getAddress());
 
         // NuBits and NuShares
-        Address nuBitAddress = new Address(NBT, hash160);
+        BitAddress nuBitAddress = new BitAddress(NBT, hash160);
         testObject = new CoinURI(NBT.getUriScheme() + ":" + nuBitAddress);
         assertEquals(NBT, testObject.getType());
         assertEquals(nuBitAddress, testObject.getAddress());
 
-        Address nuSharesAddress = new Address(NSR, hash160);
+        BitAddress nuSharesAddress = new BitAddress(NSR, hash160);
         testObject = new CoinURI(NSR.getUriScheme() + ":" + nuSharesAddress);
         assertEquals(NSR, testObject.getType());
         assertEquals(nuSharesAddress, testObject.getAddress());
@@ -145,30 +149,30 @@ public class CoinURITest {
 
     @Test
     public void testAltChainsGoodAmount() throws Exception {
-        byte[] hash160 = new Address(BitcoinMain.get(), MAINNET_GOOD_ADDRESS).getHash160();
+        byte[] hash160 = new BitAddress(BitcoinMain.get(), MAINNET_GOOD_ADDRESS).getHash160();
         String goodAddressStr;
-        Address goodAddress;
+        BitAddress goodAddress;
 
         // Litecoin
-        goodAddress = new Address(LitecoinMain.get(), hash160);
+        goodAddress = new BitAddress(LitecoinMain.get(), hash160);
         goodAddressStr = goodAddress.toString();
         testObject = new CoinURI(LitecoinMain.get(), "litecoin:" + goodAddressStr + "?amount=12.34");
         assertEquals("12.34", GenericUtils.formatCoinValue(LitecoinMain.get(), testObject.getAmount()));
 
         // Dogecoin
-        goodAddress = new Address(DogecoinMain.get(), hash160);
+        goodAddress = new BitAddress(DogecoinMain.get(), hash160);
         goodAddressStr = goodAddress.toString();
         testObject = new CoinURI(DogecoinMain.get(), "dogecoin:" + goodAddressStr + "?amount=12.34");
         assertEquals("12.34", GenericUtils.formatCoinValue(DogecoinMain.get(), testObject.getAmount()));
 
         // Peercoin
-        goodAddress = new Address(PeercoinMain.get(), hash160);
+        goodAddress = new BitAddress(PeercoinMain.get(), hash160);
         goodAddressStr = goodAddress.toString();
         testObject = new CoinURI(PeercoinMain.get(), "peercoin:" + goodAddressStr + "?amount=12.34");
         assertEquals("12.34", GenericUtils.formatCoinValue(PeercoinMain.get(), testObject.getAmount()));
 
         // Darkcoin
-        goodAddress = new Address(DashMain.get(), hash160);
+        goodAddress = new BitAddress(DashMain.get(), hash160);
         goodAddressStr = goodAddress.toString();
         testObject = new CoinURI(DashMain.get(), "dash:" + goodAddressStr + "?amount=12.34");
         assertEquals("12.34", GenericUtils.formatCoinValue(DashMain.get(), testObject.getAmount()));
@@ -180,7 +184,8 @@ public class CoinURITest {
         assertNotNull(testObject);
         assertNull("Unexpected amount", testObject.getAmount());
         assertNull("Unexpected label", testObject.getLabel());
-        assertEquals("Unexpected label", 20, testObject.getAddress().getHash160().length);
+        assertNotNull(testObject.getAddress());
+        assertEquals("Unexpected label", 20, getHash160(testObject.getAddress()).length);
     }
 
     /**

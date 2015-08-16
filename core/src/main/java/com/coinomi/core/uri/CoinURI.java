@@ -22,9 +22,10 @@ import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
 import com.coinomi.core.util.GenericUtils;
+import com.coinomi.core.wallet.AbstractAddress;
+import com.coinomi.core.wallet.families.bitcoin.BitAddress;
 import com.google.common.collect.Lists;
 
-import org.bitcoinj.core.Address;
 import org.bitcoinj.core.AddressFormatException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -192,10 +193,11 @@ public class CoinURI {
         // Parse the address if any and set type
         if (!addressToken.isEmpty()) {
             // Attempt to parse the addressToken as a possible type address
-            Address address = null;
+            AbstractAddress address = null;
+            // TODO support non-BitAddress types
             for (CoinType possibleType : possibleTypes) {
                 try {
-                    address = new Address(possibleType, addressToken);
+                    address = new BitAddress(possibleType, addressToken);
                     putWithValidation(FIELD_ADDRESS, address);
                     break;
                 } catch (final AddressFormatException e) {
@@ -206,7 +208,7 @@ public class CoinURI {
             if (address == null) {
                 throw new CoinURIParseException("Bad address: " + addressToken);
             }
-            type = (CoinType) address.getParameters();
+            type = address.getType();
         } else {
             // TODO, currently we don't support URIs without an address
             throw new CoinURIParseException("No address found");
@@ -309,8 +311,8 @@ public class CoinURI {
      * it.
      */
     @Nullable
-    public Address getAddress() {
-        return (Address) parameterMap.get(FIELD_ADDRESS);
+    public AbstractAddress getAddress() {
+        return (AbstractAddress) parameterMap.get(FIELD_ADDRESS);
     }
 
     /**
@@ -376,11 +378,11 @@ public class CoinURI {
      * @param message A message
      * @return A String containing the coin URI
      */
-    public static String convertToCoinURI(Address address, @Nullable Value amount,
+    public static String convertToCoinURI(AbstractAddress address, @Nullable Value amount,
                                           @Nullable String label, @Nullable String message) {
         checkNotNull(address);
 
-        CoinType type = (CoinType) address.getParameters();
+        CoinType type = address.getType();
         String addressStr = address.toString();
 
         if (amount != null && amount.signum() < 0) {

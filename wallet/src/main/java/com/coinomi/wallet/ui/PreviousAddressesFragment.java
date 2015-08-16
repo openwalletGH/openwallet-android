@@ -15,6 +15,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.wallet.AbstractAddress;
 import com.coinomi.core.wallet.WalletPocketHD;
 import com.coinomi.wallet.AddressBookProvider;
 import com.coinomi.wallet.Constants;
@@ -23,7 +24,6 @@ import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.util.ThrottlingWalletChangeListener;
 import com.coinomi.wallet.util.WeakHandler;
 
-import org.bitcoinj.core.Address;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -117,10 +117,10 @@ public class PreviousAddressesFragment extends Fragment {
                 if (position >= previousAddresses.getHeaderViewsCount()) {
                     Object obj = parent.getItemAtPosition(position);
 
-                    if (obj != null && obj instanceof Address) {
+                    if (obj != null && obj instanceof AbstractAddress) {
                         Bundle args = new Bundle();
                         args.putString(Constants.ARG_ACCOUNT_ID, accountId);
-                        args.putSerializable(Constants.ARG_ADDRESS, (Address)obj);
+                        args.putSerializable(Constants.ARG_ADDRESS, (AbstractAddress) obj);
                         listener.onAddressSelected(args);
                     } else {
                         Toast.makeText(getActivity(), R.string.error_generic, Toast.LENGTH_LONG).show();
@@ -189,6 +189,6 @@ public class PreviousAddressesFragment extends Fragment {
     }
 
     public interface Listener {
-        public void onAddressSelected(Bundle args);
+        void onAddressSelected(Bundle args);
     }
 }

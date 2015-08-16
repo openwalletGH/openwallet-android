@@ -10,19 +10,18 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Binder;
 import android.os.IBinder;
-import android.os.PowerManager;
 import android.os.SystemClock;
 import android.text.format.DateUtils;
 
 import com.coinomi.core.network.ConnectivityHelper;
 import com.coinomi.core.network.ServerClients;
+import com.coinomi.core.wallet.AbstractAddress;
 import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.wallet.Configuration;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.WalletApplication;
 
-import org.bitcoinj.core.Address;
 import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.Transaction;
 import org.slf4j.Logger;
@@ -59,7 +58,7 @@ public class CoinServiceImpl extends Service implements CoinService {
 
     private int notificationCount = 0;
     private BigInteger notificationAccumulatedAmount = BigInteger.ZERO;
-    private final List<Address> notificationAddresses = new LinkedList<Address>();
+    private final List<AbstractAddress> notificationAddresses = new LinkedList<>();
     private AtomicInteger transactionsReceived = new AtomicInteger();
     private long serviceCreatedAt;
 

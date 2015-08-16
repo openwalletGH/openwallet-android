@@ -31,9 +31,9 @@ import android.widget.Toast;
 
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.exchange.shapeshift.ShapeShift;
-import com.coinomi.core.exchange.shapeshift.data.ShapeShiftEmail;
 import com.coinomi.core.exchange.shapeshift.data.ShapeShiftException;
 import com.coinomi.core.exchange.shapeshift.data.ShapeShiftTxStatus;
+import com.coinomi.core.wallet.AbstractAddress;
 import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.ExchangeHistoryProvider;
@@ -43,8 +43,6 @@ import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.util.Fonts;
 import com.coinomi.wallet.util.WeakHandler;
 
-import org.bitcoinj.core.Address;
-import org.bitcoinj.core.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,10 +99,10 @@ public class TradeStatusFragment extends Fragment {
 
     private static class StatusPollTask extends TimerTask {
         private final ShapeShift shapeShift;
-        private final Address depositAddress;
+        private final AbstractAddress depositAddress;
         private final Handler handler;
 
-        private StatusPollTask(ShapeShift shapeShift, Address depositAddress, Handler handler) {
+        private StatusPollTask(ShapeShift shapeShift, AbstractAddress depositAddress, Handler handler) {
             this.shapeShift = shapeShift;
             this.depositAddress = depositAddress;
             this.handler = handler;
@@ -185,7 +183,7 @@ public class TradeStatusFragment extends Fragment {
         Bundle args = getArguments();
         showExitButton = args.getBoolean(ARG_SHOW_EXIT_BUTTON, false);
         exchangeStatus = (ExchangeEntry) args.getSerializable(Constants.ARG_EXCHANGE_ENTRY);
-        Address deposit = exchangeStatus.depositAddress;
+        AbstractAddress deposit = exchangeStatus.depositAddress;
         statusUri = ExchangeHistoryProvider.contentUri(application.getPackageName(), deposit);
         loaderManager.initLoader(ID_STATUS_LOADER, null, statusLoaderCallbacks);
 
@@ -377,8 +375,8 @@ public class TradeStatusFragment extends Fragment {
 
     private void updateViewTransaction() {
         final String txId = exchangeStatus.withdrawTransactionId;
-        final Address withdrawAddress = exchangeStatus.withdrawAddress;
-        final CoinType withdrawType = (CoinType) withdrawAddress.getParameters();
+        final AbstractAddress withdrawAddress = exchangeStatus.withdrawAddress;
+        final CoinType withdrawType = withdrawAddress.getType();
         final List<WalletAccount> accounts = application.getAccounts(withdrawAddress);
 
         if (accounts.size() > 0 || Constants.COINS_BLOCK_EXPLORERS.containsKey(withdrawType)) {

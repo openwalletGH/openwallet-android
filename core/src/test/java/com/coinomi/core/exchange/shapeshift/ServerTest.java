@@ -6,6 +6,7 @@ import com.coinomi.core.coins.DogecoinMain;
 import com.coinomi.core.coins.LitecoinMain;
 import com.coinomi.core.coins.NuBitsMain;
 import com.coinomi.core.coins.Value;
+import com.coinomi.core.exceptions.AddressMalformedException;
 import com.coinomi.core.exchange.shapeshift.data.ShapeShiftAmountTx;
 import com.coinomi.core.exchange.shapeshift.data.ShapeShiftCoin;
 import com.coinomi.core.exchange.shapeshift.data.ShapeShiftCoins;
@@ -17,13 +18,12 @@ import com.coinomi.core.exchange.shapeshift.data.ShapeShiftNormalTx;
 import com.coinomi.core.exchange.shapeshift.data.ShapeShiftRate;
 import com.coinomi.core.exchange.shapeshift.data.ShapeShiftTime;
 import com.coinomi.core.exchange.shapeshift.data.ShapeShiftTxStatus;
+import com.coinomi.core.wallet.AbstractAddress;
 import com.squareup.okhttp.ConnectionSpec;
 import com.squareup.okhttp.mockwebserver.MockResponse;
 import com.squareup.okhttp.mockwebserver.MockWebServer;
 import com.squareup.okhttp.mockwebserver.RecordedRequest;
 
-import org.bitcoinj.core.Address;
-import org.bitcoinj.core.AddressFormatException;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.After;
@@ -148,12 +148,12 @@ public class ServerTest {
     }
 
     @Test
-    public void testGetTime() throws ShapeShiftException, IOException, InterruptedException, JSONException, AddressFormatException {
+    public void testGetTime() throws ShapeShiftException, IOException, InterruptedException, JSONException, AddressMalformedException {
         // Schedule some responses.
         server.enqueue(new MockResponse().setBody(GET_TIME_PENDING_JSON));
         server.enqueue(new MockResponse().setBody(GET_TIME_EXPIRED_JSON));
 
-        Address address = new Address(NuBitsMain.get(), "BPjxHqswNZB5vznbrAAxi5zGVq3ruhtBU8");
+        AbstractAddress address = NuBitsMain.get().newAddress("BPjxHqswNZB5vznbrAAxi5zGVq3ruhtBU8");
 
         ShapeShiftTime timeReply = shapeShift.getTime(address);
         assertFalse(timeReply.isError);
@@ -173,7 +173,7 @@ public class ServerTest {
     }
 
     @Test
-    public void testGetTxStatus() throws ShapeShiftException, IOException, InterruptedException, JSONException, AddressFormatException {
+    public void testGetTxStatus() throws ShapeShiftException, IOException, InterruptedException, JSONException, AddressMalformedException {
         // Schedule some responses.
         server.enqueue(new MockResponse().setBody(TX_STATUS_NO_DEPOSIT_JSON));
         server.enqueue(new MockResponse().setBody(TX_STATUS_RECEIVED_JSON));
@@ -181,7 +181,7 @@ public class ServerTest {
         server.enqueue(new MockResponse().setBody(TX_STATUS_COMPLETE_JSON));
         server.enqueue(new MockResponse().setBody(TX_STATUS_FAILED_JSON));
 
-        Address address = new Address(BTC, "1NDQPAGamGePkSZXW2CYBzXJEefB7N4bTN");
+        AbstractAddress address = BTC.newAddress("1NDQPAGamGePkSZXW2CYBzXJEefB7N4bTN");
 
         ShapeShiftTxStatus txStatusReply = shapeShift.getTxStatus(address);
         assertFalse(txStatusReply.isError);
@@ -206,7 +206,7 @@ public class ServerTest {
         assertEquals("0.00297537", txStatusReply.incomingValue.toPlainString());
         assertEquals(BTC, txStatusReply.incomingValue.type);
         assertEquals("LMmeBWH17TWkQKvK7YFio2oiimPAzrHG6f", txStatusReply.withdraw.toString());
-        assertEquals(LTC, txStatusReply.withdraw.getParameters());
+        assertEquals(LTC, txStatusReply.withdraw.getType());
         assertEquals("0.42", txStatusReply.outgoingValue.toPlainString());
         assertEquals(LTC, txStatusReply.outgoingValue.type);
         assertEquals("66fa0b4c11227f9f05efa13d23e58c65b50acbd6395a126b5cd751064e6e79df",
@@ -229,19 +229,19 @@ public class ServerTest {
     }
 
     @Test
-    public void testNormalTransaction() throws ShapeShiftException, IOException, InterruptedException, JSONException, AddressFormatException {
+    public void testNormalTransaction() throws ShapeShiftException, IOException, InterruptedException, JSONException, AddressMalformedException {
         // Schedule some responses.
         server.enqueue(new MockResponse().setBody(NORMAL_TRANSACTION_JSON));
 
-        Address withdrawal = new Address(DOGE, "DMHLQYG4j96V8cZX9WSuXxLs5RnZn6ibrV");
-        Address refund = new Address(BTC, "1Nz4xHJjNCnZFPjRUq8CN4BZEXTgLZfeUW");
+        AbstractAddress withdrawal = DOGE.newAddress("DMHLQYG4j96V8cZX9WSuXxLs5RnZn6ibrV");
+        AbstractAddress refund = BTC.newAddress("1Nz4xHJjNCnZFPjRUq8CN4BZEXTgLZfeUW");
         ShapeShiftNormalTx normalTxReply = shapeShift.exchange(withdrawal, refund);
         assertFalse(normalTxReply.isError);
         assertEquals("btc_doge", normalTxReply.pair);
         assertEquals("18ETaXCYhJ8sxurh41vpKC3E6Tu7oJ94q8", normalTxReply.deposit.toString());
-        assertEquals(BTC, normalTxReply.deposit.getParameters());
+        assertEquals(BTC, normalTxReply.deposit.getType());
         assertEquals(withdrawal.toString(), normalTxReply.withdrawal.toString());
-        assertEquals(DOGE, normalTxReply.withdrawal.getParameters());
+        assertEquals(DOGE, normalTxReply.withdrawal.getType());
 
         // Optional: confirm that your app made the HTTP requests you were expecting.
         RecordedRequest request = server.takeRequest();
@@ -255,24 +255,24 @@ public class ServerTest {
 
     @Test
     public void testFixedAmountTransaction() throws ShapeShiftException, IOException,
-            InterruptedException, JSONException, AddressFormatException {
+            InterruptedException, JSONException, AddressMalformedException {
         // Schedule some responses.
         server.enqueue(new MockResponse().setBody(FIXED_AMOUNT_TRANSACTION_JSON));
 
-        Address withdrawal = new Address(DOGE, "DMHLQYG4j96V8cZX9WSuXxLs5RnZn6ibrV");
-        Address refund = new Address(BTC, "1Nz4xHJjNCnZFPjRUq8CN4BZEXTgLZfeUW");
+        AbstractAddress withdrawal = DOGE.newAddress("DMHLQYG4j96V8cZX9WSuXxLs5RnZn6ibrV");
+        AbstractAddress refund = BTC.newAddress("1Nz4xHJjNCnZFPjRUq8CN4BZEXTgLZfeUW");
         Value amount = DOGE.value("1000");
         ShapeShiftAmountTx amountTxReply = shapeShift.exchangeForAmount(amount, withdrawal, refund);
         assertFalse(amountTxReply.isError);
         assertEquals("btc_doge", amountTxReply.pair);
 
         assertEquals("14gQ3xywKEUA6CfH61F8t2c6oB5nLnUjL5", amountTxReply.deposit.toString());
-        assertEquals(BTC, amountTxReply.deposit.getParameters());
+        assertEquals(BTC, amountTxReply.deposit.getType());
         assertEquals("0.00052379", amountTxReply.depositAmount.toPlainString());
         assertEquals(BTC, amountTxReply.depositAmount.type);
 
         assertEquals(withdrawal.toString(), amountTxReply.withdrawal.toString());
-        assertEquals(DOGE, amountTxReply.withdrawal.getParameters());
+        assertEquals(DOGE, amountTxReply.withdrawal.getType());
         assertEquals(amount.toPlainString(), amountTxReply.withdrawalAmount.toPlainString());
         assertEquals(DOGE, amountTxReply.withdrawalAmount.type);
 
@@ -291,13 +291,13 @@ public class ServerTest {
 
     @Test
     public void testEmail() throws ShapeShiftException, IOException, InterruptedException,
-            JSONException, AddressFormatException {
+            JSONException, AddressMalformedException {
         // Schedule some responses.
         server.enqueue(new MockResponse().setBody(TX_STATUS_COMPLETE_JSON));
         server.enqueue(new MockResponse().setBody(EMAIL_JSON));
 
         ShapeShiftTxStatus txStatusReply =
-                shapeShift.getTxStatus(BTC.address("1NDQPAGamGePkSZXW2CYBzXJEefB7N4bTN"));
+                shapeShift.getTxStatus(BTC.newAddress("1NDQPAGamGePkSZXW2CYBzXJEefB7N4bTN"));
         ShapeShiftEmail emailReply =
                 shapeShift.requestEmailReceipt("mail@example.com", txStatusReply);
         assertFalse(emailReply.isError);
@@ -317,10 +317,10 @@ public class ServerTest {
 
     @Test(expected = ShapeShiftException.class)
     public void testEmailFail() throws ShapeShiftException, IOException, InterruptedException,
-            JSONException, AddressFormatException {
+            JSONException, AddressMalformedException {
         server.enqueue(new MockResponse().setBody(TX_STATUS_NO_DEPOSIT_JSON));
         ShapeShiftTxStatus txStatusReply = shapeShift
-                .getTxStatus(BTC.address("1NDQPAGamGePkSZXW2CYBzXJEefB7N4bTN"));
+                .getTxStatus(BTC.newAddress("1NDQPAGamGePkSZXW2CYBzXJEefB7N4bTN"));
         // Bad status
         shapeShift.requestEmailReceipt("mail@example.com", txStatusReply);
     }
@@ -347,48 +347,48 @@ public class ServerTest {
     }
 
     @Test(expected = ShapeShiftException.class)
-    public void testGetTxStatusFail() throws ShapeShiftException, AddressFormatException, IOException {
+    public void testGetTxStatusFail() throws ShapeShiftException, AddressMalformedException, IOException {
         server.enqueue(new MockResponse().setBody(TX_STATUS_COMPLETE_JSON));
         // Used an incorrect address, correct is 1NDQPAGamGePkSZXW2CYBzXJEefB7N4bTN
-        shapeShift.getTxStatus(BTC.address("18ETaXCYhJ8sxurh41vpKC3E6Tu7oJ94q8"));
+        shapeShift.getTxStatus(BTC.newAddress("18ETaXCYhJ8sxurh41vpKC3E6Tu7oJ94q8"));
     }
 
     @Test(expected = ShapeShiftException.class)
-    public void testNormalTransactionFail() throws ShapeShiftException, AddressFormatException, IOException {
+    public void testNormalTransactionFail() throws ShapeShiftException, AddressMalformedException, IOException {
         server.enqueue(new MockResponse().setBody(NORMAL_TRANSACTION_JSON));
         // Incorrect Dogecoin address, correct is DMHLQYG4j96V8cZX9WSuXxLs5RnZn6ibrV
-        shapeShift.exchange(DOGE.address("DSntbp199h851m3Y1g3ruYCQHzWYCZQmmA"),
-                BTC.address("1Nz4xHJjNCnZFPjRUq8CN4BZEXTgLZfeUW"));
+        shapeShift.exchange(DOGE.newAddress("DSntbp199h851m3Y1g3ruYCQHzWYCZQmmA"),
+                BTC.newAddress("1Nz4xHJjNCnZFPjRUq8CN4BZEXTgLZfeUW"));
     }
 
     @Test(expected = ShapeShiftException.class)
     public void testFixedAmountTransactionFail()
-            throws ShapeShiftException, AddressFormatException, IOException {
+            throws ShapeShiftException, AddressMalformedException, IOException {
         server.enqueue(new MockResponse().setBody(FIXED_AMOUNT_TRANSACTION_JSON));
         // We withdraw Dogecoins to a Bitcoin address
         shapeShift.exchangeForAmount(DOGE.value("1000"),
-                BTC.address("18ETaXCYhJ8sxurh41vpKC3E6Tu7oJ94q8"),
-                BTC.address("1Nz4xHJjNCnZFPjRUq8CN4BZEXTgLZfeUW"));
+                BTC.newAddress("18ETaXCYhJ8sxurh41vpKC3E6Tu7oJ94q8"),
+                BTC.newAddress("1Nz4xHJjNCnZFPjRUq8CN4BZEXTgLZfeUW"));
     }
 
     @Test(expected = ShapeShiftException.class)
     public void testFixedAmountTransactionFail2()
-            throws ShapeShiftException, AddressFormatException, IOException {
+            throws ShapeShiftException, AddressMalformedException, IOException {
         server.enqueue(new MockResponse().setBody(FIXED_AMOUNT_TRANSACTION_JSON));
         // Incorrect Dogecoin address, correct is DMHLQYG4j96V8cZX9WSuXxLs5RnZn6ibrV
         shapeShift.exchangeForAmount(DOGE.value("1000"),
-                DOGE.address("DSntbp199h851m3Y1g3ruYCQHzWYCZQmmA"),
-                BTC.address("1Nz4xHJjNCnZFPjRUq8CN4BZEXTgLZfeUW"));
+                DOGE.newAddress("DSntbp199h851m3Y1g3ruYCQHzWYCZQmmA"),
+                BTC.newAddress("1Nz4xHJjNCnZFPjRUq8CN4BZEXTgLZfeUW"));
     }
 
     @Test(expected = ShapeShiftException.class)
     public void testFixedAmountTransactionFail3()
-            throws ShapeShiftException, AddressFormatException, IOException {
+            throws ShapeShiftException, AddressMalformedException, IOException {
         server.enqueue(new MockResponse().setBody(FIXED_AMOUNT_TRANSACTION_JSON));
         // Incorrect amount, correct is 1000
         shapeShift.exchangeForAmount(DOGE.value("1"),
-                DOGE.address("DMHLQYG4j96V8cZX9WSuXxLs5RnZn6ibrV"),
-                BTC.address("1Nz4xHJjNCnZFPjRUq8CN4BZEXTgLZfeUW"));
+                DOGE.newAddress("DMHLQYG4j96V8cZX9WSuXxLs5RnZn6ibrV"),
+                BTC.newAddress("1Nz4xHJjNCnZFPjRUq8CN4BZEXTgLZfeUW"));
     }
 
     public static final String GET_COINS_JSON =

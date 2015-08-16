@@ -13,13 +13,13 @@ import com.coinomi.core.exchange.shapeshift.data.ShapeShiftNormalTx;
 import com.coinomi.core.exchange.shapeshift.data.ShapeShiftRate;
 import com.coinomi.core.exchange.shapeshift.data.ShapeShiftTime;
 import com.coinomi.core.exchange.shapeshift.data.ShapeShiftTxStatus;
+import com.coinomi.core.wallet.AbstractAddress;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 
-import org.bitcoinj.core.Address;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -144,7 +144,7 @@ public class ShapeShift extends Connection {
      * expires and a new one must be created. This api call returns how many seconds are left before
      * the transaction expires.
      */
-    public ShapeShiftTime getTime(Address address) throws ShapeShiftException, IOException {
+    public ShapeShiftTime getTime(AbstractAddress address) throws ShapeShiftException, IOException {
         String apiUrl = getApiUrl(String.format(TIME_REMAINING_API, address.toString()));
         Request request = new Request.Builder().url(apiUrl).build();
         return new ShapeShiftTime(getMakeApiCall(request));
@@ -155,7 +155,8 @@ public class ShapeShift extends Connection {
      *
      * This returns the status of the most recent deposit transaction to the address.
      */
-    public ShapeShiftTxStatus getTxStatus(Address address) throws ShapeShiftException, IOException {
+    public ShapeShiftTxStatus getTxStatus(AbstractAddress address)
+            throws ShapeShiftException, IOException {
         String apiUrl = getApiUrl(String.format(TX_STATUS_API, address.toString()));
         Request request = new Request.Builder().url(apiUrl).build();
         ShapeShiftTxStatus reply = new ShapeShiftTxStatus(getMakeApiCall(request));
@@ -169,14 +170,13 @@ public class ShapeShift extends Connection {
      * Make a normal exchange and receive with {@code withdrawal} address. The exchange pair is
      * determined from the {@link CoinType}s of {@code refund} and {@code withdrawal}.
      */
-    public ShapeShiftNormalTx exchange(Address withdrawal, Address refund)
+    public ShapeShiftNormalTx exchange(AbstractAddress withdrawal, AbstractAddress refund)
             throws ShapeShiftException, IOException {
 
         JSONObject requestJson = new JSONObject();
         try {
             requestJson.put("withdrawal", withdrawal.toString());
-            requestJson.put("pair", getPair(
-                    (CoinType) refund.getParameters(), (CoinType) withdrawal.getParameters()));
+            requestJson.put("pair", getPair(refund.getType(), withdrawal.getType()));
             requestJson.put("returnAddress", refund.toString());
             if (apiPublicKey != null) requestJson.put("apiKey", apiPublicKey);
         } catch (JSONException e) {
@@ -203,10 +203,10 @@ public class ShapeShift extends Connection {
      * The exchange pair is determined from the {@link CoinType}s of {@code refund} and
      * {@code withdrawal}.
      */
-    public ShapeShiftAmountTx exchangeForAmount(Value amount, Address withdrawal, Address refund)
+    public ShapeShiftAmountTx exchangeForAmount(Value amount, AbstractAddress withdrawal,
+                                                AbstractAddress refund)
             throws ShapeShiftException, IOException {
-        String pair = getPair((CoinType) refund.getParameters(),
-                (CoinType) withdrawal.getParameters());
+        String pair = getPair(refund.getType(), withdrawal.getType());
         JSONObject requestJson = new JSONObject();
         try {
             requestJson.put("withdrawal", withdrawal.toString());
@@ -285,8 +285,8 @@ public class ShapeShift extends Connection {
         }
     }
 
-    private void checkAddress(Address expected, Address address) throws ShapeShiftException {
-        if (!expected.getParameters().equals(address.getParameters()) ||
+    private void checkAddress(AbstractAddress expected, AbstractAddress address) throws ShapeShiftException {
+        if (!expected.getType().equals(address.getType()) ||
             !expected.toString().equals(address.toString())) {
             String errorMsg = String.format("Address mismatch, expected %s but got %s.",
                     expected, address);

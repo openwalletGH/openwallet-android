@@ -5,7 +5,7 @@ import com.coinomi.core.coins.families.PeerFamily;
 /**
  * @author Julian Yap
  */
-public class JumbucksMain extends CoinType {
+public class JumbucksMain extends PeerFamily {
     private JumbucksMain() {
         id = "jumbucks.main";
 
@@ -14,7 +14,6 @@ public class JumbucksMain extends CoinType {
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 500;
 
-        family = PeerFamily.get();
         name = "Jumbucks";
         symbol = "JBS";
         uriScheme = "jumbucks";
@@ -28,7 +27,7 @@ public class JumbucksMain extends CoinType {
     }
 
     private static JumbucksMain instance = new JumbucksMain();
-    public static synchronized JumbucksMain get() {
+    public static synchronized CoinType get() {
         return instance;
     }
 }

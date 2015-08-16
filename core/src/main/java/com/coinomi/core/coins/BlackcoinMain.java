@@ -5,7 +5,7 @@ import com.coinomi.core.coins.families.PeerFamily;
 /**
  * @author John L. Jegutanis
  */
-public class BlackcoinMain extends CoinType {
+public class BlackcoinMain extends PeerFamily {
     private BlackcoinMain() {
         id = "blackcoin.main";
 
@@ -14,7 +14,6 @@ public class BlackcoinMain extends CoinType {
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 500;
 
-        family = PeerFamily.get();
         name = "Blackcoin";
         symbol = "BLK";
         uriScheme = "blackcoin";
@@ -28,7 +27,7 @@ public class BlackcoinMain extends CoinType {
     }
 
     private static BlackcoinMain instance = new BlackcoinMain();
-    public static synchronized BlackcoinMain get() {
+    public static synchronized CoinType get() {
         return instance;
     }
 }

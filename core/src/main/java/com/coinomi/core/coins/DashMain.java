@@ -5,7 +5,7 @@ import com.coinomi.core.coins.families.BitFamily;
 /**
  * @author John L. Jegutanis
  */
-public class DashMain extends CoinType {
+public class DashMain extends BitFamily {
     private DashMain() {
         id = "darkcoin.main"; // Do not change this id as wallets serialize this string
 
@@ -14,7 +14,6 @@ public class DashMain extends CoinType {
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 100;
 
-        family = BitFamily.get();
         name = "Dash";
         symbol = "DASH";
         uriScheme = "dash"; // TODO add multi uri, darkcoin
@@ -28,7 +27,7 @@ public class DashMain extends CoinType {
     }
 
     private static DashMain instance = new DashMain();
-    public static synchronized DashMain get() {
+    public static synchronized CoinType get() {
         return instance;
     }
 }

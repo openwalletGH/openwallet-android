@@ -5,7 +5,7 @@ import com.coinomi.core.coins.families.BitFamily;
 /**
  * @author John L. Jegutanis
  */
-public class NeoscoinTest extends CoinType {
+public class NeoscoinTest extends BitFamily {
     private NeoscoinTest() {
         id = "neoscoin.test";
 
@@ -15,7 +15,6 @@ public class NeoscoinTest extends CoinType {
         spendableCoinbaseDepth = 100;
         dumpedPrivateKeyHeader = 239;
 
-        family = BitFamily.get();
         name = "Neoscoin Test";
         symbol = "NEOSt";
         uriScheme = "neoscoin";
@@ -29,7 +28,7 @@ public class NeoscoinTest extends CoinType {
     }
 
     private static NeoscoinTest instance = new NeoscoinTest();
-    public static synchronized NeoscoinTest get() {
+    public static synchronized CoinType get() {
         return instance;
     }
 }

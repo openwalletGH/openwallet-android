@@ -5,12 +5,11 @@ import com.coinomi.core.coins.families.NxtFamily;
 /**
  * @author John L. Jegutanis
  */
-public class BurstMain extends CoinType {
+public class BurstMain extends NxtFamily {
 
     private BurstMain() {
         id = "burst.main";
 
-        family = NxtFamily.get();
         name = "Burst";
         symbol = "BURST";
         uriScheme = "burst";
@@ -20,7 +19,7 @@ public class BurstMain extends CoinType {
     }
 
     private static BurstMain instance = new BurstMain();
-    public static synchronized BurstMain get() {
+    public static synchronized CoinType get() {
         return instance;
     }
 }

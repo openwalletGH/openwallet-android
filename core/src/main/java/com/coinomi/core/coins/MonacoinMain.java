@@ -5,7 +5,7 @@ import com.coinomi.core.coins.families.BitFamily;
 /**
  * @author John L. Jegutanis
  */
-public class MonacoinMain extends CoinType {
+public class MonacoinMain extends BitFamily {
     private MonacoinMain() {
         id = "monacoin.main";
 
@@ -14,7 +14,6 @@ public class MonacoinMain extends CoinType {
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 100;
 
-        family = BitFamily.get();
         name = "Monacoin";
         symbol = "MONA";
         uriScheme = "monacoin";
@@ -28,7 +27,7 @@ public class MonacoinMain extends CoinType {
     }
 
     private static MonacoinMain instance = new MonacoinMain();
-    public static synchronized MonacoinMain get() {
+    public static synchronized CoinType get() {
         return instance;
     }
 }

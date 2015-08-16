@@ -5,7 +5,7 @@ import com.coinomi.core.coins.families.BitFamily;
 /**
  * @author John L. Jegutanis
  */
-public class NamecoinMain extends CoinType {
+public class NamecoinMain extends BitFamily {
     private NamecoinMain() {
         id = "namecoin.main";
 
@@ -14,7 +14,6 @@ public class NamecoinMain extends CoinType {
         acceptableAddressCodes = new int[] { addressHeader};
         spendableCoinbaseDepth = 100;
 
-        family = BitFamily.get();
         name = "Namecoin";
         symbol = "NMC";
         uriScheme = "namecoin";
@@ -28,7 +27,7 @@ public class NamecoinMain extends CoinType {
     }
 
     private static NamecoinMain instance = new NamecoinMain();
-    public static synchronized NamecoinMain get() {
+    public static synchronized CoinType get() {
         return instance;
     }
 }

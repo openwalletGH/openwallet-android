@@ -19,10 +19,11 @@ package com.coinomi.core.wallet;
 
 import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.exceptions.AddressMalformedException;
 import com.coinomi.core.network.AddressStatus;
 import com.coinomi.core.protos.Protos;
-import org.bitcoinj.core.Address;
-import org.bitcoinj.core.AddressFormatException;
+import com.google.protobuf.ByteString;
+
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.PeerAddress;
 import org.bitcoinj.core.Sha256Hash;
@@ -36,9 +37,6 @@ import org.bitcoinj.crypto.KeyCrypter;
 import org.bitcoinj.params.Networks;
 import org.bitcoinj.store.UnreadableWalletException;
 import org.bitcoinj.wallet.WalletTransaction;
-
-import com.google.protobuf.ByteString;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,9 +52,8 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-
-import static org.bitcoinj.params.Networks.Family.PEERCOIN;
 import static org.bitcoinj.params.Networks.Family.NUBITS;
+import static org.bitcoinj.params.Networks.Family.PEERCOIN;
 import static org.bitcoinj.params.Networks.Family.REDDCOIN;
 import static org.bitcoinj.params.Networks.Family.VPNCOIN;
 
@@ -299,11 +296,11 @@ public class WalletPocketProtobufSerializer {
             // Read all the address statuses
             try {
                 for (Protos.AddressStatus sp : walletProto.getAddressStatusList()) {
-                    Address addr = new Address(coinType, sp.getAddress());
+                    AbstractAddress addr = coinType.newAddress(sp.getAddress());
                     AddressStatus status = new AddressStatus(addr, sp.getStatus());
                     pocket.commitAddressStatus(status);
                 }
-            } catch (AddressFormatException e) {
+            } catch (AddressMalformedException e) {
                 throw new UnreadableWalletException(e.getMessage(), e);
             }
 
