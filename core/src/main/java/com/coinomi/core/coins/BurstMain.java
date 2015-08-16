@@ -16,6 +16,9 @@ public class BurstMain extends NxtFamily {
         bip44Index = 30;
         unitExponent = 8;
         addressPrefix = "BURST-";
+        feePerKb = oneCoin();
+        minNonDust = value(1);
+        feePolicy = FeePolicy.FLAT_FEE;
     }
 
     private static BurstMain instance = new BurstMain();
