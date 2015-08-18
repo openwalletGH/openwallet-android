@@ -328,7 +328,7 @@ public class MessagesTest {
         assertFalse(txStatus.isError);
         assertEquals(ShapeShiftTxStatus.Status.RECEIVED, txStatus.status);
         assertEquals("1NDQPAGamGePkSZXW2CYBzXJEefB7N4bTN", txStatus.address.toString());
-        assertEquals(BTC, txStatus.address.getParameters());
+        assertEquals(BTC, txStatus.address.getType());
         assertNull(txStatus.withdraw);
         assertEquals(BTC.value("0.00297537"), txStatus.incomingValue);
         assertNull(txStatus.outgoingValue);
@@ -354,9 +354,9 @@ public class MessagesTest {
         assertFalse(txStatus.isError);
         assertEquals(ShapeShiftTxStatus.Status.COMPLETE, txStatus.status);
         assertEquals("1NDQPAGamGePkSZXW2CYBzXJEefB7N4bTN", txStatus.address.toString());
-        assertEquals(BTC, txStatus.address.getParameters());
+        assertEquals(BTC, txStatus.address.getType());
         assertEquals("LMmeBWH17TWkQKvK7YFio2oiimPAzrHG6f", txStatus.withdraw.toString());
-        assertEquals(LTC, txStatus.withdraw.getParameters());
+        assertEquals(LTC, txStatus.withdraw.getType());
         assertEquals(BTC.value("0.00297537"), txStatus.incomingValue);
         assertEquals(LTC.value("0.42"), txStatus.outgoingValue);
         assertEquals("66fa0b4c11227f9f05efa13d23e58c65b50acbd6395a126b5cd751064e6e79df",
@@ -381,9 +381,9 @@ public class MessagesTest {
         assertFalse(txStatus.isError);
         assertEquals(ShapeShiftTxStatus.Status.COMPLETE, txStatus.status);
         assertEquals("1NDQPAGamGePkSZXW2CYBzXJEefB7N4bTN", txStatus.address.toString());
-        assertEquals(BTC, txStatus.address.getParameters());
+        assertEquals(BTC, txStatus.address.getType());
         assertEquals("BB6kZZi87mCd7mC1tWWJjuKGPTYQ1n2Fcg", txStatus.withdraw.toString());
-        assertEquals(NBT, txStatus.withdraw.getParameters());
+        assertEquals(NBT, txStatus.withdraw.getType());
         assertEquals(BTC.value("0.01"), txStatus.incomingValue);
         assertEquals(NBT.value("2.33"), txStatus.outgoingValue);
         assertEquals("66fa0b4c11227f9f05efa13d23e58c65b50acbd6395a126b5cd751064e6e79df",
@@ -438,9 +438,9 @@ public class MessagesTest {
         assertFalse(normalTx.isError);
         assertEquals("btc_doge", normalTx.pair);
         assertEquals("18ETaXCYhJ8sxurh41vpKC3E6Tu7oJ94q8", normalTx.deposit.toString());
-        assertEquals(BTC, normalTx.deposit.getParameters());
+        assertEquals(BTC, normalTx.deposit.getType());
         assertEquals("DMHLQYG4j96V8cZX9WSuXxLs5RnZn6ibrV", normalTx.withdrawal.toString());
-        assertEquals(DOGE, normalTx.withdrawal.getParameters());
+        assertEquals(DOGE, normalTx.withdrawal.getType());
     }
 
     @Test
@@ -462,10 +462,10 @@ public class MessagesTest {
         assertFalse(amountTx.isError);
         assertEquals("btc_doge", amountTx.pair);
         assertEquals("14gQ3xywKEUA6CfH61F8t2c6oB5nLnUjL5", amountTx.deposit.toString());
-        assertEquals(BTC, amountTx.deposit.getParameters());
+        assertEquals(BTC, amountTx.deposit.getType());
         assertEquals(BTC.value("0.00052327"), amountTx.depositAmount);
         assertEquals("DMHLQYG4j96V8cZX9WSuXxLs5RnZn6ibrV", amountTx.withdrawal.toString());
-        assertEquals(DOGE, amountTx.withdrawal.getParameters());
+        assertEquals(DOGE, amountTx.withdrawal.getType());
         assertEquals(DOGE.value("1000"), amountTx.withdrawalAmount);
         assertEquals(1427149038191L, amountTx.expiration.getTime());
         assertEquals(BTC.value("0.00052327"), amountTx.rate.convert(Value.parse(DOGE, "1000")));
@@ -491,10 +491,10 @@ public class MessagesTest {
         assertFalse(amountTx.isError);
         assertEquals("btc_doge", amountTx.pair);
         assertEquals("14gQ3xywKEUA6CfH61F8t2c6oB5nLnUjL5", amountTx.deposit.toString());
-        assertEquals(BTC, amountTx.deposit.getParameters());
+        assertEquals(BTC, amountTx.deposit.getType());
         assertEquals(BTC.value("0.00052379"), amountTx.depositAmount);
         assertEquals("DMHLQYG4j96V8cZX9WSuXxLs5RnZn6ibrV", amountTx.withdrawal.toString());
-        assertEquals(DOGE, amountTx.withdrawal.getParameters());
+        assertEquals(DOGE, amountTx.withdrawal.getType());
         assertEquals(DOGE.value("1000"), amountTx.withdrawalAmount);
         assertEquals(1427149038191L, amountTx.expiration.getTime());
         assertEquals(BTC.value("0.00052379"), amountTx.rate.convert(Value.parse(DOGE, "1000")));

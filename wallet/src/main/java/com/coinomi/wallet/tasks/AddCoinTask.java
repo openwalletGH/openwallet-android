@@ -5,8 +5,6 @@ import android.os.AsyncTask;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.wallet.WalletAccount;
-import com.coinomi.wallet.R;
-import com.coinomi.wallet.ui.Dialogs;
 
 import org.spongycastle.crypto.params.KeyParameter;
 
