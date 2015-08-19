@@ -108,7 +108,7 @@ public class RestoreFragment extends Fragment {
         });
 
         // Setup auto complete the mnemonic words
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(),
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this.getActivity(),
                 R.layout.item_simple, MnemonicCode.INSTANCE.getWordList());
         mnemonicTextView = (MultiAutoCompleteTextView) view.findViewById(R.id.seed);
         mnemonicTextView.setAdapter(adapter);

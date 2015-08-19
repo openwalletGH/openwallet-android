@@ -24,6 +24,7 @@ public class DogecoinMain extends CoinType {
         minNonDust = value(1);
         softDustLimit = value(100000000L); // 1 DOGE
         softDustPolicy = SoftDustPolicy.BASE_FEE_FOR_EACH_SOFT_DUST_TXO;
+        signedMessageHeader = toBytes("Dogecoin Signed Message:\n");
     }
 
     private static DogecoinMain instance = new DogecoinMain();

@@ -86,6 +86,7 @@ public class AvailableAccountsAdaptor extends BaseAdapter {
         entries = createEntries(accounts, validTypes, includeTypes);
     }
 
+    @SuppressWarnings("SuspiciousMethodCalls")
     public int getAccountOrTypePosition(Object accountOrCoinType) {
         return entries.indexOf(accountOrCoinType);
     }

@@ -1,7 +1,9 @@
 package com.coinomi.core.coins;
 
 
+import com.coinomi.core.messages.MessageFactory;
 import com.coinomi.core.util.MonetaryFormat;
+import com.google.common.base.Charsets;
 
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.AddressFormatException;
@@ -14,6 +16,8 @@ import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.List;
 
+
+import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -35,6 +39,7 @@ abstract public class CoinType extends NetworkParameters implements ValueType, S
     protected Value softDustLimit;
     protected SoftDustPolicy softDustPolicy;
     protected FeePolicy feePolicy = FeePolicy.FEE_PER_KB;
+    protected byte[] signedMessageHeader;
 
     private transient MonetaryFormat friendlyFormat;
     private transient MonetaryFormat plainFormat;
@@ -97,6 +102,27 @@ abstract public class CoinType extends NetworkParameters implements ValueType, S
 
     public FeePolicy getFeePolicy() {
         return checkNotNull(feePolicy, "A coin failed to set a fee policy");
+    }
+
+    public byte[] getSignedMessageHeader() {
+        return checkNotNull(signedMessageHeader, "A coin failed to set signed message header bytes");
+    }
+
+    public boolean canSignVerifyMessages() {
+        return signedMessageHeader != null;
+    }
+
+    public boolean canHandleMessages() {
+        return getMessagesFactory() != null;
+    }
+
+    @Nullable
+    public MessageFactory getMessagesFactory() {
+        return null;
+    }
+
+    protected static byte[] toBytes(String str) {
+        return str.getBytes(Charsets.UTF_8);
     }
 
     public List<ChildNumber> getBip44Path(int account) {

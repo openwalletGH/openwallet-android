@@ -40,6 +40,10 @@ abstract public class BaseWalletActivity extends ActionBarActivity {
         return getWalletApplication().getAccounts(types);
     }
 
+    public boolean isAccountExists(String accountId) {
+        return getWalletApplication().isAccountExists(accountId);
+    }
+
     public Configuration getConfiguration() {
         return getWalletApplication().getConfiguration();
     }

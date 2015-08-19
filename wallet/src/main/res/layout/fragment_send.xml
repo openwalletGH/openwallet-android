@@ -19,91 +19,97 @@
             android:paddingRight="@dimen/activity_horizontal_margin"
             android:paddingTop="@dimen/activity_vertical_margin">
 
-            <RelativeLayout
+
+            <LinearLayout
+                android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:gravity="center_vertical">
-                <TextView
-                    android:id="@+id/pay_to_label"
-                    android:layout_width="wrap_content"
+
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"
-                    android:layout_alignParentTop="true"
-                    android:text="@string/pay_to_label"
-                    android:textColor="@color/gray_54_sec_text_icons" />
-
-                <LinearLayout
-                    android:id="@+id/send_to_address_container"
-                    android:orientation="vertical"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"
-                    android:layout_below="@+id/pay_to_label"
-                    android:layout_toLeftOf="@+id/address_button_container"
-                    android:layout_toStartOf="@+id/address_button_container">
-
-                    <!-- TODO make android:imeOptions="actionNext" work -->
-                    <AutoCompleteTextView
-                        android:id="@+id/send_to_address"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        style="@style/NormalText"
-                        android:imeOptions="actionNext|flagNoExtractUi"
-                        android:completionThreshold="1"
-                        android:hint="@string/send_coins_fragment_receiving_address_tip"
-                        android:singleLine="true"
-                        android:inputType="textMultiLine|textNoSuggestions" />
-
+                    android:gravity="center_vertical">
                     <TextView
-                        android:id="@+id/address_error_message"
-                        style="@style/ErrorText"
+                        android:id="@+id/pay_to_label"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/address_error" />
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
+                        android:layout_alignParentTop="true"
+                        android:text="@string/pay_to_label"
+                        android:textColor="@color/gray_54_sec_text_icons" />
 
-                    <com.coinomi.wallet.ui.widget.AddressView
-                        android:id="@+id/send_to_address_static"
+                    <LinearLayout
+                        android:id="@+id/send_to_address_container"
+                        android:orientation="vertical"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/quarter_standard_margin"
-                        coinomi:show_coin_icon="true"
-                        android:visibility="gone"/>
-                </LinearLayout>
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
+                        android:layout_below="@+id/pay_to_label"
+                        android:layout_toLeftOf="@+id/address_button_container"
+                        android:layout_toStartOf="@+id/address_button_container">
 
-                <LinearLayout
-                    android:id="@+id/address_button_container"
-                    android:orientation="vertical"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignTop="@+id/send_to_address_container">
-                    <ImageButton
-                        android:id="@+id/scan_qr_code"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:contentDescription="@string/scan_qr_code"
-                        android:src="@drawable/qr_code" />
+                        <!-- TODO make android:imeOptions="actionNext" work -->
+                        <AutoCompleteTextView
+                            android:id="@+id/send_to_address"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            style="@style/NormalText"
+                            android:imeOptions="actionNext|flagNoExtractUi"
+                            android:completionThreshold="1"
+                            android:hint="@string/send_coins_fragment_receiving_address_tip"
+                            android:singleLine="true"
+                            android:inputType="textMultiLine|textNoSuggestions" />
 
-                    <ImageButton
-                        android:id="@+id/erase_address"
+                        <TextView
+                            android:id="@+id/address_error_message"
+                            style="@style/ErrorText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/address_error" />
+
+                        <com.coinomi.wallet.ui.widget.AddressView
+                            android:id="@+id/send_to_address_static"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/quarter_standard_margin"
+                            coinomi:show_coin_icon="true"
+                            android:visibility="gone"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/address_button_container"
+                        android:orientation="vertical"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:contentDescription="@string/erase_address"
-                        android:src="@drawable/erase"
-                        android:visibility="gone"/>
-                </LinearLayout>
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_alignTop="@+id/send_to_address_container">
+                        <ImageButton
+                            android:id="@+id/scan_qr_code"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:contentDescription="@string/scan_qr_code"
+                            android:src="@drawable/qr_code" />
+
+                        <ImageButton
+                            android:id="@+id/erase_address"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:contentDescription="@string/erase_address"
+                            android:src="@drawable/erase"
+                            android:visibility="gone"/>
+                    </LinearLayout>
+                </RelativeLayout>
 
                 <TextView
                     android:id="@+id/amount_to_send_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"
-                    android:layout_below="@+id/send_to_address_container"
                     android:layout_marginTop="@dimen/activity_vertical_margin"
                     android:text="@string/amount_to_send_label"
                     android:textColor="@color/gray_54_sec_text_icons" />
@@ -113,8 +119,7 @@
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:baselineAligned="false"
-                    android:layout_below="@+id/amount_to_send_label">
+                    android:baselineAligned="false">
 
                     <com.coinomi.wallet.ui.widget.AmountEditView
                         android:id="@+id/send_coin_amount"
@@ -135,9 +140,6 @@
                     style="@style/ErrorText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"
-                    android:layout_below="@+id/amounts"
                     tools:text="@string/amount_error" />
 
                 <TextView
@@ -145,11 +147,60 @@
                     style="@style/WarningText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"
-                    android:layout_below="@+id/amount_error_message"
                     tools:text="@string/amount_warn_fees_apply" />
-            </RelativeLayout>
+
+                <Button
+                    android:id="@+id/tx_message_add_remove"
+                    style="@style/BorderlessButtonLink"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="@dimen/activity_vertical_margin"
+                    android:text="@string/tx_message_public_add"
+                    android:visibility="gone"
+                    tools:visibility="visible"
+                    tools:text="@string/tx_message_public_remove"/>
+
+                <TextView
+                    android:id="@+id/tx_message_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/half_standard_margin"
+                    android:text="@string/tx_message_public"
+                    android:textColor="@color/gray_54_sec_text_icons"
+                    android:visibility="gone"
+                    tools:visibility="visible"/>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <EditText
+                        android:id="@+id/tx_message"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textMultiLine"
+                        android:visibility="gone"
+                        tools:paddingBottom="@dimen/tx_message_counter_padding"
+                        tools:visibility="visible"
+                        tools:text="Lorem ipsum dol or sit am et, co ns ec te tur ad ipi sc ing el it. Do nec a diam le."/>
+
+                    <TextView
+                        android:id="@+id/tx_message_counter"
+                        style="@style/NormalText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBottom="@id/tx_message"
+                        android:layout_alignEnd="@id/tx_message"
+                        android:layout_alignRight="@id/tx_message"
+                        android:paddingBottom="@dimen/half_standard_margin"
+                        android:paddingEnd="@dimen/quarter_standard_margin"
+                        android:paddingRight="@dimen/quarter_standard_margin"
+                        android:visibility="gone"
+                        tools:textColor="@color/fg_warning"
+                        tools:text="100"
+                        tools:ignore="RtlSymmetry" />
+                </RelativeLayout>
+            </LinearLayout>
 
 
             <RelativeLayout

@@ -24,6 +24,7 @@ public class MonacoinMain extends CoinType {
         minNonDust = value(1000); // 0.00001 MNC mininput
         softDustLimit = value(100000); // 0.001 MONA
         softDustPolicy = SoftDustPolicy.BASE_FEE_FOR_EACH_SOFT_DUST_TXO;
+        signedMessageHeader = toBytes("Monacoin Signed Message:\n");
     }
 
     private static MonacoinMain instance = new MonacoinMain();

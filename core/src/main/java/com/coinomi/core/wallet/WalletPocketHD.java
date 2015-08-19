@@ -19,48 +19,42 @@
 package com.coinomi.core.wallet;
 
 import com.coinomi.core.coins.CoinType;
-import com.coinomi.core.network.interfaces.ConnectionEventListener;
-import com.coinomi.core.network.interfaces.TransactionEventListener;
 import com.coinomi.core.protos.Protos;
 import com.coinomi.core.wallet.exceptions.Bip44KeyLookAheadExceededException;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 
 import org.bitcoinj.core.Address;
+import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.InsufficientMoneyException;
-import org.bitcoinj.core.Sha256Hash;
-import org.bitcoinj.core.Transaction;
+import org.bitcoinj.crypto.ChildNumber;
 import org.bitcoinj.crypto.DeterministicKey;
 import org.bitcoinj.crypto.KeyCrypter;
 import org.bitcoinj.script.Script;
-import org.bitcoinj.utils.Threading;
 import org.bitcoinj.wallet.RedeemData;
-import org.bitcoinj.wallet.WalletTransaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.crypto.params.KeyParameter;
 
-import java.io.Serializable;
+import java.security.SignatureException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Executor;
-import java.util.concurrent.locks.ReentrantLock;
 
 import javax.annotation.Nullable;
-
-import static org.bitcoinj.wallet.KeyChain.KeyPurpose.RECEIVE_FUNDS;
-import static org.bitcoinj.wallet.KeyChain.KeyPurpose.CHANGE;
 
 import static com.coinomi.core.Preconditions.checkArgument;
 import static com.coinomi.core.Preconditions.checkNotNull;
 import static com.coinomi.core.Preconditions.checkState;
+import static org.bitcoinj.wallet.KeyChain.KeyPurpose.CHANGE;
+import static org.bitcoinj.wallet.KeyChain.KeyPurpose.RECEIVE_FUNDS;
 import static org.bitcoinj.wallet.KeyChain.KeyPurpose.REFUND;
 
 /**
@@ -257,6 +251,65 @@ public class WalletPocketHD extends AbstractWallet {
                 (address.isP2SHAddress() ?
                         isPayToScriptHashMine(address.getHash160()) :
                         isPubKeyHashMine(address.getHash160()));
+    }
+
+    @Override
+    public void signMessage(SignedMessage unsignedMessage, @Nullable KeyParameter aesKey) {
+        String message = unsignedMessage.message;
+        lock.lock();
+        try {
+            ECKey key;
+            try {
+                Address address = new Address(coinType, unsignedMessage.getAddress());
+                key = findKeyFromPubHash(address.getHash160());
+            } catch (AddressFormatException e) {
+                unsignedMessage.status = SignedMessage.Status.AddressMalformed;
+                return;
+            }
+
+            if (key == null) {
+                unsignedMessage.status = SignedMessage.Status.MissingPrivateKey;
+                return;
+            }
+
+            try {
+                unsignedMessage.signature =
+                        key.signMessage(coinType.getSignedMessageHeader(), message, aesKey);
+                unsignedMessage.status = SignedMessage.Status.SignedOK;
+            } catch (ECKey.KeyIsEncryptedException e) {
+                unsignedMessage.status = SignedMessage.Status.KeyIsEncrypted;
+            } catch (ECKey.MissingPrivateKeyException e) {
+                unsignedMessage.status = SignedMessage.Status.MissingPrivateKey;
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @Override
+    public void verifyMessage(SignedMessage signedMessage) {
+        try {
+            ECKey pubKey = ECKey.signedMessageToKey(signedMessage.message, signedMessage.signature);
+            byte[] expectedPubKeyHash = new Address(null, signedMessage.address).getHash160();
+            if (Arrays.equals(expectedPubKeyHash, pubKey.getPubKeyHash())) {
+                signedMessage.status = SignedMessage.Status.VerifiedOK;
+            } else {
+                signedMessage.status = SignedMessage.Status.InvalidSigningAddress;
+            }
+        } catch (SignatureException e) {
+            signedMessage.status = SignedMessage.Status.InvalidMessageSignature;
+        } catch (AddressFormatException e) {
+            signedMessage.status = SignedMessage.Status.AddressMalformed;
+        }
+    }
+
+    @Override
+    public String getPublicKeySerialized() {
+        // Change the path of the key to match the BIP32 paths i.e. 0H/<account index>H
+        DeterministicKey key = keys.getWatchingKey();
+        ImmutableList<ChildNumber> path = ImmutableList.of(key.getChildNumber());
+        key = new DeterministicKey(path, key.getChainCode(), key.getPubKeyPoint(), null, null);
+        return key.serializePubB58();
     }
 
     @Override

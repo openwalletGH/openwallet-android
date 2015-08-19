@@ -23,6 +23,8 @@ import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.Wallet.MissingSigsMode;
 import org.bitcoinj.wallet.CoinSelector;
+
+import com.coinomi.core.messages.TxMessage;
 import com.google.common.base.Objects;
 import com.google.common.base.Objects.ToStringHelper;
 
@@ -151,6 +153,12 @@ public class SendRequest implements Serializable{
      */
     transient public MissingSigsMode missingSigsMode = MissingSigsMode.THROW;
 
+    /**
+     * Attaches a message to the transaction. There is no guarantee that the coin supports messages
+     * or that the recipient will ultimately get them or if the message will be recorded to on the
+     * blockchain i.e. Bitcoin, Litecoin messages could be stored on a public server
+     */
+    public TxMessage txMessage;
 
     // Tracks if this has been passed to wallet.completeTx already: just a safety check.
     boolean completed;

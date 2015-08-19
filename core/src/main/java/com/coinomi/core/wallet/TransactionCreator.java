@@ -54,12 +54,6 @@ public class TransactionCreator {
         coinType = account.coinType;
     }
 
-    public TransactionCreator(AddressWallet account) {
-        this.account = account;
-        lock = account.lock;
-        coinType = account.coinType;
-    }
-
     private static class FeeCalculation {
         CoinSelection bestCoinSelection;
         TransactionOutput bestChangeOutput;
@@ -76,7 +70,13 @@ public class TransactionCreator {
     void completeTx(SendRequest req) throws InsufficientMoneyException {
         lock.lock();
         try {
+            checkArgument(req.type.equals(coinType), "Given SendRequest has an invalid coin type.");
             checkArgument(!req.completed, "Given SendRequest has already been completed.");
+            // Add any messages to the transaction if it applies to this coin type
+            if (req.txMessage != null && coinType.canHandleMessages()) {
+                req.txMessage.serializeTo(req.tx);
+            }
+
             // Calculate the amount of value we need to import.
             Coin value = Coin.ZERO;
             for (TransactionOutput output : req.tx.getOutputs()) {

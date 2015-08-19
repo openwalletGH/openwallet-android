@@ -57,6 +57,7 @@ public class Constants {
     public static final String ARG_SEND_TO_COIN_TYPE = "send_to_coin_type";
     public static final String ARG_SEND_TO_ACCOUNT_ID = "send_to_account_id";
     public static final String ARG_SEND_VALUE = "send_value";
+    public static final String ARG_TX_MESSAGE = "tx_message";
     public static final String ARG_COIN_ID = "coin_id";
     public static final String ARG_ACCOUNT_ID = "account_id";
     public static final String ARG_MULTIPLE_COIN_IDS = "multiple_coin_ids";
@@ -71,7 +72,7 @@ public class Constants {
     public static final String ARG_URI = "test_wallet";
 
     public static final String WALLET_FILENAME_PROTOBUF = "wallet";
-    public static final long WALLET_WRITE_DELAY = 3;
+    public static final long WALLET_WRITE_DELAY = 5;
     public static final TimeUnit WALLET_WRITE_DELAY_UNIT = TimeUnit.SECONDS;
 
     public static final long STOP_SERVICE_AFTER_IDLE_SECS = 30 * 60; // 30 mins

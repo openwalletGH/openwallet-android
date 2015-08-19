@@ -24,6 +24,7 @@ public class NuBitsMain extends CoinType {
         minNonDust = value(100); // 0.01NBT
         softDustLimit = minNonDust;
         softDustPolicy = SoftDustPolicy.NO_POLICY;
+        signedMessageHeader = toBytes("Nu Signed Message:\n");
     }
 
     private static NuBitsMain instance = new NuBitsMain();

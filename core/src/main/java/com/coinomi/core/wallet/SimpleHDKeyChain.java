@@ -15,6 +15,7 @@ import org.bitcoinj.crypto.HDUtils;
 import org.bitcoinj.crypto.KeyCrypter;
 import org.bitcoinj.crypto.KeyCrypterException;
 import org.bitcoinj.crypto.KeyCrypterScrypt;
+import org.bitcoinj.crypto.LazyECPoint;
 import org.bitcoinj.store.UnreadableWalletException;
 import org.bitcoinj.utils.Threading;
 import org.bitcoinj.wallet.EncryptableKeyChain;
@@ -604,8 +605,9 @@ public class SimpleHDKeyChain implements EncryptableKeyChain, KeyBag {
                                                        @Nullable KeyCrypter crypter) {
         // Deserialize the path through the tree.
         final ImmutableList<ChildNumber> immutablePath = getKeyProtoPath(key);
-        // Deserialize the public key.
-        ECPoint pubkey = ECKey.CURVE.getCurve().decodePoint(key.getPublicKey().toByteArray());
+        // Deserialize the public key and path.
+        LazyECPoint pubkey = new LazyECPoint(ECKey.CURVE.getCurve(), key.getPublicKey().toByteArray());
+
         // Deserialize the chain code.
         byte[] chainCode = key.getDeterministicKey().getChainCode().toByteArray();
 

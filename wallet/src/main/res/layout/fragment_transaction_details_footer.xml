@@ -26,6 +26,26 @@
         android:typeface="monospace"
         tools:text="d11e6246c976ccf1d565192cd9b5592b0e4c0c6e01c220f0a75e13dfb93fcb83" />
 
+    <TextView
+        android:id="@+id/tx_message_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:textColor="@color/gray_54_sec_text_icons"
+        android:visibility="gone"
+        tools:visibility="visible"
+        tools:text="@string/tx_message_public"/>
+
+    <TextView
+        android:id="@+id/tx_message"
+        style="@style/NormalText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textIsSelectable="true"
+        android:visibility="gone"
+        tools:visibility="visible"
+        tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus. Sed sit amet ipsum mauris." />
+
     <Button
         android:id="@+id/block_explorer_link"
         style="@style/BorderlessButtonLink"

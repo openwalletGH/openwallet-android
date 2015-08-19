@@ -58,6 +58,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.bitcoinj.params.Networks.Family.PEERCOIN;
 import static org.bitcoinj.params.Networks.Family.NUBITS;
 import static org.bitcoinj.params.Networks.Family.REDDCOIN;
+import static org.bitcoinj.params.Networks.Family.VPNCOIN;
 
 /**
  * @author John L. Jegutanis
@@ -118,12 +119,16 @@ public class WalletPocketProtobufSerializer {
                 .setHash(hashToByteString(tx.getHash()))
                 .setVersion((int) tx.getVersion());
 
-        if (Networks.isFamily(tx.getParams(), PEERCOIN, NUBITS, REDDCOIN)) {
+        if (Networks.isFamily(tx.getParams(), PEERCOIN, NUBITS, REDDCOIN, VPNCOIN)) {
             txBuilder.setTime((int) tx.getTime());
         }
 
         if (Networks.isFamily(tx.getParams(), NUBITS)) {
             txBuilder.setTokenId(tx.getTokenId());
+        }
+
+        if (Networks.isFamily(tx.getParams(), VPNCOIN) && tx.getExtraBytes() != null) {
+            txBuilder.setExtraBytes(ByteString.copyFrom(tx.getExtraBytes()));
         }
 
         if (tx.getUpdateTime() != null) {
@@ -332,12 +337,16 @@ public class WalletPocketProtobufSerializer {
 
         tx.setVersion(txProto.getVersion());
 
-        if (Networks.isFamily(tx.getParams(), PEERCOIN, NUBITS, REDDCOIN)) {
+        if (Networks.isFamily(tx.getParams(), PEERCOIN, NUBITS, REDDCOIN, VPNCOIN)) {
             tx.setTime(txProto.getTime());
         }
 
         if (Networks.isFamily(tx.getParams(), NUBITS)) {
             tx.setTokenId((byte) (0xFF & txProto.getTokenId()));
+        }
+
+        if (Networks.isFamily(tx.getParams(), VPNCOIN) && txProto.hasExtraBytes()) {
+            tx.setExtraBytes(txProto.getExtraBytes().toByteArray());
         }
 
         if (txProto.hasUpdatedAt()) {

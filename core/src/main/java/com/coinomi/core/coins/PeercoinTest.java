@@ -19,7 +19,7 @@ public class PeercoinTest extends CoinType {
 
         family = PeerFamily.get();
         name = "Peercoin Test";
-        symbol = "PPCTEST";
+        symbol = "PPCt";
         uriScheme = "peercoin"; // TODO verify, could be ppcoin?
         bip44Index = 1;
         unitExponent = 6;
@@ -27,6 +27,7 @@ public class PeercoinTest extends CoinType {
         minNonDust = value(10000); // 0.01PPC
         softDustLimit = minNonDust;
         softDustPolicy = SoftDustPolicy.NO_POLICY;
+        signedMessageHeader = toBytes("PPCoin Signed Message:\n");
     }
 
     private static PeercoinTest instance = new PeercoinTest();

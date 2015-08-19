@@ -25,6 +25,7 @@ public class DigitalcoinMain extends CoinType {
         minNonDust = value(10920);
         softDustLimit = minNonDust;
         softDustPolicy = SoftDustPolicy.NO_POLICY;
+        signedMessageHeader = toBytes("Digitalcoin Signed Message:\n");
     }
 
     private static DigitalcoinMain instance = new DigitalcoinMain();

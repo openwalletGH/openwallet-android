@@ -32,7 +32,6 @@ public enum CoinID {
     MONACOIN_MAIN(MonacoinMain.get()),
     FEATHERCOIN_MAIN(FeathercoinMain.get()),
     RUBYCOIN_MAIN(RubycoinMain.get()),
-//    URO_MAIN(UroMain.get()),
     DIGITALCOIN_MAIN(DigitalcoinMain.get()),
     CANNACOIN_MAIN(CannacoinMain.get()),
     DIGIBYTE_MAIN(DigibyteMain.get()),

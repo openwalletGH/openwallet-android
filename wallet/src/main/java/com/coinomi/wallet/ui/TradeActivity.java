@@ -25,7 +25,7 @@ public class TradeActivity extends BaseWalletActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_trade);
+        setContentView(R.layout.activity_fragment_wrapper);
 
         containerRes = R.id.container;
 

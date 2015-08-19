@@ -1,5 +1,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:coinomi="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -18,4 +19,25 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal|top"
         coinomi:is_fee="true" />
+
+    <TextView
+        android:id="@+id/tx_message_label"
+        style="@style/SendOutputTypeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginTop="@dimen/standard_margin"
+        android:visibility="gone"
+        tools:visibility="visible"
+        tools:text="@string/tx_message_public" />
+
+    <TextView
+        android:id="@+id/tx_message"
+        style="@style/NormalText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textIsSelectable="true"
+        android:visibility="gone"
+        tools:visibility="visible"
+        tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus. Sed sit amet ipsum mauris." />
 </LinearLayout>

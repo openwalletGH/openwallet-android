@@ -230,7 +230,9 @@ message Transaction {
 
     optional int32 token_id = 12;
 
-    // Next tag: 13
+    optional bytes extra_bytes = 13;
+
+    // Next tag: 14
 }
 
 message AddressStatus {

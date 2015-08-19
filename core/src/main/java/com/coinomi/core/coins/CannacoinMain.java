@@ -1,6 +1,7 @@
 package com.coinomi.core.coins;
 
 import com.coinomi.core.coins.families.BitFamily;
+import com.coinomi.core.coins.families.ReddFamily;
 
 /**
  * @author FuzzyHobbit
@@ -16,7 +17,7 @@ public class CannacoinMain extends CoinType {
         dumpedPrivateKeyHeader = 189;
         transactionVersion = 2;
 
-        family = ReddcoinMain.get();
+        family = ReddFamily.get();
         name = "Cannacoin";
         symbol = "CCN";
         uriScheme = "cannacoin";
@@ -26,6 +27,7 @@ public class CannacoinMain extends CoinType {
         minNonDust = value(1000000);
         softDustLimit = value(100000000);
         softDustPolicy = SoftDustPolicy.BASE_FEE_FOR_EACH_SOFT_DUST_TXO;
+        signedMessageHeader = toBytes("Cannacoin Signed Message:\n");
     }
 
     private static CannacoinMain instance = new CannacoinMain();

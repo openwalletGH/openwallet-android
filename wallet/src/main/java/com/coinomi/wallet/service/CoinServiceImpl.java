@@ -274,8 +274,7 @@ public class CoinServiceImpl extends Service implements CoinService {
     }
 
     @Override
-    public void onCreate()
-    {
+    public void onCreate() {
         serviceCreatedAt = System.currentTimeMillis();
         log.debug(".onCreate()");
 
@@ -283,9 +282,8 @@ public class CoinServiceImpl extends Service implements CoinService {
 
         nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        final String lockName = getPackageName() + " blockchain sync";
-
-        final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+//        final String lockName = getPackageName() + " blockchain sync";
+//        final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 //        wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, lockName);
 
         application = (WalletApplication) getApplication();
@@ -312,8 +310,7 @@ public class CoinServiceImpl extends Service implements CoinService {
     }
 
     @Override
-    public int onStartCommand(final Intent intent, final int flags, final int startId)
-    {
+    public int onStartCommand(final Intent intent, final int flags, final int startId) {
         log.info("service start command: " + intent
                 + (intent.hasExtra(Intent.EXTRA_ALARM_COUNT) ? " (alarm count: " + intent.getIntExtra(Intent.EXTRA_ALARM_COUNT, 0) + ")" : ""));
 
@@ -377,13 +374,10 @@ public class CoinServiceImpl extends Service implements CoinService {
             final Sha256Hash hash = new Sha256Hash(intent.getByteArrayExtra(CoinService.ACTION_BROADCAST_TRANSACTION_HASH));
             final Transaction tx = null; // FIXME
 
-            if (clients != null)
-            {
+            if (clients != null) {
                 log.info("broadcasting transaction " + tx.getHashAsString());
                 broadcastTransaction(tx);
-            }
-            else
-            {
+            } else {
                 log.info("client not available, not broadcasting transaction " + tx.getHashAsString());
             }
         }
@@ -396,8 +390,7 @@ public class CoinServiceImpl extends Service implements CoinService {
     }
 
     @Override
-    public void onDestroy()
-    {
+    public void onDestroy() {
         log.debug(".onDestroy()");
 
         unregisterReceiver(tickReceiver);

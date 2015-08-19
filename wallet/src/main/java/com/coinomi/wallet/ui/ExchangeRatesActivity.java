@@ -11,7 +11,7 @@ public class ExchangeRatesActivity extends BaseWalletActivity {
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.exchange_rates_content);
+        setContentView(R.layout.activity_fragment_wrapper);
 
         if (savedInstanceState == null) {
             ExchangeRatesFragment fragment = new ExchangeRatesFragment();

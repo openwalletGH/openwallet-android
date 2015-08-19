@@ -55,6 +55,7 @@
     <dimen name="qr_code_padding">16dp</dimen>
 
     <!-- Send fragment -->
+    <dimen name="tx_message_counter_padding">28dp</dimen>
 
     <!-- Balance fragment -->
     <dimen name="history_label">24sp</dimen>
@@ -79,6 +80,7 @@
     <dimen name="transaction_row_direction_font_icon_size">@dimen/row_font_icon_size</dimen>
     <dimen name="transaction_row_direction_bg_size">@dimen/row_font_icon_bg_size</dimen>
     <dimen name="transaction_row_confirmations_font_icon_size">18sp</dimen>
+    <dimen name="transaction_row_message_font_icon_size">14sp</dimen>
     <dimen name="transaction_row_text_size_direction_text">@dimen/row_text_size_header_text</dimen>
     <dimen name="transaction_row_text_size_amount">@dimen/row_text_size_amount</dimen>
     <dimen name="transaction_row_text_size_date">@dimen/row_text_size_date</dimen>

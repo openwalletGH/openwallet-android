@@ -16,7 +16,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.coins.VpncoinMain;
+import com.coinomi.core.messages.MessageFactory;
+import com.coinomi.core.messages.TxMessage;
 import com.coinomi.core.wallet.AbstractWallet;
+import com.coinomi.core.wallet.families.vpncoin.VpncoinTxMessage;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
@@ -24,6 +28,7 @@ import com.coinomi.wallet.util.ThrottlingWalletChangeListener;
 import com.coinomi.wallet.util.UiUtils;
 import com.coinomi.wallet.util.WeakHandler;
 
+import org.acra.ACRA;
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.Transaction;
@@ -50,9 +55,12 @@ public class TransactionDetailsFragment extends Fragment {
     private TransactionAmountVisualizerAdapter adapter;
     private TextView txStatusView;
     private TextView txIdView;
+    private TextView txMessageLabel;
+    private TextView txMessage;
     private TextView blockExplorerLink;
 
     private final Handler handler = new MyHandler(this);
+
     private static class MyHandler extends WeakHandler<TransactionDetailsFragment> {
         public MyHandler(TransactionDetailsFragment ref) { super(ref); }
 
@@ -101,6 +109,8 @@ public class TransactionDetailsFragment extends Fragment {
         View footer = inflater.inflate(R.layout.fragment_transaction_details_footer, null);
         outputRows.addFooterView(footer, null, false);
         txIdView = (TextView) footer.findViewById(R.id.tx_id);
+        txMessageLabel = (TextView) footer.findViewById(R.id.tx_message_label);
+        txMessage = (TextView) footer.findViewById(R.id.tx_message);
         blockExplorerLink = (TextView) footer.findViewById(R.id.block_explorer_link);
 
         pocket.addEventListener(walletListener);
@@ -176,6 +186,24 @@ public class TransactionDetailsFragment extends Fragment {
         adapter.setTransaction(tx);
         txIdView.setText(tx.getHashAsString());
         setupBlockExplorerLink(pocket.getCoinType(), tx.getHashAsString());
+
+        // Show message
+        MessageFactory factory = type.getMessagesFactory();
+        if (factory != null) {
+            try {
+                // TODO not efficient, should parse the message and save it to a database
+                TxMessage message = factory.extractPublicMessage(tx);
+                if (message != null) {
+                    // TODO in the future other coin types could support private encrypted messages
+                    txMessageLabel.setText(getString(R.string.tx_message_public));
+                    txMessageLabel.setVisibility(View.VISIBLE);
+                    txMessage.setText(message.toString());
+                    txMessage.setVisibility(View.VISIBLE);
+                }
+            } catch (Exception e) {
+                ACRA.getErrorReporter().handleSilentException(e);
+            }
+        }
     }
 
     private void setupBlockExplorerLink(CoinType type, String txHash) {
