@@ -601,6 +601,8 @@ public class SendFragment extends Fragment {
     }
 
     public void reset() {
+        // No-op if the view is not created
+        if (getView() == null) return;
         clearAddress(true);
         hideTxMessage();
         sendToAddressView.setVisibility(View.VISIBLE);
