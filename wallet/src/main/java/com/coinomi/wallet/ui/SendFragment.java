@@ -603,6 +603,7 @@ public class SendFragment extends Fragment {
     public void reset() {
         // No-op if the view is not created
         if (getView() == null) return;
+
         clearAddress(true);
         hideTxMessage();
         sendToAddressView.setVisibility(View.VISIBLE);
@@ -671,7 +672,10 @@ public class SendFragment extends Fragment {
         }
     }
 
-    void updateStateFrom(CoinURI coinUri) throws CoinURIParseException {
+    public void updateStateFrom(CoinURI coinUri) throws CoinURIParseException {
+        // No-op if the view is not created
+        if (getView() == null) return;
+
         setUri(coinUri);
 
         // delay these actions until fragment is resumed
