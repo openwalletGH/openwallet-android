@@ -15,7 +15,7 @@ public class ShadowCashMain extends CoinType {
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 500;
 		
-		family = PeerFamily.get();
+        family = PeerFamily.get();
         name = "ShadowCash";
         symbol = "SDC";
         uriScheme = "shadowcash";
@@ -25,7 +25,7 @@ public class ShadowCashMain extends CoinType {
         minNonDust = Coin.valueOf(1);
         softDustLimit = Coin.valueOf(1000000); // 0.01 SDC
         softDustPolicy = SoftDustPolicy.AT_LEAST_BASE_FEE_IF_SOFT_DUST_TXO_PRESENT;
-		signedMessageHeader = toBytes("ShadowCash Signed Message:\n");
+        signedMessageHeader = toBytes("ShadowCash Signed Message:\n");
     }
 
     private static ShadowCashMain instance = new ShadowCashMain();
