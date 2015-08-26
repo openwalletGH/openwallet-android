@@ -41,7 +41,8 @@ public enum CoinID {
     JUMBUCKS_MAIN(JumbucksMain.get()),
     VPNCOIN_MAIN(VpncoinMain.get()),
     NOVACOIN_MAIN(NovacoinMain.get()),
-    ;
+    SHADOWCASH_MAIN(ShadowCashMain.get()),
+	;
 
     private static List<CoinType> types;
     private static HashMap<String, CoinType> idLookup = new HashMap<>();
