@@ -9,6 +9,7 @@
     <string name="action_about">О программе</string>
     <string name="action_refresh">Обновить</string>
     <string name="action_sign_verify_message">Подписать/проверить сообщение</string>
+    <string name="action_account_details">Детали учетной записи</string>
     <string name="action_exchange_history">История обменов</string>
     <string name="action_new_address">Новый адрес</string>
     <string name="action_swap_coins">Обменять монеты</string>
@@ -57,10 +58,10 @@
     <string name="navigation_drawer_services">Сервис</string>
     <string name="navigation_drawer_wallet">Кошелёк</string>
     <!-- SendOutput widget -->
-    <string name="fee">Налог на транзакцию</string>
-    <string name="send">Отправить</string>
-    <string name="trade">Обмен</string>
-    <string name="receive">Получить</string>
+    <string name="fee">налог на транзакцию</string>
+    <string name="send">отправить</string>
+    <string name="trade">обмен</string>
+    <string name="receive">получить</string>
     <!-- Welcome fragment -->
     <string name="welcome_text">Добро пожаловать в Coinomi</string>
     <string name="create_wallet">Создать новый кошелёк</string>
@@ -151,6 +152,8 @@
     <string name="password_wallet_recovery">Чтобы восстановить Ваш кошелёк, пожалуйста, введите тот же пароль, что был использован при создании защищенной восстанавливающей фразы.\nЕсли Вы введёте другой пароль, будет создан новый пустой кошелёк.</string>
     <!-- FinalizeWalletRestorationFragment -->
     <string name="wallet_restoration">Пожалуйста, подождите, Ваш кошелёк восстанавливается</string>
+    <string name="wallet_restoration_master_key">Создание мастер-ключа</string>
+    <string name="wallet_restoration_coin">Создание ключа для %1$s</string>
     <string name="wallet_restoration_error">Невозможно восстановить Ваш кошелёк.\n\n%1$s</string>
     <!-- PasswordConfirmationFragment -->
     <string name="enter_password">Введите Ваш пароль</string>
@@ -242,9 +245,10 @@
     <string name="title_activity_show_seed">Показать восстанавливающую фразу</string>
     <string name="seed_not_available_title">Не найдена восстанавливающая фраза</string>
     <string name="seed_not_available">Ваша восстанавливающая фраза не сохранена на этом устройстве.\nПопробуйте восстановить Ваш кошелёк , чтобы исправить это.</string>
-    <string name="touch_to_decrypt_wallet">Дотроньтесь для разблокировки</string>
     <string name="seed_working">Пожалуйста подождите &#8230;</string>
     <string name="seed_password_protected">Эта восстанавливающая фраза защищена паролем (BIP39)</string>
+    <!-- Wallet locked -->
+    <string name="touch_to_decrypt_wallet">Дотроньтесь для разблокировки</string>
     <!-- Exchange -->
     <string name="title_activity_trade">Обменять</string>
     <string name="trade_info">Выберите валюту которую желаете обменять.\nПосле обмена валюта автоматически добавится в Ваш кошелёк.</string>
@@ -296,4 +300,23 @@
     <string name="message_signed">Сообщение подписано</string>
     <string name="message_verified">Сообщение проверенно</string>
     <string name="message_verification_failed">Проверка сообщения не удалась</string>
+    <!-- Messages -->
+    <string name="tx_message_public">публичное сообщение</string>
+    <string name="tx_message_private">личное сообщение</string>
+    <string name="tx_message_public_add">Добавить публичное сообщение</string>
+    <string name="tx_message_private_add">Добавить личное сообщение</string>
+    <string name="tx_message_public_remove">Удалить публичное сообщение</string>
+    <string name="tx_message_private_remove">Удалить личное сообщение</string>
+    <string name="tx_message_from">от</string>
+    <string name="tx_message_subject">объект</string>
+    <string name="tx_message">сообщение</string>
+    <!-- Account details -->
+    <string name="title_activity_account_details">Детали учетной записи</string>
+    <string name="account_description_label">описание</string>
+    <string name="account_public_key_label">публичный ключ</string>
+    <string name="account_extended_public_key_label">расширенный публичный ключ</string>
+    <string name="account_public_key_warning">Отдавая ваш публичный ключ в чужие руки, Вы позволяете просматривать ваш баланс и историю транзакций.</string>
+    <string name="account_private_key_label">личный ключ</string>
+    <string name="account_extended_private_key_label">расширенный личный ключ</string>
+    <string name="account_private_key_warning">Личный ключ позволяет вам отправлять монеты с этого аккаунта. Совсем не обязательно делать его копию, поскольку он создается на основе вашей <i>восстанавливающей фразы</i></string>
 </resources>

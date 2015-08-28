@@ -308,7 +308,9 @@
     <string name="title_activity_account_details">Λεπτομέρειες λογαριασμού</string>
     <string name="account_description_label">περιγραφή</string>
     <string name="account_public_key_label">δημόσιο κλειδί</string>
+    <string name="account_extended_public_key_label">επεκταμένο δημόσιο κλειδί</string>
     <string name="account_public_key_warning">Μοιράζοντας το δημόσιο κλειδί σας επιτρέπετε στον καθένα να δει το υπόλοιπο του λογαριασμού σας όπως και το ιστορικό των συναλλαγών σας</string>
     <string name="account_private_key_label">ιδιωτικό κλειδί</string>
+    <string name="account_extended_private_key_label">επεκταμένο ιδιωτικό κλειδί</string>
     <string name="account_private_key_warning">Το ιδιωτικό κλειδί επιτρέπει την αποστολή νομισμάτων από αυτόν τον λογαριασμό. Δεν χρειάζεται να αποθηκεύσετε αυτό το κλειδί, αφού προκύπτει από την <i>φράση ανάκτησης</i> του πορτοφολιού σας</string>
 </resources>
