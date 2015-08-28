@@ -12,7 +12,7 @@ public class CanadaeCoinMain extends CoinType {
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 120; // COINBASE_MATURITY_NEW
 
-        name = "Canada eCoin";
+        name = "Canada eCoin (beta)";
         symbol = "CDN";
         uriScheme = "canadaecoin";
         bip44Index = 34;

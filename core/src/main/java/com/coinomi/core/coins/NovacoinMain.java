@@ -13,7 +13,7 @@ public class NovacoinMain extends CoinType {
         spendableCoinbaseDepth = 520;
 
         family = PeerFamily.get();
-        name = "Novacoin";
+        name = "Novacoin (beta)";
         symbol = "NVC";
         uriScheme = "novacoin";
         bip44Index = 50;
