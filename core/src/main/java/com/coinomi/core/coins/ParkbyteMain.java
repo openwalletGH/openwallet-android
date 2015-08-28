@@ -21,7 +21,7 @@ public class ParkbyteMain extends CoinType {
         name = "ParkByte";
         symbol = "PKB";
         uriScheme = "parkbyte"; // TODO verify, could be ppcoin?
-        bip44Index = 6;
+        bip44Index = 36;
         unitExponent = 8;
         feePerKb = value(1000); // 0.0001PKB
         minNonDust = value(1000); // 0.01PKB
