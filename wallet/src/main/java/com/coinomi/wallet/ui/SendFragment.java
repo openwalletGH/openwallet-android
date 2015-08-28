@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
@@ -259,18 +258,16 @@ public class SendFragment extends Fragment {
 
     private void processUri(String uri) throws CoinURIParseException {
         CoinURI coinUri = new CoinURI(uri);
-        CoinType scannedType = coinUri.getType();
+        CoinType scannedType = coinUri.getTypeRequired();
 
         if (!Constants.SUPPORTED_COINS.contains(scannedType)) {
             String error = getResources().getString(R.string.unsupported_coin, scannedType.getName());
             throw new CoinURIParseException(error);
         }
 
-        setUri(coinUri);
-
         if (pocket == null) {
             List<WalletAccount> allAccounts = application.getAllAccounts();
-            List<WalletAccount> sendFromAccounts = application.getAccounts(coinUri.getType());
+            List<WalletAccount> sendFromAccounts = application.getAccounts(scannedType);
             if (sendFromAccounts.size() == 1) {
                 pocket = sendFromAccounts.get(0);
             } else if (allAccounts.size() == 1) {
@@ -278,6 +275,12 @@ public class SendFragment extends Fragment {
             } else {
                 throw new CoinURIParseException("No default account found");
             }
+        }
+
+        if (coinUri.isAddressRequest()) {
+            UiUtils.replyAddressRequest(getActivity(), coinUri, pocket);
+        } else {
+            setUri(coinUri);
         }
     }
 
@@ -675,6 +678,11 @@ public class SendFragment extends Fragment {
     public void updateStateFrom(CoinURI coinUri) throws CoinURIParseException {
         // No-op if the view is not created
         if (getView() == null) return;
+
+        if (coinUri.isAddressRequest() && coinUri.getTypeRequired().equals(pocket.getCoinType())) {
+            UiUtils.replyAddressRequest(getActivity(), coinUri, pocket);
+            return;
+        }
 
         setUri(coinUri);
 

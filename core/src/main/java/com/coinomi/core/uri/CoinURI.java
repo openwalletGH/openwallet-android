@@ -37,11 +37,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.Nullable;
 
 import static com.coinomi.core.Preconditions.checkNotNull;
+import static com.coinomi.core.Preconditions.checkState;
 
 /**
  * <p>Provides a standard implementation of a Bitcoin URI with support for the following:</p>
@@ -94,12 +94,15 @@ public class CoinURI {
     public static final String FIELD_AMOUNT = "amount";
     public static final String FIELD_ADDRESS = "address";
     public static final String FIELD_PAYMENT_REQUEST_URL = "r";
+    public static final String FIELD_ADDRESS_REQUEST_URI = "req-addressrequest";
+    public static final String FIELD_NETWORK = "req-network";
 
     private static final String ENCODED_SPACE_CHARACTER = "%20";
     private static final String AMPERSAND_SEPARATOR = "&";
     private static final String QUESTION_MARK_SEPARATOR = "?";
 
-    private final CoinType type;
+    @Nullable
+    private CoinType type;
 
     /**
      * Contains all the parameters in the order in which they were processed
@@ -129,6 +132,9 @@ public class CoinURI {
         checkNotNull(input);
         log.debug("Attempting to parse '{}' for {}", input, uriType == null ? "any" : uriType.getId());
 
+        // If type is null we will try to heuristically find it later
+        type = uriType;
+
         // Attempt to form the URI (fail fast syntax checking to official standards).
         URI uri;
         uri = getUri(input);
@@ -146,10 +152,10 @@ public class CoinURI {
         String uriScheme;
         List<CoinType> possibleTypes;
 
-        if (uriType == null) {
+        if (type == null) {
             if (uri.getScheme() != null) {
                 try {
-                    possibleTypes = CoinID.fromUri(input);
+                    possibleTypes = CoinID.fromUriScheme(uri.getScheme());
                     uriScheme = possibleTypes.get(0).getUriScheme();
                 } catch (IllegalArgumentException e) {
                     throw new CoinURIParseException("Unsupported URI scheme: " + uri.getScheme());
@@ -158,8 +164,8 @@ public class CoinURI {
                 throw new CoinURIParseException("Unrecognisable URI format: " + input);
             }
         } else {
-            uriScheme = uriType.getUriScheme();
-            possibleTypes = Lists.newArrayList(uriType);
+            uriScheme = type.getUriScheme();
+            possibleTypes = Lists.newArrayList(type);
         }
 
         if (input.startsWith(uriScheme + "://")) {
@@ -206,16 +212,27 @@ public class CoinURI {
             if (address == null) {
                 throw new CoinURIParseException("Bad address: " + addressToken);
             }
-            type = (CoinType) address.getParameters();
-        } else {
-            // TODO, currently we don't support URIs without an address
-            throw new CoinURIParseException("No address found");
+
+            if (type == null){
+                type = (CoinType) address.getParameters();
+            } else {
+                checkState(type.equals(address.getParameters()));
+            }
         }
 
         // Attempt to parse the rest of the URI parameters.
-        parseParameters(nameValuePairTokens);
+        parseParameters(nameValuePairTokens, possibleTypes);
 
-        if (addressToken.isEmpty() && getPaymentRequestUrl() == null) {
+        // If until now we haven't found the coin type and the URI is an Address Request, use the default type
+        if (type == null && isAddressRequest()) {
+            type = possibleTypes.get(0);
+        }
+
+        if (!addressToken.isEmpty() && isAddressRequest()) {
+            throw new CoinURIParseException("Cannot set an address when requesting an address");
+        }
+
+        if (addressToken.isEmpty() && getPaymentRequestUrl() == null && getAddressRequestUri() == null) {
             throw new CoinURIParseException("No address and no r= parameter found");
         }
     }
@@ -230,11 +247,14 @@ public class CoinURI {
         return uri;
     }
 
+
+
     /**
      * @param nameValuePairTokens The tokens representing the name value pairs (assumed to be
      *                            separated by '=' e.g. 'amount=0.2')
+     * @param possibleTypes
      */
-    private void parseParameters(String[] nameValuePairTokens) throws CoinURIParseException {
+    private void parseParameters(String[] nameValuePairTokens, List<CoinType> possibleTypes) throws CoinURIParseException {
         // Attempt to decode the rest of the tokens into a parameter map.
         for (String nameValuePairToken : nameValuePairTokens) {
             final int sepIndex = nameValuePairToken.indexOf('=');
@@ -249,6 +269,10 @@ public class CoinURI {
 
             // Parse the amount.
             if (FIELD_AMOUNT.equals(nameToken)) {
+                // Cannot parse amount for unknown coin type
+                if (type == null) {
+                    throw new OptionalFieldValidationException("Cannot parse amount for unknown coin type");
+                }
                 // Decode the amount (contains an optional decimal component to 8dp).
                 try {
                     Value amount = checkNotNull(type).value(valueToken);
@@ -261,6 +285,54 @@ public class CoinURI {
                 } catch (ArithmeticException e) {
                     throw new OptionalFieldValidationException(String.format("'%s' has too many decimal places", valueToken), e);
                 }
+            } else if (FIELD_ADDRESS_REQUEST_URI.equals(nameToken)) {
+                try {
+                    if (valueToken.length() > 0)
+                        putWithValidation(nameToken, new URI(URLDecoder.decode(valueToken, "UTF-8")));
+                } catch (UnsupportedEncodingException e) {
+                    // Unreachable.
+                    throw new RuntimeException(e);
+                } catch (URISyntaxException e) {
+                    throw new RequiredFieldValidationException("Address request URI '" + nameToken + "' is not valid");
+                }
+            } else if (FIELD_NETWORK.equals(nameToken)) {
+                CoinType parsedType = null;
+                if (valueToken.length() > 0) {
+                    boolean isTestnet = valueToken.endsWith("test");
+                    String specificType = null;
+                    // If not main or test but something like nbt.main or nsr.main try to guess
+                    // the network with the coin symbol although there is no guarantee that it
+                    // will always work.
+                    if (valueToken.length() != 4) {
+                        String[] parts = valueToken.split("\\.");
+                        if (parts.length != 0) specificType = parts[0];
+                    }
+
+                    for (CoinType t : possibleTypes) {
+                        if (t.isTestnet() == isTestnet) {
+                            // Check if a specific type is requested
+                            if (specificType != null && !specificType.equalsIgnoreCase(t.getSymbol())) {
+                                continue;
+                            }
+                            parsedType = t;
+                            break;
+                        }
+                    }
+                    if (parsedType == null) {
+                        throw new RequiredFieldValidationException("Could not find network '" + valueToken + "'");
+                    }
+                } else {
+                    // Best guess
+                    parsedType = possibleTypes.get(0);
+                }
+
+                // Sanity check
+                if (type != null && !type.equals(parsedType)) {
+                    throw new RequiredFieldValidationException("Parsed coin type '" +
+                            parsedType.getId() + "' does not match the supplied type '" + type.getId() + "'");
+                }
+                if (type == null) type = parsedType;
+                putWithValidation(nameToken, valueToken);
             } else {
                 if (nameToken.startsWith("req-")) {
                     // A required parameter that we do not know about.
@@ -297,10 +369,26 @@ public class CoinURI {
     }
 
     /**
+     * Same as {@link #getType()} but throws an exception if the uri has no type
      * @return The {@link com.coinomi.core.coins.CoinType} of this URI
      */
+    public CoinType getTypeRequired() throws CoinURIParseException {
+        if (!hasType()) {
+            throw new CoinURIParseException("Unknown coin type");
+        }
+        return getType();
+    }
+
+    /**
+     * @return The {@link com.coinomi.core.coins.CoinType} of this URI
+     */
+    @Nullable
     public CoinType getType() {
         return type;
+    }
+
+    public boolean hasType() {
+        return type != null;
     }
 
     /**
@@ -341,6 +429,34 @@ public class CoinURI {
      */
     public String getPaymentRequestUrl() {
         return (String) parameterMap.get(FIELD_PAYMENT_REQUEST_URL);
+    }
+
+    public URI getAddressRequestUri() {
+        return (URI) parameterMap.get(FIELD_ADDRESS_REQUEST_URI);
+    }
+
+    public boolean isAddressRequest() {
+        return parameterMap.containsKey(FIELD_ADDRESS_REQUEST_URI);
+    }
+
+    public URI getAddressRequestUriResponse(Address address) {
+        return getAddressRequestUriResponse(address.toString());
+    }
+
+    public URI getAddressRequestUriResponse(String address) {
+        URI uri = getAddressRequestUri();
+        if (uri != null) {
+            try {
+                StringBuilder query = new StringBuilder();
+                if (uri.getQuery() != null) {
+                    query.append(uri.getQuery()).append(AMPERSAND_SEPARATOR);
+                }
+                query.append(FIELD_ADDRESS).append("=").append(encodeURLString(address));
+                return new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(),
+                        uri.getPath(), query.toString(), uri.getFragment());
+            } catch (URISyntaxException e) { /* pass */ }
+        }
+        return null;
     }
     
     /**

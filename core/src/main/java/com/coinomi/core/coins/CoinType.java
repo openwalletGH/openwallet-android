@@ -50,6 +50,10 @@ abstract public class CoinType extends NetworkParameters implements ValueType, S
         return checkNotNull(name, "A coin failed to set a name");
     }
 
+    public boolean isTestnet() {
+        return id.endsWith("test");
+    }
+
     @Override
     public String getSymbol() {
         return checkNotNull(symbol, "A coin failed to set a symbol");

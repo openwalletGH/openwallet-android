@@ -13,6 +13,12 @@ import java.util.List;
 import java.util.Set;
 
 /**
+ * When adding new coin types the order affects which types will be chosen by default if they share
+ * a URI scheme. For example BITCOIN_MAIN and BITCOIN_TEST share the bitcoin: scheme so BITCOIN_MAIN
+ * will be chosen by default when we don't have any other information. The same applies to the other
+ * testnets and NUBITS_MAIN and NUSHARES_MAIN that share the nu: URI scheme. For anything else the
+ * order doesn't matter.
+ *
  * @author John L. Jegutanis
  */
 public enum CoinID {
@@ -26,8 +32,8 @@ public enum CoinID {
     REDDCOIN_MAIN(ReddcoinMain.get()),
     PEERCOIN_MAIN(PeercoinMain.get()),
     DASH_MAIN(DashMain.get()),
-    NUSHARES_MAIN(NuSharesMain.get()),
     NUBITS_MAIN(NuBitsMain.get()),
+    NUSHARES_MAIN(NuSharesMain.get()),
     NAMECOIN_MAIN(NamecoinMain.get()),
     BLACKCOIN_MAIN(BlackcoinMain.get()),
     MONACOIN_MAIN(MonacoinMain.get()),
@@ -46,7 +52,7 @@ public enum CoinID {
     private static List<CoinType> types;
     private static HashMap<String, CoinType> idLookup = new HashMap<>();
     private static HashMap<String, CoinType> symbolLookup = new HashMap<>();
-    private static HashMap<String, List<CoinType>> uriLookup = new HashMap<>();
+    private static HashMap<String, ArrayList<CoinType>> uriLookup = new HashMap<>();
 
     static {
         Set<NetworkParameters> bitcoinjNetworks = Networks.get();
@@ -54,12 +60,10 @@ public enum CoinID {
             Networks.unregister(network);
         }
 
-        for (CoinID id : values()) {
-            Networks.register(id.type);
-        }
-
         ImmutableList.Builder<CoinType> coinTypeBuilder = ImmutableList.builder();
         for (CoinID id : values()) {
+            Networks.register(id.type);
+
             if (symbolLookup.containsKey(id.type.symbol)) {
                 throw new IllegalStateException(
                         "Coin currency codes must be unique, double found: " + id.type.symbol);
@@ -69,6 +73,11 @@ public enum CoinID {
             if (idLookup.containsKey(id.type.getId())) {
                 throw new IllegalStateException(
                         "Coin IDs must be unique, double found: " + id.type.getId());
+            }
+            // Coin ids must end with main or test
+            if (!id.type.getId().endsWith("main") && !id.type.getId().endsWith("test")) {
+                throw new IllegalStateException(
+                        "Coin IDs must end with 'main' or 'test': " + id.type.getId());
             }
             idLookup.put(id.type.getId(), id.type);
 
@@ -84,7 +93,7 @@ public enum CoinID {
 
     private final CoinType type;
 
-    private CoinID(final CoinType type) {
+    CoinID(final CoinType type) {
         this.type = type;
     }
 
@@ -116,6 +125,14 @@ public enum CoinID {
             }
         }
         throw new IllegalArgumentException("Unsupported URI: " + input);
+    }
+
+    public static List<CoinType> fromUriScheme(String scheme) {
+        if (uriLookup.containsKey(scheme)) {
+            return uriLookup.get(scheme);
+        } else {
+            throw new IllegalArgumentException("Unsupported URI scheme: " + scheme);
+        }
     }
 
     public static List<CoinType> typesFromAddress(String address) throws AddressFormatException {

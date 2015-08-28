@@ -6,6 +6,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.ShareCompat;
 import android.support.v7.app.ActionBarActivity;
@@ -15,20 +16,38 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.coinomi.core.uri.CoinURI;
+import com.coinomi.core.uri.CoinURIParseException;
 import com.coinomi.core.util.GenericUtils;
+import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.wallet.AddressBookProvider;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.ui.EditAddressBookEntryFragment;
 
+import org.acra.ACRA;
 import org.bitcoinj.core.Address;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.URISyntaxException;
 
 /**
  * @author John L. Jegutanis
  */
 public class UiUtils {
     private static final Logger log = LoggerFactory.getLogger(UiUtils.class);
+
+    static public void replyAddressRequest(Activity activity, CoinURI uri, WalletAccount pocket) throws CoinURIParseException {
+        try {
+            String uriString = uri.getAddressRequestUriResponse(pocket.getReceiveAddress()).toString();
+            Intent intent = Intent.parseUri(uriString, 0);
+            activity.startActivity(intent);
+        } catch (Exception e) {
+            // Should not happen
+            ACRA.getErrorReporter().handleSilentException(e);
+            Toast.makeText(activity, R.string.error_generic, Toast.LENGTH_SHORT).show();
+        }
+    }
 
     static public void share(Activity activity, String text) {
         ShareCompat.IntentBuilder builder = ShareCompat.IntentBuilder.from(activity)
