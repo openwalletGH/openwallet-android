@@ -18,11 +18,11 @@ import javax.annotation.Nullable;
 public abstract class AddCoinTask  extends AsyncTask<Void, Void, Void> {
     protected final CoinType type;
     private final Wallet wallet;
-    @Nullable private final String password;
+    @Nullable private final CharSequence password;
     private WalletAccount newAccount;
     private Exception exception;
 
-    public AddCoinTask(CoinType type, Wallet wallet, @Nullable String password) {
+    public AddCoinTask(CoinType type, Wallet wallet, @Nullable CharSequence password) {
         this.type = type;
         this.wallet = wallet;
         this.password = password;

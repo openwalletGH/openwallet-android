@@ -46,6 +46,8 @@ import com.coinomi.wallet.util.WeakHandler;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
+import org.acra.ACRA;
+import org.bitcoinj.crypto.KeyCrypterException;
 import org.bitcoinj.utils.Threading;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +59,6 @@ import java.util.Timer;
 import javax.annotation.Nullable;
 
 import static com.coinomi.core.coins.Value.canCompare;
-import static com.coinomi.core.coins.Value.max;
 
 /**
  * @author John L. Jegutanis
@@ -333,7 +334,7 @@ public class TradeSelectFragment extends Fragment {
     /**
      * Start account creation task and proceed
      */
-    private void maybeStartAddCoinAndProceedTask(@Nullable String password) {
+    private void maybeStartAddCoinAndProceedTask(@Nullable CharSequence password) {
         if (addCoinAndProceedTask == null) {
             addCoinAndProceedTask = new AddCoinAndProceedTask(destinationType, wallet, password);
             addCoinAndProceedTask.execute();
@@ -1080,7 +1081,7 @@ public class TradeSelectFragment extends Fragment {
     private class AddCoinAndProceedTask extends AddCoinTask {
         private Dialogs.ProgressDialogFragment verifyDialog;
 
-        public AddCoinAndProceedTask(CoinType type, Wallet wallet, @Nullable String password) {
+        public AddCoinAndProceedTask(CoinType type, Wallet wallet, @Nullable CharSequence password) {
             super(type, wallet, password);
         }
 
@@ -1095,13 +1096,32 @@ public class TradeSelectFragment extends Fragment {
         protected void onPostExecute(Exception e, WalletAccount newAccount) {
             verifyDialog.dismiss();
             if (e != null) {
-                Toast.makeText(getActivity(), R.string.error_generic, Toast.LENGTH_LONG).show();
+                if (e instanceof KeyCrypterException) {
+                    showPasswordRetryDialog();
+                } else {
+                    ACRA.getErrorReporter().handleSilentException(e);
+                    Toast.makeText(getActivity(), R.string.error_generic, Toast.LENGTH_LONG).show();
+                }
+            } else {
+                destinationAccount = newAccount;
+                destinationType = newAccount.getCoinType();
+                onHandleNext();
             }
-            destinationAccount = newAccount;
-            destinationType = newAccount.getCoinType();
-            onHandleNext();
             addCoinAndProceedTask = null;
         }
+    }
+
+    private void showPasswordRetryDialog() {
+        DialogBuilder.warn(getActivity(), R.string.unlocking_wallet_error_title)
+                .setMessage(R.string.unlocking_wallet_error_detail)
+                .setNegativeButton(R.string.button_cancel, null)
+                .setPositiveButton(R.string.button_retry, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        createToAccountAndProceed();
+                    }
+                })
+                .create().show();
     }
 
     private DialogFragment createToAccountAndProceedDialog = new DialogFragment() {
@@ -1125,7 +1145,7 @@ public class TradeSelectFragment extends Fragment {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             if (wallet.isEncrypted()) {
-                                maybeStartAddCoinAndProceedTask(passwordView.getText().toString());
+                                maybeStartAddCoinAndProceedTask(passwordView.getText());
                             } else {
                                 maybeStartAddCoinAndProceedTask(null);
                             }
