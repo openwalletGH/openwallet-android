@@ -6,7 +6,6 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.ShareCompat;
 import android.support.v7.app.ActionBarActivity;
@@ -28,8 +27,6 @@ import org.acra.ACRA;
 import org.bitcoinj.core.Address;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.net.URISyntaxException;
 
 /**
  * @author John L. Jegutanis
@@ -62,14 +59,20 @@ public class UiUtils {
     public static void copy(Context context, String string) {
         Object clipboardService = context.getSystemService(Context.CLIPBOARD_SERVICE);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            ClipboardManager clipboard = (ClipboardManager) clipboardService;
-            clipboard.setPrimaryClip(ClipData.newPlainText("simple text", string));
-        } else {
-            android.text.ClipboardManager clipboard = (android.text.ClipboardManager) clipboardService;
-            clipboard.setText(string);
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                ClipboardManager clipboard = (ClipboardManager) clipboardService;
+                clipboard.setPrimaryClip(ClipData.newPlainText("simple text", string));
+            } else {
+                android.text.ClipboardManager clipboard = (android.text.ClipboardManager) clipboardService;
+                clipboard.setText(string);
+            }
+            Toast.makeText(context, R.string.copied_to_clipboard, Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            // Should not normally happen
+            ACRA.getErrorReporter().handleSilentException(e);
+            Toast.makeText(context, R.string.error_generic, Toast.LENGTH_SHORT).show();
         }
-        Toast.makeText(context, R.string.copied_to_clipboard, Toast.LENGTH_SHORT).show();
     }
 
     public static void setVisible(View view) {
