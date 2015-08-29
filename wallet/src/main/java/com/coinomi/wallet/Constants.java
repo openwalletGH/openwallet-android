@@ -4,6 +4,7 @@ import android.text.format.DateUtils;
 
 import com.coinomi.core.coins.BitcoinMain;
 import com.coinomi.core.coins.BitcoinTest;
+import com.coinomi.core.coins.CanadaeCoinMain;
 import com.coinomi.core.coins.BlackcoinMain;
 import com.coinomi.core.coins.BurstMain;
 import com.coinomi.core.coins.CannacoinMain;
@@ -23,6 +24,8 @@ import com.coinomi.core.coins.NuBitsMain;
 import com.coinomi.core.coins.NuSharesMain;
 import com.coinomi.core.coins.NxtMain;
 import com.coinomi.core.coins.PeercoinMain;
+import com.coinomi.core.coins.NovacoinMain;
+import com.coinomi.core.coins.ParkbyteMain;
 import com.coinomi.core.coins.ReddcoinMain;
 import com.coinomi.core.coins.RubycoinMain;
 import com.coinomi.core.coins.UroMain;
@@ -30,6 +33,7 @@ import com.coinomi.core.coins.NeoscoinMain;
 import com.coinomi.core.coins.JumbucksMain;
 import com.coinomi.core.coins.VertcoinMain;
 import com.coinomi.core.coins.VpncoinMain;
+import com.coinomi.core.coins.ShadowCashMain;
 import com.coinomi.core.network.CoinAddress;
 import com.coinomi.stratumj.ServerAddress;
 import com.google.common.collect.ImmutableList;
@@ -146,7 +150,8 @@ public class Constants {
                                                     new ServerAddress("dgb-cce-2.coinomi.net", 5023)),
             // 5024 primecoin
             // 5025 clams
-            // 5026 shadowcoin
+            new CoinAddress(ShadowCashMain.get(),   new ServerAddress("sdc-cce-1.coinomi.net", 5026),
+                                                    new ServerAddress("sdc-cce-2.coinomi.net", 5026)),
             new CoinAddress(NeoscoinMain.get(),     new ServerAddress("neos-cce-1.coinomi.net", 5027),
                                                     new ServerAddress("neos-cce-2.coinomi.net", 5027)),
             new CoinAddress(VertcoinMain.get(),     new ServerAddress("vtc-cce-1.coinomi.net", 5028),
@@ -154,7 +159,13 @@ public class Constants {
             new CoinAddress(JumbucksMain.get(),     new ServerAddress("jbs-cce-1.coinomi.net", 5029),
                                                     new ServerAddress("jbs-cce-2.coinomi.net", 5029)),
             new CoinAddress(VpncoinMain.get(),      new ServerAddress("vpn-cce-1.coinomi.net", 5032),
-                                                    new ServerAddress("vpn-cce-2.coinomi.net", 5032))
+                                                    new ServerAddress("vpn-cce-2.coinomi.net", 5032)),
+            new CoinAddress(CanadaeCoinMain.get(),  new ServerAddress("cdn-cce-1.coinomi.net", 5033),
+                                                    new ServerAddress("cdn-cce-2.coinomi.net", 5033)),
+            new CoinAddress(NovacoinMain.get(),     new ServerAddress("nvc-cce-1.coinomi.net", 5034),
+                                                    new ServerAddress("nvc-cce-2.coinomi.net", 5034)),
+            new CoinAddress(ParkbyteMain.get(),     new ServerAddress("pkb-cce-1.coinomi.net", 5035),
+                                                    new ServerAddress("pkb-cce-2.coinomi.net", 5035))
     );
 
     public static final HashMap<CoinType, Integer> COINS_ICONS;
@@ -187,6 +198,10 @@ public class Constants {
         COINS_ICONS.put(CoinID.BURST_MAIN.getCoinType(), R.drawable.burst);
         COINS_ICONS.put(CoinID.JUMBUCKS_MAIN.getCoinType(), R.drawable.jumbucks);
         COINS_ICONS.put(CoinID.VPNCOIN_MAIN.getCoinType(), R.drawable.vpncoin);
+        COINS_ICONS.put(CoinID.NOVACOIN_MAIN.getCoinType(), R.drawable.novacoin);
+        COINS_ICONS.put(CoinID.CANADAECOIN_MAIN.getCoinType(), R.drawable.canadaecoin);
+        COINS_ICONS.put(CoinID.SHADOWCASH_MAIN.getCoinType(), R.drawable.shadowcash);
+        COINS_ICONS.put(CoinID.PARKBYTE_MAIN.getCoinType(), R.drawable.parkbyte);
 
         COINS_BLOCK_EXPLORERS = new HashMap<CoinType, String>();
         COINS_BLOCK_EXPLORERS.put(CoinID.BITCOIN_MAIN.getCoinType(), "https://blockchain.info/tx/%s");
@@ -214,6 +229,10 @@ public class Constants {
         COINS_BLOCK_EXPLORERS.put(CoinID.VERTCOIN_MAIN.getCoinType(), "https://bitinfocharts.com/vertcoin/tx/%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.JUMBUCKS_MAIN.getCoinType(), "http://explorer.getjumbucks.com/tx/%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.VPNCOIN_MAIN.getCoinType(), "https://blockexperts.com/vpn/tx/%s");
+        COINS_BLOCK_EXPLORERS.put(CoinID.NOVACOIN_MAIN.getCoinType(), "http://explorer.novaco.in/tx/%s");
+        COINS_BLOCK_EXPLORERS.put(CoinID.CANADAECOIN_MAIN.getCoinType(), "http://explorer.canadaecoin.ca/tx/%s");
+        COINS_BLOCK_EXPLORERS.put(CoinID.SHADOWCASH_MAIN.getCoinType(), "http://shadowchain.info/tx/%s");
+        COINS_BLOCK_EXPLORERS.put(CoinID.PARKBYTE_MAIN.getCoinType(), "https://chainz.cryptoid.info/pkb/tx.dws?%s");
     }
 
     public static final CoinType DEFAULT_COIN = BitcoinMain.get();
@@ -228,25 +247,29 @@ public class Constants {
             BitcoinMain.get(),
             DogecoinMain.get(),
             LitecoinMain.get(),
-            NxtMain.get(),
-            NuBitsMain.get(),
-            PeercoinMain.get(),
             DashMain.get(),
+            NuBitsMain.get(),
+            NxtMain.get(),
+            PeercoinMain.get(),
             NamecoinMain.get(),
             BlackcoinMain.get(),
             MonacoinMain.get(),
             NuSharesMain.get(),
+            NovacoinMain.get(),
             VpncoinMain.get(),
             VertcoinMain.get(),
             BurstMain.get(),
+            ShadowCashMain.get(),
             FeathercoinMain.get(),
-            RubycoinMain.get(),
             ReddcoinMain.get(),
             DigibyteMain.get(),
+            RubycoinMain.get(),
             DigitalcoinMain.get(),
             JumbucksMain.get(),
-            NeoscoinMain.get(),
+            CanadaeCoinMain.get(),
             CannacoinMain.get(),
+            NeoscoinMain.get(),
+            ParkbyteMain.get(),
             BitcoinTest.get(),
             LitecoinTest.get(),
             DogecoinTest.get()

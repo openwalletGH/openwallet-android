@@ -34,6 +34,7 @@ import com.coinomi.wallet.service.CoinServiceImpl;
 import com.coinomi.wallet.tasks.CheckUpdateTask;
 import com.coinomi.wallet.util.Keyboard;
 import com.coinomi.wallet.util.SystemUtils;
+import com.coinomi.wallet.util.UiUtils;
 import com.coinomi.wallet.util.WeakHandler;
 
 import org.bitcoinj.core.Transaction;
@@ -363,22 +364,33 @@ final public class WalletActivity extends BaseWalletActivity implements
 
     private void processUri(String input) throws CoinURIParseException {
         CoinURI coinUri = new CoinURI(input);
-        CoinType scannedType = coinUri.getType();
+        CoinType scannedType = coinUri.getTypeRequired();
 
         if (!Constants.SUPPORTED_COINS.contains(scannedType)) {
             String error = getResources().getString(R.string.unsupported_coin, scannedType.getName());
             throw new CoinURIParseException(error);
         }
 
+        WalletAccount selectedAccount = null;
         List<WalletAccount> allAccounts = getAllAccounts();
-        List<WalletAccount> sendFromAccounts = getAccounts(coinUri.getType());
+        List<WalletAccount> sendFromAccounts = getAccounts(scannedType);
         if (sendFromAccounts.size() == 1) {
-            setSendFromCoin(sendFromAccounts.get(0), coinUri);
+            selectedAccount = sendFromAccounts.get(0);
         } else if (allAccounts.size() == 1) {
-            setSendFromCoin(allAccounts.get(0), coinUri);
+            selectedAccount = allAccounts.get(0);
+        }
+
+        if (coinUri.isAddressRequest() && selectedAccount != null) {
+            UiUtils.replyAddressRequest(this, coinUri, selectedAccount);
+            return;
+        }
+
+        if (selectedAccount != null) {
+            setSendFromCoin(selectedAccount, coinUri);
         } else {
             showPayWithDialog(coinUri);
         }
+
     }
 
     private void processAddress(String addressStr) throws CoinURIParseException, AddressMalformedException {

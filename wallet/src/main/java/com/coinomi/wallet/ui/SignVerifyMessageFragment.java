@@ -20,6 +20,7 @@ import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.tasks.SignVerifyMessageTask;
+import com.coinomi.wallet.util.Keyboard;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +33,6 @@ import static com.coinomi.core.Preconditions.checkNotNull;
 /**
  * Fragment that prepares a transaction
  *
- * @author Andreas Schildbach
  * @author John L. Jegutanis
  */
 public class SignVerifyMessageFragment extends Fragment {
@@ -108,6 +108,7 @@ public class SignVerifyMessageFragment extends Fragment {
         verifyButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                clearFocusAndHideKeyboard();
                 verifyMessage();
             }
         });
@@ -116,11 +117,19 @@ public class SignVerifyMessageFragment extends Fragment {
         signButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                clearFocusAndHideKeyboard();
                 signMessage();
             }
         });
 
         return view;
+    }
+
+    private void clearFocusAndHideKeyboard() {
+        signingAddressView.clearFocus();
+        messageView.clearFocus();
+        signatureView.clearFocus();
+        Keyboard.hideKeyboard(getActivity());
     }
 
     private void signMessage() {
@@ -137,7 +146,7 @@ public class SignVerifyMessageFragment extends Fragment {
 
     DialogFragment signingPasswordDialog = new UnlockWalletDialog() {
         @Override
-        public void onPassword(String password) {
+        public void onPassword(CharSequence password) {
             maybeStartSigningTask(password);
         }
         @Override public void onCancel() { }
@@ -189,7 +198,7 @@ public class SignVerifyMessageFragment extends Fragment {
         maybeStartSigningTask(null);
     }
 
-    private void maybeStartSigningTask(@Nullable String password) {
+    private void maybeStartSigningTask(@Nullable CharSequence password) {
         maybeStartSigningVerifyingTask(true, password);
     }
 
@@ -197,7 +206,7 @@ public class SignVerifyMessageFragment extends Fragment {
         maybeStartSigningVerifyingTask(false, null);
     }
 
-    private void maybeStartSigningVerifyingTask(boolean sign, @Nullable String password) {
+    private void maybeStartSigningVerifyingTask(boolean sign, @Nullable CharSequence password) {
         if (signVerifyMessageTask == null) {
             String address = signingAddressView.getText().toString().trim();
             String message = messageView.getText().toString();

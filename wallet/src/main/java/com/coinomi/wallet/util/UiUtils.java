@@ -15,12 +15,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.coinomi.core.uri.CoinURI;
+import com.coinomi.core.uri.CoinURIParseException;
 import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.AbstractAddress;
+import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.wallet.AddressBookProvider;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.ui.EditAddressBookEntryFragment;
 
+import org.acra.ACRA;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +33,18 @@ import org.slf4j.LoggerFactory;
  */
 public class UiUtils {
     private static final Logger log = LoggerFactory.getLogger(UiUtils.class);
+
+    static public void replyAddressRequest(Activity activity, CoinURI uri, WalletAccount pocket) throws CoinURIParseException {
+        try {
+            String uriString = uri.getAddressRequestUriResponse(pocket.getReceiveAddress()).toString();
+            Intent intent = Intent.parseUri(uriString, 0);
+            activity.startActivity(intent);
+        } catch (Exception e) {
+            // Should not happen
+            ACRA.getErrorReporter().handleSilentException(e);
+            Toast.makeText(activity, R.string.error_generic, Toast.LENGTH_SHORT).show();
+        }
+    }
 
     static public void share(Activity activity, String text) {
         ShareCompat.IntentBuilder builder = ShareCompat.IntentBuilder.from(activity)
@@ -43,14 +59,20 @@ public class UiUtils {
     public static void copy(Context context, String string) {
         Object clipboardService = context.getSystemService(Context.CLIPBOARD_SERVICE);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            ClipboardManager clipboard = (ClipboardManager) clipboardService;
-            clipboard.setPrimaryClip(ClipData.newPlainText("simple text", string));
-        } else {
-            android.text.ClipboardManager clipboard = (android.text.ClipboardManager) clipboardService;
-            clipboard.setText(string);
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                ClipboardManager clipboard = (ClipboardManager) clipboardService;
+                clipboard.setPrimaryClip(ClipData.newPlainText("simple text", string));
+            } else {
+                android.text.ClipboardManager clipboard = (android.text.ClipboardManager) clipboardService;
+                clipboard.setText(string);
+            }
+            Toast.makeText(context, R.string.copied_to_clipboard, Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            // Should not normally happen
+            ACRA.getErrorReporter().handleSilentException(e);
+            Toast.makeText(context, R.string.error_generic, Toast.LENGTH_SHORT).show();
         }
-        Toast.makeText(context, R.string.copied_to_clipboard, Toast.LENGTH_SHORT).show();
     }
 
     public static void setVisible(View view) {

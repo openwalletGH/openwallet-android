@@ -13,6 +13,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:focusableInTouchMode="true"
             android:paddingBottom="@dimen/activity_vertical_margin"
             android:paddingLeft="@dimen/activity_horizontal_margin"
             android:paddingRight="@dimen/activity_horizontal_margin"
@@ -88,15 +89,6 @@
                     android:inputType="textMultiLine|textNoSuggestions"
                     android:ems="10"
                     tools:text="IMBbIFDDuUwomYlvSjwWytqP/CXYym2yOKbJUx8Y+ujzZKBwoCFMr73GUxpr1Ird/DvnNZcsQLphvx18ftqN54o="/>
-
-                <TextView
-                    android:id="@+id/message_signed"
-                    style="@style/OkText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/message_signed"
-                    android:visibility="gone"
-                    tools:visibility="visible" />
 
                 <TextView
                     android:id="@+id/signature_ok"

@@ -79,6 +79,11 @@ For now test it manually by installing it `adb install -r wallet/wallet-release.
 
 ## Version history
 
+New in version 1.5.20
+- Fixed crashes on some devices
+- Added coins: Novacoin, Canada eCoin and ShadowCash
+- Experimental req-addressrequest support
+
 New in version 1.5.19
 - Possibility to sign and verify messages
 - Account details screen to view the public key

@@ -93,6 +93,9 @@
                 <data android:scheme="neoscoin" />
                 <data android:scheme="vertcoin" />
                 <data android:scheme="vpncoin" />
+                <data android:scheme="novacoin" />
+                <data android:scheme="canadaecoin" />
+                <data android:scheme="shadowcash" />
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />

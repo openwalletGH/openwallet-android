@@ -8,6 +8,8 @@
     <string name="action_settings">設定</string>
     <string name="action_about">Coinomiについて</string>
     <string name="action_refresh">更新</string>
+    <string name="action_sign_verify_message">メッセージの署名と検証</string>
+    <string name="action_account_details">アカウント詳細</string>
     <string name="action_exchange_history">両替履歴</string>
     <string name="action_new_address">新しいアドレス</string>
     <string name="action_swap_coins">コインを交換</string>
@@ -30,6 +32,8 @@
     <string name="button_remove">削除</string>
     <string name="button_edit">編集</string>
     <string name="button_send">送る</string>
+    <string name="button_sign">署名</string>
+    <string name="button_verify">検証</string>
     <string name="button_skip">スキップ</string>
     <string name="button_retry">再試行</string>
     <string name="button_download">ダウンロード</string>
@@ -148,6 +152,8 @@
     <string name="password_wallet_recovery">ウォレットを復旧するためには、保護された復元フレーズを作成した際に用いたパスワードと全く同じものを入力してください。\n異なるパスワードを入力した場合には、新しい空のウォレットが作成されます。</string>
     <!-- FinalizeWalletRestorationFragment -->
     <string name="wallet_restoration">ウォレットが復旧されるまでしばらくお待ちください</string>
+    <string name="wallet_restoration_master_key">マスター鍵を生成しています</string>
+    <string name="wallet_restoration_coin">%1$s に対する鍵を生成しています</string>
     <string name="wallet_restoration_error">ウォレットを復旧できませんでした。\n\n%1$s</string>
     <!-- PasswordConfirmationFragment -->
     <string name="enter_password">パスワードを入力してください</string>
@@ -230,13 +236,14 @@
     <string name="title_activity_show_seed">復元フレーズを表示する</string>
     <string name="seed_not_available_title">復元フレーズが見つかりませんでした</string>
     <string name="seed_not_available">復元フレーズはこのデバイスに保存されていません。\nこの問題を解決するためには、ウォレットの復旧を行ってください。</string>
-    <string name="touch_to_decrypt_wallet">タッチしてアンロックする</string>
     <string name="seed_working">お待ちください&#8230;</string>
     <string name="seed_password_protected">この復元フレーズはパスワードにより保護されています (BIP39)</string>
+    <!-- Wallet locked -->
+    <string name="touch_to_decrypt_wallet">タッチしてロックを解除</string>
     <!-- Exchange -->
     <string name="title_activity_trade">両替所</string>
     <string name="trade_info">両替を行いたいコインを選択してください。\n両替されたコインは自動的にウォレットに追加されます。</string>
-    <string name="trade_info_rates">表示されているレートにはShapeShift.ioによって差し引かれるトランザクション手数料が含まれています</string>
+    <string name="trade_info_rates">表示されているレートには、ShapeShift.ioのトランザクション手数料が含まれています</string>
     <string name="trade_from_coin_label">支払うコイン</string>
     <string name="trade_to_coin_label">受け取るコイン</string>
     <string name="trade_warn_no_account_found">%1$s のウォレットを追加する手続を開始します</string>
@@ -274,4 +281,33 @@
     <!-- ShapeShift -->
     <string name="about_shapeshift_title">ShapeShift.ioについて</string>
     <string name="about_shapeshift_message">ShapeShift.ioは、Bitcoinとオルトコインの変換サービスを提供する、即時オルトコイン両替所です。Bitcoinの生態系の中で、Bitcoinと数多のオルトコインの変換を行う、最も高速で、最も効率的なプラットフォーム（ウェブおよびAPI経由で利用可能）の代表格です。アカウントの作成は必要ありません。</string>
+    <!-- Sign Message -->
+    <string name="title_activity_sign_verify_message">メッセージの署名と検証</string>
+    <string name="signing_info">アドレスを使用することでメッセージの署名や検証ができます。</string>
+    <string name="signing_address_label">署名を行うアドレス</string>
+    <string name="address_not_found_error">指定されたアドレスはアカウント内に存在しません。</string>
+    <string name="message_to_sign_label">メッセージ</string>
+    <string name="signature_label">署名</string>
+    <string name="message_signed">メッセージの署名を行いました</string>
+    <string name="message_verified">メッセージの検証を行いました</string>
+    <string name="message_verification_failed">メッセージの検証に失敗しました</string>
+    <!-- Messages -->
+    <string name="tx_message_public">公開メッセージ</string>
+    <string name="tx_message_private">非公開メッセージ</string>
+    <string name="tx_message_public_add">公開メッセージの追加</string>
+    <string name="tx_message_private_add">非公開メッセージの追加</string>
+    <string name="tx_message_public_remove">公開メッセージの削除</string>
+    <string name="tx_message_private_remove">非公開メッセージの削除</string>
+    <string name="tx_message_from">送信元</string>
+    <string name="tx_message_subject">件名</string>
+    <string name="tx_message">メッセージ</string>
+    <!-- Account details -->
+    <string name="title_activity_account_details">アカウント詳細</string>
+    <string name="account_description_label">説明</string>
+    <string name="account_public_key_label">公開鍵</string>
+    <string name="account_extended_public_key_label">拡張公開鍵</string>
+    <string name="account_public_key_warning">公開鍵を共有すると、共有した相手があなたの残高やトランザクション履歴を閲覧できるようになります。</string>
+    <string name="account_private_key_label">秘密鍵</string>
+    <string name="account_extended_private_key_label">拡張秘密鍵</string>
+    <string name="account_private_key_warning">秘密鍵があればこのアカウントからコインを送金できます。この鍵は<i>復元フレーズ</i>から計算することができますので、この鍵をバックアップする必要はありません。</string>
 </resources>

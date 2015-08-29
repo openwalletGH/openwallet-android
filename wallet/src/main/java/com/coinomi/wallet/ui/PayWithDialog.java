@@ -37,7 +37,7 @@ public abstract class PayWithDialog extends DialogFragment {
         final CoinType type;
         try {
             uri = new CoinURI(getArguments().getString(Constants.ARG_URI));
-            type = uri.getType();
+            type = uri.getTypeRequired();
         } catch (final CoinURIParseException e) {
             return new DialogBuilder(getActivity())
                     .setMessage(getString(R.string.scan_error, e.getMessage()))
@@ -47,7 +47,7 @@ public abstract class PayWithDialog extends DialogFragment {
         // Setup accounts that we can send from directly
         ViewGroup typeAccounts = (ViewGroup) view.findViewById(R.id.pay_with_layout);
         boolean canSend = false;
-        for (WalletAccount account : app.getAccounts(uri.getType())) {
+        for (WalletAccount account : app.getAccounts(type)) {
             if (account.getBalance().isPositive()) {
                 addPayWithAccountRow(typeAccounts, account, uri);
                 canSend = true;

@@ -8,6 +8,8 @@
     <string name="action_settings">设置</string>
     <string name="action_about">关于</string>
     <string name="action_refresh">刷新</string>
+    <string name="action_sign_verify_message">签署/验证消息</string>
+    <string name="action_account_details">帐户详细信息</string>
     <string name="action_exchange_history">交易历史</string>
     <string name="action_new_address">新地址</string>
     <string name="action_swap_coins">换币</string>
@@ -30,6 +32,8 @@
     <string name="button_remove">移除</string>
     <string name="button_edit">编辑</string>
     <string name="button_send">发送</string>
+    <string name="button_sign">签署</string>
+    <string name="button_verify">验证</string>
     <string name="button_skip">跳过</string>
     <string name="button_retry">重试</string>
     <string name="button_download">下载</string>
@@ -65,7 +69,7 @@
     <string name="test_wallet">测试钱包</string>
     <!-- Intro -->
     <string name="test_wallet_warning_title">创建测试钱包？</string>
-    <string name="test_wallet_warning_message">如果您创建一个新的测试的钱包，您现有的钱包就会丢失，除非你备份你<i>恢复短语</i>。</string>
+    <string name="test_wallet_warning_message">如果你要创建一个新的测试钱包，你现有的钱包将会丢失，除非你已经备份了 <i>恢复钱包密码</i>.</string>
     <string name="incompatible_device_warning_title">设备不匹配</string>
     <string name="incompatible_device_warning_message">由于软件或硬件原因，此设备无法执行某些加密功能。\n可以通过设备生产商发布的更新来解决。\n\n如果有任何疑问，欢迎和我们联系：support@coinomi.com</string>
     <!-- Recovery fragment -->
@@ -148,11 +152,13 @@
     <string name="password_wallet_recovery">恢复钱包时，请提供创建保护种子时使用的密码。\n如果你输入一个新密码，会创建一个新的空钱包。</string>
     <!-- FinalizeWalletRestorationFragment -->
     <string name="wallet_restoration">在恢复钱包时请耐心等候。</string>
+    <string name="wallet_restoration_master_key">创建主钥</string>
+    <string name="wallet_restoration_coin">为 %1$s 创建私钥</string>
     <string name="wallet_restoration_error">无法恢复钱包。\n\n%1$s</string>
     <!-- PasswordConfirmationFragment -->
     <string name="enter_password">输入密码</string>
     <!-- SignTransactionFragment -->
-    <string name="contacting_exchange">联系交流&#8230;</string>
+    <string name="contacting_exchange">正在与&#8230;交易所通讯</string>
     <string name="preparing_transaction">你的交易正被发送中，请等候。</string>
     <string name="no_such_pocket_error">与钱包通讯时出错。如此问题重复出现，请重新恢复钱包。</string>
     <string name="password_failed">输入的密码无效。</string>
@@ -163,6 +169,9 @@
     <string name="tx_confirm_timer_message">" 请在以下时间内确认交易：%1$s"</string>
     <plurals name="tx_confirm_timer_minute">
         <item quantity="other">%s 分钟</item>
+    </plurals>
+    <plurals name="tx_confirm_timer_second">
+        <item quantity="other">%d 秒</item>
     </plurals>
     <!-- About Activity -->
     <string name="title_activity_about">关于我们</string>
@@ -224,16 +233,17 @@
     <string name="pref_title_manual_receiving_addresses">手工接收地址</string>
     <string name="pref_summary_manual_receiving_addresses">不要为每一个交易都自动创建地址</string>
     <!-- Show Seed -->
-    <string name="title_activity_show_seed">出现复苏短语</string>
+    <string name="title_activity_show_seed">显示恢复钱包密码</string>
     <string name="seed_not_available_title">没有找到恢复密码</string>
     <string name="seed_not_available">你的恢复密码没有保存在这个设备上。\n尝试恢复钱包以解决这个问题。</string>
-    <string name="touch_to_decrypt_wallet">触摸以解锁</string>
     <string name="seed_working">请等待&#8230;</string>
     <string name="seed_password_protected">恢复密码有加密保护 (BIP39)</string>
+    <!-- Wallet locked -->
+    <string name="touch_to_decrypt_wallet">触摸解锁</string>
     <!-- Exchange -->
     <string name="title_activity_trade">兑换</string>
     <string name="trade_info">选择要兑换的币种。\n换到的币将自动添加到你的钱包。</string>
-    <string name="trade_info_rates">汇率已经包括ShapeShift.io扣除的交易手续费</string>
+    <string name="trade_info_rates">此汇率已经包括ShapeShift.io扣除的交易手续费</string>
     <string name="trade_from_coin_label">兑换</string>
     <string name="trade_to_coin_label">接收</string>
     <string name="trade_warn_no_account_found">你会被提示添加一个 %1$s 钱包</string>
@@ -271,4 +281,33 @@
     <!-- ShapeShift -->
     <string name="about_shapeshift_title">关于shapeshift.io</string>
     <string name="about_shapeshift_message">shapeshift.io是一个即时加密货币交易所，提供比特币与竞争币的即时兑换。此平台（可通过网页及API交易）采用了比特币与竞争币之间最快且最有效的兑换方式，无需注册即可使用。</string>
+    <!-- Sign Message -->
+    <string name="title_activity_sign_verify_message">签署/验证消息</string>
+    <string name="signing_info">你可使用某一地址对消息进行签名或验证。</string>
+    <string name="signing_address_label">签名地址</string>
+    <string name="address_not_found_error">本帐户中不存在此地址。</string>
+    <string name="message_to_sign_label">消息</string>
+    <string name="signature_label">签字</string>
+    <string name="message_signed">消息已被签署</string>
+    <string name="message_verified">消息已被验证</string>
+    <string name="message_verification_failed">无法验证消息</string>
+    <!-- Messages -->
+    <string name="tx_message_public">公开消息</string>
+    <string name="tx_message_private">私密消息</string>
+    <string name="tx_message_public_add">添加公开消息</string>
+    <string name="tx_message_private_add">添加私密消息</string>
+    <string name="tx_message_public_remove">删除公开消息</string>
+    <string name="tx_message_private_remove">删除私密消息</string>
+    <string name="tx_message_from">来自</string>
+    <string name="tx_message_subject">主题</string>
+    <string name="tx_message">消息正文</string>
+    <!-- Account details -->
+    <string name="title_activity_account_details">帐户详细信息</string>
+    <string name="account_description_label">描述</string>
+    <string name="account_public_key_label">公钥</string>
+    <string name="account_extended_public_key_label">延展公钥</string>
+    <string name="account_public_key_warning">分享公钥可以让其他人查看你的帐户余额及交易历史</string>
+    <string name="account_private_key_label">私钥</string>
+    <string name="account_extended_private_key_label">延展私钥</string>
+    <string name="account_private_key_warning">私钥可以让你从此帐户中发送资金。没有必要备份这个私钥，因为其可以通过  <i>恢复钱包密码</i> 重新生成。</string>
 </resources>

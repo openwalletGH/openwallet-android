@@ -78,7 +78,7 @@ public class AddCoinsActivity extends BaseWalletActivity
         }
     }
 
-    private void addCoin(@Nullable String password) {
+    private void addCoin(@Nullable CharSequence password) {
         if (selectedCoin != null && addCoinTask == null) {
             addCoinTask = new MyAddCoinTask(selectedCoin, wallet, password);
             addCoinTask.execute();
@@ -88,7 +88,7 @@ public class AddCoinsActivity extends BaseWalletActivity
     private class MyAddCoinTask extends AddCoinTask {
         private Dialogs.ProgressDialogFragment verifyDialog;
 
-        public MyAddCoinTask(CoinType type, Wallet wallet, @Nullable String password) {
+        public MyAddCoinTask(CoinType type, Wallet wallet, @Nullable CharSequence password) {
             super(type, wallet, password);
         }
 
@@ -137,7 +137,7 @@ public class AddCoinsActivity extends BaseWalletActivity
                     .setPositiveButton(R.string.button_add, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            addCoin(passwordView.getText().toString());
+                            addCoin(passwordView.getText());
                         }
                     }).create();
         }
