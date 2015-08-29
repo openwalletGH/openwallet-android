@@ -36,9 +36,8 @@ abstract public class UnlockWalletDialog extends DialogFragment {
     DialogInterface.OnClickListener okListener = new DialogInterface.OnClickListener() {
         @Override
         public void onClick(DialogInterface dialog, int which) {
-            String password = passwordView.getText().toString();
             dismissAllowingStateLoss();
-            onPassword(password);
+            onPassword(passwordView.getText());
         }
     };
 
@@ -50,6 +49,6 @@ abstract public class UnlockWalletDialog extends DialogFragment {
         }
     };
 
-    abstract public void onPassword(String password);
+    abstract public void onPassword(CharSequence password);
     abstract public void onCancel();
 }

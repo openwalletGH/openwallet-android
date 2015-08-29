@@ -9,7 +9,8 @@ import static com.coinomi.core.Preconditions.checkNotNull;
  */
 final public class SignedMessage {
     public enum Status {
-        SignedOK, VerifiedOK, Unknown, AddressMalformed, KeyIsEncrypted, MissingPrivateKey, InvalidSigningAddress, InvalidMessageSignature
+        SignedOK, VerifiedOK, Unknown, AddressMalformed, KeyIsEncrypted, MissingPrivateKey,
+        InvalidSigningAddress, InvalidMessageSignature
     }
 
     final String message;
@@ -25,6 +26,13 @@ final public class SignedMessage {
 
     public SignedMessage(String address, String message) {
         this(address, message, null);
+    }
+
+    public SignedMessage(SignedMessage otherMessage, Status newStatus) {
+        message = otherMessage.message;
+        address = otherMessage.address;
+        signature = otherMessage.address;
+        status = newStatus;
     }
 
     public String getAddress() {
