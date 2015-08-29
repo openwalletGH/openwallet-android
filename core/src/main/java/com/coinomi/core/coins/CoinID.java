@@ -48,6 +48,7 @@ public enum CoinID {
     VPNCOIN_MAIN(VpncoinMain.get()),
     NOVACOIN_MAIN(NovacoinMain.get()),
     SHADOWCASH_MAIN(ShadowCashMain.get()),
+    PARKBYTE_MAIN(ParkbyteMain.get()),
     ;
 
     private static List<CoinType> types;
