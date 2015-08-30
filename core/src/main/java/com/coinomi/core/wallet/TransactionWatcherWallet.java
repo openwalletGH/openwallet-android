@@ -272,15 +272,8 @@ abstract public class TransactionWatcherWallet extends AbstractWallet { //implem
         lock.lock();
         try {
             if (log.isInfoEnabled()) {
-                log.info("Adding {} tx {} to {}",
-                        tx.isEveryOwnedOutputSpent(this) ? WalletTransaction.Pool.SPENT : WalletTransaction.Pool.UNSPENT, tx.getHash(), pool);
-                if (!tx.isEveryOwnedOutputSpent(this)) {
-                    for (TransactionOutput transactionOutput : tx.getOutputs()) {
-                        log.info("|- {} txo index {}",
-                                transactionOutput.isAvailableForSpending() ? WalletTransaction.Pool.UNSPENT : WalletTransaction.Pool.SPENT,
-                                transactionOutput.getIndex());
-                    }
-                }
+                log.info("Adding {} tx to {} pool ({})",
+                        tx.isEveryOwnedOutputSpent(this) ? WalletTransaction.Pool.SPENT : WalletTransaction.Pool.UNSPENT, pool, tx.getHash());
             }
 
             simpleAddTransaction(pool, tx);

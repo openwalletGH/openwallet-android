@@ -65,7 +65,6 @@ public class WalletApplication extends Application {
     private Intent coinServiceIntent;
     private Intent coinServiceConnectIntent;
     private Intent coinServiceCancelCoinsReceivedIntent;
-    private Intent coinServiceResetWalletIntent;
 
     private File walletFile;
     @Nullable
@@ -103,8 +102,6 @@ public class WalletApplication extends Application {
         coinServiceConnectIntent = new Intent(CoinService.ACTION_CONNECT_COIN,
                 null, this, CoinServiceImpl.class);
         coinServiceCancelCoinsReceivedIntent = new Intent(CoinService.ACTION_CANCEL_COINS_RECEIVED,
-                null, this, CoinServiceImpl.class);
-        coinServiceResetWalletIntent = new Intent(CoinService.ACTION_RESET_WALLET,
                 null, this, CoinServiceImpl.class);
 
         // Set MnemonicCode.INSTANCE if needed
@@ -346,9 +343,6 @@ public class WalletApplication extends Application {
         switch (mode) {
             case CANCEL_COINS_RECEIVED:
                 startService(coinServiceCancelCoinsReceivedIntent);
-                break;
-            case RESET_WALLET:
-                startService(coinServiceResetWalletIntent);
                 break;
             case NORMAL:
             default:

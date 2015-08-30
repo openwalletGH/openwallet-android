@@ -33,6 +33,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -98,7 +99,7 @@ public class ServerClient implements BlockchainConnection {
         @Override
         public void running() {
             // Check if connection is up as this event is fired even if there is no connection
-            if (isConnected()) {
+            if (isActivelyConnected()) {
                 log.info("{} client connected to {}", type.getName(), lastServerAddress);
                 broadcastOnConnection();
                 retrySeconds = 0;
@@ -133,12 +134,6 @@ public class ServerClient implements BlockchainConnection {
         addresses = ImmutableList.copyOf(coinAddress.getAddresses());
 
         createStratumClient();
-
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            public void run() {
-                stopAsync();
-            }
-        });
     }
 
     private StratumClient createStratumClient() {
@@ -190,8 +185,10 @@ public class ServerClient implements BlockchainConnection {
     }
 
     public void stopAsync() {
-        if (isConnected()) broadcastOnDisconnect();
+        if (stopped) return;
         stopped = true;
+        if (isActivelyConnected()) broadcastOnDisconnect();
+        eventListeners.clear();
         connectionExec.remove(reconnectTask);
         if (stratumClient != null) {
             stratumClient.stopAsync();
@@ -199,8 +196,8 @@ public class ServerClient implements BlockchainConnection {
         }
     }
 
-    public boolean isConnected() {
-        return stratumClient != null && stratumClient.isConnected();
+    public boolean isActivelyConnected() {
+        return stratumClient != null && stratumClient.isConnected() && stratumClient.isRunning();
     }
 
 //    // TODO support more than one pocket
@@ -212,14 +209,14 @@ public class ServerClient implements BlockchainConnection {
 //
 //    // TODO support more than one pocket
 //    public void setWalletPocket(WalletPocketHD pocket, boolean reconnect) {
-//        if (isConnected()) broadcastOnDisconnect();
+//        if (isActivelyConnected()) broadcastOnDisconnect();
 //        eventListeners.clear();
 //        addEventListener(pocket);
-//        if (reconnect && isConnected()) {
+//        if (reconnect && isActivelyConnected()) {
 //            resetConnection();
 //            // will broadcast event on reconnect
 //        } else {
-//            if (isConnected()) broadcastOnConnection();
+//            if (isActivelyConnected()) broadcastOnConnection();
 //        }
 //    }
 
@@ -247,7 +244,7 @@ public class ServerClient implements BlockchainConnection {
     private void addEventListener(ConnectionEventListener listener, Executor executor) {
         boolean isNew = !ListenerRegistration.removeFromList(listener, eventListeners);
         eventListeners.add(new ListenerRegistration<ConnectionEventListener>(listener, executor));
-        if (isNew && isConnected()) {
+        if (isNew && isActivelyConnected()) {
             broadcastOnConnection();
         }
     }
@@ -291,7 +288,7 @@ public class ServerClient implements BlockchainConnection {
         checkNotNull(stratumClient);
 
         // TODO use TransactionEventListener directly because the current solution leaks memory
-        StratumClient.SubscribeResult blockchainHeaderHandler = new StratumClient.SubscribeResult() {
+        StratumClient.SubscribeResultHandler blockchainHeaderHandler = new StratumClient.SubscribeResultHandler() {
             @Override
             public void handle(CallMessage message) {
                 try {
@@ -305,7 +302,7 @@ public class ServerClient implements BlockchainConnection {
 
         log.info("Going to subscribe to block chain headers");
 
-        CallMessage callMessage = new CallMessage("blockchain.headers.subscribe", (List)null);
+        final CallMessage callMessage = new CallMessage("blockchain.headers.subscribe", (List)null);
         ListenableFuture<ResultMessage> reply = stratumClient.subscribe(callMessage, blockchainHeaderHandler);
 
         Futures.addCallback(reply, new FutureCallback<ResultMessage>() {
@@ -322,7 +319,11 @@ public class ServerClient implements BlockchainConnection {
 
             @Override
             public void onFailure(Throwable t) {
-                log.error("Could not get reply for blockchain headers subscribe", t);
+                if (t instanceof CancellationException) {
+                    log.debug("Canceling {} call", callMessage.getMethod());
+                } else {
+                    log.error("Could not get reply for blockchain headers subscribe", t);
+                }
             }
         }, Threading.USER_THREAD);
     }
@@ -331,10 +332,10 @@ public class ServerClient implements BlockchainConnection {
     public void subscribeToAddresses(List<AbstractAddress> addresses, final TransactionEventListener listener) {
         checkNotNull(stratumClient);
 
-        CallMessage callMessage = new CallMessage("blockchain.address.subscribe", (List)null);
+        final CallMessage callMessage = new CallMessage("blockchain.address.subscribe", (List)null);
 
         // TODO use TransactionEventListener directly because the current solution leaks memory
-        StratumClient.SubscribeResult addressHandler = new StratumClient.SubscribeResult() {
+        StratumClient.SubscribeResultHandler addressHandler = new StratumClient.SubscribeResultHandler() {
             @Override
             public void handle(CallMessage message) {
                 try {
@@ -381,7 +382,11 @@ public class ServerClient implements BlockchainConnection {
 
                 @Override
                 public void onFailure(Throwable t) {
-                    log.error("Could not get reply for address subscribe", t);
+                    if (t instanceof CancellationException) {
+                        log.debug("Canceling {} call", callMessage.getMethod());
+                    } else {
+                        log.error("Could not get reply for address subscribe", t);
+                    }
                 }
             }, Threading.USER_THREAD);
         }
@@ -391,7 +396,7 @@ public class ServerClient implements BlockchainConnection {
     public void getHistoryTx(final AddressStatus status, final TransactionEventListener listener) {
         checkNotNull(stratumClient);
 
-        CallMessage message = new CallMessage("blockchain.address.get_history",
+        final CallMessage message = new CallMessage("blockchain.address.get_history",
                 Arrays.asList(status.getAddress().toString()));
         final ListenableFuture<ResultMessage> result = stratumClient.call(message);
 
@@ -414,7 +419,11 @@ public class ServerClient implements BlockchainConnection {
 
             @Override
             public void onFailure(Throwable t) {
-                log.error("Could not get reply for blockchain.address.get_history", t);
+                if (t instanceof CancellationException) {
+                    log.debug("Canceling {} call", message.getMethod());
+                } else {
+                    log.error("Could not get reply for blockchain.address.get_history", t);
+                }
             }
         }, Threading.USER_THREAD);
     }
@@ -423,7 +432,7 @@ public class ServerClient implements BlockchainConnection {
     public void getTransaction(final Sha256Hash txHash, final TransactionEventListener listener) {
         checkNotNull(stratumClient);
 
-        CallMessage message = new CallMessage("blockchain.transaction.get",
+        final CallMessage message = new CallMessage("blockchain.transaction.get",
                 Arrays.asList(txHash.toString()));
         final ListenableFuture<ResultMessage> result = stratumClient.call(message);
 
@@ -446,7 +455,11 @@ public class ServerClient implements BlockchainConnection {
 
             @Override
             public void onFailure(Throwable t) {
-                log.error("Could not get reply for blockchain.transaction.get", t);
+                if (t instanceof CancellationException) {
+                    log.debug("Canceling {} call", message.getMethod());
+                } else {
+                    log.error("Could not get reply for blockchain.transaction.get", t);
+                }
             }
         }, Threading.USER_THREAD);
     }
@@ -473,7 +486,6 @@ public class ServerClient implements BlockchainConnection {
                     if (listener != null) listener.onTransactionBroadcast(tx);
                 } catch (Exception e) {
                     onFailure(e);
-                    return;
                 }
             }
 
@@ -508,12 +520,11 @@ public class ServerClient implements BlockchainConnection {
 
     @Override
     public void ping() {
-        checkNotNull(stratumClient);
-        if (!stratumClient.isConnected()) {
+        if (!isActivelyConnected()) {
             log.warn("There is no connection with {} server, skipping ping.", type.getName());
             return;
         }
-        CallMessage pingMsg = new CallMessage("server.version", ImmutableList.of());
+        final CallMessage pingMsg = new CallMessage("server.version", ImmutableList.of());
         ListenableFuture<ResultMessage> pong = stratumClient.call(pingMsg);
         Futures.addCallback(pong, new FutureCallback<ResultMessage>() {
             @Override
@@ -526,7 +537,11 @@ public class ServerClient implements BlockchainConnection {
 
             @Override
             public void onFailure(Throwable t) {
-                log.error("Server {} ping failed", type.getName());
+                if (t instanceof CancellationException) {
+                    log.debug("Canceling {} call", pingMsg.getMethod());
+                } else {
+                    log.error("Server {} ping failed", type.getName());
+                }
             }
         }, Threading.USER_THREAD);
     }

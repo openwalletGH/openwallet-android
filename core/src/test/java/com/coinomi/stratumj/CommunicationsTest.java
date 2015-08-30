@@ -4,7 +4,7 @@ package com.coinomi.stratumj;
 import com.coinomi.stratumj.messages.CallMessage;
 import com.coinomi.stratumj.messages.ResultMessage;
 import org.bitcoinj.utils.BriefLogFormatter;
-import com.google.common.base.Optional;
+
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -15,7 +15,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
@@ -28,7 +27,6 @@ import javax.annotation.Nullable;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -155,7 +153,7 @@ public class CommunicationsTest {
         final CallMessage subscribeCall = CallMessage.fromJson(subscribeCallJson);
 
         // Subscribe
-        ListenableFuture<ResultMessage> futureReply = client.subscribe(call, new StratumClient.SubscribeResult() {
+        ListenableFuture<ResultMessage> futureReply = client.subscribe(call, new StratumClient.SubscribeResultHandler() {
             @Override
             public void handle(CallMessage message) {
                 Assert.assertEquals(subscribeCall.toString(), message.toString());

@@ -19,6 +19,7 @@ import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.service.CoinService;
+import com.coinomi.wallet.service.CoinServiceImpl;
 import com.coinomi.wallet.util.WeakHandler;
 
 import org.bitcoinj.crypto.KeyCrypterScrypt;
@@ -138,6 +139,10 @@ public class FinalizeWalletRestorationFragment extends Fragment {
         }
 
         protected Wallet doInBackground(Void... params) {
+            Intent intent = new Intent(CoinService.ACTION_CLEAR_CONNECTIONS, null,
+                    walletApplication, CoinServiceImpl.class);
+            walletApplication.startService(intent);
+
             ArrayList<String> seedWords = new ArrayList<String>();
             for (String word : seed.trim().split(" ")) {
                 if (word.isEmpty()) continue;
@@ -162,7 +167,6 @@ public class FinalizeWalletRestorationFragment extends Fragment {
 
                 walletApplication.setWallet(wallet);
                 walletApplication.saveWalletNow();
-                walletApplication.startBlockchainService(CoinService.ServiceMode.RESET_WALLET);
             } catch (Exception e) {
                 log.error("Error creating a wallet", e);
                 errorMessage = e.getMessage();
