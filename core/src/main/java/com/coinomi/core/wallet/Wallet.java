@@ -297,7 +297,7 @@ final public class Wallet {
         return lastIndex;
     }
 
-    /* package */ void addAccount(WalletAccount pocket) {
+    public void addAccount(WalletAccount pocket) {
         lock.lock();
         try {
             String id = pocket.getId();

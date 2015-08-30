@@ -19,7 +19,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
-import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -47,16 +46,16 @@ public class StratumClient extends AbstractExecutionThreadService {
     final private ExecutorService pool = Executors.newFixedThreadPool(NUM_OF_WORKERS);
 
     final private ConcurrentHashMap<Long, SettableFuture<ResultMessage>> callers =
-            new ConcurrentHashMap<Long, SettableFuture<ResultMessage>>();
+            new ConcurrentHashMap<>();
 
-    final private ConcurrentHashMap<String, List<SubscribeResult>> subscribes =
-            new ConcurrentHashMap<String, List<SubscribeResult>>();
+    final private ConcurrentHashMap<String, List<SubscribeResultHandler>> subscribersHandlers =
+            new ConcurrentHashMap<>();
 
     final private BlockingQueue<BaseMessage> queue = new LinkedBlockingDeque<BaseMessage>();
 
 
-    public interface SubscribeResult {
-        public void handle(CallMessage message);
+    public interface SubscribeResultHandler {
+        void handle(CallMessage message);
     }
 
     private class MessageHandler implements Runnable {
@@ -66,15 +65,13 @@ public class StratumClient extends AbstractExecutionThreadService {
                 BaseMessage message = null;
                 try {
                     message = queue.take();
-                } catch (InterruptedException ignored) {
-                    
-                }
+                } catch (InterruptedException ignored) { }
 
                 if (message != null) {
                     handle(message);
                 }
             }
-            log.debug("Shutdown message handler thread: " + Thread.currentThread().getName());
+            log.info("Shutdown message handler thread: {}", Thread.currentThread().getName());
         }
 
         private void handle(BaseMessage message) {
@@ -90,19 +87,19 @@ public class StratumClient extends AbstractExecutionThreadService {
                 }
             } else if (message instanceof CallMessage) {
                 CallMessage reply = (CallMessage) message;
-                if (subscribes.containsKey(reply.getMethod())) {
-                    List<SubscribeResult> subs;
+                if (subscribersHandlers.containsKey(reply.getMethod())) {
+                    List<SubscribeResultHandler> subs;
 
-                    synchronized (subscribes.get(reply.getMethod())) {
+                    synchronized (subscribersHandlers.get(reply.getMethod())) {
                         // Make a defensive copy
-                        subs = ImmutableList.copyOf(subscribes.get(reply.getMethod()));
+                        subs = ImmutableList.copyOf(subscribersHandlers.get(reply.getMethod()));
                     }
 
-                    for (SubscribeResult handler : subs) {
+                    for (SubscribeResultHandler handler : subs) {
                         try {
                             log.debug("Running subscriber handler with result: " + reply);
                             handler.handle(reply);
-                        } catch (RuntimeException e) {
+                        } catch (Exception e) {
                             log.error("Error while executing subscriber handler", e);
                         }
                     }
@@ -155,14 +152,14 @@ public class StratumClient extends AbstractExecutionThreadService {
 
     @Override
     protected void triggerShutdown() {
-        super.triggerShutdown();
-        try {
-            log.info("Shutting down {}", serverAddress);
-            if (isConnected()) socket.close();
-        } catch (IOException e) {
-            log.error("Unable to close socket", e);
+        log.info("Shutting down {}", serverAddress);
+        disconnect();
+        pool.shutdownNow();
+        for (SettableFuture<ResultMessage> future : callers.values()) {
+            future.cancel(true);
         }
-        pool.shutdown();
+        callers.clear();
+        subscribersHandlers.clear();
     }
 
     @Override
@@ -174,8 +171,10 @@ public class StratumClient extends AbstractExecutionThreadService {
             try {
                 serverMessage = fromServer.readLine();
             } catch (IOException e) {
-                log.info("Error communicating with server: {}", e.getMessage());
-                triggerShutdown();
+                if (isRunning()) {
+                    log.info("Error communicating with server: {}", e.getMessage());
+                    triggerShutdown();
+                }
                 break;
             }
 
@@ -230,11 +229,11 @@ public class StratumClient extends AbstractExecutionThreadService {
 
             }
         }
-        log.debug("Finished listening for server replies");
+        log.info("Finished listening for server replies");
     }
 
     public boolean isConnected() {
-        return socket != null && socket.isConnected() && isRunning();
+        return socket != null && socket.isConnected();
     }
 
 
@@ -242,8 +241,8 @@ public class StratumClient extends AbstractExecutionThreadService {
         if (isConnected()) {
             try {
                 socket.close();
-            } catch (IOException ignore) {
-                
+            } catch (IOException e) {
+                log.error("Unable to close socket", e);
             }
         }
     }
@@ -265,21 +264,22 @@ public class StratumClient extends AbstractExecutionThreadService {
         return future;
     }
 
-    public ListenableFuture<ResultMessage> subscribe(CallMessage message, SubscribeResult handler) {
-        ListenableFuture<ResultMessage> future = call(message);
+    public ListenableFuture<ResultMessage> subscribe(CallMessage message, SubscribeResultHandler handler) {
+        // Add the subscription handler the the subscribersHandlers map so that any future
+        // subscription call will be handled by it.
 
-        if (!subscribes.containsKey(message.getMethod())) {
-            List<SubscribeResult> handlers =
-                    Collections.synchronizedList(new ArrayList<SubscribeResult>());
-            handlers.add(handler);
-            subscribes.put(message.getMethod(), handlers);
-        } else {
-            // Add handler if needed
-            if (!subscribes.get(message.getMethod()).contains(handler)) {
-                subscribes.get(message.getMethod()).add(handler);
-            }
+        // If this particular method was not used before, initialize a list of handlers
+        if (!subscribersHandlers.containsKey(message.getMethod())) {
+            subscribersHandlers.put(message.getMethod(),
+                    Collections.synchronizedList(new ArrayList<SubscribeResultHandler>()));
         }
 
-        return future;
+        // Add handler if needed
+        if (!subscribersHandlers.get(message.getMethod()).contains(handler)) {
+            subscribersHandlers.get(message.getMethod()).add(handler);
+        }
+
+        // Make the subscription call, the server will reply immediately
+        return call(message);
     }
 }

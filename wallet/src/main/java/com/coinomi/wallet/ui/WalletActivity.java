@@ -552,7 +552,7 @@ final public class WalletActivity extends BaseWalletActivity implements
 
     private void refreshWallet() {
         if (getWalletApplication().getWallet() != null) {
-            Intent intent = new Intent(CoinService.ACTION_RESET_WALLET, null,
+            Intent intent = new Intent(CoinService.ACTION_RESET_ACCOUNT, null,
                     getWalletApplication(), CoinServiceImpl.class);
             intent.putExtra(Constants.ARG_ACCOUNT_ID, currentAccountId);
             getWalletApplication().startService(intent);
