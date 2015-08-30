@@ -79,6 +79,12 @@ For now test it manually by installing it `adb install -r wallet/wallet-release.
 
 ## Version history
 
+New in version 1.5.21
+- Fixed memory leak when restoring a wallet
+- Fixed crash when adding a coin account with the wrong password in the exchange screen
+- Fixed crash on empty password in sign/verify message screen
+- Added coin: ParkByte
+
 New in version 1.5.20
 - Fixed crashes on some devices
 - Added coins: Novacoin, Canada eCoin and ShadowCash
