@@ -165,7 +165,11 @@ public class Constants {
             new CoinAddress(NovacoinMain.get(),     new ServerAddress("nvc-cce-1.coinomi.net", 5034),
                                                     new ServerAddress("nvc-cce-2.coinomi.net", 5034)),
             new CoinAddress(ParkbyteMain.get(),     new ServerAddress("pkb-cce-1.coinomi.net", 5035),
-                                                    new ServerAddress("pkb-cce-2.coinomi.net", 5035))
+                                                    new ServerAddress("pkb-cce-2.coinomi.net", 5035)),
+            new CoinAddress(NxtMain.get(),          new ServerAddress("nxt-cce-1.coinomi.net", 5050),
+                                                    new ServerAddress("nxt-cce-2.coinomi.net", 5050)),
+            new CoinAddress(BurstMain.get(),        new ServerAddress("burst-cce-1.coinomi.net", 5051),
+                                                    new ServerAddress("burst-cce-2.coinomi.net", 5051))
     );
 
     public static final HashMap<CoinType, Integer> COINS_ICONS;
