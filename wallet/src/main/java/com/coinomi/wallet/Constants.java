@@ -2,6 +2,7 @@ package com.coinomi.wallet;
 
 import android.text.format.DateUtils;
 
+import com.coinomi.core.coins.AsiacoinMain;
 import com.coinomi.core.coins.AuroracoinMain;
 import com.coinomi.core.coins.BatacoinMain;
 import com.coinomi.core.coins.BitcoinMain;
@@ -198,7 +199,9 @@ public class Constants {
             new CoinAddress(BatacoinMain.get(),     new ServerAddress("bata-cce-1.coinomi.net", 5042),
                                                     new ServerAddress("bata-cce-1.coinomi.net", 5042)),
             new CoinAddress(OKCashMain.get(),       new ServerAddress("ok-cce-1.coinomi.net", 5043),
-                                                    new ServerAddress("ok-cce-2.coinomi.net", 5043))
+                                                    new ServerAddress("ok-cce-2.coinomi.net", 5043)),
+            new CoinAddress(AsiacoinMain.get(),     new ServerAddress("ac-cce-1.coinomi.net", 5044),
+                                                    new ServerAddress("ac-cce-2.coinomi.net", 5044))
     );
 
     public static final HashMap<CoinType, Integer> COINS_ICONS;
@@ -243,6 +246,7 @@ public class Constants {
         COINS_ICONS.put(CoinID.GULDEN_MAIN.getCoinType(), R.drawable.gulden);
         COINS_ICONS.put(CoinID.AURORACOIN_MAIN.getCoinType(), R.drawable.auroracoin);
         COINS_ICONS.put(CoinID.BATACOIN_MAIN.getCoinType(), R.drawable.batacoin);
+        COINS_ICONS.put(CoinID.ASIACOIN_MAIN.getCoinType(), R.drawable.asiacoin);
 
         COINS_BLOCK_EXPLORERS = new HashMap<CoinType, String>();
         COINS_BLOCK_EXPLORERS.put(CoinID.BITCOIN_MAIN.getCoinType(), "https://blockchain.info/tx/%s");
@@ -281,6 +285,7 @@ public class Constants {
         COINS_BLOCK_EXPLORERS.put(CoinID.GULDEN_MAIN.getCoinType(), "https://explorer.gulden.com/#/transaction/%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.AURORACOIN_MAIN.getCoinType(), "https://chainz.cryptoid.info/aur/tx.dws?%s.htm");
         COINS_BLOCK_EXPLORERS.put(CoinID.BATACOIN_MAIN.getCoinType(), "https://chainz.cryptoid.info/bta/tx.dws?%s");
+        COINS_BLOCK_EXPLORERS.put(CoinID.ASIACOIN_MAIN.getCoinType(), "https://chainz.cryptoid.info/ac/tx.dws?%s.htm");
     }
 
     public static final CoinType DEFAULT_COIN = BitcoinMain.get();
@@ -293,6 +298,7 @@ public class Constants {
 
     public static final List<CoinType> SUPPORTED_COINS = ImmutableList.of(
             BitcoinMain.get(),
+            AsiacoinMain.get(),
             AuroracoinMain.get(),
             BatacoinMain.get(),
             BlackcoinMain.get(),
