@@ -19,6 +19,7 @@ import com.coinomi.core.coins.DigibyteMain;
 import com.coinomi.core.coins.DigitalcoinMain;
 import com.coinomi.core.coins.DogecoinMain;
 import com.coinomi.core.coins.DogecoinTest;
+import com.coinomi.core.coins.EguldenMain;
 import com.coinomi.core.coins.FeathercoinMain;
 import com.coinomi.core.coins.GcrMain;
 import com.coinomi.core.coins.GuldenMain;
@@ -188,6 +189,8 @@ public class Constants {
                                                     new ServerAddress("burst-cce-2.coinomi.net", 5051)),
             new CoinAddress(VergeMain.get(),        new ServerAddress("electrum-verge.xyz", 50001),
                                                     new ServerAddress("electrum-verge.xyz", 50001)),
+            new CoinAddress(EguldenMain.get(),      new ServerAddress("efl-cce-1.coinomi.net", 5037),
+                                                    new ServerAddress("efl-cce-2.coinomi.net", 5037)),
             new CoinAddress(GcrMain.get(),          new ServerAddress("gcr-cce-1.coinomi.net", 5038),
                                                     new ServerAddress("gcr-cce-2.coinomi.net", 5038)),
             new CoinAddress(PotcoinMain.get(),      new ServerAddress("pot-cce-1.coinomi.net", 5039),
@@ -247,6 +250,7 @@ public class Constants {
         COINS_ICONS.put(CoinID.AURORACOIN_MAIN.getCoinType(), R.drawable.auroracoin);
         COINS_ICONS.put(CoinID.BATACOIN_MAIN.getCoinType(), R.drawable.batacoin);
         COINS_ICONS.put(CoinID.ASIACOIN_MAIN.getCoinType(), R.drawable.asiacoin);
+        COINS_ICONS.put(CoinID.EGULDEN_MAIN.getCoinType(), R.drawable.egulden);
 
         COINS_BLOCK_EXPLORERS = new HashMap<CoinType, String>();
         COINS_BLOCK_EXPLORERS.put(CoinID.BITCOIN_MAIN.getCoinType(), "https://blockchain.info/tx/%s");
@@ -286,6 +290,7 @@ public class Constants {
         COINS_BLOCK_EXPLORERS.put(CoinID.AURORACOIN_MAIN.getCoinType(), "https://chainz.cryptoid.info/aur/tx.dws?%s.htm");
         COINS_BLOCK_EXPLORERS.put(CoinID.BATACOIN_MAIN.getCoinType(), "https://chainz.cryptoid.info/bta/tx.dws?%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.ASIACOIN_MAIN.getCoinType(), "https://chainz.cryptoid.info/ac/tx.dws?%s.htm");
+        COINS_BLOCK_EXPLORERS.put(CoinID.EGULDEN_MAIN.getCoinType(), "https://chainz.cryptoid.info/efl/tx.dws?%s");
     }
 
     public static final CoinType DEFAULT_COIN = BitcoinMain.get();
@@ -310,6 +315,7 @@ public class Constants {
             DigibyteMain.get(),
             DigitalcoinMain.get(),
             DogecoinMain.get(),
+            EguldenMain.get(),
             FeathercoinMain.get(),
             GcrMain.get(),
             GuldenMain.get(),
