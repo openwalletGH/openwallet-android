@@ -49,7 +49,7 @@ final public class NxtFamilyKey implements EncryptableKeyChain, KeyBag, Serializ
         this.publicKey = Crypto.getPublicKey(getPrivateKeyMnemonic(entropy));
         // Encrypt entropy if needed
         if (keyCrypter != null && key != null) {
-            this.entropy = entropy.encrypt(keyCrypter, key);
+            this.entropy = entropy.encrypt(keyCrypter, key, entropy.getParent());
         } else {
             this.entropy = entropy;
         }
