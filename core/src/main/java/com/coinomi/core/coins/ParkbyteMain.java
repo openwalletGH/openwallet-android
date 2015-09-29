@@ -8,7 +8,7 @@ import org.bitcoinj.core.Coin;
 /**
  * @author John L. Jegutanis
  */
-public class ParkbyteMain extends CoinType {
+public class ParkbyteMain extends PeerFamily {
     private ParkbyteMain() {
         id = "parkbyte.main";
 
@@ -17,7 +17,6 @@ public class ParkbyteMain extends CoinType {
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 5;
 
-        family = PeerFamily.get();
         name = "ParkByte";
         symbol = "PKB";
         uriScheme = "parkbyte";

@@ -3,7 +3,10 @@ package com.coinomi.core.coins;
 import com.coinomi.core.coins.families.BitFamily;
 import com.coinomi.core.coins.families.PeerFamily;
 
-public class NovacoinMain extends CoinType {
+/**
+ * @author John L. Jegutanis
+ */
+public class NovacoinMain extends PeerFamily {
     private NovacoinMain() {
         id = "novacoin.main";
 
@@ -12,7 +15,6 @@ public class NovacoinMain extends CoinType {
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 520;
 
-        family = PeerFamily.get();
         name = "Novacoin (beta)";
         symbol = "NVC";
         uriScheme = "novacoin";

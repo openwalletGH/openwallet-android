@@ -6,7 +6,7 @@ import com.coinomi.core.coins.families.PeerFamily;
 /**
  * @author dasource
  */
-public class ShadowCashMain extends CoinType {
+public class ShadowCashMain extends PeerFamily {
     private ShadowCashMain() {
         id = "shadowcash.main";
 
@@ -15,7 +15,6 @@ public class ShadowCashMain extends CoinType {
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 500;
 
-        family = PeerFamily.get();
         name = "Shadow (beta)"; // TODO The original name is "ShadowCash"
         symbol = "SDC";
         uriScheme = "shadowcash";
