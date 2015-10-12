@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_scan_qr_code">Scansiona</string>
+    <string name="action_share">Condividi</string>
+    <string name="action_copy">Copia</string>
+    <string name="action_edit_label">Modifica etichetta</string>
+    <string name="action_empty_wallet">Svuota portafoglio</string>
+    <string name="action_settings">Impostazioni</string>
+    <string name="action_about">Riguardo Coinomi</string>
+    <string name="action_refresh">Aggiorna</string>
+    <string name="action_sign_verify_message">Firma/verifica messaggio</string>
+    <string name="action_account_details">Dettagli account</string>
+    <string name="action_exchange_history">Storico scambi</string>
+    <string name="action_new_address">Nuovo indirizzo</string>
+    <string name="action_swap_coins">Scambia monete</string>
+    <string name="action_delete">Cancella</string>
+    <string name="action_change_address_type">Cambia tipo di indirizzo</string>
+    <!-- Errors -->
+    <string name="error_generic">Si è verificato un errore durante l\'azione</string>
+    <string name="error_could_not_read_wallet">Non è stato possibile leggere il portafoglio</string>
+    <!-- Generic items -->
+    <string name="button_ok">OK</string>
+    <string name="button_next">Prosegui</string>
+    <string name="button_finish">Termina</string>
+    <string name="button_return">Esci</string>
+    <string name="button_confirm">Conferma</string>
+    <string name="button_cancel">Annulla</string>
+    <string name="button_dismiss">Respingi</string>
+    <string name="button_delete">Cancella</string>
+    <string name="button_add">Aggiungi</string>
+    <string name="button_save">Salva</string>
+    <string name="button_remove">Elimina</string>
+    <string name="button_edit">Modifica</string>
+    <string name="button_send">Invia</string>
+    <string name="button_sign">Firma</string>
+    <string name="button_verify">Verifica</string>
+    <string name="button_skip">Salta</string>
+    <string name="button_retry">Indietro</string>
+    <string name="button_download">Download</string>
+    <string name="button_agree">Consenti</string>
+    <string name="button_disagree">Non consenti</string>
+    <string name="button_add_coins">+ Monete</string>
+    <string name="scan_qr_code">Scansiona QR code</string>
+    <string name="erase_address">Cancella indirizzo</string>
+    <string name="copied_to_clipboard">Copiato negli appunti</string>
+    <string name="wallet_title_request">ricevi</string>
+    <string name="wallet_title_balance">saldo</string>
+    <string name="wallet_title_send">invia</string>
+    <string name="wallet_locked_message">Il tuo portafoglio è bloccato</string>
+    <string name="unlock_wallet_title">Sblocca il tuo portafoglio</string>
+    <string name="unlocking_wallet_working">Sbloccare il tuo portafoglio&#8230;</string>
+    <string name="unlocking_wallet_error_title">Non è stato possibile sbloccare il tuo portafoglio</string>
+    <string name="unlocking_wallet_error_detail">Stai usando la giusta password? Per favore assicurati che la tua password è stata inserita correttamente. Se questo errore persiste tenta il ripristino usando la frase di recupero.</string>
+    <string name="powered_by">Powered by</string>
+    <!-- Nav drawer -->
+    <string name="navigation_drawer_open">Apri cassetto di navigazione</string>
+    <string name="navigation_drawer_close">Chiudi cassetto di navigazione</string>
+    <string name="navigation_drawer_services">Servizi</string>
+    <string name="navigation_drawer_wallet">Portafoglio</string>
+    <!-- SendOutput widget -->
+    <string name="fee">costo della transazione</string>
+    <string name="send">invia</string>
+    <string name="trade">scambia</string>
+    <string name="receive">ricevi</string>
+    <!-- Welcome fragment -->
+    <string name="welcome_text">Benvenuto nel portafoglio di Coinomi</string>
+    <string name="create_wallet">Crea un nuovo portafoglio</string>
+    <string name="restore_wallet">Ripristina un portafoglio</string>
+    <string name="test_wallet">Test portafoglio</string>
+    <!-- Intro -->
+    <string name="test_wallet_warning_title">Creare un test portafoglio?</string>
+    <string name="test_wallet_warning_message">Se crei un nuovo test portafoglio, il tuo portafoglio esistente sarà perso a meno che tu non abbia salvato la tua <i>frase di recupero</i>.</string>
+    <string name="incompatible_device_warning_title">Dispositivo non compatibile</string>
+    <string name="incompatible_device_warning_message">Questo dispositivo non può eseguire determinate funzioni a causa di difetti nel software o nell\'hardware.\nCiò potrebbe essere risolto tramite un aggiornamento fatto dal fabbricante del dispositivo.\n\nContattaci se hai delle domande: support@coinomi.com</string>
+    <!-- Recovery fragment -->
+    <string name="seed_info">Questa è la tua <i>frase di recupero</i>, usata per generare le chiavi del tuo portafoglio. Per favore scrivila su un foglio e conservalo in un posto sicuro, come faresti con soldi di carta. Chi vi ha accesso può conoscere i fondi del tuo portafoglio.\nSe perdi la tua frase di recupero, il tuo portafoglio non potrà essere recuperato.</string>
+    <string name="seed_title">la tua frase di recupero</string>
+    <string name="seed_regenerate_title">tocca per generare una nuova frase di recupero</string>
+    <string name="backed_up_seed">Ho conservato in luogo sicuro la mia frase di recupero</string>
+    <!-- Restore fragment -->
+    <string name="restore_info">Per favore scrivi la tua frase di recupero:</string>
+    <string name="restore_seed_protected">La mia frase di recupero è protetta (BIP39)</string>
+    <string name="restore_skip_title">Salta verifica</string>
+    <string name="restore_skip_info1">Per favore assicurati che la tua frase di recupero coincida con la seguente:</string>
+    <string name="restore_skip_info2">Si raccomanda di non saltare la verifica in modo che eventuali errori di ortografia possono essere individuati.</string>
+    <string name="restore_error_checksum">La frase di recupero non è valida. Per favore controlla eventuali errori di ortografia.</string>
+    <string name="restore_error_words">La frase di recupero contiene parole non riconosciute.</string>
+    <string name="restore_error_mismatch">La frase di recupero inserita non coincide con la tua frase di recupero.</string>
+    <string name="restore_error">Non è stato possibile verificare la tua frase di recupero. %1$s</string>
+    <string name="extra_entropy">Extra entropia</string>
+    <!-- Wallet activity -->
+    <string name="test_wallet_message">Questo è un portafoglio di prova, dove puoi inviare e ricevere Bitcoins, Litecoin e Dogecoins di prova.\n\nSe vuoi usare il portafoglio con monete reali per favore vai a:<b>Impostazioni &gt; Ripristina portafoglio &gt; Crea un nuovo portafoglio</b>.</string>
+    <string name="wallet_update_title">La nuova versione è disponibile</string>
+    <string name="wallet_update_message">Una nuova versione di Coinomi è disponibile, contiene  nuove caratteristiche e correzioni.</string>
+    <string name="pay_with">Invia con</string>
+    <string name="exchange_and_pay_title">Scambia e invia</string>
+    <!-- PayToDialog-->
+    <string name="ambiguous_address_title">Indirizzo ambiguo</string>
+    <string name="ambiguous_address_message">Per favore seleziona il giusto tipo di moneta</string>
+    <!-- Balance fragment -->
+    <string name="wallet_transactions_coinbase">estratto</string>
+    <string name="history_empty">Nessuna moneta ricevuta finora!\n\nPuoi ricevere tramite uno scambio, negoziando e vendendo beni o servizi.</string>
+    <string name="sent_to">invia a</string>
+    <string name="received_with">ricevuto con</string>
+    <string name="get_tx_info_error">Non è stato possibile avere informazioni sulla transazione</string>
+    <string name="disconnected_label">Connessione assente</string>
+    <string name="no_wallet_pocket_selected">Nessun conto del portafoglio selezionato</string>
+    <string name="get_tx_broadcast_error">Errore nell\'emittente della transazione</string>
+    <!-- Receive fragment -->
+    <string name="receive_address_label">il mio indirizzo</string>
+    <string name="create_new_address">Creare un nuovo indirizzo?</string>
+    <string name="create_new_address_name">Nome (opzionale)</string>
+    <string name="view_previous_addresses">Indirizzi precedenti</string>
+    <string name="too_many_unused_addresses">Troppi indirizzi non utilizzati, prova a usare uno degli indirizzi precedenti prima di crearne uno nuovo.</string>
+    <!-- Send Activity -->
+    <string name="send_coins_activity_title">Invia monete</string>
+    <!-- Send fragment -->
+    <string name="send_coins_fragment_receiving_address_label">Paga a</string>
+    <string name="send_coins_fragment_receiving_address_tip">inserisci nome o indirizzo</string>
+    <string name="send_coins_fragment_receiving_address_error">Indirizzo Bitcoin non valido!</string>
+    <string name="send_coins_fragment_amount_label">Importo da pagare</string>
+    <string name="send_coins_fragment_button_send">Invia</string>
+    <string name="send_coins_fragment_button_back">Indietro</string>
+    <string name="send_coins_failed_msg">Non riuscito!</string>
+    <string name="send_coins_error_network">Impossibile collegarsi al network della moneta</string>
+    <string name="send_coins_error_dust">L\'importo che si vuole inviare è troppo piccolo e sarà respinto dal network</string>
+    <string name="send_coins_error">Non è stato possibile inviare monete: %1$s</string>
+    <string name="pay_to_label">paga a</string>
+    <string name="amount_to_send_label">importo</string>
+    <string name="scan_error">Ci è stato un problema nella scansione: %1$s</string>
+    <string name="unsupported_coin">moneta non supportata: %1$s</string>
+    <string name="address_error">L\'indirizzo fornito non è valido.</string>
+    <string name="amount_error">L\'importo fornito non è valido.</string>
+    <string name="amount_error_empty">Per favore inserisci un importo</string>
+    <string name="amount_error_negative">Non è possibile inviare un importo negativo</string>
+    <string name="amount_error_decimal_places">Troppe cifre decimali, prova meno di %1$d</string>
+    <string name="amount_error_too_small">L\'importo minimo è almeno %1$s</string>
+    <string name="amount_error_not_enough_money_plain">Denaro non sufficiente</string>
+    <string name="amount_error_not_enough_money">Denaro non sufficiente, il saldo attuale è %1$s</string>
+    <string name="amount_warn_fees_apply">Sarà inviato leggermente meno a causa delle tasse</string>
+    <!-- Set Password fragment -->
+    <string name="set_password_info">Imposta una password per proteggere il tuo portafoglio nell\'uso quotidiano.</string>
+    <string name="set_password_seed_protect">Proteggere anche la mia frase di recupero (BIP39)</string>
+    <string name="set_password_seed_protect_info">La password diviene permanente ed è richiesta per il ripristino del tuo portafoglio con la frase di recupero.\nATTENZIONE: Se dimentichi la tua password sarà impossibile ripristinare il tuo portafoglio!</string>
+    <string name="set_password1">Scrivi la tua password</string>
+    <string name="set_password2">Riscrivi la tua password</string>
+    <string name="password_too_common_error">La password \"%1$s\" è troppo comune per essere usata in modo sicuro.</string>
+    <string name="password_too_short_error">La password è troppo corta, minimo %1$d caratteri.</string>
+    <string name="passwords_mismatch">La password non coincide</string>
+    <string name="password_error">Impossibile procedere, rilevati errori nella password.</string>
+    <string name="password_skip_warn">Senza l\'impostazione di una password si può avere accesso al tuo portafoglio senza autorizzazione.</string>
+    <string name="password_wallet_recovery">Per ripristinare il tuo portafoglio in fornisci per favore la stessa password usata per la creazione della frase di recupero protetta. \nSe inserisci una password diversa verrà creato un nuovo portafoglio vuoto.</string>
+    <!-- FinalizeWalletRestorationFragment -->
+    <string name="wallet_restoration">Per favore attendi per il ripristino del tuo portafoglio</string>
+    <string name="wallet_restoration_master_key">Creazione della chiave maestro</string>
+    <string name="wallet_restoration_coin">Creazione della chiave per %1$s</string>
+    <string name="wallet_restoration_error">Non è stato possibile ripristinare il tuo portafoglio. \n\n%1$s</string>
+    <!-- PasswordConfirmationFragment -->
+    <string name="enter_password">Inserisci la tua password</string>
+    <!-- SignTransactionFragment -->
+    <string name="contacting_exchange">Contattare scambio&#8230;</string>
+    <string name="preparing_transaction">Per favore attendi, la transazione sarà preparata ed inviata.</string>
+    <string name="no_such_pocket_error">Si è verificato un errore durante l\'accesso al conto di questo portafoglio. Se il problema persiste, prova a ripristinare il portafoglio usando la frase di recupero.</string>
+    <string name="password_failed">La password inserita non è valida.</string>
+    <string name="sending_msg">Invio&#8230;</string>
+    <string name="sent_msg">Inviato! Per favore attendi la conferma della transazione.</string>
+    <string name="tx_already_broadcast">Denaro già inviato</string>
+    <string name="trade_expired">Scambio scaduto</string>
+    <string name="tx_confirm_timer_message">Per favore conferma questa transazione nel %1$s</string>
+    <plurals name="tx_confirm_timer_minute">
+        <item quantity="one">prossimo %s minuto</item>
+        <item quantity="other">prossimi %s minuti</item>
+    </plurals>
+    <plurals name="tx_confirm_timer_second">
+        <item quantity="one">prossimo %d secondo</item>
+        <item quantity="other">prossimi %d secondi</item>
+    </plurals>
+    <!-- About Activity -->
+    <string name="title_activity_about">Riguardo Coinomi</string>
+    <string name="app_name_long">Coinomi per Android</string>
+    <string name="about_licence">Un progetto open source\nhttps://github.com/Coinomi/coinomi-android\nSource code con licenza GNU General Public License 3</string>
+    <string name="about_credits_nubits">Server infrastructure donated by NuBits - The World\'s First Stable Digital Currency\nhttps://nubits.com/</string>
+    <string name="about_credits_translations">Traduzione fornita da:</string>
+    <string name="about_credits_bitcoinj">Usa la biblioteca Bitcoinj\nhttp://bitcoinj.github.io/</string>
+    <string name="about_credits_electrum">Usa il server software Electrum \nhttps://electrum.org/</string>
+    <string name="about_credits_schildbach">Ispirato da Andreas Schildbach\nhttps://github.com/schildbach/bitcoin-wallet/</string>
+    <string name="about_credits_zxing">Funzionalità QR-code da ZXing\nhttps://github.com/zxing/zxing</string>
+    <string name="about_credits_crypto_icons">Icone crittografiche da Chris Shepherd\nhttps://github.com/shphrd/crypto-icons</string>
+    <string name="about_credits_font_icons">Font-icons da Daniel Bruce\nhttp://www.entypo.com</string>
+    <string name="about_credits_exchange_rates">Tassi di cambio forniti da\nhttp://www.cryptocoincharts.info/\nhttps://bitcoinaverage.com/</string>
+    <!-- Add Coins -->
+    <string name="title_activity_add_coins">Aggiungi monete</string>
+    <string name="password_add_coin">Stai per creare un %1$s conto nel tuo portafoglio.</string>
+    <string name="adding_coin_confirmation_title">Aggiungi %1$s?</string>
+    <string name="adding_coin_working">Per favore attendi sta per essere creato un nuovo %1$s conto</string>
+    <string name="add_coin_error">Errore nell\'aggiunta %1$s: %2$s</string>
+    <string name="coin_already_added_title">%1$s già aggiunto</string>
+    <string name="coin_already_added">I conti aggiuntivi non sono ancora supportati</string>
+    <!-- Transaction amount visualizer -->
+    <string name="internal_transfer">Trasferimento interno</string>
+    <!-- Transaction Details -->
+    <string name="title_activity_transaction_details">Dettagli della transazione</string>
+    <string name="sent">Inviato</string>
+    <string name="received">Ricevuto</string>
+    <string name="status_label">stato</string>
+    <string name="date_label">data</string>
+    <string name="transaction_id_label">identificativo transazione</string>
+    <string name="view_at_a_blockchain_explorer_link">Vedi in blockchain explorer</string>
+    <plurals name="status_building">
+        <item quantity="one">%d conferma</item>
+        <item quantity="other">%d conferme</item>
+    </plurals>
+    <string name="status_pending">Attendi per la conferma della transazione</string>
+    <string name="status_unknown">Stato della transazione ignoto</string>
+    <!-- Exchange Rates -->
+    <string name="title_activity_exchange_rates">Tassi di scambio</string>
+    <string name="set_local_currency">Imposta %1$s come una valuta locale</string>
+    <string name="exchange_rates_loading">Caricamento tassi di scambio</string>
+    <string name="exchange_rates_load_error">Non è stato possibile caricare i tassi di scambio</string>
+    <string name="exchange_rates_empty_search">Non è stato possibile trovare i tassi di scambio</string>
+    <!-- Select Coins -->
+    <string name="select_coins">Seleziona le monete che vorresti utilizzare con il tuo portafoglio. Puoi aggiungere altre in seguito.</string>
+    <!-- Previous Addresses -->
+    <string name="title_activity_previous_addresses">I miei indirizzi precedenti</string>
+    <string name="previous_addresses_used">Indirizzo utilizzato</string>
+    <string name="previous_addresses_unused">Indirizzo inutilizzato</string>
+    <!-- Edit Address Book Entry -->
+    <string name="edit_address_book_entry_dialog_title_add">Aggiungi indirizzo</string>
+    <string name="edit_address_book_entry_dialog_title_edit">Modifica indirizzo</string>
+    <string name="edit_address_book_entry_dialog_address_label">Indirizzo</string>
+    <string name="edit_address_book_entry_dialog_label_label">Nome</string>
+    <!-- Settings -->
+    <string name="title_activity_settings">Impostazioni</string>
+    <string name="pref_title_restore_wallet">Ripristina portafoglio</string>
+    <string name="pref_title_exchange_rates">Tassi di scambio</string>
+    <string name="pref_title_manual_receiving_addresses">Indirizzo manuale</string>
+    <string name="pref_summary_manual_receiving_addresses">Non creare automaticamente un nuovo indirizzo per ogni transazione</string>
+    <!-- Show Seed -->
+    <string name="title_activity_show_seed">Mostra la frase di recupero</string>
+    <string name="seed_not_available_title">Nessuna frase di recupero trovata</string>
+    <string name="seed_not_available">La tua frase di recupero non è stata salvata in questo dispositivo.\nProva a ripristinare il tuo portafoglio per risolvere ciò.</string>
+    <string name="seed_working">Per favore attendi&#8230;</string>
+    <string name="seed_password_protected">Questa frase di recupero è protetta da una password (BIP39)</string>
+    <!-- Wallet locked -->
+    <string name="touch_to_decrypt_wallet">Tocca per sbloccare</string>
+    <!-- Exchange -->
+    <string name="title_activity_trade">Scambio</string>
+    <string name="trade_info">Seleziona le monete che vorresti scambiare.\nLe monete convertite verranno aggiunte automaticamente al tuo portafoglio.</string>
+    <string name="trade_info_rates">Il tasso dato include il costo della transazione ShapeShift.io</string>
+    <string name="trade_from_coin_label">scambia</string>
+    <string name="trade_to_coin_label">ricevi</string>
+    <string name="trade_warn_no_account_found">Verrà richiesto di aggiungere un %1$s portafoglio</string>
+    <string name="trade_warn_no_connection_title">Nessuna connessione</string>
+    <string name="trade_warn_no_connection_message">Per lo scambio di monete è necessaria ina connessione internet.</string>
+    <string name="trade_error">Errore nello scambio</string>
+    <string name="trade_error_no_supported_source_accounts">Non sono stati trovati conti supportati</string>
+    <string name="trade_error_service_not_available">Servizio temporaneamente non disponibile, per favore riprova tra un minuto</string>
+    <string name="trade_error_market_info">Servizio temporaneamente non disponibile\nNessuna informazione riguardo a %1$s - %2$s paio</string>
+    <string name="trade_error_sign_tx_message">Si è verificato un errore durante la firma e la trasmissione della transazione.\n\nDettagli tecnici:\n\n<b>%1$s</b></string>
+    <string name="trade_error_max_limit">L\'importo fornito supera il limite di %1$s. Per favore usa un importo inferiore.</string>
+    <string name="trade_error_min_limit">L\'importo minimo è di %1$s</string>
+    <!-- Exchange Status -->
+    <string name="title_activity_exchange_status">Stato dello scambio</string>
+    <string name="trade_status_message">Il tuo ordine sarà completato a breve. Puoi uscire dalla schermata senza incidere sullo scambio.</string>
+    <string name="trade_status_complete_message">Il tuo ordine è stato completato con successo.</string>
+    <string name="trade_status_label">stato</string>
+    <string name="trade_status_waiting_deposit">Attesa per il deposito&#8230;</string>
+    <string name="trade_status_received_deposit">Ricevuto un deposito di %1$s</string>
+    <string name="trade_status_waiting_trade">Attesa per lo scambio&#8230;</string>
+    <string name="trade_status_complete_detail">Scambio completato, inviato un totale di %1$s</string>
+    <string name="trade_status_complete">Scambio completo</string>
+    <string name="trade_status_view_transaction">Guarda transazione</string>
+    <string name="trade_status_email_receipt">Ricevuta email</string>
+    <string name="trade_status_failed_detail">Scambio fallito: %1$s</string>
+    <string name="trade_status_failed">Scambio fallito</string>
+    <string name="trade_status_delete_message">Rimuovere dalla storia?</string>
+    <string name="trade_status_tx_not_available">Transazione non trovata, riprova tra pochi secondi</string>
+    <!-- Email receipt dialog -->
+    <string name="email_receipt_title">Ricevuta email</string>
+    <string name="email_receipt_message">"Ricevi una email per questa transazione "</string>
+    <!-- Exchange History -->
+    <string name="title_activity_exchange_history">Storico scambi</string>
+    <string name="exchange_history_empty">Non sono avvenuti scambi</string>
+    <!-- ShapeShift -->
+    <string name="about_shapeshift_title">Riguardo ShapeShift.io</string>
+    <string name="about_shapeshift_message">"ShapeShift.io è un cambio istantaneo di altcoin che fornisce la conversione di Botcoin e altcoin. La piattaforma (disponibile sia sul web che su API) rappresenta la strada più veloce ed efficiente per convertire Bitcoin e decine di altcoin all'interno dell'ecosistema Bitcoin. Non è richiesto un account. "</string>
+    <!-- Sign Message -->
+    <string name="title_activity_sign_verify_message">Firma/verifica messaggio</string>
+    <string name="signing_info">Puoi firmare o verificare un messaggio usando un indirizzo.</string>
+    <string name="signing_address_label">firma indirizzi</string>
+    <string name="address_not_found_error">L\'indirizzo fornito non è stato trovato in questo conto.</string>
+    <string name="message_to_sign_label">messaggio</string>
+    <string name="signature_label">firma</string>
+    <string name="message_signed">Messaggio firmato</string>
+    <string name="message_verified">Messaggio verificato</string>
+    <string name="message_verification_failed">Verifica del messaggio fallita</string>
+    <!-- Messages -->
+    <string name="tx_message_public">messaggio pubblico</string>
+    <string name="tx_message_private">messaggio privato</string>
+    <string name="tx_message_public_add">Aggiungi messaggio pubblico</string>
+    <string name="tx_message_private_add">Aggiungi messaggio privato</string>
+    <string name="tx_message_public_remove">Rimuovi messaggio pubblico</string>
+    <string name="tx_message_private_remove">Rimuovi messaggio privato</string>
+    <string name="tx_message_from">da</string>
+    <string name="tx_message_subject">soggetto</string>
+    <string name="tx_message">messaggio</string>
+    <!-- Account details -->
+    <string name="title_activity_account_details">Dettagli conto</string>
+    <string name="account_description_label">descrizione</string>
+    <string name="account_public_key_label">chiave pubblica</string>
+    <string name="account_extended_public_key_label">chiave pubblica estesa</string>
+    <string name="account_public_key_warning">"Condividere la tua chiave pubblica permetterà che nessuno veda il tuo saldo e lo storico delle transazioni. "</string>
+    <string name="account_private_key_label">chiave privata</string>
+    <string name="account_extended_private_key_label">chiave privata estesa</string>
+    <string name="account_private_key_warning">La chiave privata ti permette di inviare monete da questo conto. Non è necessario salvare questa chiave in quanto è derivata dalla tua <i>frase di recupero</i></string>
+</resources>

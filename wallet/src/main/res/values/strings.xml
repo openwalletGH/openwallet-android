@@ -184,7 +184,7 @@
     <string name="about_licence">An open source project\nhttps://github.com/Coinomi/coinomi-android\nSource code licensed under GNU General Public License 3</string>
     <string name="about_credits_nubits">Server infrastructure donated by NuBits - The World\'s First Stable Digital Currency\nhttps://nubits.com/</string>
     <string name="about_credits_translations">Translations provided by:</string>
-    <string name="about_credits_translations_credits" translatable="false">George Kimionis (Greek)\n@visvirial (Japanese)\nДенис Рейн (Russian, Ukrainian)</string>
+    <string name="about_credits_translations_credits" translatable="false">Tamara Castellano (Italian)\nJorge Nicolas Karmis (Spanish)\nGeorge Kimionis (Greek)\n@visvirial (Japanese)\nДенис Рейн (Russian, Ukrainian)</string>
     <string name="about_credits_bitcoinj">Uses Bitcoinj library\nhttp://bitcoinj.github.io/</string>
     <string name="about_credits_electrum">Uses Electrum server software\nhttps://electrum.org/</string>
     <string name="about_credits_schildbach">Influenced by Andreas Schildbach\nhttps://github.com/schildbach/bitcoin-wallet/</string>
