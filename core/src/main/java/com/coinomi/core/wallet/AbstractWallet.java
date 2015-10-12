@@ -4,14 +4,18 @@ import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.ValueType;
 import com.coinomi.core.util.TypeUtils;
 
+import org.bitcoinj.core.Sha256Hash;
+import org.bitcoinj.core.Transaction;
 import org.bitcoinj.utils.Threading;
 
 import java.util.concurrent.locks.ReentrantLock;
 
+import javax.annotation.Nullable;
+
 /**
  * @author John L. Jegutanis
  */
-public abstract class AbstractWallet implements WalletAccount {
+public abstract class AbstractWallet<T> implements WalletAccount<T> {
     protected final String id;
     protected String description;
     protected final CoinType type;
@@ -25,6 +29,15 @@ public abstract class AbstractWallet implements WalletAccount {
     @Override
     public String getId() {
         return id;
+    }
+
+    @Nullable
+    public T getTransaction(String transactionId) {
+        return null;
+    }
+
+    public AbstractTransaction getAbstractTransaction(String transactionId) {
+        return null;
     }
 
     @Override
