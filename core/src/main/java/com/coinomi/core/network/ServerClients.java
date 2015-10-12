@@ -11,8 +11,6 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.List;
 
-import sun.org.mozilla.javascript.ast.Block;
-
 /**
  * @author John L. Jegutanis
  */
