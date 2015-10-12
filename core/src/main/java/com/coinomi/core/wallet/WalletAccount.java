@@ -4,13 +4,12 @@ import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
 import com.coinomi.core.coins.ValueType;
 import com.coinomi.core.network.interfaces.ConnectionEventListener;
-import com.coinomi.core.network.interfaces.TransactionEventListener;
 
 import org.bitcoinj.core.Sha256Hash;
-import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.TransactionBag;
 import org.bitcoinj.crypto.KeyCrypter;
 import org.bitcoinj.wallet.KeyBag;
+
 import org.spongycastle.crypto.params.KeyParameter;
 
 import java.io.Serializable;
@@ -23,7 +22,7 @@ import javax.annotation.Nullable;
 /**
  * @author John L. Jegutanis
  */
-public interface WalletAccount extends TransactionBag, KeyBag, TransactionEventListener,
+public interface WalletAccount<T> extends TransactionBag, KeyBag,
         ConnectionEventListener, Serializable {
     class WalletAccountException extends Exception {
         public WalletAccountException(Throwable cause) {
@@ -74,10 +73,10 @@ public interface WalletAccount extends TransactionBag, KeyBag, TransactionEventL
      */
     boolean canCreateNewAddresses();
 
-    Transaction getTransaction(String transactionId);
-    Map<Sha256Hash, Transaction> getUnspentTransactions();
-    Map<Sha256Hash, Transaction> getPendingTransactions();
-    Map<Sha256Hash, Transaction> getTransactions();
+    T getTransaction(String transactionId);
+    Map<Sha256Hash, T> getUnspentTransactions();
+    Map<Sha256Hash, T> getPendingTransactions();
+    Map<Sha256Hash, AbstractTransaction> getTransactions();
 
     List<AbstractAddress> getActiveAddresses();
     void markAddressAsUsed(AbstractAddress address);
