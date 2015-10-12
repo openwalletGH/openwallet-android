@@ -20,3 +20,18 @@
 # to avoid problem on Samsung 4.2.2 devices with appcompat v21
 # see https://code.google.com/p/android/issues/detail?id=78377
 -keep class !android.support.v7.internal.view.menu.**,android.support.** {*;}
+
+
+-dontoptimize
+-dontobfuscate
+-dontwarn sun.misc.Unsafe
+-dontwarn com.google.common.collect.MinMaxPriorityQueue
+-dontwarn sun.misc.Unsafe
+-dontwarn sun.misc.Cleaner
+-dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
+-dontwarn java.nio.file.Files
+-dontwarn java.nio.file.Path
+-dontwarn java.nio.file.OpenOption
+-dontwarn sun.nio.ch.DirectBuffer
+-dontwarn net.jcip.annotations.GuardedBy
+-dontwarn com.subgraph.orchid.**
