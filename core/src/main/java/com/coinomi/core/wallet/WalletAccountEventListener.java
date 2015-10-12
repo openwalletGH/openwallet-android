@@ -13,11 +13,11 @@ public interface WalletAccountEventListener {
 
     void onNewBlock(WalletAccount pocket);
 
-    void onTransactionConfidenceChanged(WalletAccount pocket, Transaction tx);
+    void onTransactionConfidenceChanged(WalletAccount pocket, AbstractTransaction tx);
 
-    void onTransactionBroadcastFailure(WalletAccount pocket, Transaction tx);
+    void onTransactionBroadcastFailure(WalletAccount pocket, AbstractTransaction tx);
 
-    void onTransactionBroadcastSuccess(WalletAccount pocket, Transaction tx);
+    void onTransactionBroadcastSuccess(WalletAccount pocket, AbstractTransaction tx);
 
     void onWalletChanged(final WalletAccount pocket);
 

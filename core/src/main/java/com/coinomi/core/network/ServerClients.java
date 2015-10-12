@@ -1,6 +1,8 @@
 package com.coinomi.core.network;
 
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.coins.families.Families;
+import com.coinomi.core.network.interfaces.BlockchainConnection;
 import com.coinomi.core.wallet.WalletAccount;
 
 import org.slf4j.Logger;
@@ -9,13 +11,15 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.List;
 
+import sun.org.mozilla.javascript.ast.Block;
+
 /**
  * @author John L. Jegutanis
  */
 public class ServerClients {
     private static final Logger log = LoggerFactory.getLogger(ServerClient.class);
     private final ConnectivityHelper connectivityHelper;
-    private HashMap<CoinType, ServerClient> connections = new HashMap<>();
+    private HashMap<CoinType, BlockchainConnection> connections = new HashMap<>();
     private HashMap<CoinType, CoinAddress> addresses = new HashMap<>();
 
 
@@ -41,7 +45,7 @@ public class ServerClients {
     }
 
     public void resetAccount(WalletAccount account) {
-        ServerClient connection = connections.get(account.getCoinType());
+        BlockchainConnection connection = connections.get(account.getCoinType());
         if (connection == null) return;
         connection.addEventListener(account);
         connection.resetConnection();
@@ -53,18 +57,25 @@ public class ServerClients {
             return;
         }
         CoinType type = pocket.getCoinType();
-        ServerClient connection = getConnection(type);
+        BlockchainConnection connection = getConnection(type);
         connection.addEventListener(pocket);
         connection.startAsync();
     }
 
-    private ServerClient getConnection(CoinType type) {
+    private BlockchainConnection getConnection(CoinType type) {
         if (connections.containsKey(type)) return connections.get(type);
         // Try to create a connection
         if (addresses.containsKey(type)) {
-            ServerClient client = new ServerClient(addresses.get(type), connectivityHelper);
-            connections.put(type, client);
-            return client;
+            if ( !type.getFamilyEnum().equals(Families.NXT )) {
+                ServerClient client = new ServerClient(addresses.get(type), connectivityHelper);
+                connections.put(type, client);
+                return client;
+            }
+            else {
+                NxtServerClient client = new NxtServerClient(addresses.get(type), connectivityHelper);
+                connections.put(type, client);
+                return client;
+            }
         } else {
             // Should not happen
             throw new RuntimeException("Tried to create connection for an unknown server.");
@@ -72,7 +83,7 @@ public class ServerClients {
     }
 
     public void stopAllAsync() {
-        for (ServerClient client : connections.values()) {
+        for (BlockchainConnection client : connections.values()) {
             client.stopAsync();
         }
         connections.clear();
@@ -80,14 +91,14 @@ public class ServerClients {
 
     public void ping() {
         for (final CoinType type : connections.keySet()) {
-            ServerClient connection = connections.get(type);
+            BlockchainConnection connection = connections.get(type);
             if (connection.isActivelyConnected()) connection.ping();
         }
     }
 
     public void resetConnections() {
         for (final CoinType type : connections.keySet()) {
-            ServerClient connection = connections.get(type);
+            BlockchainConnection connection = connections.get(type);
             if (connection.isActivelyConnected()) connection.resetConnection();
         }
     }

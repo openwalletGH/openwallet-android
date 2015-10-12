@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * @author John L. Jegutanis
  */
-public interface TransactionEventListener {
+public interface TransactionEventListener<T> {
     void onNewBlock(BlockHeader header);
 
     void onAddressStatusUpdate(AddressStatus status);
@@ -19,9 +19,9 @@ public interface TransactionEventListener {
 
     void onTransactionHistory(AddressStatus status, List<ServerClient.HistoryTx> historyTxes);
 
-    void onTransactionUpdate(Transaction tx);
+    void onTransactionUpdate(T tx);
 
-    void onTransactionBroadcast(Transaction transaction);
+    void onTransactionBroadcast(T transaction);
 
-    void onTransactionBroadcastError(Transaction tx);
+    void onTransactionBroadcastError(T tx);
 }

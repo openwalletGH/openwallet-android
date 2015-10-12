@@ -19,6 +19,7 @@
 package com.coinomi.core.wallet;
 
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.coins.Value;
 import com.coinomi.core.protos.Protos;
 import com.coinomi.core.util.KeyUtils;
 import com.coinomi.core.exceptions.Bip44KeyLookAheadExceededException;
@@ -214,14 +215,14 @@ public class WalletPocketHD extends TransactionWatcherWallet {
     /**
      * Sends coins to the given address but does not broadcast the resulting pending transaction.
      */
-    public SendRequest sendCoinsOffline(BitAddress address, Coin amount) throws WalletAccountException {
+    public SendRequest sendCoinsOffline(BitAddress address, Value amount) throws WalletAccountException {
         return sendCoinsOffline(address, amount, (KeyParameter) null);
     }
 
     /**
-     * {@link #sendCoinsOffline(BitAddress, Coin)}
+     * {@link #sendCoinsOffline(BitAddress, Value)}
      */
-    public SendRequest sendCoinsOffline(BitAddress address, Coin amount, @Nullable String password)
+    public SendRequest sendCoinsOffline(BitAddress address, Value amount, @Nullable String password)
             throws WalletAccountException {
         KeyParameter key = null;
         if (password != null) {
@@ -232,9 +233,9 @@ public class WalletPocketHD extends TransactionWatcherWallet {
     }
 
     /**
-     * {@link #sendCoinsOffline(BitAddress, Coin)}
+     * {@link #sendCoinsOffline(BitAddress, Value)}
      */
-    public SendRequest sendCoinsOffline(BitAddress address, Coin amount, @Nullable KeyParameter aesKey)
+    public SendRequest sendCoinsOffline(BitAddress address, Value amount, @Nullable KeyParameter aesKey)
             throws WalletAccountException {
         checkState(address.getParameters() instanceof CoinType);
         SendRequest request = SendRequest.to(address, amount);

@@ -7,18 +7,17 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
 import com.coinomi.core.coins.CoinType;
-import com.coinomi.core.util.AddressUtils;
+import com.coinomi.core.coins.Value;
 import com.coinomi.core.util.GenericUtils;
+import com.coinomi.core.wallet.AbstractAddress;
+import com.coinomi.core.wallet.AbstractTransaction;
 import com.coinomi.core.wallet.AbstractWallet;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.ui.widget.SendOutput;
 
-import org.bitcoinj.core.Coin;
-import org.bitcoinj.core.Transaction;
-import org.bitcoinj.core.TransactionOutput;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author John L. Jegutanis
@@ -31,10 +30,10 @@ public class TransactionAmountVisualizerAdapter extends BaseAdapter {
     private boolean isSending;
     private CoinType type;
     private String symbol;
-    private List<TransactionOutput> outputs;
+    private List<Map.Entry<AbstractAddress, Value>> outputs;
     private boolean isInternalTransfer;
     private boolean hasFee;
-    private Coin feeAmount;
+    private Value feeAmount;
 
     private int itemCount;
 
@@ -44,26 +43,29 @@ public class TransactionAmountVisualizerAdapter extends BaseAdapter {
         pocket = walletPocket;
         type = pocket.getCoinType();
         symbol = type.getSymbol();
-        outputs = new ArrayList<TransactionOutput>();
+        outputs = new ArrayList<Map.Entry<AbstractAddress, Value>>();
     }
 
-    public void setTransaction(Transaction tx) {
+    public void setTransaction(AbstractTransaction tx) {
         outputs.clear();
-        final Coin value = tx.getValue(pocket);
+        final Value value = tx.getValue(pocket);
         isSending = value.signum() < 0;
         // if sending and all the outputs point inside the current pocket it is an internal transfer
         isInternalTransfer = isSending;
-        for (TransactionOutput txo : tx.getOutputs()) {
+        List<Map.Entry<AbstractAddress, Value>> outs = tx.getOutputs(pocket);
+        for ( Map.Entry<AbstractAddress, Value> output : outs  ) {
             if (isSending) {
-                if (txo.isMine(pocket)) continue;
+                if (pocket.getActiveAddresses().contains(output.getKey())) {
+                    continue;
+                }
                 isInternalTransfer = false;
             } else {
-                if (!txo.isMine(pocket)) continue;
+                if (!pocket.getActiveAddresses().contains(output.getKey())) continue;
             }
-            outputs.add(txo);
+            outputs.add(output);
         }
 
-        feeAmount = tx.getFee();
+        feeAmount = tx.getFee(pocket);
         hasFee = feeAmount != null && !feeAmount.isZero();
 
         itemCount = isInternalTransfer ? 1 : outputs.size();
@@ -78,7 +80,7 @@ public class TransactionAmountVisualizerAdapter extends BaseAdapter {
     }
 
     @Override
-    public TransactionOutput getItem(int position) {
+    public Map.Entry<AbstractAddress, Value> getItem(int position) {
         if (position < outputs.size()) {
             return outputs.get(position);
         }
@@ -100,7 +102,7 @@ public class TransactionAmountVisualizerAdapter extends BaseAdapter {
         }
 
         final SendOutput output = (SendOutput) row;
-        final TransactionOutput txo = getItem(position);
+        final Map.Entry<AbstractAddress, Value> txo = getItem(position);
 
         if (txo == null) {
             if (position == 0) {
@@ -118,10 +120,10 @@ public class TransactionAmountVisualizerAdapter extends BaseAdapter {
                 output.setSymbol(null);
             }
         } else {
-            Coin outputAmount = txo.getValue();
+            Value outputAmount = txo.getValue();
             output.setAmount(GenericUtils.formatCoinValue(type, outputAmount));
             output.setSymbol(symbol);
-            output.setLabelAndAddress(AddressUtils.fromScript(type, txo.getScriptPubKey()));
+            output.setLabelAndAddress(txo.getKey());
             output.setSending(isSending);
         }
 

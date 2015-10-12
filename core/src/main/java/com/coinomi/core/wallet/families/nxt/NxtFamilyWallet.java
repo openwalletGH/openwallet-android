@@ -2,20 +2,26 @@ package com.coinomi.core.wallet.families.nxt;
 
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
+import com.coinomi.core.coins.nxt.Convert;
 import com.coinomi.core.coins.nxt.NxtException;
+import com.coinomi.core.coins.nxt.Transaction;
+import com.coinomi.core.exceptions.TransactionException;
 import com.coinomi.core.network.AddressStatus;
 import com.coinomi.core.network.BlockHeader;
 import com.coinomi.core.network.ServerClient;
 import com.coinomi.core.network.interfaces.BlockchainConnection;
+import com.coinomi.core.network.interfaces.TransactionEventListener;
 import com.coinomi.core.protos.Protos;
 import com.coinomi.core.util.KeyUtils;
 import com.coinomi.core.wallet.AbstractAddress;
+import com.coinomi.core.wallet.AbstractTransaction;
 import com.coinomi.core.wallet.AbstractWallet;
 import com.coinomi.core.wallet.SendRequest;
 import com.coinomi.core.wallet.SignedMessage;
 import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.core.wallet.WalletAccountEventListener;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 
 import org.bitcoinj.core.ECKey;
@@ -23,15 +29,19 @@ import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.crypto.DeterministicKey;
 import org.bitcoinj.crypto.KeyCrypter;
 import org.bitcoinj.script.Script;
+import org.bitcoinj.utils.ListenerRegistration;
 import org.bitcoinj.wallet.RedeemData;
 import org.bitcoinj.wallet.WalletTransaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.crypto.params.KeyParameter;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executor;
 
 import javax.annotation.Nullable;
@@ -43,16 +53,42 @@ import static com.google.common.base.Preconditions.checkArgument;
 /**
  * @author John L. Jegutanis
  */
-final public class NxtFamilyWallet extends AbstractWallet {
+public class NxtFamilyWallet extends AbstractWallet<Transaction> implements TransactionEventListener<Transaction> {
     private static final Logger log = LoggerFactory.getLogger(NxtFamilyWallet.class);
-
-    NxtFamilyKey rootKey;
+    protected final Map<Sha256Hash, Transaction> transactions;
+    @VisibleForTesting
+    final HashMap<AbstractAddress, String> addressesStatus;
+    @VisibleForTesting final transient ArrayList<AbstractAddress> addressesSubscribed;
+    @VisibleForTesting final transient ArrayList<AbstractAddress> addressesPendingSubscription;
+    @VisibleForTesting final transient HashMap<AbstractAddress, AddressStatus> statusPendingUpdates;
+    @VisibleForTesting final transient HashSet<Sha256Hash> fetchingTransactions;
     private final NxtFamilyAddress address;
+    NxtFamilyKey rootKey;
     private Value balance;
     private int lastEcBlockHeight;
     private long lastEcBlockId;
     // Wallet that this account belongs
     @Nullable private transient Wallet wallet = null;
+    private BlockchainConnection<Transaction> blockchainConnection;
+    @Nullable private Sha256Hash lastBlockSeenHash;
+    private int lastBlockSeenHeight = -1;
+    private long lastBlockSeenTimeSecs = 0;
+    private List<ListenerRegistration<WalletAccountEventListener>> listeners;
+
+
+    private Runnable saveLaterRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (wallet != null) wallet.saveLater();
+        }
+    };
+
+    private Runnable saveNowRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (wallet != null) wallet.saveNow();
+        }
+    };
 
     public NxtFamilyWallet(DeterministicKey entropy, CoinType type) {
         this(entropy, type, null, null);
@@ -71,7 +107,15 @@ final public class NxtFamilyWallet extends AbstractWallet {
         super(type, id);
         rootKey = key;
         address = new NxtFamilyAddress(type, key.getPublicKey());
+        log.info("nxt public key: {}", Convert.toHexString(key.getPublicKey()) );
         balance = type.value(0);
+        addressesStatus = new HashMap<>();
+        addressesSubscribed = new ArrayList<>();
+        addressesPendingSubscription = new ArrayList<>();
+        statusPendingUpdates = new HashMap<>();
+        fetchingTransactions = new HashSet<>();
+        transactions = new HashMap<>();
+        listeners = new CopyOnWriteArrayList<>();
     }
 
     @Override
@@ -109,7 +153,7 @@ final public class NxtFamilyWallet extends AbstractWallet {
     public void completeTransaction(SendRequest request) throws WalletAccountException {
         checkArgument(!request.isCompleted(), "Given SendRequest has already been completed.");
 
-        if (request.type.getTransactionVersion() > 0) {
+        /*if (request.type.getTransactionVersion() > 0) {
             request.nxtTxBuilder.ecBlockHeight(getLastEcBlockHeight());
             request.nxtTxBuilder.ecBlockId(getLastEcBlockId());
         }
@@ -121,14 +165,14 @@ final public class NxtFamilyWallet extends AbstractWallet {
             request.nxtTx = request.nxtTxBuilder.build();
         } catch (NxtException.NotValidException e) {
             throw new WalletAccount.WalletAccountException(e);
-        }
+        }*/
         request.setCompleted(true);
     }
 
     @Override
     public void signTransaction(SendRequest request) {
         checkArgument(request.isCompleted(), "Send request is not completed");
-        checkArgument(request.nxtTx != null, "No transaction found in send request");
+        checkArgument(request.tx != null, "No transaction found in send request");
         String nxtSecret;
         if (rootKey.isEncrypted()) {
             checkArgument(request.aesKey != null, "Wallet is encrypted but no decryption key provided");
@@ -136,7 +180,7 @@ final public class NxtFamilyWallet extends AbstractWallet {
         } else {
             nxtSecret = rootKey.getPrivateKeyMnemonic();
         }
-        request.nxtTx.sign(nxtSecret);
+        ((Transaction)request.tx).sign(nxtSecret);
     }
 
     @Override
@@ -172,8 +216,7 @@ final public class NxtFamilyWallet extends AbstractWallet {
 
     @Override
     public boolean isConnected() {
-//        TODO implement
-        return false;
+        return blockchainConnection != null;
     }
 
     @Override
@@ -208,22 +251,22 @@ final public class NxtFamilyWallet extends AbstractWallet {
     }
 
     @Override
-    public org.bitcoinj.core.Transaction getTransaction(String transactionId) {
+    public Transaction getTransaction(String transactionId) {
         throw new RuntimeException("Not implemented");
     }
 
     @Override
-    public Map<Sha256Hash, org.bitcoinj.core.Transaction> getUnspentTransactions() {
+    public Map<Sha256Hash, Transaction> getUnspentTransactions() {
         throw new RuntimeException("Not implemented");
     }
 
     @Override
-    public Map<Sha256Hash, org.bitcoinj.core.Transaction> getPendingTransactions() {
+    public Map<Sha256Hash, Transaction> getPendingTransactions() {
         throw new RuntimeException("Not implemented");
     }
 
     @Override
-    public Map<Sha256Hash, org.bitcoinj.core.Transaction> getTransactions() {
+    public Map<Sha256Hash, AbstractTransaction> getTransactions() {
         return new HashMap<>(); // TODO implement with Abstract Transactions
     }
 
@@ -236,13 +279,13 @@ final public class NxtFamilyWallet extends AbstractWallet {
     public void markAddressAsUsed(AbstractAddress address) { /* does not apply */ }
 
     @Override
-    public void setWallet(Wallet wallet) {
-        this.wallet = wallet;
+    public Wallet getWallet() {
+        return wallet;
     }
 
     @Override
-    public Wallet getWallet() {
-        return wallet;
+    public void setWallet(Wallet wallet) {
+        this.wallet = wallet;
     }
 
     @Override
@@ -350,7 +393,12 @@ final public class NxtFamilyWallet extends AbstractWallet {
      */
     public SendRequest sendCoinsOffline(NxtFamilyAddress address, Value amount, @Nullable KeyParameter aesKey)
             throws WalletAccountException {
-        SendRequest request = SendRequest.to(this, address, amount);
+        SendRequest request = null;
+        try {
+            request = SendRequest.to(this, address, amount);
+        } catch (Exception e) {
+            throw new WalletAccountException(e);
+        }
         request.aesKey = aesKey;
 
         return request;
@@ -389,7 +437,20 @@ final public class NxtFamilyWallet extends AbstractWallet {
 
     @Override
     public void onConnection(BlockchainConnection blockchainConnection) {
-        throw new RuntimeException("Not implemented");
+        this.blockchainConnection = blockchainConnection;
+        subscribeToBlockchain();
+
+    }
+
+    private void subscribeToBlockchain() {
+        lock.lock();
+        try {
+            if (blockchainConnection != null) {
+                blockchainConnection.subscribeToBlockchain(this);
+            }
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override
@@ -440,33 +501,140 @@ final public class NxtFamilyWallet extends AbstractWallet {
         throw new RuntimeException("Not implemented");
     }
 
+
     @Override
     public void onNewBlock(BlockHeader header) {
-        throw new RuntimeException("Not implemented");
+        log.info("Got a {} block: {}", type.getName(), header.getBlockHeight());
+
     }
 
     @Override
     public void onAddressStatusUpdate(AddressStatus status) {
-        throw new RuntimeException("Not implemented");
+        log.debug("Got a status {}", status);
+        lock.lock();
+        if (status.getStatus() != null) {
+            if (isAddressStatusChanged(status)) {
+                log.info("Must get transactions for address {}, status {}",
+                        status.getAddress(), status.getStatus());
+
+                if (blockchainConnection != null) {
+                    blockchainConnection.getHistoryTx(status, this);
+                }
+            } else {
+                log.info("Status {} already updating", status.getStatus());
+            }
+        }
+    }
+
+    private boolean isAddressStatusChanged(AddressStatus addressStatus) {
+        lock.lock();
+        try {
+            AbstractAddress address = addressStatus.getAddress();
+            String newStatus = addressStatus.getStatus();
+            if (addressesStatus.containsKey(address)) {
+                String previousStatus = addressesStatus.get(address);
+                if (previousStatus == null) {
+                    return newStatus != null; // Status changed if newStatus is not null
+                } else {
+                    return !previousStatus.equals(newStatus);
+                }
+            } else {
+                // Unused address, just mark it that we watch it
+                if (newStatus == null) {
+                    commitAddressStatus(addressStatus);
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    void commitAddressStatus(AddressStatus newStatus) {
+        lock.lock();
+        try {
+            AddressStatus updatingStatus = statusPendingUpdates.get(newStatus.getAddress());
+            if (updatingStatus != null && updatingStatus.equals(newStatus)) {
+                statusPendingUpdates.remove(newStatus.getAddress());
+            }
+            addressesStatus.put(newStatus.getAddress(), newStatus.getStatus());
+        }
+        finally {
+            lock.unlock();
+        }
+        // Skip saving null statuses
+        if (newStatus.getStatus() != null) {
+            walletSaveLater();
+        }
     }
 
     @Override
     public void onTransactionHistory(AddressStatus status, List<ServerClient.HistoryTx> historyTxes) {
-        throw new RuntimeException("Not implemented");
+        lock.lock();
+        try {
+            AddressStatus updatingStatus = statusPendingUpdates.get(status.getAddress());
+            // Check if this updating status is valid
+            if (updatingStatus != null && updatingStatus.equals(status)) {
+                updatingStatus.queueHistoryTransactions(historyTxes);
+                fetchTransactions(historyTxes);
+                //tryToApplyState(updatingStatus);
+            } else {
+                log.info("Ignoring history tx call because no entry found or newer entry.");
+            }
+        }
+        finally {
+            lock.unlock();
+        }
+    }
+
+    private void fetchTransactions(List<? extends ServerClient.HistoryTx> txes) {
+        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
+        for (ServerClient.HistoryTx tx : txes) {
+            fetchTransactionIfNeeded(tx.getTxHash());
+        }
+    }
+
+    private void fetchTransactionIfNeeded(Sha256Hash txHash) {
+        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
+        // Check if need to fetch the transaction
+        if (!isTransactionAvailableOrQueued(txHash)) {
+            log.info("Going to fetch transaction with hash {}", txHash);
+            fetchingTransactions.add(txHash);
+            if (blockchainConnection != null) {
+                blockchainConnection.getTransaction(txHash, this);
+            }
+        }
+    }
+
+    private boolean isTransactionAvailableOrQueued(Sha256Hash txHash) {
+        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
+        return getTransaction(txHash) != null || fetchingTransactions.contains(txHash);
+    }
+
+    @Nullable
+    public Transaction getTransaction(Sha256Hash hash) {
+        lock.lock();
+        try {
+            return transactions.get(hash);
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override
-    public void onTransactionUpdate(org.bitcoinj.core.Transaction tx) {
-        throw new RuntimeException("Not implemented");
+    public void onTransactionUpdate(Transaction tx) {
+
     }
 
     @Override
-    public void onTransactionBroadcast(org.bitcoinj.core.Transaction transaction) {
-        throw new RuntimeException("Not implemented");
+    public void onTransactionBroadcast(Transaction transaction) {
+
     }
 
     @Override
-    public void onTransactionBroadcastError(org.bitcoinj.core.Transaction tx) {
-        throw new RuntimeException("Not implemented");
+    public void onTransactionBroadcastError(Transaction tx) {
+
     }
 }

@@ -288,7 +288,7 @@ public class MakeTransactionFragment extends Fragment {
         if (emptyWallet) {
             sendRequest = SendRequest.emptyWallet(sendTo);
         } else {
-            sendRequest = SendRequest.to(sendTo, checkNotNull(amount).toCoin());
+            sendRequest = SendRequest.to(sendTo, checkNotNull(amount));
         }
         sendRequest.txMessage = txMessage;
         sendRequest.signInputs = false;

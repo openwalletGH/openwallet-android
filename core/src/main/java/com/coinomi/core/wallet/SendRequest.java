@@ -195,7 +195,7 @@ public class SendRequest implements Serializable{
      */
 
     // TODO combine the following function methods -> SendRequest to(AbstractAddress destination, Value amount) {
-    public static SendRequest to(AbstractAddress destination, Coin amount) {
+    public static SendRequest to(AbstractAddress destination, Value amount) {
         SendRequest req = new SendRequest();
         req.type = destination.getType();
         checkNotNull(req.type, "Address is for an unknown network");
@@ -218,7 +218,7 @@ public class SendRequest implements Serializable{
         req.feePerKb = req.type.feePerKb().toCoin();
         req.fee = req.type.value(0).toCoin();
         req.tx = new Transaction(req.type);
-        req.tx.addOutput(amount, (BitAddress) destination);
+        req.tx.addOutput(amount.toCoin(), (BitAddress) destination);
         return req;
     }
 

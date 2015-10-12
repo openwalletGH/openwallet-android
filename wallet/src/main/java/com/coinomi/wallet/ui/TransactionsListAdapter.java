@@ -33,7 +33,9 @@ import com.coinomi.core.coins.Value;
 import com.coinomi.core.messages.MessageFactory;
 import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.AbstractAddress;
+import com.coinomi.core.wallet.AbstractTransaction;
 import com.coinomi.core.wallet.AbstractWallet;
+import com.coinomi.core.wallet.families.bitcoin.BitTransaction;
 import com.coinomi.wallet.AddressBookProvider;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.ui.widget.CurrencyTextView;
@@ -62,7 +64,7 @@ public class TransactionsListAdapter extends BaseAdapter {
     private final LayoutInflater inflater;
     private final AbstractWallet walletPocket;
 
-    private final List<Transaction> transactions = new ArrayList<Transaction>();
+    private final List<AbstractTransaction> transactions = new ArrayList<AbstractTransaction>();
     private final Resources res;
     private int precision = 0;
     private int shift = 0;
@@ -122,12 +124,19 @@ public class TransactionsListAdapter extends BaseAdapter {
 
     public void replace(@Nonnull final Transaction tx) {
         transactions.clear();
+        transactions.add(new BitTransaction(tx));
+
+        notifyDataSetChanged();
+    }
+
+    public void replace(@Nonnull final AbstractTransaction tx) {
+        transactions.clear();
         transactions.add(tx);
 
         notifyDataSetChanged();
     }
 
-    public void replace(@Nonnull final Collection<Transaction> transactions) {
+    public void replace(@Nonnull final Collection<AbstractTransaction> transactions) {
         this.transactions.clear();
         this.transactions.addAll(transactions);
 
@@ -147,7 +156,7 @@ public class TransactionsListAdapter extends BaseAdapter {
     }
 
     @Override
-    public Transaction getItem(final int position) {
+    public AbstractTransaction getItem(final int position) {
         if (position == transactions.size())
             return null;
 
@@ -175,7 +184,7 @@ public class TransactionsListAdapter extends BaseAdapter {
             if (row == null)
                 row = inflater.inflate(R.layout.transaction_row, null);
 
-            final Transaction tx = getItem(position);
+            final AbstractTransaction tx = getItem(position);
             bindView(row, tx);
         } else {
             throw new IllegalStateException("unknown type: " + type);
@@ -184,7 +193,7 @@ public class TransactionsListAdapter extends BaseAdapter {
         return row;
     }
 
-    public void bindView(@Nonnull final View row, @Nonnull final Transaction tx) {
+    public void bindView(@Nonnull final View row, @Nonnull final AbstractTransaction tx) {
         Resources res = context.getResources();
         final TransactionConfidence confidence = tx.getConfidence();
         final ConfidenceType confidenceType = confidence.getConfidenceType();
@@ -192,7 +201,7 @@ public class TransactionsListAdapter extends BaseAdapter {
         final boolean isMined = tx.isCoinBase() || tx.isCoinStake();
 //        final boolean isInternal = WalletUtils.isInternal(tx);
 
-        final Coin value = tx.getValue(walletPocket);
+        final Value value = tx.getValue(walletPocket);
         final boolean sent = value.signum() < 0;
 
         final CoinType type = walletPocket.getCoinType();
@@ -331,11 +340,11 @@ public class TransactionsListAdapter extends BaseAdapter {
 
         // value
         rowValue.setAlwaysSigned(true);
-        rowValue.setAmount(Value.valueOf(type, value));
+        rowValue.setAmount(value);
 
         // Show message label
         if (type.canHandleMessages()) {
-            MessageFactory factory = type.getMessagesFactory();
+            /*MessageFactory factory = type.getMessagesFactory();
             try {
                 // TODO not efficient, should parse the message and save it to a database
                 if (factory != null && factory.extractPublicMessage(tx) != null) {
@@ -346,6 +355,12 @@ public class TransactionsListAdapter extends BaseAdapter {
             } catch (Exception e) {
                 rowMessageFontIcon.setVisibility(View.GONE);
                 ACRA.getErrorReporter().handleSilentException(e);
+            }*/
+            if (tx.getMessage() != null) {
+                rowMessageFontIcon.setVisibility(View.GONE);
+            }
+            else {
+                rowMessageFontIcon.setVisibility(View.VISIBLE);
             }
         } else {
             rowMessageFontIcon.setVisibility(View.GONE);

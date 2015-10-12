@@ -32,6 +32,13 @@ final public class NxtFamilyAddress implements AbstractAddress {
         this.rsAccount = rsAccount;
     }
 
+    public NxtFamilyAddress(CoinType type, long accountId) {
+        this.type = type;
+        publicKey = null;
+        this. accountId = accountId;
+        this.rsAccount = Convert.rsAccount(type, accountId);
+    }
+
     public static NxtFamilyAddress fromString(CoinType type, String address)
             throws AddressMalformedException {
         try {

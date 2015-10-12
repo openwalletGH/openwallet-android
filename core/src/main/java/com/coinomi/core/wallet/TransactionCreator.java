@@ -248,8 +248,9 @@ public class TransactionCreator {
         lock.lock();
         try {
             LinkedList<TransactionOutput> candidates = Lists.newLinkedList();
-            for (Transaction tx : Iterables.concat(account.getUnspentTransactions().values(),
+            for (Object tx1 : Iterables.concat(account.getUnspentTransactions().values(),
                     account.getPendingTransactions().values())) {
+                Transaction tx = (Transaction) tx1;
                 // Do not try and spend coinbases that were mined too recently, the protocol forbids it.
                 if (excludeImmatureCoinbases && !tx.isMature()) continue;
                 for (TransactionOutput output : tx.getOutputs()) {
@@ -260,9 +261,11 @@ public class TransactionCreator {
             }
 
             // If we have pending transactions, remove from candidates any future spent outputs
-            for (Transaction pendingTx : account.getPendingTransactions().values()) {
-                for (TransactionInput input : pendingTx.getInputs()) {
-                    Transaction tx = account.getTransactions().get(input.getOutpoint().getHash());
+            for (Object pendingTx : account.getPendingTransactions().values()) {
+                Transaction tx1 = (Transaction) pendingTx;
+                for (TransactionInput input : tx1.getInputs()) {
+                    //Transaction tx1 = (Transaction) tx1;
+                    Transaction tx = (Transaction)account.getTransactions().get(input.getOutpoint().getHash());
                     if (tx == null) continue;
                     TransactionOutput pendingSpentOutput = tx.getOutput((int) input.getOutpoint().getIndex());
                     candidates.remove(pendingSpentOutput);

@@ -24,11 +24,10 @@ import java.util.concurrent.atomic.AtomicLong;
 import android.os.Handler;
 
 import com.coinomi.core.coins.Value;
+import com.coinomi.core.wallet.AbstractTransaction;
 import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.core.wallet.WalletAccountEventListener;
 import com.coinomi.core.wallet.WalletPocketConnectivity;
-
-import org.bitcoinj.core.Transaction;
 
 /**
  * @author Andreas Schildbach
@@ -110,7 +109,7 @@ public abstract class ThrottlingWalletChangeListener implements WalletAccountEve
     }
 
     @Override
-    public void onTransactionConfidenceChanged(final WalletAccount pocket, final Transaction tx) {
+    public void onTransactionConfidenceChanged(final WalletAccount pocket, final AbstractTransaction tx) {
         if (confidenceRelevant) relevant.set(true);
     }
 
@@ -125,8 +124,8 @@ public abstract class ThrottlingWalletChangeListener implements WalletAccountEve
     }
 
     @Override
-    public void onTransactionBroadcastFailure(WalletAccount pocket, Transaction tx) { /* ignore */ }
+    public void onTransactionBroadcastFailure(WalletAccount pocket, AbstractTransaction tx) { /* ignore */ }
 
     @Override
-    public void onTransactionBroadcastSuccess(WalletAccount pocket, Transaction tx) { /* ignore */ }
+    public void onTransactionBroadcastSuccess(WalletAccount pocket, AbstractTransaction tx) { /* ignore */ }
 }

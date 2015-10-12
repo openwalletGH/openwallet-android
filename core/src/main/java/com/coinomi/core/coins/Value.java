@@ -53,9 +53,10 @@ public class Value implements Monetary, Comparable<Value>, Serializable {
         return new Value(type, units);
     }
 
-
-    public static Value valueOf(final ValueType type, final Coin coin) {
-        return new Value(type, coin.value);
+    @Nullable
+    public static Value valueOf(final ValueType type, @Nullable final Coin coin) {
+        if (coin != null) return new Value(type, coin.value);
+        return null;
     }
 
     @Override

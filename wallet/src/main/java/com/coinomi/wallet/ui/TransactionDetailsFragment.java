@@ -19,6 +19,7 @@ import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.messages.MessageFactory;
 import com.coinomi.core.messages.TxMessage;
 import com.coinomi.core.util.AddressUtils;
+import com.coinomi.core.wallet.AbstractTransaction;
 import com.coinomi.core.wallet.AbstractWallet;
 import com.coinomi.core.wallet.families.bitcoin.BitAddress;
 import com.coinomi.wallet.Constants;
@@ -29,7 +30,6 @@ import com.coinomi.wallet.util.UiUtils;
 import com.coinomi.wallet.util.WeakHandler;
 
 import org.acra.ACRA;
-import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.TransactionConfidence;
 import org.bitcoinj.core.TransactionOutput;
 import org.slf4j.Logger;
@@ -152,7 +152,7 @@ public class TransactionDetailsFragment extends Fragment {
         if (txId == null) {
             cannotShowTxDetails();
         } else {
-            Transaction tx = pocket.getTransaction(txId);
+            AbstractTransaction tx = pocket.getAbstractTransaction(txId);
             if (tx == null) {
                 cannotShowTxDetails();
             } else {
@@ -161,7 +161,7 @@ public class TransactionDetailsFragment extends Fragment {
         }
     }
 
-    private void showTxDetails(AbstractWallet pocket, Transaction tx) {
+    private void showTxDetails(AbstractWallet pocket, AbstractTransaction tx) {
         TransactionConfidence confidence = tx.getConfidence();
         String txStatusText;
         switch (confidence.getConfidenceType()) {
@@ -187,7 +187,7 @@ public class TransactionDetailsFragment extends Fragment {
         if (factory != null) {
             try {
                 // TODO not efficient, should parse the message and save it to a database
-                TxMessage message = factory.extractPublicMessage(tx);
+                TxMessage message = tx.getMessage();
                 if (message != null) {
                     // TODO in the future other coin types could support private encrypted messages
                     txMessageLabel.setText(getString(R.string.tx_message_public));

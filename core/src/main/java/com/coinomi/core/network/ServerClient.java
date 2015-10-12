@@ -5,6 +5,7 @@ import com.coinomi.core.network.interfaces.BlockchainConnection;
 import com.coinomi.core.network.interfaces.ConnectionEventListener;
 import com.coinomi.core.network.interfaces.TransactionEventListener;
 import com.coinomi.core.wallet.AbstractAddress;
+import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.core.wallet.families.bitcoin.BitAddress;
 import com.coinomi.stratumj.ServerAddress;
 import com.coinomi.stratumj.StratumClient;
@@ -48,7 +49,7 @@ import static com.google.common.util.concurrent.Service.State.NEW;
 /**
  * @author John L. Jegutanis
  */
-public class ServerClient implements BlockchainConnection {
+public class ServerClient implements BlockchainConnection<Transaction> {
     private static final Logger log = LoggerFactory.getLogger(ServerClient.class);
 
     private static final ScheduledThreadPoolExecutor connectionExec;
@@ -233,6 +234,7 @@ public class ServerClient implements BlockchainConnection {
      * Adds an event listener object. Methods on this object are called when something interesting happens,
      * like new connection to a server. The listener is executed by {@link org.bitcoinj.utils.Threading#USER_THREAD}.
      */
+    @Override
     public void addEventListener(ConnectionEventListener listener) {
         addEventListener(listener, Threading.USER_THREAD);
     }
@@ -532,7 +534,8 @@ public class ServerClient implements BlockchainConnection {
                 try {
                     log.info("Server {} version {} OK", type.getName(),
                             result.getResult().get(0));
-                } catch (JSONException ignore) { }
+                } catch (JSONException ignore) {
+                }
             }
 
             @Override
@@ -545,6 +548,7 @@ public class ServerClient implements BlockchainConnection {
             }
         }, Threading.USER_THREAD);
     }
+
 
     public static class HistoryTx {
         protected Sha256Hash txHash;

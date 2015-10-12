@@ -7,6 +7,7 @@ import com.coinomi.core.network.BlockHeader;
 import com.coinomi.core.network.ServerClient;
 import com.coinomi.core.network.interfaces.BlockchainConnection;
 import com.coinomi.core.network.interfaces.TransactionEventListener;
+import com.coinomi.core.wallet.families.bitcoin.BitTransaction;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -45,7 +46,7 @@ import static com.coinomi.core.Preconditions.checkState;
 /**
  * @author John L. Jegutanis
  */
-abstract public class TransactionWatcherWallet extends AbstractWallet { //implements WalletAccount {
+abstract public class TransactionWatcherWallet extends AbstractWallet<Transaction> implements TransactionEventListener<Transaction> { //implements WalletAccount {
     private static final Logger log = LoggerFactory.getLogger(TransactionWatcherWallet.class);
 
     private final static int TX_DEPTH_SAVE_THRESHOLD = 4;
@@ -91,7 +92,7 @@ abstract public class TransactionWatcherWallet extends AbstractWallet { //implem
 
     // All transactions together.
     protected final Map<Sha256Hash, Transaction> transactions;
-    private BlockchainConnection blockchainConnection;
+    private BlockchainConnection<Transaction> blockchainConnection;
     private List<ListenerRegistration<WalletAccountEventListener>> listeners;
 
     // Wallet that this account belongs
@@ -313,6 +314,12 @@ abstract public class TransactionWatcherWallet extends AbstractWallet { //implem
             lock.unlock();
         }
     }
+
+    @Nullable
+    public AbstractTransaction getAbstractTransaction(String transactionId) {
+        return new BitTransaction(getTransaction(new Sha256Hash(transactionId)));
+    }
+
 
     /**
      * Returns transactions that match the hashes, some transactions could be missing.
@@ -1050,7 +1057,8 @@ abstract public class TransactionWatcherWallet extends AbstractWallet { //implem
             registration.executor.execute(new Runnable() {
                 @Override
                 public void run() {
-                    registration.listener.onTransactionBroadcastSuccess(TransactionWatcherWallet.this, tx);
+
+                    registration.listener.onTransactionBroadcastSuccess(TransactionWatcherWallet.this, new BitTransaction(tx));
                 }
             });
         }
@@ -1061,7 +1069,7 @@ abstract public class TransactionWatcherWallet extends AbstractWallet { //implem
             registration.executor.execute(new Runnable() {
                 @Override
                 public void run() {
-                    registration.listener.onTransactionBroadcastFailure(TransactionWatcherWallet.this, tx);
+                    registration.listener.onTransactionBroadcastFailure(TransactionWatcherWallet.this, new BitTransaction(tx));
                 }
             });
         }
@@ -1131,7 +1139,11 @@ abstract public class TransactionWatcherWallet extends AbstractWallet { //implem
     }
 
     @Override
-    public Map<Sha256Hash, Transaction> getTransactions() {
-        return transactions;
+    public Map<Sha256Hash, AbstractTransaction> getTransactions() {
+        Map<Sha256Hash, AbstractTransaction> txs = new HashMap<Sha256Hash, AbstractTransaction>();
+        for ( Sha256Hash tx : transactions.keySet() ) {
+            txs.put( tx, new BitTransaction(transactions.get(tx)));
+        }
+        return txs;
     }
 }

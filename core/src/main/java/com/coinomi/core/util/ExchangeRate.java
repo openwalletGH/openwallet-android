@@ -12,6 +12,7 @@ import java.io.Serializable;
  * @author John L. Jegutanis
  */
 public interface ExchangeRate extends Serializable {
+    @Deprecated
     Value convert(CoinType type, Coin coin);
 
     /**

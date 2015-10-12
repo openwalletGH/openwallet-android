@@ -27,6 +27,7 @@ import android.widget.Toast;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
 import com.coinomi.core.util.GenericUtils;
+import com.coinomi.core.wallet.AbstractTransaction;
 import com.coinomi.core.wallet.AbstractWallet;
 import com.coinomi.core.wallet.WalletPocketConnectivity;
 import com.coinomi.wallet.AddressBookProvider;
@@ -42,12 +43,12 @@ import com.coinomi.wallet.util.WeakHandler;
 import com.google.common.collect.Lists;
 
 import org.bitcoinj.core.Coin;
-import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.TransactionConfidence;
 import org.bitcoinj.utils.Threading;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -59,7 +60,7 @@ import javax.annotation.Nonnull;
  * Use the {@link BalanceFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class BalanceFragment extends Fragment implements LoaderCallbacks<List<Transaction>> {
+public class BalanceFragment extends Fragment implements LoaderCallbacks<List<AbstractTransaction>> {
     private static final Logger log = LoggerFactory.getLogger(BalanceFragment.class);
 
     private static final int WALLET_CHANGED = 0;
@@ -186,7 +187,7 @@ public class BalanceFragment extends Fragment implements LoaderCallbacks<List<Tr
 
         emptyPocketMessage = header.findViewById(R.id.history_empty);
         // Hide empty message if have some transaction history
-//        if (pocket.getTransactions(false).size() > 0) {
+//        if (pocket.getAbstractTransactions(false).size() > 0) {
         if (pocket.getTransactions().size() > 0) {
             emptyPocketMessage.setVisibility(View.GONE);
         }
@@ -196,7 +197,7 @@ public class BalanceFragment extends Fragment implements LoaderCallbacks<List<Tr
         adapter.setPrecision(AMOUNT_MEDIUM_PRECISION, 0);
         transactionRows.setAdapter(adapter);
 
-        // Start TransactionDetailsActivity on click
+        // Start AbstractTransactionDetailsActivity on click
         transactionRows.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -205,10 +206,10 @@ public class BalanceFragment extends Fragment implements LoaderCallbacks<List<Tr
                     // the latter does not take into account the header (which has position 0).
                     Object obj = parent.getItemAtPosition(position);
 
-                    if (obj != null && obj instanceof Transaction) {
+                    if (obj != null && obj instanceof AbstractTransaction) {
                         Intent intent = new Intent(getActivity(), TransactionDetailsActivity.class);
                         intent.putExtra(Constants.ARG_ACCOUNT_ID, accountId);
-                        intent.putExtra(Constants.ARG_TRANSACTION_ID, ((Transaction) obj).getHashAsString());
+                        intent.putExtra(Constants.ARG_TRANSACTION_ID, ((AbstractTransaction) obj).getHashAsString());
                         startActivity(intent);
                     } else {
                         Toast.makeText(getActivity(), getString(R.string.get_tx_info_error), Toast.LENGTH_LONG).show();
@@ -373,12 +374,12 @@ public class BalanceFragment extends Fragment implements LoaderCallbacks<List<Tr
     }
 
     @Override
-    public Loader<List<Transaction>> onCreateLoader(int id, Bundle args) {
-        return new TransactionsLoader(getActivity(), pocket);
+    public Loader<List<AbstractTransaction>> onCreateLoader(int id, Bundle args) {
+        return new AbstractTransactionsLoader(getActivity(), pocket);
     }
 
     @Override
-    public void onLoadFinished(Loader<List<Transaction>> loader, final List<Transaction> transactions) {
+    public void onLoadFinished(Loader<List<AbstractTransaction>> loader, final List<AbstractTransaction> transactions) {
         handler.post(new Runnable() {
             @Override
             public void run() {
@@ -388,12 +389,12 @@ public class BalanceFragment extends Fragment implements LoaderCallbacks<List<Tr
     }
 
     @Override
-    public void onLoaderReset(Loader<List<Transaction>> loader) { /* ignore */ }
+    public void onLoaderReset(Loader<List<AbstractTransaction>> loader) { /* ignore */ }
 
-    private static class TransactionsLoader extends AsyncTaskLoader<List<Transaction>> {
+    private static class AbstractTransactionsLoader extends AsyncTaskLoader<List<AbstractTransaction>> {
         private final AbstractWallet walletPocket;
 
-        private TransactionsLoader(final Context context, @Nonnull final AbstractWallet walletPocket) {
+        private AbstractTransactionsLoader(final Context context, @Nonnull final AbstractWallet walletPocket) {
             super(context);
 
             this.walletPocket = walletPocket;
@@ -418,13 +419,13 @@ public class BalanceFragment extends Fragment implements LoaderCallbacks<List<Tr
         }
 
         @Override
-        public List<Transaction> loadInBackground() {
-//            final List<Transaction> filteredTransactions = Lists.newArrayList(walletPocket.getTransactions(true));
-            final List<Transaction> filteredTransactions = Lists.newArrayList(walletPocket.getTransactions().values());
+        public List<AbstractTransaction> loadInBackground() {
+//            final List<AbstractTransaction> filteredAbstractTransactions = Lists.newArrayList(walletPocket.getAbstractTransactions(true));
+            final List<AbstractTransaction> filteredAbstractTransactions = Lists.newArrayList(walletPocket.getTransactions().values());
 
-            Collections.sort(filteredTransactions, TRANSACTION_COMPARATOR);
+            Collections.sort(filteredAbstractTransactions, TRANSACTION_COMPARATOR);
 
-            return filteredTransactions;
+            return filteredAbstractTransactions;
         }
 
         private final ThrottlingWalletChangeListener transactionAddRemoveListener = new ThrottlingWalletChangeListener() {
@@ -433,14 +434,14 @@ public class BalanceFragment extends Fragment implements LoaderCallbacks<List<Tr
                 try {
                     forceLoad();
                 } catch (final RejectedExecutionException x) {
-                    log.info("rejected execution: " + TransactionsLoader.this.toString());
+                    log.info("rejected execution: " + AbstractTransactionsLoader.this.toString());
                 }
             }
         };
 
-        private static final Comparator<Transaction> TRANSACTION_COMPARATOR = new Comparator<Transaction>() {
+        private static final Comparator<AbstractTransaction> TRANSACTION_COMPARATOR = new Comparator<AbstractTransaction>() {
             @Override
-            public int compare(final Transaction tx1, final Transaction tx2) {
+            public int compare(final AbstractTransaction tx1, final AbstractTransaction tx2) {
                 final boolean pending1 = tx1.getConfidence().getConfidenceType() == TransactionConfidence.ConfidenceType.PENDING;
                 final boolean pending2 = tx2.getConfidence().getConfidenceType() == TransactionConfidence.ConfidenceType.PENDING;
 
@@ -461,7 +462,7 @@ public class BalanceFragment extends Fragment implements LoaderCallbacks<List<Tr
                         return time1 > time2 ? -1 : 1;
                 }
 
-                return tx1.getHash().compareTo(tx2.getHash());
+                return Arrays.equals(tx1.getHash(),tx2.getHash()) ? 1 : -1;
             }
         };
     }

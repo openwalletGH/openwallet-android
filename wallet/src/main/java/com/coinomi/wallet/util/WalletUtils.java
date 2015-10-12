@@ -20,14 +20,17 @@ package com.coinomi.wallet.util;
 
 import android.graphics.Typeface;
 import android.os.Build;
+import android.security.KeyChain;
 import android.text.Spannable;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 
 import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.coins.Value;
 import com.coinomi.core.util.Currencies;
 import com.coinomi.core.wallet.AbstractAddress;
+import com.coinomi.core.wallet.AbstractTransaction;
 import com.coinomi.core.wallet.AbstractWallet;
 import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.core.wallet.families.bitcoin.BitAddress;
@@ -43,6 +46,7 @@ import java.util.ArrayList;
 import java.util.Currency;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -111,25 +115,25 @@ public class WalletUtils {
     }
 
     @CheckForNull
-    public static List<AbstractAddress> getSendToAddress(@Nonnull final Transaction tx, @Nonnull final AbstractWallet pocket) {
+    public static List<AbstractAddress> getSendToAddress(@Nonnull final AbstractTransaction tx, @Nonnull final AbstractWallet pocket) {
         return getToAddresses(tx, pocket, false);
     }
 
 
     @CheckForNull
-    public static List<AbstractAddress> getReceivedWithAddress(@Nonnull final Transaction tx, @Nonnull final AbstractWallet pocket) {
+    public static List<AbstractAddress> getReceivedWithAddress(@Nonnull final AbstractTransaction tx, @Nonnull final AbstractWallet pocket) {
         return getToAddresses(tx, pocket, true);
     }
 
     @CheckForNull
-    private static List<AbstractAddress> getToAddresses(@Nonnull final Transaction tx,
+    private static List<AbstractAddress> getToAddresses(@Nonnull final AbstractTransaction tx,
                                                 @Nonnull final AbstractWallet pocket, boolean toMe) {
         List<AbstractAddress> addresses = new ArrayList<>();
-        for (final TransactionOutput output : tx.getOutputs()) {
+        List<Map.Entry<AbstractAddress, Value>> outputs = tx.getOutputs(pocket);
+        for ( Map.Entry<AbstractAddress, Value> output : outputs ) {
             try {
-                if (output.isMine(pocket) == toMe) {
-                    BitAddress address = fromScript(pocket.getCoinType(), output.getScriptPubKey());
-                    addresses.add(address);
+                if ( pocket.getActiveAddresses().contains(output.getKey()) == toMe ) {
+                    addresses.add(output.getKey());
                 }
             } catch (final ScriptException x) { /* ignore this output */ }
         }
