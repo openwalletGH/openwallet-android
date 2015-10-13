@@ -30,6 +30,7 @@ import com.coinomi.wallet.util.UiUtils;
 import com.coinomi.wallet.util.WeakHandler;
 
 import org.acra.ACRA;
+import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.TransactionConfidence;
 import org.bitcoinj.core.TransactionOutput;
 import org.slf4j.Logger;
@@ -162,12 +163,11 @@ public class TransactionDetailsFragment extends Fragment {
     }
 
     private void showTxDetails(AbstractWallet pocket, AbstractTransaction tx) {
-        TransactionConfidence confidence = tx.getConfidence();
         String txStatusText;
-        switch (confidence.getConfidenceType()) {
+        switch (tx.getConfidenceType()) {
             case BUILDING:
                 txStatusText = getResources().getQuantityString(R.plurals.status_building,
-                        confidence.getDepthInBlocks(), confidence.getDepthInBlocks());
+                        tx.getDepthInBlocks(), tx.getDepthInBlocks());
                 break;
             case PENDING:
                 txStatusText = getString(R.string.status_pending);

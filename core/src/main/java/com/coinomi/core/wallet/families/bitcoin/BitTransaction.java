@@ -27,8 +27,23 @@ public class BitTransaction extends AbstractTransaction<Transaction> {
     }
 
     @Override
-    public TransactionConfidence getConfidence() {
-        return transaction.getConfidence();
+    public TransactionConfidence.ConfidenceType getConfidenceType() {
+        return transaction.getConfidence().getConfidenceType();
+    }
+
+    @Override
+    public int getAppearedAtChainHeight() {
+        return transaction.getConfidence().getAppearedAtChainHeight();
+    }
+
+    @Override
+    public TransactionConfidence.Source getSource() {
+        return transaction.getConfidence().getSource();
+    }
+
+    @Override
+    public int getDepthInBlocks() {
+        return transaction.getConfidence().getDepthInBlocks();
     }
 
     @Override

@@ -76,7 +76,7 @@ public interface WalletAccount<T> extends TransactionBag, KeyBag,
     T getTransaction(String transactionId);
     Map<Sha256Hash, T> getUnspentTransactions();
     Map<Sha256Hash, T> getPendingTransactions();
-    Map<Sha256Hash, AbstractTransaction> getTransactions();
+    Map<Sha256Hash, AbstractTransaction> getAbstractTransactions();
 
     List<AbstractAddress> getActiveAddresses();
     void markAddressAsUsed(AbstractAddress address);

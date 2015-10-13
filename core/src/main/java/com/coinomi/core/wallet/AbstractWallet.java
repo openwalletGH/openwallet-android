@@ -8,6 +8,7 @@ import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.utils.Threading;
 
+import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.annotation.Nullable;
@@ -36,9 +37,7 @@ public abstract class AbstractWallet<T> implements WalletAccount<T> {
         return null;
     }
 
-    public AbstractTransaction getAbstractTransaction(String transactionId) {
-        return null;
-    }
+    public abstract AbstractTransaction getAbstractTransaction(String transactionId);
 
     @Override
     public CoinType getCoinType() {

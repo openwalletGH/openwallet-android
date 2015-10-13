@@ -30,12 +30,14 @@ import android.widget.TextView;
 
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
+import com.coinomi.core.coins.nxt.Transaction;
 import com.coinomi.core.messages.MessageFactory;
 import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.AbstractAddress;
 import com.coinomi.core.wallet.AbstractTransaction;
 import com.coinomi.core.wallet.AbstractWallet;
 import com.coinomi.core.wallet.families.bitcoin.BitTransaction;
+import com.coinomi.core.wallet.families.nxt.NxtTransaction;
 import com.coinomi.wallet.AddressBookProvider;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.ui.widget.CurrencyTextView;
@@ -44,7 +46,6 @@ import com.coinomi.wallet.util.WalletUtils;
 
 import org.acra.ACRA;
 import org.bitcoinj.core.Coin;
-import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.TransactionConfidence;
 import org.bitcoinj.core.TransactionConfidence.ConfidenceType;
 
@@ -122,9 +123,16 @@ public class TransactionsListAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
-    public void replace(@Nonnull final Transaction tx) {
+    public void replace(@Nonnull final org.bitcoinj.core.Transaction tx) {
         transactions.clear();
         transactions.add(new BitTransaction(tx));
+
+        notifyDataSetChanged();
+    }
+
+    public void replace(@Nonnull final Transaction tx) {
+        transactions.clear();
+        transactions.add(new NxtTransaction(tx));
 
         notifyDataSetChanged();
     }
@@ -195,9 +203,8 @@ public class TransactionsListAdapter extends BaseAdapter {
 
     public void bindView(@Nonnull final View row, @Nonnull final AbstractTransaction tx) {
         Resources res = context.getResources();
-        final TransactionConfidence confidence = tx.getConfidence();
-        final ConfidenceType confidenceType = confidence.getConfidenceType();
-        final boolean isOwn = confidence.getSource().equals(TransactionConfidence.Source.SELF);
+        final ConfidenceType confidenceType = tx.getConfidenceType();
+        final boolean isOwn = tx.getSource().equals(TransactionConfidence.Source.SELF);
         final boolean isMined = tx.isCoinBase() || tx.isCoinStake();
 //        final boolean isInternal = WalletUtils.isInternal(tx);
 
@@ -254,10 +261,10 @@ public class TransactionsListAdapter extends BaseAdapter {
         }
 
         // Confirmations
-        if (confidence.getDepthInBlocks() < 4) {
+        if (tx.getDepthInBlocks() < 4) {
             rowConfirmationsFontIcon.setVisibility(View.VISIBLE);
             rowConfirmationsFontIcon.setTextColor(colorLessSignificant);
-            switch (confidence.getDepthInBlocks()) {
+            switch (tx.getDepthInBlocks()) {
                 case 0: // No confirmations
                     rowConfirmationsFontIcon.setText(res.getString(R.string.font_icon_progress_empty));
                     rowConfirmationsFontIcon.setTextColor(colorInsignificant); // PENDING

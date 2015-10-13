@@ -2,10 +2,9 @@ package com.coinomi.core.wallet.families.nxt;
 
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
+import com.coinomi.core.coins.families.NxtFamily;
 import com.coinomi.core.coins.nxt.Convert;
-import com.coinomi.core.coins.nxt.NxtException;
 import com.coinomi.core.coins.nxt.Transaction;
-import com.coinomi.core.exceptions.TransactionException;
 import com.coinomi.core.network.AddressStatus;
 import com.coinomi.core.network.BlockHeader;
 import com.coinomi.core.network.ServerClient;
@@ -19,7 +18,6 @@ import com.coinomi.core.wallet.AbstractWallet;
 import com.coinomi.core.wallet.SendRequest;
 import com.coinomi.core.wallet.SignedMessage;
 import com.coinomi.core.wallet.Wallet;
-import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.core.wallet.WalletAccountEventListener;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
@@ -55,7 +53,7 @@ import static com.google.common.base.Preconditions.checkArgument;
  */
 public class NxtFamilyWallet extends AbstractWallet<Transaction> implements TransactionEventListener<Transaction> {
     private static final Logger log = LoggerFactory.getLogger(NxtFamilyWallet.class);
-    protected final Map<Sha256Hash, Transaction> transactions;
+    protected final Map<Sha256Hash, Transaction> rawtransactions;
     @VisibleForTesting
     final HashMap<AbstractAddress, String> addressesStatus;
     @VisibleForTesting final transient ArrayList<AbstractAddress> addressesSubscribed;
@@ -114,7 +112,7 @@ public class NxtFamilyWallet extends AbstractWallet<Transaction> implements Tran
         addressesPendingSubscription = new ArrayList<>();
         statusPendingUpdates = new HashMap<>();
         fetchingTransactions = new HashSet<>();
-        transactions = new HashMap<>();
+        rawtransactions = new HashMap<>();
         listeners = new CopyOnWriteArrayList<>();
     }
 
@@ -252,7 +250,12 @@ public class NxtFamilyWallet extends AbstractWallet<Transaction> implements Tran
 
     @Override
     public Transaction getTransaction(String transactionId) {
-        throw new RuntimeException("Not implemented");
+        lock.lock();
+        try {
+            return rawtransactions.get(new Sha256Hash(transactionId));
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override
@@ -266,8 +269,12 @@ public class NxtFamilyWallet extends AbstractWallet<Transaction> implements Tran
     }
 
     @Override
-    public Map<Sha256Hash, AbstractTransaction> getTransactions() {
-        return new HashMap<>(); // TODO implement with Abstract Transactions
+    public Map<Sha256Hash, AbstractTransaction> getAbstractTransactions() {
+        Map<Sha256Hash, AbstractTransaction> txs = new HashMap<Sha256Hash, AbstractTransaction>();
+        for ( Sha256Hash tx : rawtransactions.keySet() ) {
+            txs.put( tx, new NxtTransaction(rawtransactions.get(tx)));
+        }
+        return txs;
     }
 
     @Override
@@ -440,6 +447,35 @@ public class NxtFamilyWallet extends AbstractWallet<Transaction> implements Tran
         this.blockchainConnection = blockchainConnection;
         subscribeToBlockchain();
 
+        subscribeIfNeeded();
+    }
+
+    void subscribeIfNeeded() {
+        lock.lock();
+        try {
+            if (blockchainConnection != null) {
+                List<AbstractAddress> addressesToWatch = getAddressesToWatch();
+                if (addressesToWatch.size() > 0) {
+                    addressesPendingSubscription.addAll(addressesToWatch);
+                    blockchainConnection.subscribeToAddresses(addressesToWatch, this);
+                }
+            }
+        } catch (Exception e) {
+            log.error("Error subscribing to addresses", e);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @VisibleForTesting List<AbstractAddress> getAddressesToWatch() {
+        ImmutableList.Builder<AbstractAddress> addressesToWatch = ImmutableList.builder();
+        for (AbstractAddress address : getActiveAddresses()) {
+            // If address not already subscribed or pending subscription
+            if (!addressesSubscribed.contains(address) && !addressesPendingSubscription.contains(address)) {
+                addressesToWatch.add(address);
+            }
+        }
+        return addressesToWatch.build();
     }
 
     private void subscribeToBlockchain() {
@@ -514,15 +550,48 @@ public class NxtFamilyWallet extends AbstractWallet<Transaction> implements Tran
         lock.lock();
         if (status.getStatus() != null) {
             if (isAddressStatusChanged(status)) {
-                log.info("Must get transactions for address {}, status {}",
-                        status.getAddress(), status.getStatus());
+                this.balance = Value.valueOf(this.type , Long.valueOf(status.getStatus()));
+                if (registerStatusForUpdate(status)) {
+                    log.info("Must get transactions for address {}, status {}",
+                            status.getAddress(), status.getStatus());
 
-                if (blockchainConnection != null) {
-                    blockchainConnection.getHistoryTx(status, this);
+                    if (blockchainConnection != null) {
+                        blockchainConnection.getHistoryTx(status, this);
+                    }
                 }
             } else {
                 log.info("Status {} already updating", status.getStatus());
             }
+        }
+        else {
+            commitAddressStatus(status);
+        }
+    }
+
+    @VisibleForTesting boolean registerStatusForUpdate(AddressStatus status) {
+        checkNotNull(status.getStatus());
+
+        lock.lock();
+        try {
+            // If current address is updating
+            if (statusPendingUpdates.containsKey(status.getAddress())) {
+                AddressStatus updatingAddressStatus = statusPendingUpdates.get(status.getAddress());
+                String updatingStatus = updatingAddressStatus.getStatus();
+
+                // If the same status is updating, don't update again
+                if (updatingStatus != null && updatingStatus.equals(status.getStatus())) {
+                    return false;
+                } else { // Status is newer, so replace the updating status
+                    statusPendingUpdates.put(status.getAddress(), status);
+                    return true;
+                }
+            } else { // This status is new
+                statusPendingUpdates.put(status.getAddress(), status);
+                return true;
+            }
+        }
+        finally {
+            lock.unlock();
         }
     }
 
@@ -572,21 +641,26 @@ public class NxtFamilyWallet extends AbstractWallet<Transaction> implements Tran
 
     @Override
     public void onTransactionHistory(AddressStatus status, List<ServerClient.HistoryTx> historyTxes) {
+        log.info("onTransactionHistory");
         lock.lock();
         try {
             AddressStatus updatingStatus = statusPendingUpdates.get(status.getAddress());
             // Check if this updating status is valid
-            if (updatingStatus != null && updatingStatus.equals(status)) {
                 updatingStatus.queueHistoryTransactions(historyTxes);
+                log.info("Fetching txs");
                 fetchTransactions(historyTxes);
+                queueOnNewBalance();
                 //tryToApplyState(updatingStatus);
-            } else {
-                log.info("Ignoring history tx call because no entry found or newer entry.");
-            }
         }
         finally {
             lock.unlock();
         }
+    }
+
+
+    @Nullable
+    public AbstractTransaction getAbstractTransaction(String transactionId) {
+        return new NxtTransaction(getRawTransaction(new Sha256Hash(transactionId)));
     }
 
     private void fetchTransactions(List<? extends ServerClient.HistoryTx> txes) {
@@ -599,6 +673,7 @@ public class NxtFamilyWallet extends AbstractWallet<Transaction> implements Tran
     private void fetchTransactionIfNeeded(Sha256Hash txHash) {
         checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
         // Check if need to fetch the transaction
+        log.info("Trying to fetch transaction with hash {}", txHash);
         if (!isTransactionAvailableOrQueued(txHash)) {
             log.info("Going to fetch transaction with hash {}", txHash);
             fetchingTransactions.add(txHash);
@@ -606,18 +681,21 @@ public class NxtFamilyWallet extends AbstractWallet<Transaction> implements Tran
                 blockchainConnection.getTransaction(txHash, this);
             }
         }
+        else {
+            log.info("cannot fetch tx with hash {}", txHash);
+        }
     }
 
     private boolean isTransactionAvailableOrQueued(Sha256Hash txHash) {
         checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
-        return getTransaction(txHash) != null || fetchingTransactions.contains(txHash);
+        return getRawTransaction(txHash) != null || fetchingTransactions.contains(txHash);
     }
 
     @Nullable
-    public Transaction getTransaction(Sha256Hash hash) {
+    public Transaction getRawTransaction(Sha256Hash hash) {
         lock.lock();
         try {
-            return transactions.get(hash);
+            return rawtransactions.get(hash);
         } finally {
             lock.unlock();
         }
@@ -625,7 +703,52 @@ public class NxtFamilyWallet extends AbstractWallet<Transaction> implements Tran
 
     @Override
     public void onTransactionUpdate(Transaction tx) {
+        if (log.isInfoEnabled()) log.info("Got a new transaction {}", tx.getFullHash());
+        lock.lock();
+        try {
+            addNewTransactionIfNeeded(tx);
+            //tryToApplyState();
+        }
+        finally {
+            lock.unlock();
+        }
 
+    }
+
+
+    @VisibleForTesting
+    void addNewTransactionIfNeeded(Transaction tx) {
+        lock.lock();
+        try {
+            // If was fetching this tx, remove it
+            fetchingTransactions.remove(tx.getFullHash());
+            log.info("adding transaction to wallet");
+            // This tx not in wallet, add it
+            if (getTransaction(tx.getFullHash()) == null) {
+
+                log.info("transaction added");
+                rawtransactions.put(new Sha256Hash(tx.getFullHash()),tx);
+                //tx.getConfidence().setConfidenceType(TransactionConfidence.ConfidenceType.PENDING);
+                //addWalletTransaction(WalletTransaction.Pool.PENDING, tx, true);
+                queueOnNewBalance();
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    void queueOnNewBalance() {
+        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
+        final Value balance = getBalance();
+        for (final ListenerRegistration<WalletAccountEventListener> registration : listeners) {
+            registration.executor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    registration.listener.onNewBalance(balance);
+                    registration.listener.onWalletChanged(NxtFamilyWallet.this);
+                }
+            });
+        }
     }
 
     @Override

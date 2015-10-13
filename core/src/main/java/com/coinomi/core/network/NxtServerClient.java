@@ -177,7 +177,7 @@ public class NxtServerClient implements BlockchainConnection<Transaction> {
     private String getAccountInfo(AbstractAddress address) {
         StringBuilder builder = new StringBuilder();
         builder.append(getBaseUrl()).append(GET_REQUEST).append(GET_ACCOUNT)
-        .append("account=").append(address.toString());
+        .append("&account=").append(address.toString());
         return builder.toString();
     }
 
@@ -298,6 +298,7 @@ public class NxtServerClient implements BlockchainConnection<Transaction> {
                                     histTx.put("tx_hash",tx.getString("fullHash"));
                                     histTx.put("height",tx.getInt("height"));
                                     historyTxs.add(new ServerClient.HistoryTx(histTx));
+                                    log.info("added to historyTx: {}",tx.getString("fullHash") );
                                 }
                                 listener.onTransactionHistory(status, historyTxs.build());
 
@@ -319,21 +320,21 @@ public class NxtServerClient implements BlockchainConnection<Transaction> {
     public String getBlockChainTxsUrl(String address) {
         StringBuilder builder = new StringBuilder();
         builder.append(getBaseUrl()).append(GET_REQUEST).append(GET_BLOCKCHAIN_TXS)
-                .append("account=").append(address);
+                .append("&account=").append(address);
         return builder.toString();
     }
 
     public String getTransactionUrl(String txHash) {
         StringBuilder builder = new StringBuilder();
         builder.append(getBaseUrl()).append(GET_REQUEST).append(GET_TRANSACTION)
-                .append("fullHash=").append(txHash);
+                .append("&fullHash=").append(txHash);
         return builder.toString();
     }
 
     public String getTransactionBytesUrl(String txId) {
         StringBuilder builder = new StringBuilder();
         builder.append(getBaseUrl()).append(GET_REQUEST).append(GET_TRANSACTION_BYTES)
-                .append("transaction=").append(txId);
+                .append("&transaction=").append(txId);
         return builder.toString();
     }
 
@@ -392,7 +393,7 @@ public class NxtServerClient implements BlockchainConnection<Transaction> {
 
                     String txBytes = reply.getString("transactionBytes");
                     TransactionImpl tx = TransactionImpl.parseTransaction(Convert.parseHexString(txBytes));
-
+                    log.info("Fetching tx bytes");
                     listener.onTransactionUpdate(tx);
 
 

@@ -1139,7 +1139,7 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<Transactio
     }
 
     @Override
-    public Map<Sha256Hash, AbstractTransaction> getTransactions() {
+    public Map<Sha256Hash, AbstractTransaction> getAbstractTransactions() {
         Map<Sha256Hash, AbstractTransaction> txs = new HashMap<Sha256Hash, AbstractTransaction>();
         for ( Sha256Hash tx : transactions.keySet() ) {
             txs.put( tx, new BitTransaction(transactions.get(tx)));

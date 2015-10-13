@@ -29,7 +29,15 @@ public abstract class AbstractTransaction<T> {
         this.transaction = transaction;
     }
 
-    public abstract TransactionConfidence getConfidence();
+    //public abstract String getConfidence();
+
+    public abstract TransactionConfidence.ConfidenceType getConfidenceType();
+
+    public abstract int getAppearedAtChainHeight();
+
+    public abstract TransactionConfidence.Source getSource();
+
+    public abstract int getDepthInBlocks();
 
     public abstract String getHashAsString();
 

@@ -265,7 +265,7 @@ public class TransactionCreator {
                 Transaction tx1 = (Transaction) pendingTx;
                 for (TransactionInput input : tx1.getInputs()) {
                     //Transaction tx1 = (Transaction) tx1;
-                    Transaction tx = (Transaction)account.getTransactions().get(input.getOutpoint().getHash());
+                    Transaction tx = (Transaction)account.getAbstractTransactions().get(input.getOutpoint().getHash());
                     if (tx == null) continue;
                     TransactionOutput pendingSpentOutput = tx.getOutput((int) input.getOutpoint().getIndex());
                     candidates.remove(pendingSpentOutput);

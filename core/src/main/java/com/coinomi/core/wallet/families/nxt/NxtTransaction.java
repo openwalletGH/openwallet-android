@@ -26,8 +26,23 @@ public class NxtTransaction extends AbstractTransaction<Transaction> {
     }
 
     @Override
-    public TransactionConfidence getConfidence() {
-        return null;
+    public TransactionConfidence.ConfidenceType getConfidenceType() {
+        return TransactionConfidence.ConfidenceType.UNKNOWN;
+    }
+
+    @Override
+    public int getAppearedAtChainHeight() {
+        return transaction.getBlockTimestamp();
+    }
+
+    @Override
+    public TransactionConfidence.Source getSource() {
+        return TransactionConfidence.Source.NETWORK;
+    }
+
+    @Override
+    public int getDepthInBlocks() {
+        return transaction.getHeight();
     }
 
     @Override

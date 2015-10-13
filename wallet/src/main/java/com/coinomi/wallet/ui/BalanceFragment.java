@@ -188,7 +188,7 @@ public class BalanceFragment extends Fragment implements LoaderCallbacks<List<Ab
         emptyPocketMessage = header.findViewById(R.id.history_empty);
         // Hide empty message if have some transaction history
 //        if (pocket.getAbstractTransactions(false).size() > 0) {
-        if (pocket.getTransactions().size() > 0) {
+        if (pocket.getAbstractTransactions().size() > 0) {
             emptyPocketMessage.setVisibility(View.GONE);
         }
 
@@ -421,7 +421,7 @@ public class BalanceFragment extends Fragment implements LoaderCallbacks<List<Ab
         @Override
         public List<AbstractTransaction> loadInBackground() {
 //            final List<AbstractTransaction> filteredAbstractTransactions = Lists.newArrayList(walletPocket.getAbstractTransactions(true));
-            final List<AbstractTransaction> filteredAbstractTransactions = Lists.newArrayList(walletPocket.getTransactions().values());
+            final List<AbstractTransaction> filteredAbstractTransactions = Lists.newArrayList(walletPocket.getAbstractTransactions().values());
 
             Collections.sort(filteredAbstractTransactions, TRANSACTION_COMPARATOR);
 
@@ -442,8 +442,8 @@ public class BalanceFragment extends Fragment implements LoaderCallbacks<List<Ab
         private static final Comparator<AbstractTransaction> TRANSACTION_COMPARATOR = new Comparator<AbstractTransaction>() {
             @Override
             public int compare(final AbstractTransaction tx1, final AbstractTransaction tx2) {
-                final boolean pending1 = tx1.getConfidence().getConfidenceType() == TransactionConfidence.ConfidenceType.PENDING;
-                final boolean pending2 = tx2.getConfidence().getConfidenceType() == TransactionConfidence.ConfidenceType.PENDING;
+                final boolean pending1 = tx1.getConfidenceType() == TransactionConfidence.ConfidenceType.PENDING;
+                final boolean pending2 = tx2.getConfidenceType() == TransactionConfidence.ConfidenceType.PENDING;
 
                 if (pending1 != pending2)
                     return pending1 ? -1 : 1;
@@ -456,8 +456,8 @@ public class BalanceFragment extends Fragment implements LoaderCallbacks<List<Ab
 
                 // If both not pending
                 if (!pending1 && !pending2) {
-                    final int time1 = tx1.getConfidence().getAppearedAtChainHeight();
-                    final int time2 = tx2.getConfidence().getAppearedAtChainHeight();
+                    final int time1 = tx1.getAppearedAtChainHeight();
+                    final int time2 = tx2.getAppearedAtChainHeight();
                     if (time1 != time2)
                         return time1 > time2 ? -1 : 1;
                 }
