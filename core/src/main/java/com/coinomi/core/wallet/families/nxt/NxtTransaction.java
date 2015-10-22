@@ -1,7 +1,7 @@
 package com.coinomi.core.wallet.families.nxt;
 
-import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
+import com.coinomi.core.coins.nxt.Convert;
 import com.coinomi.core.coins.nxt.Transaction;
 import com.coinomi.core.messages.TxMessage;
 import com.coinomi.core.wallet.AbstractAddress;
@@ -11,11 +11,13 @@ import com.coinomi.core.wallet.WalletAccount;
 
 import org.bitcoinj.core.TransactionConfidence;
 
-import java.util.HashMap;
+import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import static com.coinomi.core.Preconditions.checkNotNull;
+import static java.util.AbstractMap.*;
 
 /**
  * Created by vbcs on 1/10/2015.
@@ -27,12 +29,12 @@ public class NxtTransaction extends AbstractTransaction<Transaction> {
 
     @Override
     public TransactionConfidence.ConfidenceType getConfidenceType() {
-        return TransactionConfidence.ConfidenceType.UNKNOWN;
+        return TransactionConfidence.ConfidenceType.BUILDING;
     }
 
     @Override
     public int getAppearedAtChainHeight() {
-        return transaction.getBlockTimestamp();
+        return transaction.getHeight();
     }
 
     @Override
@@ -47,32 +49,50 @@ public class NxtTransaction extends AbstractTransaction<Transaction> {
 
     @Override
     public String getHashAsString() {
-        return null;
+        return transaction.getFullHash();
     }
 
     @Override
     public Value getValue(AbstractWallet wallet) {
-        return null;
+        if (transaction.getSenderId() == wallet.getReceiveAddress().getId()) {
+            return Value.valueOf(wallet.getCoinType(), -1 * transaction.getAmountNQT());
+        } else {
+            return Value.valueOf(wallet.getCoinType(), transaction.getAmountNQT());
+        }
     }
 
     @Override
     public TxMessage getMessage() {
+        if ( transaction.getMessage() != null ) {
+            NxtTxMessage message = new NxtTxMessage(transaction);
+            return message;
+        }
         return null;
     }
 
     @Override
-    public Value getFee(AbstractWallet wallet) {
-        return null;
+    public Value getFee(WalletAccount wallet) {
+        return Value.valueOf(wallet.getCoinType(), transaction.getFeeNQT());
     }
 
     @Override
     public List<Map.Entry<AbstractAddress, Value>> getOutputs(AbstractWallet wallet) {
-        return null;
+        List<Map.Entry<AbstractAddress, Value>> outputs = new ArrayList<>();
+        outputs.add(new AbstractMap.SimpleEntry<AbstractAddress, Value>
+                (new NxtFamilyAddress(wallet.getCoinType(), transaction.getRecipientId()),
+                        Value.valueOf(wallet.getCoinType(), transaction.getAmountNQT())));
+        return outputs;
+
+    }
+
+    @Override
+    public AbstractAddress getSender(AbstractWallet wallet) {
+        return new NxtFamilyAddress(wallet.getCoinType(), transaction.getSenderId());
     }
 
     @Override
     public byte[] getHash() {
-        return new byte[0];
+        return Convert.parseHexString(transaction.getFullHash());
     }
 
     @Override
@@ -86,9 +106,15 @@ public class NxtTransaction extends AbstractTransaction<Transaction> {
     }
 
     @Override
-    public boolean isMine(Map.Entry<AbstractAddress, Value> output) {
-        return false;
+    public boolean isMine(WalletAccount wallet, Map.Entry<AbstractAddress, Value> output) {
+        return wallet.getActiveAddresses().contains(output.getKey());
     }
+
+    @Override
+    public Transaction getTransaction() {
+        return transaction;
+    }
+
 
     /*public NxtTransaction(WalletAccount account, Transaction tx) {
         super(account, tx);

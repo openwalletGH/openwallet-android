@@ -28,6 +28,7 @@ import android.text.style.StyleSpan;
 import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
+import com.coinomi.core.coins.families.Families;
 import com.coinomi.core.util.Currencies;
 import com.coinomi.core.wallet.AbstractAddress;
 import com.coinomi.core.wallet.AbstractTransaction;
@@ -122,7 +123,12 @@ public class WalletUtils {
 
     @CheckForNull
     public static List<AbstractAddress> getReceivedWithAddress(@Nonnull final AbstractTransaction tx, @Nonnull final AbstractWallet pocket) {
-        return getToAddresses(tx, pocket, true);
+        if (pocket.getCoinType().getFamily() != Families.NXT)
+            return getToAddresses(tx, pocket, true);
+
+        List<AbstractAddress> addresses = new ArrayList<>();
+        addresses.add(tx.getSender(pocket));
+        return addresses;
     }
 
     @CheckForNull
@@ -130,10 +136,13 @@ public class WalletUtils {
                                                 @Nonnull final AbstractWallet pocket, boolean toMe) {
         List<AbstractAddress> addresses = new ArrayList<>();
         List<Map.Entry<AbstractAddress, Value>> outputs = tx.getOutputs(pocket);
+        List<AbstractAddress> activeAddresses = pocket.getActiveAddresses();
         for ( Map.Entry<AbstractAddress, Value> output : outputs ) {
             try {
-                if ( pocket.getActiveAddresses().contains(output.getKey()) == toMe ) {
-                    addresses.add(output.getKey());
+                for (AbstractAddress addr : activeAddresses) {
+                    if ((addr.getId() == output.getKey().getId()) == toMe) {
+                        addresses.add(output.getKey());
+                    }
                 }
             } catch (final ScriptException x) { /* ignore this output */ }
         }

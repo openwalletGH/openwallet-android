@@ -8,6 +8,8 @@ import android.widget.BaseAdapter;
 
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
+import com.coinomi.core.coins.families.Families;
+import com.coinomi.core.coins.families.NxtFamily;
 import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.AbstractAddress;
 import com.coinomi.core.wallet.AbstractTransaction;
@@ -15,6 +17,7 @@ import com.coinomi.core.wallet.AbstractWallet;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.ui.widget.SendOutput;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +63,11 @@ public class TransactionAmountVisualizerAdapter extends BaseAdapter {
                 }
                 isInternalTransfer = false;
             } else {
-                if (!pocket.getActiveAddresses().contains(output.getKey())) continue;
+                if ( pocket.getCoinType().getFamily() == Families.NXT ) {
+                    outputs.add(new AbstractMap.SimpleEntry<AbstractAddress, Value>(tx.getSender(pocket),tx.getValue(pocket)));
+                    break;
+                }
+                    if (!pocket.getActiveAddresses().contains(output.getKey())) continue;
             }
             outputs.add(output);
         }

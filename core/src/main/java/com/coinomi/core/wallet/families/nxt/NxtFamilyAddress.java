@@ -32,6 +32,13 @@ final public class NxtFamilyAddress implements AbstractAddress {
         this.rsAccount = rsAccount;
     }
 
+    public NxtFamilyAddress(CoinType type, String rsAccount) {
+        this.type = type;
+        publicKey = null;
+        this. accountId = Convert.parseAccountId(type, rsAccount);
+        this.rsAccount = rsAccount;
+    }
+
     public NxtFamilyAddress(CoinType type, long accountId) {
         this.type = type;
         publicKey = null;

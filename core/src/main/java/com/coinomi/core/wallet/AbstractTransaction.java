@@ -45,9 +45,12 @@ public abstract class AbstractTransaction<T> {
 
     public abstract TxMessage getMessage();
 
-    public Value getFee(AbstractWallet wallet) {
+    public Value getFee(WalletAccount wallet) {
         return null;
     }
+
+    //TO BE USED ONLY ON NON BITCOIN TXS
+    public AbstractAddress getSender(AbstractWallet wallet) { return null; }
 
     public List<Map.Entry<AbstractAddress, Value>> getOutputs(AbstractWallet wallet) {
         return null;
@@ -59,6 +62,9 @@ public abstract class AbstractTransaction<T> {
 
     public abstract boolean isCoinStake();
 
-    public abstract boolean isMine(Map.Entry<AbstractAddress, Value> output);
+    public abstract boolean isMine(WalletAccount wallet, Map.Entry<AbstractAddress, Value> output);
+
+    public abstract T getTransaction();
+
 }
 

@@ -1,7 +1,5 @@
 package com.coinomi.core.coins.nxt;
 
-//import org.json.simple.JSONObject;
-
 import java.util.List;
 
 public interface Transaction extends Comparable<Transaction> {

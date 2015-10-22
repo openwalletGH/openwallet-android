@@ -12,6 +12,7 @@ import org.bitcoinj.wallet.KeyBag;
 
 import org.spongycastle.crypto.params.KeyParameter;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -61,12 +62,20 @@ public interface WalletAccount<T> extends TransactionBag, KeyBag,
      *
      * Notice: This address could be the same as the current receive address
      */
-    AbstractAddress getRefundAddress();
+    AbstractAddress getRefundAddress(boolean isManualAddressManagement);
+
+    AbstractAddress getReceiveAddress(boolean isManualAddressManagement) ;
+
 
     /**
      * Returns true if this wallet has previously used addresses
      */
     boolean hasUsedAddresses();
+
+
+    boolean broadcastTxSync(AbstractTransaction tx) throws IOException;
+
+    void broadcastTx(AbstractTransaction tx) throws IOException;
 
     /**
      * Returns true if this wallet can create new addresses

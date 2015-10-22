@@ -14,6 +14,7 @@ import com.coinomi.core.util.AddressUtils;
 import com.coinomi.core.util.ExchangeRate;
 import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.AbstractAddress;
+import com.coinomi.core.wallet.AbstractTransaction;
 import com.coinomi.core.wallet.AbstractWallet;
 import com.coinomi.wallet.R;
 import com.google.common.collect.ImmutableList;
@@ -23,6 +24,7 @@ import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.TransactionOutput;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -35,8 +37,8 @@ public class TransactionAmountVisualizer extends LinearLayout {
     private final SendOutput fee;
     private final TextView txMessageLabel;
     private final TextView txMessage;
-    private Coin outputAmount;
-    private Coin feeAmount;
+    private Value outputAmount;
+    private Value feeAmount;
     private boolean isSending;
 
     private AbstractAddress address;
@@ -60,28 +62,29 @@ public class TransactionAmountVisualizer extends LinearLayout {
         }
     }
 
-    public void setTransaction(AbstractWallet pocket, Transaction tx) {
+    public void setTransaction(AbstractWallet pocket, AbstractTransaction tx) {
         type = pocket.getCoinType();
         String symbol = type.getSymbol();
 
-        final Coin value = tx.getValue(pocket);
+        final Value value = tx.getValue(pocket);
         isSending = value.signum() < 0;
         // if sending and all the outputs point inside the current pocket. If received
         boolean isInternalTransfer = isSending;
         output.setVisibility(View.VISIBLE);
-        for (TransactionOutput txo : tx.getOutputs()) {
+        List<Map.Entry<AbstractAddress, Value>> outputs = tx.getOutputs(pocket);
+        for (Map.Entry<AbstractAddress, Value> txo : outputs) {
             if (isSending) {
-                if (txo.isMine(pocket)) continue;
+                if (tx.isMine(pocket, txo)) continue;
                 isInternalTransfer = false;
             } else {
-                if (!txo.isMine(pocket)) continue;
+                if (!tx.isMine(pocket, txo)) continue;
             }
 
             // TODO support more than one output
             outputAmount = txo.getValue();
             output.setAmount(GenericUtils.formatCoinValue(type, outputAmount));
             output.setSymbol(symbol);
-            address = AddressUtils.fromScript(type, txo.getScriptPubKey());
+            address = txo.getKey();
             output.setLabelAndAddress(address);
             break; // TODO remove when supporting more than one output
         }
@@ -92,7 +95,7 @@ public class TransactionAmountVisualizer extends LinearLayout {
 
         output.setSending(isSending);
 
-        feeAmount = tx.getFee();
+        feeAmount = tx.getFee(pocket);
         if (isSending && feeAmount != null && !feeAmount.isZero()) {
             fee.setVisibility(View.VISIBLE);
             fee.setAmount(GenericUtils.formatCoinValue(type, feeAmount));
@@ -123,13 +126,13 @@ public class TransactionAmountVisualizer extends LinearLayout {
 
     public void setExchangeRate(ExchangeRate rate) {
         if (outputAmount != null) {
-            Value fiatAmount = rate.convert(type, outputAmount);
+            Value fiatAmount = rate.convert(type, outputAmount.toCoin());
             output.setAmountLocal(GenericUtils.formatFiatValue(fiatAmount));
             output.setSymbolLocal(fiatAmount.type.getSymbol());
         }
 
         if (isSending && feeAmount != null) {
-            Value fiatAmount = rate.convert(type, feeAmount);
+            Value fiatAmount = rate.convert(type, feeAmount.toCoin());
             fee.setAmountLocal(GenericUtils.formatFiatValue(fiatAmount));
             fee.setSymbolLocal(fiatAmount.type.getSymbol());
         }

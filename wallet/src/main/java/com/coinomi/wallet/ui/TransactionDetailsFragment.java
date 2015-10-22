@@ -183,8 +183,7 @@ public class TransactionDetailsFragment extends Fragment {
         setupBlockExplorerLink(pocket.getCoinType(), tx.getHashAsString());
 
         // Show message
-        MessageFactory factory = type.getMessagesFactory();
-        if (factory != null) {
+        if (type.canHandleMessages() && tx.getMessage() != null) {
             try {
                 // TODO not efficient, should parse the message and save it to a database
                 TxMessage message = tx.getMessage();

@@ -3,11 +3,13 @@ package com.coinomi.core.wallet;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.ValueType;
 import com.coinomi.core.util.TypeUtils;
+import com.coinomi.core.wallet.families.bitcoin.BitAddress;
 
 import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.utils.Threading;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -28,6 +30,19 @@ public abstract class AbstractWallet<T> implements WalletAccount<T> {
     }
 
     @Override
+    public abstract boolean broadcastTxSync(AbstractTransaction tx) throws IOException;
+
+    @Override
+    public abstract void broadcastTx(AbstractTransaction tx) throws IOException;
+
+    @Override
+    public abstract AbstractAddress getRefundAddress(boolean isManualAddressManagement);
+
+    @Override
+    public abstract AbstractAddress getReceiveAddress(boolean isManualAddressManagement) ;
+
+
+        @Override
     public String getId() {
         return id;
     }
@@ -38,6 +53,8 @@ public abstract class AbstractWallet<T> implements WalletAccount<T> {
     }
 
     public abstract AbstractTransaction getAbstractTransaction(String transactionId);
+
+
 
     @Override
     public CoinType getCoinType() {

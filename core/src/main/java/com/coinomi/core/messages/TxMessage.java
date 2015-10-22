@@ -1,6 +1,6 @@
 package com.coinomi.core.messages;
 
-import org.bitcoinj.core.Transaction;
+import com.coinomi.core.wallet.AbstractTransaction;
 
 import java.io.Serializable;
 
@@ -9,7 +9,7 @@ import java.io.Serializable;
  */
 public interface TxMessage extends Serializable {
     // TODO use an abstract transaction
-    void serializeTo(Transaction transaction);
+    void serializeTo(AbstractTransaction transaction);
 
     enum Type {
         PUBLIC, PRIVATE

@@ -2,6 +2,8 @@ package com.coinomi.core.wallet.families.vpncoin;
 
 import com.coinomi.core.messages.TxMessage;
 import com.coinomi.core.messages.MessageFactory;
+import com.coinomi.core.wallet.AbstractTransaction;
+import com.coinomi.core.wallet.families.bitcoin.BitTransaction;
 import com.google.common.base.Charsets;
 
 import org.bitcoinj.core.Transaction;
@@ -93,8 +95,8 @@ public class VpncoinTxMessage implements TxMessage {
     }
 
     @Nullable
-    public static VpncoinTxMessage parse(Transaction tx) {
-        byte[] bytes = tx.getExtraBytes();
+    public static VpncoinTxMessage parse(AbstractTransaction tx) {
+        byte[] bytes = ((Transaction)tx.getTransaction()).getExtraBytes();
         if (bytes == null || bytes.length == 0) return null;
 
         String fullMessage = new String(bytes, Charsets.UTF_8);
@@ -103,7 +105,7 @@ public class VpncoinTxMessage implements TxMessage {
             return parseUnencrypted(fullMessage);
         } catch (Exception e) {
             try {
-                return parseEncrypted(tx.getTime(), fullMessage);
+                return parseEncrypted(((Transaction)tx.getTransaction()).getTime(), fullMessage);
             } catch (Exception e1) {
                 log.info("Could not parse message: {}", e1.getLocalizedMessage());
                 return null;
@@ -157,8 +159,8 @@ public class VpncoinTxMessage implements TxMessage {
     }
 
     @Override
-    public void serializeTo(Transaction transaction) {
-        transaction.setExtraBytes(serialize());
+    public void serializeTo(AbstractTransaction transaction) {
+        ((BitTransaction) transaction).getTransaction().setExtraBytes(serialize());
     }
 
     byte[] serialize() {
@@ -347,7 +349,7 @@ public class VpncoinTxMessage implements TxMessage {
 
         @Override
         @Nullable
-        public TxMessage extractPublicMessage(Transaction transaction) {
+        public TxMessage extractPublicMessage(AbstractTransaction transaction) {
             return parse(transaction);
         }
     }

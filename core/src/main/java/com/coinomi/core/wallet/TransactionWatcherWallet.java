@@ -91,7 +91,7 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<Transactio
     @VisibleForTesting final Map<Sha256Hash, Transaction> dead;
 
     // All transactions together.
-    protected final Map<Sha256Hash, Transaction> transactions;
+    protected final Map<Sha256Hash, Transaction> rawtransactions;
     private BlockchainConnection<Transaction> blockchainConnection;
     private List<ListenerRegistration<WalletAccountEventListener>> listeners;
 
@@ -124,9 +124,10 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<Transactio
         spent = new HashMap<>();
         pending = new HashMap<>();
         dead = new HashMap<>();
-        transactions = new HashMap<>();
+        rawtransactions = new HashMap<>();
         listeners = new CopyOnWriteArrayList<>();
     }
+
 
     @Override
     public CoinType getCoinType() {
@@ -203,7 +204,7 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<Transactio
     private void simpleAddTransaction(WalletTransaction.Pool pool, Transaction tx) {
         lock.lock();
         try {
-            transactions.put(tx.getHash(), tx);
+            rawtransactions.put(tx.getHash(), tx);
             switch (pool) {
                 case UNSPENT:
                     checkState(unspent.put(tx.getHash(), tx) == null);
@@ -309,7 +310,7 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<Transactio
     public Transaction getTransaction(Sha256Hash hash) {
         lock.lock();
         try {
-            return transactions.get(hash);
+            return rawtransactions.get(hash);
         } finally {
             lock.unlock();
         }
@@ -329,8 +330,8 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<Transactio
         try {
             HashMap<Sha256Hash, Transaction> txs = new HashMap<>();
             for (Sha256Hash hash : hashes) {
-                if (transactions.containsKey(hash)) {
-                    txs.put(hash, transactions.get(hash));
+                if (rawtransactions.containsKey(hash)) {
+                    txs.put(hash, rawtransactions.get(hash));
                 }
             }
             return txs;
@@ -356,7 +357,7 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<Transactio
             spent.clear();
             pending.clear();
             dead.clear();
-            transactions.clear();
+            rawtransactions.clear();
             addressesStatus.clear();
             clearTransientState();
         } finally {
@@ -772,7 +773,7 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<Transactio
                 }
             }
             Sha256Hash outputHash = txi.getOutpoint().getHash();
-            Transaction fromTx = transactions.get(outputHash);
+            Transaction fromTx = rawtransactions.get(outputHash);
             if (fromTx != null) {
                 // Try to connect and recover if failed once.
                 for (int i = 2; i > 0; i--) {
@@ -1091,6 +1092,15 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<Transactio
         return !addressesPendingSubscription.isEmpty() || !statusPendingUpdates.isEmpty() || !fetchingTransactions.isEmpty();
     }
 
+    @Override
+    public void broadcastTx(AbstractTransaction tx) throws IOException {
+        broadcastTx((Transaction)tx.getTransaction());
+    }
+
+    @Override
+    public boolean broadcastTxSync(AbstractTransaction tx) throws IOException {
+        return broadcastTxSync((Transaction)tx.getTransaction());
+    }
 
     public boolean broadcastTxSync(Transaction tx) throws IOException {
         if (isConnected()) {
@@ -1141,8 +1151,8 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<Transactio
     @Override
     public Map<Sha256Hash, AbstractTransaction> getAbstractTransactions() {
         Map<Sha256Hash, AbstractTransaction> txs = new HashMap<Sha256Hash, AbstractTransaction>();
-        for ( Sha256Hash tx : transactions.keySet() ) {
-            txs.put( tx, new BitTransaction(transactions.get(tx)));
+        for ( Sha256Hash tx : rawtransactions.keySet() ) {
+            txs.put( tx, new BitTransaction(rawtransactions.get(tx)));
         }
         return txs;
     }

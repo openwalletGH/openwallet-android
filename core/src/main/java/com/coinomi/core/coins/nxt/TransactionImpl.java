@@ -721,6 +721,18 @@ public final class TransactionImpl implements Transaction {
         if (encryptToSelfMessage != null) {
             flags |= position;
         }
+        position <<= 1;
+        /*if (phasing != null) {
+            flags |= position;
+        }*/
+        position <<= 1;
+        /*if (prunablePlainMessage != null) {
+            flags |= position;
+        }*/
+        position <<= 1;
+        /*if (prunableEncryptedMessage != null) {
+            flags |= position;
+        }*/
         return flags;
     }
 

@@ -28,6 +28,7 @@ import com.coinomi.core.coins.nxt.Convert;
 import com.coinomi.core.coins.nxt.TransactionImpl;
 import com.coinomi.core.messages.TxMessage;
 import com.coinomi.core.wallet.families.bitcoin.BitAddress;
+import com.coinomi.core.wallet.families.bitcoin.BitTransaction;
 import com.coinomi.core.wallet.families.nxt.NxtFamilyAddress;
 import com.google.common.base.Objects;
 import com.google.common.base.Objects.ToStringHelper;
@@ -40,7 +41,6 @@ import org.spongycastle.crypto.params.KeyParameter;
 
 import java.io.Serializable;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -71,8 +71,8 @@ public class SendRequest implements Serializable{
      * RuntimeException).</p>
      */
     // TODO unify and make abstract
-    public Transaction tx;
-    public com.coinomi.core.coins.nxt.Transaction nxtTx;
+    public AbstractTransaction tx;
+    //public com.coinomi.core.coins.nxt.Transaction nxtTx;
     public com.coinomi.core.coins.nxt.TransactionImpl.BuilderImpl nxtTxBuilder;
 
     /**
@@ -104,7 +104,7 @@ public class SendRequest implements Serializable{
      * (rounded down to the nearest kb) as that is how transactions are sorted when added to a block by miners.</p>
      */
     // TODO change to Value
-    public Coin fee;
+    public Value fee;
 
     /**
      * <p>A transaction can have a fee attached, which is defined as the difference between the input values
@@ -121,7 +121,7 @@ public class SendRequest implements Serializable{
      * <p>You might also consider using a {@link SendRequest#fee} to set the fee added for the first kb of size.</p>
      */
     // TODO change to Value
-    public Coin feePerKb;
+    public Value feePerKb;
 
     /**
      * <p>Requires that there be enough fee for a default reference client to at least relay the transaction.
@@ -194,15 +194,14 @@ public class SendRequest implements Serializable{
      * likely be rejected by the network in this case.</p>
      */
 
-    // TODO combine the following function methods -> SendRequest to(AbstractAddress destination, Value amount) {
     public static SendRequest to(AbstractAddress destination, Value amount) {
         SendRequest req = new SendRequest();
         req.type = destination.getType();
         checkNotNull(req.type, "Address is for an unknown network");
         switch (req.type.getFamilyEnum()) {
             case NXT:
-                throw new RuntimeException("Not implemented");
 
+                throw new RuntimeException("Unsupported family: " + req.type.getFamily());
             case BITCOIN:
             case NUBITS:
             case PEERCOIN:
@@ -215,10 +214,39 @@ public class SendRequest implements Serializable{
         }
 
 
-        req.feePerKb = req.type.feePerKb().toCoin();
-        req.fee = req.type.value(0).toCoin();
-        req.tx = new Transaction(req.type);
-        req.tx.addOutput(amount.toCoin(), (BitAddress) destination);
+        req.feePerKb = req.type.feePerKb();
+        req.fee = req.type.value(0);
+        Transaction tx = new Transaction(req.type);
+        tx.addOutput(amount.toCoin(), (BitAddress) destination);
+        req.tx = new BitTransaction(tx);
+        return req;
+    }
+
+    // TODO combine the following function methods -> SendRequest to(AbstractAddress destination, Value amount) {
+    public static SendRequest to(WalletAccount from, AbstractAddress destination, Value amount) {
+        SendRequest req = new SendRequest();
+        req.type = destination.getType();
+        checkNotNull(req.type, "Address is for an unknown network");
+        switch (req.type.getFamilyEnum()) {
+            case NXT:
+                return to(from, (NxtFamilyAddress) destination, amount);
+            case BITCOIN:
+            case NUBITS:
+            case PEERCOIN:
+            case REDDCOIN:
+            case VPNCOIN:
+                break;
+            default:
+            case FIAT:
+                throw new RuntimeException("Unsupported family: " + req.type.getFamily());
+        }
+
+
+        req.feePerKb = req.type.feePerKb();
+        req.fee = req.type.value(0);
+        Transaction tx = new Transaction(req.type);
+        tx.addOutput(amount.toCoin(), (BitAddress) destination);
+        req.tx = new BitTransaction(tx);
         return req;
     }
 
@@ -227,18 +255,18 @@ public class SendRequest implements Serializable{
         req.type = destination.getType();
         switch (req.type.getFeePolicy()) {
             case FLAT_FEE:
-                req.feePerKb = req.type.value(0).toCoin();
-                req.fee = req.type.feePerKb().toCoin();
+                req.feePerKb = req.type.value(0);
+                req.fee = req.type.feePerKb();
                 break;
             case FEE_PER_KB:
-                req.feePerKb = req.type.feePerKb().toCoin();
-                req.fee = req.type.value(0).toCoin();
+                req.feePerKb = req.type.feePerKb();
+                req.fee = req.type.value(0);
                 break;
             default:
                 throw new RuntimeException("Unknown fee policy: " + req.type.getFeePolicy());
         }
 
-        byte version = (byte) req.type.getTransactionVersion();
+        byte version = (byte) 1;
         int timestamp;
         if (req.type.equals(NxtMain.get())) {
             timestamp = Convert.toNxtEpochTime(System.currentTimeMillis());
@@ -287,9 +315,10 @@ public class SendRequest implements Serializable{
         }
 
         req.feePerKb = req.type.getFeePerKb();
-        req.tx = new Transaction(req.type);
-        req.tx.addOutput(Coin.ZERO, (BitAddress) destination);
+        Transaction tx = new Transaction(req.type);
+        tx.addOutput(Coin.ZERO, (BitAddress) destination);
         req.emptyWallet = true;
+        req.tx = new BitTransaction(tx);
         return req;
     }
 

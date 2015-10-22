@@ -1,6 +1,6 @@
 package com.coinomi.core.messages;
 
-import org.bitcoinj.core.Transaction;
+import com.coinomi.core.wallet.AbstractTransaction;
 
 import java.io.Serializable;
 
@@ -20,5 +20,5 @@ public interface MessageFactory {
 
     // TODO change to abstract transaction
     @Nullable
-    TxMessage extractPublicMessage(Transaction transaction);
+    TxMessage extractPublicMessage(AbstractTransaction transaction);
 }

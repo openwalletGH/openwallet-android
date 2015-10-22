@@ -78,8 +78,8 @@ abstract public class CoinType extends NetworkParameters implements ValueType, S
     }
 
     @Deprecated
-    public Coin getFeePerKb() {
-        return feePerKb().toCoin();
+    public Value getFeePerKb() {
+        return feePerKb();
     }
 
     public Value feePerKb() {

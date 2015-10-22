@@ -423,10 +423,7 @@ public class WalletPocketHD extends TransactionWatcherWallet {
         return currentAddress(RECEIVE_FUNDS);
     }
 
-    @Override
-    public BitAddress getRefundAddress() {
-        return currentAddress(REFUND);
-    }
+    public BitAddress getRefundAddress() { return currentAddress(REFUND); }
 
     @Override
     public boolean hasUsedAddresses() {
@@ -438,10 +435,12 @@ public class WalletPocketHD extends TransactionWatcherWallet {
         return true;
     }
 
+    @Override
     public BitAddress getReceiveAddress(boolean isManualAddressManagement) {
         return getAddress(RECEIVE_FUNDS, isManualAddressManagement);
     }
 
+    @Override
     public BitAddress getRefundAddress(boolean isManualAddressManagement) {
         return getAddress(REFUND, isManualAddressManagement);
     }

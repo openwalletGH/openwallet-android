@@ -102,6 +102,7 @@
     <string name="history_empty">Το πορτοφόλι σας δεν περιέχει νομίσματα ακόμα!\n\nΜπορείτε να προμηθευτείτε μερικά νομίσματα μέσω κάποιου ανταλλακτηρίου είτε ανταλλάσσοντάς τα με αγαθά ή υπηρεσίες.</string>
     <string name="sent_to">απεστάλησαν στο</string>
     <string name="received_with">παρελήφθησαν από</string>
+    <string name="received_from">παρελήφθησαν από</string>
     <string name="get_tx_info_error">Δεν μπόρεσαν να ανακτηθούν περαιτέρω πληροφορίες γι αυτή τη συναλλαγή</string>
     <string name="disconnected_label">Μη διαθέσιμη σύνδεσή</string>
     <string name="no_wallet_pocket_selected">Δεν έχει επιλεχθεί λογαριασμός</string>

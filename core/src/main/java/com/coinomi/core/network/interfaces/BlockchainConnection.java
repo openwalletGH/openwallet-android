@@ -2,10 +2,8 @@ package com.coinomi.core.network.interfaces;
 
 import com.coinomi.core.network.AddressStatus;
 import com.coinomi.core.wallet.AbstractAddress;
-import com.coinomi.core.wallet.WalletAccount;
 
 import org.bitcoinj.core.Sha256Hash;
-import org.bitcoinj.core.Transaction;
 
 import java.util.List;
 

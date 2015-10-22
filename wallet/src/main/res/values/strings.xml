@@ -105,6 +105,7 @@
     <string name="history_empty">No coins received so far!\n\nYou can get some through an exchange, trading and selling goods or services.</string>
     <string name="sent_to">sent to</string>
     <string name="received_with">received with</string>
+    <string name="received_from">received from</string>
     <string name="get_tx_info_error">Could not get transaction information</string>
     <string name="disconnected_label">No connection</string>
     <string name="no_wallet_pocket_selected">No wallet account selected</string>

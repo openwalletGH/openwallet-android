@@ -38,6 +38,7 @@ import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.FiatType;
 import com.coinomi.core.coins.Value;
 import com.coinomi.core.coins.ValueType;
+import com.coinomi.core.coins.families.Families;
 import com.coinomi.core.exceptions.AddressMalformedException;
 import com.coinomi.core.exceptions.NoSuchPocketException;
 import com.coinomi.core.exchange.shapeshift.ShapeShift;
@@ -922,6 +923,14 @@ public class SendFragment extends Fragment {
 
             try {
                 if (!input.isEmpty()) {
+                    if (pocket.getCoinType().getFamily() == Families.NXT) {
+                        //TODO validate NXT address
+                        if (processInput(input)) return;
+                        parseAddress(GenericUtils.fixAddress(input));
+                        updateView();
+                        addressError.setVisibility(View.GONE);
+                        return;
+                    }
                     // Process fast the input string
                     if (processInput(input)) return;
 
@@ -954,7 +963,15 @@ public class SendFragment extends Fragment {
     }
 
     private void parseAddress(String addressStr) throws AddressMalformedException {
+
+        if (pocket.getCoinType().getFamily() == Families.NXT) {
+            setAddress(pocket.getCoinType().newAddress(addressStr), true);
+            sendAmountType = pocket.getCoinType();
+            return;
+        }
         List<CoinType> possibleTypes = GenericUtils.getPossibleTypes(addressStr);
+
+
         if (possibleTypes.contains(pocket.getCoinType())) {
             setAddress(pocket.getCoinType().newAddress(addressStr), true);
             sendAmountType = pocket.getCoinType();

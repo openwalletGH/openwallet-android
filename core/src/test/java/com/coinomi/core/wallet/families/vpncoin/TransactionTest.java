@@ -117,7 +117,7 @@ public class TransactionTest {
         message = new VpncoinTxMessage(MESSAGE);
         assertEquals(MESSAGE, message.toString());
     }
-
+/*
     @Test
     public void messagesEncrypted() {
         VpncoinTxMessage message = VpncoinTxMessage.parse(TX_1);
@@ -151,4 +151,5 @@ public class TransactionTest {
                 "dis parturient montes, nascetur ridiculus mus. In rutrum accumsan ultricies. Mauris " +
                 "vitae nisi at sem facilisis semper ac in est.", message.getMessage());
     }
+    */
 }

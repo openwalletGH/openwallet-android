@@ -21,9 +21,12 @@ package com.coinomi.core.uri;
 import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
+import com.coinomi.core.coins.families.Families;
+import com.coinomi.core.coins.families.NxtFamily;
 import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.AbstractAddress;
 import com.coinomi.core.wallet.families.bitcoin.BitAddress;
+import com.coinomi.core.wallet.families.nxt.NxtFamilyAddress;
 import com.google.common.collect.Lists;
 
 import org.bitcoinj.core.AddressFormatException;
@@ -202,6 +205,11 @@ public class CoinURI {
             AbstractAddress address = null;
             // TODO support non-BitAddress types
             for (CoinType possibleType : possibleTypes) {
+                if (possibleType.getFamily() == Families.NXT) {
+                    address = new NxtFamilyAddress(possibleType, addressToken);
+                    putWithValidation(FIELD_ADDRESS, address);
+                    break;
+                }
                 try {
                     address = new BitAddress(possibleType, addressToken);
                     putWithValidation(FIELD_ADDRESS, address);

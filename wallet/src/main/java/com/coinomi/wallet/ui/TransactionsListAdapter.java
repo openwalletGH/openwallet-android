@@ -30,6 +30,7 @@ import android.widget.TextView;
 
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
+import com.coinomi.core.coins.families.Families;
 import com.coinomi.core.coins.nxt.Transaction;
 import com.coinomi.core.messages.MessageFactory;
 import com.coinomi.core.util.GenericUtils;
@@ -81,6 +82,7 @@ public class TransactionsListAdapter extends BaseAdapter {
     private final String sentToTitle;
     private final String fontIconSentTo;
     private final String receivedWithTitle;
+    private final String receivedFromTitle;
     private final String fontIconReceivedWith;
 
     private final Map<AbstractAddress, String> labelCache = new HashMap<>();
@@ -107,6 +109,7 @@ public class TransactionsListAdapter extends BaseAdapter {
         sentToTitle = res.getString(R.string.sent_to);
         fontIconSentTo = res.getString(R.string.font_icon_send_coins);
         receivedWithTitle = res.getString(R.string.received_with);
+        receivedFromTitle = res.getString(R.string.received_from);
         fontIconReceivedWith = res.getString(R.string.font_icon_receive_coins);
     }
 
@@ -123,7 +126,7 @@ public class TransactionsListAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
-    public void replace(@Nonnull final org.bitcoinj.core.Transaction tx) {
+    /*public void replace(@Nonnull final org.bitcoinj.core.Transaction tx) {
         transactions.clear();
         transactions.add(new BitTransaction(tx));
 
@@ -135,7 +138,7 @@ public class TransactionsListAdapter extends BaseAdapter {
         transactions.add(new NxtTransaction(tx));
 
         notifyDataSetChanged();
-    }
+    }*/
 
     public void replace(@Nonnull final AbstractTransaction tx) {
         transactions.clear();
@@ -291,8 +294,11 @@ public class TransactionsListAdapter extends BaseAdapter {
             if (value.isNegative()) {
                 rowDirectionText.setText(sentToTitle);
                 rowDirectionFontIcon.setText(fontIconSentTo);
-            } else {
+            } else if (walletPocket.getCoinType().getFamily() != Families.NXT) {
                 rowDirectionText.setText(receivedWithTitle);
+                rowDirectionFontIcon.setText(fontIconReceivedWith);
+            } else {
+                rowDirectionText.setText(receivedFromTitle);
                 rowDirectionFontIcon.setText(fontIconReceivedWith);
             }
         }
@@ -363,7 +369,7 @@ public class TransactionsListAdapter extends BaseAdapter {
                 rowMessageFontIcon.setVisibility(View.GONE);
                 ACRA.getErrorReporter().handleSilentException(e);
             }*/
-            if (tx.getMessage() != null) {
+            if (tx.getMessage() == null) {
                 rowMessageFontIcon.setVisibility(View.GONE);
             }
             else {

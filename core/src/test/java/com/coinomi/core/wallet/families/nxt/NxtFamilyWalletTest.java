@@ -109,19 +109,31 @@ public class NxtFamilyWalletTest {
         NxtFamilyAddress destination = (NxtFamilyAddress) otherAccount.getReceiveAddress();
         Value amount = NXT.value("1");
         SendRequest req = nxtAccount.sendCoinsOffline(destination, amount);
-        nxtAccount.completeAndSignTx(req);
+        //nxtAccount
+        //nxtAccount.completeAndSignTx(req);
 
-        byte[] txBytes = req.nxtTx.getBytes();
+
+
+        Transaction nxtTx = req.nxtTxBuilder.build();
+        nxtTx.sign(nxtSecret);
+
+
+        byte[] txBytes = req.nxtTxBuilder.build().getBytes();
+
+        req.tx = new NxtTransaction(req.nxtTxBuilder.build());
 
         Transaction parsedTx = TransactionImpl.parseTransaction(txBytes);
         assertEquals(Attachment.ORDINARY_PAYMENT, parsedTx.getAttachment());
         assertEquals(NxtFamily.DEFAULT_DEADLINE, parsedTx.getDeadline());
-        assertEquals(req.nxtTx.getTimestamp(), parsedTx.getTimestamp());
+        System.out.println(((Transaction) req.tx.getTransaction()).getTimestamp());
+        assertEquals(((Transaction) req.tx.getTransaction()).getTimestamp(), parsedTx.getTimestamp());
         assertEquals(nxtAccountId, parsedTx.getSenderId());
         assertArrayEquals(nxtPublicKey, parsedTx.getSenderPublicKey());
         assertEquals(amount.value, parsedTx.getAmountNQT());
         assertEquals(req.fee.value, parsedTx.getFeeNQT());
         assertEquals(destination.getAccountId(), parsedTx.getRecipientId());
+
+        System.out.println(Convert.toHexString(nxtTx.getBytes()));
         // TODO check signature
     }
 

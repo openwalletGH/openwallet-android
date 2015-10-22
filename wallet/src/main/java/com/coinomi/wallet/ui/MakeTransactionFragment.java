@@ -33,10 +33,10 @@ import com.coinomi.core.messages.TxMessage;
 import com.coinomi.core.util.ExchangeRate;
 import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.AbstractAddress;
+import com.coinomi.core.wallet.AbstractWallet;
 import com.coinomi.core.wallet.SendRequest;
 import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.wallet.WalletAccount;
-import com.coinomi.core.wallet.WalletPocketHD;
 import com.coinomi.core.exceptions.NoSuchPocketException;
 import com.coinomi.wallet.Configuration;
 import com.coinomi.wallet.ExchangeHistoryProvider;
@@ -111,7 +111,7 @@ public class MakeTransactionFragment extends Fragment {
     private CoinType sourceType;
     private SendRequest request;
     private LoaderManager loaderManager;
-    private WalletPocketHD sourceAccount;
+    private AbstractWallet sourceAccount;
     @Nullable private ExchangeEntry exchangeEntry;
     @Nullable private AbstractAddress tradeDepositAddress;
     @Nullable private Value tradeDepositAmount;
@@ -143,7 +143,7 @@ public class MakeTransactionFragment extends Fragment {
 
         try {
             String fromAccountId = args.getString(ARG_ACCOUNT_ID);
-            sourceAccount = (WalletPocketHD) checkNotNull(application.getAccount(fromAccountId));
+            sourceAccount = (AbstractWallet) checkNotNull(application.getAccount(fromAccountId));
             application.maybeConnectAccount(sourceAccount);
             sourceType = sourceAccount.getCoinType();
             emptyWallet = args.getBoolean(ARG_EMPTY_WALLET, false);
@@ -154,7 +154,7 @@ public class MakeTransactionFragment extends Fragment {
             }
             if (args.containsKey(ARG_SEND_TO_ACCOUNT_ID)) {
                 String toAccountId = args.getString(ARG_SEND_TO_ACCOUNT_ID);
-                WalletPocketHD toAccount = (WalletPocketHD) checkNotNull(application.getAccount(toAccountId));
+                AbstractWallet toAccount = (AbstractWallet) checkNotNull(application.getAccount(toAccountId));
                 sendToAddress = toAccount.getReceiveAddress(config.isManualAddressManagement());
                 sendingToAccount = true;
             } else {
@@ -288,7 +288,7 @@ public class MakeTransactionFragment extends Fragment {
         if (emptyWallet) {
             sendRequest = SendRequest.emptyWallet(sendTo);
         } else {
-            sendRequest = SendRequest.to(sendTo, checkNotNull(amount));
+            sendRequest = SendRequest.to(sourceAccount, sendTo, checkNotNull(amount));
         }
         sendRequest.txMessage = txMessage;
         sendRequest.signInputs = false;
@@ -565,8 +565,7 @@ public class MakeTransactionFragment extends Fragment {
 
                         // The amountSending could be equal to sendAmount or the actual amount if
                         // emptying the wallet
-                        Value amountSending = Value.valueOf(sourceType, request.tx
-                                .getValue(sourceAccount).negate() .subtract(request.tx.getFee()));
+                        Value amountSending = request.tx.getValue(sourceAccount).negate().subtract(request.tx.getFee(sourceAccount));
                         tradeWithdrawAmount = marketInfo.rate.convert(amountSending);
                     } else {
                         // If no values set, make the call

@@ -1,11 +1,13 @@
 package com.coinomi.core.wallet.families.bitcoin;
 
+import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
 import com.coinomi.core.messages.TxMessage;
 import com.coinomi.core.util.AddressUtils;
 import com.coinomi.core.wallet.AbstractAddress;
 import com.coinomi.core.wallet.AbstractTransaction;
 import com.coinomi.core.wallet.AbstractWallet;
+import com.coinomi.core.wallet.WalletAccount;
 
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.TransactionConfidence;
@@ -63,7 +65,7 @@ public class BitTransaction extends AbstractTransaction<Transaction> {
     }
 
     @Override
-    public Value getFee(AbstractWallet wallet) {
+    public Value getFee(WalletAccount wallet) {
         return Value.valueOf(wallet.getCoinType(), transaction.getFee());
     }
 
@@ -72,7 +74,10 @@ public class BitTransaction extends AbstractTransaction<Transaction> {
         List<Map.Entry<AbstractAddress, Value>> outputs = new ArrayList<>();
         for ( TransactionOutput output : transaction.getOutputs() )
         {
-            outputs.add(new AbstractMap.SimpleEntry<AbstractAddress, Value>(AddressUtils.fromScript(wallet.getCoinType(), output.getScriptPubKey()), Value.valueOf(wallet.getCoinType(),output.getValue())));
+            outputs.add(
+                    new AbstractMap.SimpleEntry<AbstractAddress, Value>
+                            (AddressUtils.fromScript(wallet.getCoinType(), output.getScriptPubKey()),
+                                    Value.valueOf(wallet.getCoinType(),output.getValue())));
         }
     return outputs;
     }
@@ -93,10 +98,16 @@ public class BitTransaction extends AbstractTransaction<Transaction> {
     }
 
     @Override
-    public boolean isMine(Map.Entry<AbstractAddress, Value> output) {
+    public boolean isMine(WalletAccount wallet, Map.Entry<AbstractAddress, Value> output) {
 
-        return true;
+        return wallet.getActiveAddresses().contains(output.getKey()) ;
     }
+
+    @Override
+    public Transaction getTransaction() {
+        return transaction;
+    }
+
 
 //    public BitTransaction(Transaction tx) {
 //        super(tx);
