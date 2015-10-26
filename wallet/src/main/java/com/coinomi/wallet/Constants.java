@@ -7,6 +7,7 @@ import com.coinomi.core.coins.BitcoinTest;
 import com.coinomi.core.coins.CanadaeCoinMain;
 import com.coinomi.core.coins.BlackcoinMain;
 import com.coinomi.core.coins.CannacoinMain;
+import com.coinomi.core.coins.ClamsMain;
 import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.DashMain;
@@ -148,7 +149,8 @@ public class Constants {
             new CoinAddress(DigibyteMain.get(),     new ServerAddress("dgb-cce-1.coinomi.net", 5023),
                                                     new ServerAddress("dgb-cce-2.coinomi.net", 5023)),
             // 5024 primecoin
-            // 5025 clams
+            new CoinAddress(ClamsMain.get(),        new ServerAddress("clam-cce-1.coinomi.net", 5025),
+                                                    new ServerAddress("clam-cce-2.coinomi.net", 5025)),
             new CoinAddress(ShadowCashMain.get(),   new ServerAddress("sdc-cce-1.coinomi.net", 5026),
                                                     new ServerAddress("sdc-cce-2.coinomi.net", 5026)),
             new CoinAddress(NeoscoinMain.get(),     new ServerAddress("neos-cce-1.coinomi.net", 5027),
@@ -203,6 +205,7 @@ public class Constants {
         COINS_ICONS.put(CoinID.SHADOWCASH_MAIN.getCoinType(), R.drawable.shadowcash);
         COINS_ICONS.put(CoinID.PARKBYTE_MAIN.getCoinType(), R.drawable.parkbyte);
         COINS_ICONS.put(CoinID.DOGECOINDARK_MAIN.getCoinType(), R.drawable.dogecoindark);
+        COINS_ICONS.put(CoinID.CLAMS_MAIN.getCoinType(), R.drawable.clams);
 
         COINS_BLOCK_EXPLORERS = new HashMap<CoinType, String>();
         COINS_BLOCK_EXPLORERS.put(CoinID.BITCOIN_MAIN.getCoinType(), "https://blockchain.info/tx/%s");
@@ -235,6 +238,7 @@ public class Constants {
         COINS_BLOCK_EXPLORERS.put(CoinID.SHADOWCASH_MAIN.getCoinType(), "http://shadowchain.info/tx/%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.PARKBYTE_MAIN.getCoinType(), "https://chainz.cryptoid.info/pkb/tx.dws?%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.DOGECOINDARK_MAIN.getCoinType(), "http://darkchain.link/tx/%s");
+        COINS_BLOCK_EXPLORERS.put(CoinID.CLAMS_MAIN.getCoinType(), "http://khashier.com/tx/%s");
     }
 
     public static final CoinType DEFAULT_COIN = BitcoinMain.get();
@@ -254,6 +258,7 @@ public class Constants {
             PeercoinMain.get(),
             NamecoinMain.get(),
             BlackcoinMain.get(),
+            ClamsMain.get(),
             MonacoinMain.get(),
             NuSharesMain.get(),
             NovacoinMain.get(),

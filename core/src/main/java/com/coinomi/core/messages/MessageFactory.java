@@ -10,7 +10,7 @@ import javax.annotation.Nullable;
  * @author John L. Jegutanis
  */
 public interface MessageFactory {
-    int maxMessageSize();
+    int maxMessageSizeBytes();
 
     boolean canHandlePublicMessages();
 

@@ -59,6 +59,7 @@ import com.coinomi.wallet.ui.widget.AmountEditView;
 import com.coinomi.wallet.util.ThrottlingWalletChangeListener;
 import com.coinomi.wallet.util.UiUtils;
 import com.coinomi.wallet.util.WeakHandler;
+import com.google.common.base.Charsets;
 
 import org.acra.ACRA;
 import org.bitcoinj.core.Address;
@@ -380,8 +381,8 @@ public class SendFragment extends Fragment {
             }
         });
 
-        final int maxMessageLength = messageFactory.maxMessageSize();
-        final int messageLengthThreshold = (int) (maxMessageLength * .8); // 80% full
+        final int maxMessageBytes = messageFactory.maxMessageSizeBytes();
+        final int messageLengthThreshold = (int) (maxMessageBytes * .8); // 80% full
         final int txMessageCounterPaddingOriginal = txMessageView.getPaddingBottom();
         final int txMessageCounterPadding =
                 getResources().getDimensionPixelSize(R.dimen.tx_message_counter_padding);
@@ -393,7 +394,8 @@ public class SendFragment extends Fragment {
         // to accommodate the counter.
         txMessageView.addTextChangedListener(new EditViewListener() {
             @Override public void afterTextChanged(final Editable s) {
-                int length = s.length();
+                // Not very efficient because it creates a new String object on each key press
+                int length = s.toString().getBytes(Charsets.UTF_8).length;
                 boolean isTxMessageValidNow = true;
                 if (length < messageLengthThreshold) {
                     if (txMessageCounter.getVisibility() != GONE) {
@@ -401,13 +403,13 @@ public class SendFragment extends Fragment {
                         txMessageView.setPadding(0, 0, 0, txMessageCounterPaddingOriginal);
                     }
                 } else {
-                    int remaining = maxMessageLength - s.length();
+                    int remaining = maxMessageBytes - length;
                     if (txMessageCounter.getVisibility() != VISIBLE) {
                         txMessageCounter.setVisibility(VISIBLE);
                         txMessageView.setPadding(0, 0, 0, txMessageCounterPadding);
                     }
                     txMessageCounter.setText(Integer.toString(remaining));
-                    if (length <= maxMessageLength) {
+                    if (length <= maxMessageBytes) {
                         txMessageCounter.setTextColor(colorWarn);
                     } else {
                         isTxMessageValidNow = false;
@@ -832,7 +834,8 @@ public class SendFragment extends Fragment {
 
     private void validateTxMessage() {
         if (isTxMessageAdded && messageFactory != null && txMessageView != null) {
-            isTxMessageValid = txMessageView.getText().length() <= messageFactory.maxMessageSize();
+            int messageBytes = txMessageView.getText().toString().getBytes(Charsets.UTF_8).length;
+            isTxMessageValid = messageBytes <= messageFactory.maxMessageSizeBytes();
             updateView();
         }
     }

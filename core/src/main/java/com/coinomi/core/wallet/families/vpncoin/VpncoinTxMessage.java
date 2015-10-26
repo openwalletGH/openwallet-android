@@ -326,7 +326,7 @@ public class VpncoinTxMessage implements TxMessage {
 
     public static class VpncoinMessageFactory implements MessageFactory {
         @Override
-        public int maxMessageSize() {
+        public int maxMessageSizeBytes() {
             return MAX_TX_DATA_MSG;
         }
 
