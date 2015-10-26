@@ -82,7 +82,7 @@
     <string name="backed_up_seed">I have safely stored my recovery phrase</string>
     <!-- Restore fragment -->
     <string name="restore_info">Please enter your recovery phrase:</string>
-    <string name="restore_seed_protected">My recovery phrase is protected (BIP39)</string>
+    <string name="restore_seed_protected">Use a BIP39 passphrase</string>
     <string name="restore_skip_title">Skipping verification</string>
     <string name="restore_skip_info1">Please make sure that your recovery phrase matches the following:</string>
     <string name="restore_skip_info2">It is recommended not to skip verification, so that any misspellings could be detected.</string>
@@ -143,8 +143,10 @@
     <string name="amount_warn_fees_apply">Slightly less will be sent because of fees</string>
     <!-- Set Password fragment -->
     <string name="set_password_info">Set a password to protect your wallet in everyday use.</string>
-    <string name="set_password_seed_protect">Also protect my recovery phrase (BIP39)</string>
-    <string name="set_password_seed_protect_info">The password becomes permanent and it is needed when restoring your wallet with the recovery phrase.\nWARNING: If you forget your password it will be impossible to restore your wallet!</string>
+    <string name="set_password_seed_protect">Setup a BIP39 passphrase</string>
+    <string name="set_password_seed_protect_explanation">The BIP39 passphrase locks your recovery phrase and is unchangeable. It is required when restoring your wallet.</string>
+    <string name="set_password_seed_protect_info"><b>WARNING: If you lose your passphrase it will be impossible to restore your wallet!</b>\nPlease proceed only if you know what you are doing.</string>
+    <string name="set_bip39_passphrase">Type your BIP39 passphrase</string>
     <string name="set_password1">Type your password</string>
     <string name="set_password2">Re-type your password</string>
     <string name="password_too_common_error">Password \"%1$s\" is too common to be safely used.</string>
@@ -152,7 +154,7 @@
     <string name="passwords_mismatch">Passwords don\'t match</string>
     <string name="password_error">Could not proceed, password errors detected.</string>
     <string name="password_skip_warn">By not setting a password, your wallet can be accessed without authorization.</string>
-    <string name="password_wallet_recovery">To restore your wallet, please provide the same password you used when created the protected recovery phrase.\nIf you enter a different password a new empty wallet will be created.</string>
+    <string name="password_wallet_recovery">To restore your wallet, please provide the same BIP39 passphrase you used when created the protected recovery phrase.\nIf you enter a different passphrase, a new empty wallet will be created.</string>
     <!-- FinalizeWalletRestorationFragment -->
     <string name="wallet_restoration">Please wait while your wallet is being restored</string>
     <string name="wallet_restoration_master_key">Creating master key</string>
@@ -245,7 +247,7 @@
     <string name="seed_not_available_title">No recovery phrase found</string>
     <string name="seed_not_available">Your recovery phrase is not saved on this device.\nTry restoring your wallet to solve this.</string>
     <string name="seed_working">Please wait&#8230;</string>
-    <string name="seed_password_protected">This recovery phrase is password protected (BIP39)</string>
+    <string name="seed_password_protected">This recovery phrase is protected with a BIP39 passphrase</string>
     <!-- Wallet locked -->
     <string name="touch_to_decrypt_wallet">Touch to unlock</string>
     <!-- Exchange -->

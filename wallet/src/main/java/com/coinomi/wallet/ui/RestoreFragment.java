@@ -1,6 +1,5 @@
 package com.coinomi.wallet.ui;
 
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -25,19 +24,15 @@ import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.util.Fonts;
 import com.coinomi.wallet.util.Keyboard;
-import com.coinomi.wallet.util.PasswordQualityChecker;
 
 import org.bitcoinj.crypto.MnemonicCode;
 import org.bitcoinj.crypto.MnemonicException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 
 import javax.annotation.Nullable;
-
-import static com.coinomi.core.Preconditions.checkState;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -51,16 +46,9 @@ public class RestoreFragment extends Fragment {
     @Nullable private String seed;
     private boolean isNewSeed;
     private TextView errorMnemonicΜessage;
-    private int colorSignificant;
-    private int colorInsignificant;
-    private int colorError;
     private WelcomeFragment.Listener mListener;
     private boolean isSeedProtected = false;
-    private TextView errorPassword;
-    private TextView errorPasswordsMismatch;
-    private EditText password1;
-    private EditText password2;
-    private PasswordQualityChecker passwordQualityChecker;
+    private EditText bip39Passphrase;
     private Button skipButton;
 
     public static RestoreFragment newInstance() {
@@ -86,9 +74,6 @@ public class RestoreFragment extends Fragment {
             seed = getArguments().getString(Constants.ARG_SEED);
             isNewSeed = seed != null;
         }
-        passwordQualityChecker = new PasswordQualityChecker(getActivity());
-        colorInsignificant = getResources().getColor(R.color.gray_26_hint_text);
-        colorError = getResources().getColor(R.color.fg_error);
     }
 
     @Override
@@ -98,6 +83,7 @@ public class RestoreFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_restore, container, false);
 
         Fonts.setTypeface(view.findViewById(R.id.coins_icon), Fonts.Font.COINOMI_FONT_ICONS);
+        Fonts.setTypeface(view.findViewById(R.id.warning_icon), Fonts.Font.COINOMI_FONT_ICONS);
 
         ImageButton scanQrButton = (ImageButton) view.findViewById(R.id.scan_qr_code);
         scanQrButton.setOnClickListener(new View.OnClickListener() {
@@ -123,62 +109,27 @@ public class RestoreFragment extends Fragment {
         errorMnemonicΜessage = (TextView) view.findViewById(R.id.restore_message);
         errorMnemonicΜessage.setVisibility(View.GONE);
 
-        // Password protected seed (BIP39)
-        // Type and retype password
-        errorPassword = (TextView) view.findViewById(R.id.password_error);
-        errorPasswordsMismatch = (TextView) view.findViewById(R.id.passwords_mismatch);
+        bip39Passphrase = (EditText) view.findViewById(R.id.bip39_passphrase);
+        final View bip39PassphraseTitle = view.findViewById(R.id.bip39_passphrase_title);
 
-        clearError(errorPassword);
-        clearError(errorPasswordsMismatch);
-
-        password1 = (EditText) view.findViewById(R.id.password1);
-        password2 = (EditText) view.findViewById(R.id.password2);
-
-        final View password1Title = view.findViewById(R.id.password1_title);
-        final View password2Title = view.findViewById(R.id.password2_title);
-
-        password1.setVisibility(View.GONE);
-        password2.setVisibility(View.GONE);
-        password1Title.setVisibility(View.GONE);
-        password2Title.setVisibility(View.GONE);
-
-        password1.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View textView, boolean hasFocus) {
-                if (hasFocus) {
-                    clearError(errorPassword);
-                } else {
-                    checkPasswordQuality();
-                }
-            }
-        });
-
-        password2.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View textView, boolean hasFocus) {
-                if (hasFocus) {
-                    clearError(errorPasswordsMismatch);
-                } else {
-                    checkPasswordsMatch();
-                }
-            }
-        });
+        bip39Passphrase.setVisibility(View.GONE);
+        bip39PassphraseTitle.setVisibility(View.GONE);
 
         // Checkbox to enable/disable password protected seed (BIP39)
         // For new seed
-        final TextView seedProtectInfoNew = (TextView) view.findViewById(R.id.seed_protect_info);
+        final View seedProtectInfoNew = view.findViewById(R.id.seed_protect_info);
         seedProtectInfoNew.setVisibility(View.GONE);
         CheckBox seedProtectNew = (CheckBox) view.findViewById(R.id.seed_protect);
         if (!isNewSeed) seedProtectNew.setVisibility(View.GONE);
 
         // For existing seed
-        final TextView seedProtectInfoExisting = (TextView) view.findViewById(R.id.restore_seed_protected_info);
+        final View seedProtectInfoExisting = view.findViewById(R.id.restore_seed_protected_info);
         seedProtectInfoExisting.setVisibility(View.GONE);
         final CheckBox seedProtectExisting = (CheckBox) view.findViewById(R.id.restore_seed_protected);
         if (isNewSeed) seedProtectExisting.setVisibility(View.GONE);
 
         // Generic checkbox and info text
-        final TextView seedProtectInfo;
+        final View seedProtectInfo;
         final CheckBox seedProtect;
 
         if (isNewSeed) {
@@ -196,27 +147,15 @@ public class RestoreFragment extends Fragment {
                 if (isChecked) {
                     skipButton.setVisibility(View.GONE);
                     seedProtectInfo.setVisibility(View.VISIBLE);
-                    password1Title.setVisibility(View.VISIBLE);
-                    password1.setVisibility(View.VISIBLE);
-                    if (isNewSeed) {
-                        password2Title.setVisibility(View.VISIBLE);
-                        password2.setVisibility(View.VISIBLE);
-                    } else {
-                        password2Title.setVisibility(View.GONE);
-                        password2.setVisibility(View.GONE);
-                    }
+                    bip39PassphraseTitle.setVisibility(View.VISIBLE);
+                    bip39Passphrase.setVisibility(View.VISIBLE);
                 } else {
                     skipButton.setVisibility(View.VISIBLE);
                     seedProtectInfo.setVisibility(View.GONE);
-                    password1Title.setVisibility(View.GONE);
-                    password2Title.setVisibility(View.GONE);
-                    password1.setVisibility(View.GONE);
-                    password2.setVisibility(View.GONE);
-                    password1.setText(null);
-                    password2.setText(null);
+                    bip39PassphraseTitle.setVisibility(View.GONE);
+                    bip39Passphrase.setVisibility(View.GONE);
+                    bip39Passphrase.setText(null);
                 }
-                clearError(errorPassword);
-                clearError(errorPasswordsMismatch);
             }
         });
 
@@ -252,43 +191,6 @@ public class RestoreFragment extends Fragment {
         mListener = null;
     }
 
-    private boolean checkPassword() {
-        boolean isPasswordValid = true;
-        if (isNewSeed) {
-            isPasswordValid = checkPasswordQuality() && checkPasswordsMatch();
-        }
-        return isPasswordValid;
-    }
-
-    private boolean checkPasswordQuality() {
-        String pass = password1.getText().toString();
-        boolean isPasswordGood = false;
-        try {
-            passwordQualityChecker.checkPassword(pass);
-            isPasswordGood = true;
-            clearError(errorPassword);
-        } catch (PasswordQualityChecker.PasswordTooCommonException e1) {
-            log.info("Entered a too common password {}", pass);
-            setError(errorPassword, R.string.password_too_common_error, pass);
-        } catch (PasswordQualityChecker.PasswordTooShortException e2) {
-            log.info("Entered a too short password");
-            setError(errorPassword, R.string.password_too_short_error,
-                    passwordQualityChecker.getMinPasswordLength());
-        }
-        log.info("Password good = {}", isPasswordGood);
-        return isPasswordGood;
-    }
-
-    private boolean checkPasswordsMatch() {
-        checkState(isNewSeed, "Cannot check if passwords match when restoring.");
-        String pass1 = password1.getText().toString();
-        String pass2 = password2.getText().toString();
-        boolean isPasswordsMatch = pass1.equals(pass2);
-        if (!isPasswordsMatch) showError(errorPasswordsMismatch);
-        log.info("Passwords match = {}", isPasswordsMatch);
-        return isPasswordsMatch;
-    }
-
     private View.OnClickListener getOnNextListener() {
         return new View.OnClickListener() {
             @Override
@@ -312,24 +214,16 @@ public class RestoreFragment extends Fragment {
 
     private void verifyMnemonicAndProceed() {
         Keyboard.hideKeyboard(getActivity());
-        if (checkAllValid()) {
+        if (verifyMnemonic()) {
             Bundle args = getArguments();
             if (args == null) args = new Bundle();
 
             if (isSeedProtected) {
-                args.putString(Constants.ARG_SEED_PASSWORD, password1.getText().toString());
+                args.putString(Constants.ARG_SEED_PASSWORD, bip39Passphrase.getText().toString());
             }
             args.putString(Constants.ARG_SEED, mnemonicTextView.getText().toString().trim());
             if (mListener != null) mListener.onSeedVerified(args);
         }
-    }
-
-    private boolean checkAllValid() {
-        boolean isAllValid = verifyMnemonic();
-        if (isAllValid && isSeedProtected) {
-            isAllValid = checkPassword();
-        }
-        return isAllValid;
     }
 
     private boolean verifyMnemonic() {
