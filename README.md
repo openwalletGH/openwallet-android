@@ -79,6 +79,10 @@ For now test it manually by installing it `adb install -r wallet/wallet-release.
 
 ## Version history
 
+New in version 1.5.22
+- Improved UI for setting a BIP39 passphrase
+- New coins: Clams, GCRcoin, Dogecoindark
+
 New in version 1.5.21
 - Fixed memory leak when restoring a wallet
 - Fixed crash when adding a coin account with the wrong password in the exchange screen
