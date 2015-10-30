@@ -18,7 +18,6 @@ import com.coinomi.core.coins.DigibyteMain;
 import com.coinomi.core.coins.DigitalcoinMain;
 import com.coinomi.core.coins.DogecoinMain;
 import com.coinomi.core.coins.DogecoinTest;
-import com.coinomi.core.coins.VergeMain;
 import com.coinomi.core.coins.FeathercoinMain;
 import com.coinomi.core.coins.GcrMain;
 import com.coinomi.core.coins.GuldenMain;
@@ -32,6 +31,7 @@ import com.coinomi.core.coins.NovacoinMain;
 import com.coinomi.core.coins.NuBitsMain;
 import com.coinomi.core.coins.NuSharesMain;
 import com.coinomi.core.coins.NxtMain;
+import com.coinomi.core.coins.OKCashMain;
 import com.coinomi.core.coins.ParkbyteMain;
 import com.coinomi.core.coins.PeercoinMain;
 import com.coinomi.core.coins.PotcoinMain;
@@ -39,6 +39,7 @@ import com.coinomi.core.coins.ReddcoinMain;
 import com.coinomi.core.coins.RubycoinMain;
 import com.coinomi.core.coins.ShadowCashMain;
 import com.coinomi.core.coins.UroMain;
+import com.coinomi.core.coins.VergeMain;
 import com.coinomi.core.coins.VertcoinMain;
 import com.coinomi.core.coins.VpncoinMain;
 import com.coinomi.core.network.CoinAddress;
@@ -195,7 +196,9 @@ public class Constants {
             new CoinAddress(AuroracoinMain.get(),   new ServerAddress("aur-cce-1.coinomi.net", 5041),
                                                     new ServerAddress("aur-cce-2.coinomi.net", 5041)),
             new CoinAddress(BatacoinMain.get(),     new ServerAddress("bata-cce-1.coinomi.net", 5042),
-                                                    new ServerAddress("bata-cce-1.coinomi.net", 5042))
+                                                    new ServerAddress("bata-cce-1.coinomi.net", 5042)),
+            new CoinAddress(OKCashMain.get(),       new ServerAddress("ok-cce-1.coinomi.net", 5043),
+                                                    new ServerAddress("ok-cce-2.coinomi.net", 5043))
     );
 
     public static final HashMap<CoinType, Integer> COINS_ICONS;
@@ -223,6 +226,7 @@ public class Constants {
         COINS_ICONS.put(CoinID.CANNACOIN_MAIN.getCoinType(), R.drawable.cannacoin);
         COINS_ICONS.put(CoinID.DIGIBYTE_MAIN.getCoinType(), R.drawable.digibyte);
         COINS_ICONS.put(CoinID.NEOSCOIN_MAIN.getCoinType(), R.drawable.neoscoin);
+        COINS_ICONS.put(CoinID.OKCASH_MAIN.getCoinType(), R.drawable.okcash);
         COINS_ICONS.put(CoinID.VERTCOIN_MAIN.getCoinType(), R.drawable.vertcoin);
         COINS_ICONS.put(CoinID.NXT_MAIN.getCoinType(), R.drawable.nxt);
         COINS_ICONS.put(CoinID.BURST_MAIN.getCoinType(), R.drawable.burst);
@@ -262,6 +266,7 @@ public class Constants {
         COINS_BLOCK_EXPLORERS.put(CoinID.CANNACOIN_MAIN.getCoinType(), "https://chainz.cryptoid.info/ccn/tx.dws?%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.DIGIBYTE_MAIN.getCoinType(), "https://digiexplorer.info/tx/%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.NEOSCOIN_MAIN.getCoinType(), "http://explorer.infernopool.com/tx/%s");
+        COINS_BLOCK_EXPLORERS.put(CoinID.OKCASH_MAIN.getCoinType(), "https://chainz.cryptoid.info/ok/tx.dws?%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.VERTCOIN_MAIN.getCoinType(), "https://bitinfocharts.com/vertcoin/tx/%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.JUMBUCKS_MAIN.getCoinType(), "http://explorer.getjumbucks.com/tx/%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.VPNCOIN_MAIN.getCoinType(), "https://blockexperts.com/vpn/tx/%s");
@@ -311,6 +316,7 @@ public class Constants {
             NuBitsMain.get(),
             NuSharesMain.get(),
 //            NxtMain.get(),
+            OKCashMain.get(),
             ParkbyteMain.get(),
             PeercoinMain.get(),
             PotcoinMain.get(),
