@@ -4,6 +4,7 @@ import com.coinomi.core.coins.Value;
 import com.coinomi.core.coins.nxt.Convert;
 import com.coinomi.core.coins.nxt.Transaction;
 import com.coinomi.core.messages.TxMessage;
+import com.coinomi.core.network.NxtServerClient;
 import com.coinomi.core.wallet.AbstractAddress;
 import com.coinomi.core.wallet.AbstractTransaction;
 import com.coinomi.core.wallet.AbstractWallet;
@@ -23,13 +24,21 @@ import static java.util.AbstractMap.*;
  * Created by vbcs on 1/10/2015.
  */
 public class NxtTransaction extends AbstractTransaction<Transaction> {
+
+
+    TransactionConfidence.ConfidenceType confidence = TransactionConfidence.ConfidenceType.BUILDING;;
+
     public NxtTransaction(Transaction transaction) {
         super(transaction);
     }
 
+    public void setConfidenceType(TransactionConfidence.ConfidenceType conf) {
+        confidence = conf;
+    }
+
     @Override
     public TransactionConfidence.ConfidenceType getConfidenceType() {
-        return TransactionConfidence.ConfidenceType.BUILDING;
+        return (transaction.getConfirmations() > 0 ) ? confidence : TransactionConfidence.ConfidenceType.PENDING;
     }
 
     @Override
@@ -44,7 +53,7 @@ public class NxtTransaction extends AbstractTransaction<Transaction> {
 
     @Override
     public int getDepthInBlocks() {
-        return transaction.getHeight();
+        return transaction.getConfirmations();
     }
 
     @Override
