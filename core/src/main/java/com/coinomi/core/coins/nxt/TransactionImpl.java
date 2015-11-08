@@ -7,6 +7,11 @@ package com.coinomi.core.coins.nxt;
 
 //import org.json.simple.JSONObject;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -19,6 +24,12 @@ import java.util.Map;
 import java.util.Set;
 
 public final class TransactionImpl implements Transaction {
+
+    private static final Logger log = LoggerFactory.getLogger(TransactionImpl.class);
+
+    public void setConfirmations(int confirmations) {
+        this.confirmations = confirmations;
+    }
 
     public static final class BuilderImpl implements Builder {
 
@@ -189,6 +200,8 @@ public final class TransactionImpl implements Transaction {
     private volatile long senderId;
     private volatile String fullHash;
 
+    private int confirmations = 0;
+
     private TransactionImpl(BuilderImpl builder) throws NxtException.NotValidException {
 
         this.timestamp = builder.timestamp;
@@ -334,6 +347,11 @@ public final class TransactionImpl implements Transaction {
     @Override
     public int getTimestamp() {
         return timestamp;
+    }
+
+    @Override
+    public int getConfirmations() {
+        return this.confirmations;
     }
 
     @Override
@@ -589,18 +607,19 @@ public final class TransactionImpl implements Transaction {
         return json;
     }
 
-    static TransactionImpl parseTransaction(JSONObject transactionData) throws NxtException.NotValidException {
+    */
+    public static TransactionImpl parseTransaction(JSONObject transactionData) throws NxtException.NotValidException, JSONException {
         try {
-            byte type = ((Long) transactionData.get("type")).byteValue();
-            byte subtype = ((Long) transactionData.get("subtype")).byteValue();
-            int timestamp = ((Long) transactionData.get("timestamp")).intValue();
-            short deadline = ((Long) transactionData.get("deadline")).shortValue();
+            byte type = ((Long) transactionData.getLong("type")).byteValue();
+            byte subtype = ((Long) transactionData.getLong("subtype")).byteValue();
+            int timestamp = ((Long) transactionData.getLong("timestamp")).intValue();
+            short deadline = ((Long) transactionData.getLong("deadline")).shortValue();
             byte[] senderPublicKey = Convert.parseHexString((String) transactionData.get("senderPublicKey"));
             long amountNQT = Convert.parseLong(transactionData.get("amountNQT"));
             long feeNQT = Convert.parseLong(transactionData.get("feeNQT"));
-            String referencedTransactionFullHash = (String) transactionData.get("referencedTransactionFullHash");
+            String referencedTransactionFullHash = (transactionData.has("referencedTransactionFullHash"))?(String) transactionData.get("referencedTransactionFullHash"):"";
             byte[] signature = Convert.parseHexString((String) transactionData.get("signature"));
-            Long versionValue = (Long) transactionData.get("version");
+            Long versionValue = transactionData.getLong("version");
             byte version = versionValue == null ? 0 : versionValue.byteValue();
             JSONObject attachmentData = (JSONObject) transactionData.get("attachment");
             if(attachmentData == null) {
@@ -611,11 +630,16 @@ public final class TransactionImpl implements Transaction {
             if (transactionType == null) {
                 throw new NxtException.NotValidException("Invalid transaction type: " + type + ", " + subtype);
             }
+
+
+            int height = transactionData.getInt("height");
+
             BuilderImpl builder = new BuilderImpl(version, senderPublicKey,
                     amountNQT, feeNQT, timestamp, deadline,
                     transactionType.parseAttachment(attachmentData))
                     .referencedTransactionFullHash(referencedTransactionFullHash)
-                    .signature(signature);
+                    .signature(signature).height(height);;
+
             if (transactionType.hasRecipient()) {
                 long recipientId = Convert.parseUnsignedLong((String) transactionData.get("recipient"));
                 builder.recipientId(recipientId);
@@ -627,16 +651,22 @@ public final class TransactionImpl implements Transaction {
                 builder.encryptToSelfMessage(Appendix.EncryptToSelfMessage.parse(attachmentData));
             }
             if (version > 0) {
-                builder.ecBlockHeight(((Long) transactionData.get("ecBlockHeight")).intValue());
-                builder.ecBlockId(Convert.parseUnsignedLong((String) transactionData.get("ecBlockId")));
+                if (transactionData.has("ecBlockHeight")) {
+                    builder.ecBlockHeight(((Long) transactionData.getLong("ecBlockHeight")).intValue());
+                    builder.ecBlockId(Convert.parseUnsignedLong(transactionData.getString("ecBlockId")));
+                }
             }
-            return builder.build();
-        } catch (NxtException.NotValidException|RuntimeException e) {
-            Logger.logDebugMessage("Failed to parse transaction: " + transactionData.toJSONString());
+
+            int confirmations = transactionData.getInt("confirmations");
+            log.info("confirmations {}",confirmations);
+            TransactionImpl tx = builder.build();
+            tx.setConfirmations(confirmations);
+            return tx;
+        } catch (JSONException e) {
+            log.info("Failed to parse transaction: {} ", transactionData.toString());
             throw e;
         }
     }
-    */
 
     @Override
     public int getECBlockHeight() {

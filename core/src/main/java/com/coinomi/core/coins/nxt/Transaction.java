@@ -36,6 +36,8 @@ public interface Transaction extends Comparable<Transaction> {
 
     int getTimestamp();
 
+    int getConfirmations();
+
     int getBlockTimestamp();
 
     short getDeadline();

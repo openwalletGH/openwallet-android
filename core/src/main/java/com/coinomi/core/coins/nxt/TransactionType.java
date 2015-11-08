@@ -3,6 +3,9 @@ package com.coinomi.core.coins.nxt;
 
 //import org.json.simple.JSONObject;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Collection;
@@ -193,7 +196,7 @@ public abstract class TransactionType {
 
     abstract Attachment.AbstractAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException;
 
-    //abstract Attachment.AbstractAttachment parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException;
+    abstract Attachment.AbstractAttachment parseAttachment(JSONObject attachmentData) throws JSONException, NxtException.NotValidException;
 
     //abstract void validateAttachment(Transaction transaction) throws NxtException.ValidationException;
 
@@ -248,10 +251,10 @@ public abstract class TransactionType {
                 return Attachment.ORDINARY_PAYMENT;
             }
 
-            /*@Override
-            Attachment.EmptyAttachment parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            @Override
+            Attachment.EmptyAttachment parseAttachment(JSONObject attachmentData) throws JSONException {
                 return Attachment.ORDINARY_PAYMENT;
-            }*/
+            }
 
 
         };
@@ -282,10 +285,10 @@ public abstract class TransactionType {
                 return Attachment.ARBITRARY_MESSAGE;
             }
 
-            /*@Override
-            Attachment.EmptyAttachment parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            @Override
+            Attachment.EmptyAttachment parseAttachment(JSONObject attachmentData) throws JSONException {
                 return Attachment.ARBITRARY_MESSAGE;
-            }*/
+            }
 
 
             @Override
@@ -307,10 +310,10 @@ public abstract class TransactionType {
                 return new Attachment.MessagingAliasAssignment(buffer, transactionVersion);
             }
 
-            /*@Override
-            Attachment.MessagingAliasAssignment parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            @Override
+            Attachment.MessagingAliasAssignment parseAttachment(JSONObject attachmentData) throws JSONException {
                 return new Attachment.MessagingAliasAssignment(attachmentData);
-            }*/
+            }
 
 
             @Override
@@ -332,10 +335,10 @@ public abstract class TransactionType {
                 return new Attachment.MessagingAliasSell(buffer, transactionVersion);
             }
 
-            /*@Override
-            Attachment.MessagingAliasSell parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            @Override
+            Attachment.MessagingAliasSell parseAttachment(JSONObject attachmentData) throws JSONException {
                 return new Attachment.MessagingAliasSell(attachmentData);
-            }*/
+            }
 
             @Override
             public boolean hasRecipient() {
@@ -356,10 +359,10 @@ public abstract class TransactionType {
                 return new Attachment.MessagingAliasBuy(buffer, transactionVersion);
             }
 
-            /*@Override
-            Attachment.MessagingAliasBuy parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            @Override
+            Attachment.MessagingAliasBuy parseAttachment(JSONObject attachmentData) throws JSONException {
                 return new Attachment.MessagingAliasBuy(attachmentData);
-            }*/
+            }
 
             @Override
             public boolean hasRecipient() {
@@ -379,10 +382,10 @@ public abstract class TransactionType {
                 return new Attachment.MessagingPollCreation(buffer, transactionVersion);
             }
 
-            /*@Override
-            Attachment.MessagingPollCreation parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            @Override
+            Attachment.MessagingPollCreation parseAttachment(JSONObject attachmentData) throws JSONException {
                 return new Attachment.MessagingPollCreation(attachmentData);
-            }*/
+            }
             
             @Override
             public boolean hasRecipient() {
@@ -403,10 +406,10 @@ public abstract class TransactionType {
                 return new Attachment.MessagingVoteCasting(buffer, transactionVersion);
             }
 
-            /*@Override
-            Attachment.MessagingVoteCasting parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            @Override
+            Attachment.MessagingVoteCasting parseAttachment(JSONObject attachmentData) throws JSONException {
                 return new Attachment.MessagingVoteCasting(attachmentData);
-            }*/
+            }
 
             @Override
             public boolean hasRecipient() {
@@ -427,10 +430,10 @@ public abstract class TransactionType {
                 return new Attachment.MessagingHubAnnouncement(buffer, transactionVersion);
             }
 
-            /*@Override
-            Attachment.MessagingHubAnnouncement parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            @Override
+            Attachment.MessagingHubAnnouncement parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException, JSONException {
                 return new Attachment.MessagingHubAnnouncement(attachmentData);
-            }*/
+            }
 
             @Override
             public boolean hasRecipient() {
@@ -451,10 +454,10 @@ public abstract class TransactionType {
                 return new Attachment.MessagingAccountInfo(buffer, transactionVersion);
             }
 
-            /*@Override
-            Attachment.MessagingAccountInfo parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            @Override
+            Attachment.MessagingAccountInfo parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException, JSONException {
                 return new Attachment.MessagingAccountInfo(attachmentData);
-            }*/
+            }
 
             @Override
             public boolean hasRecipient() {
@@ -496,10 +499,10 @@ public abstract class TransactionType {
                 return new Attachment.ColoredCoinsAssetIssuance(buffer, transactionVersion);
             }
 
-            /*@Override
-            Attachment.ColoredCoinsAssetIssuance parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            @Override
+            Attachment.ColoredCoinsAssetIssuance parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException, JSONException {
                 return new Attachment.ColoredCoinsAssetIssuance(attachmentData);
-            }*/
+            }
 
             @Override
             public boolean hasRecipient() {
@@ -520,10 +523,10 @@ public abstract class TransactionType {
                 return new Attachment.ColoredCoinsAssetTransfer(buffer, transactionVersion);
             }
 
-            /*@Override
-            Attachment.ColoredCoinsAssetTransfer parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            @Override
+            Attachment.ColoredCoinsAssetTransfer parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException, JSONException {
                 return new Attachment.ColoredCoinsAssetTransfer(attachmentData);
-            }*/
+            }
 
          
 
@@ -557,10 +560,10 @@ public abstract class TransactionType {
                 return new Attachment.ColoredCoinsAskOrderPlacement(buffer, transactionVersion);
             }
 
-            /*@Override
-            Attachment.ColoredCoinsAskOrderPlacement parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            @Override
+            Attachment.ColoredCoinsAskOrderPlacement parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException, JSONException {
                 return new Attachment.ColoredCoinsAskOrderPlacement(attachmentData);
-            }*/
+            }
 
             
 
@@ -578,10 +581,10 @@ public abstract class TransactionType {
                 return new Attachment.ColoredCoinsBidOrderPlacement(buffer, transactionVersion);
             }
 
-            /*@Override
-            Attachment.ColoredCoinsBidOrderPlacement parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            @Override
+            Attachment.ColoredCoinsBidOrderPlacement parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException, JSONException {
                 return new Attachment.ColoredCoinsBidOrderPlacement(attachmentData);
-            }*/
+            }
 
            
 
@@ -608,10 +611,10 @@ public abstract class TransactionType {
                 return new Attachment.ColoredCoinsAskOrderCancellation(buffer, transactionVersion);
             }
 
-            /*@Override
-            Attachment.ColoredCoinsAskOrderCancellation parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            @Override
+            Attachment.ColoredCoinsAskOrderCancellation parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException, JSONException {
                 return new Attachment.ColoredCoinsAskOrderCancellation(attachmentData);
-            }*/
+            }
         };
 
         public static final TransactionType BID_ORDER_CANCELLATION = new ColoredCoinsOrderCancellation() {
@@ -626,10 +629,10 @@ public abstract class TransactionType {
                 return new Attachment.ColoredCoinsBidOrderCancellation(buffer, transactionVersion);
             }
 
-            /*@Override
-            Attachment.ColoredCoinsBidOrderCancellation parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            @Override
+            Attachment.ColoredCoinsBidOrderCancellation parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException, JSONException {
                 return new Attachment.ColoredCoinsBidOrderCancellation(attachmentData);
-            }*/
+            }
 
        
         };
@@ -660,10 +663,10 @@ public abstract class TransactionType {
                 return new Attachment.DigitalGoodsListing(buffer, transactionVersion);
             }
 
-            /*@Override
-            Attachment.DigitalGoodsListing parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            @Override
+            Attachment.DigitalGoodsListing parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException, JSONException {
                 return new Attachment.DigitalGoodsListing(attachmentData);
-            }*/
+            }
 
 
             @Override
@@ -685,10 +688,10 @@ public abstract class TransactionType {
                 return new Attachment.DigitalGoodsDelisting(buffer, transactionVersion);
             }
 
-            /*@Override
-            Attachment.DigitalGoodsDelisting parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            @Override
+            Attachment.DigitalGoodsDelisting parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException, JSONException {
                 return new Attachment.DigitalGoodsDelisting(attachmentData);
-            }*/
+            }
 
          
 
@@ -711,10 +714,10 @@ public abstract class TransactionType {
                 return new Attachment.DigitalGoodsPriceChange(buffer, transactionVersion);
             }
 
-            /*@Override
-            Attachment.DigitalGoodsPriceChange parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            @Override
+            Attachment.DigitalGoodsPriceChange parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException, JSONException {
                 return new Attachment.DigitalGoodsPriceChange(attachmentData);
-            }*/
+            }
 
             @Override
             public boolean hasRecipient() {
@@ -735,10 +738,10 @@ public abstract class TransactionType {
                 return new Attachment.DigitalGoodsQuantityChange(buffer, transactionVersion);
             }
 
-            /*@Override
-            Attachment.DigitalGoodsQuantityChange parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            @Override
+            Attachment.DigitalGoodsQuantityChange parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException, JSONException {
                 return new Attachment.DigitalGoodsQuantityChange(attachmentData);
-            }*/
+            }
 
         
 
@@ -761,10 +764,10 @@ public abstract class TransactionType {
                 return new Attachment.DigitalGoodsPurchase(buffer, transactionVersion);
             }
 
-            /*@Override
-            Attachment.DigitalGoodsPurchase parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            @Override
+            Attachment.DigitalGoodsPurchase parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException, JSONException {
                 return new Attachment.DigitalGoodsPurchase(attachmentData);
-            }*/
+            }
 
 
             @Override
@@ -786,10 +789,10 @@ public abstract class TransactionType {
                 return new Attachment.DigitalGoodsDelivery(buffer, transactionVersion);
             }
 
-            /*@Override
-            Attachment.DigitalGoodsDelivery parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            @Override
+            Attachment.DigitalGoodsDelivery parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException, JSONException {
                 return new Attachment.DigitalGoodsDelivery(attachmentData);
-            }*/
+            }
 
             @Override
             public boolean hasRecipient() {
@@ -810,10 +813,10 @@ public abstract class TransactionType {
                 return new Attachment.DigitalGoodsFeedback(buffer, transactionVersion);
             }
 
-            /*@Override
-            Attachment.DigitalGoodsFeedback parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            @Override
+            Attachment.DigitalGoodsFeedback parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException, JSONException {
                 return new Attachment.DigitalGoodsFeedback(attachmentData);
-            }*/
+            }
 
             @Override
             public boolean hasRecipient() {
@@ -834,10 +837,10 @@ public abstract class TransactionType {
                 return new Attachment.DigitalGoodsRefund(buffer, transactionVersion);
             }
 
-            /*@Override
-            Attachment.DigitalGoodsRefund parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            @Override
+            Attachment.DigitalGoodsRefund parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException, JSONException {
                 return new Attachment.DigitalGoodsRefund(attachmentData);
-            }*/
+            }
 
             @Override
             public boolean hasRecipient() {
@@ -870,10 +873,11 @@ public abstract class TransactionType {
                 return new Attachment.AccountControlEffectiveBalanceLeasing(buffer, transactionVersion);
             }
 
-            /*@Override
+            @Override
             Attachment.AccountControlEffectiveBalanceLeasing parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
                 return new Attachment.AccountControlEffectiveBalanceLeasing(attachmentData);
-            }*/
+            }
+
 
             @Override
             public boolean hasRecipient() {
