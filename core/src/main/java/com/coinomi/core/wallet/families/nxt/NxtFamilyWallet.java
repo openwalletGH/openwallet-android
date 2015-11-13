@@ -772,13 +772,22 @@ public class NxtFamilyWallet extends AbstractWallet<Transaction> implements Tran
             //fetchingTransactions.remove(tx.getFullHash());
             log.info("adding transaction to wallet");
             // This tx not in wallet, add it
-            if (getTransaction(tx.getFullHash()) == null) {
+            Transaction storedTx = getTransaction(tx.getFullHash());
+            if (storedTx == null) {
 
                 log.info("transaction added");
                 rawtransactions.put(new Sha256Hash(tx.getFullHash()),tx);
                 //tx.getConfidence().setConfidenceType(TransactionConfidence.ConfidenceType.PENDING);
                 //addWalletTransaction(WalletTransaction.Pool.PENDING, tx, true);
                 queueOnNewBalance();
+            }
+            else
+            {
+                storedTx.setConfirmations(tx.getConfirmations());
+                if ( storedTx.getHeight() == Integer.MAX_VALUE )
+                {
+                    storedTx.setHeight(tx.getHeight());
+                }
             }
         } finally {
             lock.unlock();

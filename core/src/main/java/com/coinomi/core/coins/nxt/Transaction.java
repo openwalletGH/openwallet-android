@@ -4,6 +4,8 @@ import java.util.List;
 
 public interface Transaction extends Comparable<Transaction> {
 
+
+
     public static interface Builder {
 
         Builder recipientId(long recipientId);
@@ -21,6 +23,10 @@ public interface Transaction extends Comparable<Transaction> {
         Transaction build() throws NxtException.NotValidException;
 
     }
+
+    void setHeight(int height);
+
+    void setConfirmations(int confirmations);
 
     long getId();
 

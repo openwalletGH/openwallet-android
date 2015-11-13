@@ -27,6 +27,7 @@ public final class TransactionImpl implements Transaction {
 
     private static final Logger log = LoggerFactory.getLogger(TransactionImpl.class);
 
+    @Override
     public void setConfirmations(int confirmations) {
         this.confirmations = confirmations;
     }
@@ -325,7 +326,8 @@ public final class TransactionImpl implements Transaction {
         return height;
     }
 
-    void setHeight(int height) {
+    @Override
+    public void setHeight(int height) {
         this.height = height;
     }
 

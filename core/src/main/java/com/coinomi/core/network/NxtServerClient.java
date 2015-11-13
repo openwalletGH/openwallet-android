@@ -94,7 +94,7 @@ public class NxtServerClient implements BlockchainConnection<Transaction> {
 
     public int getEcBlockHeight() { return ecBlockHeight; }
 
-    public Long getEcBlockId() { return Convert.parseLong(ecBlockId); }
+    public Long getEcBlockId() { return Convert.parseUnsignedLong(ecBlockId); }
 
     private Runnable reconnectTask = new Runnable() {
         public boolean isPolling = true;
