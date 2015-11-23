@@ -44,8 +44,8 @@
     <color name="fg_significant">@color/gray_87_text</color>
     <color name="fg_less_significant">@color/gray_54_sec_text_icons</color>
     <color name="fg_insignificant">@color/gray_26_hint_text</color>
-    <color name="fg_error">#ffff0000</color>
-    <color name="fg_warning">#ffff7e1f</color>
+    <color name="fg_error">#ffe73519</color>
+    <color name="fg_warning">@color/fg_error</color>
     <color name="fg_ok">#ff6db10c</color>
 
     <!-- background -->

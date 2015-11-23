@@ -11,9 +11,10 @@ import javax.annotation.Nullable;
 
 
 /**
- * Created by vbcs on 14/10/2015.
+ * @author vbcs
  */
 public class NxtTxMessage implements TxMessage {
+    public static final int MAX_MESSAGE_BYTES = 0;
 
     Type type;
     byte[] message;
@@ -45,10 +46,9 @@ public class NxtTxMessage implements TxMessage {
     }
 
     public static class NxtMessageFactory implements MessageFactory {
-
         @Override
-        public int maxMessageSize() {
-            return 0;
+        public int maxMessageSizeBytes() {
+            return MAX_MESSAGE_BYTES;
         }
 
         @Override

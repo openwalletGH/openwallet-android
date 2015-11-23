@@ -4,10 +4,11 @@ import android.text.format.DateUtils;
 
 import com.coinomi.core.coins.BitcoinMain;
 import com.coinomi.core.coins.BitcoinTest;
-import com.coinomi.core.coins.CanadaeCoinMain;
 import com.coinomi.core.coins.BlackcoinMain;
 import com.coinomi.core.coins.BurstMain;
+import com.coinomi.core.coins.CanadaeCoinMain;
 import com.coinomi.core.coins.CannacoinMain;
+import com.coinomi.core.coins.ClamsMain;
 import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.DashMain;
@@ -15,25 +16,27 @@ import com.coinomi.core.coins.DigibyteMain;
 import com.coinomi.core.coins.DigitalcoinMain;
 import com.coinomi.core.coins.DogecoinMain;
 import com.coinomi.core.coins.DogecoinTest;
+import com.coinomi.core.coins.DogecoindarkMain;
 import com.coinomi.core.coins.FeathercoinMain;
+import com.coinomi.core.coins.GcrMain;
+import com.coinomi.core.coins.JumbucksMain;
 import com.coinomi.core.coins.LitecoinMain;
 import com.coinomi.core.coins.LitecoinTest;
 import com.coinomi.core.coins.MonacoinMain;
 import com.coinomi.core.coins.NamecoinMain;
+import com.coinomi.core.coins.NeoscoinMain;
+import com.coinomi.core.coins.NovacoinMain;
 import com.coinomi.core.coins.NuBitsMain;
 import com.coinomi.core.coins.NuSharesMain;
 import com.coinomi.core.coins.NxtMain;
-import com.coinomi.core.coins.PeercoinMain;
-import com.coinomi.core.coins.NovacoinMain;
 import com.coinomi.core.coins.ParkbyteMain;
+import com.coinomi.core.coins.PeercoinMain;
 import com.coinomi.core.coins.ReddcoinMain;
 import com.coinomi.core.coins.RubycoinMain;
+import com.coinomi.core.coins.ShadowCashMain;
 import com.coinomi.core.coins.UroMain;
-import com.coinomi.core.coins.NeoscoinMain;
-import com.coinomi.core.coins.JumbucksMain;
 import com.coinomi.core.coins.VertcoinMain;
 import com.coinomi.core.coins.VpncoinMain;
-import com.coinomi.core.coins.ShadowCashMain;
 import com.coinomi.core.network.CoinAddress;
 import com.coinomi.stratumj.ServerAddress;
 import com.google.common.collect.ImmutableList;
@@ -149,7 +152,8 @@ public class Constants {
             new CoinAddress(DigibyteMain.get(),     new ServerAddress("dgb-cce-1.coinomi.net", 5023),
                                                     new ServerAddress("dgb-cce-2.coinomi.net", 5023)),
             // 5024 primecoin
-            // 5025 clams
+            new CoinAddress(ClamsMain.get(),        new ServerAddress("clam-cce-1.coinomi.net", 5025),
+                                                    new ServerAddress("clam-cce-2.coinomi.net", 5025)),
             new CoinAddress(ShadowCashMain.get(),   new ServerAddress("sdc-cce-1.coinomi.net", 5026),
                                                     new ServerAddress("sdc-cce-2.coinomi.net", 5026)),
             new CoinAddress(NeoscoinMain.get(),     new ServerAddress("neos-cce-1.coinomi.net", 5027),
@@ -169,7 +173,11 @@ public class Constants {
             new CoinAddress(NxtMain.get(),          new ServerAddress("176.9.65.41", 7876),
                     new ServerAddress("176.9.65.41", 7876)),
             new CoinAddress(BurstMain.get(),        new ServerAddress("burst-cce-1.coinomi.net", 5051),
-                                                    new ServerAddress("burst-cce-2.coinomi.net", 5051))
+                                                    new ServerAddress("burst-cce-2.coinomi.net", 5051)),
+            new CoinAddress(DogecoindarkMain.get(), new ServerAddress("doged-cce-1.coinomi.net", 5036),
+                                                    new ServerAddress("doged-cce-2.coinomi.net", 5036)),
+            new CoinAddress(GcrMain.get(),          new ServerAddress("gcr-cce-1.coinomi.net", 5038),
+                                                    new ServerAddress("gcr-cce-2.coinomi.net", 5038))
     );
 
     public static final HashMap<CoinType, Integer> COINS_ICONS;
@@ -206,6 +214,9 @@ public class Constants {
         COINS_ICONS.put(CoinID.CANADAECOIN_MAIN.getCoinType(), R.drawable.canadaecoin);
         COINS_ICONS.put(CoinID.SHADOWCASH_MAIN.getCoinType(), R.drawable.shadowcash);
         COINS_ICONS.put(CoinID.PARKBYTE_MAIN.getCoinType(), R.drawable.parkbyte);
+        COINS_ICONS.put(CoinID.DOGECOINDARK_MAIN.getCoinType(), R.drawable.dogecoindark);
+        COINS_ICONS.put(CoinID.CLAMS_MAIN.getCoinType(), R.drawable.clams);
+        COINS_ICONS.put(CoinID.GCR_MAIN.getCoinType(), R.drawable.gcr);
 
         COINS_BLOCK_EXPLORERS = new HashMap<CoinType, String>();
         COINS_BLOCK_EXPLORERS.put(CoinID.BITCOIN_MAIN.getCoinType(), "https://blockchain.info/tx/%s");
@@ -237,6 +248,9 @@ public class Constants {
         COINS_BLOCK_EXPLORERS.put(CoinID.CANADAECOIN_MAIN.getCoinType(), "http://explorer.canadaecoin.ca/tx/%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.SHADOWCASH_MAIN.getCoinType(), "http://shadowchain.info/tx/%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.PARKBYTE_MAIN.getCoinType(), "https://chainz.cryptoid.info/pkb/tx.dws?%s");
+        COINS_BLOCK_EXPLORERS.put(CoinID.DOGECOINDARK_MAIN.getCoinType(), "http://darkchain.link/tx/%s");
+        COINS_BLOCK_EXPLORERS.put(CoinID.CLAMS_MAIN.getCoinType(), "http://khashier.com/tx/%s");
+        COINS_BLOCK_EXPLORERS.put(CoinID.GCR_MAIN.getCoinType(), "https://chainz.cryptoid.info/gcr/tx.dws?%s");
     }
 
     public static final CoinType DEFAULT_COIN = BitcoinMain.get();
@@ -257,9 +271,11 @@ public class Constants {
             PeercoinMain.get(),
             NamecoinMain.get(),
             BlackcoinMain.get(),
+            ClamsMain.get(),
             MonacoinMain.get(),
             NuSharesMain.get(),
             NovacoinMain.get(),
+            GcrMain.get(),
             VpncoinMain.get(),
             VertcoinMain.get(),
             BurstMain.get(),
@@ -269,6 +285,7 @@ public class Constants {
             DigibyteMain.get(),
             RubycoinMain.get(),
             DigitalcoinMain.get(),
+            DogecoindarkMain.get(),
             JumbucksMain.get(),
             CanadaeCoinMain.get(),
             CannacoinMain.get(),

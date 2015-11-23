@@ -207,6 +207,7 @@ public class WalletProtobufSerializer {
                 case PEERCOIN:
                 case REDDCOIN:
                 case VPNCOIN:
+                case CLAMS:
                     pocket = pocketSerializer.readWallet(pocketProto, crypter);
                     break;
                 default:

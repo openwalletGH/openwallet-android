@@ -30,10 +30,10 @@ public class VpncoinTxMessage implements TxMessage {
 
     static final int SIZE_LENGTH = 4;
 
-    public static final int MAX_TX_DATA      = 1024;
-    public static final int MAX_TX_DATA_MSG  = 768;
+    public static final int MAX_TX_DATA      = 65536;
     public static final int MAX_TX_DATA_FROM = 128;
     public static final int MAX_TX_DATA_SUBJ = 128;
+    public static final int MAX_TX_DATA_MSG  = MAX_TX_DATA - MAX_TX_DATA_FROM - MAX_TX_DATA_SUBJ;
 
     static final Pattern MESSAGE_REGEX =
             Pattern.compile("(?s)@(?:FROM|SUBJ|MSG)=.*?(?=@(?:FROM|SUBJ|MSG)=|$)");
@@ -328,7 +328,7 @@ public class VpncoinTxMessage implements TxMessage {
 
     public static class VpncoinMessageFactory implements MessageFactory {
         @Override
-        public int maxMessageSize() {
+        public int maxMessageSizeBytes() {
             return MAX_TX_DATA_MSG;
         }
 

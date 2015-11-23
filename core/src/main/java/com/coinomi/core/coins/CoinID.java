@@ -51,6 +51,9 @@ public enum CoinID {
     SHADOWCASH_MAIN(ShadowCashMain.get()),
     CANADAECOIN_MAIN(CanadaeCoinMain.get()),
     PARKBYTE_MAIN(ParkbyteMain.get()),
+    DOGECOINDARK_MAIN(DogecoindarkMain.get()),
+    CLAMS_MAIN(ClamsMain.get()),
+    GCR_MAIN(GcrMain.get()),
     ;
 
     private static List<CoinType> types;

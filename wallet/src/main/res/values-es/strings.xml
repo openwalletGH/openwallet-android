@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_scan_qr_code">Escanear</string>
+    <string name="action_share">Compartir</string>
+    <string name="action_copy">Copiar</string>
+    <string name="action_edit_label">Editar etiqueta</string>
+    <string name="action_empty_wallet">Vaciar billetera</string>
+    <string name="action_settings">Configuración</string>
+    <string name="action_about">Sobre Coinomi</string>
+    <string name="action_refresh">Renovar</string>
+    <string name="action_sign_verify_message">Firmar / verificar mensaje</string>
+    <string name="action_account_details">Detalles de su cuenta</string>
+    <string name="action_exchange_history">Intercambiar historial</string>
+    <string name="action_new_address">"Nueva dirección "</string>
+    <string name="action_swap_coins">Intercambiar Monedas</string>
+    <string name="action_delete">Eliminar</string>
+    <string name="action_change_address_type">"Cambiar el tipo de dirección "</string>
+    <!-- Errors -->
+    <string name="error_generic">Un error ha ocurrido durante la ejecución de la acción</string>
+    <string name="error_could_not_read_wallet">No ha podido leer la billetera</string>
+    <!-- Generic items -->
+    <string name="button_ok">OK</string>
+    <string name="button_next">Siguiente</string>
+    <string name="button_finish">Finalizar</string>
+    <string name="button_return">Retornar</string>
+    <string name="button_confirm">Confirmar</string>
+    <string name="button_cancel">Cancelar</string>
+    <string name="button_dismiss">Descartar</string>
+    <string name="button_delete">Borrar</string>
+    <string name="button_add">Agregar</string>
+    <string name="button_save">Guardar</string>
+    <string name="button_remove">Remover</string>
+    <string name="button_edit">Editar</string>
+    <string name="button_send">Enviar</string>
+    <string name="button_sign">Firma</string>
+    <string name="button_verify">Verificar</string>
+    <string name="button_skip">Omitir</string>
+    <string name="button_retry">Reintentar</string>
+    <string name="button_download">Bajar</string>
+    <string name="button_agree">De acuerdo</string>
+    <string name="button_disagree">No estoy de acuerdo</string>
+    <string name="button_add_coins">Monedas</string>
+    <string name="scan_qr_code">Escanear código QR</string>
+    <string name="erase_address">Borrar dirección</string>
+    <string name="copied_to_clipboard">Copiado al portapapeles</string>
+    <string name="wallet_title_request">Recibir</string>
+    <string name="wallet_title_balance">Balance</string>
+    <string name="wallet_title_send">Enviar</string>
+    <string name="wallet_locked_message">Su billetera esta bloqueada</string>
+    <string name="unlock_wallet_title">Desbloquear billetera</string>
+    <string name="unlocking_wallet_working">Desbloqueando su billetera &#8230;</string>
+    <string name="unlocking_wallet_error_title">No ha podido desbloquear la billetera</string>
+    <string name="unlocking_wallet_error_detail">¿Está utilizando la contraseña correcta? Por favor, asegúrese de que su contraseña se ha introducido correctamente. Intente la restauración mediante la frase de recuperación si persiste este error.</string>
+    <string name="powered_by">Generado por</string>
+    <!-- Nav drawer -->
+    <string name="navigation_drawer_open">Abrir el cajón de navegación</string>
+    <string name="navigation_drawer_close">Cerrar cajón de navegación</string>
+    <string name="navigation_drawer_services">Servicios</string>
+    <string name="navigation_drawer_wallet">Billetera</string>
+    <!-- SendOutput widget -->
+    <string name="fee">comisión de transacción</string>
+    <string name="send">enviar</string>
+    <string name="trade">intercambiar</string>
+    <string name="receive">recibir</string>
+    <!-- Welcome fragment -->
+    <string name="welcome_text">Bienvenido a la billetera Coinomi</string>
+    <string name="create_wallet">Crear una billetera nueva</string>
+    <string name="restore_wallet">Recuperar una billetera</string>
+    <string name="test_wallet">Probar Cartera</string>
+    <!-- Intro -->
+    <string name="test_wallet_warning_title">Crear una billetera de prueba</string>
+    <string name="test_wallet_warning_message">Si crea una nueva carpeta de prueba, se perderá su cartera existente, a menos que tenga una  copia de seguridad su <i>frase  de recuperación </i></string>
+    <string name="incompatible_device_warning_title">Dispositivo incompatible</string>
+    <string name="incompatible_device_warning_message">Este dispositivo no puede realizar ciertas funciones criptográficas debido a errores de software o hardware.\nEsto se podría solucionar con una actualización del fabricante del dispositivo.\n\nPóngase en contacto con nosotros si tiene alguna pregunta: support@coinomi.com</string>
+    <!-- Recovery fragment -->
+    <string name="seed_info">Esta es su<i>frase de recuperación</i>, la que es usada para generar llaves para su billetera. Por favor escribala en un papel y mantengala en un logar seguro, como lo haría con el dinero de papel. Cualquiera con acceso a ella ,tiene acceso a los fondos en la billetera.\nSi usted pierde su frase de recuperación, su billetera no podrá ser recuperada .</string>
+    <string name="seed_title">Su frase de recuperación</string>
+    <string name="seed_regenerate_title">Toque para generar una nueva frase de recuperación</string>
+    <string name="backed_up_seed">He guardado de forma segura mi frase de recuperación</string>
+    <!-- Restore fragment -->
+    <string name="restore_info">Por favor, introduzca su frase de la recuperación:</string>
+    <string name="restore_seed_protected">Mi frase de recuperación está protegida (BIP39)</string>
+    <string name="restore_skip_title">Omitir verificación</string>
+    <string name="restore_skip_info1">Por favor, asegúrese de que su frase de recuperación coincida con la siguiente:</string>
+    <string name="restore_skip_info2">Se recomienda no saltarse la verificación, por lo que cualquier falta de ortografía se pudiera detectar.</string>
+    <string name="restore_error_checksum">Frase de recuperación no es válido. Compruebe si algunas palabras están mal escritas ..</string>
+    <string name="restore_error_words">La frase de recuperación contiene palabras no reconocidas.</string>
+    <string name="restore_error_mismatch">La frase de recuperación introducida no coincide con su frase de recuperación.</string>
+    <string name="restore_error">No se pudo verificar su frase de recuperación  %1$s</string>
+    <string name="extra_entropy">Extra Entropía</string>
+    <!-- Wallet activity -->
+    <string name="test_wallet_message">Esta es una billetera de pruebas, donde se pueden enviar y recibir TestNet Bitcoins, Litecoin y Dogecoins.\n\nSi desea utilizar La billetera con dinero real por favor vaya a: <b>Configuración &amp; gt; Restaurar billetera &amp; gt; Crear una nueva billetera</b>.</string>
+    <string name="wallet_update_title">Nueva versión disponible</string>
+    <string name="wallet_update_message">Una nueva versión de Coinomi está disponible, contiene nuevas características y correcciones.</string>
+    <string name="pay_with">Enviar con</string>
+    <string name="exchange_and_pay_title">Cambiar y enviar</string>
+    <!-- PayToDialog-->
+    <string name="ambiguous_address_title">Dirección ambigua</string>
+    <string name="ambiguous_address_message">Por favor seleccione el tipo de moneda correcta</string>
+    <!-- Balance fragment -->
+    <string name="wallet_transactions_coinbase">Minado</string>
+    <string name="history_empty">No hay monedas recibidas hasta la fecha!\n\nUsted puede conseguir algunas a través de un intercambio, de el comercio y la venta de bienes  y servicios</string>
+    <string name="sent_to">Enviado a</string>
+    <string name="received_with">Recibido con</string>
+    <string name="get_tx_info_error">No se pudo obtener confirmación de la transacción</string>
+    <string name="disconnected_label">Sin conexión</string>
+    <string name="no_wallet_pocket_selected">No hay una cuenta de billetera seleccionada</string>
+    <string name="get_tx_broadcast_error">Error de transmición de transacción</string>
+    <!-- Receive fragment -->
+    <string name="receive_address_label">Mi dirección</string>
+    <string name="create_new_address">¿Crear una nueva dirección?</string>
+    <string name="create_new_address_name">Nombre (Opcional)</string>
+    <string name="view_previous_addresses">Direcciones anteriores</string>
+    <string name="too_many_unused_addresses">Demasiados direcciones no utilizadas, trate de utilizar una de las direcciones anteriores antes de crear una nueva.</string>
+    <!-- Send Activity -->
+    <string name="send_coins_activity_title">Enviar monedas</string>
+    <!-- Send fragment -->
+    <string name="send_coins_fragment_receiving_address_label">Pagar a</string>
+    <string name="send_coins_fragment_receiving_address_tip">escriba nombre o dirección</string>
+    <string name="send_coins_fragment_receiving_address_error">Dirección no válida de Bitcoin!</string>
+    <string name="send_coins_fragment_amount_label">Monto a pagar</string>
+    <string name="send_coins_fragment_button_send">Enviar</string>
+    <string name="send_coins_fragment_button_back">Atrás</string>
+    <string name="send_coins_failed_msg">No se pudo!</string>
+    <string name="send_coins_error_network">No se pudo conectar a la red de la moneda</string>
+    <string name="send_coins_error_dust">El monto enviado es demasiado pequeño y será rechazado por la red</string>
+    <string name="send_coins_error">No se han podido enviar monedas:%1$s</string>
+    <string name="pay_to_label">Pagar a</string>
+    <string name="amount_to_send_label">monto</string>
+    <string name="scan_error">Hubo un problema con escaneo :%1$s</string>
+    <string name="unsupported_coin">moneda no compatible:%1$s</string>
+    <string name="address_error">La dirección indicada no es válida.</string>
+    <string name="amount_error">El monto entrado no es válido</string>
+    <string name="amount_error_empty">Por favor introduzca un monto</string>
+    <string name="amount_error_negative">No se puede enviar un monto negativo</string>
+    <string name="amount_error_decimal_places">Demasiados cifras decimales, trate de menos de  %1$d</string>
+    <string name="amount_error_too_small">El monto mínimo es de al menos%1$s</string>
+    <string name="amount_error_not_enough_money_plain">Dinero insuficiente</string>
+    <string name="amount_error_not_enough_money">No hay suficiente dinero, su saldo actual es de%1$s</string>
+    <string name="amount_warn_fees_apply">Un poco menos se enviará por causa de las comisiones</string>
+    <!-- Set Password fragment -->
+    <string name="set_password_info">Establecer una contraseña para proteger su billetera durante el uso diario.</string>
+    <string name="set_password_seed_protect">También proteger mi frase de recuperación (BIP39)</string>
+    <string name="set_password_seed_protect_info">La contraseña se convierte en permanente y es necesariα al restaurar su billetera con la frase de recuperación.\nADVERTENCIA: Si olvida su contraseña, será imposible recuperar su billetera!</string>
+    <string name="set_password1">Escriba su contraseña</string>
+    <string name="set_password2">Reescriba su contraseña</string>
+    <string name="password_too_common_error">La contraseña \"%1$s\" es muy común para ser utilizada de forma segura.</string>
+    <string name="password_too_short_error">La contraseña es demasiada corta,  %1$d es el minimo de caracteres</string>
+    <string name="passwords_mismatch">Las contraseñas no coinciden</string>
+    <string name="password_error">No se  ha podido continuar, errores detectados en la  contraseña.</string>
+    <string name="password_skip_warn">Al no establecer una contraseña, su billeteras puede ser  accedida sin autorización.</string>
+    <string name="password_wallet_recovery">Para restaurar su billetera, por favor proporcione la misma contraseña que utilizó cuando creó la frase de recuperación protegida.\nSi introduce una contraseña diferente, se creará una nueva billetera vacía.</string>
+    <!-- FinalizeWalletRestorationFragment -->
+    <string name="wallet_restoration">Por favor espere mientras se está restaurando su billetera</string>
+    <string name="wallet_restoration_master_key">Creando la llave maestra</string>
+    <string name="wallet_restoration_coin">Crear llave para %1$s</string>
+    <string name="wallet_restoration_error">No se ha podido recuperar su billetera.\n\n%1$s</string>
+    <!-- PasswordConfirmationFragment -->
+    <string name="enter_password">Ingrese su contraseña</string>
+    <!-- SignTransactionFragment -->
+    <string name="contacting_exchange">Poniendose en contacto con el intercambio de&#8230;</string>
+    <string name="preparing_transaction">Por favor Espere mientras la transacción está siendo preparada y enviada.</string>
+    <string name="no_such_pocket_error">Se produjo un error al acceder a esta cuenta de  billetera. Si el problema persiste, intente restaurar la billetera usando la frase de recuperación.</string>
+    <string name="password_failed">La contraseña introducida no es válida.</string>
+    <string name="sending_msg">Enviando&#8230;</string>
+    <string name="sent_msg">Enviado! Por favor, espere la confirmación de la transacción.</string>
+    <string name="tx_already_broadcast">El dinero ya ha sido enviado</string>
+    <string name="trade_expired">Intercambio expirado</string>
+    <string name="tx_confirm_timer_message">Por favor, confirme esta transacción en la próximas%1$s</string>
+    <plurals name="tx_confirm_timer_minute">
+        <item quantity="one">%s minute</item>
+        <item quantity="other">%s minutes</item>
+    </plurals>
+    <plurals name="tx_confirm_timer_second">
+        <item quantity="one">%d segundo</item>
+        <item quantity="other">%d segundos</item>
+    </plurals>
+    <!-- About Activity -->
+    <string name="title_activity_about">Acerca de Coinomi</string>
+    <string name="app_name_long">Coinomi para Android</string>
+    <string name="about_licence">Un proyecto de código abierto\nhttps://github.com/Coinomi/coinomi-android\nCódigo fuente bajo licencia GNU General Public License 3</string>
+    <string name="about_credits_nubits">Infraestructura de servidor donado por NuBits - Primera moneda digital estable del mundo\nhttps://nubits.com/</string>
+    <string name="about_credits_translations">Traducciones proporcionadas por:</string>
+    <string name="about_credits_bitcoinj">Utiliza la biblioteca Bitcoinj\nhttp://bitcoinj.github.io/</string>
+    <string name="about_credits_electrum">Utiliza software de servidor Electrum\nhttps://electrum.org/</string>
+    <string name="about_credits_schildbach">Influenciado por Andreas Schildbach\nhttps://github.com/schildbach/bitcoin-wallet/</string>
+    <string name="about_credits_zxing">Funcionalidad de código QR por ZXing\nhttps://github.com/zxing/zxing</string>
+    <string name="about_credits_crypto_icons">Crypto-iconos de Chris Shepherd\nhttps://github.com/shphrd/crypto-icons</string>
+    <string name="about_credits_font_icons">Fondos-Iconos por Daniel Bruce\nhttp://www.entypo.com</string>
+    <string name="about_credits_exchange_rates">Los precios de cambio proporcionados por\nhttp://www.cryptocoincharts.info/\nhttps://bitcoinaverage.com/</string>
+    <!-- Add Coins -->
+    <string name="title_activity_add_coins">Añadir monedas</string>
+    <string name="password_add_coin">Usted está a punto de crear una cuenta de %1$s en su billetera.</string>
+    <string name="adding_coin_confirmation_title">¿Añadir %1$s?</string>
+    <string name="adding_coin_working">Por favor, espere mientras se crea una nueva cuenta de%1$s</string>
+    <string name="add_coin_error">Error al añadir %1$s: %2$s</string>
+    <string name="coin_already_added_title">%1$s ya agregado</string>
+    <string name="coin_already_added">Cuentas adicionales aún no están soportadas</string>
+    <!-- Transaction amount visualizer -->
+    <string name="internal_transfer">Transferencia interna</string>
+    <!-- Transaction Details -->
+    <string name="title_activity_transaction_details">Detalles de la transacción</string>
+    <string name="sent">Enviado</string>
+    <string name="received">Recibido</string>
+    <string name="status_label">Estado</string>
+    <string name="date_label">fecha</string>
+    <string name="transaction_id_label">ID de transacción</string>
+    <string name="view_at_a_blockchain_explorer_link">Ver en el explorador de blockchain</string>
+    <plurals name="status_building">
+        <item quantity="one">%d confirmación</item>
+        <item quantity="other">%d confirmaciones</item>
+    </plurals>
+    <string name="status_pending">Esperando la confirmación de la transacción</string>
+    <string name="status_unknown">Estado de transacción desconocido</string>
+    <!-- Exchange Rates -->
+    <string name="title_activity_exchange_rates">Precios de intercambio</string>
+    <string name="set_local_currency">Establezca %1$s como su moneda local</string>
+    <string name="exchange_rates_loading">Cargando precios de intercambio</string>
+    <string name="exchange_rates_load_error">No se pueden cargar los precios de intercambio</string>
+    <string name="exchange_rates_empty_search">No se ha podido encontrar el precio de intercambio</string>
+    <!-- Select Coins -->
+    <string name="select_coins">Seleccione las monedas que usted desea utilizar con su billetera. Usted puede agregar otras más tarde.</string>
+    <!-- Previous Addresses -->
+    <string name="title_activity_previous_addresses">Mis direcciones anteriores</string>
+    <string name="previous_addresses_used">Dirección en uso</string>
+    <string name="previous_addresses_unused">Dirección no utilizada</string>
+    <!-- Edit Address Book Entry -->
+    <string name="edit_address_book_entry_dialog_title_add">Añadir dirección</string>
+    <string name="edit_address_book_entry_dialog_title_edit">Editar dirección</string>
+    <string name="edit_address_book_entry_dialog_address_label">Dirección</string>
+    <string name="edit_address_book_entry_dialog_label_label">Nombre</string>
+    <!-- Settings -->
+    <string name="title_activity_settings">Configuración</string>
+    <string name="pref_title_restore_wallet">Recuperar  billetera</string>
+    <string name="pref_title_exchange_rates">Precios de intercambio</string>
+    <string name="pref_title_manual_receiving_addresses">Recibir direcciones manualmente</string>
+    <string name="pref_summary_manual_receiving_addresses">No crear automáticamente una nueva dirección para cada transacción</string>
+    <!-- Show Seed -->
+    <string name="title_activity_show_seed">Mostrar frase de recuperación</string>
+    <string name="seed_not_available_title">No ha sido encontrada la frase de recuperación</string>
+    <string name="seed_not_available">Su frase de recuperación no se guarda en este dispositivo.\nPruebe la recuperación de su billetera para solucionar esto.</string>
+    <string name="seed_working">Por favor espere &#8230;</string>
+    <string name="seed_password_protected">Esta frase de recuperación está protegida (BIP39)</string>
+    <!-- Wallet locked -->
+    <string name="touch_to_decrypt_wallet">Toque para desbloquear</string>
+    <!-- Exchange -->
+    <string name="title_activity_trade">Intercambio</string>
+    <string name="trade_info">Seleccione las monedas que usted desea intercambiar.\nLas monedas convertidas se agregan automáticamente a su billetera.</string>
+    <string name="trade_info_rates">Los precios dados incluyen la  tarifa de transacción ShapeShift.io</string>
+    <string name="trade_from_coin_label">Intercambio</string>
+    <string name="trade_to_coin_label">recibir</string>
+    <string name="trade_warn_no_account_found">Se le pedirá agregar una %1$s billetera</string>
+    <string name="trade_warn_no_connection_title">Sin conexión</string>
+    <string name="trade_warn_no_connection_message">Se necesita conexión a Internet para  el intercambio de monedas.</string>
+    <string name="trade_error">Error de intercambio</string>
+    <string name="trade_error_no_supported_source_accounts">No se han encontrado cuentas soportadas</string>
+    <string name="trade_error_service_not_available">Servicio no disponible temporalmente, por favor, inténtelo de nuevo en un minuto</string>
+    <string name="trade_error_market_info">Servicio no disponible temporalmente.\nNo hay información acerca de el %1$s - %2$s par</string>
+    <string name="trade_error_sign_tx_message">Se produjo un error al firmar y transmitir  la transacción.\n\nDetalles técnicos:\n\n<b>%1$s</b></string>
+    <string name="trade_error_max_limit">El monto suministrado supera el límite de %1$s por favor utilice una cantidad menor</string>
+    <string name="trade_error_min_limit">El monto mínimo es de, al menos, %1$s</string>
+    <!-- Exchange Status -->
+    <string name="title_activity_exchange_status">Estado de intercambio</string>
+    <string name="trade_status_message">Su orden se completará en breve. Puede salir de esta pantalla sin afectar el intercambio.</string>
+    <string name="trade_status_complete_message">Su orden ha sido  completada correctamente.</string>
+    <string name="trade_status_label">estado</string>
+    <string name="trade_status_waiting_deposit">A la espera de depósito&#8230;</string>
+    <string name="trade_status_received_deposit">Ha recibido depósito de %1$s</string>
+    <string name="trade_status_waiting_trade">Esperando el intercambio&#8230;</string>
+    <string name="trade_status_complete_detail">Intercambio completo, ha enviado %1$s</string>
+    <string name="trade_status_complete">Intercambio completo</string>
+    <string name="trade_status_view_transaction">Ver transacción</string>
+    <string name="trade_status_email_receipt">Recibo por correo electrónico</string>
+    <string name="trade_status_failed_detail">El intercambio ha fallado: %1$s</string>
+    <string name="trade_status_failed">El intercambio ha fallado</string>
+    <string name="trade_status_delete_message">¿Eliminar de el historial?</string>
+    <string name="trade_status_tx_not_available">Transacción no encontrado, inténtelo de nuevo en unos pocos segundos</string>
+    <!-- Email receipt dialog -->
+    <string name="email_receipt_title">Recibo por correo electrónico</string>
+    <string name="email_receipt_message">Recibir un correo electrónico para esta transacción de intercambio</string>
+    <!-- Exchange History -->
+    <string name="title_activity_exchange_history">Historial de Intercambio</string>
+    <string name="exchange_history_empty">No hay intercambios realizados</string>
+    <!-- ShapeShift -->
+    <string name="about_shapeshift_title">Acerca de ShapeShift.io</string>
+    <string name="about_shapeshift_message">ShapeShift.io es un intercambio de  altcoin instantáneo que ofrece  conversión entre  Bitcoin y altcoin. La plataforma (disponible en dos opciones web y API) representa la manera más rápida, más eficiente para convertir entre Bitcoin y docenas de altcoins dentro del ecosistema  de Bitcoin. No es necesario tener cuenta .</string>
+    <!-- Sign Message -->
+    <string name="title_activity_sign_verify_message">Firmar / verificar mensaje</string>
+    <string name="signing_info">Puede firmar o verificar un mensaje con una dirección.</string>
+    <string name="signing_address_label">Firmar dirección</string>
+    <string name="address_not_found_error">La dirección proveída, no se pudo encontrar en esta cuenta.</string>
+    <string name="message_to_sign_label">mensaje</string>
+    <string name="signature_label">firma</string>
+    <string name="message_signed">Mensaje firmado</string>
+    <string name="message_verified">Mensaje verificado</string>
+    <string name="message_verification_failed">La verificación mensaje ha fracasado</string>
+    <!-- Messages -->
+    <string name="tx_message_public">mensaje público</string>
+    <string name="tx_message_private">mensaje privado</string>
+    <string name="tx_message_public_add">Añadir mensaje público</string>
+    <string name="tx_message_private_add">Añadir mensaje privado</string>
+    <string name="tx_message_public_remove">Eliminar mensaje público</string>
+    <string name="tx_message_private_remove">Eliminar mensaje privado</string>
+    <string name="tx_message_from">de</string>
+    <string name="tx_message_subject">sujeto</string>
+    <string name="tx_message">mensaje</string>
+    <!-- Account details -->
+    <string name="title_activity_account_details">Detalles de su cuenta</string>
+    <string name="account_description_label">descripción</string>
+    <string name="account_public_key_label">clave pública</string>
+    <string name="account_extended_public_key_label">llave pública extendida</string>
+    <string name="account_public_key_warning">Compartir su clave pública permitirá que alguien pueda ver su saldo e historial de transacciones.</string>
+    <string name="account_private_key_label">llave privada</string>
+    <string name="account_extended_private_key_label">llave privada extendida</string>
+    <string name="account_private_key_warning">La llave privada le permite enviar las monedas desde esta cuenta. No es necesario realizar copias de seguridad de  esta llave , ya que se deriva de su <i>frase recuperación</i></string>
+</resources>
