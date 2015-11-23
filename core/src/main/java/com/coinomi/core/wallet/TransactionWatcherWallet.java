@@ -1148,6 +1148,10 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<Transactio
         return pending;
     }
 
+    public Map<Sha256Hash, Transaction> getTransactions() {
+        return rawtransactions;
+    }
+
     @Override
     public Map<Sha256Hash, AbstractTransaction> getAbstractTransactions() {
         Map<Sha256Hash, AbstractTransaction> txs = new HashMap<Sha256Hash, AbstractTransaction>();

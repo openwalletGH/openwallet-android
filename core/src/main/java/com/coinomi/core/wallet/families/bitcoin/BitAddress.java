@@ -8,8 +8,11 @@ import org.bitcoinj.core.Address;
 import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.WrongNetworkException;
+import org.bitcoinj.script.Script;
 
 import java.nio.ByteBuffer;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * @author John L. Jegutanis
@@ -30,6 +33,11 @@ public class BitAddress extends Address implements AbstractAddress {
 
     public BitAddress(CoinType type, String address) throws AddressFormatException {
         super(type, address);
+    }
+
+    public static BitAddress fromP2SHScript(CoinType type, Script scriptPubKey) throws WrongNetworkException {
+        checkArgument(scriptPubKey.isPayToScriptHash(), "Not a P2SH script");
+        return new BitAddress(type, type.getP2SHHeader(), scriptPubKey.getPubKeyHash());
     }
 
     public static BitAddress fromString(CoinType type, String address)
