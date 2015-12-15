@@ -26,6 +26,7 @@ import com.google.common.collect.ImmutableList;
 
 import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.Sha256Hash;
+import org.bitcoinj.core.Utils;
 import org.bitcoinj.crypto.DeterministicKey;
 import org.bitcoinj.crypto.KeyCrypter;
 import org.bitcoinj.script.Script;
@@ -39,6 +40,7 @@ import org.spongycastle.crypto.params.KeyParameter;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +56,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 /**
  * @author John L. Jegutanis
  */
-public class NxtFamilyWallet extends AbstractWallet<Transaction> implements TransactionEventListener<Transaction> {
+public class NxtFamilyWallet extends AbstractWallet implements TransactionEventListener<Transaction> {
     private static final Logger log = LoggerFactory.getLogger(NxtFamilyWallet.class);
     protected final Map<Sha256Hash, Transaction> rawtransactions;
     @VisibleForTesting
@@ -108,7 +110,6 @@ public class NxtFamilyWallet extends AbstractWallet<Transaction> implements Tran
         super(type, id);
         rootKey = key;
         address = new NxtFamilyAddress(type, key.getPublicKey());
-        log.info("nxt public key: {}", Convert.toHexString(key.getPublicKey()) );
         balance = type.value(0);
         addressesStatus = new HashMap<>();
         addressesSubscribed = new ArrayList<>();
@@ -130,17 +131,12 @@ public class NxtFamilyWallet extends AbstractWallet<Transaction> implements Tran
     }
 
     @Override
-    public String getPrivateKeyMnemonic() {
-        return rootKey.getPrivateKeyMnemonic();
-    }
-
-    @Override
     public void completeTransaction(SendRequest request) throws WalletAccountException {
         checkArgument(!request.isCompleted(), "Given SendRequest has already been completed.");
 
         if (request.type.getTransactionVersion() > 0) {
-            request.nxtTxBuilder.ecBlockHeight(blockchainConnection.getEcBlockHeight());
-            request.nxtTxBuilder.ecBlockId(blockchainConnection.getEcBlockId());
+            request.nxtTxBuilder.ecBlockHeight(lastEcBlockHeight);
+            request.nxtTxBuilder.ecBlockId(lastEcBlockId);
         }
 
         // TODO check if the destination public key was announced and if so, remove it from the tx:
@@ -158,14 +154,16 @@ public class NxtFamilyWallet extends AbstractWallet<Transaction> implements Tran
     public void signTransaction(SendRequest request) {
         checkArgument(request.isCompleted(), "Send request is not completed");
         checkArgument(request.tx != null, "No transaction found in send request");
-        String nxtSecret;
+        Transaction tx = (Transaction) checkNotNull(request.tx.getRawTransaction());
+        byte[] privateKey;
         if (rootKey.isEncrypted()) {
             checkArgument(request.aesKey != null, "Wallet is encrypted but no decryption key provided");
-            nxtSecret = rootKey.toDecrypted(request.aesKey).getPrivateKeyMnemonic();
+            privateKey = rootKey.toDecrypted(request.aesKey).getPrivateKey();
         } else {
-            nxtSecret = rootKey.getPrivateKeyMnemonic();
+            privateKey = rootKey.getPrivateKey();
         }
-        ((Transaction)request.tx.getTransaction()).sign(nxtSecret);
+        tx.sign(privateKey);
+        Arrays.fill(privateKey, (byte) 0); // clear private key
     }
 
     @Override
@@ -180,7 +178,7 @@ public class NxtFamilyWallet extends AbstractWallet<Transaction> implements Tran
 
     @Override
     public String getPublicKeySerialized() {
-        throw new RuntimeException("Not implemented");
+        return Convert.toHexString(getPublicKey());
     }
 
     @Override
@@ -202,6 +200,8 @@ public class NxtFamilyWallet extends AbstractWallet<Transaction> implements Tran
             lastBlockSeenHash = null;
             lastBlockSeenHeight = -1;
             lastBlockSeenTimeSecs = 0;
+            lastEcBlockHeight = 0;
+            lastEcBlockId = 0;
             rawtransactions.clear();
             addressesStatus.clear();
             clearTransientState();
@@ -256,12 +256,29 @@ public class NxtFamilyWallet extends AbstractWallet<Transaction> implements Tran
 
     @Override
     public boolean broadcastTxSync(AbstractTransaction tx) throws IOException {
-        return blockchainConnection.broadcastTxSync((Transaction)tx.getTransaction());
+        return tx.getRawTransaction() != null && broadcastTxSync((Transaction) tx.getRawTransaction());
+    }
+
+    public boolean broadcastTxSync(Transaction tx) throws IOException {
+        if (isConnected()) {
+            if (log.isInfoEnabled()) {
+                log.info("Broadcasting tx {}", Utils.HEX.encode(tx.getBytes()));
+            }
+            boolean success = blockchainConnection.broadcastTxSync(tx);
+            if (success) {
+                onTransactionBroadcast(tx);
+            } else {
+                onTransactionBroadcastError(tx);
+            }
+            return success;
+        } else {
+            throw new IOException("No connection available");
+        }
     }
 
     @Override
     public void broadcastTx(AbstractTransaction tx) throws IOException {
-
+        throw new RuntimeException("Not implemented");
     }
 
     @Override
@@ -269,8 +286,7 @@ public class NxtFamilyWallet extends AbstractWallet<Transaction> implements Tran
         return address;
     }
 
-    @Override
-    public Transaction getTransaction(String transactionId) {
+    public Transaction getRawTransaction(String transactionId) {
         lock.lock();
         try {
             return rawtransactions.get(new Sha256Hash(transactionId));
@@ -279,23 +295,27 @@ public class NxtFamilyWallet extends AbstractWallet<Transaction> implements Tran
         }
     }
 
-    @Override
-    public Map<Sha256Hash, Transaction> getUnspentTransactions() {
+    public Map<Sha256Hash, Transaction> getPendingRawTransactions() {
         throw new RuntimeException("Not implemented");
     }
 
     @Override
-    public Map<Sha256Hash, Transaction> getPendingTransactions() {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public Map<Sha256Hash, AbstractTransaction> getAbstractTransactions() {
-        Map<Sha256Hash, AbstractTransaction> txs = new HashMap<Sha256Hash, AbstractTransaction>();
+    public Map<Sha256Hash, AbstractTransaction> getTransactions() {
+        Map<Sha256Hash, AbstractTransaction> txs = new HashMap<>();
         for ( Sha256Hash tx : rawtransactions.keySet() ) {
             txs.put( tx, new NxtTransaction(rawtransactions.get(tx)));
         }
         return txs;
+    }
+
+    @Override
+    public AbstractTransaction getTransaction(String transactionId) {
+        return new NxtTransaction(getRawTransaction(transactionId));
+    }
+
+    @Override
+    public Map<Sha256Hash, AbstractTransaction> getPendingTransactions() {
+        throw new RuntimeException("Not implemented");
     }
 
     @Override
@@ -772,7 +792,7 @@ public class NxtFamilyWallet extends AbstractWallet<Transaction> implements Tran
             //fetchingTransactions.remove(tx.getFullHash());
             log.info("adding transaction to wallet");
             // This tx not in wallet, add it
-            Transaction storedTx = getTransaction(tx.getFullHash());
+            Transaction storedTx = getRawTransaction(tx.getFullHash());
             if (storedTx == null) {
 
                 log.info("transaction added");
@@ -823,6 +843,6 @@ public class NxtFamilyWallet extends AbstractWallet<Transaction> implements Tran
 
     @Override
     public void onTransactionBroadcastError(Transaction tx) {
-
+        //queueOnTransactionBroadcastFailure(tx);
     }
 }

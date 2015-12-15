@@ -9,7 +9,6 @@ import android.widget.BaseAdapter;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
 import com.coinomi.core.coins.families.Families;
-import com.coinomi.core.coins.families.NxtFamily;
 import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.AbstractAddress;
 import com.coinomi.core.wallet.AbstractTransaction;

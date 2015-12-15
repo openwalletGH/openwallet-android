@@ -5,7 +5,6 @@ import com.coinomi.core.coins.nxt.Transaction;
 import com.coinomi.core.messages.MessageFactory;
 import com.coinomi.core.messages.TxMessage;
 import com.coinomi.core.wallet.AbstractTransaction;
-import com.google.protobuf.Message;
 
 import javax.annotation.Nullable;
 

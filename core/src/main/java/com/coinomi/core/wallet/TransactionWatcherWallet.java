@@ -46,7 +46,7 @@ import static com.coinomi.core.Preconditions.checkState;
 /**
  * @author John L. Jegutanis
  */
-abstract public class TransactionWatcherWallet extends AbstractWallet<Transaction> implements TransactionEventListener<Transaction> { //implements WalletAccount {
+abstract public class TransactionWatcherWallet extends AbstractWallet implements TransactionEventListener<Transaction> { //implements WalletAccount {
     private static final Logger log = LoggerFactory.getLogger(TransactionWatcherWallet.class);
 
     private final static int TX_DEPTH_SAVE_THRESHOLD = 4;
@@ -299,15 +299,15 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<Transactio
      * Returns a transaction object given its hash, if it exists in this wallet, or null otherwise.
      */
     @Nullable
-    public Transaction getTransaction(String transactionId) {
-        return getTransaction(new Sha256Hash(transactionId));
+    public Transaction getRawTransaction(String transactionId) {
+        return getRawTransaction(new Sha256Hash(transactionId));
     }
 
     /**
      * Returns a transaction object given its hash, if it exists in this wallet, or null otherwise.
      */
     @Nullable
-    public Transaction getTransaction(Sha256Hash hash) {
+    public Transaction getRawTransaction(Sha256Hash hash) {
         lock.lock();
         try {
             return rawtransactions.get(hash);
@@ -315,12 +315,6 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<Transactio
             lock.unlock();
         }
     }
-
-    @Nullable
-    public AbstractTransaction getAbstractTransaction(String transactionId) {
-        return new BitTransaction(getTransaction(new Sha256Hash(transactionId)));
-    }
-
 
     /**
      * Returns transactions that match the hashes, some transactions could be missing.
@@ -874,7 +868,7 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<Transactio
 
     private boolean isTransactionAvailableOrQueued(Sha256Hash txHash) {
         checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
-        return getTransaction(txHash) != null || fetchingTransactions.contains(txHash);
+        return getRawTransaction(txHash) != null || fetchingTransactions.contains(txHash);
     }
 
     @VisibleForTesting
@@ -885,7 +879,7 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<Transactio
             fetchingTransactions.remove(tx.getHash());
 
             // This tx not in wallet, add it
-            if (getTransaction(tx.getHash()) == null) {
+            if (getRawTransaction(tx.getHash()) == null) {
                 tx.getConfidence().setConfidenceType(TransactionConfidence.ConfidenceType.PENDING);
                 addWalletTransaction(WalletTransaction.Pool.PENDING, tx, true);
             }
@@ -1094,12 +1088,13 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<Transactio
 
     @Override
     public void broadcastTx(AbstractTransaction tx) throws IOException {
-        broadcastTx((Transaction)tx.getTransaction());
+        // TODO throw transaction broadcast exception
+        broadcastTx((Transaction) tx.getRawTransaction());
     }
 
     @Override
     public boolean broadcastTxSync(AbstractTransaction tx) throws IOException {
-        return broadcastTxSync((Transaction)tx.getTransaction());
+        return tx.getRawTransaction() != null && broadcastTxSync((Transaction) tx.getRawTransaction());
     }
 
     public boolean broadcastTxSync(Transaction tx) throws IOException {
@@ -1138,25 +1133,38 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<Transactio
         return blockchainConnection != null;
     }
 
-    @Override
     public Map<Sha256Hash, Transaction> getUnspentTransactions() {
         return unspent;
     }
 
-    @Override
-    public Map<Sha256Hash, Transaction> getPendingTransactions() {
+    public Map<Sha256Hash, Transaction> getPendingRawTransactions() {
         return pending;
     }
 
-    public Map<Sha256Hash, Transaction> getTransactions() {
+    public Map<Sha256Hash, Transaction> getRawTransactions() {
         return rawtransactions;
     }
 
+    @Nullable
     @Override
-    public Map<Sha256Hash, AbstractTransaction> getAbstractTransactions() {
-        Map<Sha256Hash, AbstractTransaction> txs = new HashMap<Sha256Hash, AbstractTransaction>();
-        for ( Sha256Hash tx : rawtransactions.keySet() ) {
-            txs.put( tx, new BitTransaction(rawtransactions.get(tx)));
+    public AbstractTransaction getTransaction(String transactionId) {
+        return new BitTransaction(getRawTransaction(new Sha256Hash(transactionId)));
+    }
+
+    @Override
+    public Map<Sha256Hash, AbstractTransaction> getTransactions() {
+        return toAbstractTransactions(rawtransactions);
+    }
+
+    @Override
+    public Map<Sha256Hash, AbstractTransaction> getPendingTransactions() {
+        return toAbstractTransactions(pending);
+    }
+
+    static Map<Sha256Hash, AbstractTransaction> toAbstractTransactions(Map<Sha256Hash, Transaction> txMap) {
+        Map<Sha256Hash, AbstractTransaction> txs = new HashMap<>();
+        for (Sha256Hash hash : txMap.keySet()) {
+            txs.put(hash, new BitTransaction(txMap.get(hash)));
         }
         return txs;
     }

@@ -1,16 +1,12 @@
 package com.coinomi.core.wallet.families.nxt;
 
 import com.coinomi.core.coins.CoinType;
-import com.coinomi.core.coins.DogecoinTest;
 import com.coinomi.core.coins.NxtMain;
 import com.coinomi.core.coins.Value;
 import com.coinomi.core.coins.families.NxtFamily;
 import com.coinomi.core.coins.nxt.Account;
-import com.coinomi.core.coins.nxt.Appendix;
 import com.coinomi.core.coins.nxt.Attachment;
 import com.coinomi.core.coins.nxt.Convert;
-import com.coinomi.core.coins.nxt.Crypto;
-import com.coinomi.core.coins.nxt.EncryptedData;
 import com.coinomi.core.coins.nxt.NxtException;
 import com.coinomi.core.coins.nxt.Transaction;
 import com.coinomi.core.coins.nxt.TransactionImpl;
@@ -18,9 +14,7 @@ import com.coinomi.core.protos.Protos;
 import com.coinomi.core.wallet.SendRequest;
 import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.wallet.WalletAccount;
-import com.coinomi.core.wallet.WalletPocketHD;
 
-import org.bitcoinj.core.InsufficientMoneyException;
 import org.bitcoinj.crypto.DeterministicHierarchy;
 import org.bitcoinj.crypto.DeterministicKey;
 import org.bitcoinj.crypto.HDKeyDerivation;
@@ -46,10 +40,10 @@ import static org.junit.Assert.assertEquals;
 public class NxtFamilyWalletTest {
     CoinType NXT = NxtMain.get();
     String recoveryPhrase = "heavy virus hollow shrug shadow double dwarf affair novel weird image prize frame anxiety wait";
-    String nxtSecret = "check federal prize adapt pumpkin renew toilet flip candy leopard reform leaf venture hammer amateur rack coyote hover under clog pitch cash begin issue";
-    String nxtRsAddress = "NXT-BE3N-2KJX-ZMQJ-4GW4P";
-    long nxtAccountId = Convert.parseAccountId(NXT, "3065700120828096564");
-    byte[] nxtPublicKey = Hex.decode("195df5f2e4d826fd512d3748eb2c47a9a0d59cdd18b6a0f3b4717381b8f9ac59");
+    byte[] nxtPrivateKey = Hex.decode("200a8ead018adb6c78f2c821500ad13f5f24d101ed8431adcfb315ca58468553");
+    byte[] nxtPublicKey = Hex.decode("163c6583ed489414f27e73a74f72080b478a55dfce4a086ded2990976e8bb81e");
+    String nxtRsAddress = "NXT-CGNQ-8WBM-3P2F-AVH9J";
+    long nxtAccountId = Convert.parseAccountId(NxtMain.get(), "9808271777446836886");
 
     DeterministicHierarchy hierarchy;
     static final byte[] aesKeyBytes = {0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7};
@@ -93,12 +87,12 @@ public class NxtFamilyWalletTest {
 
     @Test
     public void testHDAccountNxt() throws MnemonicException {
-        String secret = nxtAccount.getPrivateKeyMnemonic();
-        byte[] pub = nxtAccount.getPublicKey();
+        byte[] privateKey = nxtAccount.rootKey.getPrivateKey();
+        byte[] publicKey = nxtAccount.getPublicKey();
 
-        assertEquals(nxtSecret, secret);
+        assertArrayEquals(nxtPrivateKey, privateKey);
         assertEquals(nxtRsAddress, nxtAccount.getPublicKeyMnemonic());
-        assertArrayEquals(nxtPublicKey, pub);
+        assertArrayEquals(nxtPublicKey, publicKey);
         NxtFamilyAddress address = (NxtFamilyAddress) nxtAccount.getReceiveAddress();
         assertEquals(nxtRsAddress, address.toString());
         assertEquals(nxtAccountId, address.getAccountId());
@@ -109,14 +103,10 @@ public class NxtFamilyWalletTest {
         NxtFamilyAddress destination = (NxtFamilyAddress) otherAccount.getReceiveAddress();
         Value amount = NXT.value("1");
         SendRequest req = nxtAccount.sendCoinsOffline(destination, amount);
-        //nxtAccount
-        //nxtAccount.completeAndSignTx(req);
-
-
+        nxtAccount.completeAndSignTx(req);
 
         Transaction nxtTx = req.nxtTxBuilder.build();
-        nxtTx.sign(nxtSecret);
-
+//        nxtTx.sign(nxtSecret);
 
         byte[] txBytes = req.nxtTxBuilder.build().getBytes();
 
@@ -125,15 +115,14 @@ public class NxtFamilyWalletTest {
         Transaction parsedTx = TransactionImpl.parseTransaction(txBytes);
         assertEquals(Attachment.ORDINARY_PAYMENT, parsedTx.getAttachment());
         assertEquals(NxtFamily.DEFAULT_DEADLINE, parsedTx.getDeadline());
-        System.out.println(((Transaction) req.tx.getTransaction()).getTimestamp());
-        assertEquals(((Transaction) req.tx.getTransaction()).getTimestamp(), parsedTx.getTimestamp());
+        assertEquals(((Transaction) req.tx.getRawTransaction()).getTimestamp(), parsedTx.getTimestamp());
         assertEquals(nxtAccountId, parsedTx.getSenderId());
         assertArrayEquals(nxtPublicKey, parsedTx.getSenderPublicKey());
         assertEquals(amount.value, parsedTx.getAmountNQT());
         assertEquals(req.fee.value, parsedTx.getFeeNQT());
         assertEquals(destination.getAccountId(), parsedTx.getRecipientId());
 
-        System.out.println(Convert.toHexString(nxtTx.getBytes()));
+//        System.out.println(Convert.toHexString(nxtTx.getBytes()));
         // TODO check signature
     }
 

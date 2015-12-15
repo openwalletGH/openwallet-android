@@ -1,8 +1,5 @@
 package com.coinomi.core.wallet.families.nxt;
 
-import com.coinomi.core.coins.CoinType;
-import com.coinomi.core.coins.nxt.Account;
-import com.coinomi.core.coins.nxt.Convert;
 import com.coinomi.core.coins.nxt.Crypto;
 import com.coinomi.core.protos.Protos;
 import com.coinomi.core.util.KeyUtils;
@@ -30,7 +27,6 @@ import java.util.concurrent.Executor;
 
 import javax.annotation.Nullable;
 
-import static com.coinomi.core.CoreUtils.bytesToMnemonicString;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -46,7 +42,7 @@ final public class NxtFamilyKey implements EncryptableKeyChain, KeyBag, Serializ
     public NxtFamilyKey(DeterministicKey entropy, @Nullable KeyCrypter keyCrypter,
                         @Nullable KeyParameter key) {
         checkArgument(!entropy.isEncrypted(), "Entropy must not be encrypted");
-        this.publicKey = Crypto.getPublicKey(getPrivateKeyMnemonic(entropy));
+        this.publicKey = Crypto.getPublicKey(entropy.getPrivKeyBytes());
         // Encrypt entropy if needed
         if (keyCrypter != null && key != null) {
             this.entropy = entropy.encrypt(keyCrypter, key, entropy.getParent());
@@ -61,20 +57,16 @@ final public class NxtFamilyKey implements EncryptableKeyChain, KeyBag, Serializ
 
     }
 
-    public String getPrivateKeyMnemonic() {
-        return getPrivateKeyMnemonic(entropy);
-    }
-
-    public static String getPrivateKeyMnemonic(DeterministicKey entropy) {
-        return bytesToMnemonicString(entropy.getPrivKeyBytes());
-    }
-
     public boolean isEncrypted() {
         return entropy.isEncrypted();
     }
 
     public byte[] getPublicKey() {
         return publicKey;
+    }
+
+    public byte[] getPrivateKey() {
+        return Crypto.convertToPrivateKey(entropy.getPrivKeyBytes());
     }
 
     @Nullable
@@ -250,7 +242,7 @@ final public class NxtFamilyKey implements EncryptableKeyChain, KeyBag, Serializ
         checkNotNull(getKeyCrypter(), "Key not encrypted");
         try {
             return Arrays.equals(publicKey,
-                    Crypto.getPublicKey(getPrivateKeyMnemonic(entropy.decrypt(aesKey))));
+                    Crypto.getPublicKey(entropy.decrypt(aesKey).getPrivKeyBytes()));
         } catch (KeyCrypterException e) {
             return false;
         }

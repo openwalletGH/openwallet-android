@@ -20,7 +20,6 @@ package com.coinomi.wallet.util;
 
 import android.graphics.Typeface;
 import android.os.Build;
-import android.security.KeyChain;
 import android.text.Spannable;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
@@ -34,7 +33,6 @@ import com.coinomi.core.wallet.AbstractAddress;
 import com.coinomi.core.wallet.AbstractTransaction;
 import com.coinomi.core.wallet.AbstractWallet;
 import com.coinomi.core.wallet.WalletAccount;
-import com.coinomi.core.wallet.families.bitcoin.BitAddress;
 import com.coinomi.wallet.Constants;
 
 import org.bitcoinj.core.ScriptException;
@@ -56,7 +54,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import static com.coinomi.core.Preconditions.checkState;
-import static com.coinomi.core.util.AddressUtils.fromScript;
 
 /**
  * @author Andreas Schildbach

@@ -26,12 +26,15 @@ import com.coinomi.core.coins.DogecoinMain;
 import com.coinomi.core.coins.LitecoinMain;
 import com.coinomi.core.coins.NuBitsMain;
 import com.coinomi.core.coins.NuSharesMain;
+import com.coinomi.core.coins.NxtMain;
 import com.coinomi.core.coins.PeercoinMain;
 import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.families.bitcoin.BitAddress;
+import com.coinomi.core.wallet.families.nxt.NxtFamilyAddress;
 
 import org.bitcoinj.core.Coin;
 import org.junit.Test;
+import org.spongycastle.util.encoders.Hex;
 
 import java.io.UnsupportedEncodingException;
 
@@ -52,6 +55,7 @@ public class CoinURITest {
     final CoinType DASH = DashMain.get();
     final CoinType NBT = NuBitsMain.get();
     final CoinType NSR = NuSharesMain.get();
+    final CoinType NXT = NxtMain.get();
 
 
     private static final String MAINNET_GOOD_ADDRESS = "1KzTSfqjF2iKCduwz59nv2uqh1W2JsTxZH";
@@ -119,6 +123,14 @@ public class CoinURITest {
         goodAddress = new BitAddress(DASH, hash160);
         goodAddressStr = goodAddress.toString();
         assertEquals("dash:" + goodAddressStr + "?amount=12.34&label=Hello&message=AMessage", CoinURI.convertToCoinURI(goodAddress, DASH.value("12.34"), "Hello", "AMessage"));
+
+        // NXT
+        String pubkeyStr = "3c1c0b3f8f87d6efdc2694ce43f848375a4f761624d255e5fc1194a4ebc76755";
+        byte[] pubkey = Hex.decode(pubkeyStr);
+        NxtFamilyAddress nxtGoodAddress = new NxtFamilyAddress(NXT, pubkey);
+        goodAddressStr = nxtGoodAddress.toString();
+        assertEquals("nxt:" + goodAddressStr + "?amount=12.34&label=Hello&message=AMessage&pubkey="+pubkeyStr,
+                CoinURI.convertToCoinURI(nxtGoodAddress, NXT.value("12.34"), "Hello", "AMessage", pubkeyStr));
     }
 
     @Test

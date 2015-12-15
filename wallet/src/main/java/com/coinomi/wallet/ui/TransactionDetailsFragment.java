@@ -16,7 +16,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.coinomi.core.coins.CoinType;
-import com.coinomi.core.messages.MessageFactory;
 import com.coinomi.core.messages.TxMessage;
 import com.coinomi.core.util.AddressUtils;
 import com.coinomi.core.wallet.AbstractTransaction;
@@ -30,8 +29,6 @@ import com.coinomi.wallet.util.UiUtils;
 import com.coinomi.wallet.util.WeakHandler;
 
 import org.acra.ACRA;
-import org.bitcoinj.core.Transaction;
-import org.bitcoinj.core.TransactionConfidence;
 import org.bitcoinj.core.TransactionOutput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -153,7 +150,7 @@ public class TransactionDetailsFragment extends Fragment {
         if (txId == null) {
             cannotShowTxDetails();
         } else {
-            AbstractTransaction tx = pocket.getAbstractTransaction(txId);
+            AbstractTransaction tx = pocket.getTransaction(txId);
             if (tx == null) {
                 cannotShowTxDetails();
             } else {

@@ -682,10 +682,20 @@ public final class TransactionImpl implements Transaction {
 
     @Override
     public void sign(String secretPhrase) {
+        checkForSignature();
+        signature = Crypto.signWithSecretPhrase(getBytes(), secretPhrase);
+    }
+
+    @Override
+    public void sign(byte[] privateKey) {
+        checkForSignature();
+        signature = Crypto.sign(getBytes(), privateKey);
+    }
+
+    private void checkForSignature() {
         if (signature != null) {
             throw new IllegalStateException("Transaction already signed");
         }
-        signature = Crypto.sign(getBytes(), secretPhrase);
     }
 
     @Override

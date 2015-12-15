@@ -52,6 +52,35 @@
                     tools:text="nUdHX BSBY QPJR EXZM BUdu 8ARn WM2m z3XQp" />
             </RelativeLayout>
 
+            <RelativeLayout
+                android:visibility="gone"
+                android:id="@+id/public_key"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal" >
+
+                <TextView
+                    android:id="@+id/request_public_key_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    android:text="@string/receive_address_label"
+                    android:textColor="@color/gray_54_sec_text_icons" />
+
+                <TextView
+                    android:id="@+id/request_public_key"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/request_public_key_label"
+                    style="@style/NormalText"
+                    android:typeface="monospace"
+                    android:textSize="@dimen/receive_address"
+                    tools:text="a751ca7296d1b20ea1d33cb10967f2f8\n01cc9ef42fd3a28057a3b72bab98e496" />
+
+            </RelativeLayout>
+
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="wrap_content"

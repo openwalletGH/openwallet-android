@@ -1,6 +1,5 @@
 package com.coinomi.core.wallet.families.bitcoin;
 
-import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
 import com.coinomi.core.messages.TxMessage;
 import com.coinomi.core.util.AddressUtils;
@@ -18,44 +17,49 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import static com.coinomi.core.Preconditions.checkNotNull;
 
 /**
- * Created by vbcs on 1/10/2015.
+ * @author vbcs
+ * @author John L. Jegutanis
  */
-public class BitTransaction extends AbstractTransaction<Transaction> {
+public final class BitTransaction implements AbstractTransaction {
+    final Transaction tx;
+
     public BitTransaction(Transaction transaction) {
-        super(transaction);
+        tx = checkNotNull(transaction);
     }
 
     @Override
     public TransactionConfidence.ConfidenceType getConfidenceType() {
-        return transaction.getConfidence().getConfidenceType();
+        return tx.getConfidence().getConfidenceType();
     }
 
     @Override
     public int getAppearedAtChainHeight() {
-        return transaction.getConfidence().getAppearedAtChainHeight();
+        return tx.getConfidence().getAppearedAtChainHeight();
     }
 
     @Override
     public TransactionConfidence.Source getSource() {
-        return transaction.getConfidence().getSource();
+        return tx.getConfidence().getSource();
     }
 
     @Override
     public int getDepthInBlocks() {
-        return transaction.getConfidence().getDepthInBlocks();
+        return tx.getConfidence().getDepthInBlocks();
     }
 
     @Override
     public String getHashAsString() {
-        return transaction.getHashAsString();
+        return tx.getHashAsString();
     }
 
     @Override
     public Value getValue(AbstractWallet wallet) {
-        return Value.valueOf(wallet.getCoinType(), transaction.getValue(wallet));
+        return Value.valueOf(wallet.getCoinType(), tx.getValue(wallet));
 
     }
 
@@ -66,13 +70,18 @@ public class BitTransaction extends AbstractTransaction<Transaction> {
 
     @Override
     public Value getFee(WalletAccount wallet) {
-        return Value.valueOf(wallet.getCoinType(), transaction.getFee());
+        return Value.valueOf(wallet.getCoinType(), tx.getFee());
+    }
+
+    @Override
+    public AbstractAddress getSender(AbstractWallet wallet) {
+        return null;
     }
 
     @Override
     public List<Map.Entry<AbstractAddress, Value>> getOutputs(AbstractWallet wallet) {
         List<Map.Entry<AbstractAddress, Value>> outputs = new ArrayList<>();
-        for ( TransactionOutput output : transaction.getOutputs() )
+        for ( TransactionOutput output : tx.getOutputs() )
         {
             outputs.add(
                     new AbstractMap.SimpleEntry<AbstractAddress, Value>
@@ -84,17 +93,20 @@ public class BitTransaction extends AbstractTransaction<Transaction> {
 
     @Override
     public byte[] getHash() {
-        return transaction.getHash().getBytes();
+        return tx.getHash().getBytes();
     }
 
     @Override
+    public boolean isGenerated() {
+        return tx.isCoinBase() || tx.isCoinStake();
+    }
+
     public boolean isCoinBase() {
-        return transaction.isCoinBase();
+        return tx.isCoinBase();
     }
 
-    @Override
     public boolean isCoinStake() {
-        return transaction.isCoinStake();
+        return tx.isCoinStake();
     }
 
     @Override
@@ -104,14 +116,10 @@ public class BitTransaction extends AbstractTransaction<Transaction> {
     }
 
     @Override
-    public Transaction getTransaction() {
-        return transaction;
+    @Nullable
+    public Transaction getRawTransaction() {
+        return tx;
     }
-
-
-//    public BitTransaction(Transaction tx) {
-//        super(tx);
-//    }
 
     /*public BitTransaction(WalletAccount account, Transaction tx) {
         super(account, tx);

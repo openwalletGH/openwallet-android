@@ -52,6 +52,8 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
  */
 public class NxtServerClient implements BlockchainConnection<Transaction> {
 
+    private static final int POLL_INTERVAL_SEC = 5;
+
     private static final Logger log = LoggerFactory.getLogger(NxtServerClient.class);
 
     private static final ScheduledThreadPoolExecutor connectionExec;
@@ -131,7 +133,6 @@ public class NxtServerClient implements BlockchainConnection<Transaction> {
     }
 
     private String getBaseUrl() {
-
         ServerAddress address = getServerAddress();
         StringBuilder builder = new StringBuilder();
         builder.append("http://" + address.getHost()).append(":").append(address.getPort())
@@ -245,7 +246,7 @@ public class NxtServerClient implements BlockchainConnection<Transaction> {
                 });
 
             }
-        }, 0, 15, TimeUnit.SECONDS);
+        }, 0, POLL_INTERVAL_SEC, TimeUnit.SECONDS);
         subscribeToEc();
     }
 
@@ -254,40 +255,40 @@ public class NxtServerClient implements BlockchainConnection<Transaction> {
      */
     private void subscribeToEc() {
         ScheduledExecutorService exec = Executors.newSingleThreadScheduledExecutor();
-            exec.scheduleAtFixedRate(new Runnable() {
-                @Override
-                public void run() {
+        exec.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
 
-                    Request request = new Request.Builder().url(getEcUrl()).build();
-                    getHttpClient().newCall(request).enqueue(new Callback() {
-                        @Override
-                        public void onFailure(Request request, IOException e) {
-                            log.info("Failed to communicate with server:  " + request.toString());
+                Request request = new Request.Builder().url(getEcUrl()).build();
+                getHttpClient().newCall(request).enqueue(new Callback() {
+                    @Override
+                    public void onFailure(Request request, IOException e) {
+                        log.info("Failed to communicate with server:  " + request.toString());
 
-                        }
+                    }
 
-                        @Override
-                        public void onResponse(Response response) throws IOException {
-                            try {
-                                if (!response.isSuccessful()) {
-                                    log.info("Unable to fetch EC block.");
-                                    log.info("[Error code] = " + response.code());
-                                }
-                                JSONObject reply = parseReply(response);
-                                ecBlockHeight = reply.getInt("ecBlockHeight");
-                                ecBlockId = reply.getString("ecBlockId");
-
-                            } catch (IOException e) {
-                                log.info("IOException: " + e.getMessage());
-                            } catch (JSONException e) {
-                                log.info("Could not parse JSON: " + e.getMessage());
+                    @Override
+                    public void onResponse(Response response) throws IOException {
+                        try {
+                            if (!response.isSuccessful()) {
+                                log.info("Unable to fetch EC block.");
+                                log.info("[Error code] = " + response.code());
                             }
+                            JSONObject reply = parseReply(response);
+                            ecBlockHeight = reply.getInt("ecBlockHeight");
+                            ecBlockId = reply.getString("ecBlockId");
+
+                        } catch (IOException e) {
+                            log.info("IOException: " + e.getMessage());
+                        } catch (JSONException e) {
+                            log.info("Could not parse JSON: " + e.getMessage());
                         }
-                    });
+                    }
+                });
 
 
-                }
-            }, 0, 15, TimeUnit.SECONDS);
+            }
+        }, 0, POLL_INTERVAL_SEC, TimeUnit.SECONDS);
 
     }
 
@@ -296,7 +297,7 @@ public class NxtServerClient implements BlockchainConnection<Transaction> {
     Raises onAddressStatusUpdate if changed.
      */
     @Override
-    public void subscribeToAddresses(List<AbstractAddress> addresses,final TransactionEventListener listener) {
+    public void subscribeToAddresses(List<AbstractAddress> addresses, final TransactionEventListener listener) {
         ScheduledExecutorService exec = Executors.newSingleThreadScheduledExecutor();
         for (final AbstractAddress address : addresses) {
             log.info("Going to subscribe to {}", address);
@@ -338,7 +339,7 @@ public class NxtServerClient implements BlockchainConnection<Transaction> {
                         }
                     });
                 }
-            }, 0, 15, TimeUnit.SECONDS);
+            }, 0, POLL_INTERVAL_SEC, TimeUnit.SECONDS);
 
         }
     }
@@ -354,61 +355,14 @@ public class NxtServerClient implements BlockchainConnection<Transaction> {
         exec.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
+                log.info("Going to fetch txs for {}", status.getAddress().toString());
 
-            log.info("Going to fetch txs for {}", status.getAddress().toString());
-
-                    Request request = new Request.Builder().url(getBlockChainTxsUrl(status.getAddress().toString())).build();
-                    getHttpClient().newCall(request).enqueue(new Callback() {
-                        @Override
-                        public void onFailure(Request request, IOException e) {
-                            log.info("Failed to communicate with server:  " + request.toString());
-
-                        }
-
-                        @Override
-                        public void onResponse(Response response) throws IOException {
-                            try {
-                                if (!response.isSuccessful()) {
-                                    log.info("Unable to fetch txs.");
-                                    log.info("[Error code] = " + response.code());
-                                }
-                                JSONObject reply = parseReply(response);
-                                JSONArray txs = reply.getJSONArray("transactions");
-
-                                ImmutableList.Builder<ServerClient.HistoryTx> historyTxs = ImmutableList.builder();
-
-                                for (int j = 0; j < txs.length(); j++) {
-                                    JSONObject tx = txs.getJSONObject(j);
-                                    JSONObject histTx = new JSONObject();
-                                    histTx.put("tx_hash", tx.getString("fullHash"));
-                                    histTx.put("height", tx.getInt("height"));
-                                    historyTxs.add(new ServerClient.HistoryTx(histTx));
-                                    log.info("added to historyTx: {}", tx.getString("fullHash"));
-                                }
-                                listener.onTransactionHistory(status, historyTxs.build());
-
-                            } catch (IOException e) {
-                                log.info("IOException: " + e.getMessage());
-                            } catch (JSONException e) {
-                                log.info("Could not parse JSON: " + e.getMessage());
-                            }
-                        }
-                    });
-
-    }
-}, 0, 15, TimeUnit.SECONDS);
-
-        }
-
-    @Override
-    public void getTransaction(final Sha256Hash txHash, final TransactionEventListener listener) {
-
-                Request request = new Request.Builder().url(getTransactionUrl(txHash.toString())).build();
+                Request request = new Request.Builder().url(getBlockChainTxsUrl(status.getAddress().toString())).build();
                 getHttpClient().newCall(request).enqueue(new Callback() {
                     @Override
                     public void onFailure(Request request, IOException e) {
                         log.info("Failed to communicate with server:  " + request.toString());
-                        getTransaction(txHash, listener);
+
                     }
 
                     @Override
@@ -419,25 +373,69 @@ public class NxtServerClient implements BlockchainConnection<Transaction> {
                                 log.info("[Error code] = " + response.code());
                             }
                             JSONObject reply = parseReply(response);
+                            JSONArray txs = reply.getJSONArray("transactions");
 
-                            //String txId = reply.getString("transaction");
-                            //Integer confirmations = reply.getInt("confirmations");
-                            //getTransactionBytes(txId, listener, confirmations);
+                            ImmutableList.Builder<ServerClient.HistoryTx> historyTxs = ImmutableList.builder();
 
-                            TransactionImpl tx = TransactionImpl.parseTransaction(reply);
-                            log.info("Transaction fetched");
-                            listener.onTransactionUpdate(tx);
-
+                            for (int j = 0; j < txs.length(); j++) {
+                                JSONObject tx = txs.getJSONObject(j);
+                                JSONObject histTx = new JSONObject();
+                                histTx.put("tx_hash", tx.getString("fullHash"));
+                                histTx.put("height", tx.getInt("height"));
+                                historyTxs.add(new ServerClient.HistoryTx(histTx));
+                                log.info("added to historyTx: {}", tx.getString("fullHash"));
+                            }
+                            listener.onTransactionHistory(status, historyTxs.build());
 
                         } catch (IOException e) {
                             log.info("IOException: " + e.getMessage());
                         } catch (JSONException e) {
                             log.info("Could not parse JSON: " + e.getMessage());
-                        }catch (NxtException.NotValidException e) {
-                            log.info("Could not parse JSON: " + e.getMessage());
                         }
                     }
                 });
+            }
+        }, 0, 15, TimeUnit.SECONDS);
+    }
+
+    @Override
+    public void getTransaction(final Sha256Hash txHash, final TransactionEventListener listener) {
+        Request request = new Request.Builder().url(getTransactionUrl(txHash.toString())).build();
+        getHttpClient().newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Request request, IOException e) {
+                log.info("Failed to communicate with server:  " + request.toString());
+                // FIXME infinite recursion
+//                getTransaction(txHash, listener);
+            }
+
+            @Override
+            public void onResponse(Response response) throws IOException {
+                try {
+                    if (!response.isSuccessful()) {
+                        log.info("Unable to fetch txs.");
+                        log.info("[Error code] = " + response.code());
+                    }
+                    JSONObject reply = parseReply(response);
+
+                    //String txId = reply.getString("transaction");
+                    //Integer confirmations = reply.getInt("confirmations");
+                    //getTransactionBytes(txId, listener, confirmations);
+
+                    TransactionImpl tx = TransactionImpl.parseTransaction(reply);
+                    log.info("Transaction fetched");
+                    listener.onTransactionUpdate(tx);
+
+
+                } catch (IOException e) {
+                    log.info("IOException: " + e.getMessage());
+                } catch (JSONException e) {
+                    log.info("Could not parse JSON: " + e.getMessage());
+                }catch (NxtException.NotValidException e) {
+                    log.info("Could not parse JSON: " + e.getMessage());
+                }
+            }
+        });
 
     }
 
@@ -490,6 +488,7 @@ public class NxtServerClient implements BlockchainConnection<Transaction> {
             .add("transactionBytes",Convert.toHexString(tx.getBytes())).build();
         Request request = new Request.Builder().url(getBaseUrl()).post(formBody).build();
 
+        // FIXME this is not a sync call
         getHttpClient().newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Request request, IOException e) {

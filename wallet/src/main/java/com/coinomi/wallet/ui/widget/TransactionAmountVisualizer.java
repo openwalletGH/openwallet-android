@@ -10,7 +10,6 @@ import android.widget.TextView;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
 import com.coinomi.core.messages.TxMessage;
-import com.coinomi.core.util.AddressUtils;
 import com.coinomi.core.util.ExchangeRate;
 import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.AbstractAddress;
@@ -18,10 +17,6 @@ import com.coinomi.core.wallet.AbstractTransaction;
 import com.coinomi.core.wallet.AbstractWallet;
 import com.coinomi.wallet.R;
 import com.google.common.collect.ImmutableList;
-
-import org.bitcoinj.core.Coin;
-import org.bitcoinj.core.Transaction;
-import org.bitcoinj.core.TransactionOutput;
 
 import java.util.List;
 import java.util.Map;

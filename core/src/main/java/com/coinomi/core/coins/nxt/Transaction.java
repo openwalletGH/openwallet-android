@@ -66,6 +66,8 @@ public interface Transaction extends Comparable<Transaction> {
 
     void sign(String secretPhrase);
 
+    void sign(byte[] privateKey);
+
     byte[] getBytes();
 
     byte[] getUnsignedBytes();

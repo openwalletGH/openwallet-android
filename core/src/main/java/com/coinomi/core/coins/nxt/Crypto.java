@@ -48,16 +48,25 @@ public final class Crypto {
         throw new RuntimeException("No implemented");
     }
 
-    public static byte[] getPublicKey(String secretPhrase) {
+    public static byte[] getPublicKey(byte[] privateKey) {
         byte[] publicKey = new byte[32];
-        Curve25519.keygen(publicKey, null, Crypto.sha256().digest(Convert.toBytes(secretPhrase)));
+        Curve25519.keygen(publicKey, null, privateKey);
         if (! Curve25519.isCanonicalPublicKey(publicKey)) {
             throw new RuntimeException("Public key not canonical");
         }
         return publicKey;
     }
 
-    public static byte[] getPrivateKey(String secretPhrase) {
+    public static byte[] convertToPrivateKey(byte[] entropy) {
+        Curve25519.clamp(entropy);
+        return entropy;
+    }
+
+    public static byte[] getPublicKeyFromSecretPhrase(String secretPhrase) {
+        return getPublicKey(Crypto.sha256().digest(Convert.toBytes(secretPhrase)));
+    }
+
+    public static byte[] getPrivateKeyFromSecretPhrase(String secretPhrase) {
         byte[] s = Crypto.sha256().digest(Convert.toBytes(secretPhrase));
         Curve25519.clamp(s);
         return s;
@@ -67,12 +76,17 @@ public final class Crypto {
         Curve25519.curve(Z, k, P);
     }
 
-    public static byte[] sign(byte[] message, String secretPhrase) {
+    public static byte[] signWithSecretPhrase(byte[] message, String secretPhrase) {
+        return sign(message, getPrivateKeyFromSecretPhrase(secretPhrase));
+    }
+
+    public static byte[] sign(byte[] message, byte[] privateKey) {
 
         byte[] P = new byte[32];
         byte[] s = new byte[32];
+        Curve25519.keygen(P, s, privateKey);
+
         MessageDigest digest = Crypto.sha256();
-        Curve25519.keygen(P, s, digest.digest(Convert.toBytes(secretPhrase)));
 
         byte[] m = digest.digest(message);
 

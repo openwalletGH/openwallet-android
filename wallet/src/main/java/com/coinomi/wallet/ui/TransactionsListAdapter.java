@@ -31,22 +31,16 @@ import android.widget.TextView;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
 import com.coinomi.core.coins.families.Families;
-import com.coinomi.core.coins.nxt.Transaction;
-import com.coinomi.core.messages.MessageFactory;
 import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.AbstractAddress;
 import com.coinomi.core.wallet.AbstractTransaction;
 import com.coinomi.core.wallet.AbstractWallet;
-import com.coinomi.core.wallet.families.bitcoin.BitTransaction;
-import com.coinomi.core.wallet.families.nxt.NxtTransaction;
 import com.coinomi.wallet.AddressBookProvider;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.ui.widget.CurrencyTextView;
 import com.coinomi.wallet.util.Fonts;
 import com.coinomi.wallet.util.WalletUtils;
 
-import org.acra.ACRA;
-import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.TransactionConfidence;
 import org.bitcoinj.core.TransactionConfidence.ConfidenceType;
 
@@ -66,7 +60,7 @@ public class TransactionsListAdapter extends BaseAdapter {
     private final LayoutInflater inflater;
     private final AbstractWallet walletPocket;
 
-    private final List<AbstractTransaction> transactions = new ArrayList<AbstractTransaction>();
+    private final List<AbstractTransaction> transactions = new ArrayList<>();
     private final Resources res;
     private int precision = 0;
     private int shift = 0;
@@ -208,7 +202,6 @@ public class TransactionsListAdapter extends BaseAdapter {
         Resources res = context.getResources();
         final ConfidenceType confidenceType = tx.getConfidenceType();
         final boolean isOwn = tx.getSource().equals(TransactionConfidence.Source.SELF);
-        final boolean isMined = tx.isCoinBase() || tx.isCoinStake();
 //        final boolean isInternal = WalletUtils.isInternal(tx);
 
         final Value value = tx.getValue(walletPocket);
@@ -287,7 +280,7 @@ public class TransactionsListAdapter extends BaseAdapter {
         }
 
         // Money direction and icon
-        if (isMined) {
+        if (tx.isGenerated()) {
             rowDirectionText.setText(minedTitle);
             rowDirectionFontIcon.setText(fontIconMined);
         } else {

@@ -24,24 +24,24 @@ import java.io.UnsupportedEncodingException;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.spongycastle.util.encoders.Hex.toHexString;
 
 public class NxtFamilyTest {
     String recoveryPhrase = "heavy virus hollow shrug shadow double dwarf affair novel weird image prize frame anxiety wait";
-    String nxtSecret = "check federal prize adapt pumpkin renew toilet flip candy leopard reform leaf venture hammer amateur rack coyote hover under clog pitch cash begin issue";
-    String nxtRsAddress = "NXT-BE3N-2KJX-ZMQJ-4GW4P";
-    long nxtAccountId = Convert.parseAccountId(NxtMain.get(), "3065700120828096564");
-    byte[] nxtPublicKey = Hex.decode("195df5f2e4d826fd512d3748eb2c47a9a0d59cdd18b6a0f3b4717381b8f9ac59");
+    byte[] nxtPrivateKey = Hex.decode("200a8ead018adb6c78f2c821500ad13f5f24d101ed8431adcfb315ca58468553");
+    byte[] nxtPublicKey = Hex.decode("163c6583ed489414f27e73a74f72080b478a55dfce4a086ded2990976e8bb81e");
+    String nxtRsAddress = "NXT-CGNQ-8WBM-3P2F-AVH9J";
+    long nxtAccountId = Convert.parseAccountId(NxtMain.get(), "9808271777446836886");
 
     String recipient = "NXT-RZ9H-H2XD-WTR3-B4WN2";
     byte[] recipientPublicKey = Convert.parseHexString("8381e8668479d27316dced97429c2bf7fde9d909cce2c53d565a4078ee82b13a");
 
-
     @Test
-    public void testAccountLegacyNXT() throws UnsupportedEncodingException {
-        byte[] pub = Crypto.getPublicKey(nxtSecret);
-        long id = Account.getId(pub);
+    public void testAccountNxt() throws UnsupportedEncodingException {
+        byte[] publicKey = Crypto.getPublicKey(nxtPrivateKey);
+        long id = Account.getId(publicKey);
 
-        assertArrayEquals(nxtPublicKey, pub);
+        assertArrayEquals(nxtPublicKey, publicKey);
         assertEquals(nxtRsAddress, Convert.rsAccount(NxtMain.get(), id));
         assertEquals(nxtAccountId, id);
     }
@@ -54,24 +54,18 @@ public class NxtFamilyTest {
         DeterministicKey entropy = hierarchy.get(NxtMain.get().getBip44Path(0), false, true);
 
         NxtFamilyKey nxtKey = new NxtFamilyKey(entropy, null, null);
-        String secret = nxtKey.getPrivateKeyMnemonic();
-        byte[] pub = nxtKey.getPublicKey();
-        NxtFamilyAddress address = new NxtFamilyAddress(NxtMain.get(), pub);
+        byte[] privateKey = nxtKey.getPrivateKey();
+        byte[] publicKey = nxtKey.getPublicKey();
+        NxtFamilyAddress address = new NxtFamilyAddress(NxtMain.get(), publicKey);
 
-        assertEquals(nxtSecret, secret);
-        assertArrayEquals(nxtPublicKey, pub);
+        assertArrayEquals(nxtPrivateKey, privateKey);
+        assertArrayEquals(nxtPublicKey, publicKey);
         assertEquals(nxtRsAddress, address.toString());
         assertEquals(nxtAccountId, address.getAccountId());
     }
 
     @Test
     public void testNxtTransaction() throws NxtException.ValidationException {
-        //old way
-        //NxtTransaction tx = new NxtTransaction(nxtPublicKey, recipient, 500000000L);
-        //byte[] signedTxBytes = tx.getSignedTxBytes(nxtSecret);
-
-        //new way
-
         byte version = 1;
         long amountNQT = 100000000L;
         long feeNQT = 100000000L;
@@ -87,10 +81,9 @@ public class NxtFamilyTest {
             //Block ecBlock = EconomicClustering.getECBlock(timestamp);
             //builder.ecBlockHeight(ecBlock.getHeight());
             //builder.ecBlockId(ecBlock.getId());
-
         }
         Transaction transaction = builder.recipientId(recipientLong).build();
-        transaction.sign(nxtSecret);
+        transaction.sign(nxtPrivateKey);
         byte[] txBytes = transaction.getBytes();
 
         Transaction parsedTx = TransactionImpl.parseTransaction(txBytes);
@@ -114,7 +107,7 @@ public class NxtFamilyTest {
         int timestamp = Convert.toNxtEpochTime(System.currentTimeMillis()); // different for nxt and burst
         short deadline = 1440;
         Long recipientLong = Convert.parseAccountId(NxtMain.get(), recipient);
-        EncryptedData data = EncryptedData.encrypt(Convert.toBytes("test text"), Crypto.getPrivateKey(nxtSecret), recipientPublicKey);
+        EncryptedData data = EncryptedData.encrypt(Convert.toBytes("test text"), nxtPrivateKey, recipientPublicKey);
 
         Appendix.EncryptedMessage msg = new EncryptedMessage(data, true);
 
@@ -127,11 +120,10 @@ public class NxtFamilyTest {
             //Block ecBlock = EconomicClustering.getECBlock(timestamp);
             //builder.ecBlockHeight(ecBlock.getHeight());
             //builder.ecBlockId(ecBlock.getId());
-
         }
         builder.encryptedMessage(msg);
         Transaction transaction = builder.recipientId(recipientLong).build();
-        transaction.sign( nxtSecret );
+        transaction.sign(nxtPrivateKey);
         byte[] txBytes = transaction.getBytes();
 
         Transaction parsedTx = TransactionImpl.parseTransaction(txBytes);

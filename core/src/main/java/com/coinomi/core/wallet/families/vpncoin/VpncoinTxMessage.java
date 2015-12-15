@@ -1,9 +1,8 @@
 package com.coinomi.core.wallet.families.vpncoin;
 
-import com.coinomi.core.messages.TxMessage;
 import com.coinomi.core.messages.MessageFactory;
+import com.coinomi.core.messages.TxMessage;
 import com.coinomi.core.wallet.AbstractTransaction;
-import com.coinomi.core.wallet.families.bitcoin.BitTransaction;
 import com.google.common.base.Charsets;
 
 import org.bitcoinj.core.Transaction;
@@ -21,6 +20,7 @@ import java.util.zip.Inflater;
 import javax.annotation.Nullable;
 
 import static com.coinomi.core.Preconditions.checkArgument;
+import static com.coinomi.core.Preconditions.checkNotNull;
 
 /**
  * @author John L. Jegutanis
@@ -96,18 +96,22 @@ public class VpncoinTxMessage implements TxMessage {
 
     @Nullable
     public static VpncoinTxMessage parse(AbstractTransaction tx) {
-        byte[] bytes = ((Transaction)tx.getTransaction()).getExtraBytes();
-        if (bytes == null || bytes.length == 0) return null;
-
-        String fullMessage = new String(bytes, Charsets.UTF_8);
-
+        Transaction rawTx = null;
+        byte[] bytes;
+        String fullMessage = null;
         try {
+            rawTx = (Transaction) checkNotNull(tx.getRawTransaction());
+            bytes = rawTx.getExtraBytes();
+            if (bytes == null || bytes.length == 0) return null;
+
+            fullMessage = new String(bytes, Charsets.UTF_8);
             return parseUnencrypted(fullMessage);
         } catch (Exception e) {
+            if (rawTx == null || fullMessage == null) return null;
             try {
-                return parseEncrypted(((Transaction)tx.getTransaction()).getTime(), fullMessage);
+                return parseEncrypted(rawTx.getTime(), fullMessage);
             } catch (Exception e1) {
-                log.info("Could not parse message: {}", e1.getLocalizedMessage());
+                log.info("Could not parse message: {}", e1.getMessage());
                 return null;
             }
         }
@@ -160,7 +164,8 @@ public class VpncoinTxMessage implements TxMessage {
 
     @Override
     public void serializeTo(AbstractTransaction transaction) {
-        ((BitTransaction) transaction).getTransaction().setExtraBytes(serialize());
+        Transaction rawTx = (Transaction) checkNotNull(transaction.getRawTransaction());
+        rawTx.setExtraBytes(serialize());
     }
 
     byte[] serialize() {

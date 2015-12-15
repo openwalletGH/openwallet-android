@@ -20,15 +20,14 @@ package com.coinomi.core.wallet;
 
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
+import com.coinomi.core.exceptions.Bip44KeyLookAheadExceededException;
 import com.coinomi.core.protos.Protos;
 import com.coinomi.core.util.KeyUtils;
-import com.coinomi.core.exceptions.Bip44KeyLookAheadExceededException;
 import com.coinomi.core.wallet.families.bitcoin.BitAddress;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 
 import org.bitcoinj.core.AddressFormatException;
-import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.InsufficientMoneyException;
 import org.bitcoinj.crypto.ChildNumber;
@@ -639,11 +638,6 @@ public class WalletPocketHD extends TransactionWatcherWallet {
 
     @Override
     public String getPublicKeyMnemonic() {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public String getPrivateKeyMnemonic() {
         throw new RuntimeException("Not implemented");
     }
 

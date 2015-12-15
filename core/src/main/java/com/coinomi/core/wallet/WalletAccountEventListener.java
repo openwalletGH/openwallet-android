@@ -2,8 +2,6 @@ package com.coinomi.core.wallet;
 
 import com.coinomi.core.coins.Value;
 
-import org.bitcoinj.core.Transaction;
-
 /**
  * @author John L. Jegutanis
  */

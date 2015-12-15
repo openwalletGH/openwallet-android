@@ -6,15 +6,20 @@ import com.coinomi.core.wallet.AbstractTransaction;
 import com.google.common.base.Charsets;
 
 import org.bitcoinj.core.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 
 import static com.coinomi.core.Preconditions.checkArgument;
+import static com.coinomi.core.Preconditions.checkNotNull;
 
 /**
  * @author John L. Jegutanis
  */
 public class ClamsTxMessage implements TxMessage {
+    private static final Logger log = LoggerFactory.getLogger(ClamsTxMessage.class);
+
     public static final int MAX_MESSAGE_BYTES = 140;
 
     private String message;
@@ -42,12 +47,18 @@ public class ClamsTxMessage implements TxMessage {
     }
 
     @Nullable
-    public static ClamsTxMessage parse(Transaction tx) {
-        byte[] bytes = tx.getExtraBytes();
-        if (bytes == null || bytes.length == 0) return null;
-        checkArgument(bytes.length <= MAX_MESSAGE_BYTES, "Maximum data size exceeded");
+    public static ClamsTxMessage parse(AbstractTransaction tx) {
+        try {
+            Transaction rawTx = (Transaction) checkNotNull(tx.getRawTransaction());
+            byte[] bytes = rawTx.getExtraBytes();
+            if (bytes == null || bytes.length == 0) return null;
+            checkArgument(bytes.length <= MAX_MESSAGE_BYTES, "Maximum data size exceeded");
 
-        return new ClamsTxMessage(new String(bytes, Charsets.UTF_8));
+            return new ClamsTxMessage(new String(bytes, Charsets.UTF_8));
+        } catch (Exception e) {
+            log.info("Could not parse message: {}", e.getMessage());
+            return null;
+        }
     }
 
     public boolean isEmpty() {
@@ -70,7 +81,7 @@ public class ClamsTxMessage implements TxMessage {
 
     @Override
     public void serializeTo(AbstractTransaction transaction) {
-        Transaction rawTx = (Transaction) transaction.getTransaction();
+        Transaction rawTx = (Transaction) checkNotNull(transaction.getRawTransaction());
         rawTx.setExtraBytes(serialize(message));
     }
 
@@ -102,7 +113,7 @@ public class ClamsTxMessage implements TxMessage {
         @Nullable
         @Override
         public TxMessage extractPublicMessage(AbstractTransaction transaction) {
-            return parse((Transaction) transaction.getTransaction());
+            return parse(transaction);
         }
     }
 }

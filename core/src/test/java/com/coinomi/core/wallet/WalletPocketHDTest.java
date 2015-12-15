@@ -258,11 +258,11 @@ public class WalletPocketHDTest {
         req = w1.sendCoinsOffline(w2.getReceiveAddress(), value);
         req.feePerKb = Value.valueOf(w1.getCoinType(), Coin.ZERO);
         w1.completeAndSignTx(req);
-        byte[] txBytes = ((Transaction)req.tx.getTransaction()).bitcoinSerialize();
+        byte[] txBytes = ((Transaction)req.tx.getRawTransaction()).bitcoinSerialize();
         w1.addNewTransactionIfNeeded(new Transaction(w1.getCoinType(), txBytes));
         w2.addNewTransactionIfNeeded(new Transaction(w1.getCoinType(), txBytes));
 
-        return ((Transaction)req.tx.getTransaction());
+        return ((Transaction)req.tx.getRawTransaction());
     }
 
     @Test

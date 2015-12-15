@@ -3,7 +3,6 @@ package com.coinomi.core.wallet;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.FeePolicy;
 import com.coinomi.core.coins.Value;
-import com.coinomi.core.wallet.families.bitcoin.BitTransaction;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
@@ -74,34 +73,35 @@ public class TransactionCreator {
         try {
             checkArgument(req.type.equals(coinType), "Given SendRequest has an invalid coin type.");
             checkArgument(!req.isCompleted(), "Given SendRequest has already been completed.");
+            Transaction tx = (Transaction) checkNotNull(req.tx.getRawTransaction());
             // Add any messages to the transaction if it applies to this coin type
             if (req.txMessage != null && coinType.canHandleMessages()) {
                 req.txMessage.serializeTo(req.tx);
             }
             // Calculate the amount of value we need to import.
             Coin value = Coin.ZERO;
-            for (TransactionOutput output : ((Transaction)req.tx.getTransaction()).getOutputs()) {
+            for (TransactionOutput output : tx.getOutputs()) {
                 value = value.add(output.getValue());
             }
 
             log.info("Completing send tx with {} outputs totalling {} (not including fees)",
-                    ((Transaction)req.tx.getTransaction()).getOutputs().size(), value.toFriendlyString());
+                    tx.getOutputs().size(), value.toFriendlyString());
 
             // If any inputs have already been added, we don't need to get their value from wallet
             Coin totalInput = Coin.ZERO;
-            for (TransactionInput input : ((Transaction)req.tx.getTransaction()).getInputs())
+            for (TransactionInput input : tx.getInputs())
                 if (input.getConnectedOutput() != null)
                     totalInput = totalInput.add(input.getConnectedOutput().getValue());
                 else
                     log.warn("SendRequest transaction already has inputs but we don't know how much they are worth - they will be added to fee.");
             value = value.subtract(totalInput);
 
-            List<TransactionInput> originalInputs = new ArrayList<TransactionInput>(((Transaction)req.tx.getTransaction()).getInputs());
+            List<TransactionInput> originalInputs = new ArrayList<TransactionInput>(tx.getInputs());
 
             // We need to know if we need to add an additional fee because one of our values are smaller than 0.01 BTC
             int numberOfSoftDustOutputs = 0;
             if (req.ensureMinRequiredFee && !req.emptyWallet) { // min fee checking is handled later for emptyWallet
-                for (TransactionOutput output : ((Transaction)req.tx.getTransaction()).getOutputs())
+                for (TransactionOutput output : tx.getOutputs())
                     if (output.getValue().compareTo(coinType.getSoftDustLimit()) < 0) {
                         if (output.getValue().compareTo(coinType.getMinNonDust()) < 0)
                             throw new org.bitcoinj.core.Wallet.DustySendRequested();
@@ -127,33 +127,32 @@ public class TransactionCreator {
             } else {
                 // We're being asked to empty the wallet. What this means is ensuring "tx" has only a single output
                 // of the total value we can currently spend as determined by the selector, and then subtracting the fee.
-                checkState(((Transaction)req.tx.getTransaction()).getOutputs().size() == 1, "Empty wallet TX must have a single output only.");
+                checkState(tx.getOutputs().size() == 1, "Empty wallet TX must have a single output only.");
                 CoinSelector selector = req.coinSelector == null ? coinSelector : req.coinSelector;
                 bestCoinSelection = selector.select(NetworkParameters.MAX_MONEY, candidates);
                 candidates = null;  // Selector took ownership and might have changed candidates. Don't access again.
-                ((Transaction)req.tx.getTransaction()).getOutput(0).setValue(bestCoinSelection.valueGathered);
+                tx.getOutput(0).setValue(bestCoinSelection.valueGathered);
                 log.info("  emptying {}", bestCoinSelection.valueGathered.toFriendlyString());
             }
 
             for (TransactionOutput output : bestCoinSelection.gathered)
-                ((Transaction)req.tx.getTransaction()).addInput(output);
+                tx.addInput(output);
 
             if (req.ensureMinRequiredFee && req.emptyWallet) {
                 final Value baseFee = req.fee == null ? Value.valueOf(account.getCoinType(), Coin.ZERO) : req.fee;
                 final Value feePerKb = req.feePerKb == null ? Value.valueOf(account.getCoinType(), Coin.ZERO) : req.feePerKb;
-                Transaction tx = ((Transaction)req.tx.getTransaction());
                 if (!adjustOutputDownwardsForFee(tx, bestCoinSelection, baseFee.toCoin(), feePerKb.toCoin()))
                     throw new org.bitcoinj.core.Wallet.CouldNotAdjustDownwards();
             }
 
             if (bestChangeOutput != null) {
-                ((Transaction)req.tx.getTransaction()).addOutput(bestChangeOutput);
+                tx.addOutput(bestChangeOutput);
                 log.info("  with {} change", bestChangeOutput.getValue().toFriendlyString());
             }
 
             // Now shuffle the outputs to obfuscate which is the change.
             if (req.shuffleOutputs)
-                ((Transaction)req.tx.getTransaction()).shuffleOutputs();
+                tx.shuffleOutputs();
 
             // Now sign the inputs, thus proving that we are entitled to redeem the connected outputs.
             if (req.signInputs) {
@@ -161,7 +160,7 @@ public class TransactionCreator {
             }
 
             // Check size.
-            int size = ((Transaction)req.tx.getTransaction()).bitcoinSerialize().length;
+            int size = tx.bitcoinSerialize().length;
             if (size > Transaction.MAX_STANDARD_TX_SIZE)
                 throw new org.bitcoinj.core.Wallet.ExceededMaxTransactionSize();
 
@@ -173,11 +172,11 @@ public class TransactionCreator {
             // Label the transaction as being self created. We can use this later to spend its change output even before
             // the transaction is confirmed. We deliberately won't bother notifying listeners here as there's not much
             // point - the user isn't interested in a confidence transition they made themselves.
-            ((Transaction)req.tx.getTransaction()).getConfidence().setSource(TransactionConfidence.Source.SELF);
+            tx.getConfidence().setSource(TransactionConfidence.Source.SELF);
             // Label the transaction as being a user requested payment. This can be used to render GUI wallet
             // transaction lists more appropriately, especially when the wallet starts to generate transactions itself
             // for internal purposes.
-            ((Transaction)req.tx.getTransaction()).setPurpose(Transaction.Purpose.USER_PAYMENT);
+            tx.setPurpose(Transaction.Purpose.USER_PAYMENT);
             req.setCompleted(true);
             req.fee = calculatedFee;
             log.info("  completed: {}", req.tx);
@@ -195,7 +194,7 @@ public class TransactionCreator {
     void signTransaction(SendRequest req) {
         lock.lock();
         try {
-            Transaction tx = ((Transaction)req.tx.getTransaction());
+            Transaction tx = (Transaction) checkNotNull(req.tx.getRawTransaction());
             List<TransactionInput> inputs = tx.getInputs();
             List<TransactionOutput> outputs = tx.getOutputs();
             checkState(inputs.size() > 0);
@@ -251,7 +250,7 @@ public class TransactionCreator {
         try {
             LinkedList<TransactionOutput> candidates = Lists.newLinkedList();
             for (Transaction tx : Iterables.concat(account.getUnspentTransactions().values(),
-                    account.getPendingTransactions().values())) {
+                    account.getPendingRawTransactions().values())) {
                 // Do not try and spend coinbases that were mined too recently, the protocol forbids it.
                 if (excludeImmatureCoinbases && !tx.isMature()) continue;
                 for (TransactionOutput output : tx.getOutputs()) {
@@ -262,9 +261,9 @@ public class TransactionCreator {
             }
 
             // If we have pending transactions, remove from candidates any future spent outputs
-            for (Transaction pendingTx : account.getPendingTransactions().values()) {
+            for (Transaction pendingTx : account.getPendingRawTransactions().values()) {
                 for (TransactionInput input : pendingTx.getInputs()) {
-                    Transaction tx = account.getTransactions().get(input.getOutpoint().getHash());
+                    Transaction tx = account.getRawTransactions().get(input.getOutpoint().getHash());
                     if (tx == null) continue;
                     TransactionOutput pendingSpentOutput = tx.getOutput((int) input.getOutpoint().getIndex());
                     candidates.remove(pendingSpentOutput);
@@ -279,6 +278,7 @@ public class TransactionCreator {
     private FeeCalculation calculateFee(SendRequest req, Coin value, List<TransactionInput> originalInputs,
                                         int numberOfSoftDustOutputs, LinkedList<TransactionOutput> candidates) throws InsufficientMoneyException {
         checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
+        Transaction tx = (Transaction) checkNotNull(req.tx.getRawTransaction());
         FeeCalculation result = new FeeCalculation();
         // There are 3 possibilities for what adding change might do:
         // 1) No effect
@@ -298,7 +298,7 @@ public class TransactionCreator {
         int lastCalculatedSize = 0;
         Coin valueNeeded, valueMissing = null;
         while (true) {
-            resetTxInputs(req, originalInputs);
+            resetTxInputs(tx, originalInputs);
 
             Value fees = req.fee == null ? Value.valueOf(account.getCoinType(), Coin.ZERO) : req.fee;
             if (lastCalculatedSize > 0 && coinType.getFeePolicy() == FeePolicy.FEE_PER_KB) {
@@ -391,7 +391,7 @@ public class TransactionCreator {
                 Address changeAddress = (Address) req.changeAddress;
                 if (changeAddress == null)
                     changeAddress = (Address) account.getChangeAddress();
-                changeOutput = new TransactionOutput(coinType, ((Transaction)req.tx.getTransaction()), change, changeAddress);
+                changeOutput = new TransactionOutput(coinType, tx, change, changeAddress);
                 // If the change output would result in this transaction being rejected as dust, just drop the change and make it a fee
                 if (req.ensureMinRequiredFee && coinType.getMinNonDust().compareTo(change) >= 0) {
                     // This solution definitely fits in category 3
@@ -399,7 +399,7 @@ public class TransactionCreator {
                     additionalValueForNextCategory = req.feePerKb.add(
                             coinType.getMinNonDust().add(Coin.SATOSHI)).toCoin();
                 } else {
-                    size += changeOutput.bitcoinSerialize().length + VarInt.sizeOf(((Transaction)req.tx.getTransaction()).getOutputs().size()) - VarInt.sizeOf(((Transaction)req.tx.getTransaction()).getOutputs().size() - 1);
+                    size += changeOutput.bitcoinSerialize().length + VarInt.sizeOf(tx.getOutputs().size()) - VarInt.sizeOf(tx.getOutputs().size() - 1);
                     // This solution is either category 1 or 2
                     if (!eitherCategory2Or3) // must be category 1
                         additionalValueForNextCategory = null;
@@ -414,14 +414,14 @@ public class TransactionCreator {
 
             // Now add unsigned inputs for the selected coins.
             for (TransactionOutput output : selection.gathered) {
-                TransactionInput input = ((Transaction)req.tx.getTransaction()).addInput(output);
+                TransactionInput input = tx.addInput(output);
                 // If the scriptBytes don't default to none, our size calculations will be thrown off.
                 checkState(input.getScriptBytes().length == 0);
             }
 
             // Estimate transaction size and loop again if we need more fee per kb. The serialized tx doesn't
             // include things we haven't added yet like input signatures/scripts or the change output.
-            size += ((Transaction)req.tx.getTransaction()).bitcoinSerialize().length;
+            size += tx.bitcoinSerialize().length;
             size += estimateBytesForSigning(selection);
             if (size / 1000 > lastCalculatedSize / 1000 && req.feePerKb.signum() > 0) {
                 lastCalculatedSize = size;
@@ -456,7 +456,7 @@ public class TransactionCreator {
             break;
         }
 
-        resetTxInputs(req, originalInputs);
+        resetTxInputs(tx, originalInputs);
 
         if (selection3 == null && selection2 == null && selection1 == null) {
             checkNotNull(valueMissing);
@@ -566,9 +566,9 @@ public class TransactionCreator {
         return size;
     }
 
-    private static void resetTxInputs(SendRequest req, List<TransactionInput> originalInputs) {
-        ((Transaction)req.tx.getTransaction()).clearInputs();
+    private static void resetTxInputs(Transaction tx, List<TransactionInput> originalInputs) {
+        tx.clearInputs();
         for (TransactionInput input : originalInputs)
-            ((Transaction)req.tx.getTransaction()).addInput(input);
+            tx.addInput(input);
     }
 }

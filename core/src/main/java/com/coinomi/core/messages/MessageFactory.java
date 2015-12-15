@@ -2,8 +2,6 @@ package com.coinomi.core.messages;
 
 import com.coinomi.core.wallet.AbstractTransaction;
 
-import java.io.Serializable;
-
 import javax.annotation.Nullable;
 
 /**
@@ -18,7 +16,6 @@ public interface MessageFactory {
 
     TxMessage createPublicMessage(String message);
 
-    // TODO change to abstract transaction
     @Nullable
     TxMessage extractPublicMessage(AbstractTransaction transaction);
 }

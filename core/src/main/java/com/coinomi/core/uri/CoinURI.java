@@ -100,6 +100,7 @@ public class CoinURI {
     public static final String FIELD_PAYMENT_REQUEST_URL = "r";
     public static final String FIELD_ADDRESS_REQUEST_URI = "req-addressrequest";
     public static final String FIELD_NETWORK = "req-network";
+    public static final String FIELD_PUBKEY = "pubkey";
 
     private static final String ENCODED_SPACE_CHARACTER = "%20";
     private static final String AMPERSAND_SEPARATOR = "&";
@@ -433,6 +434,14 @@ public class CoinURI {
         return (String) parameterMap.get(FIELD_MESSAGE);
     }
 
+
+    /**
+     * @return The public key.
+     */
+    public String getPublicKey() {
+        return (String) parameterMap.get(FIELD_PUBKEY);
+    }
+
     /**
      * @return The URL where a payment request (as specified in BIP 70) may
      *         be fetched.
@@ -504,6 +513,23 @@ public class CoinURI {
      */
     public static String convertToCoinURI(AbstractAddress address, @Nullable Value amount,
                                           @Nullable String label, @Nullable String message) {
+        return convertToCoinURI(address, amount, label, message, null);
+
+    }
+
+    /**
+     * Simple coin URI builder using known good fields.
+     *
+     * @param address The coin address
+     * @param amount The amount
+     * @param label A label
+     * @param message A message
+     * @param pubkey A public key
+     * @return A String containing the coin URI
+     */
+    public static String convertToCoinURI(AbstractAddress address, @Nullable Value amount,
+                                          @Nullable String label, @Nullable String message,
+                                          @Nullable String pubkey) {
         checkNotNull(address);
 
         CoinType type = address.getType();
@@ -541,6 +567,15 @@ public class CoinURI {
                 builder.append(QUESTION_MARK_SEPARATOR);
             }
             builder.append(FIELD_MESSAGE).append("=").append(encodeURLString(message));
+        }
+
+        if (pubkey != null && !"".equals(pubkey)) {
+            if (questionMarkHasBeenOutput) {
+                builder.append(AMPERSAND_SEPARATOR);
+            } else {
+                builder.append(QUESTION_MARK_SEPARATOR);
+            }
+            builder.append(FIELD_PUBKEY).append("=").append(encodeURLString(pubkey));
         }
         
         return builder.toString();

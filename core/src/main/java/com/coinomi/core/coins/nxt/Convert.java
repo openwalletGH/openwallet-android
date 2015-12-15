@@ -123,6 +123,7 @@ public final class Convert {
         if (account.startsWith(type.getAddressPrefix())) {
             return Crypto.rsDecode(account.substring(type.getAddressPrefix().length()));
         } else {
+            // Account is numeric
             return parseUnsignedLong(account);
         }
     }

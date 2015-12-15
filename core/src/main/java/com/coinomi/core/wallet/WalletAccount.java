@@ -23,7 +23,7 @@ import javax.annotation.Nullable;
 /**
  * @author John L. Jegutanis
  */
-public interface WalletAccount<T> extends TransactionBag, KeyBag,
+public interface WalletAccount extends TransactionBag, KeyBag,
         ConnectionEventListener, Serializable {
     class WalletAccountException extends Exception {
         public WalletAccountException(Throwable cause) {
@@ -82,10 +82,9 @@ public interface WalletAccount<T> extends TransactionBag, KeyBag,
      */
     boolean canCreateNewAddresses();
 
-    T getTransaction(String transactionId);
-    Map<Sha256Hash, T> getUnspentTransactions();
-    Map<Sha256Hash, T> getPendingTransactions();
-    Map<Sha256Hash, AbstractTransaction> getAbstractTransactions();
+    AbstractTransaction getTransaction(String transactionId);
+    Map<Sha256Hash, AbstractTransaction> getPendingTransactions();
+    Map<Sha256Hash, AbstractTransaction> getTransactions();
 
     List<AbstractAddress> getActiveAddresses();
     void markAddressAsUsed(AbstractAddress address);
@@ -118,7 +117,6 @@ public interface WalletAccount<T> extends TransactionBag, KeyBag,
     void maybeInitializeAllKeys();
 
     String getPublicKeyMnemonic();
-    String getPrivateKeyMnemonic();
 
     void completeAndSignTx(SendRequest request) throws WalletAccountException;
     void completeTransaction(SendRequest request) throws WalletAccountException;

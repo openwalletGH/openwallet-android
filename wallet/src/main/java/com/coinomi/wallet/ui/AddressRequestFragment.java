@@ -33,6 +33,7 @@ import android.widget.Toast;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.FiatType;
 import com.coinomi.core.coins.Value;
+import com.coinomi.core.coins.families.Families;
 import com.coinomi.core.exceptions.Bip44KeyLookAheadExceededException;
 import com.coinomi.core.uri.CoinURI;
 import com.coinomi.core.util.ExchangeRate;
@@ -389,7 +390,16 @@ public class AddressRequestFragment extends Fragment {
 
         updateLabel();
 
-        updateQrCode(CoinURI.convertToCoinURI(receiveAddress, amount, label, message));
+        updateQrCode(getQrContent());
+    }
+
+    private String getQrContent() {
+        if (type.getFamilyEnum() == Families.NXT) {
+            return CoinURI.convertToCoinURI(receiveAddress, amount, label, message,
+                    pocket.getPublicKeySerialized());
+        } else {
+            return CoinURI.convertToCoinURI(receiveAddress, amount, label, message);
+        }
     }
 
     /**

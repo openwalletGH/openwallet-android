@@ -3,22 +3,16 @@ package com.coinomi.core.wallet;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.ValueType;
 import com.coinomi.core.util.TypeUtils;
-import com.coinomi.core.wallet.families.bitcoin.BitAddress;
 
-import org.bitcoinj.core.Sha256Hash;
-import org.bitcoinj.core.Transaction;
 import org.bitcoinj.utils.Threading;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
-
-import javax.annotation.Nullable;
 
 /**
  * @author John L. Jegutanis
  */
-public abstract class AbstractWallet<T> implements WalletAccount<T> {
+public abstract class AbstractWallet implements WalletAccount {
     protected final String id;
     protected String description;
     protected final CoinType type;
@@ -47,12 +41,12 @@ public abstract class AbstractWallet<T> implements WalletAccount<T> {
         return id;
     }
 
-    @Nullable
-    public T getTransaction(String transactionId) {
-        return null;
-    }
+//    @Nullable
+//    public AbstractTransaction getTransaction(String transactionId) {
+//        return null;
+//    }
 
-    public abstract AbstractTransaction getAbstractTransaction(String transactionId);
+//    public abstract AbstractTransaction getTransaction(String transactionId);
 
 
 
