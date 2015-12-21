@@ -45,6 +45,7 @@ import com.coinomi.core.coins.UroMain;
 import com.coinomi.core.coins.VergeMain;
 import com.coinomi.core.coins.VertcoinMain;
 import com.coinomi.core.coins.VpncoinMain;
+import com.coinomi.core.coins.RichcoinMain;
 import com.coinomi.core.network.CoinAddress;
 import com.coinomi.stratumj.ServerAddress;
 import com.google.common.collect.ImmutableList;
@@ -207,7 +208,9 @@ public class Constants {
             new CoinAddress(AsiacoinMain.get(),     new ServerAddress("ac-cce-1.coinomi.net", 5044),
                                                     new ServerAddress("ac-cce-2.coinomi.net", 5044)),
             new CoinAddress(ClubcoinMain.get(),     new ServerAddress("club-cce-1.coinomi.net", 5045),
-                                                    new ServerAddress("club-cce-2.coinomi.net", 5045))
+                                                    new ServerAddress("club-cce-2.coinomi.net", 5045)),
+            new CoinAddress(RichcoinMain.get(),     new ServerAddress("richx-cce-1.coinomi.net", 5046),
+                                                    new ServerAddress("richx-cce-2.coinomi.net", 5046))
     );
 
     public static final HashMap<CoinType, Integer> COINS_ICONS;
@@ -255,6 +258,7 @@ public class Constants {
         COINS_ICONS.put(CoinID.ASIACOIN_MAIN.getCoinType(), R.drawable.asiacoin);
         COINS_ICONS.put(CoinID.EGULDEN_MAIN.getCoinType(), R.drawable.egulden);
         COINS_ICONS.put(CoinID.CLUBCOIN_MAIN.getCoinType(), R.drawable.clubcoin);
+        COINS_ICONS.put(CoinID.RICHCOIN_MAIN.getCoinType(), R.drawable.richcoin);
 
         COINS_BLOCK_EXPLORERS = new HashMap<CoinType, String>();
         COINS_BLOCK_EXPLORERS.put(CoinID.BITCOIN_MAIN.getCoinType(), "https://blockchain.info/tx/%s");
@@ -295,6 +299,7 @@ public class Constants {
         COINS_BLOCK_EXPLORERS.put(CoinID.BATACOIN_MAIN.getCoinType(), "https://chainz.cryptoid.info/bta/tx.dws?%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.ASIACOIN_MAIN.getCoinType(), "https://chainz.cryptoid.info/ac/tx.dws?%s.htm");
         COINS_BLOCK_EXPLORERS.put(CoinID.EGULDEN_MAIN.getCoinType(), "https://chainz.cryptoid.info/efl/tx.dws?%s");
+        COINS_BLOCK_EXPLORERS.put(CoinID.RICHCOIN_MAIN.getCoinType(), "https://explorer.richcoin.us/transaction?transaction=%s");
     }
 
     public static final CoinType DEFAULT_COIN = BitcoinMain.get();
@@ -338,6 +343,7 @@ public class Constants {
             PeercoinMain.get(),
             PotcoinMain.get(),
             ReddcoinMain.get(),
+            RichcoinMain.get(),
             RubycoinMain.get(),
             ShadowCashMain.get(),
             VergeMain.get(),

@@ -22,7 +22,6 @@ import java.util.Set;
  * @author John L. Jegutanis
  */
 public enum CoinID {
-    ASIACOIN_MAIN(AsiacoinMain.get()),
     BITCOIN_MAIN(BitcoinMain.get()),
     BITCOIN_TEST(BitcoinTest.get()),
     LITECOIN_MAIN(LitecoinMain.get()),
@@ -60,8 +59,10 @@ public enum CoinID {
     AURORACOIN_MAIN(AuroracoinMain.get()),
     BATACOIN_MAIN(BatacoinMain.get()),
     OKCASH_MAIN(OKCashMain.get()),
+    ASIACOIN_MAIN(AsiacoinMain.get()),
     EGULDEN_MAIN(EguldenMain.get()),
     CLUBCOIN_MAIN(ClubcoinMain.get()),
+    RICHCOIN_MAIN(RichcoinMain.get()),
     ;
 
     private static List<CoinType> types;
