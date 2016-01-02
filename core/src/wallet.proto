@@ -232,7 +232,10 @@ message Transaction {
 
     optional bytes extra_bytes = 13;
 
-    // Next tag: 14
+    // A transaction can be stored in a trimmed state where some inputs or outputs are stripped to save space.
+    optional bytes is_trimmed = 14;
+
+    // Next tag: 15
 }
 
 message AddressStatus {

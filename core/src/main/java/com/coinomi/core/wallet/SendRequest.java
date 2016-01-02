@@ -49,7 +49,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * just simplify the most common use cases. You may wish to customize a SendRequest if you want to attach a fee or
  * modify the change address.
  */
-public class SendRequest implements Serializable{
+public class SendRequest<T extends AbstractTransaction> implements Serializable {
 
     /**
      * The blockchain network (Bitcoin, Dogecoin,..) that this request is going to transact
@@ -70,9 +70,8 @@ public class SendRequest implements Serializable{
      * key, otherwise the behavior of {@link WalletPocketHD#completeTransaction(SendRequest)} is undefined (likely
      * RuntimeException).</p>
      */
-    // TODO unify and make abstract
-    public AbstractTransaction tx;
-    //public com.coinomi.core.coins.nxt.Transaction nxtTx;
+    public T tx;
+    // TODO create an NxtSendRequest that contains the builder
     public com.coinomi.core.coins.nxt.TransactionImpl.BuilderImpl nxtTxBuilder;
 
     /**
@@ -103,7 +102,6 @@ public class SendRequest implements Serializable{
      * <p>You might also consider adding a {@link SendRequest#feePerKb} to set the fee per kb of transaction size
      * (rounded down to the nearest kb) as that is how transactions are sorted when added to a block by miners.</p>
      */
-    // TODO change to Value
     public Value fee;
 
     /**
@@ -120,7 +118,6 @@ public class SendRequest implements Serializable{
      *
      * <p>You might also consider using a {@link SendRequest#fee} to set the fee added for the first kb of size.</p>
      */
-    // TODO change to Value
     public Value feePerKb;
 
     /**
@@ -314,7 +311,7 @@ public class SendRequest implements Serializable{
                 throw new RuntimeException("Unsupported family: " + req.type.getFamily());
         }
 
-        req.feePerKb = req.type.getFeePerKb();
+        req.feePerKb = req.type.feePerKb();
         Transaction tx = new Transaction(req.type);
         tx.addOutput(Coin.ZERO, (BitAddress) destination);
         req.emptyWallet = true;

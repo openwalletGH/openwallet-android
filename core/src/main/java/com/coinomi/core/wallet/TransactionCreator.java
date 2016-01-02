@@ -3,7 +3,7 @@ package com.coinomi.core.wallet;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.FeePolicy;
 import com.coinomi.core.coins.Value;
-import com.google.common.collect.Iterables;
+import com.coinomi.core.wallet.families.bitcoin.BitTransaction;
 import com.google.common.collect.Lists;
 
 import org.bitcoinj.core.Address;
@@ -15,6 +15,7 @@ import org.bitcoinj.core.ScriptException;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.TransactionConfidence;
 import org.bitcoinj.core.TransactionInput;
+import org.bitcoinj.core.TransactionOutPoint;
 import org.bitcoinj.core.TransactionOutput;
 import org.bitcoinj.core.VarInt;
 import org.bitcoinj.script.Script;
@@ -32,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static com.coinomi.core.Preconditions.checkArgument;
@@ -68,7 +70,7 @@ public class TransactionCreator {
      * @throws org.bitcoinj.core.InsufficientMoneyException if the request could not be completed due to not enough balance.
      * @throws IllegalArgumentException                     if you try and complete the same SendRequest twice
      */
-    void completeTx(SendRequest req) throws InsufficientMoneyException {
+    void completeTx(SendRequest<BitTransaction> req) throws InsufficientMoneyException {
         lock.lock();
         try {
             checkArgument(req.type.equals(coinType), "Given SendRequest has an invalid coin type.");
@@ -164,7 +166,7 @@ public class TransactionCreator {
             if (size > Transaction.MAX_STANDARD_TX_SIZE)
                 throw new org.bitcoinj.core.Wallet.ExceededMaxTransactionSize();
 
-            final Value calculatedFee = req.tx.getFee(account);
+            final Value calculatedFee = req.tx.getFee();
             if (calculatedFee != null) {
                 log.info("  with a fee of {} {}", calculatedFee.toFriendlyString(), coinType.getSymbol());
             }
@@ -191,7 +193,7 @@ public class TransactionCreator {
      * <p>Actual signing is done by pluggable {@link org.bitcoinj.signers.LocalTransactionSigner}
      * and it's not guaranteed that transaction will be complete in the end.</p>
      */
-    void signTransaction(SendRequest req) {
+    void signTransaction(SendRequest<BitTransaction> req) {
         lock.lock();
         try {
             Transaction tx = (Transaction) checkNotNull(req.tx.getRawTransaction());
@@ -249,33 +251,42 @@ public class TransactionCreator {
         lock.lock();
         try {
             LinkedList<TransactionOutput> candidates = Lists.newLinkedList();
-            for (Transaction tx : Iterables.concat(account.getUnspentTransactions().values(),
-                    account.getPendingRawTransactions().values())) {
-                // Do not try and spend coinbases that were mined too recently, the protocol forbids it.
-                if (excludeImmatureCoinbases && !tx.isMature()) continue;
-                for (TransactionOutput output : tx.getOutputs()) {
-                    if (!output.isAvailableForSpending()) continue;
-                    if (!output.isMine(account)) continue;
-                    candidates.add(output);
+            for (Map.Entry<TransactionOutPoint, TransactionOutput> txo : account.getUnspentOutputs().entrySet()) {
+                if (excludeImmatureCoinbases) {
+                    Transaction tx = account.getRawTransaction(txo.getKey().getHash());
+                    if (tx != null && !tx.isMature()) continue;
                 }
+                candidates.add(txo.getValue());
             }
 
-            // If we have pending transactions, remove from candidates any future spent outputs
-            for (Transaction pendingTx : account.getPendingRawTransactions().values()) {
-                for (TransactionInput input : pendingTx.getInputs()) {
-                    Transaction tx = account.getRawTransactions().get(input.getOutpoint().getHash());
-                    if (tx == null) continue;
-                    TransactionOutput pendingSpentOutput = tx.getOutput((int) input.getOutpoint().getIndex());
-                    candidates.remove(pendingSpentOutput);
-                }
-            }
+//            for (Transaction tx : Iterables.concat(account.getUnspentTransactions().values(),
+//                    account.getPendingRawTransactions().values())) {
+//                // Do not try and spend coinbases that were mined too recently, the protocol forbids it.
+//                if (excludeImmatureCoinbases && !tx.isMature()) continue;
+//                for (TransactionOutput output : tx.getOutputs()) {
+//                    if (!output.isAvailableForSpending()) continue;
+//                    if (!output.isMine(account)) continue;
+//                    candidates.add(output);
+//                }
+//            }
+//
+//            // If we have pending transactions, remove from candidates any future spent outputs
+//            for (Transaction pendingTx : account.getPendingRawTransactions().values()) {
+//                for (TransactionInput input : pendingTx.getInputs()) {
+//                    Transaction tx = account.getRawTransactions().get(input.getOutpoint().getHash());
+//                    if (tx == null) continue;
+//                    TransactionOutput pendingSpentOutput = tx.getOutput((int) input.getOutpoint().getIndex());
+//                    candidates.remove(pendingSpentOutput);
+//                }
+//            }
+
             return candidates;
         } finally {
             lock.unlock();
         }
     }
 
-    private FeeCalculation calculateFee(SendRequest req, Coin value, List<TransactionInput> originalInputs,
+    private FeeCalculation calculateFee(SendRequest<BitTransaction> req, Coin value, List<TransactionInput> originalInputs,
                                         int numberOfSoftDustOutputs, LinkedList<TransactionOutput> candidates) throws InsufficientMoneyException {
         checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
         Transaction tx = (Transaction) checkNotNull(req.tx.getRawTransaction());

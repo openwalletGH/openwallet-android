@@ -2,31 +2,32 @@ package com.coinomi.core.wallet;
 
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
+import com.coinomi.core.exceptions.TransactionBroadcastException;
 import com.coinomi.core.network.AddressStatus;
 import com.coinomi.core.network.BlockHeader;
 import com.coinomi.core.network.ServerClient;
 import com.coinomi.core.network.interfaces.BlockchainConnection;
 import com.coinomi.core.network.interfaces.TransactionEventListener;
 import com.coinomi.core.wallet.families.bitcoin.BitTransaction;
+import com.coinomi.core.wallet.families.bitcoin.BitWalletTransaction;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
+import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.ScriptException;
 import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.Transaction;
-import org.bitcoinj.core.TransactionConfidence;
+import org.bitcoinj.core.TransactionBag;
 import org.bitcoinj.core.TransactionInput;
+import org.bitcoinj.core.TransactionOutPoint;
 import org.bitcoinj.core.TransactionOutput;
 import org.bitcoinj.core.Utils;
 import org.bitcoinj.utils.ListenerRegistration;
 import org.bitcoinj.utils.Threading;
-import org.bitcoinj.wallet.WalletTransaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -42,11 +43,15 @@ import javax.annotation.Nullable;
 
 import static com.coinomi.core.Preconditions.checkNotNull;
 import static com.coinomi.core.Preconditions.checkState;
+import static org.bitcoinj.core.TransactionConfidence.ConfidenceType.BUILDING;
+import static org.bitcoinj.core.TransactionConfidence.ConfidenceType.PENDING;
+import static org.bitcoinj.core.TransactionConfidence.ConfidenceType.UNKNOWN;
 
 /**
  * @author John L. Jegutanis
  */
-abstract public class TransactionWatcherWallet extends AbstractWallet implements TransactionEventListener<Transaction> { //implements WalletAccount {
+abstract public class TransactionWatcherWallet extends AbstractWallet
+        implements TransactionBag, TransactionEventListener<BitTransaction> {
     private static final Logger log = LoggerFactory.getLogger(TransactionWatcherWallet.class);
 
     private final static int TX_DEPTH_SAVE_THRESHOLD = 4;
@@ -54,6 +59,9 @@ abstract public class TransactionWatcherWallet extends AbstractWallet implements
     @Nullable private Sha256Hash lastBlockSeenHash;
     private int lastBlockSeenHeight = -1;
     private long lastBlockSeenTimeSecs = 0;
+
+    @VisibleForTesting
+    final HashMap<TransactionOutPoint, TransactionOutput> unspentOutputs;
 
     // Holds the status of every address we are watching. When connecting to the server, if we get a
     // different status for a particular address this means that there are new transactions for that
@@ -85,14 +93,12 @@ abstract public class TransactionWatcherWallet extends AbstractWallet implements
     //           to the user in the UI, etc). A transaction can leave dead and move into spent/unspent if there is a
     //           re-org to a chain that doesn't include the double spend.
 
-    @VisibleForTesting final Map<Sha256Hash, Transaction> pending;
-    @VisibleForTesting final Map<Sha256Hash, Transaction> unspent;
-    @VisibleForTesting final Map<Sha256Hash, Transaction> spent;
-    @VisibleForTesting final Map<Sha256Hash, Transaction> dead;
+    @VisibleForTesting final Map<Sha256Hash, BitTransaction> pending;
+    @VisibleForTesting final Map<Sha256Hash, BitTransaction> confirmed;
 
     // All transactions together.
-    protected final Map<Sha256Hash, Transaction> rawtransactions;
-    private BlockchainConnection<Transaction> blockchainConnection;
+    protected final Map<Sha256Hash, BitTransaction> rawtransactions;
+    private BlockchainConnection<BitTransaction> blockchainConnection;
     private List<ListenerRegistration<WalletAccountEventListener>> listeners;
 
     // Wallet that this account belongs
@@ -115,15 +121,14 @@ abstract public class TransactionWatcherWallet extends AbstractWallet implements
     // Constructor
     public TransactionWatcherWallet(CoinType coinType, String id) {
         super(coinType, id);
+        unspentOutputs = new HashMap<>();
         addressesStatus = new HashMap<>();
         addressesSubscribed = new ArrayList<>();
         addressesPendingSubscription = new ArrayList<>();
         statusPendingUpdates = new HashMap<>();
         fetchingTransactions = new HashSet<>();
-        unspent = new HashMap<>();
-        spent = new HashMap<>();
+        confirmed = new HashMap<>();
         pending = new HashMap<>();
-        dead = new HashMap<>();
         rawtransactions = new HashMap<>();
         listeners = new CopyOnWriteArrayList<>();
     }
@@ -136,7 +141,7 @@ abstract public class TransactionWatcherWallet extends AbstractWallet implements
 
     @Override
     public boolean isNew() {
-        return unspent.size() + spent.size() + pending.size() == 0;
+        return rawtransactions.size() == 0;
     }
 
     @Override
@@ -164,33 +169,27 @@ abstract public class TransactionWatcherWallet extends AbstractWallet implements
 
     /**
      * Returns a set of all transactions in the wallet.
-     * @param includeDead     If true, transactions that were overridden by a double spend are included.
      */
-    public Set<Transaction> getTransactions(boolean includeDead) {
-        lock.lock();
-        try {
-            Set<Transaction> all = new HashSet<Transaction>();
-            all.addAll(unspent.values());
-            all.addAll(spent.values());
-            all.addAll(pending.values());
-            if (includeDead)
-                all.addAll(dead.values());
-            return all;
-        } finally {
-            lock.unlock();
-        }
-    }
+//    public Set<Transaction> getTransactions() {
+//        lock.lock();
+//        try {
+//            Set<Transaction> all = new HashSet<Transaction>();
+//            all.addAll(confirmed.values());
+//            all.addAll(pending.values());
+//            return all;
+//        } finally {
+//            lock.unlock();
+//        }
+//    }
 
     /**
      * Returns a set of all WalletTransactions in the wallet.
      */
-    public Iterable<WalletTransaction> getWalletTransactions() {
+    public Iterable<BitWalletTransaction> getWalletTransactions() {
         lock.lock();
         try {
-            Set<WalletTransaction> all = new HashSet<WalletTransaction>();
-            addWalletTransactionsToSet(all, WalletTransaction.Pool.UNSPENT, unspent.values());
-            addWalletTransactionsToSet(all, WalletTransaction.Pool.SPENT, spent.values());
-            addWalletTransactionsToSet(all, WalletTransaction.Pool.DEAD, dead.values());
+            Set<BitWalletTransaction> all = new HashSet<>();
+            addWalletTransactionsToSet(all, WalletTransaction.Pool.CONFIRMED, confirmed.values());
             addWalletTransactionsToSet(all, WalletTransaction.Pool.PENDING, pending.values());
             return all;
         } finally {
@@ -201,22 +200,17 @@ abstract public class TransactionWatcherWallet extends AbstractWallet implements
     /**
      * Just adds the transaction to a pool without doing anything else
      */
-    private void simpleAddTransaction(WalletTransaction.Pool pool, Transaction tx) {
+    private void simpleAddTransaction(WalletTransaction.Pool pool, BitTransaction tx) {
         lock.lock();
         try {
+//            guessTransactionSource(tx);
             rawtransactions.put(tx.getHash(), tx);
             switch (pool) {
-                case UNSPENT:
-                    checkState(unspent.put(tx.getHash(), tx) == null);
-                    break;
-                case SPENT:
-                    checkState(spent.put(tx.getHash(), tx) == null);
+                case CONFIRMED:
+                    checkState(confirmed.put(tx.getHash(), tx) == null);
                     break;
                 case PENDING:
                     checkState(pending.put(tx.getHash(), tx) == null);
-                    break;
-                case DEAD:
-                    checkState(dead.put(tx.getHash(), tx) == null);
                     break;
                 default:
                     throw new RuntimeException("Unknown wallet transaction type " + pool);
@@ -226,10 +220,10 @@ abstract public class TransactionWatcherWallet extends AbstractWallet implements
         }
     }
 
-    private static void addWalletTransactionsToSet(Set<WalletTransaction> txs,
-                                                   WalletTransaction.Pool poolType, Collection<Transaction> pool) {
-        for (Transaction tx : pool) {
-            txs.add(new WalletTransaction(poolType, tx));
+    private static void addWalletTransactionsToSet(Set<BitWalletTransaction> txs,
+                                                   WalletTransaction.Pool poolType, Collection<BitTransaction> pool) {
+        for (BitTransaction tx : pool) {
+            txs.add(new BitWalletTransaction(poolType, tx));
         }
     }
 
@@ -238,7 +232,7 @@ abstract public class TransactionWatcherWallet extends AbstractWallet implements
      * deserialization code, such as the {@link WalletPocketProtobufSerializer} class. It isn't normally useful for
      * applications. It does not trigger auto saving.
      */
-    public void addWalletTransaction(WalletTransaction wtx) {
+    public void addWalletTransaction(BitWalletTransaction wtx) {
         lock.lock();
         try {
             addWalletTransaction(wtx.getPool(), wtx.getTransaction(), true);
@@ -248,11 +242,68 @@ abstract public class TransactionWatcherWallet extends AbstractWallet implements
     }
 
     /**
+     * Remove irrelevant inputs and outputs
+     */
+    private BitTransaction getTrimmedTransaction(Transaction txFull) {
+        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
+
+        Transaction tx = new Transaction(type);
+        tx.setTime(txFull.getTime());
+        tx.setTokenId(txFull.getTokenId());
+        tx.setExtraBytes(txFull.getExtraBytes());
+        tx.setUpdateTime(txFull.getUpdateTime());
+        tx.setLockTime(txFull.getLockTime());
+
+        if (txFull.getAppearsInHashes() != null) {
+            for (Map.Entry<Sha256Hash, Integer> appears : txFull.getAppearsInHashes().entrySet()) {
+                tx.addBlockAppearance(appears.getKey(), appears.getValue());
+            }
+        }
+
+        tx.setPurpose(txFull.getPurpose());
+
+        // Strip signatures to save space
+        for (TransactionInput input : txFull.getInputs()) {
+            TransactionInput noSigInput = new TransactionInput(type, null, null,
+                    input.getOutpoint(), input.getValue());
+            tx.addInput(noSigInput);
+        }
+
+        // Merge unrelated outputs when receiving coins
+        Coin value = txFull.getValue(this);
+        boolean isReceiving = value.signum() > 0;
+        if (isReceiving) {
+            Coin outValue = Coin.ZERO;
+            for (TransactionOutput output : txFull.getOutputs()) {
+                boolean isOutputMine = false;
+                try {
+                    isOutputMine = findKeyFromPubHash(output.getScriptPubKey().getPubKeyHash()) != null;
+                } catch (ScriptException ignore) {
+                    // If we don't understand this output, ignore it
+                }
+                if (isOutputMine) {
+                    tx.addOutput(output);
+                } else {
+                    outValue = outValue.add(output.getValue());
+                }
+            }
+            tx.addOutput(new TransactionOutput(type, null, outValue, new byte[0]));
+        } else {
+            // When sending keep all outputs
+            for (TransactionOutput output : txFull.getOutputs()) {
+                tx.addOutput(output);
+            }
+        }
+
+        return new BitTransaction(txFull.getHash(), tx, true);
+    }
+
+    /**
      * Marks outputs as spent, if we don't have the keys
      */
-    private void markNotOwnOutputs(Transaction transaction) {
+    private void markNotOwnOutputs(BitTransaction transaction) {
         checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
-        for (TransactionOutput txo : transaction.getOutputs()) {
+        for (TransactionOutput txo : transaction.getRawTransaction().getOutputs()) {
             if (txo.isAvailableForSpending()) {
                 // We don't have keys for this txo therefore it is not ours
                 try {
@@ -270,13 +321,13 @@ abstract public class TransactionWatcherWallet extends AbstractWallet implements
     /**
      * Adds the given transaction to the given pools and registers a confidence change listener on it.
      */
-    private void addWalletTransaction(WalletTransaction.Pool pool, Transaction tx, boolean save) {
+    private void addWalletTransaction(WalletTransaction.Pool pool, BitTransaction tx, boolean save) {
         lock.lock();
         try {
-            if (log.isInfoEnabled()) {
-                log.info("Adding {} tx to {} pool ({})",
-                        tx.isEveryOwnedOutputSpent(this) ? WalletTransaction.Pool.SPENT : WalletTransaction.Pool.UNSPENT, pool, tx.getHash());
-            }
+//            if (log.isInfoEnabled()) {
+//                log.info("Adding {} tx to {} pool ({})",
+//                        tx.isEveryOwnedOutputSpent(this) ? WalletTransaction.Pool.SPENT : WalletTransaction.Pool.UNSPENT, pool, tx.getHash());
+//            }
 
             simpleAddTransaction(pool, tx);
 
@@ -294,15 +345,6 @@ abstract public class TransactionWatcherWallet extends AbstractWallet implements
         if (save) walletSaveLater();
     }
 
-
-    /**
-     * Returns a transaction object given its hash, if it exists in this wallet, or null otherwise.
-     */
-    @Nullable
-    public Transaction getRawTransaction(String transactionId) {
-        return getRawTransaction(new Sha256Hash(transactionId));
-    }
-
     /**
      * Returns a transaction object given its hash, if it exists in this wallet, or null otherwise.
      */
@@ -310,7 +352,12 @@ abstract public class TransactionWatcherWallet extends AbstractWallet implements
     public Transaction getRawTransaction(Sha256Hash hash) {
         lock.lock();
         try {
-            return rawtransactions.get(hash);
+            BitTransaction tx = rawtransactions.get(hash);
+            if (tx != null) {
+                return tx.getRawTransaction();
+            } else {
+                return null;
+            }
         } finally {
             lock.unlock();
         }
@@ -319,10 +366,10 @@ abstract public class TransactionWatcherWallet extends AbstractWallet implements
     /**
      * Returns transactions that match the hashes, some transactions could be missing.
      */
-    public HashMap<Sha256Hash, Transaction> getTransactions(HashSet<Sha256Hash> hashes) {
+    public HashMap<Sha256Hash, BitTransaction> getTransactions(HashSet<Sha256Hash> hashes) {
         lock.lock();
         try {
-            HashMap<Sha256Hash, Transaction> txs = new HashMap<>();
+            HashMap<Sha256Hash, BitTransaction> txs = new HashMap<>();
             for (Sha256Hash hash : hashes) {
                 if (rawtransactions.containsKey(hash)) {
                     txs.put(hash, rawtransactions.get(hash));
@@ -347,10 +394,9 @@ abstract public class TransactionWatcherWallet extends AbstractWallet implements
             lastBlockSeenHash = null;
             lastBlockSeenHeight = -1;
             lastBlockSeenTimeSecs = 0;
-            unspent.clear();
-            spent.clear();
+            unspentOutputs.clear();
+            confirmed.clear();
             pending.clear();
-            dead.clear();
             rawtransactions.clear();
             addressesStatus.clear();
             clearTransientState();
@@ -449,28 +495,32 @@ abstract public class TransactionWatcherWallet extends AbstractWallet implements
     public Value getBalance() {
         lock.lock();
         try {
-            return getTxBalance(Iterables.concat(unspent.values(), pending.values()), true);
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    Value getTxBalance(Iterable<Transaction> txs, boolean toMe) {
-        lock.lock();
-        try {
             Value value = type.value(0);
-            for (Transaction tx : txs) {
-                if (toMe) {
-                    value = value.add(tx.getValueSentToMe(this, false));
-                } else {
-                    value = value.add(tx.getValue(this));
-                }
+            for (TransactionOutput output : unspentOutputs.values()) {
+                value = value.add(output.getValue());
             }
             return value;
         } finally {
             lock.unlock();
         }
     }
+
+//    Value getTxBalance(Iterable<Transaction> txs, boolean toMe) {
+//        lock.lock();
+//        try {
+//            Value value = type.value(0);
+//            for (Transaction tx : txs) {
+//                if (toMe) {
+//                    value = value.add(tx.getValueSentToMe(this, false));
+//                } else {
+//                    value = value.add(tx.getValue(this));
+//                }
+//            }
+//            return value;
+//        } finally {
+//            lock.unlock();
+//        }
+//    }
 
     /**
      * Sets that the specified status is currently updating i.e. getting transactions.
@@ -617,11 +667,10 @@ abstract public class TransactionWatcherWallet extends AbstractWallet implements
         try {
             lastBlockSeenTimeSecs = header.getTimestamp();
             lastBlockSeenHeight = header.getBlockHeight();
-            for (Transaction tx : getTransactions(false)) {
-                TransactionConfidence confidence = tx.getConfidence();
+            for (BitTransaction tx : rawtransactions.values()) {
                 // Save wallet when we have new TXs
-                if (confidence.getDepthInBlocks() < TX_DEPTH_SAVE_THRESHOLD) shouldSave = true;
-                maybeUpdateBlockDepth(confidence);
+                if (tx.getDepthInBlocks() < TX_DEPTH_SAVE_THRESHOLD) shouldSave = true;
+                maybeUpdateBlockDepth(tx);
             }
             queueOnNewBlock();
         } finally {
@@ -630,10 +679,12 @@ abstract public class TransactionWatcherWallet extends AbstractWallet implements
         if (shouldSave) walletSaveLater();
     }
 
-    private void maybeUpdateBlockDepth(TransactionConfidence confidence) {
-        if (confidence.getConfidenceType() != TransactionConfidence.ConfidenceType.BUILDING) return;
-        int newDepth = lastBlockSeenHeight - confidence.getAppearedAtChainHeight() + 1;
-        if (newDepth > 1) confidence.setDepthInBlocks(newDepth);
+    private void maybeUpdateBlockDepth(BitTransaction tx) {
+
+//        TransactionConfidence confidence;
+        if (tx.getConfidenceType() != BUILDING) return;
+        int newDepth = lastBlockSeenHeight - tx.getAppearedAtChainHeight() + 1;
+        if (newDepth > 1) tx.setDepthInBlocks(newDepth);
     }
 
     @Override
@@ -712,7 +763,7 @@ abstract public class TransactionWatcherWallet extends AbstractWallet implements
         try {
             if (statusPendingUpdates.containsKey(status.getAddress()) && status.isReady()) {
                 HashSet<Sha256Hash> txHashes = status.getAllTransactionHashes();
-                HashMap<Sha256Hash, Transaction> txs = getTransactions(txHashes);
+                HashMap<Sha256Hash, BitTransaction> txs = getTransactions(txHashes);
                 // We have all the transactions, apply state
                 if (txs.size() == txHashes.size()) {
                     applyState(status, txs);
@@ -723,18 +774,18 @@ abstract public class TransactionWatcherWallet extends AbstractWallet implements
         }
     }
 
-    private void applyState(AddressStatus status, HashMap<Sha256Hash, Transaction> txs) {
+    private void applyState(AddressStatus status, HashMap<Sha256Hash, BitTransaction> txs) {
         checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
-        log.info("Applying state {} - {}", status.getAddress(), status.getStatus());
+//        log.info("Applying state {} - {}", status.getAddress(), status.getStatus());
         // Connect inputs to outputs
         for (ServerClient.HistoryTx historyTx : status.getHistoryTxs()) {
-            Transaction tx = txs.get(historyTx.getTxHash());
+            BitTransaction tx = txs.get(historyTx.getTxHash());
             if (tx != null) {
-                log.info("{} getHeight() = " + historyTx.getHeight(), historyTx.getTxHash());
-                if (historyTx.getHeight() > 0 && tx.getConfidence().getDepthInBlocks() == 0) {
-                    TransactionConfidence confidence = tx.getConfidence();
-                    confidence.setAppearedAtChainHeight(historyTx.getHeight());
-                    maybeUpdateBlockDepth(confidence);
+//                log.info("{} getHeight() = " + historyTx.getHeight(), historyTx.getTxHash());
+                if (historyTx.getHeight() > 0 && tx.getDepthInBlocks() == 0) {
+                    tx.setAppearedAtChainHeight(historyTx.getHeight());
+                    maybeUpdateBlockDepth(tx);
+                    maybeMovePool(tx);
                 }
             } else {
                 log.error("Could not find {} in the transactions pool. Aborting applying state",
@@ -743,7 +794,7 @@ abstract public class TransactionWatcherWallet extends AbstractWallet implements
             }
         }
 
-        for (Transaction tx : txs.values()) {
+        for (BitTransaction tx : txs.values()) {
             connectTransaction(tx);
         }
 
@@ -751,100 +802,155 @@ abstract public class TransactionWatcherWallet extends AbstractWallet implements
         queueOnNewBalance();
     }
 
-    private void connectTransaction(Transaction tx) {
-        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
-        // Connect to other transactions in the wallet pocket
-        if (log.isInfoEnabled()) log.info("Connecting inputs of tx {}", tx.getHash());
-        int txiIndex = 0;
-        for (TransactionInput txi : tx.getInputs()) {
-            TransactionOutput output = txi.getConnectedOutput();
-            if (output != null && !output.isAvailableForSpending()) {
-                // Check if the current input spends this output
-                if (output.getSpentBy() == null || output.getSpentBy().equals(txi)) {
-                    log.info("skipping an already connected txi {}", txi);
-                    txiIndex++;
-                    continue; // skip connected inputs
-                }
-            }
-            Sha256Hash outputHash = txi.getOutpoint().getHash();
-            Transaction fromTx = rawtransactions.get(outputHash);
-            if (fromTx != null) {
-                // Try to connect and recover if failed once.
-                for (int i = 2; i > 0; i--) {
-                    TransactionInput.ConnectionResult result = txi.connect(fromTx, TransactionInput.ConnectMode.DISCONNECT_ON_CONFLICT);
-                    if (result == TransactionInput.ConnectionResult.NO_SUCH_TX) {
-                        log.error("Could not connect {} to {}", txi.getOutpoint(), fromTx.getHash());
-                    } else if (result == TransactionInput.ConnectionResult.ALREADY_SPENT) {
-                        TransactionOutput out = fromTx.getOutput((int) txi.getOutpoint().getIndex());
-                        log.warn("Already spent {}, forcing unspent and retry", out);
-                        out.markAsUnspent();
-                    } else {
-                        if (log.isInfoEnabled()) {
-                            log.info("Connected {}:{} to {}:{}", fromTx.getHash(),
-                                    txi.getOutpoint().getIndex(), tx.getHashAsString(), txiIndex);
+    /**
+     * Mark as spent outputs that the provided inputs spend
+     */
+    @VisibleForTesting
+    void connectTransaction(BitTransaction tx) {
+        lock.lock();
+        try {
+            boolean isConfirmed = tx.getConfidenceType() == BUILDING;
+            boolean isReceiving = tx.getValue(this).isPositive();
 
-                        }
-                        break; // No errors, break the loop
+            // Skip if not confirmed and receiving funds
+            if (!isConfirmed && isReceiving) return;
+
+            for (TransactionInput txi : tx.getInputs()) {
+                TransactionOutPoint outpoint = txi.getOutpoint();
+
+                BitTransaction fromTx = rawtransactions.get(outpoint.getHash());
+                if (fromTx != null) {
+                    TransactionOutput outputToBeSpent = fromTx.getOutput((int) outpoint.getIndex());
+                    if (outputToBeSpent.isAvailableForSpending()) {
+                        outputToBeSpent.markAsSpent(null);
                     }
                 }
-                // Could become spent, maybe change pool
-                maybeMovePool(fromTx);
+                unspentOutputs.remove(outpoint);
             }
-            else {
-                log.info("No output found for input {}:{}", tx.getHashAsString(),
-                        txiIndex);
+
+            // Add new unspent outputs
+            List<TransactionOutput> outputs = tx.getOutputs();
+            for (int i = 0; i < outputs.size(); i++) {
+                TransactionOutput txo = outputs.get(i);
+                if (txo.isAvailableForSpending() && txo.isMineOrWatched(this)) {
+                    unspentOutputs.put(new TransactionOutPoint(type, i, tx.getHash()), txo);
+                }
             }
-            txiIndex++;
+        } finally {
+            lock.unlock();
         }
-        maybeMovePool(tx);
+
+
+
+
+
+//        if (!isConfirmed && isReceiving) return;
+//        for (TransactionInput txi : tx.getInputs()) {
+//
+//            // todo remove start
+//            TransactionOutput output = txi.getConnectedOutput();
+//            if (output != null && !output.isAvailableForSpending()) {
+//                // Check if the current input spends this output
+//                if (output.getSpentBy() == null || output.getSpentBy().equals(txi)) {
+//                    continue; // skip connected inputs
+//                }
+//            }
+//            // todo remove end
+//
+//            TransactionOutPoint outpoint = txi.getOutpoint();
+//            Transaction fromTx = rawtransactions.get(outpoint.getHash());
+//            if (fromTx != null) {
+////                TransactionOutput outputToBeSpent = fromTx.getOutput((int) outpoint.getIndex());
+////                if (outputToBeSpent.isAvailableForSpending()) {
+////                    outputToBeSpent.markAsSpent(null);
+////                }
+//
+//                // todo remove start
+//                // Try to connect and recover if failed once.
+//                for (int i = 2; i > 0; i--) {
+//                    TransactionInput.ConnectionResult result = txi.connect(fromTx, TransactionInput.ConnectMode.DISCONNECT_ON_CONFLICT);
+//                    if (result == TransactionInput.ConnectionResult.NO_SUCH_TX) {
+//                        log.error("Could not connect {} to {}", txi.getOutpoint(), fromTx.getHash());
+//                    } else if (result == TransactionInput.ConnectionResult.ALREADY_SPENT) {
+//                        TransactionOutput out = fromTx.getOutput((int) txi.getOutpoint().getIndex());
+//                        log.warn("Already spent {}, forcing unspent and retry", out);
+//                        out.markAsUnspent();
+//                    } else {
+//                        break; // No errors, break the loop
+//                    }
+//                }
+//                // todo remove end
+//
+//                // Could become spent, maybe change pool
+//                maybeMovePool(fromTx);
+//            }
+//        }
+//
+//        // Add new unspent outputs
+//        List<TransactionOutput> outputs = tx.getOutputs();
+//        for (int i = 0; i < outputs.size(); i++) {
+//            TransactionOutput txo = outputs.get(i);
+//            if (txo.isAvailableForSpending() && txo.isMineOrWatched(this)) {
+//                unspentOutputs.put(new TransactionOutPoint(type, i, tx.getHash()), txo);
+//            }
+//        }
+
+//        maybeMovePool(tx);
+    }
+
+    private void guessTransactionSource(BitTransaction tx) {
+//        tx.getConfidence().setSource(TransactionConfidence.Source.SELF);
     }
 
     /**
      * If the transactions outputs are all marked as spent, and it's in the unspent map, move it.
      * If the owned transactions outputs are not all marked as spent, and it's in the spent map, move it.
      */
-    private void maybeMovePool(Transaction tx) {
+    private void maybeMovePool(BitTransaction tx) {
         lock.lock();
         try {
-            log.info("maybeMovePool {} tx {} {}", tx.isEveryOwnedOutputSpent(this) ? WalletTransaction.Pool.SPENT : WalletTransaction.Pool.UNSPENT,
-                    tx.getHash(), tx.getConfidence().getConfidenceType());
-            if (tx.getConfidence().getConfidenceType() == TransactionConfidence.ConfidenceType.BUILDING) {
+//            log.info("maybeMovePool {} tx {} {}", tx.isEveryOwnedOutputSpent(this) ? WalletTransaction.Pool.SPENT : WalletTransaction.Pool.UNSPENT,
+//                    tx.getHash(), tx.getConfidence().getConfidenceType());
+            if (tx.getConfidenceType() == BUILDING) {
                 // Transaction is confirmed, move it
                 if (pending.remove(tx.getHash()) != null) {
-                    if (tx.isEveryOwnedOutputSpent(this)) {
-                        if (log.isInfoEnabled()) log.info("  {} <-pending ->spent", tx.getHash());
-                        spent.put(tx.getHash(), tx);
-                    } else {
-                        if (log.isInfoEnabled()) log.info("  {} <-pending ->unspent", tx.getHash());
-                        unspent.put(tx.getHash(), tx);
-                    }
-                } else {
-                    maybeFlipSpentUnspent(tx);
+                    confirmed.put(tx.getHash(), tx);
+                    connectTransaction(tx);
+//                    if (tx.isEveryOwnedOutputSpent(this)) {
+//                        if (log.isInfoEnabled()) log.info("  {} <-pending ->spent", tx.getHash());
+//                        spent.put(tx.getHash(), tx);
+//                    } else {
+//                        if (log.isInfoEnabled()) log.info("  {} <-pending ->unspent", tx.getHash());
+//                        unspent.put(tx.getHash(), tx);
+//                    }
                 }
+//                else {
+//                    maybeFlipSpentUnspent(tx);
+//                }
             }
         } finally {
             lock.unlock();
         }
     }
 
-    /**
-     * Will flip transaction from spent/unspent pool if needed.
-     */
-    private void maybeFlipSpentUnspent(Transaction tx) {
-        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
-        if (tx.isEveryOwnedOutputSpent(this)) {
-            // There's nothing left I can spend in this transaction.
-            if (unspent.remove(tx.getHash()) != null) {
-                if (log.isInfoEnabled()) log.info("  {} <-unspent ->spent", tx.getHash());
-                spent.put(tx.getHash(), tx);
-            }
-        } else {
-            if (spent.remove(tx.getHash()) != null) {
-                if (log.isInfoEnabled()) log.info("  {} <-spent ->unspent", tx.getHash());
-                unspent.put(tx.getHash(), tx);
-            }
-        }
-    }
+//    /**
+//     * Will flip transaction from spent/unspent pool if needed.
+//     */
+//    private void maybeFlipSpentUnspent(Transaction tx) {
+//        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
+//        if (tx.isEveryOwnedOutputSpent(this)) {
+//            // There's nothing left I can spend in this transaction.
+//            if (unspent.remove(tx.getHash()) != null) {
+//                if (log.isInfoEnabled()) log.info("  {} <-unspent ->spent", tx.getHash());
+//                spent.put(tx.getHash(), tx);
+//            }
+//        } else {
+//            if (spent.remove(tx.getHash()) != null) {
+//                if (log.isInfoEnabled()) log.info("  {} <-spent ->unspent", tx.getHash());
+//                unspent.put(tx.getHash(), tx);
+//            }
+//        }
+//    }
 
 
     private void fetchTransactions(List<? extends ServerClient.HistoryTx> txes) {
@@ -868,20 +974,37 @@ abstract public class TransactionWatcherWallet extends AbstractWallet implements
 
     private boolean isTransactionAvailableOrQueued(Sha256Hash txHash) {
         checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
-        return getRawTransaction(txHash) != null || fetchingTransactions.contains(txHash);
+        return rawtransactions.containsKey(txHash) || fetchingTransactions.contains(txHash);
     }
 
     @VisibleForTesting
-    void addNewTransactionIfNeeded(Transaction tx) {
+    void addNewTransactionIfNeeded(BitTransaction tx) {
         lock.lock();
         try {
             // If was fetching this tx, remove it
             fetchingTransactions.remove(tx.getHash());
 
             // This tx not in wallet, add it
-            if (getRawTransaction(tx.getHash()) == null) {
-                tx.getConfidence().setConfidenceType(TransactionConfidence.ConfidenceType.PENDING);
-                addWalletTransaction(WalletTransaction.Pool.PENDING, tx, true);
+            if (!rawtransactions.containsKey(tx.getHash())) {
+                if (tx.getConfidenceType() == UNKNOWN) {
+                    tx.setConfidenceType(PENDING);
+                }
+
+                WalletTransaction.Pool pool;
+                switch (tx.getConfidenceType()) {
+                    case BUILDING:
+                        pool = WalletTransaction.Pool.CONFIRMED;
+                        break;
+                    case PENDING:
+                        pool = WalletTransaction.Pool.PENDING;
+                        break;
+                    case DEAD:
+                    case UNKNOWN:
+                    default:
+                        throw new RuntimeException("Unsupported confidence type: " +
+                                tx.getConfidenceType().name());
+                }
+                addWalletTransaction(pool, tx, true);
             }
         } finally {
             lock.unlock();
@@ -889,7 +1012,7 @@ abstract public class TransactionWatcherWallet extends AbstractWallet implements
     }
 
     @Override
-    public void onTransactionUpdate(Transaction tx) {
+    public void onTransactionUpdate(BitTransaction tx) {
         if (log.isInfoEnabled()) log.info("Got a new transaction {}", tx.getHash());
         lock.lock();
         try {
@@ -902,7 +1025,7 @@ abstract public class TransactionWatcherWallet extends AbstractWallet implements
     }
 
     @Override
-    public void onTransactionBroadcast(Transaction tx) {
+    public void onTransactionBroadcast(BitTransaction tx) {
         lock.lock();
         try {
             log.info("Transaction sent {}", tx);
@@ -915,7 +1038,7 @@ abstract public class TransactionWatcherWallet extends AbstractWallet implements
     }
 
     @Override
-    public void onTransactionBroadcastError(Transaction tx) {
+    public void onTransactionBroadcastError(BitTransaction tx) {
         queueOnTransactionBroadcastFailure(tx);
     }
 
@@ -975,10 +1098,11 @@ abstract public class TransactionWatcherWallet extends AbstractWallet implements
         lock.lock();
         try {
             for (WalletTransaction wtx : wtxs) {
-                simpleAddTransaction(wtx.getPool(), wtx.getTransaction());
-                markNotOwnOutputs(wtx.getTransaction());
+                BitTransaction tx = (BitTransaction) wtx.getTransaction();
+                simpleAddTransaction(wtx.getPool(), tx);
+                markNotOwnOutputs(tx);
             }
-            for (Transaction utx : getTransactions(false)) {
+            for (BitTransaction utx : rawtransactions.values()) {
                 connectTransaction(utx);
             }
         } finally {
@@ -987,24 +1111,30 @@ abstract public class TransactionWatcherWallet extends AbstractWallet implements
     }
 
     @Override
-    public Map<Sha256Hash, Transaction> getTransactionPool(WalletTransaction.Pool pool) {
+    public Map<Sha256Hash, Transaction> getTransactionPool(org.bitcoinj.wallet.WalletTransaction.Pool pool) {
         lock.lock();
         try {
             switch (pool) {
                 case UNSPENT:
-                    return unspent;
                 case SPENT:
-                    return spent;
+                    return toRawTransactions(confirmed);
                 case PENDING:
-                    return pending;
+                    return toRawTransactions(pending);
                 case DEAD:
-                    return dead;
                 default:
                     throw new RuntimeException("Unknown wallet transaction type " + pool);
             }
         } finally {
             lock.unlock();
         }
+    }
+
+    static Map<Sha256Hash, Transaction> toRawTransactions(Map<Sha256Hash, BitTransaction> txs) {
+        Map<Sha256Hash, Transaction> rawTxs = new HashMap<>(txs.size());
+        for (Map.Entry<Sha256Hash, BitTransaction> tx : txs.entrySet()) {
+            rawTxs.put(tx.getKey(), tx.getValue().getRawTransaction());
+        }
+        return rawTxs;
     }
 
     void queueOnNewBalance() {
@@ -1047,24 +1177,23 @@ abstract public class TransactionWatcherWallet extends AbstractWallet implements
         }
     }
 
-    void queueOnTransactionBroadcastSuccess(final Transaction tx) {
+    void queueOnTransactionBroadcastSuccess(final BitTransaction tx) {
         for (final ListenerRegistration<WalletAccountEventListener> registration : listeners) {
             registration.executor.execute(new Runnable() {
                 @Override
                 public void run() {
-
-                    registration.listener.onTransactionBroadcastSuccess(TransactionWatcherWallet.this, new BitTransaction(tx));
+                    registration.listener.onTransactionBroadcastSuccess(TransactionWatcherWallet.this, tx);
                 }
             });
         }
     }
 
-    void queueOnTransactionBroadcastFailure(final Transaction tx) {
+    void queueOnTransactionBroadcastFailure(final BitTransaction tx) {
         for (final ListenerRegistration<WalletAccountEventListener> registration : listeners) {
             registration.executor.execute(new Runnable() {
                 @Override
                 public void run() {
-                    registration.listener.onTransactionBroadcastFailure(TransactionWatcherWallet.this, new BitTransaction(tx));
+                    registration.listener.onTransactionBroadcastFailure(TransactionWatcherWallet.this, tx);
                 }
             });
         }
@@ -1087,17 +1216,26 @@ abstract public class TransactionWatcherWallet extends AbstractWallet implements
     }
 
     @Override
-    public void broadcastTx(AbstractTransaction tx) throws IOException {
-        // TODO throw transaction broadcast exception
-        broadcastTx((Transaction) tx.getRawTransaction());
+    public void broadcastTx(AbstractTransaction tx) throws TransactionBroadcastException {
+        if (tx instanceof BitTransaction) {
+            // TODO throw transaction broadcast exception
+            broadcastTx((BitTransaction) tx, this);
+        } else {
+            throw new TransactionBroadcastException("Incompatible transaction type: " + tx.getClass().getName());
+        }
     }
 
     @Override
-    public boolean broadcastTxSync(AbstractTransaction tx) throws IOException {
-        return tx.getRawTransaction() != null && broadcastTxSync((Transaction) tx.getRawTransaction());
+    public boolean broadcastTxSync(AbstractTransaction tx) throws TransactionBroadcastException {
+        if (tx instanceof BitTransaction) {
+            return broadcastBitTxSync((BitTransaction) tx);
+        } else {
+            throw new TransactionBroadcastException("Unsupported transaction class: " +
+                    tx.getClass().getName() + ", need: " + BitTransaction.class.getName());
+        }
     }
 
-    public boolean broadcastTxSync(Transaction tx) throws IOException {
+    public boolean broadcastBitTxSync(BitTransaction tx) throws TransactionBroadcastException {
         if (isConnected()) {
             if (log.isInfoEnabled()) {
                 log.info("Broadcasting tx {}", Utils.HEX.encode(tx.bitcoinSerialize()));
@@ -1110,22 +1248,19 @@ abstract public class TransactionWatcherWallet extends AbstractWallet implements
             }
             return success;
         } else {
-            throw new IOException("No connection available");
+            throw new TransactionBroadcastException("No connection available");
         }
     }
 
-    public void broadcastTx(Transaction tx) throws IOException {
-        broadcastTx(tx, this);
-    }
-
-    private void broadcastTx(Transaction tx, TransactionEventListener listener) throws IOException {
+    private void broadcastTx(BitTransaction tx, TransactionEventListener<BitTransaction> listener)
+            throws TransactionBroadcastException {
         if (isConnected()) {
             if (log.isInfoEnabled()) {
                 log.info("Broadcasting tx {}", Utils.HEX.encode(tx.bitcoinSerialize()));
             }
             blockchainConnection.broadcastTx(tx, listener != null ? listener : this);
         } else {
-            throw new IOException("No connection available");
+            throw new TransactionBroadcastException("No connection available");
         }
     }
 
@@ -1133,38 +1268,57 @@ abstract public class TransactionWatcherWallet extends AbstractWallet implements
         return blockchainConnection != null;
     }
 
-    public Map<Sha256Hash, Transaction> getUnspentTransactions() {
-        return unspent;
+//    public Map<Sha256Hash, Transaction> getUnspentTransactions() {
+//        return unspent;
+//    }
+
+    public Map<TransactionOutPoint, TransactionOutput> getUnspentOutputs() {
+        return unspentOutputs;
     }
 
-    public Map<Sha256Hash, Transaction> getPendingRawTransactions() {
-        return pending;
-    }
+//    public Map<Sha256Hash, Transaction> getPendingRawTransactions() {
+//        return pending;
+//    }
 
-    public Map<Sha256Hash, Transaction> getRawTransactions() {
-        return rawtransactions;
-    }
+//    public Map<Sha256Hash, Transaction> getRawTransactions() {
+//        return rawtransactions;
+//    }
 
     @Nullable
     @Override
     public AbstractTransaction getTransaction(String transactionId) {
-        return new BitTransaction(getRawTransaction(new Sha256Hash(transactionId)));
+        lock.lock();
+        try {
+            return rawtransactions.get(new Sha256Hash(transactionId));
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override
     public Map<Sha256Hash, AbstractTransaction> getTransactions() {
-        return toAbstractTransactions(rawtransactions);
+        lock.lock();
+        try {
+            return toAbstractTransactions(rawtransactions);
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override
     public Map<Sha256Hash, AbstractTransaction> getPendingTransactions() {
-        return toAbstractTransactions(pending);
+        lock.lock();
+        try {
+            return toAbstractTransactions(pending);
+        } finally {
+            lock.unlock();
+        }
     }
 
-    static Map<Sha256Hash, AbstractTransaction> toAbstractTransactions(Map<Sha256Hash, Transaction> txMap) {
+    static Map<Sha256Hash, AbstractTransaction> toAbstractTransactions(Map<Sha256Hash, BitTransaction> txMap) {
         Map<Sha256Hash, AbstractTransaction> txs = new HashMap<>();
-        for (Sha256Hash hash : txMap.keySet()) {
-            txs.put(hash, new BitTransaction(txMap.get(hash)));
+        for (Map.Entry<Sha256Hash, BitTransaction> tx : txMap.entrySet()) {
+            txs.put(tx.getKey(), tx.getValue());
         }
         return txs;
     }

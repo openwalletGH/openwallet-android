@@ -7,6 +7,7 @@ import com.coinomi.core.network.interfaces.TransactionEventListener;
 import com.coinomi.core.wallet.AbstractAddress;
 import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.core.wallet.families.bitcoin.BitAddress;
+import com.coinomi.core.wallet.families.bitcoin.BitTransaction;
 import com.coinomi.stratumj.ServerAddress;
 import com.coinomi.stratumj.StratumClient;
 import com.coinomi.stratumj.messages.CallMessage;
@@ -49,7 +50,7 @@ import static com.google.common.util.concurrent.Service.State.NEW;
 /**
  * @author John L. Jegutanis
  */
-public class ServerClient implements BlockchainConnection<Transaction> {
+public class ServerClient implements BlockchainConnection<BitTransaction> {
     private static final Logger log = LoggerFactory.getLogger(ServerClient.class);
 
     private static final ScheduledThreadPoolExecutor connectionExec;
@@ -331,7 +332,7 @@ public class ServerClient implements BlockchainConnection<Transaction> {
     }
 
     @Override
-    public void subscribeToAddresses(List<AbstractAddress> addresses, final TransactionEventListener listener) {
+    public void subscribeToAddresses(List<AbstractAddress> addresses, final TransactionEventListener<BitTransaction> listener) {
         checkNotNull(stratumClient);
 
         final CallMessage callMessage = new CallMessage("blockchain.address.subscribe", (List)null);
@@ -431,7 +432,8 @@ public class ServerClient implements BlockchainConnection<Transaction> {
     }
 
     @Override
-    public void getTransaction(final Sha256Hash txHash, final TransactionEventListener listener) {
+    public void getTransaction(final Sha256Hash txHash,
+                               final TransactionEventListener<BitTransaction> listener) {
         checkNotNull(stratumClient);
 
         final CallMessage message = new CallMessage("blockchain.transaction.get",
@@ -444,7 +446,7 @@ public class ServerClient implements BlockchainConnection<Transaction> {
             public void onSuccess(ResultMessage result) {
                 try {
                     String rawTx = result.getResult().getString(0);
-                    Transaction tx = new Transaction(type, Utils.HEX.decode(rawTx));
+                    BitTransaction tx = new BitTransaction(type, Utils.HEX.decode(rawTx));
                     if (!tx.getHash().equals(txHash)) {
                         throw new Exception("Requested TX " + txHash + " but got " + tx.getHashAsString());
                     }
@@ -467,7 +469,8 @@ public class ServerClient implements BlockchainConnection<Transaction> {
     }
 
     @Override
-    public void broadcastTx(final Transaction tx, @Nullable final TransactionEventListener listener) {
+    public void broadcastTx(final BitTransaction tx,
+                            @Nullable final TransactionEventListener<BitTransaction> listener) {
         checkNotNull(stratumClient);
 
         CallMessage message = new CallMessage("blockchain.transaction.broadcast",
@@ -500,7 +503,7 @@ public class ServerClient implements BlockchainConnection<Transaction> {
     }
 
     @Override
-    public boolean broadcastTxSync(final Transaction tx) {
+    public boolean broadcastTxSync(final BitTransaction tx) {
         checkNotNull(stratumClient);
 
         CallMessage message = new CallMessage("blockchain.transaction.broadcast",
@@ -534,7 +537,7 @@ public class ServerClient implements BlockchainConnection<Transaction> {
                 try {
                     log.info("Server {} version {} OK", type.getName(),
                             result.getResult().get(0));
-                } catch (JSONException ignore) {
+                } catch (Exception ignore) {
                 }
             }
 
@@ -564,7 +567,7 @@ public class ServerClient implements BlockchainConnection<Transaction> {
             this.height = height;
         }
 
-        public static List<? extends HistoryTx> fromArray(JSONArray jsonArray) throws JSONException {
+        public static List<HistoryTx> fromArray(JSONArray jsonArray) throws JSONException {
             ImmutableList.Builder<HistoryTx> list = ImmutableList.builder();
             for (int i = 0; i < jsonArray.length(); i++) {
                 list.add(new HistoryTx(jsonArray.getJSONObject(i)));

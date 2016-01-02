@@ -1,5 +1,6 @@
 package com.coinomi.core.wallet.families.nxt;
 
+import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
 import com.coinomi.core.coins.nxt.Convert;
 import com.coinomi.core.coins.nxt.Transaction;
@@ -9,14 +10,13 @@ import com.coinomi.core.wallet.AbstractTransaction;
 import com.coinomi.core.wallet.AbstractWallet;
 import com.coinomi.core.wallet.WalletAccount;
 
+import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.TransactionConfidence;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import javax.annotation.Nullable;
 
 import static com.coinomi.core.Preconditions.checkNotNull;
 
@@ -25,12 +25,16 @@ import static com.coinomi.core.Preconditions.checkNotNull;
  * @author John L. Jegutanis
  */
 public final class NxtTransaction implements AbstractTransaction {
+    final Sha256Hash hash;
     final Transaction tx;
+    final CoinType type;
 
-    TransactionConfidence.ConfidenceType confidence = TransactionConfidence.ConfidenceType.BUILDING;;
+    TransactionConfidence.ConfidenceType confidence = TransactionConfidence.ConfidenceType.BUILDING;
 
-    public NxtTransaction(Transaction transaction) {
+    public NxtTransaction(CoinType type, Transaction transaction) {
+        this.type = type;
         tx = checkNotNull(transaction);
+        hash = new Sha256Hash(tx.getFullHash());
     }
 
     public void setConfidenceType(TransactionConfidence.ConfidenceType conf) {
@@ -48,6 +52,11 @@ public final class NxtTransaction implements AbstractTransaction {
     }
 
     @Override
+    public void setAppearedAtChainHeight(int appearedAtChainHeight) {
+        tx.setHeight(appearedAtChainHeight);
+    }
+
+    @Override
     public TransactionConfidence.Source getSource() {
         return TransactionConfidence.Source.NETWORK;
     }
@@ -55,11 +64,6 @@ public final class NxtTransaction implements AbstractTransaction {
     @Override
     public int getDepthInBlocks() {
         return tx.getConfirmations();
-    }
-
-    @Override
-    public String getHashAsString() {
-        return tx.getFullHash();
     }
 
     @Override
@@ -74,25 +78,23 @@ public final class NxtTransaction implements AbstractTransaction {
     @Override
     public TxMessage getMessage() {
         if (tx.getMessage() != null) {
-            NxtTxMessage message = new NxtTxMessage(tx);
-            return message;
+            return new NxtTxMessage(tx);
         }
         return null;
     }
 
     @Override
-    public Value getFee(WalletAccount wallet) {
-        return Value.valueOf(wallet.getCoinType(), tx.getFeeNQT());
+    public Value getFee() {
+        return type.value(tx.getFeeNQT());
     }
 
     @Override
-    public List<Map.Entry<AbstractAddress, Value>> getOutputs(AbstractWallet wallet) {
+    public List<Map.Entry<AbstractAddress, Value>> getSentTo(AbstractWallet wallet) {
         List<Map.Entry<AbstractAddress, Value>> outputs = new ArrayList<>();
         outputs.add(new AbstractMap.SimpleEntry<AbstractAddress, Value>
                 (new NxtFamilyAddress(wallet.getCoinType(), tx.getRecipientId()),
                         Value.valueOf(wallet.getCoinType(), tx.getAmountNQT())));
         return outputs;
-
     }
 
     @Override
@@ -101,8 +103,23 @@ public final class NxtTransaction implements AbstractTransaction {
     }
 
     @Override
-    public byte[] getHash() {
-        return Convert.parseHexString(tx.getFullHash());
+    public Sha256Hash getHash() {
+        return hash;
+    }
+
+    @Override
+    public byte[] getHashBytes() {
+        return hash.getBytes();
+    }
+
+    @Override
+    public void setDepthInBlocks(int depthInBlocks) {
+
+    }
+
+    @Override
+    public String getHashAsString() {
+        return hash.toString();
     }
 
     @Override
@@ -111,12 +128,15 @@ public final class NxtTransaction implements AbstractTransaction {
     }
 
     @Override
+    public boolean isTrimmed() {
+        return false;
+    }
+
+    @Override
     public boolean isMine(WalletAccount wallet, Map.Entry<AbstractAddress, Value> output) {
         return wallet.getActiveAddresses().contains(output.getKey());
     }
 
-    @Override
-    @Nullable
     public Transaction getRawTransaction() {
         return tx;
     }

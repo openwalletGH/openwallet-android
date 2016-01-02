@@ -48,9 +48,10 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 
 /**
- * Created by vbcs on 29/9/2015.
+ * @author vbcs
+ * @author John L. Jegutanis
  */
-public class NxtServerClient implements BlockchainConnection<Transaction> {
+public class NxtServerClient implements BlockchainConnection<NxtTransaction> {
 
     private static final int POLL_INTERVAL_SEC = 5;
 
@@ -297,7 +298,8 @@ public class NxtServerClient implements BlockchainConnection<Transaction> {
     Raises onAddressStatusUpdate if changed.
      */
     @Override
-    public void subscribeToAddresses(List<AbstractAddress> addresses, final TransactionEventListener listener) {
+    public void subscribeToAddresses(List<AbstractAddress> addresses,
+                                     final TransactionEventListener<NxtTransaction> listener) {
         ScheduledExecutorService exec = Executors.newSingleThreadScheduledExecutor();
         for (final AbstractAddress address : addresses) {
             log.info("Going to subscribe to {}", address);
@@ -357,7 +359,8 @@ public class NxtServerClient implements BlockchainConnection<Transaction> {
             public void run() {
                 log.info("Going to fetch txs for {}", status.getAddress().toString());
 
-                Request request = new Request.Builder().url(getBlockChainTxsUrl(status.getAddress().toString())).build();
+                Request request = new Request.Builder().url(
+                        getBlockChainTxsUrl(status.getAddress().toString())).build();
                 getHttpClient().newCall(request).enqueue(new Callback() {
                     @Override
                     public void onFailure(Request request, IOException e) {
@@ -399,7 +402,8 @@ public class NxtServerClient implements BlockchainConnection<Transaction> {
     }
 
     @Override
-    public void getTransaction(final Sha256Hash txHash, final TransactionEventListener listener) {
+    public void getTransaction(final Sha256Hash txHash,
+                               final TransactionEventListener<NxtTransaction> listener) {
         Request request = new Request.Builder().url(getTransactionUrl(txHash.toString())).build();
         getHttpClient().newCall(request).enqueue(new Callback() {
             @Override
@@ -422,24 +426,25 @@ public class NxtServerClient implements BlockchainConnection<Transaction> {
                     //Integer confirmations = reply.getInt("confirmations");
                     //getTransactionBytes(txId, listener, confirmations);
 
-                    TransactionImpl tx = TransactionImpl.parseTransaction(reply);
-                    log.info("Transaction fetched");
+                    NxtTransaction tx = new NxtTransaction(type,
+                            TransactionImpl.parseTransaction(reply));
+                    //log.info("Transaction fetched");
                     listener.onTransactionUpdate(tx);
-
-
                 } catch (IOException e) {
                     log.info("IOException: " + e.getMessage());
                 } catch (JSONException e) {
                     log.info("Could not parse JSON: " + e.getMessage());
                 }catch (NxtException.NotValidException e) {
-                    log.info("Could not parse JSON: " + e.getMessage());
+                    log.info("Not valid transaction: " + e.getMessage());
                 }
             }
         });
 
     }
 
-    public void getTransactionBytes(final String txId, final TransactionEventListener listener, final Integer confirmations) {
+    public void getTransactionBytes(final String txId,
+                                    final TransactionEventListener<NxtTransaction> listener,
+                                    final Integer confirmations) {
         Request request = new Request.Builder().url(getTransactionBytesUrl(txId)).build();
         getHttpClient().newCall(request).enqueue(new Callback() {
             @Override
@@ -458,12 +463,11 @@ public class NxtServerClient implements BlockchainConnection<Transaction> {
                     JSONObject reply = parseReply(response);
 
                     String txBytes = reply.getString("transactionBytes");
-                    TransactionImpl tx = TransactionImpl.parseTransaction(Convert.parseHexString(txBytes));
-                    tx.setConfirmations(confirmations);
+                    TransactionImpl rawTx = TransactionImpl.parseTransaction(Convert.parseHexString(txBytes));
+                    rawTx.setConfirmations(confirmations);
+                    NxtTransaction tx = new NxtTransaction(type, rawTx);
                     log.info("Fetching tx bytes");
                     listener.onTransactionUpdate(tx);
-
-
                 } catch (IOException e) {
                     log.info("IOException: " + e.getMessage());
                 } catch (JSONException e) {
@@ -478,14 +482,14 @@ public class NxtServerClient implements BlockchainConnection<Transaction> {
     }
 
     @Override
-    public void broadcastTx(Transaction tx, TransactionEventListener listener) {
+    public void broadcastTx(NxtTransaction tx, TransactionEventListener listener) {
 
     }
 
     @Override
-    public boolean broadcastTxSync(final Transaction tx) {
+    public boolean broadcastTxSync(final NxtTransaction tx) {
         RequestBody formBody = new FormEncodingBuilder().add("requestType","broadcastTransaction")
-            .add("transactionBytes",Convert.toHexString(tx.getBytes())).build();
+            .add("transactionBytes", Convert.toHexString(tx.getRawTransaction().getBytes())).build();
         Request request = new Request.Builder().url(getBaseUrl()).post(formBody).build();
 
         // FIXME this is not a sync call

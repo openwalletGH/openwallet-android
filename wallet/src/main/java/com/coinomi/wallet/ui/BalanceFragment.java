@@ -462,7 +462,7 @@ public class BalanceFragment extends Fragment implements LoaderCallbacks<List<Ab
                         return time1 > time2 ? -1 : 1;
                 }
 
-                return Arrays.equals(tx1.getHash(),tx2.getHash()) ? 1 : -1;
+                return Arrays.equals(tx1.getHashBytes(),tx2.getHashBytes()) ? 1 : -1;
             }
         };
     }

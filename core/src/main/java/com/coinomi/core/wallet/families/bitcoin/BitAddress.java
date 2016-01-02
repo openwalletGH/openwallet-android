@@ -53,6 +53,16 @@ public class BitAddress extends Address implements AbstractAddress {
         return new BitAddress(type, key.getPubKeyHash());
     }
 
+    public static BitAddress fromAbstractAddress(AbstractAddress address) throws AddressFormatException {
+        if (address instanceof BitAddress) {
+            return (BitAddress) address;
+        } else if (address instanceof Address) {
+            return new BitAddress(address.getType(), ((Address) address).getHash160());
+        } else {
+            return new BitAddress(address.getType(), address.toString());
+        }
+    }
+
     @Override
     public CoinType getType() {
         return (CoinType) getParameters();

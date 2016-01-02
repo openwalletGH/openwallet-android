@@ -173,7 +173,7 @@ public class TransactionsListAdapter extends BaseAdapter {
         if (position == transactions.size())
             return 0;
 
-        return WalletUtils.longHash(transactions.get(position).getHash());
+        return WalletUtils.longHash(transactions.get(position).getHashBytes());
     }
 
     @Override

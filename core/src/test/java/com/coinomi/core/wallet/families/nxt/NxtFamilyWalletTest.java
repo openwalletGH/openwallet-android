@@ -110,7 +110,7 @@ public class NxtFamilyWalletTest {
 
         byte[] txBytes = req.nxtTxBuilder.build().getBytes();
 
-        req.tx = new NxtTransaction(req.nxtTxBuilder.build());
+        req.tx = new NxtTransaction(NXT, req.nxtTxBuilder.build());
 
         Transaction parsedTx = TransactionImpl.parseTransaction(txBytes);
         assertEquals(Attachment.ORDINARY_PAYMENT, parsedTx.getAttachment());

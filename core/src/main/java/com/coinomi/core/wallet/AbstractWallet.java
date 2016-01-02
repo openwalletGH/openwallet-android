@@ -6,7 +6,6 @@ import com.coinomi.core.util.TypeUtils;
 
 import org.bitcoinj.utils.Threading;
 
-import java.io.IOException;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -22,12 +21,6 @@ public abstract class AbstractWallet implements WalletAccount {
         this.type = coinType;
         this.id = id;
     }
-
-    @Override
-    public abstract boolean broadcastTxSync(AbstractTransaction tx) throws IOException;
-
-    @Override
-    public abstract void broadcastTx(AbstractTransaction tx) throws IOException;
 
     @Override
     public abstract AbstractAddress getRefundAddress(boolean isManualAddressManagement);

@@ -54,7 +54,7 @@ public class TransactionAmountVisualizerAdapter extends BaseAdapter {
         isSending = value.signum() < 0;
         // if sending and all the outputs point inside the current pocket it is an internal transfer
         isInternalTransfer = isSending;
-        List<Map.Entry<AbstractAddress, Value>> outs = tx.getOutputs(pocket);
+        List<Map.Entry<AbstractAddress, Value>> outs = tx.getSentTo(pocket);
         for ( Map.Entry<AbstractAddress, Value> output : outs  ) {
             if (isSending) {
                 if (pocket.getActiveAddresses().contains(output.getKey())) {
@@ -71,7 +71,7 @@ public class TransactionAmountVisualizerAdapter extends BaseAdapter {
             outputs.add(output);
         }
 
-        feeAmount = tx.getFee(pocket);
+        feeAmount = tx.getFee();
         hasFee = feeAmount != null && !feeAmount.isZero();
 
         itemCount = isInternalTransfer ? 1 : outputs.size();

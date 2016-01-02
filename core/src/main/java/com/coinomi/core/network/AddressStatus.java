@@ -1,9 +1,11 @@
 package com.coinomi.core.network;
 
+import org.bitcoinj.core.Sha256Hash;
+
 import com.coinomi.core.wallet.AbstractAddress;
 import com.google.common.collect.Sets;
 
-import org.bitcoinj.core.Sha256Hash;
+import com.coinomi.core.network.ServerClient.HistoryTx;
 
 import java.util.HashSet;
 import java.util.List;
@@ -17,8 +19,8 @@ final public class AddressStatus {
     final AbstractAddress address;
     @Nullable final String status;
 
-    HashSet<ServerClient.HistoryTx> historyTransactions;
-    HashSet<Sha256Hash> allTransactions = new HashSet<Sha256Hash>();
+    HashSet<HistoryTx> historyTransactions;
+    HashSet<Sha256Hash> allTransactions = new HashSet<>();
 
     public AddressStatus(AbstractAddress address, @Nullable String status) {
         this.address = address;
@@ -36,15 +38,15 @@ final public class AddressStatus {
     /**
      * Queue transactions that are going to be fetched
      */
-    public void queueHistoryTransactions(List<ServerClient.HistoryTx> txs) {
+    public void queueHistoryTransactions(List<HistoryTx> txs) {
         if (historyTransactions == null) {
-            historyTransactions = (HashSet<ServerClient.HistoryTx>) fillTransactions(txs);
+            historyTransactions = fillTransactions(txs);
         }
     }
 
-    private HashSet<? extends ServerClient.HistoryTx> fillTransactions(List<? extends ServerClient.HistoryTx> txs) {
-        HashSet<? extends ServerClient.HistoryTx> txSet = Sets.newHashSet(txs);
-        for (ServerClient.HistoryTx tx : txs) {
+    private HashSet<HistoryTx> fillTransactions(List<HistoryTx> txs) {
+        HashSet<HistoryTx> txSet = Sets.newHashSet(txs);
+        for (HistoryTx tx : txs) {
             allTransactions.add(tx.getTxHash());
         }
         return txSet;
@@ -67,7 +69,7 @@ final public class AddressStatus {
     /**
      * Get history transactions info
      */
-    public HashSet<ServerClient.HistoryTx> getHistoryTxs() {
+    public HashSet<HistoryTx> getHistoryTxs() {
         return historyTransactions;
     }
 

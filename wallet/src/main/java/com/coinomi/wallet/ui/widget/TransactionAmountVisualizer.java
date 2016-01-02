@@ -66,7 +66,7 @@ public class TransactionAmountVisualizer extends LinearLayout {
         // if sending and all the outputs point inside the current pocket. If received
         boolean isInternalTransfer = isSending;
         output.setVisibility(View.VISIBLE);
-        List<Map.Entry<AbstractAddress, Value>> outputs = tx.getOutputs(pocket);
+        List<Map.Entry<AbstractAddress, Value>> outputs = tx.getSentTo(pocket);
         for (Map.Entry<AbstractAddress, Value> txo : outputs) {
             if (isSending) {
                 if (tx.isMine(pocket, txo)) continue;
@@ -90,7 +90,7 @@ public class TransactionAmountVisualizer extends LinearLayout {
 
         output.setSending(isSending);
 
-        feeAmount = tx.getFee(pocket);
+        feeAmount = tx.getFee();
         if (isSending && feeAmount != null && !feeAmount.isZero()) {
             fee.setVisibility(View.VISIBLE);
             fee.setAmount(GenericUtils.formatCoinValue(type, feeAmount));

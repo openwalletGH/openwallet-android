@@ -565,7 +565,7 @@ public class MakeTransactionFragment extends Fragment {
 
                         // The amountSending could be equal to sendAmount or the actual amount if
                         // emptying the wallet
-                        Value amountSending = request.tx.getValue(sourceAccount).negate().subtract(request.tx.getFee(sourceAccount));
+                        Value amountSending = request.tx.getValue(sourceAccount).negate().subtract(request.tx.getFee());
                         tradeWithdrawAmount = marketInfo.rate.convert(amountSending);
                     } else {
                         // If no values set, make the call

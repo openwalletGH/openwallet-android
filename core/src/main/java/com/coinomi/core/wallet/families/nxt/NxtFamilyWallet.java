@@ -5,6 +5,7 @@ import com.coinomi.core.coins.Value;
 import com.coinomi.core.coins.nxt.Convert;
 import com.coinomi.core.coins.nxt.NxtException;
 import com.coinomi.core.coins.nxt.Transaction;
+import com.coinomi.core.exceptions.TransactionBroadcastException;
 import com.coinomi.core.network.AddressStatus;
 import com.coinomi.core.network.BlockHeader;
 import com.coinomi.core.network.NxtServerClient;
@@ -21,6 +22,7 @@ import com.coinomi.core.wallet.SignedMessage;
 import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.core.wallet.WalletAccountEventListener;
+import com.coinomi.core.wallet.families.bitcoin.BitTransaction;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 
@@ -29,11 +31,9 @@ import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.Utils;
 import org.bitcoinj.crypto.DeterministicKey;
 import org.bitcoinj.crypto.KeyCrypter;
-import org.bitcoinj.script.Script;
 import org.bitcoinj.utils.ListenerRegistration;
 import org.bitcoinj.utils.Threading;
 import org.bitcoinj.wallet.RedeemData;
-import org.bitcoinj.wallet.WalletTransaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.crypto.params.KeyParameter;
@@ -56,9 +56,9 @@ import static com.google.common.base.Preconditions.checkArgument;
 /**
  * @author John L. Jegutanis
  */
-public class NxtFamilyWallet extends AbstractWallet implements TransactionEventListener<Transaction> {
+public class NxtFamilyWallet extends AbstractWallet implements TransactionEventListener<NxtTransaction> {
     private static final Logger log = LoggerFactory.getLogger(NxtFamilyWallet.class);
-    protected final Map<Sha256Hash, Transaction> rawtransactions;
+    protected final Map<Sha256Hash, NxtTransaction> rawtransactions;
     @VisibleForTesting
     final HashMap<AbstractAddress, String> addressesStatus;
     @VisibleForTesting final transient ArrayList<AbstractAddress> addressesSubscribed;
@@ -143,7 +143,7 @@ public class NxtFamilyWallet extends AbstractWallet implements TransactionEventL
         // request.nxtTxBuilder.publicKeyAnnouncement(null);
 
         try {
-            request.tx = new NxtTransaction(request.nxtTxBuilder.build());
+            request.tx = new NxtTransaction(type, request.nxtTxBuilder.build());
         } catch (NxtException.NotValidException e) {
             throw new WalletAccount.WalletAccountException(e);
         }
@@ -154,7 +154,7 @@ public class NxtFamilyWallet extends AbstractWallet implements TransactionEventL
     public void signTransaction(SendRequest request) {
         checkArgument(request.isCompleted(), "Send request is not completed");
         checkArgument(request.tx != null, "No transaction found in send request");
-        Transaction tx = (Transaction) checkNotNull(request.tx.getRawTransaction());
+        Transaction tx = ((SendRequest<NxtTransaction>) request).tx.getRawTransaction();
         byte[] privateKey;
         if (rootKey.isEncrypted()) {
             checkArgument(request.aesKey != null, "Wallet is encrypted but no decryption key provided");
@@ -255,14 +255,19 @@ public class NxtFamilyWallet extends AbstractWallet implements TransactionEventL
     }
 
     @Override
-    public boolean broadcastTxSync(AbstractTransaction tx) throws IOException {
-        return tx.getRawTransaction() != null && broadcastTxSync((Transaction) tx.getRawTransaction());
+    public boolean broadcastTxSync(AbstractTransaction tx) throws TransactionBroadcastException {
+        if (tx instanceof NxtTransaction) {
+            return broadcastNxtTxSync((NxtTransaction) tx);
+        } else {
+            throw new TransactionBroadcastException("Unsupported transaction class: " +
+                    tx.getClass().getName() + ", need: " + NxtTransaction.class.getName());
+        }
     }
 
-    public boolean broadcastTxSync(Transaction tx) throws IOException {
+    public boolean broadcastNxtTxSync(NxtTransaction tx) throws TransactionBroadcastException {
         if (isConnected()) {
             if (log.isInfoEnabled()) {
-                log.info("Broadcasting tx {}", Utils.HEX.encode(tx.getBytes()));
+                log.info("Broadcasting tx {}", Utils.HEX.encode(tx.getRawTransaction().getBytes()));
             }
             boolean success = blockchainConnection.broadcastTxSync(tx);
             if (success) {
@@ -272,27 +277,18 @@ public class NxtFamilyWallet extends AbstractWallet implements TransactionEventL
             }
             return success;
         } else {
-            throw new IOException("No connection available");
+            throw new TransactionBroadcastException("No connection available");
         }
     }
 
     @Override
-    public void broadcastTx(AbstractTransaction tx) throws IOException {
+    public void broadcastTx(AbstractTransaction tx) throws TransactionBroadcastException {
         throw new RuntimeException("Not implemented");
     }
 
     @Override
     public AbstractAddress getRefundAddress(boolean isManualAddressManagement) {
         return address;
-    }
-
-    public Transaction getRawTransaction(String transactionId) {
-        lock.lock();
-        try {
-            return rawtransactions.get(new Sha256Hash(transactionId));
-        } finally {
-            lock.unlock();
-        }
     }
 
     public Map<Sha256Hash, Transaction> getPendingRawTransactions() {
@@ -303,14 +299,19 @@ public class NxtFamilyWallet extends AbstractWallet implements TransactionEventL
     public Map<Sha256Hash, AbstractTransaction> getTransactions() {
         Map<Sha256Hash, AbstractTransaction> txs = new HashMap<>();
         for ( Sha256Hash tx : rawtransactions.keySet() ) {
-            txs.put( tx, new NxtTransaction(rawtransactions.get(tx)));
+            txs.put( tx, rawtransactions.get(tx));
         }
         return txs;
     }
 
     @Override
     public AbstractTransaction getTransaction(String transactionId) {
-        return new NxtTransaction(getRawTransaction(transactionId));
+        lock.lock();
+        try {
+            return rawtransactions.get(new Sha256Hash(transactionId));
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override
@@ -553,32 +554,6 @@ public class NxtFamilyWallet extends AbstractWallet implements TransactionEventL
     }
 
     @Override
-    public boolean isPubKeyHashMine(byte[] pubkeyHash) {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public boolean isWatchedScript(Script script) {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public boolean isPubKeyMine(byte[] pubkey) {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public boolean isPayToScriptHashMine(byte[] payToScriptHash) {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public Map<Sha256Hash, org.bitcoinj.core.Transaction> getTransactionPool(WalletTransaction.Pool pool) {
-        throw new RuntimeException("Not implemented");
-    }
-
-
-    @Override
     public void onNewBlock(BlockHeader header) {
         log.info("Got a {} block: {}", type.getName(), header.getBlockHeight());
         boolean shouldSave = false;
@@ -718,17 +693,10 @@ public class NxtFamilyWallet extends AbstractWallet implements TransactionEventL
                 log.info("Fetching txs");
                 fetchTransactions(historyTxes);
                 queueOnNewBalance();
-                //tryToApplyState(updatingStatus);
         }
         finally {
             lock.unlock();
         }
-    }
-
-
-    @Nullable
-    public AbstractTransaction getAbstractTransaction(String transactionId) {
-        return new NxtTransaction(getRawTransaction(new Sha256Hash(transactionId)));
     }
 
     private void fetchTransactions(List<? extends ServerClient.HistoryTx> txes) {
@@ -756,26 +724,30 @@ public class NxtFamilyWallet extends AbstractWallet implements TransactionEventL
 
     private boolean isTransactionAvailableOrQueued(Sha256Hash txHash) {
         checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
-        return getRawTransaction(txHash) != null;
+        return rawtransactions.containsKey(txHash);
     }
 
     @Nullable
     public synchronized Transaction getRawTransaction(Sha256Hash hash) {
         lock.lock();
         try {
-            return rawtransactions.get(hash);
+            NxtTransaction tx = rawtransactions.get(hash);
+            if (tx != null) {
+                return tx.getRawTransaction();
+            } else {
+                return null;
+            }
         } finally {
             lock.unlock();
         }
     }
 
     @Override
-    public void onTransactionUpdate(Transaction tx) {
-        if (log.isInfoEnabled()) log.info("Got a new transaction {}", tx.getFullHash());
+    public void onTransactionUpdate(NxtTransaction tx) {
+        if (log.isInfoEnabled()) log.info("Got a new transaction {}", tx.getHashAsString());
         lock.lock();
         try {
             addNewTransactionIfNeeded(tx);
-            //tryToApplyState();
         }
         finally {
             lock.unlock();
@@ -785,29 +757,24 @@ public class NxtFamilyWallet extends AbstractWallet implements TransactionEventL
 
 
     @VisibleForTesting
-    void addNewTransactionIfNeeded(Transaction tx) {
+    void addNewTransactionIfNeeded(NxtTransaction tx) {
         lock.lock();
         try {
             // If was fetching this tx, remove it
             //fetchingTransactions.remove(tx.getFullHash());
             log.info("adding transaction to wallet");
             // This tx not in wallet, add it
-            Transaction storedTx = getRawTransaction(tx.getFullHash());
+            NxtTransaction storedTx = rawtransactions.get(tx.getHash());
             if (storedTx == null) {
-
                 log.info("transaction added");
-                rawtransactions.put(new Sha256Hash(tx.getFullHash()),tx);
+                rawtransactions.put(tx.getHash(), tx);
                 //tx.getConfidence().setConfidenceType(TransactionConfidence.ConfidenceType.PENDING);
                 //addWalletTransaction(WalletTransaction.Pool.PENDING, tx, true);
                 queueOnNewBalance();
             }
-            else
-            {
-                storedTx.setConfirmations(tx.getConfirmations());
-                if ( storedTx.getHeight() == Integer.MAX_VALUE )
-                {
-                    storedTx.setHeight(tx.getHeight());
-                }
+            else {
+                storedTx.setDepthInBlocks(tx.getDepthInBlocks());
+                storedTx.setAppearedAtChainHeight(tx.getAppearedAtChainHeight());
             }
         } finally {
             lock.unlock();
@@ -829,7 +796,7 @@ public class NxtFamilyWallet extends AbstractWallet implements TransactionEventL
     }
 
     @Override
-    public void onTransactionBroadcast(Transaction tx) {
+    public void onTransactionBroadcast(NxtTransaction tx) {
         lock.lock();
         try {
             log.info("Transaction sent {}", tx);
@@ -842,7 +809,7 @@ public class NxtFamilyWallet extends AbstractWallet implements TransactionEventL
     }
 
     @Override
-    public void onTransactionBroadcastError(Transaction tx) {
+    public void onTransactionBroadcastError(NxtTransaction tx) {
         //queueOnTransactionBroadcastFailure(tx);
     }
 }

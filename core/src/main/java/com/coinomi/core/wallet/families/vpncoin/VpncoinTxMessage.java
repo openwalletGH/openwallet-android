@@ -3,6 +3,7 @@ package com.coinomi.core.wallet.families.vpncoin;
 import com.coinomi.core.messages.MessageFactory;
 import com.coinomi.core.messages.TxMessage;
 import com.coinomi.core.wallet.AbstractTransaction;
+import com.coinomi.core.wallet.families.bitcoin.BitTransaction;
 import com.google.common.base.Charsets;
 
 import org.bitcoinj.core.Transaction;
@@ -20,7 +21,6 @@ import java.util.zip.Inflater;
 import javax.annotation.Nullable;
 
 import static com.coinomi.core.Preconditions.checkArgument;
-import static com.coinomi.core.Preconditions.checkNotNull;
 
 /**
  * @author John L. Jegutanis
@@ -100,7 +100,7 @@ public class VpncoinTxMessage implements TxMessage {
         byte[] bytes;
         String fullMessage = null;
         try {
-            rawTx = (Transaction) checkNotNull(tx.getRawTransaction());
+            rawTx = ((BitTransaction) tx).getRawTransaction();
             bytes = rawTx.getExtraBytes();
             if (bytes == null || bytes.length == 0) return null;
 
@@ -164,8 +164,10 @@ public class VpncoinTxMessage implements TxMessage {
 
     @Override
     public void serializeTo(AbstractTransaction transaction) {
-        Transaction rawTx = (Transaction) checkNotNull(transaction.getRawTransaction());
-        rawTx.setExtraBytes(serialize());
+        if (transaction instanceof BitTransaction) {
+            Transaction rawTx = ((BitTransaction) transaction).getRawTransaction();
+            rawTx.setExtraBytes(serialize());
+        }
     }
 
     byte[] serialize() {

@@ -132,7 +132,7 @@ public class WalletUtils {
     private static List<AbstractAddress> getToAddresses(@Nonnull final AbstractTransaction tx,
                                                 @Nonnull final AbstractWallet pocket, boolean toMe) {
         List<AbstractAddress> addresses = new ArrayList<>();
-        List<Map.Entry<AbstractAddress, Value>> outputs = tx.getOutputs(pocket);
+        List<Map.Entry<AbstractAddress, Value>> outputs = tx.getSentTo(pocket);
         List<AbstractAddress> activeAddresses = pocket.getActiveAddresses();
         for ( Map.Entry<AbstractAddress, Value> output : outputs ) {
             try {

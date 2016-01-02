@@ -3,6 +3,7 @@ package com.coinomi.core.wallet.families.clams;
 import com.coinomi.core.messages.MessageFactory;
 import com.coinomi.core.messages.TxMessage;
 import com.coinomi.core.wallet.AbstractTransaction;
+import com.coinomi.core.wallet.families.bitcoin.BitTransaction;
 import com.google.common.base.Charsets;
 
 import org.bitcoinj.core.Transaction;
@@ -12,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 
 import static com.coinomi.core.Preconditions.checkArgument;
-import static com.coinomi.core.Preconditions.checkNotNull;
 
 /**
  * @author John L. Jegutanis
@@ -47,9 +47,9 @@ public class ClamsTxMessage implements TxMessage {
     }
 
     @Nullable
-    public static ClamsTxMessage parse(AbstractTransaction tx) {
+    public static ClamsTxMessage parse(AbstractTransaction  tx) {
         try {
-            Transaction rawTx = (Transaction) checkNotNull(tx.getRawTransaction());
+            Transaction rawTx = ((BitTransaction) tx).getRawTransaction();
             byte[] bytes = rawTx.getExtraBytes();
             if (bytes == null || bytes.length == 0) return null;
             checkArgument(bytes.length <= MAX_MESSAGE_BYTES, "Maximum data size exceeded");
@@ -81,8 +81,10 @@ public class ClamsTxMessage implements TxMessage {
 
     @Override
     public void serializeTo(AbstractTransaction transaction) {
-        Transaction rawTx = (Transaction) checkNotNull(transaction.getRawTransaction());
-        rawTx.setExtraBytes(serialize(message));
+        if (transaction instanceof BitTransaction) {
+            Transaction rawTx = ((BitTransaction) transaction).getRawTransaction();
+            rawTx.setExtraBytes(serialize(message));
+        }
     }
 
     static byte[] serialize(String message) {

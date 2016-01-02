@@ -22,6 +22,8 @@ import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.exceptions.AddressMalformedException;
 import com.coinomi.core.network.AddressStatus;
 import com.coinomi.core.protos.Protos;
+import com.coinomi.core.wallet.families.bitcoin.BitTransaction;
+import com.coinomi.core.wallet.families.bitcoin.BitWalletTransaction;
 import com.google.protobuf.ByteString;
 
 import org.bitcoinj.core.Coin;
@@ -35,7 +37,6 @@ import org.bitcoinj.core.TransactionOutPoint;
 import org.bitcoinj.core.TransactionOutput;
 import org.bitcoinj.crypto.KeyCrypter;
 import org.bitcoinj.store.UnreadableWalletException;
-import org.bitcoinj.wallet.WalletTransaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,7 +67,7 @@ public class WalletPocketProtobufSerializer {
     private static final Logger log = LoggerFactory.getLogger(WalletPocketProtobufSerializer.class);
 
     // Used for de-serialization
-    protected Map<ByteString, Transaction> txMap = new HashMap<ByteString, Transaction>();
+    protected Map<ByteString, Transaction> txMap = new HashMap<>();
 
     public static Protos.WalletPocket toProtobuf(WalletPocketHD pocket) {
 
@@ -109,8 +110,18 @@ public class WalletPocketProtobufSerializer {
         return walletBuilder.build();
     }
 
+
     private static Protos.Transaction makeTxProto(WalletTransaction wtx) {
-        Transaction tx = wtx.getTransaction();
+        if (wtx instanceof BitWalletTransaction) {
+            return makeBitTxProto((BitWalletTransaction) wtx);
+        } else {
+            throw new RuntimeException("Unknown wallet transaction type: " +
+                    wtx.getClass().getName());
+        }
+    }
+
+    private static Protos.Transaction makeBitTxProto(BitWalletTransaction wtx) {
+        Transaction tx = wtx.getTransaction().getRawTransaction();
         Protos.Transaction.Builder txBuilder = Protos.Transaction.newBuilder();
 
 
@@ -135,7 +146,7 @@ public class WalletPocketProtobufSerializer {
         }
 
         if (tx.getLockTime() > 0) {
-            txBuilder.setLockTime((int)tx.getLockTime());
+            txBuilder.setLockTime((int) tx.getLockTime());
         }
 
         // Handle inputs.
@@ -186,10 +197,10 @@ public class WalletPocketProtobufSerializer {
 
     private static Protos.Transaction.Pool getProtoPool(WalletTransaction wtx) {
         switch (wtx.getPool()) {
-            case UNSPENT: return Protos.Transaction.Pool.UNSPENT;
-            case SPENT: return Protos.Transaction.Pool.SPENT;
-            case DEAD: return Protos.Transaction.Pool.DEAD;
-            case PENDING: return Protos.Transaction.Pool.PENDING;
+            case CONFIRMED:
+                return Protos.Transaction.Pool.SPENT;
+            case PENDING:
+                return Protos.Transaction.Pool.PENDING;
             default:
                 throw new RuntimeException("Unreachable");
         }
@@ -400,10 +411,10 @@ public class WalletPocketProtobufSerializer {
         Transaction tx = txMap.get(txProto.getHash());
         final WalletTransaction.Pool pool;
         switch (txProto.getPool()) {
-            case DEAD: pool = WalletTransaction.Pool.DEAD; break;
             case PENDING: pool = WalletTransaction.Pool.PENDING; break;
-            case SPENT: pool = WalletTransaction.Pool.SPENT; break;
-            case UNSPENT: pool = WalletTransaction.Pool.UNSPENT; break;
+            case SPENT:
+            case UNSPENT: pool = WalletTransaction.Pool.CONFIRMED; break;
+            case DEAD:
             default:
                 throw new UnreadableWalletException("Unknown transaction pool: " + txProto.getPool());
         }
@@ -429,7 +440,10 @@ public class WalletPocketProtobufSerializer {
             readConfidence(tx, confidenceProto, confidence);
         }
 
-        return new WalletTransaction(pool, tx);
+        // TODO handle general case and trimmed transactions
+        Sha256Hash hash = byteStringToHash(txProto.getHash());
+        BitTransaction atx = new BitTransaction(hash, tx, false);
+        return new BitWalletTransaction(pool, atx);
     }
 
     private void readConfidence(Transaction tx, Protos.TransactionConfidence confidenceProto,

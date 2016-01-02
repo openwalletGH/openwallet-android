@@ -3,6 +3,7 @@ package com.coinomi.core.wallet;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
 import com.coinomi.core.coins.ValueType;
+import com.coinomi.core.exceptions.TransactionBroadcastException;
 import com.coinomi.core.network.interfaces.ConnectionEventListener;
 
 import org.bitcoinj.core.Sha256Hash;
@@ -23,7 +24,7 @@ import javax.annotation.Nullable;
 /**
  * @author John L. Jegutanis
  */
-public interface WalletAccount extends TransactionBag, KeyBag,
+public interface WalletAccount extends KeyBag,
         ConnectionEventListener, Serializable {
     class WalletAccountException extends Exception {
         public WalletAccountException(Throwable cause) {
@@ -73,9 +74,9 @@ public interface WalletAccount extends TransactionBag, KeyBag,
     boolean hasUsedAddresses();
 
 
-    boolean broadcastTxSync(AbstractTransaction tx) throws IOException;
+    boolean broadcastTxSync(AbstractTransaction tx) throws TransactionBroadcastException;
 
-    void broadcastTx(AbstractTransaction tx) throws IOException;
+    void broadcastTx(AbstractTransaction tx) throws TransactionBroadcastException;
 
     /**
      * Returns true if this wallet can create new addresses
