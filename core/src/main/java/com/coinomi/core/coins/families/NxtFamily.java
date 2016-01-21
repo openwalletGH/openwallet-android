@@ -4,7 +4,7 @@ import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.exceptions.AddressMalformedException;
 import com.coinomi.core.messages.MessageFactory;
 import com.coinomi.core.wallet.AbstractAddress;
-import com.coinomi.core.wallet.families.nxt.NxtFamilyAddress;
+import com.coinomi.core.wallet.families.nxt.NxtAddress;
 import com.coinomi.core.wallet.families.nxt.NxtTxMessage;
 
 import javax.annotation.Nullable;
@@ -24,7 +24,7 @@ public abstract class NxtFamily extends CoinType {
 
     @Override
     public AbstractAddress newAddress(String addressStr) throws AddressMalformedException {
-        return NxtFamilyAddress.fromString(this, addressStr);
+        return NxtAddress.fromString(this, addressStr);
     }
 
     @Override

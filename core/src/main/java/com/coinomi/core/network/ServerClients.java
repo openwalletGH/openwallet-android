@@ -1,13 +1,16 @@
 package com.coinomi.core.network;
 
 import com.coinomi.core.coins.CoinType;
-import com.coinomi.core.coins.families.Families;
+import com.coinomi.core.coins.families.BitFamily;
+import com.coinomi.core.coins.families.NxtFamily;
+import com.coinomi.core.exceptions.UnsupportedCoinTypeException;
 import com.coinomi.core.network.interfaces.BlockchainConnection;
 import com.coinomi.core.wallet.WalletAccount;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 
@@ -25,6 +28,8 @@ public class ServerClients {
         @Override
         public boolean isConnected() { return true; }
     };
+    private File cacheDir;
+    private int cacheSize;
 
     public ServerClients(List<CoinAddress> coins) {
         // Supply a dumb ConnectivityHelper that reports that connection is always available
@@ -64,15 +69,18 @@ public class ServerClients {
         if (connections.containsKey(type)) return connections.get(type);
         // Try to create a connection
         if (addresses.containsKey(type)) {
-            if ( !type.getFamilyEnum().equals(Families.NXT )) {
+            if (type instanceof BitFamily) {
                 ServerClient client = new ServerClient(addresses.get(type), connectivityHelper);
+                client.setCacheDir(cacheDir, cacheSize);
                 connections.put(type, client);
                 return client;
-            }
-            else {
+            } else if (type instanceof NxtFamily) {
                 NxtServerClient client = new NxtServerClient(addresses.get(type), connectivityHelper);
+                client.setCacheDir(cacheDir, cacheSize);
                 connections.put(type, client);
                 return client;
+            } else {
+                throw new UnsupportedCoinTypeException(type);
             }
         } else {
             // Should not happen
@@ -99,5 +107,10 @@ public class ServerClients {
             BlockchainConnection connection = connections.get(type);
             if (connection.isActivelyConnected()) connection.resetConnection();
         }
+    }
+
+    public void setCacheDir(File cacheDir, int cacheSize) {
+        this.cacheDir = cacheDir;
+        this.cacheSize = cacheSize;
     }
 }

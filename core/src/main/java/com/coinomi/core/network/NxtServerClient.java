@@ -34,6 +34,7 @@ import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 
 import java.util.List;
@@ -616,4 +617,7 @@ public class NxtServerClient implements BlockchainConnection<NxtTransaction> {
         }
     };
 
+    public void setCacheDir(File cacheDir, int cacheSize) {
+        // TODO
+    }
 }

@@ -6,10 +6,8 @@ package com.coinomi.core.coins.nxt;
 
 import com.coinomi.core.coins.NxtMain;
 import com.coinomi.core.coins.nxt.Appendix.EncryptedMessage;
-import com.coinomi.core.wallet.Wallet;
-import com.coinomi.core.wallet.families.nxt.NxtFamilyAddress;
+import com.coinomi.core.wallet.families.nxt.NxtAddress;
 import com.coinomi.core.wallet.families.nxt.NxtFamilyKey;
-import com.coinomi.core.wallet.families.nxt.NxtFamilyWallet;
 
 import org.bitcoinj.crypto.DeterministicHierarchy;
 import org.bitcoinj.crypto.DeterministicKey;
@@ -24,7 +22,6 @@ import java.io.UnsupportedEncodingException;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static org.spongycastle.util.encoders.Hex.toHexString;
 
 public class NxtFamilyTest {
     String recoveryPhrase = "heavy virus hollow shrug shadow double dwarf affair novel weird image prize frame anxiety wait";
@@ -56,7 +53,7 @@ public class NxtFamilyTest {
         NxtFamilyKey nxtKey = new NxtFamilyKey(entropy, null, null);
         byte[] privateKey = nxtKey.getPrivateKey();
         byte[] publicKey = nxtKey.getPublicKey();
-        NxtFamilyAddress address = new NxtFamilyAddress(NxtMain.get(), publicKey);
+        NxtAddress address = new NxtAddress(NxtMain.get(), publicKey);
 
         assertArrayEquals(nxtPrivateKey, privateKey);
         assertArrayEquals(nxtPublicKey, publicKey);

@@ -286,12 +286,12 @@ public class MakeTransactionFragment extends Fragment {
 
         SendRequest sendRequest;
         if (emptyWallet) {
-            sendRequest = SendRequest.emptyWallet(sendTo);
+            sendRequest = sourceAccount.getEmptyWalletRequest(sendTo);
         } else {
-            sendRequest = SendRequest.to(sourceAccount, sendTo, checkNotNull(amount));
+            sendRequest = sourceAccount.getSendToRequest(sendTo, checkNotNull(amount));
         }
         sendRequest.txMessage = txMessage;
-        sendRequest.signInputs = false;
+        sendRequest.signTransaction = false;
         sourceAccount.completeTransaction(sendRequest);
 
         return sendRequest;
@@ -635,7 +635,7 @@ public class MakeTransactionFragment extends Fragment {
                     KeyCrypter crypter = checkNotNull(wallet.getKeyCrypter());
                     request.aesKey = crypter.deriveKey(password);
                 }
-                request.signInputs = true;
+                request.signTransaction = true;
                 sourceAccount.completeAndSignTx(request);
                 // Before broadcasting, check if there is an error, like the trade expiration
                 if (error != null) throw error;

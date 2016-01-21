@@ -1,10 +1,12 @@
 package com.coinomi.core.wallet;
 
+import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
 import com.coinomi.core.messages.TxMessage;
 
 import org.bitcoinj.core.Sha256Hash;
-import org.bitcoinj.core.TransactionConfidence;
+import org.bitcoinj.core.TransactionConfidence.ConfidenceType;
+import org.bitcoinj.core.TransactionConfidence.Source;
 
 import java.io.Serializable;
 import java.util.List;
@@ -16,31 +18,51 @@ import javax.annotation.Nullable;
  * @author John L. Jegutanis
  */
 public interface AbstractTransaction extends Serializable {
-    TransactionConfidence.ConfidenceType getConfidenceType();
+    class AbstractOutput {
+        final AbstractAddress abstractAddress;
+        final Value value;
 
-    void setConfidenceType(TransactionConfidence.ConfidenceType type);
+        public AbstractOutput(AbstractAddress abstractAddress, Value value) {
+            this.abstractAddress = abstractAddress;
+            this.value = value;
+        }
 
-    int getAppearedAtChainHeight();
+        public AbstractAddress getAddress() {
+            return abstractAddress;
+        }
 
-    void setAppearedAtChainHeight(int appearedAtChainHeight);
+        public Value getValue() {
+            return value;
+        }
+    }
 
-    TransactionConfidence.Source getSource();
-    int getDepthInBlocks();
+    CoinType getType();
+
     Sha256Hash getHash();
     String getHashAsString();
     byte[] getHashBytes();
 
+    ConfidenceType getConfidenceType();
+    void setConfidenceType(ConfidenceType type);
+
+    int getAppearedAtChainHeight();
+    void setAppearedAtChainHeight(int appearedAtChainHeight);
+
+    Source getSource();
+    void setSource(Source source);
+
+    int getDepthInBlocks();
     void setDepthInBlocks(int depthInBlocks);
 
     Value getValue(AbstractWallet wallet);
-    TxMessage getMessage();
-    Value getFee();
-    @Nullable AbstractAddress getSender(AbstractWallet wallet);
-    List<Map.Entry<AbstractAddress, Value>> getSentTo(AbstractWallet wallet);
+    @Nullable Value getFee();
+    @Nullable TxMessage getMessage();
+    List<AbstractAddress> getReceivedFrom();
+    List<AbstractOutput> getSentTo();
     // Coin base or coin stake transaction
     boolean isGenerated();
     // If this transaction has trimmed irrelevant data to save space
     boolean isTrimmed();
-    boolean isMine(WalletAccount wallet, Map.Entry<AbstractAddress, Value> output);
     String toString();
+    boolean equals(Object o);
 }

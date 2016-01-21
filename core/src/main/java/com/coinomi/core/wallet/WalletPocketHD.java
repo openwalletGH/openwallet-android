@@ -20,14 +20,15 @@ package com.coinomi.core.wallet;
 
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
+import com.coinomi.core.exceptions.AddressMalformedException;
 import com.coinomi.core.exceptions.Bip44KeyLookAheadExceededException;
 import com.coinomi.core.protos.Protos;
 import com.coinomi.core.util.KeyUtils;
 import com.coinomi.core.wallet.families.bitcoin.BitAddress;
+import com.coinomi.core.wallet.families.bitcoin.BitSendRequest;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 
-import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.InsufficientMoneyException;
 import org.bitcoinj.crypto.ChildNumber;
@@ -54,8 +55,8 @@ import javax.annotation.Nullable;
 import static com.coinomi.core.Preconditions.checkArgument;
 import static com.coinomi.core.Preconditions.checkNotNull;
 import static com.coinomi.core.Preconditions.checkState;
-import static com.coinomi.core.util.AddressUtils.getHash160;
-import static com.coinomi.core.util.AddressUtils.isP2SHAddress;
+import static com.coinomi.core.util.BitAddressUtils.getHash160;
+import static com.coinomi.core.util.BitAddressUtils.isP2SHAddress;
 import static org.bitcoinj.wallet.KeyChain.KeyPurpose.CHANGE;
 import static org.bitcoinj.wallet.KeyChain.KeyPurpose.RECEIVE_FUNDS;
 import static org.bitcoinj.wallet.KeyChain.KeyPurpose.REFUND;
@@ -214,14 +215,16 @@ public class WalletPocketHD extends TransactionWatcherWallet {
     /**
      * Sends coins to the given address but does not broadcast the resulting pending transaction.
      */
-    public SendRequest sendCoinsOffline(BitAddress address, Value amount) throws WalletAccountException {
+    public BitSendRequest sendCoinsOffline(BitAddress address, Value amount)
+            throws WalletAccountException {
         return sendCoinsOffline(address, amount, (KeyParameter) null);
     }
 
     /**
      * {@link #sendCoinsOffline(BitAddress, Value)}
      */
-    public SendRequest sendCoinsOffline(BitAddress address, Value amount, @Nullable String password)
+    public BitSendRequest sendCoinsOffline(BitAddress address, Value amount,
+                                           @Nullable String password)
             throws WalletAccountException {
         KeyParameter key = null;
         if (password != null) {
@@ -234,10 +237,11 @@ public class WalletPocketHD extends TransactionWatcherWallet {
     /**
      * {@link #sendCoinsOffline(BitAddress, Value)}
      */
-    public SendRequest sendCoinsOffline(BitAddress address, Value amount, @Nullable KeyParameter aesKey)
+    public BitSendRequest sendCoinsOffline(BitAddress address, Value amount,
+                                           @Nullable KeyParameter aesKey)
             throws WalletAccountException {
         checkState(address.getParameters() instanceof CoinType);
-        SendRequest request = SendRequest.to(address, amount);
+        BitSendRequest request = BitSendRequest.to(address, amount);
         request.aesKey = aesKey;
 
         return request;
@@ -258,9 +262,9 @@ public class WalletPocketHD extends TransactionWatcherWallet {
         try {
             ECKey key;
             try {
-                BitAddress address = new BitAddress(type, unsignedMessage.getAddress());
+                BitAddress address = BitAddress.from(type, unsignedMessage.getAddress());
                 key = findKeyFromPubHash(address.getHash160());
-            } catch (AddressFormatException e) {
+            } catch (AddressMalformedException e) {
                 unsignedMessage.status = SignedMessage.Status.AddressMalformed;
                 return;
             }
@@ -288,7 +292,7 @@ public class WalletPocketHD extends TransactionWatcherWallet {
     public void verifyMessage(SignedMessage signedMessage) {
         try {
             ECKey pubKey = ECKey.signedMessageToKey(signedMessage.message, signedMessage.signature);
-            byte[] expectedPubKeyHash = new BitAddress(null, signedMessage.address).getHash160();
+            byte[] expectedPubKeyHash = BitAddress.from(null, signedMessage.address).getHash160();
             if (Arrays.equals(expectedPubKeyHash, pubKey.getPubKeyHash())) {
                 signedMessage.status = SignedMessage.Status.VerifiedOK;
             } else {
@@ -296,7 +300,7 @@ public class WalletPocketHD extends TransactionWatcherWallet {
             }
         } catch (SignatureException e) {
             signedMessage.status = SignedMessage.Status.InvalidMessageSignature;
-        } catch (AddressFormatException e) {
+        } catch (AddressMalformedException e) {
             signedMessage.status = SignedMessage.Status.AddressMalformed;
         }
     }
@@ -332,16 +336,56 @@ public class WalletPocketHD extends TransactionWatcherWallet {
         return false;
     }
 
+    @Override
+    public SendRequest getEmptyWalletRequest(AbstractAddress destination)
+            throws WalletAccountException {
+        checkAddress(destination);
+        return BitSendRequest.emptyWallet((BitAddress) destination);
+    }
+
+    @Override
+    public SendRequest getSendToRequest(AbstractAddress destination, Value amount)
+            throws WalletAccountException {
+        checkAddress(destination);
+        return BitSendRequest.to((BitAddress) destination, amount);
+    }
+
+    private void checkAddress(AbstractAddress destination) throws WalletAccountException {
+        if (!(destination instanceof BitAddress)) {
+            throw new WalletAccountException("Incompatible address" +
+                    destination.getClass().getName() + ", expected " + BitAddress.class.getName());
+        }
+    }
+
+    @Override
+    public void completeTransaction(SendRequest request) throws WalletAccountException {
+        checkSendRequest(request);
+        completeTransaction((BitSendRequest) request);
+    }
+
+    @Override
+    public void signTransaction(SendRequest request) throws WalletAccountException {
+        checkSendRequest(request);
+        signTransaction((BitSendRequest) request);
+    }
+
+
+    private void checkSendRequest(SendRequest request) throws WalletAccountException {
+        if (!(request instanceof BitSendRequest)) {
+            throw new WalletAccountException("Incompatible request " +
+                    request.getClass().getName() + ", expected " + BitSendRequest.class.getName());
+        }
+    }
+
     /**
      * Given a spend request containing an incomplete transaction, makes it valid by adding outputs and signed inputs
      * according to the instructions in the request. The transaction in the request is modified by this method.
      *
-     * @param req a SendRequest that contains the incomplete transaction and details for how to make it valid.
+     * @param req a BitSendRequest that contains the incomplete transaction and details for how to make it valid.
      * @throws WalletAccount.WalletAccountException if the request could not be completed due to not enough balance.
      * @throws IllegalArgumentException if you try and complete the same SendRequest twice
      */
-    @Override
-    public void completeTransaction(SendRequest req) throws WalletAccountException {
+    public void completeTransaction(BitSendRequest req) throws WalletAccountException {
         lock.lock();
         try {
             transactionCreator.completeTx(req);
@@ -358,8 +402,7 @@ public class WalletPocketHD extends TransactionWatcherWallet {
      * <p>Actual signing is done by pluggable {@link org.bitcoinj.signers.LocalTransactionSigner}
      * and it's not guaranteed that transaction will be complete in the end.</p>
      */
-    @Override
-    public void signTransaction(SendRequest req) {
+    public void signTransaction(BitSendRequest req) {
         lock.lock();
         try {
             transactionCreator.signTransaction(req);
@@ -453,7 +496,7 @@ public class WalletPocketHD extends TransactionWatcherWallet {
         try {
             DeterministicKey lastUsedKey = keys.getLastIssuedKey(purpose);
             if (lastUsedKey != null) {
-                return BitAddress.fromKey(type, lastUsedKey);
+                return BitAddress.from(type, lastUsedKey);
             } else {
                 return null;
             }
@@ -568,7 +611,7 @@ public class WalletPocketHD extends TransactionWatcherWallet {
             Collections.sort(issuedKeys, HD_KEY_COMPARATOR);
 
             for (ECKey key : issuedKeys) {
-                receiveAddresses.add(BitAddress.fromKey(type, key));
+                receiveAddresses.add(BitAddress.from(type, key));
             }
             return receiveAddresses;
         } finally {
@@ -586,7 +629,7 @@ public class WalletPocketHD extends TransactionWatcherWallet {
 
             for (Map.Entry<AbstractAddress, String> entry : addressesStatus.entrySet()) {
                 if (entry.getValue() != null) {
-                    usedAddresses.add((BitAddress) entry.getKey());
+                    usedAddresses.add(entry.getKey());
                 }
             }
 
@@ -615,10 +658,10 @@ public class WalletPocketHD extends TransactionWatcherWallet {
     @VisibleForTesting BitAddress currentAddress(SimpleHDKeyChain.KeyPurpose purpose) {
         lock.lock();
         try {
-            return BitAddress.fromKey(type, keys.getCurrentUnusedKey(purpose));
+            return BitAddress.from(type, keys.getCurrentUnusedKey(purpose));
         } finally {
             lock.unlock();
-            subscribeIfNeeded();
+            subscribeToAddressesIfNeeded();
         }
     }
 
@@ -645,7 +688,7 @@ public class WalletPocketHD extends TransactionWatcherWallet {
     public List<AbstractAddress> getActiveAddresses() {
         ImmutableList.Builder<AbstractAddress> activeAddresses = ImmutableList.builder();
         for (DeterministicKey key : keys.getActiveKeys()) {
-            activeAddresses.add(BitAddress.fromKey(type, key));
+            activeAddresses.add(BitAddress.from(type, key));
         }
         return activeAddresses.build();
     }

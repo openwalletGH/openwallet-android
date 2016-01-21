@@ -46,6 +46,7 @@ abstract public class CoinType extends NetworkParameters implements ValueType, S
     private transient MonetaryFormat plainFormat;
     private transient Value oneCoin;
 
+    @Deprecated
     public Families getFamilyEnum() {
         return (Families) family;
     }

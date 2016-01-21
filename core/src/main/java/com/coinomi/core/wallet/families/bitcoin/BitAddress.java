@@ -1,8 +1,8 @@
 package com.coinomi.core.wallet.families.bitcoin;
 
 import com.coinomi.core.coins.CoinType;
-import com.coinomi.core.wallet.AbstractAddress;
 import com.coinomi.core.exceptions.AddressMalformedException;
+import com.coinomi.core.wallet.AbstractAddress;
 
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.AddressFormatException;
@@ -12,36 +12,28 @@ import org.bitcoinj.script.Script;
 
 import java.nio.ByteBuffer;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 /**
  * @author John L. Jegutanis
  */
 public class BitAddress extends Address implements AbstractAddress {
 
-    public BitAddress(Address address) {
-        this((CoinType) address.getParameters(), address.getHash160());
+    BitAddress(Address address) throws WrongNetworkException {
+        this((CoinType) address.getParameters(), address.getVersion(), address.getHash160());
     }
 
-    public BitAddress(CoinType type, byte[] hash160) {
+    BitAddress(CoinType type, byte[] hash160) {
         super(type, hash160);
     }
 
-    public BitAddress(CoinType type, int version, byte[] hash160) throws WrongNetworkException {
+    BitAddress(CoinType type, int version, byte[] hash160) throws WrongNetworkException {
         super(type, version, hash160);
     }
 
-    public BitAddress(CoinType type, String address) throws AddressFormatException {
+    BitAddress(CoinType type, String address) throws AddressFormatException {
         super(type, address);
     }
 
-    public static BitAddress fromP2SHScript(CoinType type, Script scriptPubKey) throws WrongNetworkException {
-        checkArgument(scriptPubKey.isPayToScriptHash(), "Not a P2SH script");
-        return new BitAddress(type, type.getP2SHHeader(), scriptPubKey.getPubKeyHash());
-    }
-
-    public static BitAddress fromString(CoinType type, String address)
-            throws AddressMalformedException {
+    public static BitAddress from(CoinType type, String address) throws AddressMalformedException {
         try {
             return new BitAddress(type, address);
         } catch (AddressFormatException e) {
@@ -49,17 +41,55 @@ public class BitAddress extends Address implements AbstractAddress {
         }
     }
 
-    public static BitAddress fromKey(CoinType type, ECKey key) {
+    public static BitAddress from(CoinType type, int version, byte[] hash160)
+            throws AddressMalformedException {
+        try {
+            return new BitAddress(type, version, hash160);
+        } catch (WrongNetworkException e) {
+            throw new AddressMalformedException(e);
+        }
+    }
+
+    public static BitAddress from(CoinType type, byte[] publicKeyHash160)
+            throws AddressMalformedException {
+        try {
+            return new BitAddress(type, type.getAddressHeader(), publicKeyHash160);
+        } catch (WrongNetworkException e) {
+            throw new AddressMalformedException(e);
+        }
+    }
+
+    public static BitAddress from(CoinType type, Script script) throws AddressMalformedException {
+        try {
+            return new BitAddress(script.getToAddress(type));
+        } catch (WrongNetworkException e) {
+            throw new AddressMalformedException(e);
+        }
+    }
+
+    public static BitAddress from(CoinType type, ECKey key) {
         return new BitAddress(type, key.getPubKeyHash());
     }
 
-    public static BitAddress fromAbstractAddress(AbstractAddress address) throws AddressFormatException {
-        if (address instanceof BitAddress) {
-            return (BitAddress) address;
-        } else if (address instanceof Address) {
-            return new BitAddress(address.getType(), ((Address) address).getHash160());
-        } else {
-            return new BitAddress(address.getType(), address.toString());
+    public static BitAddress from(AbstractAddress address) throws AddressMalformedException {
+        try {
+            if (address instanceof BitAddress) {
+                return (BitAddress) address;
+            } else if (address instanceof Address) {
+                return new BitAddress((Address) address);
+            } else {
+                return new BitAddress(address.getType(), address.toString());
+            }
+        } catch (AddressFormatException e) {
+            throw new AddressMalformedException(e);
+        }
+    }
+
+    public static BitAddress from(Address address) throws AddressMalformedException {
+        try {
+            return new BitAddress(address);
+        } catch (WrongNetworkException e) {
+            throw new AddressMalformedException(e);
         }
     }
 

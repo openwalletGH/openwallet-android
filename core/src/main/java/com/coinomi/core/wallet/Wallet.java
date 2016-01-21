@@ -2,7 +2,9 @@ package com.coinomi.core.wallet;
 
 import com.coinomi.core.CoreUtils;
 import com.coinomi.core.coins.CoinType;
-import com.coinomi.core.exceptions.NoSuchPocketException;
+import com.coinomi.core.coins.families.BitFamily;
+import com.coinomi.core.coins.families.NxtFamily;
+import com.coinomi.core.exceptions.UnsupportedCoinTypeException;
 import com.coinomi.core.protos.Protos;
 import com.coinomi.core.wallet.families.nxt.NxtFamilyWallet;
 import com.google.common.annotations.VisibleForTesting;
@@ -275,23 +277,14 @@ final public class Wallet {
         int newIndex = getLastAccountIndex(coinType) + 1;
         DeterministicKey rootKey = hierarchy.get(coinType.getBip44Path(newIndex), false, true);
 
-//        CoinFamily family = coinType.getFamily();
         WalletAccount newPocket;
 
-        switch (coinType.getFamilyEnum()) {
-            case NXT:
-                newPocket = new NxtFamilyWallet(rootKey, coinType, getKeyCrypter(), key);
-                break;
-            case BITCOIN:
-            case NUBITS:
-            case PEERCOIN:
-            case REDDCOIN:
-            case VPNCOIN:
-                newPocket = new WalletPocketHD(rootKey, coinType, getKeyCrypter(), key);
-                break;
-            default:
-            case FIAT:
-                throw new RuntimeException("Unsupported family: " + coinType.getFamilyEnum());
+        if (coinType instanceof BitFamily) {
+            newPocket = new WalletPocketHD(rootKey, coinType, getKeyCrypter(), key);
+        } else if (coinType instanceof NxtFamily) {
+            newPocket = new NxtFamilyWallet(rootKey, coinType, getKeyCrypter(), key);
+        } else {
+            throw new UnsupportedCoinTypeException(coinType);
         }
 
         if (isEncrypted() && !newPocket.isEncrypted()) {
@@ -334,6 +327,21 @@ final public class Wallet {
             accountsByType.get(type).add(pocket);
             accounts.put(pocket.getId(), pocket);
             pocket.setWallet(this);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public void deleteAccount(String id) {
+        lock.lock();
+        try {
+            checkState(accounts.containsKey(id), "Cannot delete a non existing account");
+
+            WalletAccount deletedAccount = accounts.remove(id);
+            if (!accountsByType.get(deletedAccount.getCoinType()).remove(deletedAccount)) {
+                log.warn("Could not find account in accounts by type index");
+            }
+            saveNow();
         } finally {
             lock.unlock();
         }

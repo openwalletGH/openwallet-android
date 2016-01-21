@@ -31,12 +31,6 @@ public class ClamsMain extends ClamsFamily {
         signedMessageHeader = toBytes("Clam Signed Message:\n");
     }
 
-    @Override
-    @Nullable
-    public MessageFactory getMessagesFactory() {
-        return ClamsTxMessage.getFactory();
-    }
-
     private static ClamsMain instance = new ClamsMain();
     public static synchronized ClamsMain get() {
         return instance;

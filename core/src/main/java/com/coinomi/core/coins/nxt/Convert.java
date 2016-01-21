@@ -114,7 +114,7 @@ public final class Convert {
     }
 
     public static long parseAccountId(CoinType type, String account) {
-        checkArgument(type.getFamily().equals(Families.NXT), "Unexpected type for an account");
+        checkArgument(type instanceof NxtFamily, "Unexpected type for an account");
         if (account == null) {
             return 0;
         }
@@ -129,7 +129,7 @@ public final class Convert {
     }
 
     public static String rsAccount(CoinType type, long accountId) {
-        checkArgument(type.getFamily().equals(Families.NXT), "Family must be Nxt");
+        checkArgument(type instanceof NxtFamily, "Family must be Nxt");
         return type.getAddressPrefix() + Crypto.rsEncode(accountId);
     }
 

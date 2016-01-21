@@ -14,6 +14,7 @@ import com.coinomi.core.util.ExchangeRate;
 import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.AbstractAddress;
 import com.coinomi.core.wallet.AbstractTransaction;
+import com.coinomi.core.wallet.AbstractTransaction.AbstractOutput;
 import com.coinomi.core.wallet.AbstractWallet;
 import com.coinomi.wallet.R;
 import com.google.common.collect.ImmutableList;
@@ -25,6 +26,8 @@ import javax.annotation.Nullable;
 
 /**
  * @author John L. Jegutanis
+ *
+ * TODO TransactionAmountVisualizerAdapter does a similar function, keep only one
  */
 public class TransactionAmountVisualizer extends LinearLayout {
 
@@ -66,20 +69,20 @@ public class TransactionAmountVisualizer extends LinearLayout {
         // if sending and all the outputs point inside the current pocket. If received
         boolean isInternalTransfer = isSending;
         output.setVisibility(View.VISIBLE);
-        List<Map.Entry<AbstractAddress, Value>> outputs = tx.getSentTo(pocket);
-        for (Map.Entry<AbstractAddress, Value> txo : outputs) {
+        List<AbstractOutput> outputs = tx.getSentTo();
+        for (AbstractOutput txo : outputs) {
             if (isSending) {
-                if (tx.isMine(pocket, txo)) continue;
+                if (pocket.isAddressMine(txo.getAddress())) continue;
                 isInternalTransfer = false;
             } else {
-                if (!tx.isMine(pocket, txo)) continue;
+                if (!pocket.isAddressMine(txo.getAddress())) continue;
             }
 
             // TODO support more than one output
             outputAmount = txo.getValue();
             output.setAmount(GenericUtils.formatCoinValue(type, outputAmount));
             output.setSymbol(symbol);
-            address = txo.getKey();
+            address = txo.getAddress();
             output.setLabelAndAddress(address);
             break; // TODO remove when supporting more than one output
         }

@@ -1,26 +1,26 @@
 package com.coinomi.core.network;
 
 import com.coinomi.core.coins.CoinType;
-import com.coinomi.core.network.interfaces.BlockchainConnection;
+import com.coinomi.core.exceptions.AddressMalformedException;
 import com.coinomi.core.network.interfaces.ConnectionEventListener;
 import com.coinomi.core.network.interfaces.TransactionEventListener;
 import com.coinomi.core.wallet.AbstractAddress;
-import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.core.wallet.families.bitcoin.BitAddress;
+import com.coinomi.core.wallet.families.bitcoin.BitBlockchainConnection;
 import com.coinomi.core.wallet.families.bitcoin.BitTransaction;
+import com.coinomi.core.wallet.families.bitcoin.BitTransactionEventListener;
 import com.coinomi.stratumj.ServerAddress;
 import com.coinomi.stratumj.StratumClient;
 import com.coinomi.stratumj.messages.CallMessage;
 import com.coinomi.stratumj.messages.ResultMessage;
 import com.google.common.collect.ImmutableList;
+import com.google.common.io.Files;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.Service;
 
-import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.Sha256Hash;
-import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.TransactionOutPoint;
 import org.bitcoinj.core.Utils;
 import org.bitcoinj.utils.ListenerRegistration;
@@ -31,6 +31,8 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -50,7 +52,7 @@ import static com.google.common.util.concurrent.Service.State.NEW;
 /**
  * @author John L. Jegutanis
  */
-public class ServerClient implements BlockchainConnection<BitTransaction> {
+public class ServerClient implements BitBlockchainConnection {
     private static final Logger log = LoggerFactory.getLogger(ServerClient.class);
 
     private static final ScheduledThreadPoolExecutor connectionExec;
@@ -71,6 +73,9 @@ public class ServerClient implements BlockchainConnection<BitTransaction> {
     private StratumClient stratumClient;
     private long retrySeconds = 0;
     private boolean stopped = false;
+
+    private File cacheDir;
+    private int cacheSize;
 
     // TODO, only one is supported at the moment. Change when accounts are supported.
     private transient CopyOnWriteArrayList<ListenerRegistration<ConnectionEventListener>> eventListeners;
@@ -342,7 +347,7 @@ public class ServerClient implements BlockchainConnection<BitTransaction> {
             @Override
             public void handle(CallMessage message) {
                 try {
-                    AbstractAddress address = new BitAddress(type, message.getParams().getString(0));
+                    AbstractAddress address = BitAddress.from(type, message.getParams().getString(0));
                     AddressStatus status;
                     if (message.getParams().isNull(1)) {
                         status = new AddressStatus(address, null);
@@ -351,7 +356,7 @@ public class ServerClient implements BlockchainConnection<BitTransaction> {
                         status = new AddressStatus(address, message.getParams().getString(1));
                     }
                     listener.onAddressStatusUpdate(status);
-                } catch (AddressFormatException e) {
+                } catch (AddressMalformedException e) {
                     log.error("Address subscribe sent a malformed address", e);
                 } catch (JSONException e) {
                     log.error("Unexpected JSON format", e);
@@ -373,8 +378,7 @@ public class ServerClient implements BlockchainConnection<BitTransaction> {
                     try {
                         if (result.getResult().isNull(0)) {
                             status = new AddressStatus(address, null);
-                        }
-                        else {
+                        } else {
                             status = new AddressStatus(address, result.getResult().getString(0));
                         }
                         listener.onAddressStatusUpdate(status);
@@ -396,7 +400,41 @@ public class ServerClient implements BlockchainConnection<BitTransaction> {
     }
 
     @Override
-    public void getHistoryTx(final AddressStatus status, final TransactionEventListener listener) {
+    public void getUnspentTx(final AddressStatus status,
+                             final BitTransactionEventListener listener) {
+        checkNotNull(stratumClient);
+
+        CallMessage message = new CallMessage("blockchain.address.listunspent",
+                Arrays.asList(status.getAddress().toString()));
+        final ListenableFuture<ResultMessage> result = stratumClient.call(message);
+
+        Futures.addCallback(result, new FutureCallback<ResultMessage>() {
+
+            @Override
+            public void onSuccess(ResultMessage result) {
+                JSONArray resTxs = result.getResult();
+                ImmutableList.Builder<UnspentTx> utxes = ImmutableList.builder();
+                try {
+                    for (int i = 0; i < resTxs.length(); i++) {
+                        utxes.add(new UnspentTx(resTxs.getJSONObject(i)));
+                    }
+                } catch (JSONException e) {
+                    onFailure(e);
+                    return;
+                }
+                listener.onUnspentTransactionUpdate(status, utxes.build());
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                log.error("Could not get reply for blockchain.address.listunspent", t);
+            }
+        }, Threading.USER_THREAD);
+    }
+
+    @Override
+    public void getHistoryTx(final AddressStatus status,
+                             final TransactionEventListener<BitTransaction> listener) {
         checkNotNull(stratumClient);
 
         final CallMessage message = new CallMessage("blockchain.address.get_history",
@@ -434,10 +472,47 @@ public class ServerClient implements BlockchainConnection<BitTransaction> {
     @Override
     public void getTransaction(final Sha256Hash txHash,
                                final TransactionEventListener<BitTransaction> listener) {
+
+        if (cacheDir != null) {
+            Threading.USER_THREAD.execute(new Runnable() {
+                @Override
+                public void run() {
+                    File txCachedFile = getTxCacheFile(txHash);
+                    if (txCachedFile.exists()) {
+                        try {
+                            byte[] txBytes = Files.toByteArray(txCachedFile);
+                            BitTransaction tx = new BitTransaction(type, txBytes);
+                            if (!tx.getHash().equals(txHash)) {
+                                if (!txCachedFile.delete()) {
+                                    log.warn("Error deleting cached transaction {}", txCachedFile);
+                                }
+                            } else {
+                                listener.onTransactionUpdate(tx);
+                                return;
+                            }
+                        } catch (IOException e) {
+                            log.warn("Error reading cached transaction", e);
+                        }
+                    }
+                    // Fallback to fetching from the network
+                    getTransactionFromNetwork(txHash, listener);
+                }
+            });
+        } else {
+            // Caching disabled, fetch from network
+            getTransactionFromNetwork(txHash, listener);
+        }
+    }
+
+    private File getTxCacheFile(Sha256Hash txHash) {
+        return new File(new File(checkNotNull(cacheDir), type.getId()), txHash.toString());
+    }
+
+    private void getTransactionFromNetwork(final Sha256Hash txHash, final TransactionEventListener<BitTransaction> listener) {
         checkNotNull(stratumClient);
 
-        final CallMessage message = new CallMessage("blockchain.transaction.get",
-                Arrays.asList(txHash.toString()));
+        final CallMessage message = new CallMessage("blockchain.transaction.get", txHash.toString());
+
         final ListenableFuture<ResultMessage> result = stratumClient.call(message);
 
         Futures.addCallback(result, new FutureCallback<ResultMessage>() {
@@ -446,14 +521,21 @@ public class ServerClient implements BlockchainConnection<BitTransaction> {
             public void onSuccess(ResultMessage result) {
                 try {
                     String rawTx = result.getResult().getString(0);
-                    BitTransaction tx = new BitTransaction(type, Utils.HEX.decode(rawTx));
+                    byte[] txBytes = Utils.HEX.decode(rawTx);
+                    BitTransaction tx = new BitTransaction(type, txBytes);
                     if (!tx.getHash().equals(txHash)) {
                         throw new Exception("Requested TX " + txHash + " but got " + tx.getHashAsString());
                     }
                     listener.onTransactionUpdate(tx);
+                    if (cacheDir != null) {
+                        try {
+                            Files.write(txBytes, getTxCacheFile(txHash));
+                        } catch (IOException e) {
+                            log.warn("Error writing cached transaction", e);
+                        }
+                    }
                 } catch (Exception e) {
                     onFailure(e);
-                    return;
                 }
             }
 
@@ -552,10 +634,15 @@ public class ServerClient implements BlockchainConnection<BitTransaction> {
         }, Threading.USER_THREAD);
     }
 
+    public void setCacheDir(File cacheDir, int cacheSize) {
+        this.cacheDir = cacheDir;
+        this.cacheSize = cacheSize;
+    }
+
 
     public static class HistoryTx {
-        protected Sha256Hash txHash;
-        protected int height;
+        protected final Sha256Hash txHash;
+        protected final int height;
 
         public HistoryTx(JSONObject json) throws JSONException {
             txHash = new Sha256Hash(json.getString("tx_hash"));
@@ -567,7 +654,7 @@ public class ServerClient implements BlockchainConnection<BitTransaction> {
             this.height = height;
         }
 
-        public static List<HistoryTx> fromArray(JSONArray jsonArray) throws JSONException {
+        public static List<HistoryTx> historyFromArray(JSONArray jsonArray) throws JSONException {
             ImmutableList.Builder<HistoryTx> list = ImmutableList.builder();
             for (int i = 0; i < jsonArray.length(); i++) {
                 list.add(new HistoryTx(jsonArray.getJSONObject(i)));
@@ -581,6 +668,61 @@ public class ServerClient implements BlockchainConnection<BitTransaction> {
 
         public int getHeight() {
             return height;
+        }
+    }
+
+    public static class UnspentTx extends HistoryTx {
+        protected final int txPos;
+        protected final long value;
+
+        public UnspentTx(JSONObject json) throws JSONException {
+            super(json);
+            txPos = json.getInt("tx_pos");
+            value = json.getLong("value");
+        }
+
+        public UnspentTx(TransactionOutPoint txop, long value, int height) {
+            super(txop, height);
+            this.txPos = (int) txop.getIndex();
+            this.value = value;
+        }
+
+        public static List<HistoryTx> unspentFromArray(JSONArray jsonArray) throws JSONException {
+            ImmutableList.Builder<HistoryTx> list = ImmutableList.builder();
+            for (int i = 0; i < jsonArray.length(); i++) {
+                list.add(new UnspentTx(jsonArray.getJSONObject(i)));
+            }
+            return list.build();
+        }
+
+        public int getTxPos() {
+            return txPos;
+        }
+
+        public long getValue() {
+            return value;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            UnspentTx unspentTx = (UnspentTx) o;
+
+            if (txPos != unspentTx.txPos) return false;
+            if (value != unspentTx.value) return false;
+            if (!txHash.equals(unspentTx.txHash)) return false;
+
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = txHash.hashCode();
+            result = 31 * result + txPos;
+            result = 31 * result + (int) (value ^ (value >>> 32));
+            return result;
         }
     }
 }

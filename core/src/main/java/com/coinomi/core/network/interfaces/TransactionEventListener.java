@@ -2,7 +2,7 @@ package com.coinomi.core.network.interfaces;
 
 import com.coinomi.core.network.AddressStatus;
 import com.coinomi.core.network.BlockHeader;
-import com.coinomi.core.network.ServerClient;
+import com.coinomi.core.network.ServerClient.HistoryTx;
 
 import java.util.List;
 
@@ -14,7 +14,7 @@ public interface TransactionEventListener<T> {
 
     void onAddressStatusUpdate(AddressStatus status);
 
-    void onTransactionHistory(AddressStatus status, List<ServerClient.HistoryTx> historyTxes);
+    void onTransactionHistory(AddressStatus status, List<HistoryTx> historyTxes);
 
     void onTransactionUpdate(T transaction);
 

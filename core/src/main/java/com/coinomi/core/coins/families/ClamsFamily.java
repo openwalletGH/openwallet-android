@@ -10,7 +10,7 @@ import javax.annotation.Nullable;
  *
  * This family contains Clams
  */
-public class ClamsFamily  extends BitFamily {
+public class ClamsFamily extends BitFamily {
     {
         family = Families.CLAMS;
     }

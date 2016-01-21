@@ -134,7 +134,7 @@
     <string name="amount_error_empty">请输入金额</string>
     <string name="amount_error_negative">无法发送负数金额。</string>
     <string name="amount_error_decimal_places">太多小数点，尝试少于 %1$d</string>
-    <string name="amount_error_too_small">最低金额不少于 %1$s %2$s</string>
+    <string name="amount_error_too_small">最低金额不少于 %1$s</string>
     <string name="amount_error_not_enough_money_plain">余额不足</string>
     <string name="amount_error_not_enough_money">余额不足，目前余额为%1$s</string>
     <string name="amount_warn_fees_apply">因手续费实际发送的数量会稍微少一些。</string>

@@ -19,11 +19,16 @@ package com.coinomi.core.wallet;
 
 import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.coins.Value;
 import com.coinomi.core.exceptions.AddressMalformedException;
 import com.coinomi.core.network.AddressStatus;
 import com.coinomi.core.protos.Protos;
 import com.coinomi.core.wallet.families.bitcoin.BitTransaction;
 import com.coinomi.core.wallet.families.bitcoin.BitWalletTransaction;
+import com.coinomi.core.wallet.families.bitcoin.EmptyTransactionOutput;
+import com.coinomi.core.wallet.families.bitcoin.TrimmedTransaction;
+import com.coinomi.core.wallet.families.bitcoin.TrimmedOutput;
+import com.coinomi.core.wallet.families.bitcoin.OutPointOutput;
 import com.google.protobuf.ByteString;
 
 import org.bitcoinj.core.Coin;
@@ -51,7 +56,8 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.coinomi.core.Preconditions.checkNotNull;
+import static com.coinomi.core.Preconditions.checkState;
 import static org.bitcoinj.params.Networks.Family.CLAMS;
 import static org.bitcoinj.params.Networks.Family.NUBITS;
 import static org.bitcoinj.params.Networks.Family.PEERCOIN;
@@ -67,7 +73,7 @@ public class WalletPocketProtobufSerializer {
     private static final Logger log = LoggerFactory.getLogger(WalletPocketProtobufSerializer.class);
 
     // Used for de-serialization
-    protected Map<ByteString, Transaction> txMap = new HashMap<>();
+    protected Map<ByteString, BitTransaction> txMap = new HashMap<>();
 
     public static Protos.WalletPocket toProtobuf(WalletPocketHD pocket) {
 
@@ -86,7 +92,7 @@ public class WalletPocketProtobufSerializer {
                 continue; // Don't serialize null statuses
             }
             addressStatus.setAddress(status.getAddress().toString());
-            addressStatus.setStatus(status.getStatus()); // TODO check null values
+            addressStatus.setStatus(status.getStatus());
 
             walletBuilder.addAddressStatus(addressStatus.build());
         }
@@ -96,11 +102,19 @@ public class WalletPocketProtobufSerializer {
             walletBuilder.addTransaction(txProto);
         }
 
+        for (OutPointOutput utxo : pocket.getUnspentOutputs().values()) {
+            Protos.UnspentOutput utxoProto = makeUTXOProto(utxo);
+            walletBuilder.addUnspentOutput(utxoProto);
+        }
+
         walletBuilder.addAllKey(pocket.serializeKeychainToProtobuf());
 
         // Populate the lastSeenBlockHash field.
         if (pocket.getLastBlockSeenHash() != null) {
+            // TODO remove
             walletBuilder.setLastSeenBlockHash(hashToByteString(pocket.getLastBlockSeenHash()));
+        }
+        if (pocket.getLastBlockSeenHeight() >= 0) {
             walletBuilder.setLastSeenBlockHeight(pocket.getLastBlockSeenHeight());
         }
         if (pocket.getLastBlockSeenTimeSecs() > 0) {
@@ -108,6 +122,16 @@ public class WalletPocketProtobufSerializer {
         }
 
         return walletBuilder.build();
+    }
+
+    private static Protos.UnspentOutput makeUTXOProto(OutPointOutput utxo) {
+        Protos.UnspentOutput.Builder utxoBuilder = Protos.UnspentOutput.newBuilder();
+        utxoBuilder.setOutPointHash(ByteString.copyFrom(utxo.getTxHash().getBytes()));
+        utxoBuilder.setOutPointIndex((int) utxo.getIndex());
+        utxoBuilder.setScriptBytes(ByteString.copyFrom(utxo.getScriptBytes()));
+        utxoBuilder.setValue(utxo.getValueLong());
+        if (utxo.isGenerated()) utxoBuilder.setIsGenerated(true);
+        return utxoBuilder.build();
     }
 
 
@@ -121,12 +145,13 @@ public class WalletPocketProtobufSerializer {
     }
 
     private static Protos.Transaction makeBitTxProto(BitWalletTransaction wtx) {
-        Transaction tx = wtx.getTransaction().getRawTransaction();
+        BitTransaction bitTx = wtx.getTransaction();
+        boolean isTrimmed = bitTx.isTrimmed();
+        Transaction tx = bitTx.getRawTransaction();
         Protos.Transaction.Builder txBuilder = Protos.Transaction.newBuilder();
 
-
         txBuilder.setPool(getProtoPool(wtx))
-                .setHash(hashToByteString(tx.getHash()))
+                .setHash(hashToByteString(bitTx.getHash()))
                 .setVersion((int) tx.getVersion());
 
         if (isFamily(tx.getParams(), PEERCOIN, NUBITS, REDDCOIN, VPNCOIN, CLAMS)) {
@@ -163,18 +188,40 @@ public class WalletPocketProtobufSerializer {
         }
 
         // Handle outputs.
+        boolean hasAllOutputs = true;
+        if (isTrimmed && !((TrimmedTransaction) tx).hasAllOutputs()) {
+            txBuilder.setNumOfOutputs(((TrimmedTransaction) tx).getNumberOfOutputs());
+            hasAllOutputs = false;
+        }
+        int index = 0;
         for (TransactionOutput output : tx.getOutputs()) {
+            // Skip empty outputs
+            if (output instanceof EmptyTransactionOutput) {
+                checkState(isTrimmed, "Transaction contains empty outputs but is not trimmed");
+                index++;
+                continue;
+            }
             Protos.TransactionOutput.Builder outputBuilder = Protos.TransactionOutput.newBuilder()
                     .setScriptBytes(ByteString.copyFrom(output.getScriptBytes()))
                     .setValue(output.getValue().value);
-            final TransactionInput spentBy = output.getSpentBy();
-            if (spentBy != null) {
-                Sha256Hash spendingHash = spentBy.getParentTransaction().getHash();
-                int spentByTransactionIndex = spentBy.getParentTransaction().getInputs().indexOf(spentBy);
-                outputBuilder.setSpentByTransactionHash(hashToByteString(spendingHash))
-                        .setSpentByTransactionIndex(spentByTransactionIndex);
+            if (!output.isAvailableForSpending()) {
+                outputBuilder.setIsSpent(true);
+            }
+            if (!isTrimmed) {
+                final TransactionInput spentBy = output.getSpentBy();
+                if (spentBy != null) {
+                    // TODO review
+                    Sha256Hash spendingHash = spentBy.getParentTransaction().getHash();
+                    int spentByTransactionIndex = spentBy.getParentTransaction().getInputs().indexOf(spentBy);
+                    outputBuilder.setSpentByTransactionHash(hashToByteString(spendingHash))
+                            .setSpentByTransactionIndex(spentByTransactionIndex);
+                }
+            }
+            if (!hasAllOutputs) {
+                outputBuilder.setIndex(index);
             }
             txBuilder.addTransactionOutput(outputBuilder);
+            index++;
         }
 
         // Handle which blocks tx was seen in.
@@ -190,6 +237,13 @@ public class WalletPocketProtobufSerializer {
             TransactionConfidence confidence = tx.getConfidence();
             Protos.TransactionConfidence.Builder confidenceBuilder = Protos.TransactionConfidence.newBuilder();
             writeConfidence(txBuilder, confidence, confidenceBuilder);
+        }
+
+        if (bitTx.isTrimmed()) {
+            txBuilder.setIsTrimmed(true);
+            txBuilder.setValueReceived(bitTx.getValueReceived().value);
+            txBuilder.setValueSent(bitTx.getValueSent().value);
+            if (bitTx.getFee() != null) txBuilder.setFee(bitTx.getFee().value);
         }
 
         return txBuilder.build();
@@ -215,14 +269,15 @@ public class WalletPocketProtobufSerializer {
                 confidenceBuilder.setAppearedAtHeight(confidence.getAppearedAtChainHeight());
                 confidenceBuilder.setDepth(confidence.getDepthInBlocks());
             }
-            if (confidence.getConfidenceType() == TransactionConfidence.ConfidenceType.DEAD) {
-                // Copy in the overriding transaction, if available.
-                // (A dead coinbase transaction has no overriding transaction).
-                if (confidence.getOverridingTransaction() != null) {
-                    Sha256Hash overridingHash = confidence.getOverridingTransaction().getHash();
-                    confidenceBuilder.setOverridingTransaction(hashToByteString(overridingHash));
-                }
-            }
+            // TODO deprecate overriding transactions
+//            if (confidence.getConfidenceType() == TransactionConfidence.ConfidenceType.DEAD) {
+//                // Copy in the overriding transaction, if available.
+//                // (A dead coinbase transaction has no overriding transaction).
+//                if (confidence.getOverridingTransaction() != null) {
+//                    Sha256Hash overridingHash = confidence.getOverridingTransaction().getHash();
+//                    confidenceBuilder.setOverridingTransaction(hashToByteString(overridingHash));
+//                }
+//            }
             TransactionConfidence.Source source = confidence.getSource();
             switch (source) {
                 case SELF: confidenceBuilder.setSource(Protos.TransactionConfidence.Source.SOURCE_SELF); break;
@@ -299,12 +354,21 @@ public class WalletPocketProtobufSerializer {
             }
 
             // Update transaction outputs to point to inputs that spend them
-            ArrayList<WalletTransaction> wtxs = new ArrayList<WalletTransaction>(walletProto.getTransactionList().size());
+            ArrayList<WalletTransaction<BitTransaction>> wtxs = new ArrayList<>(walletProto.getTransactionList().size());
             for (Protos.Transaction txProto : walletProto.getTransactionList()) {
                 wtxs.add(connectTransactionOutputs(txProto));
             }
 
             pocket.restoreWalletTransactions(wtxs);
+
+            for (Protos.UnspentOutput proto : walletProto.getUnspentOutputList()) {
+                TrimmedOutput utxo = new TrimmedOutput(coinType,
+                        proto.getValue(), byteStringToHash(proto.getOutPointHash()),
+                        proto.getOutPointIndex() & 0xFFFFFFFFL,
+                        proto.getScriptBytes().toByteArray());
+                pocket.addUnspentOutput(
+                        new OutPointOutput(utxo, proto.getIsGenerated()));
+            }
 
             // Read all the address statuses
             try {
@@ -343,7 +407,23 @@ public class WalletPocketProtobufSerializer {
     }
 
     private void readTransaction(Protos.Transaction txProto, CoinType params) throws UnreadableWalletException {
-        Transaction tx = new Transaction(params);
+        boolean isTrimmed = txProto.getIsTrimmed();
+        Sha256Hash hash = byteStringToHash(txProto.getHash());
+
+        Transaction tx;
+        boolean needsOutputIndexes = false;
+        if (isTrimmed) {
+            int numOfOutputs;
+            if (txProto.hasNumOfOutputs()) {
+                needsOutputIndexes = true;
+                numOfOutputs = txProto.getNumOfOutputs();
+            } else {
+                numOfOutputs = txProto.getTransactionOutputList().size();
+            }
+            tx = new TrimmedTransaction(params, hash, numOfOutputs);
+        } else {
+            tx = new Transaction(params);
+        }
 
         tx.setVersion(txProto.getVersion());
 
@@ -363,18 +443,30 @@ public class WalletPocketProtobufSerializer {
             tx.setUpdateTime(new Date(txProto.getUpdatedAt()));
         }
 
+        int lastIndex = -1;
         for (Protos.TransactionOutput outputProto : txProto.getTransactionOutputList()) {
-            Coin value = Coin.valueOf(outputProto.getValue());
-            byte[] scriptBytes = outputProto.getScriptBytes().toByteArray();
-            TransactionOutput output = new TransactionOutput(params, tx, value, scriptBytes);
-            tx.addOutput(output);
+            TransactionOutput output = getOutput(params, tx,
+                    outputProto.getValue(), outputProto.getScriptBytes());
+
+            if (isTrimmed) {
+                if (needsOutputIndexes) {
+                    checkState(outputProto.hasIndex(), "Trimmed transaction must have output indexes");
+                    checkState(outputProto.getIndex() > lastIndex, "Output index is not in the correct order");
+                    lastIndex = outputProto.getIndex();
+                    ((TrimmedTransaction) tx).addOutput(lastIndex, output);
+                } else {
+                    ((TrimmedTransaction) tx).addOutput(++lastIndex, output);
+                }
+            } else {
+                tx.addOutput(output);
+            }
         }
 
         for (Protos.TransactionInput inputProto : txProto.getTransactionInputList()) {
             byte[] scriptBytes = inputProto.getScriptBytes().toByteArray();
-            TransactionOutPoint outpoint = new TransactionOutPoint(params,
-                    inputProto.getTransactionOutPointIndex() & 0xFFFFFFFFL,
-                    byteStringToHash(inputProto.getTransactionOutPointHash())
+            TransactionOutPoint outpoint = getTransactionOutPoint(params,
+                    inputProto.getTransactionOutPointIndex(),
+                    inputProto.getTransactionOutPointHash()
             );
             Coin value = inputProto.hasValue() ? Coin.valueOf(inputProto.getValue()) : null;
             TransactionInput input = new TransactionInput(params, tx, scriptBytes, outpoint, value);
@@ -398,17 +490,38 @@ public class WalletPocketProtobufSerializer {
 
 //        tx.setPurpose(Transaction.Purpose.USER_PAYMENT);
 
+        final BitTransaction bitTx;
+        if (isTrimmed) {
+            CoinType type = (CoinType) tx.getParams();
+            final Value valueSent = type.value(txProto.getValueSent());
+            final Value valueReceived = type.value(txProto.getValueReceived());
+            final Value fee = txProto.hasFee() ? type.value(txProto.getFee()) : null;
+            bitTx = BitTransaction.fromTrimmed(byteStringToHash(txProto.getHash()), tx, valueSent,
+                    valueReceived, fee);
+        } else {
+            bitTx = new BitTransaction(tx);
+        }
+
         // Transaction should now be complete.
-        Sha256Hash protoHash = byteStringToHash(txProto.getHash());
-        if (!tx.getHash().equals(protoHash))
-            throw new UnreadableWalletException(String.format("Transaction did not deserialize completely: %s vs %s", tx.getHash(), protoHash));
+        if (!bitTx.getHash().equals(hash))
+            throw new UnreadableWalletException(String.format("Transaction did not deserialize completely: %s vs %s", tx.getHash(), hash));
         if (txMap.containsKey(txProto.getHash()))
             throw new UnreadableWalletException("Wallet contained duplicate transaction " + byteStringToHash(txProto.getHash()));
-        txMap.put(txProto.getHash(), tx);
+
+        txMap.put(txProto.getHash(), bitTx);
     }
 
-    private WalletTransaction connectTransactionOutputs(Protos.Transaction txProto) throws UnreadableWalletException {
-        Transaction tx = txMap.get(txProto.getHash());
+    private TransactionOutput getOutput(CoinType type, @Nullable Transaction tx,
+                                        long value, ByteString scriptBytes) {
+        return new TransactionOutput(type, tx, Coin.valueOf(value), scriptBytes.toByteArray());
+    }
+
+    private TransactionOutPoint getTransactionOutPoint(CoinType type, int index, ByteString hash) {
+        return new TransactionOutPoint(type, index & 0xFFFFFFFFL, byteStringToHash(hash));
+    }
+
+    private BitWalletTransaction connectTransactionOutputs(Protos.Transaction txProto) throws UnreadableWalletException {
+        BitTransaction tx = txMap.get(txProto.getHash());
         final WalletTransaction.Pool pool;
         switch (txProto.getPool()) {
             case PENDING: pool = WalletTransaction.Pool.PENDING; break;
@@ -418,32 +531,38 @@ public class WalletPocketProtobufSerializer {
             default:
                 throw new UnreadableWalletException("Unknown transaction pool: " + txProto.getPool());
         }
-        for (int i = 0 ; i < tx.getOutputs().size() ; i++) {
+
+        for (int i = 0 ; i < tx.getOutputs(false).size() ; i++) {
             TransactionOutput output = tx.getOutputs().get(i);
             final Protos.TransactionOutput transactionOutput = txProto.getTransactionOutput(i);
-            if (transactionOutput.hasSpentByTransactionHash()) {
-                final ByteString spentByTransactionHash = transactionOutput.getSpentByTransactionHash();
-                Transaction spendingTx = txMap.get(spentByTransactionHash);
-                if (spendingTx == null) {
-                    throw new UnreadableWalletException(String.format("Could not connect %s to %s",
-                            tx.getHashAsString(), byteStringToHash(spentByTransactionHash)));
+
+            if (tx.isTrimmed()) {
+                if (transactionOutput.getIsSpent() && output.isAvailableForSpending()) {
+                    output.markAsSpent(null);
                 }
-                final int spendingIndex = transactionOutput.getSpentByTransactionIndex();
-                TransactionInput input = checkNotNull(spendingTx.getInput(spendingIndex), "A spending index does not exist");
-                input.connect(output);
+            } else {
+                if (transactionOutput.hasSpentByTransactionHash()) {
+                    final ByteString spentByTransactionHash = transactionOutput.getSpentByTransactionHash();
+                    BitTransaction spendingTx = txMap.get(spentByTransactionHash);
+                    if (spendingTx == null || spendingTx.isTrimmed()) {
+                        throw new UnreadableWalletException(String.format("Could not connect %s to %s",
+                                tx.getHashAsString(), byteStringToHash(spentByTransactionHash)));
+                    }
+                    final int spendingIndex = transactionOutput.getSpentByTransactionIndex();
+                    TransactionInput input = checkNotNull(spendingTx.getRawTransaction().getInput(spendingIndex), "A spending index does not exist");
+                    input.connect(output);
+                }
             }
         }
 
         if (txProto.hasConfidence()) {
             Protos.TransactionConfidence confidenceProto = txProto.getConfidence();
-            TransactionConfidence confidence = tx.getConfidence();
-            readConfidence(tx, confidenceProto, confidence);
+            Transaction rawTx = tx.getRawTransaction();
+            TransactionConfidence confidence = rawTx.getConfidence();
+            readConfidence(rawTx, confidenceProto, confidence);
         }
 
-        // TODO handle general case and trimmed transactions
-        Sha256Hash hash = byteStringToHash(txProto.getHash());
-        BitTransaction atx = new BitTransaction(hash, tx, false);
-        return new BitWalletTransaction(pool, atx);
+        return new BitWalletTransaction(pool, tx);
     }
 
     private void readConfidence(Transaction tx, Protos.TransactionConfidence confidenceProto,
@@ -479,19 +598,20 @@ public class WalletPocketProtobufSerializer {
             }
             confidence.setDepthInBlocks(confidenceProto.getDepth());
         }
-        if (confidenceProto.hasOverridingTransaction()) {
-            if (confidence.getConfidenceType() != ConfidenceType.DEAD) {
-                log.warn("Have overridingTransaction but not OVERRIDDEN for tx {}", tx.getHashAsString());
-                return;
-            }
-            Transaction overridingTransaction =
-                    txMap.get(confidenceProto.getOverridingTransaction());
-            if (overridingTransaction == null) {
-                log.warn("Have overridingTransaction that is not in wallet for tx {}", tx.getHashAsString());
-                return;
-            }
-            confidence.setOverridingTransaction(overridingTransaction);
-        }
+        // TODO deprecate overriding transactions
+//        if (confidenceProto.hasOverridingTransaction()) {
+//            if (confidence.getConfidenceType() != ConfidenceType.DEAD) {
+//                log.warn("Have overridingTransaction but not OVERRIDDEN for tx {}", tx.getHashAsString());
+//                return;
+//            }
+//            Transaction overridingTransaction =
+//                    txMap.get(confidenceProto.getOverridingTransaction());
+//            if (overridingTransaction == null) {
+//                log.warn("Have overridingTransaction that is not in wallet for tx {}", tx.getHashAsString());
+//                return;
+//            }
+//            confidence.setOverridingTransaction(overridingTransaction);
+//        }
         for (Protos.PeerAddress proto : confidenceProto.getBroadcastByList()) {
             InetAddress ip;
             try {

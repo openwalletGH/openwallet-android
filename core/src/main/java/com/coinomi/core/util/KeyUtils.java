@@ -88,7 +88,7 @@ public class KeyUtils {
             } else {
                 // No secret key bytes and key is not encrypted: either a watching key or private key bytes
                 // will be rederived on the fly from the parent.
-                checkNotNull(parent, "Watching keys are not supported at the moment.");
+//                checkNotNull(parent, "Watching keys are not supported at the moment.");
                 detkey = new DeterministicKey(immutablePath, chainCode, pubkey, null, parent);
             }
         }

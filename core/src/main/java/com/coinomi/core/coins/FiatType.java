@@ -43,6 +43,7 @@ public class FiatType implements ValueType {
     }
 
     @Override
+    @Deprecated
     public Families getFamilyEnum() {
         return Families.FIAT;
     }

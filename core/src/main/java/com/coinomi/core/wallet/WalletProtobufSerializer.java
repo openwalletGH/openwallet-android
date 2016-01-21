@@ -2,6 +2,8 @@ package com.coinomi.core.wallet;
 
 import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.coins.families.BitFamily;
+import com.coinomi.core.coins.families.NxtFamily;
 import com.coinomi.core.protos.Protos;
 import com.coinomi.core.util.KeyUtils;
 import com.coinomi.core.wallet.families.nxt.NxtFamilyWallet;
@@ -198,21 +200,12 @@ public class WalletProtobufSerializer {
             CoinType type = getType(pocketProto);
             AbstractWallet pocket;
 
-            switch (type.getFamilyEnum()) {
-                case NXT:
-                    pocket = nxtPocketSerializer.readWallet(pocketProto, crypter);
-                    break;
-                case BITCOIN:
-                case NUBITS:
-                case PEERCOIN:
-                case REDDCOIN:
-                case VPNCOIN:
-                case CLAMS:
-                    pocket = pocketSerializer.readWallet(pocketProto, crypter);
-                    break;
-                default:
-                case FIAT:
-                    throw new UnreadableWalletException("Unsupported family " + type.getFamily());
+            if (type instanceof BitFamily) {
+                pocket = pocketSerializer.readWallet(pocketProto, crypter);
+            } else if (type instanceof NxtFamily) {
+                pocket = nxtPocketSerializer.readWallet(pocketProto, crypter);
+            } else {
+                throw new UnreadableWalletException("Unsupported type " + type);
             }
 
             wallet.addAccount(pocket);

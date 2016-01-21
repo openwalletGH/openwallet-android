@@ -26,26 +26,21 @@ import android.text.style.StyleSpan;
 
 import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
-import com.coinomi.core.coins.Value;
-import com.coinomi.core.coins.families.Families;
+import com.coinomi.core.coins.families.NxtFamily;
 import com.coinomi.core.util.Currencies;
 import com.coinomi.core.wallet.AbstractAddress;
 import com.coinomi.core.wallet.AbstractTransaction;
+import com.coinomi.core.wallet.AbstractTransaction.AbstractOutput;
 import com.coinomi.core.wallet.AbstractWallet;
 import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.wallet.Constants;
 
-import org.bitcoinj.core.ScriptException;
 import org.bitcoinj.core.Sha256Hash;
-import org.bitcoinj.core.Transaction;
-import org.bitcoinj.core.TransactionOutput;
-import org.bitcoinj.script.Script;
 
 import java.util.ArrayList;
 import java.util.Currency;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -89,59 +84,35 @@ public class WalletUtils {
                 ((bytes[len - 8] & 0xFFl) << 56);
     }
 
-    public static boolean isInternal(@Nonnull final Transaction tx) {
-        if (tx.isCoinBase())
-            return false;
-
-        final List<TransactionOutput> outputs = tx.getOutputs();
-        if (outputs.size() != 1)
-            return false;
-
-        try
-        {
-            final TransactionOutput output = outputs.get(0);
-            final Script scriptPubKey = output.getScriptPubKey();
-            if (!scriptPubKey.isSentToRawPubKey())
-                return false;
-
-            return true;
-        }
-        catch (final ScriptException x)
-        {
-            return false;
-        }
-    }
-
     @CheckForNull
-    public static List<AbstractAddress> getSendToAddress(@Nonnull final AbstractTransaction tx, @Nonnull final AbstractWallet pocket) {
+    public static List<AbstractAddress> getSendToAddress(@Nonnull final AbstractTransaction tx,
+                                                         @Nonnull final AbstractWallet pocket) {
         return getToAddresses(tx, pocket, false);
     }
 
 
     @CheckForNull
-    public static List<AbstractAddress> getReceivedWithAddress(@Nonnull final AbstractTransaction tx, @Nonnull final AbstractWallet pocket) {
-        if (pocket.getCoinType().getFamily() != Families.NXT)
+    public static List<AbstractAddress> getReceivedWithOrFrom(@Nonnull final AbstractTransaction tx,
+                                                              @Nonnull final AbstractWallet pocket) {
+        // TODO a better approach is to use a "features" enum list and check agaist that
+        if (pocket.getCoinType() instanceof NxtFamily) {
+            return tx.getReceivedFrom();
+        } else {
             return getToAddresses(tx, pocket, true);
-
-        List<AbstractAddress> addresses = new ArrayList<>();
-        addresses.add(tx.getSender(pocket));
-        return addresses;
+        }
     }
 
     @CheckForNull
     private static List<AbstractAddress> getToAddresses(@Nonnull final AbstractTransaction tx,
-                                                @Nonnull final AbstractWallet pocket, boolean toMe) {
+                                                        @Nonnull final AbstractWallet pocket,
+                                                        boolean toMe) {
         List<AbstractAddress> addresses = new ArrayList<>();
-        List<Map.Entry<AbstractAddress, Value>> outputs = tx.getSentTo(pocket);
-        List<AbstractAddress> activeAddresses = pocket.getActiveAddresses();
-        for ( Map.Entry<AbstractAddress, Value> output : outputs ) {
-            try {
-                for (AbstractAddress addr : activeAddresses) {
-                    if ((addr.getId() == output.getKey().getId()) == toMe) {
-                        addresses.add(output.getKey());
-                    }
-                }
-            } catch (final ScriptException x) { /* ignore this output */ }
+        List<AbstractOutput> outputs = tx.getSentTo();
+        for (AbstractOutput output : outputs) {
+            boolean isMine = pocket.isAddressMine(output.getAddress());
+            if (isMine == toMe) {
+                addresses.add(output.getAddress());
+            }
         }
         return addresses;
     }

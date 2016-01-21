@@ -17,10 +17,9 @@ import android.widget.Toast;
 
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.messages.TxMessage;
-import com.coinomi.core.util.AddressUtils;
 import com.coinomi.core.wallet.AbstractTransaction;
+import com.coinomi.core.wallet.AbstractTransaction.AbstractOutput;
 import com.coinomi.core.wallet.AbstractWallet;
-import com.coinomi.core.wallet.families.bitcoin.BitAddress;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
@@ -29,7 +28,6 @@ import com.coinomi.wallet.util.UiUtils;
 import com.coinomi.wallet.util.WeakHandler;
 
 import org.acra.ACRA;
-import org.bitcoinj.core.TransactionOutput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,10 +77,10 @@ public class TransactionDetailsFragment extends Fragment {
         if (getArguments() != null) {
             accountId = getArguments().getString(Constants.ARG_ACCOUNT_ID);
         }
-        // TODO
         pocket = (AbstractWallet) getWalletApplication().getAccount(accountId);
         if (pocket == null) {
             Toast.makeText(getActivity(), R.string.no_such_pocket_error, Toast.LENGTH_LONG).show();
+            // TODO report anomaly
             return;
         }
         type = pocket.getCoinType();
@@ -128,10 +126,9 @@ public class TransactionDetailsFragment extends Fragment {
                 if (position >= outputRows.getHeaderViewsCount()) {
                     Object obj = parent.getItemAtPosition(position);
 
-                    if (obj != null && obj instanceof TransactionOutput) {
-                        TransactionOutput txo = (TransactionOutput) obj;
-                        BitAddress address = AddressUtils.fromScript(type, txo.getScriptPubKey());
-                        UiUtils.startAddressActionMode(address, getActivity(), getFragmentManager());
+                    if (obj != null && obj instanceof AbstractOutput) {
+                        UiUtils.startAddressActionMode(((AbstractOutput) obj).getAddress(),
+                                getActivity(), getFragmentManager());
                     }
                 }
             }

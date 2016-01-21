@@ -11,7 +11,8 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * @author John L. Jegutanis
  */
-public abstract class AbstractWallet implements WalletAccount {
+public abstract class AbstractWallet<T extends AbstractTransaction, A extends AbstractAddress>
+        implements WalletAccount<T, A> {
     protected final String id;
     protected String description;
     protected final CoinType type;
@@ -23,25 +24,9 @@ public abstract class AbstractWallet implements WalletAccount {
     }
 
     @Override
-    public abstract AbstractAddress getRefundAddress(boolean isManualAddressManagement);
-
-    @Override
-    public abstract AbstractAddress getReceiveAddress(boolean isManualAddressManagement) ;
-
-
-        @Override
     public String getId() {
         return id;
     }
-
-//    @Nullable
-//    public AbstractTransaction getTransaction(String transactionId) {
-//        return null;
-//    }
-
-//    public abstract AbstractTransaction getTransaction(String transactionId);
-
-
 
     @Override
     public CoinType getCoinType() {

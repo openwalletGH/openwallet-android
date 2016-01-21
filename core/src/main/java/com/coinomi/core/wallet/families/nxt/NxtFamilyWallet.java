@@ -22,9 +22,9 @@ import com.coinomi.core.wallet.SignedMessage;
 import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.core.wallet.WalletAccountEventListener;
-import com.coinomi.core.wallet.families.bitcoin.BitTransaction;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.Sha256Hash;
@@ -38,7 +38,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.crypto.params.KeyParameter;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -56,7 +55,8 @@ import static com.google.common.base.Preconditions.checkArgument;
 /**
  * @author John L. Jegutanis
  */
-public class NxtFamilyWallet extends AbstractWallet implements TransactionEventListener<NxtTransaction> {
+public class NxtFamilyWallet extends AbstractWallet<NxtTransaction, NxtAddress>
+        implements TransactionEventListener<NxtTransaction> {
     private static final Logger log = LoggerFactory.getLogger(NxtFamilyWallet.class);
     protected final Map<Sha256Hash, NxtTransaction> rawtransactions;
     @VisibleForTesting
@@ -65,7 +65,7 @@ public class NxtFamilyWallet extends AbstractWallet implements TransactionEventL
     @VisibleForTesting final transient ArrayList<AbstractAddress> addressesPendingSubscription;
     @VisibleForTesting final transient HashMap<AbstractAddress, AddressStatus> statusPendingUpdates;
     //@VisibleForTesting final transient HashSet<Sha256Hash> fetchingTransactions;
-    private final NxtFamilyAddress address;
+    private final NxtAddress address;
     NxtFamilyKey rootKey;
     private Value balance;
     private int lastEcBlockHeight;
@@ -109,7 +109,7 @@ public class NxtFamilyWallet extends AbstractWallet implements TransactionEventL
     public NxtFamilyWallet(String id, NxtFamilyKey key, CoinType type) {
         super(type, id);
         rootKey = key;
-        address = new NxtFamilyAddress(type, key.getPublicKey());
+        address = new NxtAddress(type, key.getPublicKey());
         balance = type.value(0);
         addressesStatus = new HashMap<>();
         addressesSubscribed = new ArrayList<>();
@@ -131,7 +131,45 @@ public class NxtFamilyWallet extends AbstractWallet implements TransactionEventL
     }
 
     @Override
+    public SendRequest getEmptyWalletRequest(AbstractAddress destination) throws WalletAccountException {
+        checkAddress(destination);
+        return NxtSendRequest.emptyWallet(this, (NxtAddress) destination);
+    }
+
+    @Override
+    public SendRequest getSendToRequest(AbstractAddress destination, Value amount) throws WalletAccountException {
+        checkAddress(destination);
+        return NxtSendRequest.to(this, (NxtAddress) destination, amount);
+    }
+
+    private void checkAddress(AbstractAddress destination) throws WalletAccountException {
+        if (!(destination instanceof NxtAddress)) {
+            throw new WalletAccountException("Incompatible address" +
+                    destination.getClass().getName() + ", expected " + NxtAddress.class.getName());
+        }
+    }
+
+
+    @Override
     public void completeTransaction(SendRequest request) throws WalletAccountException {
+        checkSendRequest(request);
+        completeTransaction((NxtSendRequest) request);
+    }
+
+    @Override
+    public void signTransaction(SendRequest request) throws WalletAccountException {
+        checkSendRequest(request);
+        signTransaction((NxtSendRequest) request);
+    }
+
+    private void checkSendRequest(SendRequest request) throws WalletAccountException {
+        if (!(request instanceof NxtSendRequest)) {
+            throw new WalletAccountException("Incompatible request " +
+                    request.getClass().getName() + ", expected " + NxtSendRequest.class.getName());
+        }
+    }
+
+    public void completeTransaction(NxtSendRequest request) throws WalletAccountException {
         checkArgument(!request.isCompleted(), "Given SendRequest has already been completed.");
 
         if (request.type.getTransactionVersion() > 0) {
@@ -144,17 +182,20 @@ public class NxtFamilyWallet extends AbstractWallet implements TransactionEventL
 
         try {
             request.tx = new NxtTransaction(type, request.nxtTxBuilder.build());
+            request.setCompleted(true);
         } catch (NxtException.NotValidException e) {
             throw new WalletAccount.WalletAccountException(e);
         }
-        request.setCompleted(true);
+
+        if (request.signTransaction) {
+            signTransaction(request);
+        }
     }
 
-    @Override
-    public void signTransaction(SendRequest request) {
+    public void signTransaction(NxtSendRequest request) {
         checkArgument(request.isCompleted(), "Send request is not completed");
         checkArgument(request.tx != null, "No transaction found in send request");
-        Transaction tx = ((SendRequest<NxtTransaction>) request).tx.getRawTransaction();
+        Transaction tx = request.tx.getRawTransaction();
         byte[] privateKey;
         if (rootKey.isEncrypted()) {
             checkArgument(request.aesKey != null, "Wallet is encrypted but no decryption key provided");
@@ -239,7 +280,7 @@ public class NxtFamilyWallet extends AbstractWallet implements TransactionEventL
     }
 
     @Override
-    public NxtFamilyAddress getReceiveAddress(boolean isManualAddressManagement) {
+    public NxtAddress getReceiveAddress(boolean isManualAddressManagement) {
         return this.address;
     }
 
@@ -296,16 +337,17 @@ public class NxtFamilyWallet extends AbstractWallet implements TransactionEventL
     }
 
     @Override
-    public Map<Sha256Hash, AbstractTransaction> getTransactions() {
-        Map<Sha256Hash, AbstractTransaction> txs = new HashMap<>();
-        for ( Sha256Hash tx : rawtransactions.keySet() ) {
-            txs.put( tx, rawtransactions.get(tx));
+    public Map<Sha256Hash, NxtTransaction> getTransactions() {
+        lock.lock();
+        try {
+            return ImmutableMap.copyOf(rawtransactions);
+        } finally {
+            lock.unlock();
         }
-        return txs;
     }
 
     @Override
-    public AbstractTransaction getTransaction(String transactionId) {
+    public NxtTransaction getTransaction(String transactionId) {
         lock.lock();
         try {
             return rawtransactions.get(new Sha256Hash(transactionId));
@@ -315,7 +357,7 @@ public class NxtFamilyWallet extends AbstractWallet implements TransactionEventL
     }
 
     @Override
-    public Map<Sha256Hash, AbstractTransaction> getPendingTransactions() {
+    public Map<Sha256Hash, NxtTransaction> getPendingTransactions() {
         throw new RuntimeException("Not implemented");
     }
 
@@ -420,14 +462,14 @@ public class NxtFamilyWallet extends AbstractWallet implements TransactionEventL
     /**
      * Sends coins to the given address but does not broadcast the resulting pending transaction.
      */
-    public SendRequest sendCoinsOffline(NxtFamilyAddress address, Value amount) throws WalletAccountException {
+    public NxtSendRequest sendCoinsOffline(NxtAddress address, Value amount) throws WalletAccountException {
         return sendCoinsOffline(address, amount, (KeyParameter) null);
     }
 
     /**
-     * {@link #sendCoinsOffline(NxtFamilyAddress, Value)}
+     * {@link #sendCoinsOffline(NxtAddress, Value)}
      */
-    public SendRequest sendCoinsOffline(NxtFamilyAddress address, Value amount, @Nullable String password)
+    public NxtSendRequest sendCoinsOffline(NxtAddress address, Value amount, @Nullable String password)
             throws WalletAccountException {
         KeyParameter key = null;
         if (password != null) {
@@ -438,13 +480,13 @@ public class NxtFamilyWallet extends AbstractWallet implements TransactionEventL
     }
 
     /**
-     * {@link #sendCoinsOffline(NxtFamilyAddress, Value)}
+     * {@link #sendCoinsOffline(NxtAddress, Value)}
      */
-    public SendRequest sendCoinsOffline(NxtFamilyAddress address, Value amount, @Nullable KeyParameter aesKey)
+    public NxtSendRequest sendCoinsOffline(NxtAddress address, Value amount, @Nullable KeyParameter aesKey)
             throws WalletAccountException {
-        SendRequest request = null;
+        NxtSendRequest request;
         try {
-            request = SendRequest.to(this, address, amount);
+            request = NxtSendRequest.to(this, address, amount);
         } catch (Exception e) {
             throw new WalletAccountException(e);
         }
@@ -477,7 +519,7 @@ public class NxtFamilyWallet extends AbstractWallet implements TransactionEventL
 
     @Override
     public boolean isAddressMine(AbstractAddress address) {
-        return false;
+        return this.address.equals(address);
     }
 
     @Override
@@ -693,6 +735,7 @@ public class NxtFamilyWallet extends AbstractWallet implements TransactionEventL
                 log.info("Fetching txs");
                 fetchTransactions(historyTxes);
                 queueOnNewBalance();
+                //tryToApplyState(updatingStatus);
         }
         finally {
             lock.unlock();

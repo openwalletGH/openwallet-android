@@ -311,7 +311,7 @@ public class TransactionsListAdapter extends BaseAdapter {
             address = sentTo.size() == 0 ? null : sentTo.get(0);
         } else {
             // received with those addresses
-            List<AbstractAddress> receivedWith = WalletUtils.getReceivedWithAddress(tx, walletPocket);
+            List<AbstractAddress> receivedWith = WalletUtils.getReceivedWithOrFrom(tx, walletPocket);
             // Should be one
             address = receivedWith.size() == 0 ? null : receivedWith.get(0);
         }

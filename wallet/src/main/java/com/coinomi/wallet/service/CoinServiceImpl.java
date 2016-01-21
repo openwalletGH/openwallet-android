@@ -225,7 +225,11 @@ public class CoinServiceImpl extends Service implements CoinService {
     };
 
     private ServerClients getServerClients(Wallet wallet) {
-        return new ServerClients(Constants.DEFAULT_COINS_SERVERS, connHelper);
+        ServerClients newClients = new ServerClients(Constants.DEFAULT_COINS_SERVERS, connHelper);
+        if (application.getTxCachePath() != null) {
+            newClients.setCacheDir(application.getTxCachePath(), Constants.TX_CACHE_SIZE);
+        }
+        return newClients;
     }
 
     private final BroadcastReceiver tickReceiver = new BroadcastReceiver() {

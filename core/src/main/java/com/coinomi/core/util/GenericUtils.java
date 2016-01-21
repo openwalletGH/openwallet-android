@@ -8,7 +8,7 @@ import com.coinomi.core.coins.ValueType;
 import com.coinomi.core.exceptions.AddressMalformedException;
 import com.coinomi.core.wallet.AbstractAddress;
 import com.coinomi.core.wallet.families.bitcoin.BitAddress;
-import com.coinomi.core.wallet.families.nxt.NxtFamilyAddress;
+import com.coinomi.core.wallet.families.nxt.NxtAddress;
 import com.google.common.collect.ImmutableList;
 
 import org.bitcoinj.core.AddressFormatException;
@@ -40,8 +40,8 @@ public class GenericUtils {
     }
 
     public static String addressSplitToGroupsMultiline(final AbstractAddress address) {
-        if (address instanceof NxtFamilyAddress) {
-            return addressSplitToGroupsMultiline((NxtFamilyAddress) address);
+        if (address instanceof NxtAddress) {
+            return addressSplitToGroupsMultiline((NxtAddress) address);
         } else if (address instanceof BitAddress) {
             return addressSplitToGroupsMultiline((BitAddress) address);
         } else {
@@ -49,7 +49,7 @@ public class GenericUtils {
         }
     }
 
-    public static String addressSplitToGroupsMultiline(final NxtFamilyAddress address) {
+    public static String addressSplitToGroupsMultiline(final NxtAddress address) {
         // Nxt addresses are short, so no need to split them in multiple lines
         return addressSplitToGroups(address);
     }
@@ -77,8 +77,8 @@ public class GenericUtils {
     }
 
     public static String addressSplitToGroups(final AbstractAddress address) {
-        if (address instanceof NxtFamilyAddress) {
-            return addressSplitToGroups((NxtFamilyAddress) address);
+        if (address instanceof NxtAddress) {
+            return addressSplitToGroups((NxtAddress) address);
         } else if (address instanceof BitAddress) {
             return addressSplitToGroups((BitAddress) address);
         } else {
@@ -86,7 +86,7 @@ public class GenericUtils {
         }
     }
 
-    public static String addressSplitToGroups(final NxtFamilyAddress address) {
+    public static String addressSplitToGroups(final NxtAddress address) {
         return address.toString(); // already split in groups
     }
 

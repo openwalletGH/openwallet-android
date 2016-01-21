@@ -119,6 +119,10 @@ public class Value implements Monetary, Comparable<Value>, Serializable {
         return new Value(this.type, LongMath.checkedAdd(this.value, value.value));
     }
 
+    public Value add(final long value) {
+        return new Value(this.type, LongMath.checkedAdd(this.value, value));
+    }
+
     public Value subtract(final Value value) {
         checkArgument(type.equals(value.type), "Cannot subtract a different type");
         return new Value(this.type, LongMath.checkedSubtract(this.value, value.value));
@@ -126,6 +130,10 @@ public class Value implements Monetary, Comparable<Value>, Serializable {
 
     public Value subtract(String str) {
         return subtract(type.value(str));
+    }
+
+    public Value subtract(long value) {
+        return new Value(this.type, LongMath.checkedSubtract(this.value, value));
     }
 
     public Value multiply(final long factor) {

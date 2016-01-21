@@ -3,7 +3,10 @@ package com.coinomi.core.wallet;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.FeePolicy;
 import com.coinomi.core.coins.Value;
-import com.coinomi.core.wallet.families.bitcoin.BitTransaction;
+import com.coinomi.core.wallet.families.bitcoin.BitSendRequest;
+import com.coinomi.core.wallet.families.bitcoin.CoinSelection;
+import com.coinomi.core.wallet.families.bitcoin.CoinSelector;
+import com.coinomi.core.wallet.families.bitcoin.OutPointOutput;
 import com.google.common.collect.Lists;
 
 import org.bitcoinj.core.Address;
@@ -15,15 +18,12 @@ import org.bitcoinj.core.ScriptException;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.TransactionConfidence;
 import org.bitcoinj.core.TransactionInput;
-import org.bitcoinj.core.TransactionOutPoint;
 import org.bitcoinj.core.TransactionOutput;
 import org.bitcoinj.core.VarInt;
 import org.bitcoinj.script.Script;
 import org.bitcoinj.signers.LocalTransactionSigner;
 import org.bitcoinj.signers.MissingSigResolutionSigner;
 import org.bitcoinj.signers.TransactionSigner;
-import org.bitcoinj.wallet.CoinSelection;
-import org.bitcoinj.wallet.CoinSelector;
 import org.bitcoinj.wallet.DecryptingKeyBag;
 import org.bitcoinj.wallet.KeyBag;
 import org.bitcoinj.wallet.RedeemData;
@@ -33,7 +33,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static com.coinomi.core.Preconditions.checkArgument;
@@ -70,12 +69,12 @@ public class TransactionCreator {
      * @throws org.bitcoinj.core.InsufficientMoneyException if the request could not be completed due to not enough balance.
      * @throws IllegalArgumentException                     if you try and complete the same SendRequest twice
      */
-    void completeTx(SendRequest<BitTransaction> req) throws InsufficientMoneyException {
+    void completeTx(BitSendRequest req) throws InsufficientMoneyException {
         lock.lock();
         try {
             checkArgument(req.type.equals(coinType), "Given SendRequest has an invalid coin type.");
             checkArgument(!req.isCompleted(), "Given SendRequest has already been completed.");
-            Transaction tx = (Transaction) checkNotNull(req.tx.getRawTransaction());
+            Transaction tx = req.tx.getRawTransaction();
             // Add any messages to the transaction if it applies to this coin type
             if (req.txMessage != null && coinType.canHandleMessages()) {
                 req.txMessage.serializeTo(req.tx);
@@ -117,7 +116,7 @@ public class TransactionCreator {
             //
             // Note that this code is poorly optimized: the spend candidates only alter when transactions in the wallet
             // change - it could be pre-calculated and held in RAM, and this is probably an optimization worth doing.
-            LinkedList<TransactionOutput> candidates = calculateAllSpendCandidates(true);
+            LinkedList<OutPointOutput> candidates = calculateAllSpendCandidates(true);
             CoinSelection bestCoinSelection;
             TransactionOutput bestChangeOutput = null;
             if (!req.emptyWallet) {
@@ -137,8 +136,9 @@ public class TransactionCreator {
                 log.info("  emptying {}", bestCoinSelection.valueGathered.toFriendlyString());
             }
 
-            for (TransactionOutput output : bestCoinSelection.gathered)
-                tx.addInput(output);
+            for (OutPointOutput utxo : bestCoinSelection.gathered) {
+                tx.addInput(utxo.getInput());
+            }
 
             if (req.ensureMinRequiredFee && req.emptyWallet) {
                 final Value baseFee = req.fee == null ? Value.valueOf(account.getCoinType(), Coin.ZERO) : req.fee;
@@ -157,7 +157,7 @@ public class TransactionCreator {
                 tx.shuffleOutputs();
 
             // Now sign the inputs, thus proving that we are entitled to redeem the connected outputs.
-            if (req.signInputs) {
+            if (req.signTransaction) {
                 signTransaction(req);
             }
 
@@ -193,10 +193,10 @@ public class TransactionCreator {
      * <p>Actual signing is done by pluggable {@link org.bitcoinj.signers.LocalTransactionSigner}
      * and it's not guaranteed that transaction will be complete in the end.</p>
      */
-    void signTransaction(SendRequest<BitTransaction> req) {
+    void signTransaction(BitSendRequest req) {
         lock.lock();
         try {
-            Transaction tx = (Transaction) checkNotNull(req.tx.getRawTransaction());
+            Transaction tx = req.tx.getRawTransaction();
             List<TransactionInput> inputs = tx.getInputs();
             List<TransactionOutput> outputs = tx.getOutputs();
             checkState(inputs.size() > 0);
@@ -247,49 +247,24 @@ public class TransactionCreator {
      * (which the protocol may forbid us from spending). In other words, return all outputs that this wallet holds
      * keys for and which are not already marked as spent.
      */
-    LinkedList<TransactionOutput> calculateAllSpendCandidates(boolean excludeImmatureCoinbases) {
+    LinkedList<OutPointOutput> calculateAllSpendCandidates(boolean excludeImmatureCoinbases) {
         lock.lock();
         try {
-            LinkedList<TransactionOutput> candidates = Lists.newLinkedList();
-            for (Map.Entry<TransactionOutPoint, TransactionOutput> txo : account.getUnspentOutputs().entrySet()) {
-                if (excludeImmatureCoinbases) {
-                    Transaction tx = account.getRawTransaction(txo.getKey().getHash());
-                    if (tx != null && !tx.isMature()) continue;
-                }
-                candidates.add(txo.getValue());
+            LinkedList<OutPointOutput> candidates = Lists.newLinkedList();
+            for (OutPointOutput utxo : account.getUnspentOutputs().values()) {
+                if (excludeImmatureCoinbases && !utxo.isMature()) continue;
+                candidates.add(utxo);
             }
-
-//            for (Transaction tx : Iterables.concat(account.getUnspentTransactions().values(),
-//                    account.getPendingRawTransactions().values())) {
-//                // Do not try and spend coinbases that were mined too recently, the protocol forbids it.
-//                if (excludeImmatureCoinbases && !tx.isMature()) continue;
-//                for (TransactionOutput output : tx.getOutputs()) {
-//                    if (!output.isAvailableForSpending()) continue;
-//                    if (!output.isMine(account)) continue;
-//                    candidates.add(output);
-//                }
-//            }
-//
-//            // If we have pending transactions, remove from candidates any future spent outputs
-//            for (Transaction pendingTx : account.getPendingRawTransactions().values()) {
-//                for (TransactionInput input : pendingTx.getInputs()) {
-//                    Transaction tx = account.getRawTransactions().get(input.getOutpoint().getHash());
-//                    if (tx == null) continue;
-//                    TransactionOutput pendingSpentOutput = tx.getOutput((int) input.getOutpoint().getIndex());
-//                    candidates.remove(pendingSpentOutput);
-//                }
-//            }
-
             return candidates;
         } finally {
             lock.unlock();
         }
     }
 
-    private FeeCalculation calculateFee(SendRequest<BitTransaction> req, Coin value, List<TransactionInput> originalInputs,
-                                        int numberOfSoftDustOutputs, LinkedList<TransactionOutput> candidates) throws InsufficientMoneyException {
+    private FeeCalculation calculateFee(BitSendRequest req, Coin value, List<TransactionInput> originalInputs,
+                                        int numberOfSoftDustOutputs, LinkedList<OutPointOutput> candidates) throws InsufficientMoneyException {
         checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
-        Transaction tx = (Transaction) checkNotNull(req.tx.getRawTransaction());
+        Transaction tx = req.tx.getRawTransaction();
         FeeCalculation result = new FeeCalculation();
         // There are 3 possibilities for what adding change might do:
         // 1) No effect
@@ -344,7 +319,7 @@ public class TransactionCreator {
             // Of the coins we could spend, pick some that we actually will spend.
             CoinSelector selector = req.coinSelector == null ? coinSelector : req.coinSelector;
             // selector is allowed to modify candidates list.
-            CoinSelection selection = selector.select(valueNeeded, new LinkedList<TransactionOutput>(candidates));
+            CoinSelection selection = selector.select(valueNeeded, candidates);
             // Can we afford this?
             if (selection.valueGathered.compareTo(valueNeeded) < 0) {
                 valueMissing = valueNeeded.subtract(selection.valueGathered);
@@ -424,8 +399,8 @@ public class TransactionCreator {
             }
 
             // Now add unsigned inputs for the selected coins.
-            for (TransactionOutput output : selection.gathered) {
-                TransactionInput input = tx.addInput(output);
+            for (OutPointOutput utxo : selection.gathered) {
+                TransactionInput input = tx.addInput(utxo.getInput());
                 // If the scriptBytes don't default to none, our size calculations will be thrown off.
                 checkState(input.getScriptBytes().length == 0);
             }
@@ -548,8 +523,9 @@ public class TransactionCreator {
 
     private int estimateBytesForSigning(CoinSelection selection) {
         int size = 0;
-        for (TransactionOutput output : selection.gathered) {
+        for (OutPointOutput utxo : selection.gathered) {
             try {
+                TransactionOutput output = utxo.getOutput();
                 Script script = output.getScriptPubKey();
                 ECKey key = null;
                 Script redeemScript = null;

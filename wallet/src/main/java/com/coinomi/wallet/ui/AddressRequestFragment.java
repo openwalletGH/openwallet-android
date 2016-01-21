@@ -33,8 +33,10 @@ import android.widget.Toast;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.FiatType;
 import com.coinomi.core.coins.Value;
-import com.coinomi.core.coins.families.Families;
+import com.coinomi.core.coins.families.BitFamily;
+import com.coinomi.core.coins.families.NxtFamily;
 import com.coinomi.core.exceptions.Bip44KeyLookAheadExceededException;
+import com.coinomi.core.exceptions.UnsupportedCoinTypeException;
 import com.coinomi.core.uri.CoinURI;
 import com.coinomi.core.util.ExchangeRate;
 import com.coinomi.core.util.GenericUtils;
@@ -394,11 +396,13 @@ public class AddressRequestFragment extends Fragment {
     }
 
     private String getQrContent() {
-        if (type.getFamilyEnum() == Families.NXT) {
+        if (type instanceof BitFamily) {
+            return CoinURI.convertToCoinURI(receiveAddress, amount, label, message);
+        } else if (type instanceof NxtFamily){
             return CoinURI.convertToCoinURI(receiveAddress, amount, label, message,
                     pocket.getPublicKeySerialized());
         } else {
-            return CoinURI.convertToCoinURI(receiveAddress, amount, label, message);
+            throw new UnsupportedCoinTypeException(type);
         }
     }
 

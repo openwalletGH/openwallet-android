@@ -13,7 +13,6 @@ import org.bitcoinj.wallet.KeyBag;
 
 import org.spongycastle.crypto.params.KeyParameter;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -24,11 +23,16 @@ import javax.annotation.Nullable;
 /**
  * @author John L. Jegutanis
  */
-public interface WalletAccount extends KeyBag,
-        ConnectionEventListener, Serializable {
+public interface WalletAccount<T extends AbstractTransaction, A extends AbstractAddress>
+        extends KeyBag, ConnectionEventListener, Serializable {
+
     class WalletAccountException extends Exception {
         public WalletAccountException(Throwable cause) {
             super(cause);
+        }
+
+        public WalletAccountException(String s) {
+            super(s);
         }
     }
 
@@ -83,9 +87,9 @@ public interface WalletAccount extends KeyBag,
      */
     boolean canCreateNewAddresses();
 
-    AbstractTransaction getTransaction(String transactionId);
-    Map<Sha256Hash, AbstractTransaction> getPendingTransactions();
-    Map<Sha256Hash, AbstractTransaction> getTransactions();
+    T getTransaction(String transactionId);
+    Map<Sha256Hash, T> getPendingTransactions();
+    Map<Sha256Hash, T> getTransactions();
 
     List<AbstractAddress> getActiveAddresses();
     void markAddressAsUsed(AbstractAddress address);
@@ -119,9 +123,12 @@ public interface WalletAccount extends KeyBag,
 
     String getPublicKeyMnemonic();
 
+    SendRequest getEmptyWalletRequest(AbstractAddress destination) throws WalletAccountException;
+    SendRequest getSendToRequest(AbstractAddress destination, Value amount) throws WalletAccountException;
+
     void completeAndSignTx(SendRequest request) throws WalletAccountException;
     void completeTransaction(SendRequest request) throws WalletAccountException;
-    void signTransaction(SendRequest request);
+    void signTransaction(SendRequest request) throws WalletAccountException;
 
     void signMessage(SignedMessage unsignedMessage, @Nullable KeyParameter aesKey);
     void verifyMessage(SignedMessage signedMessage);

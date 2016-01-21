@@ -11,6 +11,7 @@ import java.io.Serializable;
  * @author John L. Jegutanis
  */
 public interface ValueType extends Serializable {
+    @Deprecated
     Families getFamilyEnum();
     String getName();
     String getSymbol();

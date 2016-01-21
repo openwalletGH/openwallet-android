@@ -15,7 +15,7 @@
  */
 
 /*
- * Authors: Jim Burton, Miron Cuperman, Andreas Schildbach
+ * Authors: Jim Burton, Miron Cuperman, Andreas Schildbach, John L. Jegutanis
  */
 
 /* Notes:
@@ -139,6 +139,23 @@ message TransactionOutput {
     optional bytes spent_by_transaction_hash = 3;
     // If spent, the index of the transaction input of the transaction doing the spend.
     optional int32 spent_by_transaction_index = 4;
+    // If the output is generally spent
+    optional bool is_spent = 5 [default = false];
+    // The index of this output, used in trimmed transactions
+    optional int32 index = 6;
+}
+
+message UnspentOutput {
+    // Hash of the transaction this input is using.
+    required bytes out_point_hash = 1;
+    // Index of transaction output used by this input.
+    required uint32 out_point_index = 2;
+    // Script of transaction output
+    required bytes script_bytes = 3;
+    // Value of theoutput
+    required int64 value = 4;
+    // If this output is from a coin base or coin stake transaction
+    optional bool is_generated = 5 [default = false];
 }
 
 /**
@@ -218,6 +235,7 @@ message Transaction {
     optional int64 updated_at = 5; // millis since epoch the transaction was last updated
 
     repeated TransactionInput transaction_input = 6;
+    optional int32 num_of_outputs = 18; // The original number of outputs, used in trimmed transactions
     repeated TransactionOutput transaction_output = 7;
 
     // A list of blocks in which the transaction has been observed (on any chain). Also, a number used to disambiguate
@@ -233,9 +251,16 @@ message Transaction {
     optional bytes extra_bytes = 13;
 
     // A transaction can be stored in a trimmed state where some inputs or outputs are stripped to save space.
-    optional bytes is_trimmed = 14;
+    optional bool is_trimmed = 14 [default = false];
 
-    // Next tag: 15
+    // The value that the wallet sends, it is the sum of the inputs that are spending coins with keys in the wallet.
+    optional int64 value_sent = 15 [default = 0];
+    // The value that the wallet received, it is the sum of the outputs that are sending coins to a key in the wallet.
+    optional int64 value_received = 16 [default = 0];
+    // The transaction fee
+    optional int64 fee = 17;
+
+    // Next tag: 19
 }
 
 message AddressStatus {
@@ -264,7 +289,9 @@ message WalletPocket {
 
     optional string id = 9;
 
-    // Next tag: 10
+    repeated UnspentOutput unspent_output = 10;
+
+    // Next tag: 11
 }
 
 /** The parameters used in the scrypt key derivation function.

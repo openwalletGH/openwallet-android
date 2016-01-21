@@ -1,14 +1,15 @@
 package com.coinomi.core.network;
 
-import org.bitcoinj.core.Sha256Hash;
-
+import com.coinomi.core.network.ServerClient.HistoryTx;
+import com.coinomi.core.network.ServerClient.UnspentTx;
 import com.coinomi.core.wallet.AbstractAddress;
 import com.google.common.collect.Sets;
 
-import com.coinomi.core.network.ServerClient.HistoryTx;
+import org.bitcoinj.core.Sha256Hash;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
@@ -20,7 +21,13 @@ final public class AddressStatus {
     @Nullable final String status;
 
     HashSet<HistoryTx> historyTransactions;
-    HashSet<Sha256Hash> allTransactions = new HashSet<>();
+    HashSet<UnspentTx> unspentTransactions;
+    HashSet<Sha256Hash> historyTxHashes = new HashSet<>();
+    HashSet<Sha256Hash> unspentTxHashes = new HashSet<>();
+
+    boolean stateMustBeApplied;
+    boolean historyTxStateApplied;
+    boolean unspentTxStateApplied;
 
     public AddressStatus(AbstractAddress address, @Nullable String status) {
         this.address = address;
@@ -40,30 +47,57 @@ final public class AddressStatus {
      */
     public void queueHistoryTransactions(List<HistoryTx> txs) {
         if (historyTransactions == null) {
-            historyTransactions = fillTransactions(txs);
+            historyTransactions = Sets.newHashSet(txs);
+            historyTxHashes = fillTransactions(txs);
+            stateMustBeApplied = true;
         }
-    }
-
-    private HashSet<HistoryTx> fillTransactions(List<HistoryTx> txs) {
-        HashSet<HistoryTx> txSet = Sets.newHashSet(txs);
-        for (HistoryTx tx : txs) {
-            allTransactions.add(tx.getTxHash());
-        }
-        return txSet;
     }
 
     /**
-     * Return true if history and unspent transactions are queued
+     * Queue transactions that are going to be fetched
      */
-    public boolean isReady() {
+    public void queueUnspentTransactions(List<UnspentTx> txs) {
+        if (unspentTransactions == null) {
+            unspentTransactions = Sets.newHashSet(txs);
+            unspentTxHashes = fillTransactions(txs);
+            stateMustBeApplied = true;
+        }
+    }
+
+    private HashSet<Sha256Hash> fillTransactions(Iterable<? extends HistoryTx> txs) {
+        HashSet<Sha256Hash> transactionHashes = new HashSet<>();
+        for (HistoryTx tx : txs) {
+            transactionHashes.add(tx.getTxHash());
+        }
+        return transactionHashes;
+    }
+
+    /**
+     * Return true if history transactions are queued
+     */
+    public boolean isHistoryTxQueued() {
         return historyTransactions != null;
     }
 
     /**
-     * Get all queued transactions
+     * Return true if unspent transactions are queued
      */
-    public HashSet<Sha256Hash> getAllTransactionHashes() {
-        return allTransactions;
+    public boolean isUnspentTxQueued() {
+        return unspentTransactions != null;
+    }
+
+    /**
+     * Get queued history transactions
+     */
+    public Set<Sha256Hash> getHistoryTxHashes() {
+        return historyTxHashes;
+    }
+
+    /**
+     * Get queued unspent transactions
+     */
+    public Set<Sha256Hash> getUnspentTxHashes() {
+        return unspentTxHashes;
     }
 
     /**
@@ -71,6 +105,13 @@ final public class AddressStatus {
      */
     public HashSet<HistoryTx> getHistoryTxs() {
         return historyTransactions;
+    }
+
+    /**
+     * Get unspent transactions info
+     */
+    public HashSet<UnspentTx> getUnspentTxs() {
+        return unspentTransactions;
     }
 
     @Override
@@ -99,5 +140,25 @@ final public class AddressStatus {
                 "address=" + address +
                 ", status='" + status + '\'' +
                 '}';
+    }
+
+    public boolean isHistoryTxStateApplied() {
+        return historyTxStateApplied;
+    }
+
+    public void setHistoryTxStateApplied(boolean historyTxStateApplied) {
+        this.historyTxStateApplied = historyTxStateApplied;
+    }
+
+    public boolean isUnspentTxStateApplied() {
+        return unspentTxStateApplied;
+    }
+
+    public void setUnspentTxStateApplied(boolean unspentTxStateApplied) {
+        this.unspentTxStateApplied = unspentTxStateApplied;
+    }
+
+    public boolean canCommitStatus() {
+        return !stateMustBeApplied || historyTxStateApplied && unspentTxStateApplied;
     }
 }

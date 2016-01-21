@@ -12,44 +12,44 @@ import javax.annotation.Nullable;
 /**
  * @author John L. Jegutanis
  */
-final public class NxtFamilyAddress implements AbstractAddress {
+final public class NxtAddress implements AbstractAddress {
     private final CoinType type;
     private final byte[] publicKey;
     private final long accountId;
     private final String rsAccount;
 
-    public NxtFamilyAddress(CoinType type, byte[] pubKey) {
+    public NxtAddress(CoinType type, byte[] pubKey) {
         this.type = type;
         publicKey = pubKey;
         accountId = Account.getId(pubKey);
         rsAccount = Convert.rsAccount(type, accountId);
     }
 
-    public NxtFamilyAddress(CoinType type, long accountId, String rsAccount) {
+    public NxtAddress(CoinType type, long accountId, String rsAccount) {
         this.type = type;
         publicKey = null;
-        this. accountId = accountId;
+        this.accountId = accountId;
         this.rsAccount = rsAccount;
     }
 
-    public NxtFamilyAddress(CoinType type, String rsAccount) {
+    public NxtAddress(CoinType type, String rsAccount) {
         this.type = type;
         publicKey = null;
-        this. accountId = Convert.parseAccountId(type, rsAccount);
+        this.accountId = Convert.parseAccountId(type, rsAccount);
         this.rsAccount = rsAccount;
     }
 
-    public NxtFamilyAddress(CoinType type, long accountId) {
+    public NxtAddress(CoinType type, long accountId) {
         this.type = type;
         publicKey = null;
-        this. accountId = accountId;
+        this.accountId = accountId;
         this.rsAccount = Convert.rsAccount(type, accountId);
     }
 
-    public static NxtFamilyAddress fromString(CoinType type, String address)
+    public static NxtAddress fromString(CoinType type, String address)
             throws AddressMalformedException {
         try {
-            return new NxtFamilyAddress(type,
+            return new NxtAddress(type,
                     Crypto.rsDecode(address.replace(type.getAddressPrefix(), "")), address);
         } catch (Exception e) {
             throw new AddressMalformedException(e);
@@ -82,5 +82,25 @@ final public class NxtFamilyAddress implements AbstractAddress {
     @Override
     public long getId() {
         return accountId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        NxtAddress that = (NxtAddress) o;
+
+        if (accountId != that.accountId) return false;
+        if (!type.equals(that.type)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = type.hashCode();
+        result = 31 * result + (int) (accountId ^ (accountId >>> 32));
+        return result;
     }
 }

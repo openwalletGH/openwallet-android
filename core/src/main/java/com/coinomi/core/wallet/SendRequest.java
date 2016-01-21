@@ -17,31 +17,18 @@
 package com.coinomi.core.wallet;
 
 
-import com.coinomi.core.coins.BurstMain;
 import com.coinomi.core.coins.CoinType;
-import com.coinomi.core.coins.NxtMain;
 import com.coinomi.core.coins.Value;
-import com.coinomi.core.coins.families.NxtFamily;
-import com.coinomi.core.coins.nxt.Appendix;
-import com.coinomi.core.coins.nxt.Attachment;
-import com.coinomi.core.coins.nxt.Convert;
-import com.coinomi.core.coins.nxt.TransactionImpl;
 import com.coinomi.core.messages.TxMessage;
-import com.coinomi.core.wallet.families.bitcoin.BitAddress;
-import com.coinomi.core.wallet.families.bitcoin.BitTransaction;
-import com.coinomi.core.wallet.families.nxt.NxtFamilyAddress;
+import com.coinomi.core.wallet.families.bitcoin.CoinSelector;
 import com.google.common.base.Objects;
 import com.google.common.base.Objects.ToStringHelper;
 
-import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.Wallet.MissingSigsMode;
-import org.bitcoinj.wallet.CoinSelector;
 import org.spongycastle.crypto.params.KeyParameter;
 
 import java.io.Serializable;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A SendRequest gives the wallet information about precisely how to send money to a recipient or set of recipients.
@@ -60,19 +47,8 @@ public class SendRequest<T extends AbstractTransaction> implements Serializable 
      * <p>A transaction, probably incomplete, that describes the outline of what you want to do. This typically will
      * mean it has some outputs to the intended destinations, but no inputs or change address (and therefore no
      * fees) - the wallet will calculate all that for you and update tx later.</p>
-     *
-     * <p>Be careful when adding outputs that you check the min output value
-     * ({@link org.bitcoinj.core.TransactionOutput#getMinNonDustValue(Coin)}) to avoid the whole transaction being rejected
-     * because one output is dust.</p>
-     *
-     * <p>If there are already inputs to the transaction, make sure their out point has a connected output,
-     * otherwise their value will be added to fee.  Also ensure they are either signed or are spendable by a wallet
-     * key, otherwise the behavior of {@link WalletPocketHD#completeTransaction(SendRequest)} is undefined (likely
-     * RuntimeException).</p>
      */
     public T tx;
-    // TODO create an NxtSendRequest that contains the builder
-    public com.coinomi.core.coins.nxt.TransactionImpl.BuilderImpl nxtTxBuilder;
 
     /**
      * When emptyWallet is set, all coins selected by the coin selector are sent to the first output in tx
@@ -134,7 +110,7 @@ public class SendRequest<T extends AbstractTransaction> implements Serializable 
     /**
      * If true (the default), the inputs will be signed.
      */
-    public boolean signInputs = true;
+    public boolean signTransaction = true;
 
     /**
      * The AES key to use to decrypt the private keys before signing.
@@ -182,141 +158,20 @@ public class SendRequest<T extends AbstractTransaction> implements Serializable 
     // Tracks if this has been passed to wallet.completeTransaction already: just a safety check.
     private boolean completed;
 
-    private SendRequest() {}
-
-    /**
-     * <p>Creates a new SendRequest to the given address for the given value.</p>
-     *
-     * <p>Be very careful when value is smaller than {@link Transaction#MIN_NONDUST_OUTPUT} as the transaction will
-     * likely be rejected by the network in this case.</p>
-     */
-
-    public static SendRequest to(AbstractAddress destination, Value amount) {
-        SendRequest req = new SendRequest();
-        req.type = destination.getType();
-        checkNotNull(req.type, "Address is for an unknown network");
-        switch (req.type.getFamilyEnum()) {
-            case NXT:
-
-                throw new RuntimeException("Unsupported family: " + req.type.getFamily());
-            case BITCOIN:
-            case NUBITS:
-            case PEERCOIN:
-            case REDDCOIN:
-            case VPNCOIN:
-                break;
-            default:
-            case FIAT:
-                throw new RuntimeException("Unsupported family: " + req.type.getFamily());
-        }
-
-
-        req.feePerKb = req.type.feePerKb();
-        req.fee = req.type.value(0);
-        Transaction tx = new Transaction(req.type);
-        tx.addOutput(amount.toCoin(), (BitAddress) destination);
-        req.tx = new BitTransaction(tx);
-        return req;
-    }
-
-    // TODO combine the following function methods -> SendRequest to(AbstractAddress destination, Value amount) {
-    public static SendRequest to(WalletAccount from, AbstractAddress destination, Value amount) {
-        SendRequest req = new SendRequest();
-        req.type = destination.getType();
-        checkNotNull(req.type, "Address is for an unknown network");
-        switch (req.type.getFamilyEnum()) {
-            case NXT:
-                return to(from, (NxtFamilyAddress) destination, amount);
-            case BITCOIN:
-            case NUBITS:
-            case PEERCOIN:
-            case REDDCOIN:
-            case VPNCOIN:
-                break;
-            default:
-            case FIAT:
-                throw new RuntimeException("Unsupported family: " + req.type.getFamily());
-        }
-
-
-        req.feePerKb = req.type.feePerKb();
-        req.fee = req.type.value(0);
-        Transaction tx = new Transaction(req.type);
-        tx.addOutput(amount.toCoin(), (BitAddress) destination);
-        req.tx = new BitTransaction(tx);
-        return req;
-    }
-
-    public static SendRequest to(WalletAccount from, NxtFamilyAddress destination, Value amount) {
-        SendRequest req = new SendRequest();
-        req.type = destination.getType();
-        switch (req.type.getFeePolicy()) {
+    protected SendRequest(CoinType type) {
+        this.type = type;
+        switch (type.getFeePolicy()) {
             case FLAT_FEE:
-                req.feePerKb = req.type.value(0);
-                req.fee = req.type.feePerKb();
+                feePerKb = type.value(0);
+                fee = type.feePerKb();
                 break;
             case FEE_PER_KB:
-                req.feePerKb = req.type.feePerKb();
-                req.fee = req.type.value(0);
+                feePerKb = type.feePerKb();
+                fee = type.value(0);
                 break;
             default:
-                throw new RuntimeException("Unknown fee policy: " + req.type.getFeePolicy());
+                throw new RuntimeException("Unknown fee policy: " + type.getFeePolicy());
         }
-
-        byte version = (byte) 1;
-        int timestamp;
-        if (req.type.equals(NxtMain.get())) {
-            timestamp = Convert.toNxtEpochTime(System.currentTimeMillis());
-        } else if (req.type.equals(BurstMain.get())){
-            timestamp = Convert.toBurstEpochTime(System.currentTimeMillis());
-        } else {
-            throw new RuntimeException("Unexpected NXT family type: " + req.type.toString());
-        }
-
-        TransactionImpl.BuilderImpl builder = new TransactionImpl.BuilderImpl(version,
-                from.getPublicKey(), amount.value, req.fee.value, timestamp,
-                NxtFamily.DEFAULT_DEADLINE, Attachment.ORDINARY_PAYMENT);
-
-        builder.recipientId(destination.getAccountId());
-
-        // TODO extra check, query the server if the public key announcement is actually needed
-        if (destination.getPublicKey() != null) {
-            Appendix.PublicKeyAnnouncement publicKeyAnnouncement
-                    = new Appendix.PublicKeyAnnouncement(destination.getPublicKey());
-            builder.publicKeyAnnouncement(publicKeyAnnouncement);
-        }
-
-        req.nxtTxBuilder = builder;
-
-        return req;
-    }
-
-    // TODO implement a universal method for Bitcoin and NXT that uses AbstractAddress destination
-    public static SendRequest emptyWallet(AbstractAddress destination) {
-        SendRequest req = new SendRequest();
-        req.type = destination.getType();
-        checkNotNull(req.type, "Address is for an unknown network");
-        switch (req.type.getFamilyEnum()) {
-            case NXT:
-                throw new RuntimeException("Not implemented");
-
-            case BITCOIN:
-            case NUBITS:
-            case PEERCOIN:
-            case REDDCOIN:
-            case VPNCOIN:
-                break;
-            default:
-            case FIAT:
-                throw new RuntimeException("Unsupported family: " + req.type.getFamily());
-        }
-
-        req.feePerKb = req.type.feePerKb();
-        Transaction tx = new Transaction(req.type);
-        tx.addOutput(Coin.ZERO, (BitAddress) destination);
-        req.emptyWallet = true;
-        req.tx = new BitTransaction(tx);
-        return req;
     }
 
     @Override
@@ -328,7 +183,7 @@ public class SendRequest<T extends AbstractTransaction> implements Serializable 
         helper.add("fee", fee);
         helper.add("feePerKb", feePerKb);
         helper.add("ensureMinRequiredFee", ensureMinRequiredFee);
-        helper.add("signInputs", signInputs);
+        helper.add("signTransaction", signTransaction);
         helper.add("aesKey", aesKey != null ? "set" : null); // careful to not leak the key
         helper.add("coinSelector", coinSelector);
         helper.add("shuffleOutputs", shuffleOutputs);

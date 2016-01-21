@@ -93,16 +93,16 @@ public class NxtFamilyWalletTest {
         assertArrayEquals(nxtPrivateKey, privateKey);
         assertEquals(nxtRsAddress, nxtAccount.getPublicKeyMnemonic());
         assertArrayEquals(nxtPublicKey, publicKey);
-        NxtFamilyAddress address = (NxtFamilyAddress) nxtAccount.getReceiveAddress();
+        NxtAddress address = (NxtAddress) nxtAccount.getReceiveAddress();
         assertEquals(nxtRsAddress, address.toString());
         assertEquals(nxtAccountId, address.getAccountId());
     }
 
     @Test
     public void testNxtTransaction() throws WalletAccount.WalletAccountException, NxtException.ValidationException {
-        NxtFamilyAddress destination = (NxtFamilyAddress) otherAccount.getReceiveAddress();
+        NxtAddress destination = (NxtAddress) otherAccount.getReceiveAddress();
         Value amount = NXT.value("1");
-        SendRequest req = nxtAccount.sendCoinsOffline(destination, amount);
+        NxtSendRequest req = nxtAccount.sendCoinsOffline(destination, amount);
         nxtAccount.completeAndSignTx(req);
 
         Transaction nxtTx = req.nxtTxBuilder.build();
@@ -115,7 +115,7 @@ public class NxtFamilyWalletTest {
         Transaction parsedTx = TransactionImpl.parseTransaction(txBytes);
         assertEquals(Attachment.ORDINARY_PAYMENT, parsedTx.getAttachment());
         assertEquals(NxtFamily.DEFAULT_DEADLINE, parsedTx.getDeadline());
-        assertEquals(((Transaction) req.tx.getRawTransaction()).getTimestamp(), parsedTx.getTimestamp());
+        assertEquals((req.tx.getRawTransaction()).getTimestamp(), parsedTx.getTimestamp());
         assertEquals(nxtAccountId, parsedTx.getSenderId());
         assertArrayEquals(nxtPublicKey, parsedTx.getSenderPublicKey());
         assertEquals(amount.value, parsedTx.getAmountNQT());
@@ -155,8 +155,5 @@ public class NxtFamilyWalletTest {
         assertEquals(Convert.toHexString(nxtAccount.getPublicKey()), Convert.toHexString(newWallet.getPublicKey()));
         assertEquals(nxtAccount.getPublicKeyMnemonic(), newWallet.getPublicKeyMnemonic());
         assertEquals(nxtAccount.getId(), newWallet.getId());
-        
     }
-
-
 }

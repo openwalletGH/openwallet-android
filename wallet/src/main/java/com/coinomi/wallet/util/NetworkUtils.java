@@ -23,7 +23,7 @@ public class NetworkUtils {
             httpClient.setConnectionSpecs(Collections.singletonList(ConnectionSpec.MODERN_TLS));
             httpClient.setConnectTimeout(Constants.HTTP_TIMEOUT_MS, TimeUnit.MILLISECONDS);
             // Setup cache
-            File cacheDir = new File(context.getCacheDir(), Constants.HTTP_CACHE_DIR);
+            File cacheDir = new File(context.getCacheDir(), Constants.HTTP_CACHE_NAME);
             Cache cache = new Cache(cacheDir, Constants.HTTP_CACHE_SIZE);
             httpClient.setCache(cache);
         }

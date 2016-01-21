@@ -75,6 +75,7 @@ public class WalletApplication extends Application {
 
     private ConnectivityManager connManager;
     private ShapeShift shapeShift;
+    private File txCachePath;
 
     @Override
     public void onCreate() {
@@ -95,7 +96,6 @@ public class WalletApplication extends Application {
 
         packageInfo = packageInfoFromContext(this);
 
-
         activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
 
         coinServiceIntent = new Intent(this, CoinServiceImpl.class);
@@ -103,6 +103,8 @@ public class WalletApplication extends Application {
                 null, this, CoinServiceImpl.class);
         coinServiceCancelCoinsReceivedIntent = new Intent(CoinService.ACTION_CANCEL_COINS_RECEIVED,
                 null, this, CoinServiceImpl.class);
+
+        createTxCache();
 
         // Set MnemonicCode.INSTANCE if needed
         if (MnemonicCode.INSTANCE == null) {
@@ -115,7 +117,6 @@ public class WalletApplication extends Application {
 
         config.updateLastVersionCode(packageInfo.versionCode);
 
-
         connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
         walletFile = getFileStreamPath(Constants.WALLET_FILENAME_PROTOBUF);
@@ -124,6 +125,29 @@ public class WalletApplication extends Application {
         afterLoadWallet();
 
         Fonts.initFonts(this.getAssets());
+    }
+
+    private void createTxCache() {
+        txCachePath = new File(this.getCacheDir(), Constants.TX_CACHE_NAME);
+        if (!txCachePath.exists()) {
+            if (!txCachePath.mkdirs()) {
+                txCachePath = null;
+                log.error("Error creating transaction cache folder");
+                return;
+            }
+        }
+
+        // Make cache dirs for all coins
+        for (CoinType type : Constants.SUPPORTED_COINS) {
+            File coinCachePath = new File(txCachePath, type.getId());
+            if (!coinCachePath.exists()) {
+                if (!coinCachePath.mkdirs()) {
+                    txCachePath = null;
+                    log.error("Error creating transaction cache folder");
+                    return;
+                }
+            }
+        }
     }
 
     public boolean isConnected() {
@@ -136,6 +160,10 @@ public class WalletApplication extends Application {
             shapeShift = new ShapeShift(NetworkUtils.getHttpClient(getApplicationContext()));
         }
         return shapeShift;
+    }
+
+    public File getTxCachePath() {
+        return txCachePath;
     }
 
     /**

@@ -21,15 +21,14 @@ package com.coinomi.core.uri;
 import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
-import com.coinomi.core.coins.families.Families;
 import com.coinomi.core.coins.families.NxtFamily;
+import com.coinomi.core.exceptions.AddressMalformedException;
 import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.AbstractAddress;
 import com.coinomi.core.wallet.families.bitcoin.BitAddress;
-import com.coinomi.core.wallet.families.nxt.NxtFamilyAddress;
+import com.coinomi.core.wallet.families.nxt.NxtAddress;
 import com.google.common.collect.Lists;
 
-import org.bitcoinj.core.AddressFormatException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -206,16 +205,16 @@ public class CoinURI {
             AbstractAddress address = null;
             // TODO support non-BitAddress types
             for (CoinType possibleType : possibleTypes) {
-                if (possibleType.getFamily() == Families.NXT) {
-                    address = new NxtFamilyAddress(possibleType, addressToken);
+                if (possibleType instanceof NxtFamily) {
+                    address = new NxtAddress(possibleType, addressToken);
                     putWithValidation(FIELD_ADDRESS, address);
                     break;
                 }
                 try {
-                    address = new BitAddress(possibleType, addressToken);
+                    address = BitAddress.from(possibleType, addressToken);
                     putWithValidation(FIELD_ADDRESS, address);
                     break;
-                } catch (final AddressFormatException e) {
+                } catch (final AddressMalformedException e) {
                     /* continue */
                 }
             }

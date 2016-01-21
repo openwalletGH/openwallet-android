@@ -141,7 +141,7 @@ public class StratumClient extends AbstractExecutionThreadService {
         }
         try {
             socket = createSocket();
-            log.debug("Creating I/O streams to socket: {}", socket);
+            log.info("Creating I/O streams to socket: {}", socket);
             toServer = new DataOutputStream(socket.getOutputStream());
             fromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         } catch (Exception e) {
