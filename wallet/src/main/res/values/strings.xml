@@ -184,6 +184,7 @@
     <!-- About Activity -->
     <string name="title_activity_about">About Coinomi</string>
     <string name="app_name_long">Coinomi for Android</string>
+    <string name="about_coinomi">https://coinomi.com</string>
     <string name="about_licence">An open source project\nhttps://github.com/Coinomi/coinomi-android\nSource code licensed under GNU General Public License 3</string>
     <string name="about_credits_nubits">Server infrastructure donated by NuBits - The World\'s First Stable Digital Currency\nhttps://nubits.com/</string>
     <string name="about_credits_translations">Translations provided by:</string>
