@@ -36,6 +36,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="top"
                 style="@style/PagerTabStrip"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
                 android:paddingTop="4dp"
                 android:paddingBottom="4dp" />
 

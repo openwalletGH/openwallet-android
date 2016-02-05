@@ -37,7 +37,7 @@ public class AmountEditView extends RelativeLayout {
     @Nullable private Value hint;
     private MonetaryFormat hintFormat = new MonetaryFormat().noCode();
 
-    public static interface Listener {
+    public interface Listener {
         void changed();
         void focusChanged(final boolean hasFocus);
     }
