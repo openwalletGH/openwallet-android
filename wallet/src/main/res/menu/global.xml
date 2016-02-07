@@ -6,6 +6,11 @@
         android:orderInCategory="103"
         app:showAsAction="never" />
 
+    <item android:id="@+id/action_support"
+        android:title="@string/action_support"
+        android:orderInCategory="104"
+        app:showAsAction="never" />
+
     <item android:id="@+id/action_about"
         android:title="@string/action_about"
         android:orderInCategory="200"

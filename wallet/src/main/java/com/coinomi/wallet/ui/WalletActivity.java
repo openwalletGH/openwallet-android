@@ -511,12 +511,37 @@ final public class WalletActivity extends BaseWalletActivity implements
         } else if (id == R.id.action_account_details) {
             accountDetails();
             return true;
+        } else if (id == R.id.action_support) {
+            sendSupportEmail();
+            return true;
         } else if (id == R.id.action_about) {
             startActivity(new Intent(WalletActivity.this, AboutActivity.class));
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void sendSupportEmail() {
+//        Intent i = new Intent(Intent.ACTION_SENDTO,
+//                Uri.fromParts("mailto", Constants.SUPPORT_EMAIL, null));
+//        i.putExtra(Intent.EXTRA_EMAIL, new String[]{Constants.SUPPORT_EMAIL});
+//        try {
+//            startActivity(Intent.createChooser(i,
+//                    getResources().getString(R.string.action_support)));
+//        } catch (android.content.ActivityNotFoundException ex) {
+//            Toast.makeText(this, R.string.error_generic, Toast.LENGTH_SHORT).show();
+//        }
+        Intent intent = new Intent(Intent.ACTION_SENDTO);
+        intent.setData(Uri.parse("mailto:")); // only email apps should handle this
+        intent.putExtra(Intent.EXTRA_EMAIL, new String[]{Constants.SUPPORT_EMAIL});
+        intent.putExtra(Intent.EXTRA_SUBJECT, "");
+        try {
+            startActivity(Intent.createChooser(intent,
+                    getResources().getString(R.string.support_message)));
+        } catch (android.content.ActivityNotFoundException ex) {
+            Toast.makeText(this, R.string.error_generic, Toast.LENGTH_SHORT).show();
+        }
     }
 
     void startExchangeRates() {

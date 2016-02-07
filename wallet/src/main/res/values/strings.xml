@@ -9,6 +9,7 @@
     <string name="action_edit_label">Edit label</string>
     <string name="action_empty_wallet">Empty wallet</string>
     <string name="action_settings">Settings</string>
+    <string name="action_support">Contact support</string>
     <string name="action_about">About</string>
     <string name="action_refresh">Refresh</string>
     <string name="action_sign_verify_message">Sign/verify message</string>
@@ -321,4 +322,6 @@
     <string name="account_private_key_label">private key</string>
     <string name="account_extended_private_key_label">extended private key</string>
     <string name="account_private_key_warning">The private key allows you to send coins from this account. It is not necessary to backup this key as it is derived from your <i>recovery phrase</i></string>
+    <!-- Support -->
+    <string name="support_message">Contact Coinomi support</string>
 </resources>
