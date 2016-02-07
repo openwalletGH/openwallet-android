@@ -12,6 +12,7 @@ import com.coinomi.core.wallet.TransactionWatcherWallet;
 import com.coinomi.core.wallet.WalletAccount;
 import com.google.common.collect.ImmutableList;
 
+import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.TransactionBag;
@@ -184,22 +185,6 @@ public final class BitTransaction implements AbstractTransaction {
         }
     }
 
-    private boolean isOutputAvailable(int index) {
-        if (tx instanceof TrimmedTransaction) {
-            return ((TrimmedTransaction) tx).isOutputAvailable(index);
-        } else {
-            return index < getNumberOfOutputs();
-        }
-    }
-
-    private long getNumberOfOutputs() {
-        if (tx instanceof TrimmedTransaction) {
-            return ((TrimmedTransaction) tx).getNumberOfOutputs();
-        } else {
-            return tx.getOutputs().size();
-        }
-    }
-
     public Value getValueReceived() {
         return isTrimmed ? valueReceived : type.value(0);
     }
@@ -212,6 +197,25 @@ public final class BitTransaction implements AbstractTransaction {
     @Nullable
     public Value getFee() {
         return isTrimmed ? fee : type.value(tx.getFee());
+    }
+
+    @Nullable
+    public Value getRawTxFee(TransactionWatcherWallet wallet) {
+        checkState(!isTrimmed, "Cannot get raw tx fee from a trimmed transaction");
+        Value fee = type.value(0);
+        for (TransactionInput input : tx.getInputs()) {
+            TransactionOutPoint outPoint = input.getOutpoint();
+            BitTransaction inTx = wallet.getTransaction(outPoint.getHash());
+            if (inTx == null || !inTx.isOutputAvailable((int) outPoint.getIndex())) {
+                return null;
+            }
+            TransactionOutput txo = inTx.getOutput((int) outPoint.getIndex());
+            fee = fee.add(txo.getValue());
+        }
+        for (TransactionOutput output : getOutputs()) {
+            fee = fee.subtract(output.getValue());
+        }
+        return fee;
     }
 
     @Override
@@ -296,6 +300,22 @@ public final class BitTransaction implements AbstractTransaction {
             return ((TrimmedTransaction) tx).getOutputs(includeEmptyOutputs);
         } else {
             return tx.getOutputs();
+        }
+    }
+
+    private boolean isOutputAvailable(int index) {
+        if (tx instanceof TrimmedTransaction) {
+            return ((TrimmedTransaction) tx).isOutputAvailable(index);
+        } else {
+            return index < getNumberOfOutputs();
+        }
+    }
+
+    private long getNumberOfOutputs() {
+        if (tx instanceof TrimmedTransaction) {
+            return ((TrimmedTransaction) tx).getNumberOfOutputs();
+        } else {
+            return tx.getOutputs().size();
         }
     }
 

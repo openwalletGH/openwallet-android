@@ -128,6 +128,10 @@ public class Value implements Monetary, Comparable<Value>, Serializable {
         return new Value(this.type, LongMath.checkedSubtract(this.value, value.value));
     }
 
+    public Value subtract(final Coin value) {
+        return new Value(this.type, LongMath.checkedSubtract(this.value, value.value));
+    }
+
     public Value subtract(String str) {
         return subtract(type.value(str));
     }

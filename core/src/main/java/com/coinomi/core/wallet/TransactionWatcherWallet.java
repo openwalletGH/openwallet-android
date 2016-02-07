@@ -30,7 +30,6 @@ import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.TransactionBag;
 import org.bitcoinj.core.TransactionConfidence;
-import org.bitcoinj.core.TransactionConfidence.ConfidenceType;
 import org.bitcoinj.core.TransactionConfidence.Source;
 import org.bitcoinj.core.TransactionInput;
 import org.bitcoinj.core.TransactionOutPoint;
@@ -58,6 +57,9 @@ import javax.annotation.Nullable;
 
 import static com.coinomi.core.Preconditions.checkNotNull;
 import static com.coinomi.core.Preconditions.checkState;
+import static org.bitcoinj.core.TransactionConfidence.ConfidenceType.BUILDING;
+import static org.bitcoinj.core.TransactionConfidence.ConfidenceType.PENDING;
+import static org.bitcoinj.core.TransactionConfidence.ConfidenceType.UNKNOWN;
 
 /**
  * @author John L. Jegutanis
@@ -256,8 +258,10 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<BitTransac
 
         final Value valueSent = transaction.getValueSent(this);
         final Value valueReceived = transaction.getValueReceived(this);
-        final Value fee = transaction.getFee();
         boolean isReceiving = valueReceived.compareTo(valueSent) > 0;
+
+        // Remove fee when receiving
+        final Value fee = isReceiving ? null : transaction.getRawTxFee(this);
 
         WalletTransaction.Pool txPool;
         if (confirmed.containsKey(hash)) {
@@ -284,7 +288,7 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<BitTransac
         TransactionConfidence txConf = tx.getConfidence();
         txConf.setSource(fullTxConf.getSource());
         txConf.setConfidenceType(fullTxConf.getConfidenceType());
-        if (txConf.getConfidenceType() == ConfidenceType.BUILDING) {
+        if (txConf.getConfidenceType() == BUILDING) {
             txConf.setAppearedAtChainHeight(fullTxConf.getAppearedAtChainHeight());
             txConf.setDepthInBlocks(fullTxConf.getDepthInBlocks());
         }
@@ -706,7 +710,7 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<BitTransac
 
     private void maybeUpdateBlockDepth(BitTransaction tx, boolean updateUtxoSet) {
         checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
-        if (tx.getConfidenceType() != ConfidenceType.BUILDING) return;
+        if (tx.getConfidenceType() != BUILDING) return;
         int newDepth = lastBlockSeenHeight - tx.getAppearedAtChainHeight() + 1;
         if (newDepth > 1) {
             tx.setDepthInBlocks(newDepth);
@@ -869,7 +873,7 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<BitTransac
             // If not present add it now
             if (!unspentOutputs.containsKey(outPoint)) {
                 OutPointOutput utxo = new OutPointOutput(tx, outPoint.getIndex());
-                if (tx.getConfidenceType() == ConfidenceType.BUILDING) {
+                if (tx.getConfidenceType() == BUILDING) {
                     utxo.setAppearedAtChainHeight(tx.getAppearedAtChainHeight());
                     utxo.setDepthInBlocks(tx.getDepthInBlocks());
                 }
@@ -904,12 +908,27 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<BitTransac
         if (status.canCommitStatus()) commitAddressStatus(status);
     }
 
-    private void checkTxConfirmation(HistoryTx unspentTx, BitTransaction tx) {
-        if (unspentTx.getHeight() > 0 && tx.getDepthInBlocks() == 0) {
-            int height = unspentTx.getHeight();
-            setAppearedAtChainHeight(tx, height, true);
-            maybeUpdateBlockDepth(tx, true);
-            maybeMovePool(tx);
+    private void checkTxConfirmation(HistoryTx historyTx, BitTransaction tx) {
+        int height = historyTx.getHeight();
+        TransactionConfidence.ConfidenceType confidence = tx.getConfidenceType();
+        if (height > 0) {
+            switch (confidence) {
+                case BUILDING:
+                    // If the height is the same, don't do anything
+                    if (tx.getAppearedAtChainHeight() == historyTx.getHeight()) {
+                        break;
+                    }
+                case PENDING:
+                    setAppearedAtChainHeight(tx, height, true);
+                    maybeUpdateBlockDepth(tx, true);
+                    maybeMovePool(tx);
+                    break;
+                case DEAD:
+                case UNKNOWN:
+                default:
+                    throw new RuntimeException("Unsupported confidence type: " +
+                            tx.getConfidenceType().name());
+            }
         }
     }
 
@@ -934,7 +953,7 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<BitTransac
     private void maybeMovePool(BitTransaction tx) {
         lock.lock();
         try {
-            if (tx.getConfidenceType() == ConfidenceType.BUILDING) {
+            if (tx.getConfidenceType() == BUILDING) {
                 // Transaction is confirmed, move it
                 if (pending.remove(tx.getHash()) != null) {
                     confirmed.put(tx.getHash(), tx);
@@ -963,6 +982,12 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<BitTransac
             log.info("Going to fetch transaction with hash {}", txHash);
             if (blockchainConnection != null) {
                 blockchainConnection.getTransaction(txHash, this);
+            }
+        } else if (fetchingTransactions.containsKey(txHash)) {
+            // Check if we should update the confirmation height
+            Integer txHeight = fetchingTransactions.get(txHash);
+            if (height != null && txHeight != null && height < txHeight) {
+                fetchingTransactions.put(txHash, height);
             }
         }
     }
@@ -995,13 +1020,13 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<BitTransac
 
             // This tx not in wallet, add it
             if (!rawTransactions.containsKey(hash) && !outOfOrderTransactions.containsKey(hash)) {
-                if (tx.getConfidenceType() == ConfidenceType.UNKNOWN) {
+                if (tx.getConfidenceType() == UNKNOWN) {
                     // Set if transaction is confirmed
                     if (appearedInHeight != null && appearedInHeight > 0) {
                         setAppearedAtChainHeight(tx, appearedInHeight, false);
                         maybeUpdateBlockDepth(tx, false);
                     } else {
-                        tx.setConfidenceType(ConfidenceType.PENDING);
+                        tx.setConfidenceType(PENDING);
                     }
                 }
 
@@ -1017,6 +1042,10 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<BitTransac
                 if (!missingTransactions.isEmpty()) {
                     outOfOrderTransactions.put(hash,
                             new AbstractMap.SimpleImmutableEntry<>(tx, missingTransactions));
+                    // Fetch the missing Transactions
+                    for (Sha256Hash missingTx : missingTransactions) {
+                        fetchTransactionIfNeeded(missingTx, appearedInHeight);
+                    }
                     return;
                 }
 
