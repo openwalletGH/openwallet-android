@@ -2,6 +2,7 @@ package com.coinomi.core.wallet;
 
 import com.coinomi.core.CoreUtils;
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.coins.Value;
 import com.coinomi.core.coins.families.BitFamily;
 import com.coinomi.core.coins.families.NxtFamily;
 import com.coinomi.core.exceptions.UnsupportedCoinTypeException;
@@ -691,6 +692,19 @@ final public class Wallet {
             return Splitter.on(" ").splitToList(new String(mnemonicCode, "UTF-8"));
         } catch (UnsupportedEncodingException e) {
             throw new UnreadableWalletException(e.toString());
+        }
+    }
+
+    public List<Value> getBalances() {
+        ImmutableList.Builder<Value> builder = ImmutableList.builder();
+        lock.lock();
+        try {
+            for (WalletAccount account : accounts.values()) {
+                builder.add(account.getBalance());
+            }
+            return builder.build();
+        } finally {
+            lock.unlock();
         }
     }
 

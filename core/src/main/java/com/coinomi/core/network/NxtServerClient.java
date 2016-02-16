@@ -54,7 +54,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
  */
 public class NxtServerClient implements BlockchainConnection<NxtTransaction> {
 
-    private static final int POLL_INTERVAL_SEC = 5;
+    private static final int POLL_INTERVAL_SEC = 30;
 
     private static final Logger log = LoggerFactory.getLogger(NxtServerClient.class);
 
@@ -111,7 +111,7 @@ public class NxtServerClient implements BlockchainConnection<NxtTransaction> {
                     // Start polling for connection to become available
                     if (!isPolling) log.info("No connectivity, starting polling.");
                     connectionExec.remove(reconnectTask);
-                    connectionExec.schedule(reconnectTask, 1, TimeUnit.SECONDS);
+                    connectionExec.schedule(reconnectTask, 10, TimeUnit.SECONDS);
                     isPolling = true;
                 }
             } else {

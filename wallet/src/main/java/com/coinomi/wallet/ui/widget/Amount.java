@@ -19,6 +19,7 @@ public class Amount extends LinearLayout {
     private final TextView symbolView;
 //    private final TextView amountPending;
     boolean isBig = false;
+    boolean isSmall = false;
     boolean isSingleLine = false;
 
     public Amount(Context context, AttributeSet attrs) {
@@ -34,6 +35,7 @@ public class Amount extends LinearLayout {
                 R.styleable.Amount, 0, 0);
         try {
             isBig = a.getBoolean(R.styleable.Amount_show_big, false);
+            isSmall = a.getBoolean(R.styleable.Amount_show_small, false);
             isSingleLine = a.getBoolean(R.styleable.Amount_single_line, false);
         } finally {
             a.recycle();
@@ -45,6 +47,10 @@ public class Amount extends LinearLayout {
             if (isBig) {
                 amountView.setTextAppearance(context, R.style.AmountBig);
                 symbolView.setTextAppearance(context, R.style.AmountSymbolBig);
+            } else if (isSmall) {
+                amountView.setTextAppearance(context, R.style.AmountSmall);
+                symbolView.setTextAppearance(context, R.style.AmountSymbolSmall);
+
             } else {
                 amountView.setTextAppearance(context, R.style.Amount);
                 symbolView.setTextAppearance(context, R.style.AmountSymbol);

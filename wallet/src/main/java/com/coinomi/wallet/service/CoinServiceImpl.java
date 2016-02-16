@@ -360,19 +360,34 @@ public class CoinServiceImpl extends Service implements CoinService {
                 Wallet wallet = application.getWallet();
                 if (intent.hasExtra(Constants.ARG_ACCOUNT_ID)) {
                     lastAccount = intent.getStringExtra(Constants.ARG_ACCOUNT_ID);
-                    WalletAccount pocket = wallet.getAccount(lastAccount);
-                    if (pocket != null) {
+                    WalletAccount account = wallet.getAccount(lastAccount);
+                    if (account != null) {
                         if (clients == null && connHelper.isConnected()) {
                             clients = getServerClients(wallet);
                         }
 
-                        if (clients != null) clients.startAsync(pocket);
+                        if (clients != null) clients.startAsync(account);
                     } else {
-                        log.warn("Tried to start a service for account id {} but no pocket found.",
+                        log.warn("Tried to start a service for account id {} but no account found.",
                                 lastAccount);
                     }
                 } else {
                     log.warn("Missing account id argument, not doing anything");
+                }
+            } else {
+                log.error("Got connect coin intent, but no wallet is available");
+            }
+        } else if (CoinService.ACTION_CONNECT_ALL_COIN.equals(action)) {
+            if (application.getWallet() != null) {
+                Wallet wallet = application.getWallet();
+                if (clients == null && connHelper.isConnected()) {
+                    clients = getServerClients(wallet);
+                }
+
+                if (clients != null) {
+                    for (WalletAccount account : wallet.getAllAccounts()) {
+                        clients.startAsync(account);
+                    }
                 }
             } else {
                 log.error("Got connect coin intent, but no wallet is available");

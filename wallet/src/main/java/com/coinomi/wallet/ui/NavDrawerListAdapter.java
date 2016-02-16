@@ -74,6 +74,7 @@ public class NavDrawerListAdapter extends BaseAdapter {
                     row = inflater.inflate(R.layout.nav_drawer_section_title, null);
                     break;
                 case ITEM_COIN:
+                case ITEM_OVERVIEW:
                 case ITEM_TRADE:
                     row = new NavDrawerItemView(context);
                     break;
@@ -91,6 +92,7 @@ public class NavDrawerListAdapter extends BaseAdapter {
                 if (row instanceof TextView) ((TextView)row).setText(item.title);
                 break;
             case ITEM_COIN:
+            case ITEM_OVERVIEW:
             case ITEM_TRADE:
                 ((NavDrawerItemView) row).setData(item.title, item.iconRes);
                 break;

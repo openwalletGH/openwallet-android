@@ -252,6 +252,8 @@
     <string name="seed_password_protected">This recovery phrase is protected with a BIP39 passphrase</string>
     <!-- Wallet locked -->
     <string name="touch_to_decrypt_wallet">Touch to unlock</string>
+    <!-- Overview -->
+    <string name="title_activity_overview">Overview</string>
     <!-- Exchange -->
     <string name="title_activity_trade">Exchange</string>
     <string name="trade_info">Select the coins you wish to exchange.\nThe converted coins will be automatically added to your wallet.</string>
