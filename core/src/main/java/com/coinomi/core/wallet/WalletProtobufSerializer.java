@@ -2,16 +2,12 @@ package com.coinomi.core.wallet;
 
 import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
-import com.coinomi.core.coins.DashMain;
-import com.coinomi.core.coins.DogecoindarkMain;
 import com.coinomi.core.coins.families.BitFamily;
 import com.coinomi.core.coins.families.NxtFamily;
-import com.coinomi.core.network.ServerClient;
 import com.coinomi.core.protos.Protos;
 import com.coinomi.core.util.KeyUtils;
 import com.coinomi.core.wallet.families.bitcoin.BitTransaction;
 import com.coinomi.core.wallet.families.bitcoin.OutPointOutput;
-import com.coinomi.core.wallet.families.bitcoin.TrimmedOutPoint;
 import com.coinomi.core.wallet.families.nxt.NxtFamilyWallet;
 import com.coinomi.core.wallet.families.nxt.NxtFamilyWalletProtobufSerializer;
 import com.google.common.base.Splitter;
@@ -36,7 +32,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.coinomi.core.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static org.bitcoinj.core.TransactionConfidence.ConfidenceType.BUILDING;
 
@@ -334,11 +329,11 @@ public class WalletProtobufSerializer {
             }
             // Update coin type ids
             if (account.getNetworkIdentifier().equals("dogecoindark.main")) {
-                account.setNetworkIdentifier(DogecoindarkMain.get().getId());
+                account.setNetworkIdentifier("verge.main");
                 b.setPockets(i, account);
             }
             if (account.getNetworkIdentifier().equals("darkcoin.main")) {
-                account.setNetworkIdentifier(DashMain.get().getId());
+                account.setNetworkIdentifier("dash.main");
                 b.setPockets(i, account);
             }
         }

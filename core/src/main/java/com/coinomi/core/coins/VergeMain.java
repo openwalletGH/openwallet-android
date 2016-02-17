@@ -5,8 +5,8 @@ import com.coinomi.core.coins.families.PeerFamily;
 /**
  * @author John L. Jegutanis
  */
-public class DogecoindarkMain extends PeerFamily {
-    private DogecoindarkMain() {
+public class VergeMain extends PeerFamily {
+    private VergeMain() {
         id = "verge.main";
 
         addressHeader = 30;
@@ -15,19 +15,19 @@ public class DogecoindarkMain extends PeerFamily {
         spendableCoinbaseDepth = 100;
         dumpedPrivateKeyHeader = 158;
 
-        name = "Dogecoindark (beta)";
-        symbol = "DOGED";
-        uriScheme = "dogecoindark";
+        name = "Verge";
+        symbol = "XVG";
+        uriScheme = "verge";
         bip44Index = 77;
         unitExponent = 6;
         feeValue = value(100000);
         minNonDust = value(100000);
-        softDustLimit = value(100000); // 0.1 DOGED
+        softDustLimit = value(100000);
         softDustPolicy = SoftDustPolicy.BASE_FEE_FOR_EACH_SOFT_DUST_TXO;
     }
 
-    private static DogecoindarkMain instance = new DogecoindarkMain();
-    public static synchronized DogecoindarkMain get() {
+    private static VergeMain instance = new VergeMain();
+    public static synchronized VergeMain get() {
         return instance;
     }
 }

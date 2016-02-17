@@ -18,7 +18,7 @@ import com.coinomi.core.coins.DigibyteMain;
 import com.coinomi.core.coins.DigitalcoinMain;
 import com.coinomi.core.coins.DogecoinMain;
 import com.coinomi.core.coins.DogecoinTest;
-import com.coinomi.core.coins.DogecoindarkMain;
+import com.coinomi.core.coins.VergeMain;
 import com.coinomi.core.coins.FeathercoinMain;
 import com.coinomi.core.coins.GcrMain;
 import com.coinomi.core.coins.GuldenMain;
@@ -184,8 +184,8 @@ public class Constants {
                     new ServerAddress("176.9.65.41", 7876)),
             new CoinAddress(BurstMain.get(),        new ServerAddress("burst-cce-1.coinomi.net", 5051),
                                                     new ServerAddress("burst-cce-2.coinomi.net", 5051)),
-            new CoinAddress(DogecoindarkMain.get(), new ServerAddress("doged-cce-1.coinomi.net", 5036),
-                                                    new ServerAddress("doged-cce-2.coinomi.net", 5036)),
+            new CoinAddress(VergeMain.get(),        new ServerAddress("electrum-verge.xyz", 50001),
+                                                    new ServerAddress("electrum-verge.xyz", 50001)),
             new CoinAddress(GcrMain.get(),          new ServerAddress("gcr-cce-1.coinomi.net", 5038),
                                                     new ServerAddress("gcr-cce-2.coinomi.net", 5038)),
             new CoinAddress(PotcoinMain.get(),      new ServerAddress("pot-cce-1.coinomi.net", 5039),
@@ -232,7 +232,7 @@ public class Constants {
         COINS_ICONS.put(CoinID.CANADAECOIN_MAIN.getCoinType(), R.drawable.canadaecoin);
         COINS_ICONS.put(CoinID.SHADOWCASH_MAIN.getCoinType(), R.drawable.shadowcash);
         COINS_ICONS.put(CoinID.PARKBYTE_MAIN.getCoinType(), R.drawable.parkbyte);
-        COINS_ICONS.put(CoinID.DOGECOINDARK_MAIN.getCoinType(), R.drawable.dogecoindark);
+        COINS_ICONS.put(CoinID.VERGE_MAIN.getCoinType(), R.drawable.verge);
         COINS_ICONS.put(CoinID.CLAMS_MAIN.getCoinType(), R.drawable.clams);
         COINS_ICONS.put(CoinID.GCR_MAIN.getCoinType(), R.drawable.gcr);
         COINS_ICONS.put(CoinID.POTCOIN_MAIN.getCoinType(), R.drawable.potcoin);
@@ -269,7 +269,7 @@ public class Constants {
         COINS_BLOCK_EXPLORERS.put(CoinID.CANADAECOIN_MAIN.getCoinType(), "http://explorer.canadaecoin.ca/tx/%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.SHADOWCASH_MAIN.getCoinType(), "http://shadowchain.info/tx/%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.PARKBYTE_MAIN.getCoinType(), "https://chainz.cryptoid.info/pkb/tx.dws?%s");
-        COINS_BLOCK_EXPLORERS.put(CoinID.DOGECOINDARK_MAIN.getCoinType(), "http://darkchain.link/tx/%s");
+        COINS_BLOCK_EXPLORERS.put(CoinID.VERGE_MAIN.getCoinType(), "http://blockexperts.com/xvg/tx/%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.CLAMS_MAIN.getCoinType(), "http://khashier.com/tx/%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.GCR_MAIN.getCoinType(), "https://chainz.cryptoid.info/gcr/tx.dws?%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.POTCOIN_MAIN.getCoinType(), "https://chainz.cryptoid.info/pot/tx.dws?%s");
@@ -299,7 +299,6 @@ public class Constants {
             DigibyteMain.get(),
             DigitalcoinMain.get(),
             DogecoinMain.get(),
-            DogecoindarkMain.get(),
             FeathercoinMain.get(),
             GcrMain.get(),
             GuldenMain.get(),
@@ -318,6 +317,7 @@ public class Constants {
             ReddcoinMain.get(),
             RubycoinMain.get(),
             ShadowCashMain.get(),
+            VergeMain.get(),
             VertcoinMain.get(),
             VpncoinMain.get(),
             BitcoinTest.get(),

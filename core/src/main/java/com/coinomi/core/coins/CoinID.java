@@ -51,7 +51,7 @@ public enum CoinID {
     SHADOWCASH_MAIN(ShadowCashMain.get()),
     CANADAECOIN_MAIN(CanadaeCoinMain.get()),
     PARKBYTE_MAIN(ParkbyteMain.get()),
-    DOGECOINDARK_MAIN(DogecoindarkMain.get()),
+    VERGE_MAIN(VergeMain.get()),
     CLAMS_MAIN(ClamsMain.get()),
     GCR_MAIN(GcrMain.get()),
     POTCOIN_MAIN(PotcoinMain.get()),
