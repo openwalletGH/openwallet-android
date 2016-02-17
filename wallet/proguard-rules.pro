@@ -35,3 +35,16 @@
 -dontwarn sun.nio.ch.DirectBuffer
 -dontwarn net.jcip.annotations.GuardedBy
 -dontwarn com.subgraph.orchid.**
+
+# Butterknife
+-keep class butterknife.** { *; }
+-dontwarn butterknife.internal.**
+-keep class **$$ViewBinder { *; }
+
+-keepclasseswithmembernames class * {
+    @butterknife.* <fields>;
+}
+
+-keepclasseswithmembernames class * {
+    @butterknife.* <methods>;
+}
