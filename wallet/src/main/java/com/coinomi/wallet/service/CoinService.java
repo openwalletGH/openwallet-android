@@ -14,6 +14,7 @@ import javax.annotation.CheckForNull;
 public interface CoinService {
     String ACTION_CANCEL_COINS_RECEIVED = CoinService.class.getPackage().getName() + ".cancel_coins_received";
     String ACTION_CONNECT_COIN = CoinService.class.getPackage().getName() + ".connect_coin";
+    String ACTION_CONNECT_ALL_COIN = CoinService.class.getPackage().getName() + ".connect_all_coin";
     String ACTION_RESET_ACCOUNT = CoinService.class.getPackage().getName() + ".reset_account";
     String ACTION_CLEAR_CONNECTIONS = CoinService.class.getPackage().getName() + ".clear_connections";
     String ACTION_BROADCAST_TRANSACTION = CoinService.class.getPackage().getName() + ".broadcast_transaction";

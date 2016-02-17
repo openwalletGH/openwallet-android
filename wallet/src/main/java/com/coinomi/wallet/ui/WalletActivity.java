@@ -18,6 +18,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.coinomi.core.coins.CoinType;
@@ -49,6 +50,7 @@ import javax.annotation.Nullable;
 import static com.coinomi.wallet.ui.NavDrawerItemType.ITEM_COIN;
 import static com.coinomi.wallet.ui.NavDrawerItemType.ITEM_SECTION_TITLE;
 import static com.coinomi.wallet.ui.NavDrawerItemType.ITEM_TRADE;
+import static com.coinomi.wallet.ui.NavDrawerItemType.ITEM_OVERVIEW;
 
 
 /**
@@ -57,7 +59,7 @@ import static com.coinomi.wallet.ui.NavDrawerItemType.ITEM_TRADE;
  */
 final public class WalletActivity extends BaseWalletActivity implements
         NavigationDrawerFragment.NavigationDrawerCallbacks, BalanceFragment.Listener,
-        SendFragment.Listener {
+        SendFragment.Listener, OverviewFragment.Listener {
     private static final Logger log = LoggerFactory.getLogger(WalletActivity.class);
 
     private static final int RECEIVE = 0;
@@ -87,9 +89,14 @@ final public class WalletActivity extends BaseWalletActivity implements
     private AppSectionsPagerAdapter pagerAdapter;
     private String currentAccountId;
     private Intent connectCoinIntent;
+    private Intent connectAllCoinIntent;
     private List<NavDrawerItem> navDrawerItems = new ArrayList<>();
     private ActionMode lastActionMode;
     private final Handler handler = new MyHandler(this);
+    private View overviewView;
+    private View accountView;
+
+    private Menu menu;
 
     public WalletActivity() {}
 
@@ -114,6 +121,11 @@ final public class WalletActivity extends BaseWalletActivity implements
 
         if (savedInstanceState == null) {
             checkAlerts();
+
+            // Add overview fragment
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.wallet_overview, new OverviewFragment())
+                    .commit();
         }
 
         mTitle = getTitle();
@@ -130,6 +142,9 @@ final public class WalletActivity extends BaseWalletActivity implements
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout),
                 navDrawerItems);
+
+        overviewView = findViewById(R.id.wallet_overview);
+        accountView = findViewById(R.id.wallet_account);
 
         // Set up the ViewPager, attaching the adapter and setting up a listener for when the
         // user swipes between sections.
@@ -178,6 +193,7 @@ final public class WalletActivity extends BaseWalletActivity implements
         NavDrawerItem.addItem(navDrawerItems, ITEM_SECTION_TITLE, getString(R.string.navigation_drawer_services));
         NavDrawerItem.addItem(navDrawerItems, ITEM_TRADE, getString(R.string.title_activity_trade), R.drawable.trade, null);
         NavDrawerItem.addItem(navDrawerItems, ITEM_SECTION_TITLE, getString(R.string.navigation_drawer_wallet));
+        NavDrawerItem.addItem(navDrawerItems, ITEM_OVERVIEW, getString(R.string.title_activity_overview), R.drawable.ic_launcher, null);
         for (WalletAccount account : getAllAccounts()) {
             CoinType type = account.getCoinType();
             NavDrawerItem.addItem(navDrawerItems, ITEM_COIN, type.getName(), Constants.COINS_ICONS.get(type), account.getId());
@@ -198,6 +214,16 @@ final public class WalletActivity extends BaseWalletActivity implements
     @Override
     public void onLocalAmountClick() {
         startExchangeRates();
+    }
+
+    @Override
+    public void onSend() {
+
+    }
+
+    @Override
+    public void onReceive() {
+
     }
 
     @Override
@@ -229,6 +255,20 @@ final public class WalletActivity extends BaseWalletActivity implements
         navDrawerSelectAccount(getAccount(currentAccountId), true);
     }
 
+    @Override
+    public void onOverviewSelected() {
+        mTitle = getResources().getString(R.string.title_activity_overview);
+        overviewView.setVisibility(View.VISIBLE);
+        OverviewFragment overview = (OverviewFragment) getSupportFragmentManager().findFragmentById(R.id.wallet_overview);
+        overview.updateWallet();
+        overview.updateView();
+        accountView.setVisibility(View.GONE);
+        //hide unwanted MenuItems
+        menu.findItem(R.id.action_scan_qr_code).setVisible(false);
+        //invalidateOptionsMenu();
+        connectAllCoinService();
+    }
+
     private void openPocket(WalletAccount account) {
         openPocket(account, true);
     }
@@ -252,6 +292,9 @@ final public class WalletActivity extends BaseWalletActivity implements
                 navDrawerSelectAccount(account, true);
             }
         }
+        overviewView.setVisibility(View.GONE);
+        accountView.setVisibility(View.VISIBLE);
+        navDrawerSelectAccount(account, selectInNavDrawer);
     }
 
     private void connectCoinService() {
@@ -262,6 +305,14 @@ final public class WalletActivity extends BaseWalletActivity implements
         // Open connection if needed or possible
         connectCoinIntent.putExtra(Constants.ARG_ACCOUNT_ID, currentAccountId);
         getWalletApplication().startService(connectCoinIntent);
+    }
+
+    private void connectAllCoinService() {
+        if (connectAllCoinIntent == null) {
+            connectAllCoinIntent = new Intent(CoinService.ACTION_CONNECT_ALL_COIN, null,
+                    getWalletApplication(), CoinServiceImpl.class);
+        }
+        getWalletApplication().startService(connectAllCoinIntent);
     }
 
     public void restoreActionBar() {
@@ -485,8 +536,10 @@ final public class WalletActivity extends BaseWalletActivity implements
             // decide what to show in the action bar.
             getMenuInflater().inflate(R.menu.global, menu);
             restoreActionBar();
+            this.menu = menu;
             return true;
         }
+        this.menu = menu;
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -603,7 +656,23 @@ final public class WalletActivity extends BaseWalletActivity implements
         // If not in balance screen, back button brings us there
         boolean screenChanged = goToBalance();
         if (!screenChanged) {
-            super.onBackPressed();
+            if (overviewView.getVisibility() != View.VISIBLE) {
+                mTitle = "Overview";
+                if (mNavigationDrawerFragment != null) {
+                    int position = 0;
+                    for (NavDrawerItem item : navDrawerItems) {
+                        if (item.itemType == ITEM_OVERVIEW) {
+                            mNavigationDrawerFragment.setSelectedItem(position, true);
+                            break;
+                        }
+                        position++;
+                    }
+                }
+                restoreActionBar();
+                onOverviewSelected();
+            } else {
+                super.onBackPressed();
+            }
         }
         finishActionMode();
     }

@@ -56,28 +56,16 @@
             android:layout_height="wrap_content"
             style="@style/NormalText"
             android:autoLink="web"
-            android:paddingTop="14dp"
-            android:text="@string/about_licence" />
+            android:paddingTop="16dp"
+            android:text="@string/about_coinomi" />
 
-        <LinearLayout
-            android:orientation="horizontal"
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingTop="16dp">
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginEnd="10dp"
-                android:layout_marginRight="10dp"
-                android:src="@drawable/nubits"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/NormalText"
-                android:autoLink="web"
-                android:text="@string/about_credits_nubits" />
-        </LinearLayout>
+            style="@style/NormalText"
+            android:autoLink="web"
+            android:paddingTop="14dp"
+            android:text="@string/about_licence" />
 
         <LinearLayout
             android:orientation="horizontal"

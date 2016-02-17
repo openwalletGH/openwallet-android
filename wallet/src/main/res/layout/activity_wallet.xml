@@ -8,7 +8,15 @@
     android:layout_height="match_parent"
     tools:context=".WalletActivity">
 
+    <FrameLayout
+        android:id="@+id/wallet_overview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
+
     <LinearLayout
+        android:id="@+id/wallet_account"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">

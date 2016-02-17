@@ -18,6 +18,7 @@
 
     <!-- Coin icons -->
     <dimen name="generic_icon_size">36dp</dimen>
+    <dimen name="generic_medium_icon_size">48dp</dimen>
 
     <!-- Font icons -->
     <dimen name="font_icon_bg_size">50dp</dimen>
@@ -33,6 +34,7 @@
     <!--<dimen name="amount_margin_top">8dp</dimen>-->
     <dimen name="amount_margin_bottom">4dp</dimen>
     <dimen name="amount_text_size_big">56sp</dimen>
+    <dimen name="amount_text_size_small">12sp</dimen>
     <dimen name="amount_text_size">32sp</dimen>
     <dimen name="amount_pending_text_size">24sp</dimen>
     <dimen name="amount_symbol_text_size">24sp</dimen>

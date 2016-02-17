@@ -221,6 +221,9 @@ public class NavigationDrawerFragment extends Fragment {
                 case ITEM_TRADE:
                     mCallbacks.onTradeSelected();
                     break;
+                case ITEM_OVERVIEW:
+                    mCallbacks.onOverviewSelected();
+                    break;
             }
         }
     }
@@ -308,9 +311,10 @@ public class NavigationDrawerFragment extends Fragment {
     /**
      * Callbacks interface that all activities using this fragment must implement.
      */
-    public static interface NavigationDrawerCallbacks {
+    public interface NavigationDrawerCallbacks {
         void onAccountSelected(String accountId);
         void onAddCoinsSelected();
         void onTradeSelected();
+        void onOverviewSelected();
     }
 }

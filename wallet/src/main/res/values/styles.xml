@@ -125,6 +125,9 @@
     <style name="AmountBig" parent="Amount">
         <item name="android:textSize">@dimen/amount_text_size_big</item>
     </style>
+    <style name="AmountSmall" parent="Amount">
+        <item name="android:textSize">@dimen/amount_text_size_small</item>
+    </style>
     <style name="AmountPending" parent="Amount">
         <item name="android:textSize">@dimen/amount_pending_text_size</item>
         <item name="android:textColor">@color/gray_26_hint_text</item>
@@ -134,6 +137,10 @@
     </style>
     <style name="AmountSymbolBig" parent="AmountSymbol">
         <item name="android:textSize">@dimen/amount_symbol_text_size</item>
+        <item name="android:singleLine">true</item>
+    </style>
+    <style name="AmountSymbolSmall" parent="AmountSymbol">
+        <item name="android:textSize">@dimen/amount_text_size_small</item>
         <item name="android:singleLine">true</item>
     </style>
 

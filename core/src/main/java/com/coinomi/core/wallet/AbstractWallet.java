@@ -50,7 +50,11 @@ public abstract class AbstractWallet<T extends AbstractTransaction, A extends Ab
      */
     @Override
     public String getDescription() {
-        return description;
+        if (description == null || description.trim().equals("")) {
+            return type.getName();
+        } else {
+            return description;
+        }
     }
 
     @Override
