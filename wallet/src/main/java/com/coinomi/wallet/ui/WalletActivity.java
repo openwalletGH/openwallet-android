@@ -263,8 +263,8 @@ final public class WalletActivity extends BaseWalletActivity implements
         overview.updateWallet();
         overview.updateView();
         accountView.setVisibility(View.GONE);
-        //hide unwanted MenuItems
-        menu.findItem(R.id.action_scan_qr_code).setVisible(false);
+        //fixme hide unwanted MenuItems
+//        menu.findItem(R.id.action_scan_qr_code).setVisible(false);
         //invalidateOptionsMenu();
         connectAllCoinService();
     }

@@ -259,7 +259,8 @@ public class OverviewFragment extends Fragment{
                 currentBalance = currentBalance.multiply(0);
             }
             for (WalletAccount w : wallet.getAllAccounts()) {
-                ExchangeRate rate = ExchangeRatesProvider.getRate(application.getApplicationContext(), w.getCoinType().getSymbol(), config.getExchangeCurrencyCode());
+                ExchangeRate rate = ExchangeRatesProvider.getRate(application, w.getCoinType().getSymbol(), config.getExchangeCurrencyCode());
+                if (rate == null) continue;
                 if (currentBalance != null) {
                     currentBalance = currentBalance.add(rate.rate.convert(w.getBalance()));
                 }
