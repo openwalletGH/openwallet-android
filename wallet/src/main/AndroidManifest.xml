@@ -95,6 +95,7 @@
                 <data android:scheme="canadaecoin" />
                 <data android:scheme="shadowcash" />
                 <data android:scheme="gulden" />
+                <data android:scheme="auroracoin" />
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />

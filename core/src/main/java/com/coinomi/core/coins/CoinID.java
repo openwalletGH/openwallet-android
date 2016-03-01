@@ -56,6 +56,7 @@ public enum CoinID {
     GCR_MAIN(GcrMain.get()),
     POTCOIN_MAIN(PotcoinMain.get()),
     GULDEN_MAIN(GuldenMain.get()),
+    AURORACOIN_MAIN(AuroracoinMain.get()),
     ;
 
     private static List<CoinType> types;
