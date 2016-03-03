@@ -13,6 +13,7 @@ public class CanadaeCoinMain extends BitFamily {
         p2shHeader = 5;
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 120; // COINBASE_MATURITY_NEW
+        dumpedPrivateKeyHeader = 156;
 
         name = "Canada eCoin (beta)";
         symbol = "CDN";

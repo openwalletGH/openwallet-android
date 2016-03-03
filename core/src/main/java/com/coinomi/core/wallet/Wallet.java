@@ -25,6 +25,7 @@ import org.bitcoinj.wallet.DeterministicSeed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.crypto.params.KeyParameter;
+import org.spongycastle.util.encoders.Hex;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -105,7 +106,6 @@ final public class Wallet {
         SecureRandom sr = new SecureRandom();
         sr.nextBytes(entropy);
 
-
         return bytesToMnemonic(entropy);
     }
 
@@ -121,6 +121,13 @@ final public class Wallet {
             sb.append(' ');
         }
         return sb.toString();
+    }
+
+    static String generateRandomId() {
+        byte[] randomIdBytes = new byte[32];
+        SecureRandom sr = new SecureRandom();
+        sr.nextBytes(randomIdBytes);
+        return Hex.toHexString(randomIdBytes);
     }
 
     public WalletAccount createAccount(CoinType coin, @Nullable KeyParameter key) {

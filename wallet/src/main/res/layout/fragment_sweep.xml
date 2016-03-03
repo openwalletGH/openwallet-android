@@ -1,0 +1,148 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:descendantFocusability="beforeDescendants"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/NormalText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="bottom"
+                android:text="@string/sweep_wallet_info" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/activity_vertical_margin"
+            android:paddingTop="@dimen/activity_vertical_margin">
+
+            <LinearLayout
+                android:id="@+id/private_key_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/SecondaryText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/sweep_wallet_key_title" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <EditText
+                        android:id="@+id/sweep_wallet_key"
+                        style="@style/NormalText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="@string/sweep_wallet_key_hint"
+                        android:inputType="textNoSuggestions" />
+
+                    <ImageButton
+                        android:id="@+id/scan_qr_code"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@string/scan_qr_code"
+                        android:src="@drawable/qr_code" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/passwordView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/SecondaryText"
+                        android:text="@string/enter_password" />
+
+                    <EditText
+                        android:id="@+id/passwordInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ems="10"
+                        android:inputType="textPassword" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/sweep_error"
+                    style="@style/ErrorText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/sweep_loading"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/sweep_wallet_key_wait" />
+
+                <ProgressBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.AppCompat.ProgressBar"
+                    android:layout_margin="@dimen/standard_margin" />
+
+                <TextView
+                    android:id="@+id/sweeping_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/button_next"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/button_next"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true" />
+        </RelativeLayout>
+    </LinearLayout>
+</ScrollView>

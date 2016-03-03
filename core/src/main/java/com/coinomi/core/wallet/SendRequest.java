@@ -113,6 +113,16 @@ public class SendRequest<T extends AbstractTransaction> implements Serializable 
     public boolean signTransaction = true;
 
     /**
+     * If true, the wallet will use unconfirmed received coins (that could be double spent)
+     */
+    public boolean useUnsafeOutputs = false;
+
+    /**
+     * If true, the wallet will use mined funds coins are not sufficiently confirmed
+     */
+    public boolean useImmatureCoinbases = false;
+
+    /**
      * The AES key to use to decrypt the private keys before signing.
      * If null then no decryption will be performed and if decryption is required an exception will be thrown.
      * You can get this from a password by doing wallet.getKeyCrypter().deriveKey(password).

@@ -17,6 +17,7 @@ public class VpncoinMain extends VpncoinFamily {
         p2shHeader = 5;
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 100;
+        dumpedPrivateKeyHeader = 199;
 
         name = "Vpncoin";
         symbol = "VPN";

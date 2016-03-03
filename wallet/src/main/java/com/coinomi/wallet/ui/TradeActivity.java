@@ -18,10 +18,6 @@ public class TradeActivity extends BaseWalletActivity implements
 
     private int containerRes;
 
-    private enum State {
-        INPUT, PREPARATION, SENDING, SENT, FAILED
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

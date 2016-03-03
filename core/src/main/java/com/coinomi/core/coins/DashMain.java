@@ -13,6 +13,7 @@ public class DashMain extends BitFamily {
         p2shHeader = 16;
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 100;
+        dumpedPrivateKeyHeader = 204;
 
         name = "Dash";
         symbol = "DASH";

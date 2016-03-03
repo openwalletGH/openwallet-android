@@ -13,6 +13,7 @@ public class DigitalcoinMain extends BitFamily {
         p2shHeader = 5;
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 5;
+        dumpedPrivateKeyHeader = 158;
 
         name = "Digitalcoin";
         symbol = "DGC";

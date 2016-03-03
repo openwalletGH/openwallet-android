@@ -14,6 +14,7 @@ public class ShadowCashMain extends PeerFamily {
         p2shHeader = 125;
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 500;
+        dumpedPrivateKeyHeader = 191;
 
         name = "Shadow (beta)"; // TODO The original name is "ShadowCash"
         symbol = "SDC";

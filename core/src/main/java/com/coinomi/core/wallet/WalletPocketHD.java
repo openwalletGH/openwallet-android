@@ -66,10 +66,8 @@ import static org.bitcoinj.wallet.KeyChain.KeyPurpose.REFUND;
  *
  *
  */
-public class WalletPocketHD extends TransactionWatcherWallet {
+public class WalletPocketHD extends BitWalletBase {
     private static final Logger log = LoggerFactory.getLogger(WalletPocketHD.class);
-
-    private final TransactionCreator transactionCreator;
 
     @VisibleForTesting
     protected SimpleHDKeyChain keys;
@@ -86,7 +84,6 @@ public class WalletPocketHD extends TransactionWatcherWallet {
     WalletPocketHD(String id, SimpleHDKeyChain keys, CoinType coinType) {
         super(checkNotNull(coinType), id);
         this.keys = checkNotNull(keys);
-        transactionCreator = new TransactionCreator(this);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -206,105 +203,6 @@ public class WalletPocketHD extends TransactionWatcherWallet {
         }
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    //
-    // Transaction signing support
-    //
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * Sends coins to the given address but does not broadcast the resulting pending transaction.
-     */
-    public BitSendRequest sendCoinsOffline(BitAddress address, Value amount)
-            throws WalletAccountException {
-        return sendCoinsOffline(address, amount, (KeyParameter) null);
-    }
-
-    /**
-     * {@link #sendCoinsOffline(BitAddress, Value)}
-     */
-    public BitSendRequest sendCoinsOffline(BitAddress address, Value amount,
-                                           @Nullable String password)
-            throws WalletAccountException {
-        KeyParameter key = null;
-        if (password != null) {
-            checkState(isEncrypted());
-            key = checkNotNull(getKeyCrypter()).deriveKey(password);
-        }
-        return sendCoinsOffline(address, amount, key);
-    }
-
-    /**
-     * {@link #sendCoinsOffline(BitAddress, Value)}
-     */
-    public BitSendRequest sendCoinsOffline(BitAddress address, Value amount,
-                                           @Nullable KeyParameter aesKey)
-            throws WalletAccountException {
-        checkState(address.getParameters() instanceof CoinType);
-        BitSendRequest request = BitSendRequest.to(address, amount);
-        request.aesKey = aesKey;
-
-        return request;
-    }
-
-    @Override
-    public boolean isAddressMine(AbstractAddress address) {
-        return address != null && address.getType().equals(type) &&
-                (isP2SHAddress(address) ?
-                        isPayToScriptHashMine(getHash160(address)) :
-                        isPubKeyHashMine(getHash160(address)));
-    }
-
-    @Override
-    public void signMessage(SignedMessage unsignedMessage, @Nullable KeyParameter aesKey) {
-        String message = unsignedMessage.message;
-        lock.lock();
-        try {
-            ECKey key;
-            try {
-                BitAddress address = BitAddress.from(type, unsignedMessage.getAddress());
-                key = findKeyFromPubHash(address.getHash160());
-            } catch (AddressMalformedException e) {
-                unsignedMessage.status = SignedMessage.Status.AddressMalformed;
-                return;
-            }
-
-            if (key == null) {
-                unsignedMessage.status = SignedMessage.Status.MissingPrivateKey;
-                return;
-            }
-
-            try {
-                unsignedMessage.signature =
-                        key.signMessage(type.getSignedMessageHeader(), message, aesKey);
-                unsignedMessage.status = SignedMessage.Status.SignedOK;
-            } catch (ECKey.KeyIsEncryptedException e) {
-                unsignedMessage.status = SignedMessage.Status.KeyIsEncrypted;
-            } catch (ECKey.MissingPrivateKeyException e) {
-                unsignedMessage.status = SignedMessage.Status.MissingPrivateKey;
-            }
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    @Override
-    public void verifyMessage(SignedMessage signedMessage) {
-        try {
-            ECKey pubKey = ECKey.signedMessageToKey(signedMessage.message, signedMessage.signature);
-            byte[] expectedPubKeyHash = BitAddress.from(null, signedMessage.address).getHash160();
-            if (Arrays.equals(expectedPubKeyHash, pubKey.getPubKeyHash())) {
-                signedMessage.status = SignedMessage.Status.VerifiedOK;
-            } else {
-                signedMessage.status = SignedMessage.Status.InvalidSigningAddress;
-            }
-        } catch (SignatureException e) {
-            signedMessage.status = SignedMessage.Status.InvalidMessageSignature;
-        } catch (AddressMalformedException e) {
-            signedMessage.status = SignedMessage.Status.AddressMalformed;
-        }
-    }
-
     @Override
     public String getPublicKeySerialized() {
         // Change the path of the key to match the BIP32 paths i.e. 0H/<account index>H
@@ -315,19 +213,9 @@ public class WalletPocketHD extends TransactionWatcherWallet {
     }
 
     @Override
-    public boolean isPubKeyHashMine(byte[] pubkeyHash) {
-        return findKeyFromPubHash(pubkeyHash) != null;
-    }
-
-    @Override
     public boolean isWatchedScript(Script script) {
         // Not supported
         return false;
-    }
-
-    @Override
-    public boolean isPubKeyMine(byte[] pubkey) {
-        return findKeyFromPubKey(pubkey) != null;
     }
 
     @Override
@@ -335,82 +223,6 @@ public class WalletPocketHD extends TransactionWatcherWallet {
         // Not supported
         return false;
     }
-
-    @Override
-    public SendRequest getEmptyWalletRequest(AbstractAddress destination)
-            throws WalletAccountException {
-        checkAddress(destination);
-        return BitSendRequest.emptyWallet((BitAddress) destination);
-    }
-
-    @Override
-    public SendRequest getSendToRequest(AbstractAddress destination, Value amount)
-            throws WalletAccountException {
-        checkAddress(destination);
-        return BitSendRequest.to((BitAddress) destination, amount);
-    }
-
-    private void checkAddress(AbstractAddress destination) throws WalletAccountException {
-        if (!(destination instanceof BitAddress)) {
-            throw new WalletAccountException("Incompatible address" +
-                    destination.getClass().getName() + ", expected " + BitAddress.class.getName());
-        }
-    }
-
-    @Override
-    public void completeTransaction(SendRequest request) throws WalletAccountException {
-        checkSendRequest(request);
-        completeTransaction((BitSendRequest) request);
-    }
-
-    @Override
-    public void signTransaction(SendRequest request) throws WalletAccountException {
-        checkSendRequest(request);
-        signTransaction((BitSendRequest) request);
-    }
-
-
-    private void checkSendRequest(SendRequest request) throws WalletAccountException {
-        if (!(request instanceof BitSendRequest)) {
-            throw new WalletAccountException("Incompatible request " +
-                    request.getClass().getName() + ", expected " + BitSendRequest.class.getName());
-        }
-    }
-
-    /**
-     * Given a spend request containing an incomplete transaction, makes it valid by adding outputs and signed inputs
-     * according to the instructions in the request. The transaction in the request is modified by this method.
-     *
-     * @param req a BitSendRequest that contains the incomplete transaction and details for how to make it valid.
-     * @throws WalletAccount.WalletAccountException if the request could not be completed due to not enough balance.
-     * @throws IllegalArgumentException if you try and complete the same SendRequest twice
-     */
-    public void completeTransaction(BitSendRequest req) throws WalletAccountException {
-        lock.lock();
-        try {
-            transactionCreator.completeTx(req);
-        } catch (InsufficientMoneyException e) {
-            throw new WalletAccountException(e);
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    /**
-     * <p>Given a send request containing transaction, attempts to sign it's inputs. This method expects transaction
-     * to have all necessary inputs connected or they will be ignored.</p>
-     * <p>Actual signing is done by pluggable {@link org.bitcoinj.signers.LocalTransactionSigner}
-     * and it's not guaranteed that transaction will be complete in the end.</p>
-     */
-    public void signTransaction(BitSendRequest req) {
-        lock.lock();
-        try {
-            transactionCreator.signTransaction(req);
-        } finally {
-            lock.unlock();
-        }
-    }
-
 
     /**
      * Locates a keypair from the basicKeyChain given the hash of the public key. This is needed
@@ -452,7 +264,12 @@ public class WalletPocketHD extends TransactionWatcherWallet {
 
     @Override
     public byte[] getPublicKey() {
-        return keys.getRootKey().getPubKey();
+        lock.lock();
+        try {
+            return keys.getRootKey().getPubKey();
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override
@@ -686,11 +503,16 @@ public class WalletPocketHD extends TransactionWatcherWallet {
 
     @Override
     public List<AbstractAddress> getActiveAddresses() {
-        ImmutableList.Builder<AbstractAddress> activeAddresses = ImmutableList.builder();
-        for (DeterministicKey key : keys.getActiveKeys()) {
-            activeAddresses.add(BitAddress.from(type, key));
+        lock.lock();
+        try {
+            ImmutableList.Builder<AbstractAddress> activeAddresses = ImmutableList.builder();
+            for (DeterministicKey key : keys.getActiveKeys()) {
+                activeAddresses.add(BitAddress.from(type, key));
+            }
+            return activeAddresses.build();
+        } finally {
+            lock.unlock();
         }
-        return activeAddresses.build();
     }
 
     @Override

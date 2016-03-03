@@ -534,10 +534,14 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<BitTransac
 
     @Override
     public Value getBalance() {
+        return getBalance(false);
+    }
+
+    public Value getBalance(boolean includeReceiving) {
         lock.lock();
         try {
             long value = 0;
-            for (OutPointOutput utxo : getUnspentOutputs().values()) {
+            for (OutPointOutput utxo : getUnspentOutputs(includeReceiving).values()) {
                 value = LongMath.checkedAdd(value, utxo.getValueLong());
             }
             return type.value(value);
@@ -1319,7 +1323,10 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<BitTransac
     }
 
     public boolean isLoading() {
-        return !addressesPendingSubscription.isEmpty() || !statusPendingUpdates.isEmpty() || !fetchingTransactions.isEmpty();
+        return addressesStatus.isEmpty() ||
+                !addressesPendingSubscription.isEmpty() ||
+                !statusPendingUpdates.isEmpty() ||
+                !fetchingTransactions.isEmpty();
     }
 
     @Override
@@ -1375,7 +1382,7 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<BitTransac
         return blockchainConnection != null;
     }
 
-    Map<TrimmedOutPoint, OutPointOutput> getUnspentOutputs() {
+    Map<TrimmedOutPoint, OutPointOutput> getUnspentOutputs(boolean includeUnsafe) {
         lock.lock();
         try {
             // The confirmed UTXO set
@@ -1385,7 +1392,7 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<BitTransac
 
             // The unconfirmed UTXO set originating from transactions the wallet sends
             for (BitTransaction tx : pending.values()) {
-                if (tx.getSource() == Source.SELF) {
+                if (includeUnsafe || tx.getSource() == Source.SELF) {
                     boolean isDoubleSpending = false;
                     txSpendingTxo.clear();
                     // Remove any unspent outputs that this transaction spends

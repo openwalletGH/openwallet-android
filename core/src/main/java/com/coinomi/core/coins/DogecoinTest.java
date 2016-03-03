@@ -13,6 +13,7 @@ public class DogecoinTest extends BitFamily {
         p2shHeader = 196;
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 240; // COINBASE_MATURITY_NEW
+        dumpedPrivateKeyHeader = 241;
 
         name = "Dogecoin Test";
         symbol = "DOGEt";

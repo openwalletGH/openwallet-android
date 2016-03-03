@@ -16,6 +16,7 @@ public class ParkbyteMain extends PeerFamily {
         p2shHeader = 28;
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 5;
+        dumpedPrivateKeyHeader = 183;
 
         name = "ParkByte";
         symbol = "PKB";

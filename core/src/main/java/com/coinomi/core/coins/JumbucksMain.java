@@ -13,6 +13,7 @@ public class JumbucksMain extends PeerFamily {
         p2shHeader = 105;
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 500;
+        dumpedPrivateKeyHeader = 171;
 
         name = "Jumbucks";
         symbol = "JBS";

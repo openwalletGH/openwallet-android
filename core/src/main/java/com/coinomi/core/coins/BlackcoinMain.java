@@ -13,6 +13,7 @@ public class BlackcoinMain extends PeerFamily {
         p2shHeader = 85;
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 500;
+        dumpedPrivateKeyHeader = 153;
 
         name = "Blackcoin";
         symbol = "BLK";

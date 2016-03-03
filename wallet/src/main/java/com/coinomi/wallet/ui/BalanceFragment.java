@@ -521,6 +521,6 @@ public class BalanceFragment extends Fragment implements LoaderCallbacks<List<Ab
     }
 
     public interface Listener {
-        public void onLocalAmountClick();
+        void onLocalAmountClick();
     }
 }

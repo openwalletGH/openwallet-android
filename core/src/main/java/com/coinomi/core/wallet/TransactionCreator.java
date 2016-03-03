@@ -116,7 +116,7 @@ public class TransactionCreator {
             //
             // Note that this code is poorly optimized: the spend candidates only alter when transactions in the wallet
             // change - it could be pre-calculated and held in RAM, and this is probably an optimization worth doing.
-            LinkedList<OutPointOutput> candidates = calculateAllSpendCandidates(true);
+            LinkedList<OutPointOutput> candidates = calculateAllSpendCandidates(req);
             CoinSelection bestCoinSelection;
             TransactionOutput bestChangeOutput = null;
             if (!req.emptyWallet) {
@@ -246,13 +246,14 @@ public class TransactionCreator {
      * Returns a list of all possible outputs we could possibly spend, potentially even including immature coinbases
      * (which the protocol may forbid us from spending). In other words, return all outputs that this wallet holds
      * keys for and which are not already marked as spent.
+     * @param req
      */
-    LinkedList<OutPointOutput> calculateAllSpendCandidates(boolean excludeImmatureCoinbases) {
+    LinkedList<OutPointOutput> calculateAllSpendCandidates(BitSendRequest req) {
         lock.lock();
         try {
             LinkedList<OutPointOutput> candidates = Lists.newLinkedList();
-            for (OutPointOutput utxo : account.getUnspentOutputs().values()) {
-                if (excludeImmatureCoinbases && !utxo.isMature()) continue;
+            for (OutPointOutput utxo : account.getUnspentOutputs(req.useUnsafeOutputs).values()) {
+                if (!req.useImmatureCoinbases && !utxo.isMature()) continue;
                 candidates.add(utxo);
             }
             return candidates;

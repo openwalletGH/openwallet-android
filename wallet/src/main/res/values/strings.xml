@@ -8,6 +8,7 @@
     <string name="action_copy">Copy</string>
     <string name="action_edit_label">Edit label</string>
     <string name="action_empty_wallet">Use all funds</string>
+    <string name="action_sweep_wallet">Sweep wallet</string>
     <string name="action_settings">Settings</string>
     <string name="action_support">Contact support</string>
     <string name="action_about">About</string>
@@ -163,7 +164,7 @@
     <string name="wallet_restoration_coin">Creating key for %1$s</string>
     <string name="wallet_restoration_error">Could not restore your wallet.\n\n%1$s</string>
     <!-- PasswordConfirmationFragment -->
-    <string name="enter_password">Enter your password</string>
+    <string name="enter_password">enter your password</string>
     <!-- SignTransactionFragment -->
     <string name="contacting_exchange">Contacting exchange&#8230;</string>
     <string name="preparing_transaction">Please wait while your transaction is being prepared and sent.</string>
@@ -327,4 +328,19 @@
     <string name="account_private_key_warning">The private key allows you to send coins from this account. It is not necessary to backup this key as it is derived from your <i>recovery phrase</i></string>
     <!-- Support -->
     <string name="support_message">Contact Coinomi support</string>
+    <!-- Sweep wallet -->
+    <string name="title_activity_sweep_wallet">Sweep paper wallet</string>
+    <string name="sweep_wallet_info">You are about to transfer coins from a paper wallet to your Coinomi wallet.\nAfter the transfer, please avoid reusing the paper wallet for privacy and security reasons.</string>
+    <string name="sweep_wallet_key_title">private key</string>
+    <string name="sweep_wallet_key_password">private key password</string>
+    <string name="sweep_wallet_key_hint">type or scan a private key</string>
+    <string name="sweep_wallet_bad_format">Could not recognize the private key format.</string>
+    <string name="sweep_wallet_bad_coin_type">The private key type does not match the destination account type.</string>
+    <string name="sweep_wallet_bad_password">Incorrect password.</string>
+    <string name="sweep_wallet_zero_coins">The private key does not contain any funds.</string>
+    <string name="sweep_wallet_key_wait">Please wait while sweeping your paper wallet</string>
+    <string name="sweep_wallet_key_decoding">Decoding private key&#8230;</string>
+    <string name="sweep_wallet_key_loading">Loading balance&#8230;</string>
+    <string name="sweep_wallet_key_signing">Creating transaction&#8230;</string>
+
 </resources>

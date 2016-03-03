@@ -10,6 +10,7 @@ public class GcrMain extends PeerFamily {
         p2shHeader = 97;
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 30;
+        dumpedPrivateKeyHeader = 154;
 
         name = "GCRCoin (beta)";
         symbol = "GCR";

@@ -14,6 +14,7 @@ public class NovacoinMain extends PeerFamily {
         p2shHeader = 20;
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 520;
+        dumpedPrivateKeyHeader = 136;
 
         name = "Novacoin (beta)";
         symbol = "NVC";

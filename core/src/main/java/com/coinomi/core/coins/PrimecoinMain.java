@@ -13,6 +13,7 @@ public class PrimecoinMain extends BitFamily {
         p2shHeader = 83;
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 3000;
+        dumpedPrivateKeyHeader = 151;
 
         name = "Primecoin";
         symbol = "XPM";

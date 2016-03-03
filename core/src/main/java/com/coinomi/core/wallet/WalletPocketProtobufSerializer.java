@@ -102,7 +102,7 @@ public class WalletPocketProtobufSerializer {
             walletBuilder.addTransaction(txProto);
         }
 
-        for (OutPointOutput utxo : pocket.getUnspentOutputs().values()) {
+        for (OutPointOutput utxo : pocket.unspentOutputs.values()) {
             Protos.UnspentOutput utxoProto = makeUTXOProto(utxo);
             walletBuilder.addUnspentOutput(utxoProto);
         }

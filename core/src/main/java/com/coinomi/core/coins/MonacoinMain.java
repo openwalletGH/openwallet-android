@@ -13,6 +13,7 @@ public class MonacoinMain extends BitFamily {
         p2shHeader = 5;
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 100;
+        dumpedPrivateKeyHeader = 178;
 
         name = "Monacoin";
         symbol = "MONA";

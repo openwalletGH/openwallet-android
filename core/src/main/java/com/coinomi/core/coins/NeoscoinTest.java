@@ -13,7 +13,6 @@ public class NeoscoinTest extends BitFamily {
         p2shHeader = 188;
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 100;
-        dumpedPrivateKeyHeader = 239;
 
         name = "Neoscoin Test";
         symbol = "NEOSt";

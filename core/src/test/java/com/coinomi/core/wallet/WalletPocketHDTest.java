@@ -33,7 +33,6 @@ import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.TransactionConfidence.Source;
 import org.bitcoinj.core.TransactionInput;
-import org.bitcoinj.core.TransactionOutPoint;
 import org.bitcoinj.core.TransactionOutput;
 import org.bitcoinj.core.Utils;
 import org.bitcoinj.crypto.DeterministicHierarchy;
@@ -45,7 +44,6 @@ import org.bitcoinj.store.UnreadableWalletException;
 import org.bitcoinj.utils.BriefLogFormatter;
 import org.bitcoinj.wallet.DeterministicSeed;
 import org.bitcoinj.wallet.KeyChain;
-import org.bouncycastle.util.encoders.Hex;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -105,6 +103,14 @@ public class WalletPocketHDTest {
     @Test
     public void testId() throws Exception {
         assertEquals("8747886e9a77fe2a1588df3168b867648434d6d339b0b448793ae1db8f283f41", pocket.getId());
+    }
+
+    @Test
+    public void testSingleAddressWallet() throws Exception {
+        ECKey key = pocket.keys.getCurrentUnusedKey(KeyChain.KeyPurpose.RECEIVE_FUNDS);
+        BitWalletSingleKey bitWalletSingleKey = new BitWalletSingleKey(DOGE, key);
+        bitWalletSingleKey.onConnection(getBlockchainConnection(DOGE));
+        assertEquals(DOGE.value("10"), bitWalletSingleKey.getBalance());
     }
 
     @Test

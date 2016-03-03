@@ -13,6 +13,7 @@ public class PeercoinMain extends PeerFamily {
         p2shHeader = 117;
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 500;
+        dumpedPrivateKeyHeader = 183;
 
         name = "Peercoin";
         symbol = "PPC";

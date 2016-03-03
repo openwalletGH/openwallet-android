@@ -60,22 +60,22 @@ public class TransactionAmountVisualizer extends LinearLayout {
         }
     }
 
-    public void setTransaction(AbstractWallet pocket, AbstractTransaction tx) {
-        type = pocket.getCoinType();
+    public void setTransaction(@Nullable AbstractWallet pocket, AbstractTransaction tx) {
+        type = tx.getType();
         String symbol = type.getSymbol();
 
-        final Value value = tx.getValue(pocket);
-        isSending = value.signum() < 0;
+        final Value value = pocket != null ? tx.getValue(pocket) : type.value(0);
+        isSending = pocket != null ? value.signum() < 0 : true;
         // if sending and all the outputs point inside the current pocket. If received
         boolean isInternalTransfer = isSending;
         output.setVisibility(View.VISIBLE);
         List<AbstractOutput> outputs = tx.getSentTo();
         for (AbstractOutput txo : outputs) {
             if (isSending) {
-                if (pocket.isAddressMine(txo.getAddress())) continue;
+                if (pocket != null && pocket.isAddressMine(txo.getAddress())) continue;
                 isInternalTransfer = false;
             } else {
-                if (!pocket.isAddressMine(txo.getAddress())) continue;
+                if (pocket != null && !pocket.isAddressMine(txo.getAddress())) continue;
             }
 
             // TODO support more than one output

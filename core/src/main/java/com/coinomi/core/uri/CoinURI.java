@@ -83,6 +83,7 @@ import static com.coinomi.core.Preconditions.checkState;
  * @author Andreas Schildbach (initial code)
  * @author Jim Burton (enhancements for MultiBit)
  * @author Gary Rowe (BIP21 support)
+ * @author John L. Jegutanis
  * @see <a href="https://github.com/bitcoin/bips/blob/master/bip-0021.mediawiki">BIP 0021</a>
  */
 public class CoinURI {
@@ -203,19 +204,19 @@ public class CoinURI {
         if (!addressToken.isEmpty()) {
             // Attempt to parse the addressToken as a possible type address
             AbstractAddress address = null;
-            // TODO support non-BitAddress types
             for (CoinType possibleType : possibleTypes) {
                 if (possibleType instanceof NxtFamily) {
-                    address = new NxtAddress(possibleType, addressToken);
-                    putWithValidation(FIELD_ADDRESS, address);
-                    break;
-                }
-                try {
-                    address = BitAddress.from(possibleType, addressToken);
-                    putWithValidation(FIELD_ADDRESS, address);
-                    break;
-                } catch (final AddressMalformedException e) {
-                    /* continue */
+                    try {
+                        address = new NxtAddress(possibleType, addressToken);
+                        putWithValidation(FIELD_ADDRESS, address);
+                        break;
+                    } catch (RuntimeException e) {  /* continue */ }
+                } else {
+                    try {
+                        address = BitAddress.from(possibleType, addressToken);
+                        putWithValidation(FIELD_ADDRESS, address);
+                        break;
+                    } catch (final AddressMalformedException e) { /* continue */ }
                 }
             }
 

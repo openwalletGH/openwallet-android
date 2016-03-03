@@ -12,6 +12,7 @@ public class NuBitsMain extends NuFamily {
         addressHeader = 25;
         p2shHeader = 26;
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
+        dumpedPrivateKeyHeader = 150;
         tokenId = 0x42;
 
         name = "NuBits";

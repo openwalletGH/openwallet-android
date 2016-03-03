@@ -202,6 +202,11 @@
             android:label="@string/title_activity_account_details"
             android:theme="@style/AppTheme" >
         </activity>
+        <activity
+            android:name="com.coinomi.wallet.ui.SweepWalletActivity"
+            android:label="@string/title_activity_sweep_wallet"
+            android:theme="@style/AppTheme" >
+        </activity>
 
         <provider
             android:name="com.coinomi.wallet.ExchangeRatesProvider"

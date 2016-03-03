@@ -13,6 +13,7 @@ public class RubycoinMain extends PeerFamily {
         p2shHeader = 85;
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 50;
+        dumpedPrivateKeyHeader = 188;
 
         name = "Rubycoin";
         symbol = "RBY";

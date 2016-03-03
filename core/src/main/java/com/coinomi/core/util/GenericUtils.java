@@ -225,11 +225,12 @@ public class GenericUtils {
     public static List<CoinType> getPossibleTypes(String addressStr) throws AddressMalformedException {
         ImmutableList.Builder<CoinType> builder = ImmutableList.builder();
         tryBitcoinFamilyAddresses(addressStr, builder);
+        // TODO try other coin addresses
         List<CoinType> possibleTypes = builder.build();
         if (possibleTypes.size() == 0) {
             throw new AddressMalformedException("Unsupported address: " + addressStr);
         }
-        return builder.build();
+        return possibleTypes;
     }
 
     /**

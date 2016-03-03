@@ -2,6 +2,7 @@ package com.coinomi.wallet.ui;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -27,6 +28,7 @@ import com.coinomi.core.uri.CoinURI;
 import com.coinomi.core.uri.CoinURIParseException;
 import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.AbstractAddress;
+import com.coinomi.core.wallet.SerializedKey;
 import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
@@ -409,7 +411,11 @@ final public class WalletActivity extends BaseWalletActivity implements
         try {
             processUri(input);
         } catch (final CoinURIParseException x) {
-            processAddress(input);
+            if (SerializedKey.isSerializedKey(input)) {
+                sweepWallet(input);
+            } else {
+                processAddress(input);
+            }
         }
     }
 
@@ -564,6 +570,9 @@ final public class WalletActivity extends BaseWalletActivity implements
         } else if (id == R.id.action_account_details) {
             accountDetails();
             return true;
+        } else if (id == R.id.action_sweep_wallet) {
+            sweepWallet(null);
+            return true;
         } else if (id == R.id.action_support) {
             sendSupportEmail();
             return true;
@@ -576,15 +585,6 @@ final public class WalletActivity extends BaseWalletActivity implements
     }
 
     private void sendSupportEmail() {
-//        Intent i = new Intent(Intent.ACTION_SENDTO,
-//                Uri.fromParts("mailto", Constants.SUPPORT_EMAIL, null));
-//        i.putExtra(Intent.EXTRA_EMAIL, new String[]{Constants.SUPPORT_EMAIL});
-//        try {
-//            startActivity(Intent.createChooser(i,
-//                    getResources().getString(R.string.action_support)));
-//        } catch (android.content.ActivityNotFoundException ex) {
-//            Toast.makeText(this, R.string.error_generic, Toast.LENGTH_SHORT).show();
-//        }
         Intent intent = new Intent(Intent.ACTION_SENDTO);
         intent.setData(Uri.parse("mailto:")); // only email apps should handle this
         intent.putExtra(Intent.EXTRA_EMAIL, new String[]{Constants.SUPPORT_EMAIL});
@@ -592,7 +592,7 @@ final public class WalletActivity extends BaseWalletActivity implements
         try {
             startActivity(Intent.createChooser(intent,
                     getResources().getString(R.string.support_message)));
-        } catch (android.content.ActivityNotFoundException ex) {
+        } catch (ActivityNotFoundException ex) {
             Toast.makeText(this, R.string.error_generic, Toast.LENGTH_SHORT).show();
         }
     }
@@ -622,6 +622,17 @@ final public class WalletActivity extends BaseWalletActivity implements
         if (isAccountExists(currentAccountId)) {
             Intent intent = new Intent(this, AccountDetailsActivity.class);
             intent.putExtra(Constants.ARG_ACCOUNT_ID, currentAccountId);
+            startActivity(intent);
+        } else {
+            Toast.makeText(this, R.string.no_wallet_pocket_selected, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    void sweepWallet(@Nullable String key) {
+        if (isAccountExists(currentAccountId)) {
+            Intent intent = new Intent(this, SweepWalletActivity.class);
+            intent.putExtra(Constants.ARG_ACCOUNT_ID, currentAccountId);
+            if (key != null) intent.putExtra(Constants.ARG_PRIVATE_KEY, key);
             startActivity(intent);
         } else {
             Toast.makeText(this, R.string.no_wallet_pocket_selected, Toast.LENGTH_LONG).show();

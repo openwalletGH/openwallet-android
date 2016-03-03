@@ -12,6 +12,7 @@ public class NuSharesMain extends NuFamily {
         addressHeader = 63;
         p2shHeader = 64;
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
+        dumpedPrivateKeyHeader = 149;
         tokenId = 0x53;
 
         name = "NuShares";

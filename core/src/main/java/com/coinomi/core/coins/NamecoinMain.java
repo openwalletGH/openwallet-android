@@ -13,6 +13,7 @@ public class NamecoinMain extends BitFamily {
         // Namecoin does not have p2sh addresses
         acceptableAddressCodes = new int[] { addressHeader};
         spendableCoinbaseDepth = 100;
+        dumpedPrivateKeyHeader = 128;
 
         name = "Namecoin";
         symbol = "NMC";

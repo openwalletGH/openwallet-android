@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
+import com.coinomi.core.exceptions.NoSuchPocketException;
 import com.coinomi.core.exchange.shapeshift.ShapeShift;
 import com.coinomi.core.exchange.shapeshift.data.ShapeShiftAmountTx;
 import com.coinomi.core.exchange.shapeshift.data.ShapeShiftMarketInfo;
@@ -37,7 +38,6 @@ import com.coinomi.core.wallet.AbstractWallet;
 import com.coinomi.core.wallet.SendRequest;
 import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.wallet.WalletAccount;
-import com.coinomi.core.exceptions.NoSuchPocketException;
 import com.coinomi.wallet.Configuration;
 import com.coinomi.wallet.ExchangeHistoryProvider;
 import com.coinomi.wallet.ExchangeHistoryProvider.ExchangeEntry;
@@ -58,9 +58,15 @@ import java.util.HashMap;
 
 import javax.annotation.Nullable;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
 import static com.coinomi.core.Preconditions.checkNotNull;
+import static com.coinomi.core.Preconditions.checkState;
 import static com.coinomi.wallet.Constants.ARG_ACCOUNT_ID;
 import static com.coinomi.wallet.Constants.ARG_EMPTY_WALLET;
+import static com.coinomi.wallet.Constants.ARG_SEND_REQUEST;
 import static com.coinomi.wallet.Constants.ARG_SEND_TO_ACCOUNT_ID;
 import static com.coinomi.wallet.Constants.ARG_SEND_TO_ADDRESS;
 import static com.coinomi.wallet.Constants.ARG_SEND_VALUE;
@@ -100,18 +106,15 @@ public class MakeTransactionFragment extends Fragment {
     private CreateTransactionTask createTransactionTask;
     private WalletApplication application;
     private Configuration config;
-    private TextView transactionInfo;
-    private EditText passwordView;
-    private TransactionAmountVisualizer txVisualizer;
-    private SendOutput tradeWithdrawSendOutput;
-    private AbstractAddress sendToAddress;
-    private boolean sendingToAccount;
+
+    @Nullable AbstractAddress sendToAddress;
+    boolean sendingToAccount;
     @Nullable private Value sendAmount;
-    private boolean emptyWallet;
+    boolean emptyWallet;
     private CoinType sourceType;
     private SendRequest request;
     private LoaderManager loaderManager;
-    private AbstractWallet sourceAccount;
+    @Nullable private AbstractWallet sourceAccount;
     @Nullable private ExchangeEntry exchangeEntry;
     @Nullable private AbstractAddress tradeDepositAddress;
     @Nullable private Value tradeDepositAmount;
@@ -121,8 +124,12 @@ public class MakeTransactionFragment extends Fragment {
     private boolean transactionBroadcast = false;
     @Nullable private Exception error;
     private HashMap<String, ExchangeRate> localRates = new HashMap<>();
-
     private CountDownTimer countDownTimer;
+
+    @Bind(R.id.transaction_info) TextView transactionInfo;
+    @Bind(R.id.password) EditText passwordView;
+    @Bind(R.id.transaction_amount_visualizer) TransactionAmountVisualizer txVisualizer;
+    @Bind(R.id.transaction_trade_withdraw) SendOutput tradeWithdrawSendOutput;
 
     public static MakeTransactionFragment newInstance(Bundle args) {
         MakeTransactionFragment fragment = new MakeTransactionFragment();
@@ -142,6 +149,15 @@ public class MakeTransactionFragment extends Fragment {
         checkNotNull(args, "Must provide arguments");
 
         try {
+            if (args.containsKey(ARG_SEND_REQUEST)) {
+                request = (SendRequest) checkNotNull(args.getSerializable(ARG_SEND_REQUEST));
+                checkState(request.isCompleted(), "Only completed requests are currently supported.");
+                checkState(request.tx.getSentTo().size() == 1, "Only one output is currently supported");
+                sendToAddress = request.tx.getSentTo().get(0).getAddress();
+                sourceType = request.type;
+                return;
+            }
+
             String fromAccountId = args.getString(ARG_ACCOUNT_ID);
             sourceAccount = (AbstractWallet) checkNotNull(application.getAccount(fromAccountId));
             application.maybeConnectAccount(sourceAccount);
@@ -200,15 +216,14 @@ public class MakeTransactionFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_make_transaction, container, false);
+        ButterKnife.bind(this, view);
 
         if (error != null) return view;
 
-        transactionInfo = (TextView) view.findViewById(R.id.transaction_info);
         transactionInfo.setVisibility(View.GONE);
 
-        passwordView = (EditText) view.findViewById(R.id.password);
         final TextView passwordLabelView = (TextView) view.findViewById(R.id.enter_password_label);
-        if (sourceAccount.isEncrypted()) {
+        if (sourceAccount != null && sourceAccount.isEncrypted()) {
             passwordView.requestFocus();
             passwordView.setVisibility(View.VISIBLE);
             passwordLabelView.setVisibility(View.VISIBLE);
@@ -217,21 +232,8 @@ public class MakeTransactionFragment extends Fragment {
             passwordLabelView.setVisibility(View.GONE);
         }
 
-        txVisualizer = (TransactionAmountVisualizer) view.findViewById(R.id.transaction_amount_visualizer);
-        tradeWithdrawSendOutput = (SendOutput) view.findViewById(R.id.transaction_trade_withdraw);
         tradeWithdrawSendOutput.setVisibility(View.GONE);
         showTransaction();
-
-        view.findViewById(R.id.button_confirm).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (passwordView.isShown()) {
-                    Keyboard.hideKeyboard(getActivity());
-                    password = passwordView.getText().toString();
-                }
-                maybeStartSignAndBroadcast();
-            }
-        });
 
         TextView poweredByShapeShift = (TextView) view.findViewById(R.id.powered_by_shapeshift);
         poweredByShapeShift.setOnClickListener(new View.OnClickListener() {
@@ -247,6 +249,21 @@ public class MakeTransactionFragment extends Fragment {
         poweredByShapeShift.setVisibility((isExchangeNeeded() ? View.VISIBLE : View.GONE));
 
         return view;
+    }
+
+    @OnClick(R.id.button_confirm)
+    void onConfirmClick() {
+        if (passwordView.isShown()) {
+            Keyboard.hideKeyboard(getActivity());
+            password = passwordView.getText().toString();
+        }
+        maybeStartSignAndBroadcast();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ButterKnife.unbind(this);
     }
 
     private void showTransaction() {
@@ -270,7 +287,7 @@ public class MakeTransactionFragment extends Fragment {
     }
 
     boolean isExchangeNeeded() {
-        return !sourceAccount.getCoinType().equals(sendToAddress.getType());
+        return !sourceType.equals(sendToAddress.getType());
     }
 
     private void maybeStartCreateTransaction() {
@@ -341,7 +358,7 @@ public class MakeTransactionFragment extends Fragment {
             loaderManager = getLoaderManager();
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement " + MakeTransactionFragment.Listener.class);
+                    + " must implement " + Listener.class);
         }
     }
 
@@ -631,17 +648,31 @@ public class MakeTransactionFragment extends Fragment {
             Wallet wallet = application.getWallet();
             if (wallet == null) return new NoSuchPocketException("No wallet found.");
             try {
-                if (wallet.isEncrypted()) {
-                    KeyCrypter crypter = checkNotNull(wallet.getKeyCrypter());
-                    request.aesKey = crypter.deriveKey(password);
+                if (sourceAccount != null) {
+                    if (wallet.isEncrypted()) {
+                        KeyCrypter crypter = checkNotNull(wallet.getKeyCrypter());
+                        request.aesKey = crypter.deriveKey(password);
+                    }
+                    request.signTransaction = true;
+                    sourceAccount.completeAndSignTx(request);
                 }
-                request.signTransaction = true;
-                sourceAccount.completeAndSignTx(request);
+
                 // Before broadcasting, check if there is an error, like the trade expiration
                 if (error != null) throw error;
-                if (!sourceAccount.broadcastTxSync(request.tx)) {
-                    throw new Exception("Error broadcasting transaction: " + request.tx.getHashAsString());
+
+                if (sourceAccount != null) {
+                    if (!sourceAccount.broadcastTxSync(request.tx)) {
+                        throw new Exception("Error broadcasting transaction: " + request.tx.getHashAsString());
+                    }
+                } else {
+                    // TODO handle better
+                    WalletAccount account =
+                            wallet.getAccounts(request.tx.getSentTo().get(0).getAddress()).get(0);
+                    if (!account.broadcastTxSync(request.tx)) {
+                        throw new Exception("Error broadcasting transaction: " + request.tx.getHashAsString());
+                    }
                 }
+
                 transactionBroadcast = true;
                 if (isExchangeNeeded() && tradeDepositAddress != null && tradeDepositAmount != null) {
                     exchangeEntry = new ExchangeEntry(tradeDepositAddress,

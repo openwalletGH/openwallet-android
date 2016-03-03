@@ -18,6 +18,7 @@ public class ClamsMain extends ClamsFamily {
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 500;
         transactionVersion = 2;
+        dumpedPrivateKeyHeader = 133;
 
         name = "Clams (beta)";
         symbol = "CLAM";

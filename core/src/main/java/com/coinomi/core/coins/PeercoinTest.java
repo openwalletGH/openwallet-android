@@ -13,6 +13,7 @@ public class PeercoinTest extends PeerFamily {
         p2shHeader = 196;
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 500;
+        dumpedPrivateKeyHeader = 239;
 
         name = "Peercoin Test";
         symbol = "PPCt";
