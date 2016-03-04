@@ -572,7 +572,7 @@ public class WalletPocketHDTest {
     }
 
     private void checkUnspentOutputs(Map<TrimmedOutPoint, OutPointOutput> expectedUtxoSet, WalletPocketHD pocket) {
-        Map<TrimmedOutPoint, OutPointOutput> pocketUtxoSet = pocket.getUnspentOutputs();
+        Map<TrimmedOutPoint, OutPointOutput> pocketUtxoSet = pocket.getUnspentOutputs(false);
         for (OutPointOutput utxo : expectedUtxoSet.values()) {
             assertEquals(utxo, pocketUtxoSet.get(utxo.getOutPoint()));
         }

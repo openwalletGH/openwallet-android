@@ -1323,10 +1323,10 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<BitTransac
     }
 
     public boolean isLoading() {
-        return addressesStatus.isEmpty() ||
+        return blockchainConnection != null && (addressesStatus.isEmpty() ||
                 !addressesPendingSubscription.isEmpty() ||
                 !statusPendingUpdates.isEmpty() ||
-                !fetchingTransactions.isEmpty();
+                !fetchingTransactions.isEmpty());
     }
 
     @Override
