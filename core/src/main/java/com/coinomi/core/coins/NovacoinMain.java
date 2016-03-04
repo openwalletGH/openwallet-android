@@ -1,6 +1,5 @@
 package com.coinomi.core.coins;
 
-import com.coinomi.core.coins.families.BitFamily;
 import com.coinomi.core.coins.families.PeerFamily;
 
 /**
@@ -21,7 +20,7 @@ public class NovacoinMain extends PeerFamily {
         uriScheme = "novacoin";
         bip44Index = 50;
         unitExponent = 6;
-        feePerKb = value(1000); // 0.001 NVC
+        feeValue = value(1000); // 0.001 NVC
         minNonDust = value(1);
         softDustLimit = value(10000); // 0.01 NVC
         softDustPolicy = SoftDustPolicy.BASE_FEE_FOR_EACH_SOFT_DUST_TXO;

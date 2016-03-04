@@ -20,7 +20,7 @@ public class NuSharesMain extends NuFamily {
         uriScheme = "nu";
         bip44Index = 11;
         unitExponent = 4;
-        feePerKb = value(10000); // 1NSR, careful NuBits has 10000 units per coin
+        feeValue = value(10000); // 1NSR, careful NuBits has 10000 units per coin
         minNonDust = value(10000); // 1NSR
         softDustLimit = minNonDust;
         softDustPolicy = SoftDustPolicy.NO_POLICY;

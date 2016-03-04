@@ -1,10 +1,6 @@
 package com.coinomi.core.coins;
 
 import com.coinomi.core.coins.families.ClamsFamily;
-import com.coinomi.core.messages.MessageFactory;
-import com.coinomi.core.wallet.families.clams.ClamsTxMessage;
-
-import javax.annotation.Nullable;
 
 /**
  * @author John L. Jegutanis
@@ -25,7 +21,7 @@ public class ClamsMain extends ClamsFamily {
         uriScheme = "clams";
         bip44Index = 23;
         unitExponent = 8;
-        feePerKb = value(10000);
+        feeValue = value(10000);
         minNonDust = value(1);
         softDustLimit = value(1000000);
         softDustPolicy = SoftDustPolicy.AT_LEAST_BASE_FEE_IF_SOFT_DUST_TXO_PRESENT;

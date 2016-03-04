@@ -269,7 +269,7 @@ public class WalletPocketHDTest {
         assertEquals(w1.getCoinType(), w2.getCoinType());
         CoinType type = w1.getCoinType();
         BitSendRequest req = w1.sendCoinsOffline(w2.getReceiveAddress(), value);
-        req.feePerKb = type.value("0.01");
+        req.feePerTxSize = type.value("0.01");
         w1.completeAndSignTx(req);
         byte[] txBytes = req.tx.bitcoinSerialize();
         w1.addNewTransactionIfNeeded(new BitTransaction(type, txBytes));
@@ -602,12 +602,12 @@ public class WalletPocketHDTest {
 
         BitAddress toAddr = BitAddress.from(DOGE, "nZB8PHkfgJvuCJqchSexmfY3ABXa2aE1vp");
 
-        Value softDust = DOGE.softDustLimit();
+        Value softDust = DOGE.getSoftDustLimit();
         assertNotNull(softDust);
         // Send a soft dust
         BitSendRequest sendRequest = pocket.sendCoinsOffline(toAddr, softDust.subtract(DOGE.value(1)));
         pocket.completeTransaction(sendRequest);
-        assertEquals(DOGE.feePerKb().multiply(2), sendRequest.tx.getFee());
+        assertEquals(DOGE.getFeeValue().multiply(2), sendRequest.tx.getFee());
     }
 
     @Test
@@ -619,7 +619,7 @@ public class WalletPocketHDTest {
         Value orgBalance = pocket.getBalance();
         BitSendRequest sendRequest = pocket.sendCoinsOffline(toAddr, DOGE.value(AMOUNT_TO_SEND));
         sendRequest.shuffleOutputs = false;
-        sendRequest.feePerKb = DOGE.value(0);
+        sendRequest.feePerTxSize = DOGE.value(0);
         pocket.completeTransaction(sendRequest);
 
         // FIXME, mock does not work here

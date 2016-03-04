@@ -1,6 +1,5 @@
 package com.coinomi.core.coins;
 
-import com.coinomi.core.coins.families.BitFamily;
 import com.coinomi.core.coins.families.PeerFamily;
 
 /**
@@ -21,7 +20,7 @@ public class ShadowCashMain extends PeerFamily {
         uriScheme = "shadowcash";
         bip44Index = 35;
         unitExponent = 8;
-        feePerKb = value(10000); // 0.0001 SDC
+        feeValue = value(10000); // 0.0001 SDC
         minNonDust = value(1);
         softDustLimit = value(1000000); // 0.01 SDC
         softDustPolicy = SoftDustPolicy.AT_LEAST_BASE_FEE_IF_SOFT_DUST_TXO_PRESENT;

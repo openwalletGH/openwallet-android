@@ -20,7 +20,7 @@ public class BitcoinTest extends BitFamily {
         uriScheme = "bitcoin";
         bip44Index = 1;
         unitExponent = 8;
-        feePerKb = value(10000);
+        feeValue = value(10000);
         minNonDust = value(5460);
         softDustLimit = value(1000000); // 0.01 BTC
         softDustPolicy = SoftDustPolicy.AT_LEAST_BASE_FEE_IF_SOFT_DUST_TXO_PRESENT;

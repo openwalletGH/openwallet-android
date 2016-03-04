@@ -43,12 +43,6 @@ public class FiatType implements ValueType {
     }
 
     @Override
-    @Deprecated
-    public Families getFamilyEnum() {
-        return Families.FIAT;
-    }
-
-    @Override
     public String getName() {
         return name;
     }
@@ -73,7 +67,7 @@ public class FiatType implements ValueType {
     }
 
     @Override
-    public Value minNonDust() {
+    public Value getMinNonDust() {
         return value(1);
     }
 

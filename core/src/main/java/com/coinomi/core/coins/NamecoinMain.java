@@ -20,7 +20,7 @@ public class NamecoinMain extends BitFamily {
         uriScheme = "namecoin";
         bip44Index = 7;
         unitExponent = 8;
-        feePerKb = value(500000);
+        feeValue = value(500000);
         minNonDust = value(10000); // 0.0001 NMC mininput
         softDustLimit = value(1000000); // 0.01 NMC
         softDustPolicy = SoftDustPolicy.BASE_FEE_FOR_EACH_SOFT_DUST_TXO;

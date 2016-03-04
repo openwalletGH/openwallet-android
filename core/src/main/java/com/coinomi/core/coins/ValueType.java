@@ -11,8 +11,6 @@ import java.io.Serializable;
  * @author John L. Jegutanis
  */
 public interface ValueType extends Serializable {
-    @Deprecated
-    Families getFamilyEnum();
     String getName();
     String getSymbol();
     int getUnitExponent();
@@ -25,7 +23,7 @@ public interface ValueType extends Serializable {
     /**
      * Get the minimum valid amount that can be sent a.k.a. dust amount or minimum input
      */
-    Value minNonDust();
+    Value getMinNonDust();
 
     Value value(Coin coin);
 

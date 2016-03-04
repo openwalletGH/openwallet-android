@@ -9,7 +9,6 @@ import com.coinomi.core.coins.families.NxtFamily;
 import com.coinomi.core.coins.nxt.Appendix;
 import com.coinomi.core.coins.nxt.Attachment;
 import com.coinomi.core.coins.nxt.Convert;
-import com.coinomi.core.coins.nxt.Transaction;
 import com.coinomi.core.coins.nxt.TransactionImpl;
 import com.coinomi.core.util.TypeUtils;
 import com.coinomi.core.wallet.SendRequest;
@@ -67,7 +66,7 @@ public class NxtSendRequest extends SendRequest<NxtTransaction> {
         checkNotNull(destination.getType(), "Address is for an unknown network");
         checkState(destination.getType().getFeePolicy() == FeePolicy.FLAT_FEE, "Only flat fee is supported");
 
-        Value allFundsMinusFee = from.getBalance().subtract(destination.getType().feePerKb());
+        Value allFundsMinusFee = from.getBalance().subtract(destination.getType().getFeeValue());
 
         return to(from, destination, allFundsMinusFee);
     }

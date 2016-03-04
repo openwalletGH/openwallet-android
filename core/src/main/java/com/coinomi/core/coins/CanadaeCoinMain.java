@@ -20,7 +20,7 @@ public class CanadaeCoinMain extends BitFamily {
         uriScheme = "canadaecoin";
         bip44Index = 34;
         unitExponent = 8;
-        feePerKb = value(100000);
+        feeValue = value(100000);
         minNonDust = value(100000);
         softDustLimit = value(100000); // 0.001 CDN
         softDustPolicy = SoftDustPolicy.BASE_FEE_FOR_EACH_SOFT_DUST_TXO;

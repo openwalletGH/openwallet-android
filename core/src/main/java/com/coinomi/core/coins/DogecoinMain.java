@@ -20,7 +20,7 @@ public class DogecoinMain extends BitFamily {
         uriScheme = "dogecoin";
         bip44Index = 3;
         unitExponent = 8;
-        feePerKb = value(100000000L);
+        feeValue = value(100000000L);
         minNonDust = value(1);
         softDustLimit = value(100000000L); // 1 DOGE
         softDustPolicy = SoftDustPolicy.BASE_FEE_FOR_EACH_SOFT_DUST_TXO;

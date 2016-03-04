@@ -20,7 +20,7 @@ public class MonacoinMain extends BitFamily {
         uriScheme = "monacoin";
         bip44Index = 22;
         unitExponent = 8;
-        feePerKb = value(100000);
+        feeValue = value(100000);
         minNonDust = value(1000); // 0.00001 MNC mininput
         softDustLimit = value(100000); // 0.001 MONA
         softDustPolicy = SoftDustPolicy.BASE_FEE_FOR_EACH_SOFT_DUST_TXO;

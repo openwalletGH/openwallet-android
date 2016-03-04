@@ -35,7 +35,7 @@ abstract public class CoinType extends NetworkParameters implements ValueType, S
     protected Integer bip44Index;
     protected Integer unitExponent;
     protected String addressPrefix;
-    protected Value feePerKb;
+    protected Value feeValue;
     protected Value minNonDust;
     protected Value softDustLimit;
     protected SoftDustPolicy softDustPolicy;
@@ -45,11 +45,6 @@ abstract public class CoinType extends NetworkParameters implements ValueType, S
     private transient MonetaryFormat friendlyFormat;
     private transient MonetaryFormat plainFormat;
     private transient Value oneCoin;
-
-    @Deprecated
-    public Families getFamilyEnum() {
-        return (Families) family;
-    }
 
     @Override
     public String getName() {
@@ -78,31 +73,16 @@ abstract public class CoinType extends NetworkParameters implements ValueType, S
         return checkNotNull(unitExponent, "A coin failed to set a unit exponent");
     }
 
-    @Deprecated
-    public Value getFeePerKb() {
-        return feePerKb();
-    }
-
-    public Value feePerKb() {
-        return checkNotNull(feePerKb, "A coin failed to set a fee per kilobyte");
-    }
-
-    @Deprecated
-    public Coin getMinNonDust() {
-        return minNonDust().toCoin();
+    public Value getFeeValue() {
+        return checkNotNull(feeValue, "A coin failed to set a fee value");
     }
 
     @Override
-    public Value minNonDust() {
+    public Value getMinNonDust() {
         return checkNotNull(minNonDust, "A coin failed to set a minimum amount to be considered not dust");
     }
 
-    @Deprecated
-    public Coin getSoftDustLimit() {
-        return softDustLimit().toCoin();
-    }
-
-    public Value softDustLimit() {
+    public Value getSoftDustLimit() {
         return checkNotNull(softDustLimit, "A coin failed to set a soft dust limit");
     }
 

@@ -794,7 +794,7 @@ public class SendFragment extends Fragment {
      * Get the lowest deposit or withdraw for the provided amount type
      */
     private Value getLowestAmount(ValueType type) {
-        Value min = type.minNonDust();
+        Value min = type.getMinNonDust();
         if (marketInfo != null) {
             if (marketInfo.minimum.isOfType(min)) {
                 min = Value.max(marketInfo.minimum, min);

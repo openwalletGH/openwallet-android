@@ -17,7 +17,7 @@ public class GcrMain extends PeerFamily {
         uriScheme = "gcr";
         bip44Index = 49;
         unitExponent = 8;
-        feePerKb = value(10000);
+        feeValue = value(10000);
         minNonDust = value(1);
         softDustLimit = value(10000);
         softDustPolicy = SoftDustPolicy.AT_LEAST_BASE_FEE_IF_SOFT_DUST_TXO_PRESENT;

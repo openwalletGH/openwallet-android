@@ -20,7 +20,7 @@ public class PrimecoinMain extends BitFamily {
         uriScheme = "primecoin";
         bip44Index = 24;
         unitExponent = 8;
-        feePerKb = value(1000000);
+        feeValue = value(1000000);
         minNonDust = value(546000);
         softDustLimit = value(1000000); // 0.01 XPM
         softDustPolicy = SoftDustPolicy.AT_LEAST_BASE_FEE_IF_SOFT_DUST_TXO_PRESENT;

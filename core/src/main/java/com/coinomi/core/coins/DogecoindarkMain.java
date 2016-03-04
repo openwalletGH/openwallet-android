@@ -20,7 +20,7 @@ public class DogecoindarkMain extends PeerFamily {
         uriScheme = "dogecoindark";
         bip44Index = 77;
         unitExponent = 6;
-        feePerKb = value(100000);
+        feeValue = value(100000);
         minNonDust = value(100000);
         softDustLimit = value(100000); // 0.1 DOGED
         softDustPolicy = SoftDustPolicy.BASE_FEE_FOR_EACH_SOFT_DUST_TXO;

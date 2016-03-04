@@ -21,7 +21,7 @@ public class ReddcoinMain extends ReddFamily {
         uriScheme = "reddcoin";
         bip44Index = 4;
         unitExponent = 8;
-        feePerKb = value(100000);
+        feeValue = value(100000);
         minNonDust = value(1000000);   // 0.01 RDD mininput
         softDustLimit = value(100000000); // 1 RDD
         softDustPolicy = SoftDustPolicy.BASE_FEE_FOR_EACH_SOFT_DUST_TXO;

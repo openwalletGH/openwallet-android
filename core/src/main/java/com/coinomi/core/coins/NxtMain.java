@@ -16,7 +16,7 @@ public class NxtMain extends NxtFamily {
         bip44Index = 29;
         unitExponent = 8;
         addressPrefix = "NXT-";
-        feePerKb = oneCoin();
+        feeValue = oneCoin();
         minNonDust = value(1);
         feePolicy = FeePolicy.FLAT_FEE;
     }

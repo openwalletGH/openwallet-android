@@ -75,7 +75,7 @@ public class SendRequest<T extends AbstractTransaction> implements Serializable 
      * at least {@link Transaction#REFERENCE_DEFAULT_MIN_TX_FEE} if it is set, as default reference clients will
      * otherwise simply treat the transaction as if there were no fee at all.</p>
      *
-     * <p>You might also consider adding a {@link SendRequest#feePerKb} to set the fee per kb of transaction size
+     * <p>You might also consider adding a {@link SendRequest#feePerTxSize} to set the fee per kb of transaction size
      * (rounded down to the nearest kb) as that is how transactions are sorted when added to a block by miners.</p>
      */
     public Value fee;
@@ -94,7 +94,7 @@ public class SendRequest<T extends AbstractTransaction> implements Serializable 
      *
      * <p>You might also consider using a {@link SendRequest#fee} to set the fee added for the first kb of size.</p>
      */
-    public Value feePerKb;
+    public Value feePerTxSize;
 
     /**
      * <p>Requires that there be enough fee for a default reference client to at least relay the transaction.
@@ -102,7 +102,7 @@ public class SendRequest<T extends AbstractTransaction> implements Serializable 
      * only set this to false if you know what you're doing.</p>
      *
      * <p>Note that this does not enforce certain fee rules that only apply to transactions which are larger than
-     * 26,000 bytes. If you get a transaction which is that large, you should set a fee and feePerKb of at least
+     * 26,000 bytes. If you get a transaction which is that large, you should set a fee and feeValue of at least
      * {@link Transaction#REFERENCE_DEFAULT_MIN_TX_FEE}.</p>
      */
     public boolean ensureMinRequiredFee = true;
@@ -172,11 +172,11 @@ public class SendRequest<T extends AbstractTransaction> implements Serializable 
         this.type = type;
         switch (type.getFeePolicy()) {
             case FLAT_FEE:
-                feePerKb = type.value(0);
-                fee = type.feePerKb();
+                feePerTxSize = type.value(0);
+                fee = type.getFeeValue();
                 break;
             case FEE_PER_KB:
-                feePerKb = type.feePerKb();
+                feePerTxSize = type.getFeeValue();
                 fee = type.value(0);
                 break;
             default:
@@ -191,7 +191,7 @@ public class SendRequest<T extends AbstractTransaction> implements Serializable 
         helper.add("emptyWallet", emptyWallet);
         helper.add("changeAddress", changeAddress);
         helper.add("fee", fee);
-        helper.add("feePerKb", feePerKb);
+        helper.add("feePerTxSize", feePerTxSize);
         helper.add("ensureMinRequiredFee", ensureMinRequiredFee);
         helper.add("signTransaction", signTransaction);
         helper.add("aesKey", aesKey != null ? "set" : null); // careful to not leak the key

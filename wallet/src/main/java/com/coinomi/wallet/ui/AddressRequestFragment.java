@@ -470,7 +470,7 @@ public class AddressRequestFragment extends Fragment {
     private final AmountEditView.Listener amountsListener = new AmountEditView.Listener() {
         boolean isValid(Value amount) {
             return amount != null && amount.isPositive()
-                    && amount.compareTo(type.minNonDust()) >= 0;
+                    && amount.compareTo(type.getMinNonDust()) >= 0;
         }
 
         void checkAndUpdateAmount() {

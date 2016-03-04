@@ -20,7 +20,7 @@ public class FeathercoinMain extends BitFamily {
         uriScheme = "feathercoin";
         bip44Index = 8;
         unitExponent = 8;
-        feePerKb = value(2000000);
+        feeValue = value(2000000);
         minNonDust = value(1000); // 0.00001 FTC mininput
         softDustLimit = value(100000); // 0.001 FTC
         softDustPolicy = SoftDustPolicy.BASE_FEE_FOR_EACH_SOFT_DUST_TXO;

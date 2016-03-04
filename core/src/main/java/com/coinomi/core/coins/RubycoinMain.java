@@ -20,7 +20,7 @@ public class RubycoinMain extends PeerFamily {
         uriScheme = "rubycoin";
         bip44Index = 16;
         unitExponent = 8;
-        feePerKb = value(10000); // 0.0001 RBY
+        feeValue = value(10000); // 0.0001 RBY
         minNonDust = value(1);
         softDustLimit = value(1000000); // 0.01 RBY
         softDustPolicy = SoftDustPolicy.AT_LEAST_BASE_FEE_IF_SOFT_DUST_TXO_PRESENT;

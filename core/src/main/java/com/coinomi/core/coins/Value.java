@@ -267,7 +267,7 @@ public class Value implements Monetary, Comparable<Value>, Serializable {
     }
 
     public boolean isDust() {
-        return compareTo(type.minNonDust()) < 0;
+        return compareTo(type.getMinNonDust()) < 0;
     }
 
     public boolean isOfType(ValueType otherType) {

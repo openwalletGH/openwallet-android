@@ -20,7 +20,7 @@ public class DigibyteMain extends BitFamily {
         uriScheme = "digibyte";
         bip44Index = 20;
         unitExponent = 8;
-        feePerKb = value(10000);
+        feeValue = value(10000);
         minNonDust = value(5460);
         softDustLimit = value(100000);
         softDustPolicy = SoftDustPolicy.BASE_FEE_FOR_EACH_SOFT_DUST_TXO;

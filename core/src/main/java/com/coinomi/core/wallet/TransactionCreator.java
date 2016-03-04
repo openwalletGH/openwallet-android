@@ -46,6 +46,8 @@ public class TransactionCreator {
     private static final Logger log = LoggerFactory.getLogger(TransactionCreator.class);
     private final TransactionWatcherWallet account;
     private final CoinType coinType;
+    private final Coin minNonDust;
+    private final Coin softDustLimit;
 
     private final CoinSelector coinSelector = new WalletCoinSelector();
     private final ReentrantLock lock; // TODO remove
@@ -54,6 +56,8 @@ public class TransactionCreator {
         this.account = account;
         lock = account.lock;
         coinType = account.type;
+        minNonDust = coinType.getMinNonDust().toCoin();
+        softDustLimit = coinType.getSoftDustLimit().toCoin();
     }
 
     private static class FeeCalculation {
@@ -103,8 +107,8 @@ public class TransactionCreator {
             int numberOfSoftDustOutputs = 0;
             if (req.ensureMinRequiredFee && !req.emptyWallet) { // min fee checking is handled later for emptyWallet
                 for (TransactionOutput output : tx.getOutputs())
-                    if (output.getValue().compareTo(coinType.getSoftDustLimit()) < 0) {
-                        if (output.getValue().compareTo(coinType.getMinNonDust()) < 0)
+                    if (output.getValue().compareTo(softDustLimit) < 0) {
+                        if (output.getValue().compareTo(minNonDust) < 0)
                             throw new org.bitcoinj.core.Wallet.DustySendRequested();
                         numberOfSoftDustOutputs++;
                     }
@@ -142,8 +146,8 @@ public class TransactionCreator {
 
             if (req.ensureMinRequiredFee && req.emptyWallet) {
                 final Value baseFee = req.fee == null ? Value.valueOf(account.getCoinType(), Coin.ZERO) : req.fee;
-                final Value feePerKb = req.feePerKb == null ? Value.valueOf(account.getCoinType(), Coin.ZERO) : req.feePerKb;
-                if (!adjustOutputDownwardsForFee(tx, bestCoinSelection, baseFee.toCoin(), feePerKb.toCoin()))
+                final Value feePerTxSize = req.feePerTxSize == null ? Value.valueOf(account.getCoinType(), Coin.ZERO) : req.feePerTxSize;
+                if (!adjustOutputDownwardsForFee(tx, bestCoinSelection, baseFee.toCoin(), feePerTxSize.toCoin()))
                     throw new org.bitcoinj.core.Wallet.CouldNotAdjustDownwards();
             }
 
@@ -290,20 +294,20 @@ public class TransactionCreator {
             Value fees = req.fee == null ? Value.valueOf(account.getCoinType(), Coin.ZERO) : req.fee;
             if (lastCalculatedSize > 0 && coinType.getFeePolicy() == FeePolicy.FEE_PER_KB) {
                 // If the size is exactly 1000 bytes then we'll over-pay, but this should be rare.
-                fees = fees.add(req.feePerKb.multiply((lastCalculatedSize / 1000) + 1));
+                fees = fees.add(req.feePerTxSize.multiply((lastCalculatedSize / 1000) + 1));
             } else {
-                fees = fees.add(req.feePerKb);  // First time around the loop.
+                fees = fees.add(req.feePerTxSize);  // First time around the loop.
             }
 
             if (numberOfSoftDustOutputs > 0) {
                 switch (coinType.getSoftDustPolicy()) {
                     case AT_LEAST_BASE_FEE_IF_SOFT_DUST_TXO_PRESENT:
-                        if (fees.compareTo(req.feePerKb) < 0) {
-                            fees = req.feePerKb;
+                        if (fees.compareTo(req.feePerTxSize) < 0) {
+                            fees = req.feePerTxSize;
                         }
                         break;
                     case BASE_FEE_FOR_EACH_SOFT_DUST_TXO:
-                        fees = fees.add(req.feePerKb.multiply(numberOfSoftDustOutputs));
+                        fees = fees.add(req.feePerTxSize.multiply(numberOfSoftDustOutputs));
                         break;
                     case NO_POLICY:
                         break;
@@ -343,24 +347,24 @@ public class TransactionCreator {
 
             // If change is a soft dust, we will need to have at least base fee to be accepted by the network
             if (req.ensureMinRequiredFee && !change.equals(Coin.ZERO) &&
-                    change.compareTo(coinType.getSoftDustLimit()) < 0) {
+                    change.compareTo(softDustLimit) < 0) {
 
                 switch (coinType.getSoftDustPolicy()) {
                     case AT_LEAST_BASE_FEE_IF_SOFT_DUST_TXO_PRESENT:
-                        if (fees.compareTo(req.feePerKb) < 0) {
+                        if (fees.compareTo(req.feePerTxSize) < 0) {
                             // This solution may fit into category 2, but it may also be category 3, we'll check that later
                             eitherCategory2Or3 = true;
-                            additionalValueForNextCategory = coinType.getSoftDustLimit();
+                            additionalValueForNextCategory = softDustLimit;
                             // If the change is smaller than the fee we want to add, this will be negative
-                            change = change.subtract(req.feePerKb.subtract(fees).toCoin());
+                            change = change.subtract(req.feePerTxSize.subtract(fees).toCoin());
                         }
                         break;
                     case BASE_FEE_FOR_EACH_SOFT_DUST_TXO:
                         // This solution may fit into category 2, but it may also be category 3, we'll check that later
                         eitherCategory2Or3 = true;
-                        additionalValueForNextCategory = coinType.getSoftDustLimit();
+                        additionalValueForNextCategory = softDustLimit;
                         // If the change is smaller than the fee we want to add, this will be negative
-                        change = change.subtract(req.feePerKb.toCoin());
+                        change = change.subtract(req.feePerTxSize.toCoin());
                         break;
                     case NO_POLICY:
                         break;
@@ -380,11 +384,11 @@ public class TransactionCreator {
                     changeAddress = (Address) account.getChangeAddress();
                 changeOutput = new TransactionOutput(coinType, tx, change, changeAddress);
                 // If the change output would result in this transaction being rejected as dust, just drop the change and make it a fee
-                if (req.ensureMinRequiredFee && coinType.getMinNonDust().compareTo(change) >= 0) {
+                if (req.ensureMinRequiredFee && minNonDust.compareTo(change) >= 0) {
                     // This solution definitely fits in category 3
                     isCategory3 = true;
-                    additionalValueForNextCategory = req.feePerKb.add(
-                            coinType.getMinNonDust().add(Coin.SATOSHI)).toCoin();
+                    additionalValueForNextCategory = req.feePerTxSize.add(
+                            minNonDust.add(Coin.SATOSHI)).toCoin();
                 } else {
                     size += changeOutput.bitcoinSerialize().length + VarInt.sizeOf(tx.getOutputs().size()) - VarInt.sizeOf(tx.getOutputs().size() - 1);
                     // This solution is either category 1 or 2
@@ -395,7 +399,7 @@ public class TransactionCreator {
                 if (eitherCategory2Or3) {
                     // This solution definitely fits in category 3 (we threw away change because it was smaller than MIN_TX_FEE)
                     isCategory3 = true;
-                    additionalValueForNextCategory = req.feePerKb.add(Coin.SATOSHI).toCoin();
+                    additionalValueForNextCategory = req.feePerTxSize.add(Coin.SATOSHI).toCoin();
                 }
             }
 
@@ -410,7 +414,7 @@ public class TransactionCreator {
             // include things we haven't added yet like input signatures/scripts or the change output.
             size += tx.bitcoinSerialize().length;
             size += estimateBytesForSigning(selection);
-            if (size / 1000 > lastCalculatedSize / 1000 && req.feePerKb.signum() > 0) {
+            if (size / 1000 > lastCalculatedSize / 1000 && req.feePerTxSize.signum() > 0) {
                 lastCalculatedSize = size;
                 // We need more fees anyway, just try again with the same additional value
                 additionalValueForNextCategory = additionalValueSelected;
@@ -424,7 +428,7 @@ public class TransactionCreator {
                 // If we are in selection2, we will require at least CENT additional. If we do that, there is no way
                 // we can end up back here because CENT additional will always get us to 1
                 checkState(selection2 == null);
-                checkState(additionalValueForNextCategory.equals(coinType.getSoftDustLimit()));
+                checkState(additionalValueForNextCategory.equals(softDustLimit));
                 selection2 = selection;
                 selection2Change = checkNotNull(changeOutput); // If we get no change in category 2, we are actually in category 3
             } else {
@@ -482,9 +486,9 @@ public class TransactionCreator {
     }
 
     /**
-     * Reduce the value of the first output of a transaction to pay the given feePerKb as appropriate for its size.
+     * Reduce the value of the first output of a transaction to pay the given feeValue as appropriate for its size.
      */
-    private boolean adjustOutputDownwardsForFee(Transaction tx, CoinSelection coinSelection, Coin baseFee, Coin feePerKb) {
+    private boolean adjustOutputDownwardsForFee(Transaction tx, CoinSelection coinSelection, Coin baseFee, Coin feePerTxSize) {
         TransactionOutput output = tx.getOutput(0);
         // Check if we need additional fee due to the transaction's size
         int size = tx.bitcoinSerialize().length;
@@ -492,25 +496,25 @@ public class TransactionCreator {
         Coin fee;
         switch (coinType.getFeePolicy()) {
             case FEE_PER_KB:
-                fee = baseFee.add(feePerKb.multiply((size / 1000) + 1));
+                fee = baseFee.add(feePerTxSize.multiply((size / 1000) + 1));
                 break;
             case FLAT_FEE:
-                fee = baseFee.add(feePerKb);
+                fee = baseFee.add(feePerTxSize);
                 break;
             default:
                 throw new RuntimeException("Unknown fee policy: " + coinType.getFeePolicy());
         }
         output.setValue(output.getValue().subtract(fee));
         // Check if we need additional fee due to the output's value
-        if (output.getValue().compareTo(coinType.getSoftDustLimit()) < 0) {
+        if (output.getValue().compareTo(softDustLimit) < 0) {
             switch (coinType.getSoftDustPolicy()) {
                 case AT_LEAST_BASE_FEE_IF_SOFT_DUST_TXO_PRESENT:
-                    if (fee.compareTo(feePerKb) < 0) {
-                        output.setValue(output.getValue().subtract(feePerKb.subtract(fee)));
+                    if (fee.compareTo(feePerTxSize) < 0) {
+                        output.setValue(output.getValue().subtract(feePerTxSize.subtract(fee)));
                     }
                     break;
                 case BASE_FEE_FOR_EACH_SOFT_DUST_TXO:
-                    output.setValue(output.getValue().subtract(feePerKb));
+                    output.setValue(output.getValue().subtract(feePerTxSize));
                     break;
                 case NO_POLICY:
                     break;
@@ -519,7 +523,7 @@ public class TransactionCreator {
             }
         }
 
-        return coinType.getMinNonDust().compareTo(output.getValue()) <= 0;
+        return minNonDust.compareTo(output.getValue()) <= 0;
     }
 
     private int estimateBytesForSigning(CoinSelection selection) {

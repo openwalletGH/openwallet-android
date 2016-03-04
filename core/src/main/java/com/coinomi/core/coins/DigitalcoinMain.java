@@ -20,7 +20,7 @@ public class DigitalcoinMain extends BitFamily {
         uriScheme = "digitalcoin";
         bip44Index = 18;
         unitExponent = 8;
-        feePerKb = value(5000000); // 0.05 DGC
+        feeValue = value(5000000); // 0.05 DGC
         feePolicy = FeePolicy.FLAT_FEE;
         minNonDust = value(10920);
         softDustLimit = minNonDust;

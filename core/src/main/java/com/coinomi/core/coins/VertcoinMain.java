@@ -20,7 +20,7 @@ public class VertcoinMain extends BitFamily {
         uriScheme = "vertcoin";
         bip44Index = 28;
         unitExponent = 8;
-        feePerKb = value(100000);
+        feeValue = value(100000);
         minNonDust = value(1000); // 0.00001 VTC mininput
         softDustLimit = value(100000); // 0.001 VTC
         softDustPolicy = SoftDustPolicy.BASE_FEE_FOR_EACH_SOFT_DUST_TXO;

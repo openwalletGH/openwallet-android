@@ -1,6 +1,5 @@
 package com.coinomi.core.coins;
 
-import com.coinomi.core.coins.families.BitFamily;
 import com.coinomi.core.coins.families.ReddFamily;
 
 /**
@@ -22,7 +21,7 @@ public class CannacoinMain extends ReddFamily {
         uriScheme = "cannacoin";
         bip44Index = 19;
         unitExponent = 8;
-        feePerKb = value(100000);
+        feeValue = value(100000);
         minNonDust = value(1000000);
         softDustLimit = value(100000000);
         softDustPolicy = SoftDustPolicy.BASE_FEE_FOR_EACH_SOFT_DUST_TXO;

@@ -782,7 +782,7 @@ public class TradeSelectFragment extends Fragment {
      * Get the lowest deposit or withdraw for the provided amount type
      */
     private Value getLowestAmount(Value amount) {
-        Value min = amount.type.minNonDust();
+        Value min = amount.type.getMinNonDust();
         if (minimumDeposit != null) {
             if (minimumDeposit.isOfType(min)) {
                 min = Value.max(minimumDeposit, min);
