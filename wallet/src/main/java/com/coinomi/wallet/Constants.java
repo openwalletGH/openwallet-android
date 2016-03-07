@@ -19,6 +19,7 @@ import com.coinomi.core.coins.DogecoinTest;
 import com.coinomi.core.coins.DogecoindarkMain;
 import com.coinomi.core.coins.FeathercoinMain;
 import com.coinomi.core.coins.GcrMain;
+import com.coinomi.core.coins.GuldenMain;
 import com.coinomi.core.coins.JumbucksMain;
 import com.coinomi.core.coins.LitecoinMain;
 import com.coinomi.core.coins.LitecoinTest;
@@ -186,7 +187,9 @@ public class Constants {
             new CoinAddress(GcrMain.get(),          new ServerAddress("gcr-cce-1.coinomi.net", 5038),
                                                     new ServerAddress("gcr-cce-2.coinomi.net", 5038)),
             new CoinAddress(PotcoinMain.get(),      new ServerAddress("pot-cce-1.coinomi.net", 5039),
-                                                    new ServerAddress("pot-cce-2.coinomi.net", 5039))
+                                                    new ServerAddress("pot-cce-2.coinomi.net", 5039)),
+            new CoinAddress(GuldenMain.get(),       new ServerAddress("gulden-cce-1.coinomi.net", 5040),
+                                                    new ServerAddress("gulden-cce-2.coinomi.net", 5040))
     );
 
     public static final HashMap<CoinType, Integer> COINS_ICONS;
@@ -227,6 +230,7 @@ public class Constants {
         COINS_ICONS.put(CoinID.CLAMS_MAIN.getCoinType(), R.drawable.clams);
         COINS_ICONS.put(CoinID.GCR_MAIN.getCoinType(), R.drawable.gcr);
         COINS_ICONS.put(CoinID.POTCOIN_MAIN.getCoinType(), R.drawable.potcoin);
+        COINS_ICONS.put(CoinID.GULDEN_MAIN.getCoinType(), R.drawable.gulden);
 
         COINS_BLOCK_EXPLORERS = new HashMap<CoinType, String>();
         COINS_BLOCK_EXPLORERS.put(CoinID.BITCOIN_MAIN.getCoinType(), "https://blockchain.info/tx/%s");
@@ -261,6 +265,7 @@ public class Constants {
         COINS_BLOCK_EXPLORERS.put(CoinID.CLAMS_MAIN.getCoinType(), "http://khashier.com/tx/%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.GCR_MAIN.getCoinType(), "https://chainz.cryptoid.info/gcr/tx.dws?%s");
         COINS_BLOCK_EXPLORERS.put(CoinID.POTCOIN_MAIN.getCoinType(), "https://chainz.cryptoid.info/pot/tx.dws?%s");
+        COINS_BLOCK_EXPLORERS.put(CoinID.GULDEN_MAIN.getCoinType(), "https://explorer.gulden.com/#/transaction/%s");
     }
 
     public static final CoinType DEFAULT_COIN = BitcoinMain.get();
@@ -285,6 +290,7 @@ public class Constants {
             DogecoindarkMain.get(),
             FeathercoinMain.get(),
             GcrMain.get(),
+            GuldenMain.get(),
             JumbucksMain.get(),
             LitecoinMain.get(),
             MonacoinMain.get(),

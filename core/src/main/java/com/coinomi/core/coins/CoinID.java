@@ -55,6 +55,7 @@ public enum CoinID {
     CLAMS_MAIN(ClamsMain.get()),
     GCR_MAIN(GcrMain.get()),
     POTCOIN_MAIN(PotcoinMain.get()),
+    GULDEN_MAIN(GuldenMain.get()),
     ;
 
     private static List<CoinType> types;
@@ -127,8 +128,9 @@ public enum CoinID {
     }
 
     public static List<CoinType> fromUri(String input) {
+        String inputLowercase = input.toLowerCase();
         for (String uri : uriLookup.keySet()) {
-            if (input.startsWith(uri + "://") || input.startsWith(uri + ":")) {
+            if (inputLowercase.startsWith(uri + "://") || inputLowercase.startsWith(uri + ":")) {
                 return uriLookup.get(uri);
             }
         }
@@ -136,8 +138,9 @@ public enum CoinID {
     }
 
     public static List<CoinType> fromUriScheme(String scheme) {
-        if (uriLookup.containsKey(scheme)) {
-            return uriLookup.get(scheme);
+        String schemeLowercase = scheme.toLowerCase();
+        if (uriLookup.containsKey(schemeLowercase)) {
+            return uriLookup.get(schemeLowercase);
         } else {
             throw new IllegalArgumentException("Unsupported URI scheme: " + scheme);
         }

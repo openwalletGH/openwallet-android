@@ -174,9 +174,10 @@ public class CoinURI implements Serializable {
             possibleTypes = Lists.newArrayList(type);
         }
 
-        if (input.startsWith(uriScheme + "://")) {
+        String inputLowercase = input.toLowerCase();
+        if (inputLowercase.startsWith(uriScheme + "://")) {
             schemeSpecificPart = input.substring((uriScheme + "://").length());
-        } else if (input.startsWith(uriScheme + ":")) {
+        } else if (inputLowercase.startsWith(uriScheme + ":")) {
             schemeSpecificPart = input.substring((uriScheme + ":").length());
         } else {
             throw new CoinURIParseException("Unsupported URI scheme: " + uri.getScheme());
