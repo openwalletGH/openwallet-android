@@ -20,7 +20,7 @@ public class NuBitsMain extends NuFamily {
         uriScheme = "nu";
         bip44Index = 12;
         unitExponent = 4;
-        feeValue = value(200); // 0.02NBT, careful NuBits has 10000 units per coin
+        feeValue = value(100); // 0.02NBT, careful NuBits has 10000 units per coin
         minNonDust = value(100); // 0.01NBT
         softDustLimit = minNonDust;
         softDustPolicy = SoftDustPolicy.NO_POLICY;
