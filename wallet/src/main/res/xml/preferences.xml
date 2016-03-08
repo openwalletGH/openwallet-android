@@ -6,6 +6,11 @@
             android:targetClass="com.coinomi.wallet.ui.ExchangeRatesActivity" />
     </Preference>
 
+    <Preference android:title="@string/title_activity_transaction_fees" >
+        <intent android:targetPackage="@string/app_package"
+            android:targetClass="com.coinomi.wallet.ui.FeesSettingsActivity" />
+    </Preference>
+
     <Preference android:title="@string/title_activity_show_seed" >
         <intent android:targetPackage="@string/app_package"
             android:targetClass="com.coinomi.wallet.ui.ShowSeedActivity" />

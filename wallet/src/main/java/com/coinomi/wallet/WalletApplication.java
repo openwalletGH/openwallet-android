@@ -15,6 +15,7 @@ import android.preference.PreferenceManager;
 import android.widget.Toast;
 
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.coins.Value;
 import com.coinomi.core.exchange.shapeshift.ShapeShift;
 import com.coinomi.core.util.HardwareSoftwareCompliance;
 import com.coinomi.core.wallet.AbstractAddress;
@@ -178,6 +179,7 @@ public class WalletApplication extends Application {
     }
 
     private void afterLoadWallet() {
+        setupFeeProvider();
 //        wallet.autosaveToFile(walletFile, 1, TimeUnit.SECONDS, new WalletAutosaveEventListener());
 //
         // clean up spam
@@ -186,6 +188,15 @@ public class WalletApplication extends Application {
 //        ensureKey();
 //
 //        migrateBackup();
+    }
+
+    private void setupFeeProvider() {
+        CoinType.setFeeProvider(new CoinType.FeeProvider() {
+            @Override
+            public Value getFeeValue(CoinType type) {
+                return config.getFeeValue(type);
+            }
+        });
     }
 
     private void initLogging() {

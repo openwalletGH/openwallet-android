@@ -218,9 +218,9 @@ public final class CurrencyCalculatorLink {
 
     public View activeTextView() {
         if (exchangeDirection)
-            return coinAmountView.getTextView();
+            return coinAmountView.getAmountView();
         else
-            return localAmountView.getTextView();
+            return localAmountView.getAmountView();
     }
 
     public void requestFocus() {

@@ -207,6 +207,14 @@
             android:label="@string/title_activity_sweep_wallet"
             android:theme="@style/AppTheme" >
         </activity>
+        <activity
+            android:name="com.coinomi.wallet.ui.FeesSettingsActivity"
+            android:label="@string/title_activity_transaction_fees"
+            android:theme="@style/AppTheme" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.coinomi.wallet.ui.SettingsActivity" />
+        </activity>
 
         <provider
             android:name="com.coinomi.wallet.ExchangeRatesProvider"

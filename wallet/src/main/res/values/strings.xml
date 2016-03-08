@@ -30,6 +30,7 @@
     <string name="button_return">Return</string>
     <string name="button_confirm">Confirm</string>
     <string name="button_cancel">Cancel</string>
+    <string name="button_default">Default</string>
     <string name="button_dismiss">Dismiss</string>
     <string name="button_delete">Delete</string>
     <string name="button_add">Add</string>
@@ -342,5 +343,14 @@
     <string name="sweep_wallet_key_decoding">Decoding private key&#8230;</string>
     <string name="sweep_wallet_key_loading">Loading balance&#8230;</string>
     <string name="sweep_wallet_key_signing">Creating transaction&#8230;</string>
+    <!-- Fees settings -->
+    <string name="title_activity_transaction_fees">Transaction fees</string>
+    <!-- Example: Bitcoin transaction fees-->
+    <string name="tx_fees_title">%1$s transaction fees</string>
+    <!-- Example: The fee value is per kilobyte.-->
+    <string name="tx_fees_description">The fee value is %1$s.</string>
+    <string name="tx_fees_per_kilobyte">per kilobyte of transaction data</string>
+    <string name="tx_fees_per_byte">per byte of transaction data</string>
+    <string name="tx_fees_per_transaction">per transaction</string>
 
 </resources>

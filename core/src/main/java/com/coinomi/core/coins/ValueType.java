@@ -11,6 +11,7 @@ import java.io.Serializable;
  * @author John L. Jegutanis
  */
 public interface ValueType extends Serializable {
+    String getId();
     String getName();
     String getSymbol();
     int getUnitExponent();

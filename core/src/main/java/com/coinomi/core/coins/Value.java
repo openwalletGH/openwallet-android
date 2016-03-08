@@ -23,6 +23,7 @@ import com.google.common.math.LongMath;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -57,6 +58,14 @@ public class Value implements Monetary, Comparable<Value>, Serializable {
     public static Value valueOf(final ValueType type, @Nullable final Coin coin) {
         if (coin != null) return new Value(type, coin.value);
         return null;
+    }
+
+    public static Value valueOf(final ValueType type, BigInteger units) {
+        return new Value(type, units.longValue());
+    }
+
+    public static Value valueOf(final ValueType type, String unitsStr) {
+        return valueOf(type, new BigInteger(unitsStr));
     }
 
     @Override
@@ -239,6 +248,13 @@ public class Value implements Monetary, Comparable<Value>, Serializable {
     @Override
     public String toString() {
         return toPlainString() + type.getSymbol();
+    }
+
+    /**
+     * Returns the value expressed as string
+     */
+    public String toUnitsString() {
+        return BigInteger.valueOf(value).toString();
     }
 
     @Override

@@ -3,11 +3,11 @@ package com.coinomi.wallet.ui.widget;
 import android.content.Context;
 import android.text.Editable;
 import android.text.Spannable;
-import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -23,19 +23,26 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnFocusChange;
+import butterknife.OnTextChanged;
+
 /**
  * @author Andreas Schildbach
  * @author John L. Jegutanis
  */
 public class AmountEditView extends RelativeLayout {
-    private final TextView symbol;
-    private final EditText textView;
+    @Bind(R.id.symbol) TextView symbol;
+    @Bind(R.id.amount) EditText amount;
+    @Bind(R.id.amount_edit_layout) LinearLayout view;
     private Listener listener;
     @Nullable private ValueType type;
     private MonetaryFormat inputFormat;
     private boolean amountSigned = false;
     @Nullable private Value hint;
     private MonetaryFormat hintFormat = new MonetaryFormat().noCode();
+    private boolean fireListener = true;
 
     public interface Listener {
         void changed();
@@ -44,18 +51,12 @@ public class AmountEditView extends RelativeLayout {
 
     public AmountEditView(Context context, AttributeSet attrs) {
         super(context, attrs);
-
         LayoutInflater.from(context).inflate(R.layout.amount_edit, this, true);
-
-        textView = (EditText) findViewById(R.id.amount);
-        symbol = (TextView) findViewById(R.id.symbol);
-
-        textView.addTextChangedListener(textViewListener);
-        textView.setOnFocusChangeListener(textViewListener);
+        ButterKnife.bind(this);
     }
 
     public void reset() {
-        textView.setText(null);
+        amount.setText(null);
         symbol.setText(null);
         type = null;
         hint = null;
@@ -96,9 +97,17 @@ public class AmountEditView extends RelativeLayout {
         this.amountSigned = amountSigned;
     }
 
+    public void setSingleLine(boolean isSingleLine) {
+        if (isSingleLine) {
+            view.setOrientation(LinearLayout.HORIZONTAL);
+        } else {
+            view.setOrientation(LinearLayout.VERTICAL);
+        }
+    }
+
     @CheckForNull
     public Value getAmount() {
-        final String str = textView.getText().toString().trim();
+        final String str = amount.getText().toString().trim();
         Value amount = null;
 
         try {
@@ -113,23 +122,23 @@ public class AmountEditView extends RelativeLayout {
     }
 
     public void setAmount(@Nullable final Value value, final boolean fireListener) {
-        if (!fireListener) textViewListener.setFire(false);
+        if (!fireListener) setFireListener(false);
 
         if (value != null) {
-            textView.setText(new MonetarySpannable(inputFormat, amountSigned, value));
+            amount.setText(new MonetarySpannable(inputFormat, amountSigned, value));
         } else {
-            textView.setText(null);
+            amount.setText(null);
         }
 
-        if (!fireListener) textViewListener.setFire(true);
+        if (!fireListener) setFireListener(true);
     }
 
     public String getAmountText() {
-        return textView.getText().toString().trim();
+        return amount.getText().toString().trim();
     }
 
-    public TextView getTextView() {
-        return textView;
+    public TextView getAmountView() {
+        return amount;
     }
 
     private void updateAppearance() {
@@ -143,47 +152,41 @@ public class AmountEditView extends RelativeLayout {
 
         final Spannable hintSpannable = new MonetarySpannable(hintFormat, amountSigned,
                 hint != null ? hint : Coin.ZERO);
-        textView.setHint(hintSpannable);
+        amount.setHint(hintSpannable);
     }
 
-    private final TextViewListener textViewListener = new TextViewListener();
+    private void setFireListener(boolean fireListener) {
+        this.fireListener = fireListener;
+    }
 
-    private final class TextViewListener implements TextWatcher, OnFocusChangeListener {
-        private boolean fire = true;
+    private boolean isFireListener() {
+        return fireListener;
+    }
 
-        public void setFire(final boolean fire) {
-            this.fire = fire;
+    @OnTextChanged(value = R.id.amount, callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
+    public void afterTextChanged(final Editable s) {
+        // workaround for German keyboards
+        final String original = s.toString();
+        final String replaced = original.replace(',', '.');
+        if (!replaced.equals(original)) {
+            s.clear();
+            s.append(replaced);
+        }
+    }
+
+    @OnTextChanged(value = R.id.amount, callback = OnTextChanged.Callback.TEXT_CHANGED)
+    public void onTextChanged(final CharSequence s, final int start, final int before, final int count) {
+        if (listener != null && isFireListener()) listener.changed();
+    }
+
+    @OnFocusChange(R.id.amount)
+    public void onFocusChange(final View v, final boolean hasFocus) {
+        if (!hasFocus) {
+            final Value amount = getAmount();
+            if (amount != null)
+                setAmount(amount, false);
         }
 
-        @Override
-        public void afterTextChanged(final Editable s) {
-            // workaround for German keyboards
-            final String original = s.toString();
-            final String replaced = original.replace(',', '.');
-            if (!replaced.equals(original)) {
-                s.clear();
-                s.append(replaced);
-            }
-        }
-
-        @Override
-        public void beforeTextChanged(final CharSequence s, final int start, final int count, final int after) {
-        }
-
-        @Override
-        public void onTextChanged(final CharSequence s, final int start, final int before, final int count) {
-            if (listener != null && fire) listener.changed();
-        }
-
-        @Override
-        public void onFocusChange(final View v, final boolean hasFocus) {
-            if (!hasFocus) {
-                final Value amount = getAmount();
-                if (amount != null)
-                    setAmount(amount, false);
-            }
-
-            if (listener != null && fire) listener.focusChanged(hasFocus);
-        }
+        if (listener != null && isFireListener()) listener.focusChanged(hasFocus);
     }
 }

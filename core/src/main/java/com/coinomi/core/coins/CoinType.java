@@ -46,6 +46,8 @@ abstract public class CoinType extends NetworkParameters implements ValueType, S
     private transient MonetaryFormat plainFormat;
     private transient Value oneCoin;
 
+    private static FeeProvider feeProvider = null;
+
     @Override
     public String getName() {
         return checkNotNull(name, "A coin failed to set a name");
@@ -74,6 +76,14 @@ abstract public class CoinType extends NetworkParameters implements ValueType, S
     }
 
     public Value getFeeValue() {
+        if (feeProvider != null) {
+            return feeProvider.getFeeValue(this);
+        } else {
+            return getDefaultFeeValue();
+        }
+    }
+
+    public Value getDefaultFeeValue() {
         return checkNotNull(feeValue, "A coin failed to set a fee value");
     }
 
@@ -211,5 +221,13 @@ abstract public class CoinType extends NetworkParameters implements ValueType, S
     @Override
     public boolean equals(ValueType obj) {
         return super.equals(obj);
+    }
+
+    public static void setFeeProvider(FeeProvider feeProvider) {
+        CoinType.feeProvider = feeProvider;
+    }
+
+    public interface FeeProvider {
+        Value getFeeValue(CoinType type);
     }
 }

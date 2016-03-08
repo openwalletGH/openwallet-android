@@ -34,7 +34,7 @@
         tools:text="Bitcoin" />
 
     <com.coinomi.wallet.ui.widget.Amount
-        android:id="@+id/exchange_rate"
+        android:id="@+id/amount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/half_standard_margin"

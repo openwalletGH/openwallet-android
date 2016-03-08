@@ -50,7 +50,6 @@ public class Amount extends LinearLayout {
             } else if (isSmall) {
                 amountView.setTextAppearance(context, R.style.AmountSmall);
                 symbolView.setTextAppearance(context, R.style.AmountSymbolSmall);
-
             } else {
                 amountView.setTextAppearance(context, R.style.Amount);
                 symbolView.setTextAppearance(context, R.style.AmountSymbol);
@@ -59,9 +58,7 @@ public class Amount extends LinearLayout {
 
         amountView.setMaxTextSize(amountView.getTextSize());
 
-        if (isSingleLine) {
-            ((LinearLayout)findViewById(R.id.amount_layout)).setOrientation(HORIZONTAL);
-        }
+        setSingleLine(isSingleLine);
 
         if (getRootView().isInEditMode()) {
             amountView.setText("3.14159265");
@@ -74,6 +71,15 @@ public class Amount extends LinearLayout {
 
     public void setSymbol(CharSequence symbol) {
         symbolView.setText(symbol);
+    }
+
+    public void setSingleLine(boolean isSingleLine) {
+        this.isSingleLine = isSingleLine;
+        if (isSingleLine) {
+            ((LinearLayout)findViewById(R.id.amount_layout)).setOrientation(HORIZONTAL);
+        } else {
+            ((LinearLayout)findViewById(R.id.amount_layout)).setOrientation(VERTICAL);
+        }
     }
 
     public void setAmountPending(@Nullable String pendingAmount) {

@@ -43,6 +43,11 @@ public class FiatType implements ValueType {
     }
 
     @Override
+    public String getId() {
+        return getSymbol();
+    }
+
+    @Override
     public String getName() {
         return name;
     }

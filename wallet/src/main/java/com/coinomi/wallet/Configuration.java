@@ -4,19 +4,17 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.text.format.DateUtils;
 
-import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
-import com.coinomi.core.wallet.Wallet;
-import com.coinomi.core.wallet.WalletAccount;
+import com.coinomi.core.coins.Value;
 import com.coinomi.wallet.util.WalletUtils;
-import com.coinomi.wallet.ExchangeRatesProvider.ExchangeRate;
+import com.google.common.collect.ImmutableMap;
 
-import org.bitcoinj.core.Coin;
-import org.bitcoinj.utils.Fiat;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -41,6 +39,7 @@ public class Configuration {
     public static final String PREFS_KEY_BTC_PRECISION = "btc_precision";
     public static final String PREFS_KEY_CONNECTIVITY_NOTIFICATION = "connectivity_notification";
     public static final String PREFS_KEY_EXCHANGE_CURRENCY = "exchange_currency";
+    public static final String PREFS_KEY_FEES = "fees";
     public static final String PREFS_KEY_DISCLAIMER = "disclaimer";
     public static final String PREFS_KEY_SELECTED_ADDRESS = "selected_address";
 
@@ -66,6 +65,14 @@ public class Configuration {
         this.prefs = prefs;
 
         this.lastVersionCode = prefs.getInt(PREFS_KEY_LAST_VERSION, 0);
+    }
+
+    public void registerOnSharedPreferenceChangeListener(final OnSharedPreferenceChangeListener listener) {
+        prefs.registerOnSharedPreferenceChangeListener(listener);
+    }
+
+    public void unregisterOnSharedPreferenceChangeListener(final OnSharedPreferenceChangeListener listener) {
+        prefs.unregisterOnSharedPreferenceChangeListener(listener);
     }
 
     public void updateLastVersionCode(final int currentVersionCode) {
@@ -114,6 +121,50 @@ public class Configuration {
         }
     }
 
+    public Map<CoinType, Value> getFeeValues() {
+        JSONObject feesJson = getFeesJson();
+        ImmutableMap.Builder<CoinType, Value> feesMapBuilder = ImmutableMap.builder();
+
+        for (CoinType type : Constants.SUPPORTED_COINS) {
+            Value fee = getFeeFromJson(feesJson, type);
+            feesMapBuilder.put(type, fee);
+        }
+
+        return feesMapBuilder.build();
+    }
+
+    public Value getFeeValue(CoinType type) {
+        return getFeeFromJson(getFeesJson(), type);
+    }
+
+    public void setFeeValue(final Value feeValue) {
+        JSONObject feesJson = getFeesJson();
+        try {
+            feesJson.put(feeValue.type.getId(), feeValue.toUnitsString());
+        } catch (JSONException e) {
+            // Should not happen
+            log.error("Error setting fee value", e);
+        }
+        prefs.edit().putString(PREFS_KEY_FEES, feesJson.toString()).apply();
+    }
+
+    private Value getFeeFromJson(JSONObject feesJson, CoinType type) {
+        String feeStr = feesJson.optString(type.getId());
+        if (feeStr.isEmpty()) {
+            return type.getDefaultFeeValue();
+        } else {
+            return Value.valueOf(type, feeStr);
+        }
+    }
+
+    private JSONObject getFeesJson() {
+        try {
+            return new JSONObject(prefs.getString(PREFS_KEY_FEES, ""));
+        } catch (JSONException e) {
+            return new JSONObject();
+        }
+    }
+
     /**
      * Returns the user selected currency. If defaultFallback is set to true it return a default
      * currency is no user selected setting found.
@@ -158,14 +209,6 @@ public class Configuration {
         edit.apply();
     }
 
-    public void registerOnSharedPreferenceChangeListener(final OnSharedPreferenceChangeListener listener) {
-        prefs.registerOnSharedPreferenceChangeListener(listener);
-    }
-
-    public void unregisterOnSharedPreferenceChangeListener(final OnSharedPreferenceChangeListener listener) {
-        prefs.unregisterOnSharedPreferenceChangeListener(listener);
-    }
-
     public boolean getLastExchangeDirection() {
         return prefs.getBoolean(PREFS_KEY_LAST_EXCHANGE_DIRECTION, true);
     }
@@ -177,7 +220,6 @@ public class Configuration {
     public boolean isManualAddressManagement() {
         return prefs.getBoolean(PREFS_KEY_MANUAL_RECEIVING_ADDRESSES, false);
     }
-
 
     public void setDeviceCompatible(final boolean isDeviceCompatible) {
         prefs.edit().putBoolean(PREFS_KEY_DEVICE_COMPATIBLE, isDeviceCompatible).apply();
