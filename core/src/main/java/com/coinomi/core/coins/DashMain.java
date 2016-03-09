@@ -7,7 +7,7 @@ import com.coinomi.core.coins.families.BitFamily;
  */
 public class DashMain extends BitFamily {
     private DashMain() {
-        id = "darkcoin.main"; // Do not change this id as wallets serialize this string
+        id = "dash.main"; // Do not change this id as wallets serialize this string
 
         addressHeader = 76;
         p2shHeader = 16;

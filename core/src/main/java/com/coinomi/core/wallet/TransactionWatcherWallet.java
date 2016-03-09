@@ -101,7 +101,7 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<BitTransac
     @VisibleForTesting final Map<Sha256Hash, BitTransaction> confirmed;
 
     // All transactions together.
-    private final Map<Sha256Hash, BitTransaction> rawTransactions;
+    final Map<Sha256Hash, BitTransaction> rawTransactions;
     private BitBlockchainConnection blockchainConnection;
     private List<ListenerRegistration<WalletAccountEventListener>> listeners;
 
@@ -230,6 +230,15 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<BitTransac
         lock.lock();
         try {
             addWalletTransaction(wtx.getPool(), wtx.getTransaction(), true);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    boolean trimTransactionIfNeeded(Sha256Hash hash) {
+        lock.lock();
+        try {
+            return trimTransaction(hash);
         } finally {
             lock.unlock();
         }
@@ -628,8 +637,7 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<BitTransac
                     return true;
                 }
             }
-        }
-        finally {
+        } finally {
             lock.unlock();
         }
     }

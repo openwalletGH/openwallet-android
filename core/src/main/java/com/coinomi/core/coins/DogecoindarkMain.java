@@ -7,7 +7,7 @@ import com.coinomi.core.coins.families.PeerFamily;
  */
 public class DogecoindarkMain extends PeerFamily {
     private DogecoindarkMain() {
-        id = "dogecoindark.main";
+        id = "verge.main";
 
         addressHeader = 30;
         p2shHeader = 33;

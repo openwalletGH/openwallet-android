@@ -2,16 +2,24 @@ package com.coinomi.core.wallet;
 
 import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.coins.DashMain;
+import com.coinomi.core.coins.DogecoindarkMain;
 import com.coinomi.core.coins.families.BitFamily;
 import com.coinomi.core.coins.families.NxtFamily;
+import com.coinomi.core.network.ServerClient;
 import com.coinomi.core.protos.Protos;
 import com.coinomi.core.util.KeyUtils;
+import com.coinomi.core.wallet.families.bitcoin.BitTransaction;
+import com.coinomi.core.wallet.families.bitcoin.OutPointOutput;
+import com.coinomi.core.wallet.families.bitcoin.TrimmedOutPoint;
 import com.coinomi.core.wallet.families.nxt.NxtFamilyWallet;
 import com.coinomi.core.wallet.families.nxt.NxtFamilyWalletProtobufSerializer;
 import com.google.common.base.Splitter;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.TextFormat;
 
+import org.bitcoinj.core.Sha256Hash;
+import org.bitcoinj.core.TransactionOutput;
 import org.bitcoinj.crypto.ChildNumber;
 import org.bitcoinj.crypto.DeterministicKey;
 import org.bitcoinj.crypto.EncryptedData;
@@ -24,9 +32,13 @@ import org.bitcoinj.wallet.DeterministicSeed;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import static com.coinomi.core.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static org.bitcoinj.core.TransactionConfidence.ConfidenceType.BUILDING;
 
 /**
  * @author John L. Jegutanis
@@ -163,8 +175,12 @@ public class WalletProtobufSerializer {
      * @throws UnreadableWalletException thrown in various error conditions (see description).
      */
     public static Wallet readWallet(Protos.Wallet walletProto) throws UnreadableWalletException {
-        if (walletProto.getVersion() > 1)
+        if (walletProto.getVersion() > 2)
             throw new UnreadableWalletException.FutureVersion();
+
+        if (walletProto.getVersion() < 2) {
+            walletProto = updateV1toV2Proto(walletProto);
+        }
 
         // Check if wallet is encrypted
         final KeyCrypter crypter = getKeyCrypter(walletProto);
@@ -209,6 +225,10 @@ public class WalletProtobufSerializer {
             }
 
             wallet.addAccount(pocket);
+        }
+
+        if (wallet.getVersion() < 2) {
+            updateV1toV2(wallet);
         }
 
         return wallet;
@@ -261,5 +281,54 @@ public class WalletProtobufSerializer {
      */
     public static Protos.Wallet parseToProto(InputStream input) throws IOException {
         return Protos.Wallet.parseFrom(input);
+    }
+
+    private static Protos.Wallet updateV1toV2Proto(Protos.Wallet walletProto) {
+        checkState(walletProto.getVersion() < 2, "Can update only from version < 2");
+        Protos.Wallet.Builder b = walletProto.toBuilder();
+        for (int i = 0; i < b.getPocketsCount(); i++) {
+            Protos.WalletPocket.Builder account = b.getPocketsBuilder(i);
+            if (account.getNetworkIdentifier().equals("dogecoindark.main")) {
+                account.setNetworkIdentifier(DogecoindarkMain.get().getId());
+                b.setPockets(i, account);
+            }
+            if (account.getNetworkIdentifier().equals("darkcoin.main")) {
+                account.setNetworkIdentifier(DashMain.get().getId());
+                b.setPockets(i, account);
+            }
+        }
+        return b.build();
+    }
+
+    private static void updateV1toV2(Wallet wallet) {
+        checkState(wallet.getVersion() < 2, "Can update only from version < 2");
+        wallet.setVersion(2);
+        for (WalletAccount walletAccount : wallet.getAllAccounts()) {
+            if (walletAccount instanceof WalletPocketHD) {
+                WalletPocketHD account = (WalletPocketHD) walletAccount;
+                // Force resync
+                account.addressesStatus.clear();
+                // Gather hashes to trim them later
+                Set<Sha256Hash> txHashes = new HashSet<>(account.rawTransactions.size());
+                // Reconstruct UTXO set
+                for (BitTransaction tx : account.rawTransactions.values()) {
+                    txHashes.add(tx.getHash());
+                    for (TransactionOutput txo : tx.getOutputs()) {
+                        if (txo.isAvailableForSpending() && txo.isMineOrWatched(account)) {
+                            OutPointOutput utxo = new OutPointOutput(tx, txo.getIndex());
+                            if (tx.getConfidenceType() == BUILDING) {
+                                utxo.setAppearedAtChainHeight(tx.getAppearedAtChainHeight());
+                                utxo.setDepthInBlocks(tx.getDepthInBlocks());
+                            }
+                            account.unspentOutputs.put(utxo.getOutPoint(), utxo);
+                        }
+                    }
+                }
+                // Trim transactions
+                for (Sha256Hash txHash : txHashes) {
+                    account.trimTransactionIfNeeded(txHash);
+                }
+            }
+        }
     }
 }
