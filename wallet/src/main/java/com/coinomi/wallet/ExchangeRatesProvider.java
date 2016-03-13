@@ -35,7 +35,7 @@ import com.coinomi.core.coins.FiatValue;
 import com.coinomi.core.coins.Value;
 import com.coinomi.core.util.ExchangeRateBase;
 import com.coinomi.wallet.util.NetworkUtils;
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
@@ -169,9 +169,9 @@ public class ExchangeRatesProvider extends ContentProvider {
         return rate;
     }
 
-    public static List<ExchangeRate> getRates(final Context context,
+    public static Map<String, ExchangeRate> getRates(final Context context,
                                               @Nonnull String localSymbol) {
-        ImmutableList.Builder<ExchangeRate> builder = ImmutableList.builder();
+        ImmutableMap.Builder<String, ExchangeRate> builder = ImmutableMap.builder();
 
         if (context != null) {
             final Uri uri = contentUriToCrypto(context.getPackageName(), localSymbol, true);
@@ -181,7 +181,8 @@ public class ExchangeRatesProvider extends ContentProvider {
             if (cursor != null && cursor.getCount() > 0) {
                 cursor.moveToFirst();
                 do {
-                    builder.add(getExchangeRate(cursor));
+                    ExchangeRate rate = getExchangeRate(cursor);
+                    builder.put(rate.currencyCodeId, rate);
                 } while (cursor.moveToNext());
                 cursor.close();
             }

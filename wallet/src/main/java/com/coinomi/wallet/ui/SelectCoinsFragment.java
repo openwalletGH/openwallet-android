@@ -24,6 +24,7 @@ import com.coinomi.wallet.ExchangeRatesProvider.ExchangeRate;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.ui.widget.HeaderWithFontIcon;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
 import org.slf4j.Logger;
@@ -210,15 +211,15 @@ public class SelectCoinsFragment extends Fragment {
         @Override
         public void onLoadFinished(final Loader<Cursor> loader, final Cursor data) {
             if (data != null && data.getCount() > 0) {
-                List<ExchangeRate> rates = new ArrayList<ExchangeRate>(data.getCount());
+                ImmutableMap.Builder<String, ExchangeRate> builder = ImmutableMap.builder();
 
                 data.moveToFirst();
                 do {
                     ExchangeRate exchangeRate = ExchangeRatesProvider.getExchangeRate(data);
-                    rates.add(exchangeRate);
+                    builder.put(exchangeRate.currencyCodeId, exchangeRate);
                 } while (data.moveToNext());
 
-                adapter.setExchangeRates(rates);
+                adapter.setExchangeRates(builder.build());
             }
         }
 

@@ -6,7 +6,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
-import android.support.v7.app.ActionBar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -35,11 +34,7 @@ import com.coinomi.wallet.util.WeakHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-
-import javax.annotation.Nullable;
-
-import static com.coinomi.wallet.ui.NavDrawerItemType.ITEM_COIN;
+import java.util.Map;
 
 /**
  * Use the {@link OverviewFragment#newInstance} factory method to
@@ -87,7 +82,7 @@ public class OverviewFragment extends Fragment{
     private LoaderManager loaderManager;
     private NavigationDrawerFragment mNavigationDrawerFragment;
     private Amount mainAmount;
-    List<ExchangeRate> exchangeRates;
+    Map<String, ExchangeRate> exchangeRates;
 
     private Listener listener;
 
@@ -255,20 +250,20 @@ public class OverviewFragment extends Fragment{
     public void updateWallet() {
         if (wallet != null) {
             adapter.replace(wallet);
-            if (currentBalance != null) {
-                currentBalance = currentBalance.multiply(0);
-            }
+            currentBalance = null;
+            Map<String, ExchangeRate> rates = ExchangeRatesProvider.getRates(application, config.getExchangeCurrencyCode());
             for (WalletAccount w : wallet.getAllAccounts()) {
-                ExchangeRate rate = ExchangeRatesProvider.getRate(application, w.getCoinType().getSymbol(), config.getExchangeCurrencyCode());
-                if (rate == null) continue;
+                ExchangeRate rate = rates.get(w.getCoinType().getSymbol());
+                if (rate == null) {
+                    log.info("Missing exchange rate for {}, skipping...", w.getCoinType().getName());
+                    continue;
+                }
                 if (currentBalance != null) {
                     currentBalance = currentBalance.add(rate.rate.convert(w.getBalance()));
                 }
                 else {
                     currentBalance = rate.rate.convert(w.getBalance());
                 }
-                log.info("Total: {}",
-                        rate.rate.convert(w.getBalance()));
             }
         }
     }

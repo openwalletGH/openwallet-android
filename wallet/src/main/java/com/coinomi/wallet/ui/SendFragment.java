@@ -251,7 +251,7 @@ public class SendFragment extends Fragment {
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
 
         String localSymbol = config.getExchangeCurrencyCode();
-        for (ExchangeRatesProvider.ExchangeRate rate : getRates(getActivity(), localSymbol)) {
+        for (ExchangeRatesProvider.ExchangeRate rate : getRates(getActivity(), localSymbol).values()) {
             localRates.put(rate.currencyCodeId, rate.rate);
         }
 

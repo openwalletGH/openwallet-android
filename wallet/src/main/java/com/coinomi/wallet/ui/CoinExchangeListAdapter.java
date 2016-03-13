@@ -6,12 +6,12 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
 import com.coinomi.core.coins.CoinType;
-import com.coinomi.wallet.ExchangeRatesProvider;
 import com.coinomi.wallet.ExchangeRatesProvider.ExchangeRate;
 import com.coinomi.wallet.ui.widget.CoinListItem;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -24,10 +24,10 @@ public class CoinExchangeListAdapter extends BaseAdapter {
     private final HashMap<String, ExchangeRate> rates;
 
     public CoinExchangeListAdapter(final Context context, List<CoinType> coins,
-                                   @Nullable List<ExchangeRate> rates) {
+                                   @Nullable Map<String, ExchangeRate> rates) {
         this.context = context;
         this.coins = coins;
-        this.rates = new HashMap<String, ExchangeRate>(coins.size());
+        this.rates = new HashMap<>(coins.size());
         setExchangeRates(rates);
     }
 
@@ -45,9 +45,9 @@ public class CoinExchangeListAdapter extends BaseAdapter {
         return coins.get(position);
     }
 
-    public void setExchangeRates(@Nullable List<ExchangeRate> newRates) {
+    public void setExchangeRates(@Nullable Map<String, ExchangeRate> newRates) {
         if (newRates != null) {
-            for (ExchangeRate rate : newRates) {
+            for (ExchangeRate rate : newRates.values()) {
                 if (isRateRelative(rate)) {
                     this.rates.put(rate.currencyCodeId, rate);
                 }

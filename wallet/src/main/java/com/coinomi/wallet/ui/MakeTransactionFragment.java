@@ -199,7 +199,7 @@ public class MakeTransactionFragment extends Fragment {
         }
 
         String localSymbol = config.getExchangeCurrencyCode();
-        for (ExchangeRatesProvider.ExchangeRate rate : getRates(getActivity(), localSymbol)) {
+        for (ExchangeRatesProvider.ExchangeRate rate : getRates(getActivity(), localSymbol).values()) {
             localRates.put(rate.currencyCodeId, rate.rate);
         }
 
