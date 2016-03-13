@@ -92,7 +92,7 @@ public class Constants {
     public static final int HTTP_TIMEOUT_MS = 15 * (int) DateUtils.SECOND_IN_MILLIS;
 
     public static final String TX_CACHE_NAME = "tx_cache";
-    public static final int TX_CACHE_SIZE = 5 * 1024 * 1024; // 5 MiB
+    public static final int TX_CACHE_SIZE = 5 * 1024 * 1024; // 5 MiB, TODO currently not enforced
 
     public static final long RATE_UPDATE_FREQ_MS = 30 * DateUtils.SECOND_IN_MILLIS;
 

@@ -54,7 +54,7 @@
                             android:id="@+id/seed_password_protected_lock"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/font_icon_lock"
+                            android:text="@string/font_icon_lock_bip39"
                             android:layout_marginEnd="4dp"
                             android:layout_marginRight="4dp"
                             tools:text="CD" />
