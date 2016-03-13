@@ -39,6 +39,7 @@ import com.coinomi.wallet.AddressBookProvider;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.ui.widget.CurrencyTextView;
 import com.coinomi.wallet.util.Fonts;
+import com.coinomi.wallet.util.TimeUtils;
 import com.coinomi.wallet.util.WalletUtils;
 
 import org.bitcoinj.core.TransactionConfidence;
@@ -218,8 +219,7 @@ public class TransactionsListAdapter extends BaseAdapter {
         Fonts.setTypeface(rowConfirmationsFontIcon, Fonts.Font.COINOMI_FONT_ICONS);
         final TextView rowMessageFontIcon = (TextView) row.findViewById(R.id.transaction_row_message_font_icon);
         Fonts.setTypeface(rowMessageFontIcon, Fonts.Font.COINOMI_FONT_ICONS);
-        // TODO implement date
-//        final TextView rowDate = (TextView) row.findViewById(R.id.transaction_row_time);
+        final TextView rowDate = (TextView) row.findViewById(R.id.transaction_row_time);
         final TextView rowLabel = (TextView) row.findViewById(R.id.transaction_row_label);
         final TextView rowAddress = (TextView) row.findViewById(R.id.transaction_row_address);
         final CurrencyTextView rowValue = (CurrencyTextView) row.findViewById(R.id.transaction_row_value);
@@ -297,8 +297,13 @@ public class TransactionsListAdapter extends BaseAdapter {
         }
 
         // date
-//        final Date time = tx.getUpdateTime();
-//        rowDate.setText(time != null ? (DateUtils.getRelativeTimeSpanString(context, time.getTime())) : null);
+        final long time = tx.getTimestamp();
+        if (time > 0) {
+            rowDate.setText(TimeUtils.toRelativeTimeString(time));
+            rowDate.setVisibility(View.VISIBLE);
+        } else {
+            rowDate.setVisibility(View.GONE);
+        }
 
         // address - label
         final AbstractAddress address;

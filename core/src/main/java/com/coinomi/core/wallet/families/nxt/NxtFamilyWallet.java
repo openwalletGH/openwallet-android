@@ -611,6 +611,11 @@ public class NxtFamilyWallet extends AbstractWallet<NxtTransaction, NxtAddress>
         //if (shouldSave) walletSaveLater();
     }
 
+    @Override
+    public void onBlockUpdate(BlockHeader header) {
+        // TODO should update transaction times if needed
+    }
+
     void queueOnNewBlock() {
         checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
         for (final ListenerRegistration<WalletAccountEventListener> registration : listeners) {

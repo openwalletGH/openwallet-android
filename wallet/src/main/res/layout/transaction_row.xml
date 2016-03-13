@@ -70,16 +70,15 @@
                 android:layout_gravity="center_vertical"
                 tools:text="Send to" />
 
-            <!-- TODO enable date -->
-            <!--<TextView-->
-                <!--android:id="@+id/transaction_row_time"-->
-                <!--style="@style/TransactionRowDate"-->
-                <!--android:layout_width="0dp"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_gravity="center_vertical"-->
-                <!--android:layout_weight="1"-->
-                <!--android:gravity="end"-->
-                <!--tools:text="13:37, Sep 15" />-->
+            <TextView
+                android:id="@+id/transaction_row_time"
+                style="@style/TransactionRowDate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:gravity="end"
+                tools:text="Today" />
 
         </LinearLayout>
 

@@ -4,15 +4,12 @@ import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
 import com.coinomi.core.messages.MessageFactory;
 import com.coinomi.core.messages.TxMessage;
-import com.coinomi.core.util.BitAddressUtils;
 import com.coinomi.core.wallet.AbstractAddress;
 import com.coinomi.core.wallet.AbstractTransaction;
 import com.coinomi.core.wallet.AbstractWallet;
 import com.coinomi.core.wallet.TransactionWatcherWallet;
-import com.coinomi.core.wallet.WalletAccount;
 import com.google.common.collect.ImmutableList;
 
-import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.TransactionBag;
@@ -23,8 +20,8 @@ import org.bitcoinj.core.TransactionOutput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -125,6 +122,16 @@ public final class BitTransaction implements AbstractTransaction {
     @Override
     public void setDepthInBlocks(int depthInBlocks) {
         tx.getConfidence().setDepthInBlocks(depthInBlocks);
+    }
+
+    @Override
+    public long getTimestamp() {
+        return tx.getUpdateTime().getTime();
+    }
+
+    @Override
+    public void setTimestamp(long timestamp) {
+        tx.setUpdateTime(new Date(timestamp));
     }
 
     @Override

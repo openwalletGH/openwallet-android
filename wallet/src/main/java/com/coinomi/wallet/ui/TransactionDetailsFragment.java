@@ -24,6 +24,7 @@ import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.util.ThrottlingWalletChangeListener;
+import com.coinomi.wallet.util.TimeUtils;
 import com.coinomi.wallet.util.UiUtils;
 import com.coinomi.wallet.util.WeakHandler;
 
@@ -48,6 +49,8 @@ public class TransactionDetailsFragment extends Fragment {
     private ListView outputRows;
     private TransactionAmountVisualizerAdapter adapter;
     private TextView txStatusView;
+    private TextView txDateLabel;
+    private TextView txDate;
     private TextView txIdView;
     private TextView txMessageLabel;
     private TextView txMessage;
@@ -98,6 +101,8 @@ public class TransactionDetailsFragment extends Fragment {
         View header = inflater.inflate(R.layout.fragment_transaction_details_header, null);
         outputRows.addHeaderView(header, null, false);
         txStatusView = (TextView) header.findViewById(R.id.tx_status);
+        txDateLabel = (TextView) header.findViewById(R.id.tx_date_label);
+        txDate = (TextView) header.findViewById(R.id.tx_date);
 
         // Footer
         View footer = inflater.inflate(R.layout.fragment_transaction_details_footer, null);
@@ -172,6 +177,15 @@ public class TransactionDetailsFragment extends Fragment {
                 txStatusText = getString(R.string.status_unknown);
         }
         txStatusView.setText(txStatusText);
+        long timestamp = tx.getTimestamp();
+        if (timestamp > 0) {
+            txDate.setText(TimeUtils.toTimeString(getWalletApplication(), timestamp));
+            txDateLabel.setVisibility(View.VISIBLE);
+            txDate.setVisibility(View.VISIBLE);
+        } else {
+            txDateLabel.setVisibility(View.GONE);
+            txDate.setVisibility(View.GONE);
+        }
         adapter.setTransaction(tx);
         txIdView.setText(tx.getHashAsString());
         setupBlockExplorerLink(pocket.getCoinType(), tx.getHashAsString());

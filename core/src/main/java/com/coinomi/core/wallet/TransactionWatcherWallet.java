@@ -77,18 +77,20 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<BitTransac
     private long lastBlockSeenTimeSecs = 0;
 
     @VisibleForTesting
-    final HashMap<TrimmedOutPoint, OutPointOutput> unspentOutputs;
+    final Map<TrimmedOutPoint, OutPointOutput> unspentOutputs;
 
     // Holds the status of every address we are watching. When connecting to the server, if we get a
     // different status for a particular address this means that there are new transactions for that
     // address and we have to fetch them. The status String could be null when an address is unused.
     @VisibleForTesting
-    final HashMap<AbstractAddress, String> addressesStatus;
+    final Map<AbstractAddress, String> addressesStatus;
 
     @VisibleForTesting final transient ArrayList<AbstractAddress> addressesSubscribed;
     @VisibleForTesting final transient ArrayList<AbstractAddress> addressesPendingSubscription;
-    @VisibleForTesting final transient HashMap<AbstractAddress, AddressStatus> statusPendingUpdates;
-    @VisibleForTesting final transient HashMap<Sha256Hash, Integer> fetchingTransactions;
+    @VisibleForTesting final transient Map<AbstractAddress, AddressStatus> statusPendingUpdates;
+    @VisibleForTesting final transient Map<Sha256Hash, Integer> fetchingTransactions;
+    @VisibleForTesting final transient Map<Integer, Long> blockTimes;
+    @VisibleForTesting final transient Map<Integer, Set<Sha256Hash>> missingTimestamps;
     // Transactions that are waiting to be added once transactions that they depend on are added
     final transient Map<Sha256Hash, Map.Entry<BitTransaction, Set<Sha256Hash>>> outOfOrderTransactions;
 
@@ -133,6 +135,8 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<BitTransac
         addressesPendingSubscription = new ArrayList<>();
         statusPendingUpdates = new HashMap<>();
         fetchingTransactions = new HashMap<>();
+        blockTimes = new HashMap<>();
+        missingTimestamps = new HashMap<>();
         confirmed = new HashMap<>();
         pending = new HashMap<>();
         rawTransactions = new HashMap<>();
@@ -339,6 +343,7 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<BitTransac
     }
 
     private void removeTransaction(Sha256Hash hash) {
+        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
         rawTransactions.remove(hash);
         confirmed.remove(hash);
         pending.remove(hash);
@@ -384,6 +389,7 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<BitTransac
     }
 
     private void guessSource(BitTransaction tx) {
+        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
         if (tx.getSource() == Source.UNKNOWN) {
             boolean isReceiving = tx.getValue(this).isPositive();
 
@@ -444,6 +450,8 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<BitTransac
             lastBlockSeenHash = null;
             lastBlockSeenHeight = -1;
             lastBlockSeenTimeSecs = 0;
+            blockTimes.clear();
+            missingTimestamps.clear();
             unspentOutputs.clear();
             confirmed.clear();
             pending.clear();
@@ -676,6 +684,7 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<BitTransac
      * Returns all the addresses that are not currently watched
      */
     @VisibleForTesting List<AbstractAddress> getAddressesToWatch() {
+        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
         ImmutableList.Builder<AbstractAddress> addressesToWatch = ImmutableList.builder();
         for (AbstractAddress address : getActiveAddresses()) {
             // If address not already subscribed or pending subscription
@@ -708,6 +717,7 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<BitTransac
         try {
             lastBlockSeenTimeSecs = header.getTimestamp();
             lastBlockSeenHeight = header.getBlockHeight();
+            updateTransactionTimes(header);
             for (BitTransaction tx : rawTransactions.values()) {
                 // Save wallet when we have new TXs
                 if (tx.getDepthInBlocks() < TX_DEPTH_SAVE_THRESHOLD) shouldSave = true;
@@ -737,6 +747,34 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<BitTransac
                 }
             }
         }
+    }
+
+    @Override
+    public void onBlockUpdate(BlockHeader header) {
+        log.info("Got a {} block update: {}", type.getName(), header.getBlockHeight());
+        lock.lock();
+        try {
+            updateTransactionTimes(header);
+            queueOnNewBlock();
+        }
+        finally {
+            lock.unlock();
+        }
+    }
+
+    private void updateTransactionTimes(BlockHeader header) {
+        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
+        Integer height = header.getBlockHeight();
+        Long timestamp = header.getTimestamp();
+        blockTimes.put(height, timestamp);
+        if (missingTimestamps.containsKey(height)) {
+            for (Sha256Hash hash : missingTimestamps.get(height)) {
+                if (rawTransactions.containsKey(hash)) {
+                    rawTransactions.get(hash).setTimestamp(timestamp);
+                }
+            }
+        }
+        missingTimestamps.remove(height);
     }
 
     @Override
@@ -921,6 +959,7 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<BitTransac
     }
 
     private void checkTxConfirmation(HistoryTx historyTx, BitTransaction tx) {
+        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
         int height = historyTx.getHeight();
         TransactionConfidence.ConfidenceType confidence = tx.getConfidenceType();
         if (height > 0) {
@@ -947,6 +986,7 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<BitTransac
     private void setAppearedAtChainHeight(BitTransaction tx, int height, boolean updateUtxoSet) {
         checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
         tx.setAppearedAtChainHeight(height);
+        fetchTimestamp(tx, height);
         // Update unspent outputs
         if (updateUtxoSet) {
             for (TransactionOutput output : tx.getOutputs(false)) {
@@ -954,6 +994,24 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<BitTransac
                 if (unspentOutput != null) {
                     unspentOutput.setAppearedAtChainHeight(height);
                 }
+            }
+        }
+    }
+
+    private void fetchTimestamp(BitTransaction tx, Integer height) {
+        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
+        if (blockTimes.containsKey(height)) {
+            tx.setTimestamp(blockTimes.get(height));
+        } else {
+            log.info("Must get timestamp for block on height {}", height);
+            if (!missingTimestamps.containsKey(height)) {
+                missingTimestamps.put(height, new HashSet<Sha256Hash>());
+                missingTimestamps.get(height).add(tx.getHash());
+                if (blockchainConnection != null) {
+                    blockchainConnection.getBlock(height, this);
+                }
+            } else {
+                missingTimestamps.get(height).add(tx.getHash());
             }
         }
     }
@@ -1151,6 +1209,9 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<BitTransac
         try {
             if (blockchainConnection != null) {
                 blockchainConnection.subscribeToBlockchain(this);
+                for (Integer missingTimestampOnHeight : missingTimestamps.keySet()) {
+                    blockchainConnection.getBlock(missingTimestampOnHeight, this);
+                }
             }
         } finally {
             lock.unlock();
@@ -1199,7 +1260,11 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<BitTransac
         lock.lock();
         try {
             for (WalletTransaction<BitTransaction> wtx : wtxs) {
-                simpleAddTransaction(wtx.getPool(), wtx.getTransaction());
+                BitTransaction tx = wtx.getTransaction();
+                simpleAddTransaction(wtx.getPool(), tx);
+                if (tx.getConfidenceType() == BUILDING && tx.getTimestamp() == 0) {
+                    fetchTimestamp(tx, tx.getAppearedAtChainHeight());
+                }
             }
         } finally {
             lock.unlock();

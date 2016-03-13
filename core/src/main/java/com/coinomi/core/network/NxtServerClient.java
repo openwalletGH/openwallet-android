@@ -2,7 +2,6 @@ package com.coinomi.core.network;
 
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.nxt.Convert;
-import com.coinomi.core.coins.nxt.Transaction;
 import com.coinomi.core.wallet.AbstractAddress;
 import com.coinomi.core.coins.nxt.NxtException;
 import com.coinomi.core.coins.nxt.TransactionImpl;
@@ -294,10 +293,15 @@ public class NxtServerClient implements BlockchainConnection<NxtTransaction> {
 
     }
 
+    @Override
+    public void getBlock(int height, TransactionEventListener<NxtTransaction> listener) {
+        throw new RuntimeException("NxtServerClient::getBlock not implemented");
+    }
+
     /*
-    Method that monitors account's unconfirmed balance.
-    Raises onAddressStatusUpdate if changed.
-     */
+        Method that monitors account's unconfirmed balance.
+        Raises onAddressStatusUpdate if changed.
+         */
     @Override
     public void subscribeToAddresses(List<AbstractAddress> addresses,
                                      final TransactionEventListener<NxtTransaction> listener) {

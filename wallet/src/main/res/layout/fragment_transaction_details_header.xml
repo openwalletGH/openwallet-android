@@ -11,6 +11,22 @@
     android:paddingRight="@dimen/activity_horizontal_margin">
 
     <TextView
+        android:id="@+id/tx_date_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/SecondaryText"
+        android:text="@string/date_label"
+        android:textColor="@color/gray_54_sec_text_icons" />
+
+    <TextView
+        android:id="@+id/tx_date"
+        style="@style/NormalText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        tools:text="8 hours ago" />
+
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/status_label"

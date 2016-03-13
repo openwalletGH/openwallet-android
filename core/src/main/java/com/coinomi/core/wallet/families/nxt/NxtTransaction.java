@@ -7,16 +7,12 @@ import com.coinomi.core.messages.TxMessage;
 import com.coinomi.core.wallet.AbstractAddress;
 import com.coinomi.core.wallet.AbstractTransaction;
 import com.coinomi.core.wallet.AbstractWallet;
-import com.coinomi.core.wallet.WalletAccount;
 import com.google.common.collect.ImmutableList;
 
 import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.TransactionConfidence;
 
-import java.util.AbstractMap;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import static com.coinomi.core.Preconditions.checkNotNull;
 
@@ -124,6 +120,17 @@ public final class NxtTransaction implements AbstractTransaction {
     @Override
     public void setDepthInBlocks(int depthInBlocks) {
 
+    }
+
+    @Override
+    public long getTimestamp() {
+        return tx.getTimestamp(); // TODO use block timestamp instead
+//        return tx.getBlockTimestamp();
+    }
+
+    @Override
+    public void setTimestamp(long timestamp) {
+        throw new RuntimeException("NxtTransaction::setTimestamp not implemented");
     }
 
     @Override

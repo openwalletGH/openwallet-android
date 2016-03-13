@@ -1,7 +1,5 @@
 package com.coinomi.stratumj.messages;
 
-import com.google.common.base.Optional;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -27,6 +25,12 @@ public class CallMessage extends BaseMessage {
     }
 
     public CallMessage(String method, String param) {
+        super();
+        setMethod(method);
+        setParams(Arrays.asList(param));
+    }
+
+    public CallMessage(String method, int param) {
         super();
         setMethod(method);
         setParams(Arrays.asList(param));

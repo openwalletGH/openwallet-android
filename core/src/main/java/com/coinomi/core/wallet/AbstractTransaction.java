@@ -10,7 +10,6 @@ import org.bitcoinj.core.TransactionConfidence.Source;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -53,6 +52,9 @@ public interface AbstractTransaction extends Serializable {
 
     int getDepthInBlocks();
     void setDepthInBlocks(int depthInBlocks);
+
+    long getTimestamp();
+    void setTimestamp(long timestamp);
 
     Value getValue(AbstractWallet wallet);
     @Nullable Value getFee();

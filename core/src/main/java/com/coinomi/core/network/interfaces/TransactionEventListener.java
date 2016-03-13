@@ -12,6 +12,8 @@ import java.util.List;
 public interface TransactionEventListener<T> {
     void onNewBlock(BlockHeader header);
 
+    void onBlockUpdate(BlockHeader header);
+
     void onAddressStatusUpdate(AddressStatus status);
 
     void onTransactionHistory(AddressStatus status, List<HistoryTx> historyTxes);

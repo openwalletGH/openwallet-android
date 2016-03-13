@@ -551,6 +551,36 @@ public class ServerClient implements BitBlockchainConnection {
     }
 
     @Override
+    public void getBlock(final int height, final TransactionEventListener<BitTransaction> listener) {
+        checkNotNull(stratumClient);
+
+        final CallMessage message = new CallMessage("blockchain.block.get_header", height);
+
+        final ListenableFuture<ResultMessage> result = stratumClient.call(message);
+
+        Futures.addCallback(result, new FutureCallback<ResultMessage>() {
+            @Override
+            public void onSuccess(ResultMessage result) {
+                try {
+                    BlockHeader header = parseBlockHeader(type, result.getResult().getJSONObject(0));
+                    listener.onBlockUpdate(header);
+                } catch (JSONException e) {
+                    log.error("Unexpected JSON format", e);
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                if (t instanceof CancellationException) {
+                    log.debug("Canceling {} call", message.getMethod());
+                } else {
+                    log.error("Could not get reply for blockchain.block.get_header", t);
+                }
+            }
+        }, Threading.USER_THREAD);
+    }
+
+    @Override
     public void broadcastTx(final BitTransaction tx,
                             @Nullable final TransactionEventListener<BitTransaction> listener) {
         checkNotNull(stratumClient);
