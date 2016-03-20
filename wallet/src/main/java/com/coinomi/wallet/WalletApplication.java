@@ -53,8 +53,7 @@ import javax.annotation.Nullable;
 @ReportsCrashes(
         // Also uncomment ACRA.init(this) in onCreate
         httpMethod = HttpSender.Method.PUT,
-        reportType = HttpSender.Type.JSON,
-        formKey = ""
+        reportType = HttpSender.Type.JSON
 )
 public class WalletApplication extends Application {
     private static final Logger log = LoggerFactory.getLogger(WalletApplication.class);
