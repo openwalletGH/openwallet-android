@@ -684,15 +684,20 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<BitTransac
      * Returns all the addresses that are not currently watched
      */
     @VisibleForTesting List<AbstractAddress> getAddressesToWatch() {
-        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
-        ImmutableList.Builder<AbstractAddress> addressesToWatch = ImmutableList.builder();
-        for (AbstractAddress address : getActiveAddresses()) {
-            // If address not already subscribed or pending subscription
-            if (!addressesSubscribed.contains(address) && !addressesPendingSubscription.contains(address)) {
-                addressesToWatch.add(address);
+        lock.lock();
+        try {
+            ImmutableList.Builder<AbstractAddress> addressesToWatch = ImmutableList.builder();
+            for (AbstractAddress address : getActiveAddresses()) {
+                // If address not already subscribed or pending subscription
+                if (!addressesSubscribed.contains(address) && !addressesPendingSubscription.contains(address)) {
+                    addressesToWatch.add(address);
+                }
             }
+            return addressesToWatch.build();
         }
-        return addressesToWatch.build();
+        finally {
+            lock.unlock();
+        }
     }
 
     private void confirmAddressSubscription(AbstractAddress address) {

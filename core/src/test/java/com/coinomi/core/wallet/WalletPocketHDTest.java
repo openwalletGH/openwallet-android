@@ -731,6 +731,9 @@ public class WalletPocketHDTest {
         }
 
         @Override
+        public void getBlock(int height, TransactionEventListener<BitTransaction> listener) { }
+
+        @Override
         public void subscribeToBlockchain(TransactionEventListener<BitTransaction> listener) {
             listener.onNewBlock(new BlockHeader(coinType, blockTimestamp, blockHeight));
         }

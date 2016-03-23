@@ -68,7 +68,7 @@ final public class Wallet {
     // FIXME, make multi account capable
     private final static int ACCOUNT_ZERO = 0;
 
-    private int version;
+    private int version = 2;
 
     public Wallet(String mnemonic) throws MnemonicException {
         this(CoreUtils.parseMnemonic(mnemonic), null);
