@@ -1,6 +1,5 @@
 package com.coinomi.wallet.ui;
 
-import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -15,8 +14,6 @@ import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -319,18 +316,16 @@ public class BalanceFragment extends Fragment implements LoaderCallbacks<List<Ab
     };
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(final Context context) {
+        super.onAttach(context);
         try {
-            listener = (Listener) activity;
-            resolver = activity.getContentResolver();
+            listener = (Listener) context;
+            resolver = context.getContentResolver();
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement " + Listener.class);
+            throw new ClassCastException(context.toString() + " must implement " + Listener.class);
         }
-        application = (WalletApplication) activity.getApplication();
+        application = (WalletApplication) context.getApplicationContext();
         config = application.getConfiguration();
-//        loaderManager = getLoaderManager();
     }
 
     @Override

@@ -17,10 +17,10 @@ package com.coinomi.wallet.ui;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
@@ -82,15 +82,14 @@ public final class EditAddressBookEntryFragment extends DialogFragment {
         return fragment;
     }
 
-    private Activity activity;
+    private Context context;
     private ContentResolver contentResolver;
 
     @Override
-    public void onAttach(final Activity activity) {
-        super.onAttach(activity);
-
-        this.activity = activity;
-        this.contentResolver = activity.getContentResolver();
+    public void onAttach(final Context context) {
+        super.onAttach(context);
+        this.context = context;
+        this.contentResolver = context.getContentResolver();
     }
 
     @Override
@@ -100,16 +99,16 @@ public final class EditAddressBookEntryFragment extends DialogFragment {
         final AbstractAddress address = (AbstractAddress) args.getSerializable(KEY_ADDRESS);
         final String suggestedAddressLabel = args.getString(KEY_SUGGESTED_ADDRESS_LABEL);
 
-        final LayoutInflater inflater = LayoutInflater.from(activity);
+        final LayoutInflater inflater = LayoutInflater.from(context);
 
-        final Uri uri = AddressBookProvider.contentUri(activity.getPackageName(), type)
+        final Uri uri = AddressBookProvider.contentUri(context.getPackageName(), type)
                 .buildUpon().appendPath(address.toString()).build();
 
-        final String label = AddressBookProvider.resolveLabel(activity, address);
+        final String label = AddressBookProvider.resolveLabel(context, address);
 
         final boolean isAdd = label == null;
 
-        final DialogBuilder dialog = new DialogBuilder(activity);
+        final DialogBuilder dialog = new DialogBuilder(context);
 
         dialog.setTitle(isAdd ? R.string.edit_address_book_entry_dialog_title_add : R.string.edit_address_book_entry_dialog_title_edit);
 

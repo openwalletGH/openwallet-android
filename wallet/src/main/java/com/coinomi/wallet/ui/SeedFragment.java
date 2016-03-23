@@ -1,7 +1,7 @@
 package com.coinomi.wallet.ui;
 
 
-import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 public class SeedFragment extends Fragment {
     private static final Logger log = LoggerFactory.getLogger(SeedFragment.class);
 
-    private WelcomeFragment.Listener mListener;
+    private WelcomeFragment.Listener listener;
     private boolean hasExtraEntropy = false;
     private TextView mnemonicView;
 
@@ -49,8 +49,8 @@ public class SeedFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 log.info("Clicked restore wallet");
-                if (mListener != null) {
-                    mListener.onSeedCreated(mnemonicView.getText().toString());
+                if (listener != null) {
+                    listener.onSeedCreated(mnemonicView.getText().toString());
                 }
             }
         });
@@ -104,19 +104,19 @@ public class SeedFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(final Context context) {
+        super.onAttach(context);
         try {
-            mListener = (WelcomeFragment.Listener) activity;
+            listener = (WelcomeFragment.Listener) context;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement WelcomeFragment.OnFragmentInteractionListener");
+            throw new ClassCastException(context.toString()
+                    + " must implement " + WelcomeFragment.Listener.class);
         }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        listener = null;
     }
 }

@@ -45,7 +45,7 @@ public class CheckUpdateTask extends AsyncTask<Void, Void, Integer> {
                 return Integer.valueOf(line);
             }
         } catch (final Exception e) {
-            log.info("Could not check for update", e);
+            log.info("Could not check for update: {}", e.getMessage());
         } finally {
             if (connection != null)
                 connection.disconnect();

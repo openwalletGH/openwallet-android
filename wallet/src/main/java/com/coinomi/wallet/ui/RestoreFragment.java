@@ -3,6 +3,7 @@ package com.coinomi.wallet.ui;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -21,7 +22,6 @@ import android.widget.MultiAutoCompleteTextView;
 import android.widget.TextView;
 
 import com.coinomi.core.CoreUtils;
-import com.coinomi.core.wallet.Wallet;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.util.Fonts;
@@ -48,7 +48,7 @@ public class RestoreFragment extends Fragment {
     @Nullable private String seed;
     private boolean isNewSeed;
     private TextView errorMnemonicΜessage;
-    private WelcomeFragment.Listener mListener;
+    private WelcomeFragment.Listener listener;
     private boolean isSeedProtected = false;
     private EditText bip39Passphrase;
     private Button skipButton;
@@ -177,20 +177,20 @@ public class RestoreFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(final Context context) {
+        super.onAttach(context);
         try {
-            mListener = (WelcomeFragment.Listener) activity;
+            listener = (WelcomeFragment.Listener) context;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement WelcomeFragment.OnFragmentInteractionListener");
+            throw new ClassCastException(context.toString()
+                    + " must implement " + WelcomeFragment.Listener.class);
         }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        listener = null;
     }
 
     private View.OnClickListener getOnNextListener() {
@@ -224,7 +224,7 @@ public class RestoreFragment extends Fragment {
                 args.putString(Constants.ARG_SEED_PASSWORD, bip39Passphrase.getText().toString());
             }
             args.putString(Constants.ARG_SEED, mnemonicTextView.getText().toString().trim());
-            if (mListener != null) mListener.onSeedVerified(args);
+            if (listener != null) listener.onSeedVerified(args);
         }
     }
 

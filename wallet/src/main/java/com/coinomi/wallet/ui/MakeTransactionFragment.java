@@ -1,8 +1,8 @@
 package com.coinomi.wallet.ui;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.database.Cursor;
@@ -100,7 +100,7 @@ public class MakeTransactionFragment extends Fragment {
 
     private Handler handler = new MyHandler(this);
     @Nullable private String password;
-    private Listener mListener;
+    private Listener listener;
     private ContentResolver contentResolver;
     private SignAndBroadcastTask signAndBroadcastTask;
     private CreateTransactionTask createTransactionTask;
@@ -193,8 +193,8 @@ public class MakeTransactionFragment extends Fragment {
             maybeStartCreateTransaction();
         } catch (Exception e) {
             error = e;
-            if (mListener != null) {
-                mListener.onSignResult(e, null);
+            if (listener != null) {
+                listener.onSignResult(e, null);
             }
         }
 
@@ -328,8 +328,8 @@ public class MakeTransactionFragment extends Fragment {
             signAndBroadcastTask.execute();
         } else if (transactionBroadcast) {
             Toast.makeText(getActivity(), R.string.tx_already_broadcast, Toast.LENGTH_SHORT).show();
-            if (mListener != null) {
-                mListener.onSignResult(error, exchangeEntry);
+            if (listener != null) {
+                listener.onSignResult(error, exchangeEntry);
             }
         }
     }
@@ -348,24 +348,23 @@ public class MakeTransactionFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(final Context context) {
+        super.onAttach(context);
         try {
-            mListener = (Listener) activity;
-            contentResolver = activity.getContentResolver();
-            application = (WalletApplication) activity.getApplication();
+            listener = (Listener) context;
+            contentResolver = context.getContentResolver();
+            application = (WalletApplication) context.getApplicationContext();
             config = application.getConfiguration();
             loaderManager = getLoaderManager();
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement " + Listener.class);
+            throw new ClassCastException(context.toString() + " must implement " + Listener.class);
         }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        listener = null;
         onStopTradeCountDown();
     }
 
@@ -407,9 +406,9 @@ public class MakeTransactionFragment extends Fragment {
         String errorString = getString(R.string.trade_expired);
         transactionInfo.setText(errorString);
 
-        if (mListener != null) {
+        if (listener != null) {
             error = new Exception(errorString);
-            mListener.onSignResult(error, null);
+            listener.onSignResult(error, null);
         }
     }
 
@@ -622,8 +621,8 @@ public class MakeTransactionFragment extends Fragment {
         @Override
         protected void onPostExecute(Void aVoid) {
             if (busyDialog != null) busyDialog.dismissAllowingStateLoss();
-            if (error != null && mListener != null) {
-                mListener.onSignResult(error, null);
+            if (error != null && listener != null) {
+                listener.onSignResult(error, null);
             } else if (error == null) {
                 showTransaction();
             } else {
@@ -696,7 +695,7 @@ public class MakeTransactionFragment extends Fragment {
                         .setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                mListener.onSignResult(e, exchangeEntry);
+                                listener.onSignResult(e, exchangeEntry);
                             }
                         })
                         .setPositiveButton(R.string.button_retry, new DialogInterface.OnClickListener() {
@@ -709,8 +708,8 @@ public class MakeTransactionFragment extends Fragment {
                             }
                         })
                         .create().show();
-            } else if (mListener != null) {
-                mListener.onSignResult(e, exchangeEntry);
+            } else if (listener != null) {
+                listener.onSignResult(e, exchangeEntry);
             }
         }
     }

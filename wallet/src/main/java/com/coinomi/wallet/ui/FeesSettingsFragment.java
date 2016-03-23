@@ -1,6 +1,6 @@
 package com.coinomi.wallet.ui;
 
-import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -17,9 +17,6 @@ import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.ui.adaptors.FeesListAdapter;
 import com.coinomi.wallet.ui.dialogs.EditFeeDialog;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnItemClick;
@@ -33,7 +30,7 @@ public class FeesSettingsFragment extends Fragment implements SharedPreferences.
     @Bind(R.id.coins_list) ListView coinList;
 
     private Configuration config;
-    private Activity activity;
+    private Context context;
     private FeesListAdapter adapter;
 
     public FeesSettingsFragment() {
@@ -43,7 +40,7 @@ public class FeesSettingsFragment extends Fragment implements SharedPreferences.
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        adapter = new FeesListAdapter(activity, config);
+        adapter = new FeesListAdapter(context, config);
     }
 
     @Override
@@ -72,10 +69,10 @@ public class FeesSettingsFragment extends Fragment implements SharedPreferences.
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        this.activity = activity;
-        WalletApplication application = (WalletApplication) activity.getApplication();
+    public void onAttach(final Context context) {
+        super.onAttach(context);
+        this.context = context;
+        WalletApplication application = (WalletApplication) context.getApplicationContext();
         config = application.getConfiguration();
         config.registerOnSharedPreferenceChangeListener(this);
     }

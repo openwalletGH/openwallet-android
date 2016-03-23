@@ -1,7 +1,7 @@
 package com.coinomi.wallet.ui;
 
 
-import android.app.Activity;
+import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -31,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import static com.coinomi.wallet.ExchangeRatesProvider.getRates;
 
@@ -40,14 +39,14 @@ import static com.coinomi.wallet.ExchangeRatesProvider.getRates;
  */
 public class SelectCoinsFragment extends Fragment {
     private static final Logger log = LoggerFactory.getLogger(SelectCoinsFragment.class);
-    private Listener mListener;
+    private Listener listener;
     private String message;
     private boolean isMultipleChoice;
     private ListView coinList;
     private Button nextButton;
 
     private Configuration config;
-    private Activity activity;
+    private Context context;
     private CoinExchangeListAdapter adapter;
     private LoaderManager loaderManager;
 
@@ -79,7 +78,7 @@ public class SelectCoinsFragment extends Fragment {
             message = args.getString(Constants.ARG_MESSAGE);
         }
 
-        adapter = new CoinExchangeListAdapter(activity, Constants.SUPPORTED_COINS);
+        adapter = new CoinExchangeListAdapter(context, Constants.SUPPORTED_COINS);
 
         String localSymbol = config.getExchangeCurrencyCode();
         adapter.setExchangeRates(getRates(getActivity(), localSymbol));
@@ -110,12 +109,12 @@ public class SelectCoinsFragment extends Fragment {
         coinList = (ListView) view.findViewById(R.id.coins_list);
         // Set header if needed
         if (message != null) {
-            HeaderWithFontIcon header = new HeaderWithFontIcon(activity);
+            HeaderWithFontIcon header = new HeaderWithFontIcon(context);
             header.setFontIcon(R.string.font_icon_coins);
             header.setMessage(R.string.select_coins);
             coinList.addHeaderView(header, null, false);
         } else {
-            View topPaddingView = new View(activity);
+            View topPaddingView = new View(context);
             topPaddingView.setMinimumHeight(getResources().getDimensionPixelSize(R.dimen.half_standard_margin));
             coinList.addHeaderView(topPaddingView, null, false);
         }
@@ -170,35 +169,35 @@ public class SelectCoinsFragment extends Fragment {
     }
 
     private void selectCoins(ArrayList<String> ids) {
-        if (mListener != null) {
+        if (listener != null) {
             Bundle args = getArguments() == null ? new Bundle() : getArguments();
             args.putStringArrayList(Constants.ARG_MULTIPLE_COIN_IDS, ids);
-            mListener.onCoinSelection(args);
+            listener.onCoinSelection(args);
         }
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(final Context context) {
+        super.onAttach(context);
         try {
-            mListener = (Listener) activity;
-            this.activity = activity;
-            WalletApplication application = (WalletApplication) activity.getApplication();
+            listener = (Listener) context;
+            this.context = context;
+            WalletApplication application = (WalletApplication) context.getApplicationContext();
             config = application.getConfiguration();
             loaderManager = getLoaderManager();
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement " + Listener.class);
+            throw new ClassCastException(context.toString() + " must implement " + Listener.class);
         }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        listener = null;
     }
 
     public interface Listener {
-        public void onCoinSelection(Bundle args);
+        void onCoinSelection(Bundle args);
     }
 
     private final LoaderManager.LoaderCallbacks<Cursor> rateLoaderCallbacks = new LoaderManager.LoaderCallbacks<Cursor>() {

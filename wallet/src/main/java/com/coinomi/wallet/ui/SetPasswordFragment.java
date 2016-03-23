@@ -3,6 +3,7 @@ package com.coinomi.wallet.ui;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -12,8 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,7 +32,7 @@ import org.slf4j.LoggerFactory;
 public class SetPasswordFragment extends Fragment {
     private static final Logger log = LoggerFactory.getLogger(SetPasswordFragment.class);
 
-    private Listener mListener;
+    private Listener listener;
     private boolean isPasswordGood;
     private boolean isPasswordsMatch;
     private PasswordQualityChecker passwordQualityChecker;
@@ -151,7 +150,7 @@ public class SetPasswordFragment extends Fragment {
                 if (isPasswordGood && isPasswordsMatch) {
                     Bundle args = getArguments();
                     args.putString(Constants.ARG_PASSWORD, password1.getText().toString());
-                    mListener.onPasswordSet(args);
+                    listener.onPasswordSet(args);
                 } else {
                     Toast.makeText(SetPasswordFragment.this.getActivity(),
                             R.string.password_error, Toast.LENGTH_LONG).show();
@@ -220,20 +219,19 @@ public class SetPasswordFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(final Context context) {
+        super.onAttach(context);
         try {
-            mListener = (Listener) activity;
+            listener = (Listener) context;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement " + Listener.class);
+            throw new ClassCastException(context.toString() + " must implement " + Listener.class);
         }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        listener = null;
     }
 
     public interface Listener {

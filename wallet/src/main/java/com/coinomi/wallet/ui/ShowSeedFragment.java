@@ -1,6 +1,6 @@
 package com.coinomi.wallet.ui;
 
-import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
@@ -104,15 +104,14 @@ public class ShowSeedFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(final Context context) {
+        super.onAttach(context);
         try {
-            listener = (Listener) activity;
-            WalletApplication application = (WalletApplication) activity.getApplication();
+            listener = (Listener) context;
+            WalletApplication application = (WalletApplication) context.getApplicationContext();
             wallet = application.getWallet();
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement " + ShowSeedFragment.Listener.class.getCanonicalName());
+            throw new ClassCastException(context.toString() + " must implement " + Listener.class);
         }
     }
 
@@ -235,6 +234,6 @@ public class ShowSeedFragment extends Fragment {
     }
 
     public interface Listener {
-        public void onSeedNotAvailable();
+        void onSeedNotAvailable();
     }
 }

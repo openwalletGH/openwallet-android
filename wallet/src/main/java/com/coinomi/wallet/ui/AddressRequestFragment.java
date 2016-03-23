@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.ContentObserver;
@@ -283,10 +284,10 @@ public class AddressRequestFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        this.resolver = activity.getContentResolver();
-        this.config = ((WalletApplication) activity.getApplication()).getConfiguration();
+    public void onAttach(final Context  context) {
+        super.onAttach(context);
+        this.resolver = context.getContentResolver();
+        this.config = ((WalletApplication) context.getApplicationContext()).getConfiguration();
         this.loaderManager = getLoaderManager();
     }
 

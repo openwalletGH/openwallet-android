@@ -1,9 +1,9 @@
 package com.coinomi.wallet.ui;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -72,7 +72,7 @@ public class TradeStatusFragment extends Fragment {
 
     private static final String ARG_SHOW_EXIT_BUTTON = "show_exit_button";
 
-    private Listener mListener;
+    private Listener listener;
     private ContentResolver contentResolver;
     private LoaderManager loaderManager;
     private TextView exchangeInfo;
@@ -277,8 +277,8 @@ public class TradeStatusFragment extends Fragment {
 
     public void onExitPressed() {
         stopPolling();
-        if (mListener != null) {
-            mListener.onFinish();
+        if (listener != null) {
+            listener.onFinish();
         }
     }
 
@@ -430,15 +430,15 @@ public class TradeStatusFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(final Context context) {
+        super.onAttach(context);
         try {
-            mListener = (Listener) activity;
-            contentResolver = activity.getContentResolver();
-            application = (WalletApplication) activity.getApplication();
+            listener = (Listener) context;
+            contentResolver = context.getContentResolver();
+            application = (WalletApplication) context.getApplicationContext();
             loaderManager = getLoaderManager();
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
+            throw new ClassCastException(context.toString()
                     + " must implement " + TradeStatusFragment.Listener.class);
         }
     }
@@ -446,11 +446,11 @@ public class TradeStatusFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        listener = null;
     }
 
     public interface Listener {
-        public void onFinish();
+        void onFinish();
     }
 
     private final LoaderCallbacks<Cursor> statusLoaderCallbacks = new LoaderCallbacks<Cursor>() {

@@ -1,6 +1,5 @@
 package com.coinomi.wallet.ui;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -38,7 +37,7 @@ import javax.annotation.CheckForNull;
  * @author John L. Jegutanis
  */
 public final class ExchangeHistoryFragment extends ListFragment {
-    private Activity activity;
+    private Context activity;
     private WalletApplication application;
     private Configuration config;
     private com.coinomi.core.wallet.Wallet wallet;
@@ -56,11 +55,11 @@ public final class ExchangeHistoryFragment extends ListFragment {
     private CoinType type;
 
     @Override
-    public void onAttach(final Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(final Context context) {
+        super.onAttach(context);
 
-        this.activity = activity;
-        this.application = (WalletApplication) activity.getApplication();
+        this.activity = context;
+        this.application = (WalletApplication) context.getApplicationContext();
         this.wallet = application.getWallet();
 
         this.loaderManager = getLoaderManager();

@@ -3,7 +3,7 @@ package com.coinomi.wallet.ui;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.wallet.Wallet;
@@ -18,7 +18,7 @@ import javax.annotation.Nullable;
 /**
  * @author John L. Jegutanis
  */
-abstract public class BaseWalletActivity extends ActionBarActivity {
+abstract public class BaseWalletActivity extends AppCompatActivity {
 
     public WalletApplication getWalletApplication() {
         return (WalletApplication) getApplication();
@@ -60,7 +60,7 @@ abstract public class BaseWalletActivity extends ActionBarActivity {
     public void replaceFragment(Fragment fragment, int container, @Nullable String tag) {
         FragmentTransaction transaction = getFM().beginTransaction();
 
-        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         // Replace whatever is in the fragment_container view with this fragment,
         // and add the transaction to the back stack so the user can navigate back
         transaction.replace(container, fragment, tag);

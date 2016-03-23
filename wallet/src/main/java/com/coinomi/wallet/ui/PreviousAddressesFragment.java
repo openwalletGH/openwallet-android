@@ -1,7 +1,7 @@
 package com.coinomi.wallet.ui;
 
-import android.app.Activity;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.database.ContentObserver;
 import android.os.Bundle;
 import android.os.Handler;
@@ -171,14 +171,13 @@ public class PreviousAddressesFragment extends Fragment {
     };
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(final Context context) {
+        super.onAttach(context);
         try {
-            listener = (Listener) activity;
-            resolver = activity.getContentResolver();
+            listener = (Listener) context;
+            resolver = context.getContentResolver();
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement " + PreviousAddressesFragment.Listener.class);
+            throw new ClassCastException(context.toString() + " must implement " + Listener.class);
         }
     }
 

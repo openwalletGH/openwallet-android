@@ -1049,17 +1049,16 @@ public class SendFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(final Context context) {
+        super.onAttach(context);
         try {
-            this.listener = (Listener) activity;
-            this.application = (WalletApplication) activity.getApplication();
+            this.listener = (Listener) context;
+            this.application = (WalletApplication) context.getApplicationContext();
             this.config = application.getConfiguration();
-            this.resolver = activity.getContentResolver();
+            this.resolver = context.getContentResolver();
             this.loaderManager = getLoaderManager();
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement " + Listener.class);
+            throw new ClassCastException(context.toString() + " must implement " + Listener.class);
         }
     }
 

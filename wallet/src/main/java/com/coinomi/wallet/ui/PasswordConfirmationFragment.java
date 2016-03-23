@@ -1,6 +1,6 @@
 package com.coinomi.wallet.ui;
 
-import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -27,7 +27,7 @@ import javax.annotation.Nullable;
  */
 public class PasswordConfirmationFragment extends Fragment {
     @Nullable private String message;
-    private Listener mListener;
+    private Listener listener;
 
     static PasswordConfirmationFragment newInstance(String message) {
         return newInstance(message, null);
@@ -70,11 +70,11 @@ public class PasswordConfirmationFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Keyboard.hideKeyboard(getActivity());
-                if (mListener != null) {
+                if (listener != null) {
                     Bundle args = getArguments() == null ? new Bundle() : getArguments();
                     args.remove(Constants.ARG_MESSAGE);
                     args.putString(Constants.ARG_PASSWORD, password.getText().toString());
-                    mListener.onPasswordConfirmed(args);
+                    listener.onPasswordConfirmed(args);
                 }
             }
         });
@@ -83,23 +83,22 @@ public class PasswordConfirmationFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(final Context context) {
+        super.onAttach(context);
         try {
-            mListener = (Listener) activity;
+            listener = (Listener) context;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
+            throw new ClassCastException(context.toString() + " must implement " + Listener.class);
         }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        listener = null;
     }
 
     public interface Listener {
-        public void onPasswordConfirmed(Bundle args);
+        void onPasswordConfirmed(Bundle args);
     }
 }

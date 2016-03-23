@@ -164,13 +164,13 @@ public class SweepWalletFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(final Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(final Context context) {
+        super.onAttach(context);
         try {
-            listener = (Listener) activity;
+            listener = (Listener) context;
             // TODO implement differently
             ConnectivityHelper connHelper = new ConnectivityHelper() {
-                ConnectivityManager connManager = (ConnectivityManager) activity
+                ConnectivityManager connManager = (ConnectivityManager) context
                         .getSystemService(Context.CONNECTIVITY_SERVICE);
 
                 @Override
@@ -182,7 +182,7 @@ public class SweepWalletFragment extends Fragment {
 
             serverClients = new ServerClients(Constants.DEFAULT_COINS_SERVERS, connHelper);
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement " + Listener.class);
+            throw new ClassCastException(context.toString() + " must implement " + Listener.class);
         }
     }
 

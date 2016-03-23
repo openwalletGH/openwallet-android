@@ -1,6 +1,6 @@
 package com.coinomi.wallet.ui;
 
-import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -87,7 +87,8 @@ public class AccountFragment extends Fragment {
         viewPager.setOffscreenPageLimit(2);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
-            public void onPageScrolled(int pos, float posOffset, int posOffsetPixels) { }
+            public void onPageScrolled(int pos, float posOffset, int posOffsetPixels) {
+            }
 
             @Override
             public void onPageSelected(int position) {
@@ -108,7 +109,8 @@ public class AccountFragment extends Fragment {
             }
 
             @Override
-            public void onPageScrollStateChanged(int state) { }
+            public void onPageScrollStateChanged(int state) {
+            }
         });
 
         return view;
@@ -128,13 +130,13 @@ public class AccountFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(final Context context) {
+        super.onAttach(context);
         try {
-            this.listener = (Listener) activity;
-            this.application = (WalletApplication) activity.getApplication();
+            this.listener = (Listener) context;
+            this.application = (WalletApplication) context.getApplicationContext();
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement " + Listener.class);
+            throw new ClassCastException(context.toString() + " must implement " + Listener.class);
         }
     }
 

@@ -330,7 +330,8 @@ public class ServerClient implements BitBlockchainConnection {
                 if (t instanceof CancellationException) {
                     log.debug("Canceling {} call", callMessage.getMethod());
                 } else {
-                    log.error("Could not get reply for blockchain headers subscribe", t);
+                    log.error("Could not get reply for {} blockchain headers subscribe: {}",
+                            type.getName(), t.getMessage());
                 }
             }
         }, Threading.USER_THREAD);
@@ -365,7 +366,7 @@ public class ServerClient implements BitBlockchainConnection {
         };
 
         for (final AbstractAddress address : addresses) {
-            log.info("Going to subscribe to {}", address);
+            log.debug("Going to subscribe to {}", address);
             callMessage.setParam(address.toString());
 
             ListenableFuture<ResultMessage> reply = stratumClient.subscribe(callMessage, addressHandler);
@@ -390,9 +391,10 @@ public class ServerClient implements BitBlockchainConnection {
                 @Override
                 public void onFailure(Throwable t) {
                     if (t instanceof CancellationException) {
-                        log.debug("Canceling {} call", callMessage.getMethod());
+                        log.info("Canceling {} call", callMessage.getMethod());
                     } else {
-                        log.error("Could not get reply for address subscribe", t);
+                        log.error("Could not get reply for {} address subscribe {}: ",
+                                type.getName(), address, t.getMessage());
                     }
                 }
             }, Threading.USER_THREAD);

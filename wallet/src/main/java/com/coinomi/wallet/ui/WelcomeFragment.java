@@ -1,6 +1,6 @@
 package com.coinomi.wallet.ui;
 
-import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -8,12 +8,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.coinomi.wallet.R;
-import com.coinomi.wallet.util.Fonts;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nullable;
 
 /**
  *
@@ -21,7 +18,7 @@ import javax.annotation.Nullable;
 public class WelcomeFragment extends Fragment {
     private static final Logger log = LoggerFactory.getLogger(WelcomeFragment.class);
 
-    private Listener mListener;
+    private Listener listener;
 
     public WelcomeFragment() { }
 
@@ -47,8 +44,8 @@ public class WelcomeFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 log.info("Clicked create new wallet");
-                if (mListener != null) {
-                    mListener.onCreateNewWallet();
+                if (listener != null) {
+                    listener.onCreateNewWallet();
                 }
             }
         };
@@ -59,8 +56,8 @@ public class WelcomeFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 log.info("Clicked restore wallet");
-                if (mListener != null) {
-                    mListener.onRestoreWallet();
+                if (listener != null) {
+                    listener.onRestoreWallet();
                 }
             }
         };
@@ -71,28 +68,27 @@ public class WelcomeFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 log.info("Clicked test wallet");
-                if (mListener != null) {
-                    mListener.onTestWallet();
+                if (listener != null) {
+                    listener.onTestWallet();
                 }
             }
         };
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(final Context context) {
+        super.onAttach(context);
         try {
-            mListener = (Listener) activity;
+            listener = (Listener) context;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
+            throw new ClassCastException(context.toString() + " must implement " + Listener.class);
         }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        listener = null;
     }
 
     public interface Listener {

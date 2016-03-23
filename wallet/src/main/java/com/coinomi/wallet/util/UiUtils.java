@@ -8,7 +8,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.ShareCompat;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -92,11 +92,11 @@ public class UiUtils {
     }
 
     public static ActionMode startActionMode(final Activity activity, final ActionMode.Callback callback) {
-        if (activity == null || !(activity instanceof ActionBarActivity)) {
-            log.warn("To show action mode, your activity must extend " + ActionBarActivity.class);
+        if (activity == null || !(activity instanceof AppCompatActivity)) {
+            log.warn("To show action mode, your activity must extend " + AppCompatActivity.class);
             return null;
         }
-        return ((ActionBarActivity) activity).startSupportActionMode(callback);
+        return ((AppCompatActivity) activity).startSupportActionMode(callback);
     }
 
     public static ActionMode startAddressActionMode(final AbstractAddress address,

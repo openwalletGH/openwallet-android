@@ -1,6 +1,6 @@
 package com.coinomi.wallet.ui;
 
-import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -9,8 +9,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -44,7 +44,7 @@ public class NavigationDrawerFragment extends Fragment {
     /**
      * A pointer to the current callbacks instance (the Activity).
      */
-    private NavigationDrawerCallbacks mCallbacks;
+    private Listener listener;
 
     /**
      * Helper component that ties the action bar to the navigation drawer.
@@ -211,18 +211,18 @@ public class NavigationDrawerFragment extends Fragment {
 
     private void selectItem(int position, boolean closeDrawer, boolean enableCallbacks) {
         setSelectedItem(position, closeDrawer);
-        if (enableCallbacks && mCallbacks != null && listAdapter != null) {
+        if (enableCallbacks && listener != null && listAdapter != null) {
             NavDrawerItem item = listAdapter.getItem(position);
 
             switch (item.itemType) {
                 case ITEM_COIN:
-                    mCallbacks.onAccountSelected((String) item.itemData);
+                    listener.onAccountSelected((String) item.itemData);
                     break;
                 case ITEM_TRADE:
-                    mCallbacks.onTradeSelected();
+                    listener.onTradeSelected();
                     break;
                 case ITEM_OVERVIEW:
-                    mCallbacks.onOverviewSelected();
+                    listener.onOverviewSelected();
                     break;
             }
         }
@@ -240,16 +240,16 @@ public class NavigationDrawerFragment extends Fragment {
 
     private void addCoins() {
         closeDrawer();
-        if (mCallbacks != null) {
-            mCallbacks.onAddCoinsSelected();
+        if (listener != null) {
+            listener.onAddCoinsSelected();
         }
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(final Context context) {
+        super.onAttach(context);
         try {
-            mCallbacks = (NavigationDrawerCallbacks) activity;
+            listener = (Listener) context;
         } catch (ClassCastException e) {
             throw new ClassCastException("Activity must implement NavigationDrawerCallbacks.");
         }
@@ -258,7 +258,7 @@ public class NavigationDrawerFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        mCallbacks = null;
+        listener = null;
     }
 
     @Override
@@ -305,13 +305,13 @@ public class NavigationDrawerFragment extends Fragment {
     }
 
     private ActionBar getActionBar() {
-        return ((ActionBarActivity) getActivity()).getSupportActionBar();
+        return ((AppCompatActivity) getActivity()).getSupportActionBar();
     }
 
     /**
      * Callbacks interface that all activities using this fragment must implement.
      */
-    public interface NavigationDrawerCallbacks {
+    public interface Listener {
         void onAccountSelected(String accountId);
         void onAddCoinsSelected();
         void onTradeSelected();
