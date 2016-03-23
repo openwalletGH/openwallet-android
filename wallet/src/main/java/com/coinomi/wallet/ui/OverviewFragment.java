@@ -265,8 +265,8 @@ public class OverviewFragment extends Fragment{
 
     public void updateView() {
         if (currentBalance != null) {
-            String newBalanceStr = GenericUtils.formatCoinValue(currentBalance.type, currentBalance,
-                    isFullAmount ? AMOUNT_FULL_PRECISION : AMOUNT_SHORT_PRECISION, AMOUNT_SHIFT);
+            String newBalanceStr = GenericUtils.formatFiatValue(currentBalance);
+
             mainAmount.setAmount(newBalanceStr);
             mainAmount.setSymbol(currentBalance.type.getSymbol());
         } else {
