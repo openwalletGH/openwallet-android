@@ -828,7 +828,7 @@ public class WalletPocketHDTest {
         }
 
         @Override
-        public void ping() {}
+        public void ping(String versionString) {}
 
         @Override
         public void addEventListener(ConnectionEventListener listener) {

@@ -70,9 +70,9 @@ public class WalletApplication extends Application {
     @Nullable
     private Wallet wallet;
     private PackageInfo packageInfo;
+    private String versionString;
 
     private long lastStop;
-
     private ConnectivityManager connManager;
     private ShapeShift shapeShift;
     private File txCachePath;
@@ -95,6 +95,8 @@ public class WalletApplication extends Application {
         super.onCreate();
 
         packageInfo = packageInfoFromContext(this);
+        versionString = packageInfo.versionName.replace(" ", "_") + "__" +
+                packageInfo.packageName + "_android";
 
         activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
 
@@ -404,6 +406,10 @@ public class WalletApplication extends Application {
 
     public PackageInfo packageInfo() {
         return packageInfo;
+    }
+
+    public String getVersionString() {
+        return versionString;
     }
 
     public void touchLastResume() {

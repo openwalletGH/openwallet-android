@@ -238,7 +238,7 @@ public class CoinServiceImpl extends Service implements CoinService {
             log.debug("Received a tick {}", intent);
 
             if (clients != null) {
-                clients.ping();
+                clients.ping(application.getVersionString());
             }
 
             long lastStop = application.getLastStop();

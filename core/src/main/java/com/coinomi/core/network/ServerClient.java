@@ -56,6 +56,8 @@ public class ServerClient implements BitBlockchainConnection {
     private static final Logger log = LoggerFactory.getLogger(ServerClient.class);
 
     private static final ScheduledThreadPoolExecutor connectionExec;
+    private static final String CLIENT_PROTOCOL = "0.9";
+
     static {
         connectionExec = new ScheduledThreadPoolExecutor(1);
         // FIXME, causing a crash in old Androids
@@ -638,12 +640,18 @@ public class ServerClient implements BitBlockchainConnection {
     }
 
     @Override
-    public void ping() {
+    public void ping(@Nullable String versionString) {
         if (!isActivelyConnected()) {
             log.warn("There is no connection with {} server, skipping ping.", type.getName());
             return;
         }
-        final CallMessage pingMsg = new CallMessage("server.version", ImmutableList.of());
+
+        if (versionString == null) {
+            versionString = this.getClass().getCanonicalName();
+        }
+
+        final CallMessage pingMsg = new CallMessage("server.version",
+                ImmutableList.of(versionString, CLIENT_PROTOCOL));
         ListenableFuture<ResultMessage> pong = stratumClient.call(pingMsg);
         Futures.addCallback(pong, new FutureCallback<ResultMessage>() {
             @Override

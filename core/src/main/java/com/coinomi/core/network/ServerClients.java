@@ -14,6 +14,8 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 /**
  * @author John L. Jegutanis
  */
@@ -96,9 +98,13 @@ public class ServerClients {
     }
 
     public void ping() {
+        ping(null);
+    }
+
+    public void ping(@Nullable String versionString) {
         for (final CoinType type : connections.keySet()) {
             BlockchainConnection connection = connections.get(type);
-            if (connection.isActivelyConnected()) connection.ping();
+            if (connection.isActivelyConnected()) connection.ping(versionString);
         }
     }
 

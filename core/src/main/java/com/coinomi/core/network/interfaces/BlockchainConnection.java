@@ -7,6 +7,8 @@ import org.bitcoinj.core.Sha256Hash;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 /**
  * @author John L. Jegutanis
  */
@@ -26,7 +28,7 @@ public interface BlockchainConnection<T> {
 
     boolean broadcastTxSync(final T tx);
 
-    void ping();
+    void ping(@Nullable String versionString);
 
     void addEventListener(ConnectionEventListener listener);
 

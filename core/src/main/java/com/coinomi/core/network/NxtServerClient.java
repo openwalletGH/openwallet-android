@@ -530,7 +530,7 @@ public class NxtServerClient implements BlockchainConnection<NxtTransaction> {
     }
 
     @Override
-    public void ping() {
+    public void ping(String versionString) {
 
     }
 
