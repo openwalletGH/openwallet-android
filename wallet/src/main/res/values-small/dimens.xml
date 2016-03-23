@@ -17,6 +17,9 @@
     <dimen name="seed_text_size">22sp</dimen>
     <dimen name="seed_smaller_padding">4dp</dimen>
 
+    <!-- Overview fragment -->
+    <dimen name="overview_amount_margin_top">10dp</dimen>
+
     <!-- About Activity -->
     <dimen name="app_name_long">26sp</dimen>
 

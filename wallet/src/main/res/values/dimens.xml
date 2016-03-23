@@ -51,6 +51,9 @@
     <dimen name="seed_padding">16dp</dimen>
     <dimen name="seed_smaller_padding">8dp</dimen>
 
+    <!-- Overview fragment -->
+    <dimen name="overview_amount_margin_top">20dp</dimen>
+
     <!-- Receive fragment -->
     <dimen name="receive_address">20sp</dimen>
     <dimen name="qr_code_size">224dp</dimen>

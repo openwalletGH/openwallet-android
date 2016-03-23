@@ -21,7 +21,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -152,7 +151,6 @@ public class SendFragment extends Fragment {
     private WalletAccount pocket;
     private Configuration config;
     private ContentResolver resolver;
-    private NavigationDrawerFragment mNavigationDrawerFragment;
     private LoaderManager loaderManager;
     private ReceivingAddressViewAdapter sendToAddressViewAdapter;
     private Map<String, ExchangeRate> localRates = new HashMap<>();
@@ -246,9 +244,6 @@ public class SendFragment extends Fragment {
         }
 
         updateBalance();
-        setHasOptionsMenu(true);
-        mNavigationDrawerFragment = (NavigationDrawerFragment)
-                getFragmentManager().findFragmentById(R.id.navigation_drawer);
 
         String localSymbol = config.getExchangeCurrencyCode();
         for (ExchangeRatesProvider.ExchangeRate rate : getRates(getActivity(), localSymbol).values()) {
@@ -257,6 +252,9 @@ public class SendFragment extends Fragment {
 
         loaderManager.initLoader(ID_RATE_LOADER, null, rateLoaderCallbacks);
         loaderManager.initLoader(ID_RECEIVING_ADDRESS_LOADER, null, receivingAddressLoaderCallbacks);
+
+        // The onCreateOptionsMenu is handled in com.coinomi.wallet.ui.AccountFragment
+        setHasOptionsMenu(true);
     }
 
     private void processUri(String uri) throws CoinURIParseException {
@@ -1039,16 +1037,6 @@ public class SendFragment extends Fragment {
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        if (mNavigationDrawerFragment != null && !mNavigationDrawerFragment.isDrawerOpen()) {
-            // Only show items in the action bar relevant to this screen
-            // if the drawer is not showing. Otherwise, let the drawer
-            // decide what to show in the action bar.
-            inflater.inflate(R.menu.send, menu);
-        }
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_empty_wallet:
@@ -1082,8 +1070,8 @@ public class SendFragment extends Fragment {
     }
 
     public interface Listener {
-        public void onTransactionBroadcastSuccess(WalletAccount pocket, Transaction transaction);
-        public void onTransactionBroadcastFailure(WalletAccount pocket, Transaction transaction);
+        void onTransactionBroadcastSuccess(WalletAccount pocket, Transaction transaction);
+        void onTransactionBroadcastFailure(WalletAccount pocket, Transaction transaction);
     }
 
     private abstract class EditViewListener implements View.OnFocusChangeListener, TextWatcher {

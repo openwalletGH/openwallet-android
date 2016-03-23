@@ -255,7 +255,7 @@ public class StratumClient extends AbstractExecutionThreadService {
         try {
             toServer.writeBytes(message.toString());
             callers.put(message.getId(), future);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             future.setException(e);
             log.error("Error making a call to the server: {}", e.getMessage());
             triggerShutdown();

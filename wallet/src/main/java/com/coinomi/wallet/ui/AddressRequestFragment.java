@@ -21,8 +21,6 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.view.ActionMode;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -163,12 +161,15 @@ public class AddressRequestFragment extends Fragment {
             return;
         }
         type = pocket.getCoinType();
-        setHasOptionsMenu(true);
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
         maxQrSize = LayoutUtils.calculateMaxQrCodeSize(getResources());
 
         loaderManager.initLoader(ID_RATE_LOADER, null, rateLoaderCallbacks);
+
+        // The onCreateOptionsMenu is handled in com.coinomi.wallet.ui.AccountFragment
+        // or in com.coinomi.wallet.ui.PreviousAddressesActivity
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -258,25 +259,6 @@ public class AddressRequestFragment extends Fragment {
         pocket.removeEventListener(walletListener);
         walletListener.removeCallbacks();
         super.onDestroyView();
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        // Only show items in the action bar relevant to this screen
-        // if the drawer is not showing. Otherwise, let the drawer
-        // decide what to show in the action bar.
-        if (mNavigationDrawerFragment == null || !mNavigationDrawerFragment.isDrawerOpen()) {
-            if (showAddress == null) {
-                inflater.inflate(R.menu.request, menu);
-            } else {
-                inflater.inflate(R.menu.request_single_address, menu);
-            }
-
-            MenuItem newAddressItem = menu.findItem(R.id.action_new_address);
-            if (newAddressItem != null) {
-                newAddressItem.setVisible(pocket.canCreateNewAddresses());
-            }
-        }
     }
 
     @Override

@@ -2,21 +2,13 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:coinomi="http://schemas.android.com/apk/res-auto"
-
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingTop="@dimen/amount_margin_top"
+    android:paddingTop="@dimen/overview_amount_margin_top"
     android:paddingBottom="@dimen/transaction_row_padding_vertical" >
-    >
 
-    <!--<fr.castorflex.android.smoothprogressbar.SmoothProgressBar-->
-    <!--android:id="@+id/loading_bar"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:indeterminate="true"-->
-    <!--style="@style/ProgressBar"/>-->
 
     <LinearLayout
         android:orientation="vertical"
@@ -35,27 +27,5 @@
             android:layout_marginBottom="@dimen/amount_margin_bottom"
             coinomi:show_big="true"
             android:gravity="center_horizontal" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingStart="@dimen/activity_horizontal_margin"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingEnd="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
-        android:layout_gravity="center_horizontal">
-
-        <TextView
-            android:id="@+id/welcome_message"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:layout_marginBottom="32dp"
-            android:gravity="center"
-            android:text="@string/history_empty"
-            android:textColor="@color/gray_26_hint_text"
-            android:textSize="@dimen/history_empty" />
     </LinearLayout>
 </LinearLayout>

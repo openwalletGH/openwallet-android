@@ -105,9 +105,7 @@ public class BalanceFragment extends Fragment implements LoaderCallbacks<List<Ab
     private Configuration config;
 
     private TransactionsListAdapter adapter;
-    private LoaderManager loaderManager;
     private View emptyPocketMessage;
-    private NavigationDrawerFragment mNavigationDrawerFragment;
     private Amount mainAmount;
     private Amount localAmount;
     private TextView connectionLabel;
@@ -152,18 +150,23 @@ public class BalanceFragment extends Fragment implements LoaderCallbacks<List<Ab
             return;
         }
         type = pocket.getCoinType();
-        setHasOptionsMenu(true);
-        mNavigationDrawerFragment = (NavigationDrawerFragment)
-                getFragmentManager().findFragmentById(R.id.navigation_drawer);
 
-        loaderManager.initLoader(ID_TRANSACTION_LOADER, null, this);
-        loaderManager.initLoader(ID_RATE_LOADER, null, rateLoaderCallbacks);
+        // The onCreateOptionsMenu is handled in com.coinomi.wallet.ui.AccountFragment
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        getLoaderManager().initLoader(ID_TRANSACTION_LOADER, null, this);
+        getLoaderManager().initLoader(ID_RATE_LOADER, null, rateLoaderCallbacks);
     }
 
     @Override
     public void onDestroy() {
-        loaderManager.destroyLoader(ID_TRANSACTION_LOADER);
-        loaderManager.destroyLoader(ID_RATE_LOADER);
+        getLoaderManager().destroyLoader(ID_TRANSACTION_LOADER);
+        getLoaderManager().destroyLoader(ID_RATE_LOADER);
 
         super.onDestroy();
     }
@@ -316,18 +319,6 @@ public class BalanceFragment extends Fragment implements LoaderCallbacks<List<Ab
     };
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        if (!mNavigationDrawerFragment.isDrawerOpen()) {
-            // Only show items in the action bar relevant to this screen
-            // if the drawer is not showing. Otherwise, let the drawer
-            // decide what to show in the action bar.
-            inflater.inflate(R.menu.balance, menu);
-            // Disable sign/verify for coins that don't support it
-            menu.findItem(R.id.action_sign_verify_message).setVisible(type.canSignVerifyMessages());
-        }
-    }
-
-    @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
@@ -339,7 +330,7 @@ public class BalanceFragment extends Fragment implements LoaderCallbacks<List<Ab
         }
         application = (WalletApplication) activity.getApplication();
         config = application.getConfiguration();
-        loaderManager = getLoaderManager();
+//        loaderManager = getLoaderManager();
     }
 
     @Override
@@ -393,11 +384,23 @@ public class BalanceFragment extends Fragment implements LoaderCallbacks<List<Ab
 
     private static class AbstractTransactionsLoader extends AsyncTaskLoader<List<AbstractTransaction>> {
         private final AbstractWallet walletPocket;
+        private final ThrottlingWalletChangeListener transactionAddRemoveListener;
+
 
         private AbstractTransactionsLoader(final Context context, @Nonnull final AbstractWallet walletPocket) {
             super(context);
 
             this.walletPocket = walletPocket;
+            this.transactionAddRemoveListener = new ThrottlingWalletChangeListener() {
+                @Override
+                public void onThrottledWalletChanged() {
+                    try {
+                        forceLoad();
+                    } catch (final RejectedExecutionException x) {
+                        log.info("rejected execution: " + AbstractTransactionsLoader.this.toString());
+                    }
+                }
+            };
         }
 
         @Override
@@ -427,17 +430,6 @@ public class BalanceFragment extends Fragment implements LoaderCallbacks<List<Ab
 
             return filteredAbstractTransactions;
         }
-
-        private final ThrottlingWalletChangeListener transactionAddRemoveListener = new ThrottlingWalletChangeListener() {
-            @Override
-            public void onThrottledWalletChanged() {
-                try {
-                    forceLoad();
-                } catch (final RejectedExecutionException x) {
-                    log.info("rejected execution: " + AbstractTransactionsLoader.this.toString());
-                }
-            }
-        };
 
         private static final Comparator<AbstractTransaction> TRANSACTION_COMPARATOR = new Comparator<AbstractTransaction>() {
             @Override

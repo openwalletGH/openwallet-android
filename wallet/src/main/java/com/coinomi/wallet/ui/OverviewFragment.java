@@ -21,7 +21,6 @@ import com.coinomi.core.wallet.AbstractWallet;
 import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.wallet.Configuration;
-import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.ExchangeRatesProvider;
 import com.coinomi.wallet.ExchangeRatesProvider.ExchangeRate;
 import com.coinomi.wallet.R;
@@ -31,14 +30,15 @@ import com.coinomi.wallet.ui.widget.Amount;
 import com.coinomi.wallet.util.ThrottlingWalletChangeListener;
 import com.coinomi.wallet.util.WeakHandler;
 
+import org.bitcoinj.utils.Threading;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
 /**
- * Use the {@link OverviewFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * @author vbcs
+ * @author John L. Jegutanis
  */
 public class OverviewFragment extends Fragment{
     private static final Logger log = LoggerFactory.getLogger(OverviewFragment.class);
@@ -86,20 +86,8 @@ public class OverviewFragment extends Fragment{
 
     private Listener listener;
 
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param accountId of the account
-     * @return A new instance of fragment InfoFragment.
-     */
-    public static OverviewFragment newInstance(String accountId) {
-        OverviewFragment fragment = new OverviewFragment();
-        Bundle args = new Bundle();
-        args.putSerializable(Constants.ARG_ACCOUNT_ID, accountId);
-        fragment.setArguments(args);
-        return fragment;
+    public static OverviewFragment getInstance() {
+        return new OverviewFragment();
     }
 
     public OverviewFragment() {}
@@ -151,9 +139,6 @@ public class OverviewFragment extends Fragment{
         listFooter.setMinimumHeight(getResources().getDimensionPixelSize(R.dimen.activity_vertical_margin));
         accountRows.addFooterView(listFooter);
 
-        if (wallet.getAllAccounts().size() > 0) {
-            view.findViewById(R.id.welcome_message).setVisibility(View.GONE);
-        }
         // Init list adapter
         adapter = new AccountListAdapter(inflater.getContext(), wallet);
         accountRows.setAdapter(adapter);
@@ -209,8 +194,7 @@ public class OverviewFragment extends Fragment{
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         if (mNavigationDrawerFragment != null && !mNavigationDrawerFragment.isDrawerOpen()) {
-                //inflater.inflate(R.menu.global, menu);
-
+            inflater.inflate(R.menu.overview, menu);
         }
     }
 
@@ -238,12 +222,24 @@ public class OverviewFragment extends Fragment{
     @Override
     public void onResume() {
         super.onResume();
+
+        // TODO add an event listener to the Wallet class
+        for (WalletAccount account : wallet.getAllAccounts()) {
+            account.addEventListener(walletChangeListener, Threading.SAME_THREAD);
+        }
+
         updateWallet();
         updateView();
     }
 
     @Override
     public void onPause() {
+        // TODO add an event listener to the Wallet class
+        for (WalletAccount account : wallet.getAllAccounts()) {
+            account.removeEventListener(walletChangeListener);
+        }
+        walletChangeListener.removeCallbacks();
+
         super.onPause();
     }
 
@@ -274,7 +270,11 @@ public class OverviewFragment extends Fragment{
                     isFullAmount ? AMOUNT_FULL_PRECISION : AMOUNT_SHORT_PRECISION, AMOUNT_SHIFT);
             mainAmount.setAmount(newBalanceStr);
             mainAmount.setSymbol(currentBalance.type.getSymbol());
+        } else {
+            mainAmount.setAmount("-.--");
+            mainAmount.setSymbol("");
         }
+
         exchangeRates = ExchangeRatesProvider.getRates(
                 application.getApplicationContext(), config.getExchangeCurrencyCode());
         adapter.setExchangeRates(exchangeRates);
@@ -284,7 +284,5 @@ public class OverviewFragment extends Fragment{
     public interface Listener {
         void onLocalAmountClick();
         void onAccountSelected(String accountId);
-        void onSend();
-        void onReceive();
     }
 }

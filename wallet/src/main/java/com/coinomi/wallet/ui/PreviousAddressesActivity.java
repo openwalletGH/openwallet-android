@@ -1,8 +1,8 @@
 package com.coinomi.wallet.ui;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBar;
+import android.view.Menu;
 import android.view.MenuItem;
 
 import com.coinomi.wallet.R;
@@ -31,8 +31,11 @@ public class PreviousAddressesActivity extends BaseWalletActivity implements
                     .commit();
         }
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(false);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowHomeEnabled(false);
+        }
 
         currentFragment = LIST_ADDRESSES;
     }
@@ -56,21 +59,18 @@ public class PreviousAddressesActivity extends BaseWalletActivity implements
         }
     }
 
-    private void replaceFragment(Fragment fragment) {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-
-        // Replace whatever is in the fragment_container view with this fragment,
-        // and add the transaction to the back stack so the user can navigate back
-        transaction.replace(R.id.container, fragment);
-        transaction.addToBackStack(null);
-
-        // Commit the transaction
-        transaction.commit();
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if (currentFragment == VIEW_ADDRESS) {
+            getMenuInflater().inflate(R.menu.request_single_address, menu);
+            return true;
+        }
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public void onAddressSelected(Bundle args) {
         currentFragment = VIEW_ADDRESS;
-        replaceFragment(AddressRequestFragment.newInstance(args));
+        replaceFragment(AddressRequestFragment.newInstance(args), R.id.container);
     }
 }

@@ -32,6 +32,7 @@ import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -86,7 +87,7 @@ import static com.coinomi.core.Preconditions.checkState;
  * @author John L. Jegutanis
  * @see <a href="https://github.com/bitcoin/bips/blob/master/bip-0021.mediawiki">BIP 0021</a>
  */
-public class CoinURI {
+public class CoinURI implements Serializable {
     /**
      * Provides logging for this class
      */
