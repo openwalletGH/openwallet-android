@@ -771,15 +771,20 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<BitTransac
         checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
         Integer height = header.getBlockHeight();
         Long timestamp = header.getTimestamp();
+        boolean mustSave = false;
         blockTimes.put(height, timestamp);
         if (missingTimestamps.containsKey(height)) {
             for (Sha256Hash hash : missingTimestamps.get(height)) {
                 if (rawTransactions.containsKey(hash)) {
                     rawTransactions.get(hash).setTimestamp(timestamp);
+                    mustSave = true;
                 }
             }
         }
         missingTimestamps.remove(height);
+        if (mustSave) {
+            walletSaveLater();
+        }
     }
 
     @Override
