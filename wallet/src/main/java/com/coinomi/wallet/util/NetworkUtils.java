@@ -21,7 +21,7 @@ public class NetworkUtils {
         if (httpClient == null) {
             httpClient = new OkHttpClient();
             httpClient.setConnectionSpecs(Collections.singletonList(ConnectionSpec.MODERN_TLS));
-            httpClient.setConnectTimeout(Constants.HTTP_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+            httpClient.setConnectTimeout(Constants.NETWORK_TIMEOUT_MS, TimeUnit.MILLISECONDS);
             // Setup cache
             File cacheDir = new File(context.getCacheDir(), Constants.HTTP_CACHE_NAME);
             Cache cache = new Cache(cacheDir, Constants.HTTP_CACHE_SIZE);

@@ -64,7 +64,7 @@ public class SweepWalletFragment extends Fragment {
     private static final String ERROR = "error";
     private static final String STATUS = "status";
 
-    enum Error {NONE, BAD_FORMAT, BAD_COIN_TYPE, BAD_PASSWORD, ZERO_COINS, GENERIC_ERROR}
+    enum Error {NONE, BAD_FORMAT, BAD_COIN_TYPE, BAD_PASSWORD, ZERO_COINS, NO_CONNECTION, GENERIC_ERROR}
     enum TxStatus {INITIAL, DECODING, LOADING, SIGNING}
 
     // FIXME: Improve this: a reference to the task even if the fragment is recreated
@@ -252,6 +252,10 @@ public class SweepWalletFragment extends Fragment {
                 errorΜessage.setText(R.string.sweep_wallet_zero_coins);
                 setVisible(errorΜessage);
                 break;
+            case NO_CONNECTION:
+                errorΜessage.setText(R.string.disconnected_label);
+                setVisible(errorΜessage);
+                break;
             case GENERIC_ERROR:
                 errorΜessage.setText(R.string.error_generic);
                 setVisible(errorΜessage);
@@ -378,6 +382,12 @@ public class SweepWalletFragment extends Fragment {
         }
 
         protected Void doInBackground(Void... params) {
+            startSweeping();
+            serverClients.stopAllAsync();
+            return null;
+        }
+
+        private void startSweeping() {
             log.info("Starting sweep wallet task. Decoding private key...");
             this.publishProgress(TxStatus.DECODING);
             SerializedKey.TypedKey rawKey;
@@ -390,13 +400,13 @@ public class SweepWalletFragment extends Fragment {
             } catch (SerializedKey.BadPassphraseException e) {
                 log.info("Could not get key due to bad passphrase");
                 error = Error.BAD_PASSWORD;
-                return null;
+                return;
             }
 
             if (!rawKey.possibleType.contains(type)) {
                 log.info("Incorrect coin type");
                 error = Error.BAD_COIN_TYPE;
-                return null;
+                return;
             }
 
             log.info("Creating temporary wallet");
@@ -404,13 +414,29 @@ public class SweepWalletFragment extends Fragment {
             BitWalletSingleKey sweepWallet = new BitWalletSingleKey(type, rawKey.key);
             serverClients.startAsync(sweepWallet);
 
+            int maxWaitMs = Constants.NETWORK_TIMEOUT_MS;
+            log.info("Waiting wallet to connect...");
+            while(!sweepWallet.isConnected() && maxWaitMs > 0) {
+                try {
+                    Thread.sleep(100);
+                    maxWaitMs -= 100;
+                } catch (InterruptedException e) {
+                    log.info("Stopping wallet loading task...");
+                    return;
+                }
+            }
+            if (!sweepWallet.isConnected()) {
+                error = Error.NO_CONNECTION;
+                return;
+            }
+
+            log.info("Waiting wallet to load...");
             while(sweepWallet.isLoading()) {
                 try {
-                    System.out.println("Waiting wallet to load...");
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
-                    System.out.println("Stopping task...");
-                    return null;
+                    log.info("Stopping wallet loading task...");
+                    return;
                 }
             }
 
@@ -434,14 +460,11 @@ public class SweepWalletFragment extends Fragment {
                 } catch (WalletAccount.WalletAccountException e) {
                     log.info("Could not create transaction: {}", e.getMessage());
                     error = Error.GENERIC_ERROR;
-                } finally {
-                    serverClients.stopAllAsync();
                 }
             } else {
                 log.info("Wallet is empty");
                 error = Error.ZERO_COINS;
             }
-            return null;
         }
 
         @Override

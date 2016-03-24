@@ -331,7 +331,7 @@
     <string name="support_message">Contact Coinomi support</string>
     <!-- Sweep wallet -->
     <string name="title_activity_sweep_wallet">Sweep paper wallet</string>
-    <string name="sweep_wallet_info">You are about to transfer coins from a paper wallet to your Coinomi wallet.\nAfter the transfer, please avoid reusing the paper wallet for privacy and security reasons.</string>
+    <string name="sweep_wallet_info">You are about to transfer coins from a paper wallet to your Coinomi wallet.\nAfter the transfer is complete, please avoid reusing the paper wallet for security reasons.\n\nSupported formats: WIF, BIP38, Mini private key.</string>
     <string name="sweep_wallet_key_title">private key</string>
     <string name="sweep_wallet_key_password">private key password</string>
     <string name="sweep_wallet_key_hint">type or scan a private key</string>
