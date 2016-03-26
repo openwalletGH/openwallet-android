@@ -56,14 +56,14 @@ public class ServerClients {
         connection.resetConnection();
     }
 
-    public void startAsync(WalletAccount pocket) {
-        if (pocket == null) {
+    public void startAsync(WalletAccount account) {
+        if (account == null) {
             log.warn("Provided wallet account is null, not doing anything");
             return;
         }
-        CoinType type = pocket.getCoinType();
+        CoinType type = account.getCoinType();
         BlockchainConnection connection = getConnection(type);
-        connection.addEventListener(pocket);
+        connection.addEventListener(account);
         connection.startAsync();
     }
 
@@ -118,5 +118,13 @@ public class ServerClients {
     public void setCacheDir(File cacheDir, int cacheSize) {
         this.cacheDir = cacheDir;
         this.cacheSize = cacheSize;
+    }
+
+    public void startOrResetAccountAsync(WalletAccount account) {
+        if (connections.containsKey(account.getCoinType())) {
+            resetAccount(account);
+        } else {
+            startAsync(account);
+        }
     }
 }

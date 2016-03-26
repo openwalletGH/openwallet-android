@@ -332,25 +332,45 @@ public class CoinServiceImpl extends Service implements CoinService {
                 Wallet wallet = application.getWallet();
                 if (intent.hasExtra(Constants.ARG_ACCOUNT_ID)) {
                     String accountId = intent.getStringExtra(Constants.ARG_ACCOUNT_ID);
-                    WalletAccount pocket = wallet.getAccount(accountId);
-                    if (pocket != null) {
-                        pocket.refresh();
+                    WalletAccount account = wallet.getAccount(accountId);
+                    if (account != null) {
+                        account.refresh();
 
                         if (clients == null) {
                             if (connHelper.isConnected()) {
                                 clients = getServerClients(wallet);
-                                clients.startAsync(pocket);
+                                clients.startAsync(account);
                             }
                         } else {
-                            clients.resetAccount(pocket);
+                            clients.resetAccount(account);
                         }
                     } else {
-                        log.warn("Tried to start a service for account id {} but no pocket found.",
+                        log.warn("Tried to start a service for account id {} but no account found.",
                                 accountId);
                     }
 
                 } else {
                     log.warn("Missing account id argument, not doing anything");
+                }
+            } else {
+                log.warn("Got wallet reset intent, but no wallet is available");
+            }
+        } else if (CoinService.ACTION_RESET_WALLET.equals(action)) {
+            if (application.getWallet() != null) {
+                Wallet wallet = application.getWallet();
+
+                if (clients == null) {
+                    if (connHelper.isConnected()) {
+                        clients = getServerClients(wallet);
+                    }
+                }
+
+                for (WalletAccount account : wallet.getAllAccounts()) {
+                    account.refresh();
+
+                    if (clients != null) {
+                        clients.startOrResetAccountAsync(account);
+                    }
                 }
             } else {
                 log.warn("Got wallet reset intent, but no wallet is available");

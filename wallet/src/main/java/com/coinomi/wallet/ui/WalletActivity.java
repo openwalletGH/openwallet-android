@@ -476,7 +476,6 @@ final public class WalletActivity extends BaseWalletActivity implements
         } else {
             showPayWithDialog(coinUri);
         }
-
     }
 
     private void processAddress(String addressStr) throws CoinURIParseException, AddressMalformedException {
@@ -658,9 +657,15 @@ final public class WalletActivity extends BaseWalletActivity implements
 
     private void refreshWallet() {
         if (getWalletApplication().getWallet() != null) {
-            Intent intent = new Intent(CoinService.ACTION_RESET_ACCOUNT, null,
-                    getWalletApplication(), CoinServiceImpl.class);
-            intent.putExtra(Constants.ARG_ACCOUNT_ID, lastAccountId);
+            Intent intent;
+            if (accountFragment.isVisible()) {
+                intent = new Intent(CoinService.ACTION_RESET_ACCOUNT, null,
+                        getWalletApplication(), CoinServiceImpl.class);
+                intent.putExtra(Constants.ARG_ACCOUNT_ID, lastAccountId);
+            } else {
+                intent = new Intent(CoinService.ACTION_RESET_WALLET, null,
+                        getWalletApplication(), CoinServiceImpl.class);
+            }
             getWalletApplication().startService(intent);
         }
     }

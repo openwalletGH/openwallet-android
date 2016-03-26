@@ -178,7 +178,7 @@ public class ServerClient implements BitBlockchainConnection {
 
         Service.State state = stratumClient.state();
         if (state != NEW || stopped) {
-            log.info("Not starting service as it is already started or explicitly stopped");
+            log.debug("Not starting service as it is already started or explicitly stopped");
             return;
         }
 
