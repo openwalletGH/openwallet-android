@@ -2,7 +2,6 @@ package com.coinomi.wallet.ui;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -19,8 +18,7 @@ import com.coinomi.core.wallet.Wallet;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.util.Fonts;
-import com.coinomi.wallet.util.LayoutUtils;
-import com.coinomi.wallet.util.Qr;
+import com.coinomi.wallet.util.QrUtils;
 import com.coinomi.wallet.util.WeakHandler;
 
 import org.bitcoinj.crypto.DeterministicKey;
@@ -41,7 +39,6 @@ public class ShowSeedFragment extends Fragment {
 
     private static final int UPDATE_VIEW = 0;
 
-    private int maxQrSize;
     private View seedLayout;
     private View seedEncryptedLayout;
     private TextView seedView;
@@ -69,8 +66,6 @@ public class ShowSeedFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        maxQrSize = LayoutUtils.calculateMaxQrCodeSize(getResources());
     }
 
     @Override
@@ -157,7 +152,6 @@ public class ShowSeedFragment extends Fragment {
 
     private class LoadSeedTask extends AsyncTask<Void, Void, Void> {
         private Dialogs.ProgressDialogFragment busyDialog;
-        Bitmap qrCodeBitmap;
         private String seedString;
         private boolean isSeedPasswordProtected;
 
@@ -197,7 +191,6 @@ public class ShowSeedFragment extends Fragment {
                 seedString = Wallet.mnemonicToString(seed.getMnemonicCode());
                 DeterministicKey testMasterKey = HDKeyDerivation.createMasterPrivateKey(seed.getSeedBytes());
                 isSeedPasswordProtected = !masterKey.getPrivKey().equals(testMasterKey.getPrivKey());
-                qrCodeBitmap = Qr.bitmap(seedString, maxQrSize);
             }
 
             return null;
@@ -211,7 +204,7 @@ public class ShowSeedFragment extends Fragment {
                 seedLayout.setVisibility(View.VISIBLE);
                 seedEncryptedLayout.setVisibility(View.GONE);
                 seedView.setText(seedString);
-                qrView.setImageBitmap(qrCodeBitmap);
+                QrUtils.setQr(qrView, getResources(), seedString);
                 if (isSeedPasswordProtected) {
                     seedPasswordProtectedView.setVisibility(View.VISIBLE);
                 } else {

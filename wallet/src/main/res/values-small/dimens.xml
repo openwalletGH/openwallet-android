@@ -26,4 +26,6 @@
     <!-- generic rows -->
     <dimen name="row_padding_vertical">4dp</dimen>
 
+    <!-- Qr codes -->
+    <dimen name="qr_code_size">176dp</dimen>
 </resources>

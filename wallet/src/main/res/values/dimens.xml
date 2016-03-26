@@ -56,8 +56,11 @@
 
     <!-- Receive fragment -->
     <dimen name="receive_address">20sp</dimen>
-    <dimen name="qr_code_size">224dp</dimen>
-    <dimen name="qr_code_padding">16dp</dimen>
+
+    <!-- Qr codes -->
+    <dimen name="qr_code_size">192dp</dimen>
+    <dimen name="qr_code_quite_zone_pixels">0px</dimen>
+    <dimen name="qr_code_margin">16dp</dimen>
 
     <!-- Send fragment -->
     <dimen name="tx_message_counter_padding">28dp</dimen>

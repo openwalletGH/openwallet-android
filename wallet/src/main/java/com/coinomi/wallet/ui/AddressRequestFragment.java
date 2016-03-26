@@ -10,7 +10,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.ContentObserver;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
@@ -49,8 +48,7 @@ import com.coinomi.wallet.ExchangeRatesProvider;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.ui.widget.AmountEditView;
-import com.coinomi.wallet.util.LayoutUtils;
-import com.coinomi.wallet.util.Qr;
+import com.coinomi.wallet.util.QrUtils;
 import com.coinomi.wallet.util.ThrottlingWalletChangeListener;
 import com.coinomi.wallet.util.UiUtils;
 import com.coinomi.wallet.util.WeakHandler;
@@ -91,7 +89,6 @@ public class AddressRequestFragment extends Fragment {
     private NavigationDrawerFragment mNavigationDrawerFragment;
     private String accountId;
     private WalletAccount pocket;
-    private int maxQrSize;
     private String lastQrContent;
 
     private final Handler handler = new MyHandler(this);
@@ -164,7 +161,6 @@ public class AddressRequestFragment extends Fragment {
         type = pocket.getCoinType();
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
-        maxQrSize = LayoutUtils.calculateMaxQrCodeSize(getResources());
 
         loaderManager.initLoader(ID_RATE_LOADER, null, rateLoaderCallbacks);
 
@@ -391,12 +387,10 @@ public class AddressRequestFragment extends Fragment {
 
     /**
      * Update qr code if the content is different
-     * @param qrContent
      */
     private void updateQrCode(final String qrContent) {
         if (lastQrContent == null || !lastQrContent.equals(qrContent)) {
-            Bitmap qrCodeBitmap = Qr.bitmap(qrContent, maxQrSize);
-            qrView.setImageBitmap(qrCodeBitmap);
+            QrUtils.setQr(qrView, getResources(), qrContent);
             lastQrContent = qrContent;
         }
     }

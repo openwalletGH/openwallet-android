@@ -14,8 +14,7 @@ import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
-import com.coinomi.wallet.util.LayoutUtils;
-import com.coinomi.wallet.util.Qr;
+import com.coinomi.wallet.util.QrUtils;
 import com.coinomi.wallet.util.UiUtils;
 
 import static com.coinomi.core.Preconditions.checkNotNull;
@@ -62,9 +61,8 @@ public class AccountDetailsFragment extends Fragment {
         publicKey.setOnClickListener(getPubKeyOnClickListener());
         publicKey.setText(publicKeySerialized);
 
-        int maxQrSize = LayoutUtils.calculateMaxQrCodeSize(getResources());
         ImageView qrView = (ImageView) view.findViewById(R.id.qr_code_public_key);
-        qrView.setImageBitmap(Qr.bitmap(publicKeySerialized, maxQrSize));
+        QrUtils.setQr(qrView, getResources(), publicKeySerialized);
 
         return view;
     }

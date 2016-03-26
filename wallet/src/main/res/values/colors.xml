@@ -71,4 +71,7 @@
         <item>@color/primary_800</item>
     </integer-array>
 
+    <!-- QR code -->
+    <color name="qr_code_normal_bg">#00000000</color>
+
 </resources>

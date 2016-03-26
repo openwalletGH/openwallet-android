@@ -707,6 +707,11 @@ final public class WalletActivity extends BaseWalletActivity implements
         }
     }
 
+    @SuppressWarnings("unused")
+    private boolean goToReceive() {
+        return accountFragment.isVisible() && accountFragment.goToReceive();
+    }
+
     private boolean goToBalance() {
         return accountFragment.isVisible() && accountFragment.goToBalance();
     }

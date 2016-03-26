@@ -200,6 +200,14 @@ public class AccountFragment extends Fragment {
         }
     }
 
+    public boolean goToReceive() {
+        if (viewPager != null && viewPager.getCurrentItem() != RECEIVE) {
+            viewPager.setCurrentItem(RECEIVE);
+            return true;
+        }
+        return false;
+    }
+
     public boolean goToBalance() {
         if (viewPager != null && viewPager.getCurrentItem() != BALANCE) {
             viewPager.setCurrentItem(BALANCE);
