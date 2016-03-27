@@ -94,6 +94,9 @@ public class NxtServerClient implements BlockchainConnection<NxtTransaction> {
 
     // TODO, only one is supported at the moment. Change when accounts are supported.
     private transient CopyOnWriteArrayList<ListenerRegistration<ConnectionEventListener>> eventListeners;
+    private ScheduledExecutorService blockchainSubscription;
+    private ScheduledExecutorService ecSubscription;
+    private ScheduledExecutorService addressSubscription;
 
     public int getEcBlockHeight() { return ecBlockHeight; }
 
@@ -208,9 +211,12 @@ public class NxtServerClient implements BlockchainConnection<NxtTransaction> {
     public void subscribeToBlockchain(final TransactionEventListener listener) {
 
         log.info("Going to subscribe to block chain headers");
+        if (blockchainSubscription != null) {
+            blockchainSubscription.shutdownNow();
+        }
 
-        ScheduledExecutorService exec = Executors.newSingleThreadScheduledExecutor();
-        exec.scheduleAtFixedRate(new Runnable() {
+        blockchainSubscription = Executors.newSingleThreadScheduledExecutor();
+        blockchainSubscription.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
 
@@ -255,8 +261,12 @@ public class NxtServerClient implements BlockchainConnection<NxtTransaction> {
     Method to keep up to date ecBlockId and ecBlockHeight parameters ( runs every 15seconds )
      */
     private void subscribeToEc() {
-        ScheduledExecutorService exec = Executors.newSingleThreadScheduledExecutor();
-        exec.scheduleAtFixedRate(new Runnable() {
+        if (ecSubscription != null) {
+            ecSubscription.shutdownNow();
+        }
+
+        ecSubscription = Executors.newSingleThreadScheduledExecutor();
+        ecSubscription.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
 
@@ -305,11 +315,14 @@ public class NxtServerClient implements BlockchainConnection<NxtTransaction> {
     @Override
     public void subscribeToAddresses(List<AbstractAddress> addresses,
                                      final TransactionEventListener<NxtTransaction> listener) {
-        ScheduledExecutorService exec = Executors.newSingleThreadScheduledExecutor();
+        if (addressSubscription != null) {
+            addressSubscription.shutdownNow();
+        }
+        addressSubscription = Executors.newSingleThreadScheduledExecutor();
         for (final AbstractAddress address : addresses) {
             log.info("Going to subscribe to {}", address);
 
-            exec.scheduleAtFixedRate(new Runnable() {
+            addressSubscription.scheduleAtFixedRate(new Runnable() {
                 @Override
                 public void run() {
 
@@ -577,18 +590,35 @@ public class NxtServerClient implements BlockchainConnection<NxtTransaction> {
 
     @Override
     public void stopAsync() {
+        if (stopped) return;
+        stopped = true;
+        if (isActivelyConnected()) broadcastOnDisconnect();
+        eventListeners.clear();
+        connectionExec.remove(reconnectTask);
+        if (blockchainSubscription != null) {
+            blockchainSubscription.shutdownNow();
+            blockchainSubscription = null;
+        }
+        if (ecSubscription != null) {
+            ecSubscription.shutdownNow();
+            ecSubscription = null;
+        }
+        if (addressSubscription != null) {
+            addressSubscription.shutdownNow();
+            addressSubscription = null;
+        }
 
     }
 
     @Override
     public boolean isActivelyConnected() {
+        // TODO implement
         return true;
     }
 
     @Override
     public void startAsync() {
-
-
+        // TODO implement
     }
 
     private Service.Listener serviceListener = new Service.Listener() {

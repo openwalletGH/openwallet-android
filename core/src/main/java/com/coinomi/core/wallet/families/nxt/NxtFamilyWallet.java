@@ -22,6 +22,7 @@ import com.coinomi.core.wallet.SignedMessage;
 import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.core.wallet.WalletAccountEventListener;
+import com.coinomi.core.wallet.WalletPocketConnectivity;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -267,6 +268,13 @@ public class NxtFamilyWallet extends AbstractWallet<NxtTransaction, NxtAddress>
     public boolean isLoading() {
 //        TODO implement
         return false;
+    }
+
+    @Override
+    public void disconnect() {
+        if (blockchainConnection != null) {
+            blockchainConnection.stopAsync();
+        }
     }
 
     @Override
@@ -574,7 +582,8 @@ public class NxtFamilyWallet extends AbstractWallet<NxtTransaction, NxtAddress>
 
     @Override
     public void onDisconnect() {
-        throw new RuntimeException("Not implemented");
+        blockchainConnection = null;
+        queueOnConnectivity();
     }
 
     @Nullable
@@ -837,6 +846,19 @@ public class NxtFamilyWallet extends AbstractWallet<NxtTransaction, NxtAddress>
                 @Override
                 public void run() {
                     registration.listener.onNewBalance(balance);
+                    registration.listener.onWalletChanged(NxtFamilyWallet.this);
+                }
+            });
+        }
+    }
+
+    void queueOnConnectivity() {
+        final WalletPocketConnectivity connectivity = getConnectivityStatus();
+        for (final ListenerRegistration<WalletAccountEventListener> registration : listeners) {
+            registration.executor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    registration.listener.onConnectivityStatus(connectivity);
                     registration.listener.onWalletChanged(NxtFamilyWallet.this);
                 }
             });

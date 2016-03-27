@@ -340,16 +340,28 @@ final public class Wallet {
         }
     }
 
-    public void deleteAccount(String id) {
+    public WalletAccount deleteAccount(String id) {
         lock.lock();
         try {
-            checkState(accounts.containsKey(id), "Cannot delete a non existing account");
+            if (!accounts.containsKey(id)) {
+                return null;
+            }
 
             WalletAccount deletedAccount = accounts.remove(id);
-            if (!accountsByType.get(deletedAccount.getCoinType()).remove(deletedAccount)) {
-                log.warn("Could not find account in accounts by type index");
+            CoinType type = deletedAccount.getCoinType();
+            ArrayList<WalletAccount> sameTypeAccounts = accountsByType.get(type);
+            if (sameTypeAccounts != null) {
+                if (!sameTypeAccounts.remove(deletedAccount)) {
+                    log.warn("Could not find account in accounts by type index");
+                }
+                if (sameTypeAccounts.size() == 0) {
+                    accountsByType.remove(type);
+                }
             }
+            deletedAccount.setWallet(null);
+            deletedAccount.disconnect();
             saveNow();
+            return deletedAccount;
         } finally {
             lock.unlock();
         }
@@ -363,7 +375,7 @@ final public class Wallet {
         try {
             for (WalletAccount account : accounts.values()) {
                 if (account instanceof WalletPocketHD) {
-                    ((WalletPocketHD)account).maybeInitializeAllKeys();
+                    account.maybeInitializeAllKeys();
                 }
             }
         } finally {
@@ -403,17 +415,6 @@ final public class Wallet {
             lock.unlock();
         }
     }
-
-//    //TODO
-//    @Deprecated
-//    public List<CoinType> getCoinTypes() {
-//        lock.lock();
-//        try {
-//            return ImmutableList.copyOf(accountsByType.keySet());
-//        } finally {
-//            lock.unlock();
-//        }
-//    }
 
     /** Returns the {@link KeyCrypter} in use or null if the key chain is not encrypted. */
     @Nullable

@@ -50,6 +50,7 @@ public interface WalletAccount<T extends AbstractTransaction, A extends Abstract
 
     boolean isConnected();
     boolean isLoading();
+    void disconnect();
     WalletPocketConnectivity getConnectivityStatus();
 
     /**

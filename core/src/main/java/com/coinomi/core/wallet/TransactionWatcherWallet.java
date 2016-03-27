@@ -1465,6 +1465,13 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<BitTransac
         return blockchainConnection != null;
     }
 
+    @Override
+    public void disconnect() {
+        if (blockchainConnection != null) {
+            blockchainConnection.stopAsync();
+        }
+    }
+
     Map<TrimmedOutPoint, OutPointOutput> getUnspentOutputs(boolean includeUnsafe) {
         lock.lock();
         try {

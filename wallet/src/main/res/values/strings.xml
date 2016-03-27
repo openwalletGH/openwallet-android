@@ -241,6 +241,11 @@
     <string name="edit_address_book_entry_dialog_title_edit">Edit address</string>
     <string name="edit_address_book_entry_dialog_address_label">Address</string>
     <string name="edit_address_book_entry_dialog_label_label">Name</string>
+    <!-- Edit Account -->
+    <string name="edit_account_title">Edit account</string>
+    <string name="edit_account_description">Description</string>
+    <string name="edit_account_delete_title">Remove account %1$s?</string>
+    <string name="edit_account_delete_description">This removes the account from the wallet but it is still possible to re-add it and recover the coins.</string>
     <!-- Settings -->
     <string name="title_activity_settings">Settings</string>
     <string name="pref_title_restore_wallet">Restore wallet</string>

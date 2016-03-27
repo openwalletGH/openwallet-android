@@ -1,23 +1,23 @@
 package com.coinomi.wallet.ui;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v7.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.coinomi.core.coins.Value;
 import com.coinomi.core.util.GenericUtils;
-import com.coinomi.core.wallet.AbstractWallet;
 import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.wallet.Configuration;
@@ -28,6 +28,7 @@ import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.ui.adaptors.AccountListAdapter;
 import com.coinomi.wallet.ui.widget.Amount;
 import com.coinomi.wallet.util.ThrottlingWalletChangeListener;
+import com.coinomi.wallet.util.UiUtils;
 import com.coinomi.wallet.util.WeakHandler;
 
 import org.bitcoinj.utils.Threading;
@@ -35,6 +36,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.OnItemClick;
+import butterknife.OnItemLongClick;
 
 /**
  * @author vbcs
@@ -80,9 +87,11 @@ public class OverviewFragment extends Fragment{
 
     private AccountListAdapter adapter;
     private LoaderManager loaderManager;
-    private NavigationDrawerFragment mNavigationDrawerFragment;
-    private Amount mainAmount;
     Map<String, ExchangeRate> exchangeRates;
+    private NavigationDrawerFragment mNavigationDrawerFragment;
+
+    @Bind(R.id.account_rows) ListView accountRows;
+    @Bind(R.id.main_amount) Amount mainAmount;
 
     private Listener listener;
 
@@ -123,16 +132,14 @@ public class OverviewFragment extends Fragment{
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_overview, container, false);
+        View header = inflater.inflate(R.layout.fragment_overview_header, null);
+        accountRows = ButterKnife.findById(view, R.id.account_rows);
+        accountRows.addHeaderView(header, null, false);
+        ButterKnife.bind(this, view);
 
         if (wallet == null) {
             return view;
         }
-
-        final ListView accountRows = (ListView) view.findViewById(R.id.account_rows);
-
-        View header = inflater.inflate(R.layout.fragment_overview_header, null);
-        // Initialize your header here.
-        accountRows.addHeaderView(header, null, false);
 
         // Set a space in the end of the list
         View listFooter = new View(getActivity());
@@ -144,43 +151,13 @@ public class OverviewFragment extends Fragment{
         accountRows.setAdapter(adapter);
         adapter.setExchangeRates(exchangeRates);
 
-        // Start AbstractTransactionDetailsActivity on click
-        accountRows.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (position >= accountRows.getHeaderViewsCount()) {
-                    // Note the usage of getItemAtPosition() instead of adapter's getItem() because
-                    // the latter does not take into account the header (which has position 0).
-                    Object obj = parent.getItemAtPosition(position);
-
-                    if (listener != null && obj != null && obj instanceof AbstractWallet) {
-                        listener.onAccountSelected(((AbstractWallet) obj).getId());
-                    } else {
-                        Toast.makeText(getActivity(), getString(R.string.error_generic), Toast.LENGTH_LONG).show();
-                    }
-                }
-            }
-        });
-
-        mainAmount = (Amount) view.findViewById(R.id.main_amount);
-        //mainAmount.setSymbol(type.getSymbol());
-        mainAmount.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (listener != null) listener.onLocalAmountClick();
-            }
-        });
-
-        // Update the amount
-        updateWallet();
-        // TODO check if called by onResume
-        updateView();
         return view;
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        ButterKnife.unbind(this);
     }
 
     private final ThrottlingWalletChangeListener walletChangeListener = new ThrottlingWalletChangeListener() {
@@ -242,6 +219,54 @@ public class OverviewFragment extends Fragment{
         super.onPause();
     }
 
+    @OnClick(R.id.main_amount)
+    public void onMainAmountClick(View v) {
+        if (listener != null) listener.onLocalAmountClick();
+    }
+
+    @OnItemClick(R.id.account_rows)
+    public void onAmountClick(int position) {
+        if (position >= accountRows.getHeaderViewsCount()) {
+            // Note the usage of getItemAtPosition() instead of adapter's getItem() because
+            // the latter does not take into account the header (which has position 0).
+            Object obj = accountRows.getItemAtPosition(position);
+
+            if (listener != null && obj != null && obj instanceof WalletAccount) {
+                listener.onAccountSelected(((WalletAccount) obj).getId());
+            } else {
+                showGenericError();
+            }
+        }
+    }
+
+    @OnItemLongClick(R.id.account_rows)
+    public boolean onAmountLongClick(int position) {
+        if (position >= accountRows.getHeaderViewsCount()) {
+            // Note the usage of getItemAtPosition() instead of adapter's getItem() because
+            // the latter does not take into account the header (which has position 0).
+            Object obj = accountRows.getItemAtPosition(position);
+            Activity activity = getActivity();
+
+            if (obj != null && obj instanceof WalletAccount && activity != null) {
+                ActionMode actionMode = UiUtils.startAccountActionMode(
+                        (WalletAccount) obj, activity, getFragmentManager());
+                // Hack to dismiss this action mode when back is pressed
+                if (activity instanceof WalletActivity) {
+                    ((WalletActivity) activity).registerActionMode(actionMode);
+                }
+
+                return true;
+            } else {
+                showGenericError();
+            }
+        }
+        return false;
+    }
+
+    private void showGenericError() {
+        Toast.makeText(getActivity(), getString(R.string.error_generic), Toast.LENGTH_LONG).show();
+    }
+
     public void updateWallet() {
         if (wallet != null) {
             adapter.replace(wallet);
@@ -280,7 +305,7 @@ public class OverviewFragment extends Fragment{
         adapter.notifyDataSetChanged();
     }
 
-    public interface Listener {
+    public interface Listener extends EditAccountFragment.Listener {
         void onLocalAmountClick();
         void onAccountSelected(String accountId);
     }

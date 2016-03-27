@@ -85,7 +85,7 @@ final public class WalletActivity extends BaseWalletActivity implements
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
-    private CharSequence mTitle;
+    private CharSequence title;
 
     @Nullable private String lastAccountId;
     private Intent connectCoinIntent;
@@ -167,14 +167,14 @@ final public class WalletActivity extends BaseWalletActivity implements
     }
 
     private void setOverviewTitle() {
-        mTitle = getResources().getString(R.string.title_activity_overview);
+        title = getResources().getString(R.string.title_activity_overview);
     }
 
     private void setAccountTitle(@Nullable WalletAccount account) {
         if (account != null) {
-            mTitle = account.getCoinType().getName();
+            title = account.getDescription();
         } else {
-            mTitle = "";
+            title = "";
         }
     }
 
@@ -217,8 +217,8 @@ final public class WalletActivity extends BaseWalletActivity implements
         NavDrawerItem.addItem(navDrawerItems, ITEM_SECTION_TITLE, getString(R.string.navigation_drawer_wallet));
         NavDrawerItem.addItem(navDrawerItems, ITEM_OVERVIEW, getString(R.string.title_activity_overview), R.drawable.ic_launcher, null);
         for (WalletAccount account : getAllAccounts()) {
-            CoinType type = account.getCoinType();
-            NavDrawerItem.addItem(navDrawerItems, ITEM_COIN, type.getName(), Constants.COINS_ICONS.get(type), account.getId());
+            NavDrawerItem.addItem(navDrawerItems, ITEM_COIN, account.getDescription(),
+                    Constants.COINS_ICONS.get(account.getCoinType()), account.getId());
         }
     }
 
@@ -348,7 +348,7 @@ final public class WalletActivity extends BaseWalletActivity implements
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayShowTitleEnabled(true);
-            actionBar.setTitle(mTitle);
+            actionBar.setTitle(title);
         }
     }
 
@@ -756,6 +756,13 @@ final public class WalletActivity extends BaseWalletActivity implements
             lastActionMode.finish();
             lastActionMode = null;
         }
+    }
+
+    @Override
+    public void onAccountModified(WalletAccount account) {
+        // Recreate items
+        createNavDrawerItems();
+        mNavigationDrawerFragment.setItems(navDrawerItems);
     }
 
     private static class MyHandler extends WeakHandler<WalletActivity> {

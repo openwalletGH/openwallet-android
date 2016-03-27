@@ -1,9 +1,11 @@
 package com.coinomi.wallet.util;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.support.v4.app.FragmentManager;
@@ -19,9 +21,13 @@ import com.coinomi.core.uri.CoinURI;
 import com.coinomi.core.uri.CoinURIParseException;
 import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.AbstractAddress;
+import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.wallet.AddressBookProvider;
+import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
+import com.coinomi.wallet.ui.AccountDetailsActivity;
+import com.coinomi.wallet.ui.EditAccountFragment;
 import com.coinomi.wallet.ui.EditAddressBookEntryFragment;
 
 import org.acra.ACRA;
@@ -112,6 +118,12 @@ public class UiUtils {
                 new CopyShareActionModeCallback(string, activity));
     }
 
+    public static ActionMode startAccountActionMode(final WalletAccount account,
+                                                    final Activity activity,
+                                                    final FragmentManager fragmentManager) {
+        return startActionMode(activity,
+                new AccountActionModeCallback(account, activity, fragmentManager));
+    }
 
     public static class AddressActionModeCallback implements ActionMode.Callback {
         private final AbstractAddress address;
@@ -134,15 +146,13 @@ public class UiUtils {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             mode.getMenuInflater().inflate(R.menu.address_options, menu);
-            return true;
-        }
-
-        @Override
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
             final String label = AddressBookProvider.resolveLabel(context, address);
             mode.setTitle(label != null ? label : GenericUtils.addressSplitToGroups(address));
             return true;
         }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) { return false; }
 
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem menuItem) {
@@ -193,6 +203,70 @@ public class UiUtils {
                     return true;
                 case R.id.action_copy:
                     UiUtils.copy(activity, string);
+                    mode.finish();
+                    return true;
+            }
+
+            return false;
+        }
+
+        @Override public void onDestroyActionMode(ActionMode actionMode) { }
+    }
+
+    public static class AccountActionModeCallback implements ActionMode.Callback {
+        private final WalletAccount account;
+        private final Activity activity;
+        private final FragmentManager fragmentManager;
+
+        public AccountActionModeCallback(final WalletAccount account,
+                                         final Activity activity,
+                                         final FragmentManager fragmentManager) {
+            this.account = account;
+            this.activity = activity;
+            this.fragmentManager = fragmentManager;
+        }
+
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            mode.getMenuInflater().inflate(R.menu.account_options, menu);
+            mode.setTitle(account.getDescription());
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) { return false; }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem menuItem) {
+            switch (menuItem.getItemId()) {
+                case R.id.action_edit_description:
+                    EditAccountFragment.edit(fragmentManager, account);
+                    mode.finish();
+                    return true;
+                case R.id.action_account_details:
+                    Intent intent = new Intent(activity, AccountDetailsActivity.class);
+                    intent.putExtra(Constants.ARG_ACCOUNT_ID, account.getId());
+                    activity.startActivity(intent);
+                    mode.finish();
+                    return true;
+                case R.id.action_delete:
+                    new AlertDialog.Builder(activity)
+                            .setTitle(activity.getString(R.string.edit_account_delete_title,
+                                    account.getDescription()))
+                            .setMessage(R.string.edit_account_delete_description)
+                            .setNegativeButton(R.string.button_cancel, null)
+                            .setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Wallet wallet = account.getWallet();
+                                    wallet.deleteAccount(account.getId());
+                                    if (activity instanceof EditAccountFragment.Listener) {
+                                        ((EditAccountFragment.Listener) activity)
+                                                .onAccountModified(account);
+                                    }
+                                }
+                            })
+                            .create().show();
                     mode.finish();
                     return true;
             }
