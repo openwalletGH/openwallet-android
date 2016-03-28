@@ -2,11 +2,13 @@ package com.coinomi.wallet.ui;
 
 import android.app.Activity;
 import android.content.Context;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v7.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -30,6 +32,7 @@ import com.coinomi.wallet.ui.widget.Amount;
 import com.coinomi.wallet.util.ThrottlingWalletChangeListener;
 import com.coinomi.wallet.util.UiUtils;
 import com.coinomi.wallet.util.WeakHandler;
+import com.google.common.collect.ImmutableMap;
 
 import org.bitcoinj.utils.Threading;
 import org.slf4j.Logger;
@@ -52,14 +55,9 @@ public class OverviewFragment extends Fragment{
 
     private static final int WALLET_CHANGED = 0;
     private static final int UPDATE_VIEW = 1;
+    private static final int SET_EXCHANGE_RATES = 2;
 
-    private static final int AMOUNT_FULL_PRECISION = 8;
-    private static final int AMOUNT_MEDIUM_PRECISION = 6;
-    private static final int AMOUNT_SHORT_PRECISION = 4;
-    private static final int AMOUNT_SHIFT = 0;
-
-    private static final int ID_TRANSACTION_LOADER = 0;
-    private static final int ID_RATE_LOADER = 1;
+    private static final int ID_RATE_LOADER = 0;
 
     private final Handler handler = new MyHandler(this);
 
@@ -67,10 +65,15 @@ public class OverviewFragment extends Fragment{
         public MyHandler(OverviewFragment ref) { super(ref); }
 
         @Override
+        @SuppressWarnings("unchecked")
         protected void weakHandleMessage(OverviewFragment ref, Message msg) {
             switch (msg.what) {
                 case WALLET_CHANGED:
                     ref.updateWallet();
+                    break;
+                case SET_EXCHANGE_RATES:
+                    ref.setExchangeRates((Map<String, ExchangeRate>) msg.obj);
+                    break;
                 case UPDATE_VIEW:
                     ref.updateView();
                     break;
@@ -86,7 +89,6 @@ public class OverviewFragment extends Fragment{
     private Configuration config;
 
     private AccountListAdapter adapter;
-    private LoaderManager loaderManager;
     Map<String, ExchangeRate> exchangeRates;
     private NavigationDrawerFragment mNavigationDrawerFragment;
 
@@ -116,14 +118,18 @@ public class OverviewFragment extends Fragment{
         exchangeRates = ExchangeRatesProvider.getRates(
                 application.getApplicationContext(), config.getExchangeCurrencyCode());
         if (adapter != null) adapter.setExchangeRates(exchangeRates);
-        //loaderManager.initLoader(ID_RATE_LOADER, null, rateLoaderCallbacks);
     }
 
     @Override
-    public void onDestroy() {
-        loaderManager.destroyLoader(ID_TRANSACTION_LOADER);
-        loaderManager.destroyLoader(ID_RATE_LOADER);
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        getLoaderManager().initLoader(ID_RATE_LOADER, null, rateLoaderCallbacks);
+    }
 
+
+    @Override
+    public void onDestroy() {
+        getLoaderManager().destroyLoader(ID_RATE_LOADER);
         super.onDestroy();
     }
 
@@ -185,7 +191,6 @@ public class OverviewFragment extends Fragment{
         }
         application = (WalletApplication) context.getApplicationContext();
         config = application.getConfiguration();
-        loaderManager = getLoaderManager();
     }
 
     @Override
@@ -267,42 +272,72 @@ public class OverviewFragment extends Fragment{
         Toast.makeText(getActivity(), getString(R.string.error_generic), Toast.LENGTH_LONG).show();
     }
 
+    private final LoaderManager.LoaderCallbacks<Cursor> rateLoaderCallbacks = new LoaderManager.LoaderCallbacks<Cursor>() {
+        @Override
+        public Loader<Cursor> onCreateLoader(final int id, final Bundle args) {
+            String localSymbol = config.getExchangeCurrencyCode();
+            return new ExchangeRateLoader(getActivity(), config, localSymbol);
+        }
+
+        @Override
+        public void onLoadFinished(final Loader<Cursor> loader, final Cursor data) {
+            if (data != null && data.getCount() > 0) {
+                ImmutableMap.Builder<String, ExchangeRate> builder = ImmutableMap.builder();
+                data.moveToFirst();
+                do {
+                    ExchangeRate rate = ExchangeRatesProvider.getExchangeRate(data);
+                    builder.put(rate.currencyCodeId, rate);
+                } while (data.moveToNext());
+
+                handler.sendMessage(handler.obtainMessage(SET_EXCHANGE_RATES, builder.build()));
+            }
+        }
+
+        @Override
+        public void onLoaderReset(final Loader<Cursor> loader) { }
+    };
+
     public void updateWallet() {
         if (wallet != null) {
             adapter.replace(wallet);
-            currentBalance = null;
-            Map<String, ExchangeRate> rates = ExchangeRatesProvider.getRates(application, config.getExchangeCurrencyCode());
-            for (WalletAccount w : wallet.getAllAccounts()) {
-                ExchangeRate rate = rates.get(w.getCoinType().getSymbol());
-                if (rate == null) {
-                    log.info("Missing exchange rate for {}, skipping...", w.getCoinType().getName());
-                    continue;
-                }
-                if (currentBalance != null) {
-                    currentBalance = currentBalance.add(rate.rate.convert(w.getBalance()));
-                }
-                else {
-                    currentBalance = rate.rate.convert(w.getBalance());
-                }
+            calculateNewBalance();
+            updateView();
+        }
+    }
+
+    private void calculateNewBalance() {
+        currentBalance = null;
+        for (WalletAccount w : wallet.getAllAccounts()) {
+            ExchangeRate rate = exchangeRates.get(w.getCoinType().getSymbol());
+            if (rate == null) {
+                log.info("Missing exchange rate for {}, skipping...", w.getCoinType().getName());
+                continue;
+            }
+            if (currentBalance != null) {
+                currentBalance = currentBalance.add(rate.rate.convert(w.getBalance()));
+            }
+            else {
+                currentBalance = rate.rate.convert(w.getBalance());
             }
         }
+    }
+
+    public void setExchangeRates(Map<String, ExchangeRate> newExchangeRates) {
+        exchangeRates = newExchangeRates;
+        adapter.setExchangeRates(newExchangeRates);
+        calculateNewBalance();
+        updateView();
     }
 
     public void updateView() {
         if (currentBalance != null) {
             String newBalanceStr = GenericUtils.formatFiatValue(currentBalance);
-
             mainAmount.setAmount(newBalanceStr);
             mainAmount.setSymbol(currentBalance.type.getSymbol());
         } else {
             mainAmount.setAmount("-.--");
             mainAmount.setSymbol("");
         }
-
-        exchangeRates = ExchangeRatesProvider.getRates(
-                application.getApplicationContext(), config.getExchangeCurrencyCode());
-        adapter.setExchangeRates(exchangeRates);
-        adapter.notifyDataSetChanged();
     }
 
     public interface Listener extends EditAccountFragment.Listener {

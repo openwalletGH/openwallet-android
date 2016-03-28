@@ -194,7 +194,6 @@ public final class ExchangeRatesFragment extends ListFragment implements OnShare
 
         defaultCurrency = exchangeRate.currencyCodeId;
         config.setExchangeCurrencyCode(defaultCurrency);
-        updateView();
 
         Toast.makeText(getActivity(), getString(R.string.set_local_currency, defaultCurrency),
                 Toast.LENGTH_SHORT).show();

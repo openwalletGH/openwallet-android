@@ -1,6 +1,7 @@
 package com.coinomi.wallet.ui;
 
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 
 import com.coinomi.wallet.R;
 
@@ -21,7 +22,10 @@ public class ExchangeRatesActivity extends BaseWalletActivity {
                     .commit();
         }
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(false);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowHomeEnabled(false);
+        }
     }
 }

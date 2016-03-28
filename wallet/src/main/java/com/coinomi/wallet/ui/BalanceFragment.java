@@ -105,6 +105,7 @@ public class BalanceFragment extends Fragment implements LoaderCallbacks<List<Ab
     private View emptyPocketMessage;
     private Amount mainAmount;
     private Amount localAmount;
+    private ExchangeRate exchangeRate;
     private TextView connectionLabel;
 
     private Listener listener;
@@ -187,7 +188,6 @@ public class BalanceFragment extends Fragment implements LoaderCallbacks<List<Ab
 
         emptyPocketMessage = header.findViewById(R.id.history_empty);
         // Hide empty message if have some transaction history
-//        if (pocket.getAbstractTransactions(false).size() > 0) {
         if (pocket.getTransactions().size() > 0) {
             emptyPocketMessage.setVisibility(View.GONE);
         }
@@ -454,7 +454,6 @@ public class BalanceFragment extends Fragment implements LoaderCallbacks<List<Ab
         };
     }
 
-    private ExchangeRate exchangeRate;
     private final LoaderCallbacks<Cursor> rateLoaderCallbacks = new LoaderManager.LoaderCallbacks<Cursor>() {
         @Override
         public Loader<Cursor> onCreateLoader(final int id, final Bundle args) {

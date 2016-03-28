@@ -25,18 +25,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
-import android.net.Uri;
 import android.support.v4.content.CursorLoader;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 
 /**
  * @author Andreas Schildbach
+ * @author John L. Jegutanis
  */
 public final class ExchangeRateLoader extends CursorLoader implements OnSharedPreferenceChangeListener {
     private final Configuration config;
     private final String packageName;
     private final Context context;
+    private String localCurrency;
 
     public ExchangeRateLoader(final Context context, final Configuration config,
                               final String localSymbol,
@@ -47,6 +48,7 @@ public final class ExchangeRateLoader extends CursorLoader implements OnSharedPr
         this.config = config;
         this.packageName = context.getPackageName();
         this.context = context;
+        this.localCurrency = localSymbol;
     }
 
     public ExchangeRateLoader(final Context context, final Configuration config,
@@ -57,11 +59,14 @@ public final class ExchangeRateLoader extends CursorLoader implements OnSharedPr
         this.config = config;
         this.packageName = context.getPackageName();
         this.context = context;
+        this.localCurrency = localSymbol;
     }
 
     @Override
     protected void onStartLoading() {
         super.onStartLoading();
+
+        refreshUri(config.getExchangeCurrencyCode());
 
         config.registerOnSharedPreferenceChangeListener(this);
 
@@ -89,12 +94,15 @@ public final class ExchangeRateLoader extends CursorLoader implements OnSharedPr
     }
 
     private void onCurrencyChange() {
-        final String localCurrency = config.getExchangeCurrencyCode();
-
-        Uri newUri = ExchangeRatesProvider.contentUriToCrypto(packageName, localCurrency, false);
-        setUri(newUri);
-
+        refreshUri(config.getExchangeCurrencyCode());
         forceLoad();
+    }
+
+    private void refreshUri(String newLocalCurrency) {
+        if (!newLocalCurrency.equals(localCurrency)) {
+            localCurrency = newLocalCurrency;
+            setUri(ExchangeRatesProvider.contentUriToCrypto(packageName, localCurrency, false));
+        }
     }
 
     private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
