@@ -480,12 +480,14 @@ final public class WalletActivity extends BaseWalletActivity implements
 
     private void processAddress(String addressStr) throws CoinURIParseException, AddressMalformedException {
         List<CoinType> possibleTypes = GenericUtils.getPossibleTypes(addressStr);
-        WalletAccount currentAccount = getAccount(lastAccountId);
+//        WalletAccount currentAccount = getAccount(lastAccountId);
 
-        if (currentAccount != null && possibleTypes.contains(currentAccount.getCoinType())) {
-            AbstractAddress address = currentAccount.getCoinType().newAddress(addressStr);
-            processUri(CoinURI.convertToCoinURI(address, null, null, null));
-        } else if (possibleTypes.size() == 1) {
+        // TODO improve
+//        if (currentAccount != null && possibleTypes.contains(currentAccount.getCoinType())) {
+//            AbstractAddress address = currentAccount.getCoinType().newAddress(addressStr);
+//            processUri(CoinURI.convertToCoinURI(address, null, null, null));
+//        } else
+        if (possibleTypes.size() == 1) {
             AbstractAddress address = possibleTypes.get(0).newAddress(addressStr);
             processUri(CoinURI.convertToCoinURI(address, null, null, null));
         } else {

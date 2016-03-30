@@ -973,10 +973,12 @@ public class SendFragment extends Fragment {
         List<CoinType> possibleTypes = GenericUtils.getPossibleTypes(addressStr);
 
 
-        if (possibleTypes.contains(pocket.getCoinType())) {
-            setAddress(pocket.getCoinType().newAddress(addressStr), true);
-            sendAmountType = pocket.getCoinType();
-        } else if (possibleTypes.size() == 1) {
+        // TODO improve
+//        if (possibleTypes.contains(pocket.getCoinType())) {
+//            setAddress(pocket.getCoinType().newAddress(addressStr), true);
+//            sendAmountType = pocket.getCoinType();
+//        } else
+        if (possibleTypes.size() == 1) {
             setAddress(possibleTypes.get(0).newAddress(addressStr), true);
             sendAmountType = possibleTypes.get(0);
         } else {
