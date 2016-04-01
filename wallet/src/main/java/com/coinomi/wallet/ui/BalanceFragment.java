@@ -26,7 +26,7 @@ import com.coinomi.core.coins.Value;
 import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.AbstractTransaction;
 import com.coinomi.core.wallet.AbstractWallet;
-import com.coinomi.core.wallet.WalletPocketConnectivity;
+import com.coinomi.core.wallet.WalletConnectivityStatus;
 import com.coinomi.wallet.AddressBookProvider;
 import com.coinomi.wallet.Configuration;
 import com.coinomi.wallet.Constants;
@@ -266,7 +266,7 @@ public class BalanceFragment extends Fragment implements LoaderCallbacks<List<Ab
 
     private void setupConnectivityStatus() {
         // Set connected for now...
-        setConnectivityStatus(WalletPocketConnectivity.CONNECTED);
+        setConnectivityStatus(WalletConnectivityStatus.CONNECTED);
         // ... but check the status in some seconds
         handler.sendMessageDelayed(handler.obtainMessage(WALLET_CHANGED), 2000);
     }
@@ -314,18 +314,21 @@ public class BalanceFragment extends Fragment implements LoaderCallbacks<List<Ab
         setConnectivityStatus(pocket.getConnectivityStatus());
     }
 
-    private void setConnectivityStatus(final WalletPocketConnectivity connectivity) {
+    private void setConnectivityStatus(final WalletConnectivityStatus connectivity) {
         switch (connectivity) {
             case CONNECTED:
+            case LOADING:
                 connectionLabel.setVisibility(View.GONE);
                 break;
-            default:
             case DISCONNECTED:
                 connectionLabel.setVisibility(View.VISIBLE);
+                break;
+            default:
+                throw new RuntimeException("Unknown connectivity status: " + connectivity);
         }
     }
 
-    private final ThrottlingWalletChangeListener transactionChangeListener = new ThrottlingWalletChangeListener() {
+    private final ThrottlingWalletChangeListener walletChangeListener = new ThrottlingWalletChangeListener() {
 
         @Override
         public void onThrottledWalletChanged() {
@@ -361,7 +364,7 @@ public class BalanceFragment extends Fragment implements LoaderCallbacks<List<Ab
         resolver.registerContentObserver(AddressBookProvider.contentUri(
                 getActivity().getPackageName(), type), true, addressBookObserver);
 
-        pocket.addEventListener(transactionChangeListener, Threading.SAME_THREAD);
+        pocket.addEventListener(walletChangeListener, Threading.SAME_THREAD);
 
         checkEmptyPocketMessage();
 
@@ -370,8 +373,8 @@ public class BalanceFragment extends Fragment implements LoaderCallbacks<List<Ab
 
     @Override
     public void onPause() {
-        pocket.removeEventListener(transactionChangeListener);
-        transactionChangeListener.removeCallbacks();
+        pocket.removeEventListener(walletChangeListener);
+        walletChangeListener.removeCallbacks();
 
         resolver.unregisterContentObserver(addressBookObserver);
 

@@ -22,7 +22,7 @@ import com.coinomi.core.wallet.SignedMessage;
 import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.core.wallet.WalletAccountEventListener;
-import com.coinomi.core.wallet.WalletPocketConnectivity;
+import com.coinomi.core.wallet.WalletConnectivityStatus;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -853,7 +853,7 @@ public class NxtFamilyWallet extends AbstractWallet<NxtTransaction, NxtAddress>
     }
 
     void queueOnConnectivity() {
-        final WalletPocketConnectivity connectivity = getConnectivityStatus();
+        final WalletConnectivityStatus connectivity = getConnectivityStatus();
         for (final ListenerRegistration<WalletAccountEventListener> registration : listeners) {
             registration.executor.execute(new Runnable() {
                 @Override

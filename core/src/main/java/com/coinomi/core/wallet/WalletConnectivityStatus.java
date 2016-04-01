@@ -3,7 +3,7 @@ package com.coinomi.core.wallet;
 /**
  * @author John L. Jegutanis
  */
-public enum WalletPocketConnectivity {
+public enum WalletConnectivityStatus {
     DISCONNECTED,
     LOADING,
     CONNECTED;

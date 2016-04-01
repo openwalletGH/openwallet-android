@@ -27,7 +27,7 @@ import com.coinomi.core.coins.Value;
 import com.coinomi.core.wallet.AbstractTransaction;
 import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.core.wallet.WalletAccountEventListener;
-import com.coinomi.core.wallet.WalletPocketConnectivity;
+import com.coinomi.core.wallet.WalletConnectivityStatus;
 
 /**
  * @author Andreas Schildbach
@@ -54,12 +54,6 @@ public abstract class ThrottlingWalletChangeListener implements WalletAccountEve
     public ThrottlingWalletChangeListener(final long throttleMs)
     {
         this(throttleMs, true, true, true, true);
-    }
-
-    public ThrottlingWalletChangeListener(final boolean coinsRelevant, final boolean reorganizeRelevant,
-                                          final boolean confidenceRelevant, final boolean connectivityRelevant)
-    {
-        this(DEFAULT_THROTTLE_MS, coinsRelevant, reorganizeRelevant, confidenceRelevant, connectivityRelevant);
     }
 
     public ThrottlingWalletChangeListener(final long throttleMs, final boolean coinsRelevant, final boolean reorganizeRelevant,
@@ -119,7 +113,7 @@ public abstract class ThrottlingWalletChangeListener implements WalletAccountEve
     }
 
     @Override
-    public void onConnectivityStatus(WalletPocketConnectivity pocketConnectivity) {
+    public void onConnectivityStatus(WalletConnectivityStatus pocketConnectivity) {
         if (connectivityRelevant) relevant.set(true);
     }
 

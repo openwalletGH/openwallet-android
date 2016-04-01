@@ -81,15 +81,14 @@ public abstract class AbstractWallet<T extends AbstractTransaction, A extends Ab
         return TypeUtils.is(type, address);
     }
 
-    public WalletPocketConnectivity getConnectivityStatus() {
+    public WalletConnectivityStatus getConnectivityStatus() {
         if (!isConnected()) {
-            return WalletPocketConnectivity.DISCONNECTED;
+            return WalletConnectivityStatus.DISCONNECTED;
         } else {
             if (isLoading()) {
-                // TODO support LOADING state, for now is just CONNECTED
-                return WalletPocketConnectivity.CONNECTED;
+                return WalletConnectivityStatus.LOADING;
             } else {
-                return WalletPocketConnectivity.CONNECTED;
+                return WalletConnectivityStatus.CONNECTED;
             }
         }
     }

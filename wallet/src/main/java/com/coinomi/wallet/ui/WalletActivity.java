@@ -232,6 +232,15 @@ final public class WalletActivity extends BaseWalletActivity implements
 
         getWalletApplication().startBlockchainService(CoinService.ServiceMode.CANCEL_COINS_RECEIVED);
         connectAllCoinService();
+
+        // Restore the correct action bar shadow
+        if (getSupportActionBar() != null) {
+            if (overviewFragment.isVisible()) {
+                getSupportActionBar().setElevation(actionBarDefaultElevation);
+            } else {
+                getSupportActionBar().setElevation(0f);
+            }
+        }
     }
 
 
@@ -334,7 +343,7 @@ final public class WalletActivity extends BaseWalletActivity implements
             }
             // Hide the shadow of the action bar because the PagerTabStrip of the AccountFragment is visible
             if (getSupportActionBar() != null) {
-                getSupportActionBar().setElevation(0);
+                getSupportActionBar().setElevation(0f);
             }
         }
     }

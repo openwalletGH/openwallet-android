@@ -7,7 +7,6 @@ import com.coinomi.core.exceptions.TransactionBroadcastException;
 import com.coinomi.core.network.interfaces.ConnectionEventListener;
 
 import org.bitcoinj.core.Sha256Hash;
-import org.bitcoinj.core.TransactionBag;
 import org.bitcoinj.crypto.KeyCrypter;
 import org.bitcoinj.wallet.KeyBag;
 
@@ -51,7 +50,7 @@ public interface WalletAccount<T extends AbstractTransaction, A extends Abstract
     boolean isConnected();
     boolean isLoading();
     void disconnect();
-    WalletPocketConnectivity getConnectivityStatus();
+    WalletConnectivityStatus getConnectivityStatus();
 
     /**
      * Returns the address used for change outputs. Note: this will probably go away in future.

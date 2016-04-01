@@ -111,6 +111,7 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<BitTransac
     @Nullable private transient Wallet wallet = null;
 
     @VisibleForTesting transient Value lastBalance;
+    transient WalletConnectivityStatus lastConnectivity = WalletConnectivityStatus.DISCONNECTED;
 
     private Runnable saveLaterRunnable = new Runnable() {
         @Override
@@ -613,6 +614,7 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<BitTransac
                 statusPendingUpdates.remove(newStatus.getAddress());
             }
             addressesStatus.put(newStatus.getAddress(), newStatus.getStatus());
+            queueOnConnectivity();
         }
         finally {
             lock.unlock();
@@ -701,16 +703,11 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<BitTransac
     }
 
     private void confirmAddressSubscription(AbstractAddress address) {
-        lock.lock();
-        try {
-            if (addressesPendingSubscription.contains(address)) {
-                log.debug("Subscribed to {}", address);
-                addressesPendingSubscription.remove(address);
-                addressesSubscribed.add(address);
-            }
-        }
-        finally {
-            lock.unlock();
+        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
+        if (addressesPendingSubscription.contains(address)) {
+            log.debug("Subscribed to {}", address);
+            addressesPendingSubscription.remove(address);
+            addressesSubscribed.add(address);
         }
     }
 
@@ -1200,18 +1197,28 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<BitTransac
 
     @Override
     public void onConnection(BlockchainConnection blockchainConnection) {
-        this.blockchainConnection = (BitBlockchainConnection) blockchainConnection;
-        clearTransientState();
-        subscribeToBlockchain();
-        subscribeToAddressesIfNeeded();
-        queueOnConnectivity();
+        lock.lock();
+        try {
+            this.blockchainConnection = (BitBlockchainConnection) blockchainConnection;
+            clearTransientState();
+            subscribeToBlockchain();
+            subscribeToAddressesIfNeeded();
+            queueOnConnectivity();
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override
     public void onDisconnect() {
-        blockchainConnection = null;
-        clearTransientState();
-        queueOnConnectivity();
+        lock.lock();
+        try {
+            blockchainConnection = null;
+            clearTransientState();
+            queueOnConnectivity();
+        } finally {
+            lock.unlock();
+        }
     }
 
     private void subscribeToBlockchain() {
@@ -1236,6 +1243,7 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<BitTransac
                 if (addressesToWatch.size() > 0) {
                     addressesPendingSubscription.addAll(addressesToWatch);
                     blockchainConnection.subscribeToAddresses(addressesToWatch, this);
+                    queueOnConnectivity();
                 }
             }
         } catch (Exception e) {
@@ -1246,12 +1254,14 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<BitTransac
     }
 
     private void clearTransientState() {
+        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
         addressesSubscribed.clear();
         addressesPendingSubscription.clear();
         statusPendingUpdates.clear();
         fetchingTransactions.clear();
         outOfOrderTransactions.clear();
         lastBalance = type.value(0);
+        lastConnectivity = WalletConnectivityStatus.DISCONNECTED;
     }
 
     /**
@@ -1359,15 +1369,19 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<BitTransac
     }
 
     void queueOnConnectivity() {
-        final WalletPocketConnectivity connectivity = getConnectivityStatus();
-        for (final ListenerRegistration<WalletAccountEventListener> registration : listeners) {
-            registration.executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    registration.listener.onConnectivityStatus(connectivity);
-                    registration.listener.onWalletChanged(TransactionWatcherWallet.this);
-                }
-            });
+        checkState(lock.isHeldByCurrentThread(), "Lock is held by another thread");
+        final WalletConnectivityStatus newConnectivity = getConnectivityStatus();
+        if (newConnectivity != lastConnectivity) {
+            lastConnectivity = newConnectivity;
+            for (final ListenerRegistration<WalletAccountEventListener> registration : listeners) {
+                registration.executor.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        registration.listener.onConnectivityStatus(newConnectivity);
+                        registration.listener.onWalletChanged(TransactionWatcherWallet.this);
+                    }
+                });
+            }
         }
     }
 
@@ -1406,10 +1420,15 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<BitTransac
     }
 
     public boolean isLoading() {
-        return blockchainConnection != null && (addressesStatus.isEmpty() ||
-                !addressesPendingSubscription.isEmpty() ||
-                !statusPendingUpdates.isEmpty() ||
-                !fetchingTransactions.isEmpty());
+        lock.lock();
+        try {
+            return blockchainConnection != null && (addressesStatus.isEmpty() ||
+                    !addressesPendingSubscription.isEmpty() ||
+                    !statusPendingUpdates.isEmpty() ||
+                    !fetchingTransactions.isEmpty());
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override
@@ -1432,18 +1451,23 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<BitTransac
         }
     }
 
-    public boolean broadcastBitTxSync(BitTransaction tx) throws TransactionBroadcastException {
+    private boolean broadcastBitTxSync(BitTransaction tx) throws TransactionBroadcastException {
         if (isConnected()) {
-            if (log.isInfoEnabled()) {
-                log.info("Broadcasting tx {}", Utils.HEX.encode(tx.bitcoinSerialize()));
+            lock.lock();
+            try {
+                if (log.isInfoEnabled()) {
+                    log.info("Broadcasting tx {}", Utils.HEX.encode(tx.bitcoinSerialize()));
+                }
+                boolean success = blockchainConnection.broadcastTxSync(tx);
+                if (success) {
+                    onTransactionBroadcast(tx);
+                } else {
+                    onTransactionBroadcastError(tx);
+                }
+                return success;
+            } finally {
+                lock.unlock();
             }
-            boolean success = blockchainConnection.broadcastTxSync(tx);
-            if (success) {
-                onTransactionBroadcast(tx);
-            } else {
-                onTransactionBroadcastError(tx);
-            }
-            return success;
         } else {
             throw new TransactionBroadcastException("No connection available");
         }
@@ -1452,24 +1476,40 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<BitTransac
     private void broadcastTx(BitTransaction tx, TransactionEventListener<BitTransaction> listener)
             throws TransactionBroadcastException {
         if (isConnected()) {
-            if (log.isInfoEnabled()) {
-                log.info("Broadcasting tx {}", Utils.HEX.encode(tx.bitcoinSerialize()));
+            lock.lock();
+            try {
+                if (log.isInfoEnabled()) {
+                    log.info("Broadcasting tx {}", Utils.HEX.encode(tx.bitcoinSerialize()));
+                }
+                blockchainConnection.broadcastTx(tx, listener != null ? listener : this);
+            } finally {
+                lock.unlock();
             }
-            blockchainConnection.broadcastTx(tx, listener != null ? listener : this);
         } else {
             throw new TransactionBroadcastException("No connection available");
         }
     }
 
     public boolean isConnected() {
-        return blockchainConnection != null;
+        lock.lock();
+        try {
+            return blockchainConnection != null;
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override
     public void disconnect() {
-        if (blockchainConnection != null) {
-            blockchainConnection.stopAsync();
+        lock.lock();
+        try {
+            if (blockchainConnection != null) {
+                blockchainConnection.stopAsync();
+            }
+        } finally {
+            lock.unlock();
         }
+
     }
 
     Map<TrimmedOutPoint, OutPointOutput> getUnspentOutputs(boolean includeUnsafe) {

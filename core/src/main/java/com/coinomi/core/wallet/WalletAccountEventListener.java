@@ -19,5 +19,5 @@ public interface WalletAccountEventListener {
 
     void onWalletChanged(final WalletAccount pocket);
 
-    void onConnectivityStatus(WalletPocketConnectivity pocketConnectivity);
+    void onConnectivityStatus(WalletConnectivityStatus connectivityStatus);
 }
