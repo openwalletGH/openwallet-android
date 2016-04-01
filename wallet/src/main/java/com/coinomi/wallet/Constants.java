@@ -269,7 +269,7 @@ public class Constants {
     public static final List<CoinType> SUPPORTED_COINS = ImmutableList.of(
             BitcoinMain.get(),
             BlackcoinMain.get(),
-            BurstMain.get(),
+//            BurstMain.get(),
             CanadaeCoinMain.get(),
             CannacoinMain.get(),
             ClamsMain.get(),
@@ -288,7 +288,7 @@ public class Constants {
             NovacoinMain.get(),
             NuBitsMain.get(),
             NuSharesMain.get(),
-            NxtMain.get(),
+//            NxtMain.get(),
             ParkbyteMain.get(),
             PeercoinMain.get(),
             ReddcoinMain.get(),
