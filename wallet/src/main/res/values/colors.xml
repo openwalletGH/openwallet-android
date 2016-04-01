@@ -64,12 +64,10 @@
     <color name="scan_result_view">#b0000000</color>
     <color name="scan_result_dots">#c099cc00</color>
 
-    <!-- progress bar -->
-    <integer-array name="progress_bar_colors">
-        <item>@color/primary_600</item>
-        <item>@color/primary_700</item>
-        <item>@color/primary_800</item>
-    </integer-array>
+    <color name="progress_bar_color_1">#7986CB</color>
+    <color name="progress_bar_color_2">#AED581</color>
+    <color name="progress_bar_color_3">#FFD54F</color>
+    <color name="progress_bar_color_4">#E57373</color>
 
     <!-- QR code -->
     <color name="qr_code_normal_bg">#00000000</color>

@@ -716,6 +716,15 @@ final public class Wallet {
         }
     }
 
+    public boolean isLoading() {
+        for (WalletAccount account : accounts.values()) {
+            if (account.isLoading()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // TODO
 //    public void broadcastTx(SendRequest request) throws IOException {
 //        getPocket(request.type).broadcastTx(request.tx);

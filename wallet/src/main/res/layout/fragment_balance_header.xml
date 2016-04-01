@@ -2,18 +2,10 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:coinomi="http://schemas.android.com/apk/res-auto"
-
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
-
-    <!--<fr.castorflex.android.smoothprogressbar.SmoothProgressBar-->
-        <!--android:id="@+id/loading_bar"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:indeterminate="true"-->
-        <!--style="@style/ProgressBar"/>-->
 
     <LinearLayout
         android:orientation="vertical"
@@ -23,20 +15,20 @@
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingEnd="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/amount_margin_top"
+        android:paddingBottom="@dimen/amount_margin_bottom"
         android:layout_gravity="center_horizontal">
 
         <com.coinomi.wallet.ui.widget.Amount
             android:id="@+id/amount_local"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/amount_margin_top"
             coinomi:single_line="true" />
 
         <com.coinomi.wallet.ui.widget.Amount
             android:id="@+id/main_amount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/amount_margin_bottom"
             coinomi:show_big="true"
             android:gravity="center_horizontal" />
     </LinearLayout>

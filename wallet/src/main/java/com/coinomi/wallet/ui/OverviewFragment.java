@@ -29,6 +29,7 @@ import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.ui.adaptors.AccountListAdapter;
 import com.coinomi.wallet.ui.widget.Amount;
+import com.coinomi.wallet.ui.widget.SwipeRefreshLayout;
 import com.coinomi.wallet.util.ThrottlingWalletChangeListener;
 import com.coinomi.wallet.util.UiUtils;
 import com.coinomi.wallet.util.WeakHandler;
@@ -92,6 +93,7 @@ public class OverviewFragment extends Fragment{
     Map<String, ExchangeRate> exchangeRates;
     private NavigationDrawerFragment mNavigationDrawerFragment;
 
+    @Bind(R.id.swipeContainer) SwipeRefreshLayout swipeContainer;
     @Bind(R.id.account_rows) ListView accountRows;
     @Bind(R.id.main_amount) Amount mainAmount;
 
@@ -146,6 +148,22 @@ public class OverviewFragment extends Fragment{
         if (wallet == null) {
             return view;
         }
+
+        // Setup refresh listener which triggers new data loading
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                if (listener != null) {
+                    listener.onRefresh();
+                }
+            }
+        });
+        // Configure the refreshing colors
+        swipeContainer.setColorSchemeResources(
+                R.color.progress_bar_color_1,
+                R.color.progress_bar_color_2,
+                R.color.progress_bar_color_3,
+                R.color.progress_bar_color_4);
 
         // Set a space in the end of the list
         View listFooter = new View(getActivity());
@@ -338,10 +356,13 @@ public class OverviewFragment extends Fragment{
             mainAmount.setAmount("-.--");
             mainAmount.setSymbol("");
         }
+
+        swipeContainer.setRefreshing(wallet.isLoading());
     }
 
     public interface Listener extends EditAccountFragment.Listener {
         void onLocalAmountClick();
         void onAccountSelected(String accountId);
+        void onRefresh();
     }
 }

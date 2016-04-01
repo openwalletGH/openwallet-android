@@ -95,6 +95,7 @@ final public class WalletActivity extends BaseWalletActivity implements
     private final Handler handler = new MyHandler(this);
     private OverviewFragment overviewFragment;
     private AccountFragment accountFragment;
+    private float actionBarDefaultElevation = 0f;
 
     public WalletActivity() {}
 
@@ -117,6 +118,12 @@ final public class WalletActivity extends BaseWalletActivity implements
                     .create().show();
         }
 
+        // Save elevation i.e. amount of shadow cast by the action bar
+        if (getSupportActionBar() != null) {
+            actionBarDefaultElevation = getSupportActionBar().getElevation();
+        }
+
+        // Create the overview and account fragments
         FragmentTransaction tr = getFM().beginTransaction();
         if (savedInstanceState == null) {
             checkAlerts();
@@ -150,10 +157,7 @@ final public class WalletActivity extends BaseWalletActivity implements
         }
         tr.commit();
 
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setElevation(0);
-        }
-
+        // Setup navigation bar
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getFM().findFragmentById(R.id.navigation_drawer);
         // Set up the drawer.
@@ -237,6 +241,11 @@ final public class WalletActivity extends BaseWalletActivity implements
     }
 
     @Override
+    public void onRefresh() {
+        refreshWallet();
+    }
+
+    @Override
     public void onTransactionBroadcastSuccess(WalletAccount pocket, Transaction transaction) {
         handler.sendMessage(handler.obtainMessage(TX_BROADCAST_OK, transaction));
     }
@@ -289,6 +298,10 @@ final public class WalletActivity extends BaseWalletActivity implements
             if (selectInNavDrawer) {
                 navDrawerSelectOverview(true);
             }
+            // Restore the default action bar shadow
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setElevation(actionBarDefaultElevation);
+            }
         }
     }
 
@@ -318,6 +331,10 @@ final public class WalletActivity extends BaseWalletActivity implements
             connectCoinService(lastAccountId);
             if (selectInNavDrawer) {
                 navDrawerSelectAccount(account, true);
+            }
+            // Hide the shadow of the action bar because the PagerTabStrip of the AccountFragment is visible
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setElevation(0);
             }
         }
     }

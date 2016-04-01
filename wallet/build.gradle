@@ -63,8 +63,6 @@ dependencies {
     compile 'ch.acra:acra:4.8.5'
     compile 'com.android.support:support-v4-preferencefragment:1.0.0@aar'
     compile 'com.jakewharton:butterknife:7.0.1'
-
-//    compile 'com.github.castorflex.smoothprogressbar:library:1.1.0'
 }
 
 //apply plugin: 'robolectric'

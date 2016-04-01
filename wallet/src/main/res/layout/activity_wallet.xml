@@ -8,52 +8,6 @@
     android:layout_height="match_parent"
     tools:context=".WalletActivity">
 
-    <!--<FrameLayout-->
-        <!--android:id="@+id/wallet_overview"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:visibility="gone" />-->
-
-
-    <!--<LinearLayout-->
-        <!--android:id="@+id/wallet_account"-->
-        <!--android:orientation="vertical"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent">-->
-
-        <!--&lt;!&ndash;<android.support.v7.widget.Toolbar&ndash;&gt;-->
-            <!--&lt;!&ndash;android:id="@+id/toolbar"&ndash;&gt;-->
-            <!--&lt;!&ndash;android:layout_height="wrap_content"&ndash;&gt;-->
-            <!--&lt;!&ndash;android:layout_width="match_parent"&ndash;&gt;-->
-            <!--&lt;!&ndash;android:minHeight="?attr/actionBarSize"&ndash;&gt;-->
-            <!--&lt;!&ndash;android:background="?attr/colorPrimary"&ndash;&gt;-->
-            <!--&lt;!&ndash;app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"&ndash;&gt;-->
-            <!--&lt;!&ndash;app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />&ndash;&gt;-->
-
-        <!--<android.support.v4.view.ViewPager-->
-            <!--android:id="@+id/pager"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent">-->
-
-            <!--&lt;!&ndash;-->
-            <!--This title strip will display the currently visible page title, as well as the page-->
-            <!--titles for adjacent pages.-->
-            <!--&ndash;&gt;-->
-            <!--<android.support.v4.view.PagerTabStrip android:id="@+id/pager_title_strip"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_gravity="top"-->
-                <!--style="@style/PagerTabStrip"-->
-                <!--android:paddingRight="@dimen/activity_horizontal_margin"-->
-                <!--android:paddingLeft="@dimen/activity_horizontal_margin"-->
-                <!--android:paddingTop="4dp"-->
-                <!--android:paddingBottom="4dp" />-->
-
-        <!--</android.support.v4.view.ViewPager>-->
-
-
-    <!--</LinearLayout>-->
-
     <FrameLayout
         android:id="@+id/contents"
         android:layout_width="match_parent"

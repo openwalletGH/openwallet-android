@@ -30,8 +30,6 @@
 
     <!-- Amount Widget -->
     <dimen name="amount_margin_top">16dp</dimen>
-    <!-- TODO enable for SmoothProgressBar-->
-    <!--<dimen name="amount_margin_top">8dp</dimen>-->
     <dimen name="amount_margin_bottom">4dp</dimen>
     <dimen name="amount_text_size_big">56sp</dimen>
     <dimen name="amount_text_size_small">12sp</dimen>

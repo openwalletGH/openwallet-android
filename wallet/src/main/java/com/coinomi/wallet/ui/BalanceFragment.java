@@ -35,6 +35,7 @@ import com.coinomi.wallet.ExchangeRatesProvider.ExchangeRate;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.ui.widget.Amount;
+import com.coinomi.wallet.ui.widget.SwipeRefreshLayout;
 import com.coinomi.wallet.util.ThrottlingWalletChangeListener;
 import com.coinomi.wallet.util.WeakHandler;
 import com.google.common.collect.Lists;
@@ -102,6 +103,7 @@ public class BalanceFragment extends Fragment implements LoaderCallbacks<List<Ab
     private Configuration config;
 
     private TransactionsListAdapter adapter;
+    private SwipeRefreshLayout swipeContainer;
     private View emptyPocketMessage;
     private Amount mainAmount;
     private Amount localAmount;
@@ -185,6 +187,23 @@ public class BalanceFragment extends Fragment implements LoaderCallbacks<List<Ab
         View listFooter = new View(getActivity());
         listFooter.setMinimumHeight(getResources().getDimensionPixelSize(R.dimen.activity_vertical_margin));
         transactionRows.addFooterView(listFooter);
+
+        swipeContainer = (SwipeRefreshLayout) view.findViewById(R.id.swipeContainer);
+        // Setup refresh listener which triggers new data loading
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                if (listener != null) {
+                    listener.onRefresh();
+                }
+            }
+        });
+        // Configure the refreshing colors
+        swipeContainer.setColorSchemeResources(
+                R.color.progress_bar_color_1,
+                R.color.progress_bar_color_2,
+                R.color.progress_bar_color_3,
+                R.color.progress_bar_color_4);
 
         emptyPocketMessage = header.findViewById(R.id.history_empty);
         // Hide empty message if have some transaction history
@@ -503,10 +522,13 @@ public class BalanceFragment extends Fragment implements LoaderCallbacks<List<Ab
             }
         }
 
+        swipeContainer.setRefreshing(pocket.isLoading());
+
         adapter.clearLabelCache();
     }
 
     public interface Listener {
         void onLocalAmountClick();
+        void onRefresh();
     }
 }
