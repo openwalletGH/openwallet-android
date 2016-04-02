@@ -331,7 +331,7 @@ public class ExchangeRatesProvider extends ContentProvider {
         try {
             Response response = client.newCall(request).execute();
             if (response.isSuccessful()) {
-                log.info("fetched exchange rates from {} ({}), {} chars, took {} ms", url,
+                log.info("fetched exchange rates from {}, took {} ms", url,
                         System.currentTimeMillis() - start);
                 return new JSONObject(response.body().string());
             } else {
