@@ -285,9 +285,20 @@ public class WalletProtobufSerializer {
 
     private static Protos.Wallet updateV1toV2Proto(Protos.Wallet walletProto) {
         checkState(walletProto.getVersion() < 2, "Can update only from version < 2");
+        // Purge blockchain data if wallet is bigger than 2mb
+        boolean purgeBlockchain = walletProto.getSerializedSize() > 200000;
         Protos.Wallet.Builder b = walletProto.toBuilder();
         for (int i = 0; i < b.getPocketsCount(); i++) {
             Protos.WalletPocket.Builder account = b.getPocketsBuilder(i);
+            // Purge blockchain data if needed
+            if (purgeBlockchain) {
+                account.clearAddressStatus();
+                account.clearLastSeenBlockHash();
+                account.clearLastSeenBlockHeight();
+                account.clearLastSeenBlockTimeSecs();
+                account.clearTransaction();
+            }
+            // Update coin type ids
             if (account.getNetworkIdentifier().equals("dogecoindark.main")) {
                 account.setNetworkIdentifier(DogecoindarkMain.get().getId());
                 b.setPockets(i, account);
