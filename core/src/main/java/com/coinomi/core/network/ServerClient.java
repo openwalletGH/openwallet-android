@@ -656,10 +656,11 @@ public class ServerClient implements BitBlockchainConnection {
         Futures.addCallback(pong, new FutureCallback<ResultMessage>() {
             @Override
             public void onSuccess(@Nullable ResultMessage result) {
-                try {
-                    log.info("Server {} version {} OK", type.getName(),
-                            result.getResult().get(0));
-                } catch (Exception ignore) {
+                if (log.isDebugEnabled()) {
+                    try {
+                        log.debug("Server {} version {} OK", type.getName(),
+                                checkNotNull(result).getResult().get(0));
+                    } catch (Exception ignore) { }
                 }
             }
 

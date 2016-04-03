@@ -28,6 +28,7 @@ import com.coinomi.wallet.util.Fonts;
 import com.coinomi.wallet.util.LinuxSecureRandom;
 import com.coinomi.wallet.util.NetworkUtils;
 import com.google.common.collect.ImmutableList;
+import com.google.common.io.Files;
 
 import org.acra.ACRA;
 import org.acra.annotation.ReportsCrashes;
@@ -351,11 +352,11 @@ public class WalletApplication extends Application {
 
                 log.info("wallet loaded from: '" + walletFile + "', took " + (System.currentTimeMillis() - start) + "ms");
             } catch (final FileNotFoundException e) {
-                Toast.makeText(WalletApplication.this, R.string.error_could_not_read_wallet, Toast.LENGTH_LONG).show();
                 ACRA.getErrorReporter().handleException(e);
+                Toast.makeText(WalletApplication.this, R.string.error_could_not_read_wallet, Toast.LENGTH_LONG).show();
             } catch (final UnreadableWalletException e) {
-                ACRA.getErrorReporter().handleException(e);
                 Toast.makeText(WalletApplication.this, R.string.error_could_not_read_wallet, Toast.LENGTH_LONG).show();
+                ACRA.getErrorReporter().handleException(e);
             } finally {
                 if (walletStream != null) {
                     try {

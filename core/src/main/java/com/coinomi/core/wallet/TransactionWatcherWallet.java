@@ -1010,7 +1010,7 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<BitTransac
         if (blockTimes.containsKey(height)) {
             tx.setTimestamp(blockTimes.get(height));
         } else {
-            log.info("Must get timestamp for block on height {}", height);
+            if (log.isDebugEnabled()) log.debug("Must get timestamp for {} block on height {}", type.getName(), height);
             if (!missingTimestamps.containsKey(height)) {
                 missingTimestamps.put(height, new HashSet<Sha256Hash>());
                 missingTimestamps.get(height).add(tx.getHash());
