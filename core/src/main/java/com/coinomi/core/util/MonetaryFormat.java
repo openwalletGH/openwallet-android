@@ -29,6 +29,7 @@ import static com.google.common.math.LongMath.checkedMultiply;
 import static com.google.common.math.LongMath.checkedPow;
 import static com.google.common.math.LongMath.divide;
 
+import java.io.Serializable;
 import java.math.RoundingMode;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
@@ -50,7 +51,7 @@ import org.bitcoinj.core.Monetary;
  * static constants.
  * </p>
  */
-public final class MonetaryFormat {
+public final class MonetaryFormat implements Serializable {
 
     /** Standard format for the BTC denomination. */
     public static final MonetaryFormat BTC = new MonetaryFormat().shift(0).minDecimals(2).repeatOptionalDecimals(2, 3);

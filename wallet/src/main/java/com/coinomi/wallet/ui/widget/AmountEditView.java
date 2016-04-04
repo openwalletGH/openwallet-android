@@ -1,14 +1,16 @@
 package com.coinomi.wallet.ui.widget;
 
 import android.content.Context;
+import android.os.Bundle;
+import android.os.Parcelable;
 import android.text.Editable;
 import android.text.Spannable;
+import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.coinomi.core.coins.Value;
@@ -23,26 +25,29 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import butterknife.Bind;
-import butterknife.ButterKnife;
-import butterknife.OnFocusChange;
-import butterknife.OnTextChanged;
-
 /**
- * @author Andreas Schildbach
  * @author John L. Jegutanis
  */
-public class AmountEditView extends RelativeLayout {
-    @Bind(R.id.symbol) TextView symbol;
-    @Bind(R.id.amount) EditText amount;
-    @Bind(R.id.amount_edit_layout) LinearLayout view;
+public class AmountEditView extends LinearLayout {
+    private static final String AMOUNT_EDIT_VIEW_SUPER_STATE = "amount_edit_view_super_state";
+    private static final String AMOUNT_EDIT_VIEW_AMOUNT_VALUE = "amount_edit_view_value";
+    private static final String AMOUNT_EDIT_VIEW_HINT_VALUE = "amount_edit_view_hint_value";
+    private static final String AMOUNT_EDIT_VIEW_TYPE = "amount_edit_view_type";
+    private static final String AMOUNT_EDIT_VIEW_TEXT = "amount_edit_view_text";
+    private static final String AMOUNT_EDIT_VIEW_AMOUNT_SIGNED = "amount_edit_view_amount_signed";
+    private static final String AMOUNT_EDIT_VIEW_FORMAT = "amount_edit_view_format";
+
     private Listener listener;
-    @Nullable private ValueType type;
-    private MonetaryFormat inputFormat;
+
+    private TextView symbol;
+    private EditText amountText;
     private boolean amountSigned = false;
-    @Nullable private Value hint;
-    private MonetaryFormat hintFormat = new MonetaryFormat().noCode();
-    private boolean fireListener = true;
+    @Nullable
+    private ValueType type;
+    @Nullable
+    private Value hint;
+    private MonetaryFormat format = new MonetaryFormat().noCode();
+    private final TextViewListener amountTextListener = new TextViewListener();
 
     public interface Listener {
         void changed();
@@ -52,11 +57,46 @@ public class AmountEditView extends RelativeLayout {
     public AmountEditView(Context context, AttributeSet attrs) {
         super(context, attrs);
         LayoutInflater.from(context).inflate(R.layout.amount_edit, this, true);
-        ButterKnife.bind(this);
+
+        amountText = (EditText) getChildAt(0);
+        amountText.addTextChangedListener(amountTextListener);
+        amountText.setOnFocusChangeListener(amountTextListener);
+        symbol = (TextView) getChildAt(1);
+    }
+
+    @Override
+    public Parcelable onSaveInstanceState()
+    {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(AMOUNT_EDIT_VIEW_SUPER_STATE, super.onSaveInstanceState());
+        bundle.putSerializable(AMOUNT_EDIT_VIEW_TYPE, type);
+        bundle.putSerializable(AMOUNT_EDIT_VIEW_FORMAT, format);
+        bundle.putString(AMOUNT_EDIT_VIEW_TEXT, amountText.getText().toString());
+        bundle.putBoolean(AMOUNT_EDIT_VIEW_AMOUNT_SIGNED, amountSigned);
+        bundle.putSerializable(AMOUNT_EDIT_VIEW_AMOUNT_VALUE, getAmount());
+        bundle.putSerializable(AMOUNT_EDIT_VIEW_HINT_VALUE, hint);
+        return bundle;
+    }
+
+    @Override
+    public void onRestoreInstanceState(Parcelable state)
+    {
+        if (state instanceof Bundle) // implicit null check
+        {
+            Bundle bundle = (Bundle) state;
+            setType((ValueType) bundle.getSerializable(AMOUNT_EDIT_VIEW_TYPE));
+            bundle.putSerializable(AMOUNT_EDIT_VIEW_FORMAT, format);
+            amountText.setText(bundle.getString(AMOUNT_EDIT_VIEW_TEXT));
+            bundle.putBoolean(AMOUNT_EDIT_VIEW_AMOUNT_SIGNED, amountSigned);
+            setAmount((Value) bundle.getSerializable(AMOUNT_EDIT_VIEW_AMOUNT_VALUE), false);
+            setHint((Value) bundle.getSerializable(AMOUNT_EDIT_VIEW_HINT_VALUE));
+            state = bundle.getParcelable(AMOUNT_EDIT_VIEW_SUPER_STATE);
+        }
+        super.onRestoreInstanceState(state);
     }
 
     public void reset() {
-        amount.setText(null);
+        amountText.setText(null);
         symbol.setText(null);
         type = null;
         hint = null;
@@ -74,8 +114,7 @@ public class AmountEditView extends RelativeLayout {
     }
 
     public void setFormat(final MonetaryFormat inputFormat) {
-        this.inputFormat = inputFormat.noCode();
-        hintFormat = inputFormat.noCode();
+        this.format = inputFormat.noCode();
         updateAppearance();
     }
 
@@ -99,21 +138,21 @@ public class AmountEditView extends RelativeLayout {
 
     public void setSingleLine(boolean isSingleLine) {
         if (isSingleLine) {
-            view.setOrientation(LinearLayout.HORIZONTAL);
+            setOrientation(LinearLayout.HORIZONTAL);
         } else {
-            view.setOrientation(LinearLayout.VERTICAL);
+            setOrientation(LinearLayout.VERTICAL);
         }
     }
 
     @CheckForNull
     public Value getAmount() {
-        final String str = amount.getText().toString().trim();
+        final String str = amountText.getText().toString().trim();
         Value amount = null;
 
         try {
             if (!str.isEmpty()) {
                 if (type != null) {
-                    amount = inputFormat.parse(type, str);
+                    amount = format.parse(type, str);
                 }
             }
         } catch (final Exception x) { /* ignored */ }
@@ -122,23 +161,23 @@ public class AmountEditView extends RelativeLayout {
     }
 
     public void setAmount(@Nullable final Value value, final boolean fireListener) {
-        if (!fireListener) setFireListener(false);
+        if (!fireListener) amountTextListener.setFire(false);
 
         if (value != null) {
-            amount.setText(new MonetarySpannable(inputFormat, amountSigned, value));
+            amountText.setText(new MonetarySpannable(format, amountSigned, value));
         } else {
-            amount.setText(null);
+            amountText.setText(null);
         }
 
-        if (!fireListener) setFireListener(true);
+        if (!fireListener) amountTextListener.setFire(true);
     }
 
     public String getAmountText() {
-        return amount.getText().toString().trim();
+        return amountText.getText().toString().trim();
     }
 
     public TextView getAmountView() {
-        return amount;
+        return amountText;
     }
 
     private void updateAppearance() {
@@ -150,43 +189,46 @@ public class AmountEditView extends RelativeLayout {
             symbol.setVisibility(GONE);
         }
 
-        final Spannable hintSpannable = new MonetarySpannable(hintFormat, amountSigned,
+        final Spannable hintSpannable = new MonetarySpannable(format, amountSigned,
                 hint != null ? hint : Coin.ZERO);
-        amount.setHint(hintSpannable);
+        amountText.setHint(hintSpannable);
     }
 
-    private void setFireListener(boolean fireListener) {
-        this.fireListener = fireListener;
-    }
+    private final class TextViewListener implements TextWatcher, OnFocusChangeListener {
+        private boolean fire = true;
 
-    private boolean isFireListener() {
-        return fireListener;
-    }
-
-    @OnTextChanged(value = R.id.amount, callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
-    public void afterTextChanged(final Editable s) {
-        // workaround for German keyboards
-        final String original = s.toString();
-        final String replaced = original.replace(',', '.');
-        if (!replaced.equals(original)) {
-            s.clear();
-            s.append(replaced);
-        }
-    }
-
-    @OnTextChanged(value = R.id.amount, callback = OnTextChanged.Callback.TEXT_CHANGED)
-    public void onTextChanged(final CharSequence s, final int start, final int before, final int count) {
-        if (listener != null && isFireListener()) listener.changed();
-    }
-
-    @OnFocusChange(R.id.amount)
-    public void onFocusChange(final View v, final boolean hasFocus) {
-        if (!hasFocus) {
-            final Value amount = getAmount();
-            if (amount != null)
-                setAmount(amount, false);
+        public void setFire(final boolean fire) {
+            this.fire = fire;
         }
 
-        if (listener != null && isFireListener()) listener.focusChanged(hasFocus);
+        @Override
+        public void afterTextChanged(final Editable s) {
+            // workaround for German keyboards
+            final String original = s.toString();
+            final String replaced = original.replace(',', '.');
+            if (!replaced.equals(original)) {
+                s.clear();
+                s.append(replaced);
+            }
+        }
+
+        @Override
+        public void beforeTextChanged(final CharSequence s, final int start, final int count, final int after) { }
+
+        @Override
+        public void onTextChanged(final CharSequence s, final int start, final int before, final int count) {
+            if (listener != null && fire) listener.changed();
+        }
+
+        @Override
+        public void onFocusChange(final View v, final boolean hasFocus) {
+            if (!hasFocus) {
+                final Value amount = getAmount();
+                if (amount != null)
+                    setAmount(amount, false);
+            }
+
+            if (listener != null && fire) listener.focusChanged(hasFocus);
+        }
     }
 }
