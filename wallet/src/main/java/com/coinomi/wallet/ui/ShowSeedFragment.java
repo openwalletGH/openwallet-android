@@ -6,7 +6,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,6 +37,11 @@ public class ShowSeedFragment extends Fragment {
     private static final Logger log = LoggerFactory.getLogger(ShowSeedFragment.class);
 
     private static final int UPDATE_VIEW = 0;
+    private static final int SET_PASSWORD = 1;
+    private static final int SET_SEED = 2;
+
+    private static final String SEED_PROCESSING_DIALOG_TAG = "seed_processing_dialog_tag";
+    private static final String PASSWORD_DIALOG_TAG = "password_dialog_tag";
 
     private View seedLayout;
     private View seedEncryptedLayout;
@@ -49,23 +53,39 @@ public class ShowSeedFragment extends Fragment {
 
     private Wallet wallet;
     private CharSequence password;
+    private SeedInfo seedInfo;
 
     private final Handler handler = new MyHandler(this);
+
     private static class MyHandler extends WeakHandler<ShowSeedFragment> {
         public MyHandler(ShowSeedFragment ref) { super(ref); }
 
         @Override
         protected void weakHandleMessage(ShowSeedFragment ref, Message msg) {
             switch (msg.what) {
+                case SET_SEED:
+                    ref.seedInfo = (SeedInfo) msg.obj;
+                    ref.updateView();
+                    break;
+                case SET_PASSWORD:
+                    ref.setPassword((CharSequence) msg.obj);
+                    break;
                 case UPDATE_VIEW:
                     ref.updateView();
+                    break;
             }
         }
+    }
+
+    public void setPassword(CharSequence password) {
+        this.password = password;
+        updateView();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRetainInstance(true); // for the async task
     }
 
     @Override
@@ -89,13 +109,18 @@ public class ShowSeedFragment extends Fragment {
         lockIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                passwordDialog.show(getFragmentManager(), null);
+                showUnlockDialog();
             }
         });
 
         updateView();
 
         return view;
+    }
+
+    private void showUnlockDialog() {
+        Dialogs.dismissAllowingStateLoss(getFragmentManager(), PASSWORD_DIALOG_TAG);
+        UnlockWalletDialog.getInstance().show(getFragmentManager(), PASSWORD_DIALOG_TAG);
     }
 
     @Override
@@ -122,8 +147,18 @@ public class ShowSeedFragment extends Fragment {
                 if (listener != null) listener.onSeedNotAvailable();
             } else if (wallet.getSeed().isEncrypted()) {
                 seedEncryptedLayout.setVisibility(View.VISIBLE);
-                if (password == null) {
-                    passwordDialog.show(getFragmentManager(), null);
+                if (seedInfo != null) {
+                    seedLayout.setVisibility(View.VISIBLE);
+                    seedEncryptedLayout.setVisibility(View.GONE);
+                    seedView.setText(seedInfo.seedString);
+                    QrUtils.setQr(qrView, getResources(), seedInfo.seedString);
+                    if (seedInfo.isSeedPasswordProtected) {
+                        seedPasswordProtectedView.setVisibility(View.VISIBLE);
+                    } else {
+                        seedPasswordProtectedView.setVisibility(View.GONE);
+                    }
+                } else if (password == null) {
+                    showUnlockDialog();
                 } else {
                     maybeStartDecryptTask();
                 }
@@ -134,15 +169,6 @@ public class ShowSeedFragment extends Fragment {
         }
     }
 
-    DialogFragment passwordDialog = new UnlockWalletDialog() {
-        @Override
-        public void onPassword(CharSequence password) {
-            ShowSeedFragment.this.password = password;
-            handler.sendEmptyMessage(UPDATE_VIEW);
-        }
-        @Override public void onCancel() { }
-    };
-
     private void maybeStartDecryptTask() {
         if (decryptSeedTask == null) {
             decryptSeedTask = new LoadSeedTask();
@@ -151,16 +177,12 @@ public class ShowSeedFragment extends Fragment {
     }
 
     private class LoadSeedTask extends AsyncTask<Void, Void, Void> {
-        private Dialogs.ProgressDialogFragment busyDialog;
-        private String seedString;
-        private boolean isSeedPasswordProtected;
+        SeedInfo seedInfo = null;
 
         @Override
         protected void onPreExecute() {
-            super.onPreExecute();
-            busyDialog = Dialogs.ProgressDialogFragment.newInstance(
-                    getResources().getString(R.string.seed_working));
-            busyDialog.show(getFragmentManager(), null);
+            Dialogs.ProgressDialogFragment.show(getFragmentManager(),
+                    getString(R.string.seed_working), SEED_PROCESSING_DIALOG_TAG);
         }
 
         @Override
@@ -188,29 +210,25 @@ public class ShowSeedFragment extends Fragment {
             }
 
             if (seed != null && masterKey != null) {
-                seedString = Wallet.mnemonicToString(seed.getMnemonicCode());
+                seedInfo = new SeedInfo();
+                seedInfo.seedString = Wallet.mnemonicToString(seed.getMnemonicCode());
                 DeterministicKey testMasterKey = HDKeyDerivation.createMasterPrivateKey(seed.getSeedBytes());
-                isSeedPasswordProtected = !masterKey.getPrivKey().equals(testMasterKey.getPrivKey());
+                seedInfo.isSeedPasswordProtected = !masterKey.getPrivKey().equals(testMasterKey.getPrivKey());
+
             }
 
             return null;
         }
 
         protected void onPostExecute(Void aVoid) {
-            decryptSeedTask = null;
             password = null;
-            busyDialog.dismissAllowingStateLoss();
-            if (seedString != null) {
-                seedLayout.setVisibility(View.VISIBLE);
-                seedEncryptedLayout.setVisibility(View.GONE);
-                seedView.setText(seedString);
-                QrUtils.setQr(qrView, getResources(), seedString);
-                if (isSeedPasswordProtected) {
-                    seedPasswordProtectedView.setVisibility(View.VISIBLE);
-                } else {
-                    seedPasswordProtectedView.setVisibility(View.GONE);
-                }
+
+            if (Dialogs.dismissAllowingStateLoss(getFragmentManager(), SEED_PROCESSING_DIALOG_TAG)) return;
+
+            if (seedInfo != null) {
+                handler.sendMessage(handler.obtainMessage(SET_SEED, seedInfo));
             } else {
+                decryptSeedTask = null;
                 seedEncryptedLayout.setVisibility(View.VISIBLE);
                 DialogBuilder.warn(getActivity(), R.string.unlocking_wallet_error_title)
                         .setMessage(R.string.unlocking_wallet_error_detail)
@@ -218,7 +236,7 @@ public class ShowSeedFragment extends Fragment {
                         .setPositiveButton(R.string.button_retry, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                passwordDialog.show(getFragmentManager(), null);
+                                showUnlockDialog();
                             }
                         })
                         .create().show();
@@ -226,7 +244,12 @@ public class ShowSeedFragment extends Fragment {
         }
     }
 
-    public interface Listener {
+    private static class SeedInfo {
+        String seedString;
+        boolean isSeedPasswordProtected;
+    }
+
+    public interface Listener extends UnlockWalletDialog.Listener {
         void onSeedNotAvailable();
     }
 }

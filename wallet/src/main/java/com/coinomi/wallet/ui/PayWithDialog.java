@@ -1,5 +1,6 @@
 package com.coinomi.wallet.ui;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
@@ -23,9 +24,33 @@ import com.coinomi.wallet.util.UiUtils;
 /**
  * @author John L. Jegutanis
  */
-public abstract class PayWithDialog extends DialogFragment {
+public class PayWithDialog extends DialogFragment {
+    private Listener listener;
 
     public PayWithDialog() {}
+
+    public static DialogFragment getInstance(CoinURI uri) {
+        DialogFragment dialog = new PayWithDialog();
+        dialog.setArguments(new Bundle());
+        dialog.getArguments().putString(Constants.ARG_URI, uri.toUriString());
+        return dialog;
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            this.listener = (Listener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.getClass() + " must implement " + Listener.class);
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        listener = null;
+        super.onDetach();
+    }
 
     @Override @NonNull
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -100,12 +125,14 @@ public abstract class PayWithDialog extends DialogFragment {
         row.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                payWith(account, uri);
+                if (listener != null) listener.payWith(account, uri);
                 dismiss();
             }
         });
         container.addView(row);
     }
 
-    abstract public void payWith(WalletAccount account, CoinURI uri);
+    public interface Listener {
+        void payWith(WalletAccount account, CoinURI uri);
+    }
 }

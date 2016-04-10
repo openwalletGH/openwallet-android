@@ -40,6 +40,10 @@ import org.slf4j.LoggerFactory;
 public class UiUtils {
     private static final Logger log = LoggerFactory.getLogger(UiUtils.class);
 
+    static public void toastGenericError(Context context) {
+        Toast.makeText(context, R.string.error_generic, Toast.LENGTH_SHORT).show();
+    }
+
     static public void replyAddressRequest(Activity activity, CoinURI uri, WalletAccount pocket) throws CoinURIParseException {
         try {
             String uriString = uri.getAddressRequestUriResponse(pocket.getReceiveAddress()).toString();

@@ -33,7 +33,6 @@ import com.coinomi.wallet.service.CoinService;
 import com.coinomi.wallet.service.CoinServiceImpl;
 import com.coinomi.wallet.tasks.CheckUpdateTask;
 import com.coinomi.wallet.util.SystemUtils;
-import com.coinomi.wallet.util.UiUtils;
 import com.coinomi.wallet.util.WeakHandler;
 
 import org.bitcoinj.core.Transaction;
@@ -57,7 +56,8 @@ import static com.coinomi.wallet.ui.NavDrawerItemType.ITEM_TRADE;
  */
 final public class WalletActivity extends BaseWalletActivity implements
         NavigationDrawerFragment.Listener,
-        AccountFragment.Listener, OverviewFragment.Listener {
+        AccountFragment.Listener, OverviewFragment.Listener, SelectCoinTypeDialog.Listener,
+        PayWithDialog.Listener {
     private static final Logger log = LoggerFactory.getLogger(WalletActivity.class);
 
 
@@ -73,6 +73,8 @@ final public class WalletActivity extends BaseWalletActivity implements
     // Fragment tags
     private static final String ACCOUNT = "account";
     private static final String OVERVIEW = "overview";
+    private static final String PAY_TO_DIALOG_TAG = "pay_to_dialog_tag";
+    private static final String PAY_WITH_DIALOG_TAG = "pay_with_dialog_tag";
 
     // Saved state variables
     private static final String OVERVIEW_VISIBLE = "overview_visible";
@@ -93,9 +95,9 @@ final public class WalletActivity extends BaseWalletActivity implements
     private List<NavDrawerItem> navDrawerItems = new ArrayList<>();
     private ActionMode lastActionMode;
     private final Handler handler = new MyHandler(this);
+    private boolean isOverviewVisible;
     private OverviewFragment overviewFragment;
     private AccountFragment accountFragment;
-    private float actionBarDefaultElevation = 0f;
 
     public WalletActivity() {}
 
@@ -118,10 +120,6 @@ final public class WalletActivity extends BaseWalletActivity implements
                     .create().show();
         }
 
-        // Save elevation i.e. amount of shadow cast by the action bar
-        if (getSupportActionBar() != null) {
-            actionBarDefaultElevation = getSupportActionBar().getElevation();
-        }
 
         // Create the overview and account fragments
         FragmentTransaction tr = getFM().beginTransaction();
@@ -144,10 +142,11 @@ final public class WalletActivity extends BaseWalletActivity implements
             }
             // Else no accounts, how to handle this case? TODO
         } else {
+            isOverviewVisible = savedInstanceState.getBoolean(OVERVIEW_VISIBLE);
             overviewFragment = (OverviewFragment) getFM().findFragmentByTag(OVERVIEW);
             accountFragment = (AccountFragment) getFM().findFragmentByTag(ACCOUNT);
 
-            if (savedInstanceState.getBoolean(OVERVIEW_VISIBLE, true)) {
+            if (isOverviewVisible) {
                 tr.show(overviewFragment).hide(accountFragment);
                 setOverviewTitle();
             } else {
@@ -185,7 +184,7 @@ final public class WalletActivity extends BaseWalletActivity implements
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putBoolean(OVERVIEW_VISIBLE, overviewFragment.isVisible());
+        outState.putBoolean(OVERVIEW_VISIBLE, isOverviewVisible);
     }
 
     private void navDrawerSelectAccount(@Nullable WalletAccount account, boolean closeDrawer) {
@@ -235,10 +234,11 @@ final public class WalletActivity extends BaseWalletActivity implements
 
         // Restore the correct action bar shadow
         if (getSupportActionBar() != null) {
-            if (overviewFragment.isVisible()) {
-                getSupportActionBar().setElevation(actionBarDefaultElevation);
+            if (isOverviewVisible) {
+                getSupportActionBar().setElevation(
+                        getResources().getDimensionPixelSize(R.dimen.active_elevation));
             } else {
-                getSupportActionBar().setElevation(0f);
+                getSupportActionBar().setElevation(0);
             }
         }
     }
@@ -280,7 +280,7 @@ final public class WalletActivity extends BaseWalletActivity implements
     public void onTradeSelected() {
         startActivity(new Intent(WalletActivity.this, TradeActivity.class));
         // Reselect the last item as the trade is a separate activity
-        if (overviewFragment.isVisible()) {
+        if (isOverviewVisible) {
             navDrawerSelectOverview(true);
         } else {
             navDrawerSelectAccount(getAccount(lastAccountId), true);
@@ -297,19 +297,21 @@ final public class WalletActivity extends BaseWalletActivity implements
     }
 
     public void openOverview(boolean selectInNavDrawer) {
-        if (!overviewFragment.isVisible()) {
+        if (!isOverviewVisible && !isFinishing()) {
             setOverviewTitle();
             FragmentTransaction ft = getFM().beginTransaction();
             ft.show(overviewFragment);
             ft.hide(accountFragment);
             ft.commit();
+            isOverviewVisible = true;
             connectAllCoinService();
             if (selectInNavDrawer) {
                 navDrawerSelectOverview(true);
             }
             // Restore the default action bar shadow
             if (getSupportActionBar() != null) {
-                getSupportActionBar().setElevation(actionBarDefaultElevation);
+                getSupportActionBar().setElevation(
+                        getResources().getDimensionPixelSize(R.dimen.active_elevation));
             }
         }
     }
@@ -323,7 +325,7 @@ final public class WalletActivity extends BaseWalletActivity implements
     }
 
     private void openAccount(WalletAccount account, boolean selectInNavDrawer) {
-        if (account != null) {
+        if (account != null && !isFinishing()) {
             if (isAccountVisible(account)) return;
             lastAccountId = account.getId();
             setAccountTitle(account);
@@ -333,8 +335,11 @@ final public class WalletActivity extends BaseWalletActivity implements
             ft.hide(overviewFragment);
             ft.commit();
 
+            isOverviewVisible = false;
+
             accountFragment.setupArgs(lastAccountId);
             accountFragment.applyArguments();
+            accountFragment.goToBalance(false);
 
             getWalletApplication().getConfiguration().touchLastAccountId(lastAccountId);
             connectCoinService(lastAccountId);
@@ -343,7 +348,7 @@ final public class WalletActivity extends BaseWalletActivity implements
             }
             // Hide the shadow of the action bar because the PagerTabStrip of the AccountFragment is visible
             if (getSupportActionBar() != null) {
-                getSupportActionBar().setElevation(0f);
+                getSupportActionBar().setElevation(0);
             }
         }
     }
@@ -483,6 +488,11 @@ final public class WalletActivity extends BaseWalletActivity implements
             throw new CoinURIParseException(error);
         }
 
+        if (accountFragment.isVisible() && accountFragment.getAccount() != null) {
+            payWith(accountFragment.getAccount(), coinUri);
+            return;
+        }
+
         WalletAccount selectedAccount = null;
         List<WalletAccount> allAccounts = getAllAccounts();
         List<WalletAccount> sendFromAccounts = getAccounts(scannedType);
@@ -492,13 +502,14 @@ final public class WalletActivity extends BaseWalletActivity implements
             selectedAccount = allAccounts.get(0);
         }
 
-        if (coinUri.isAddressRequest() && selectedAccount != null) {
-            UiUtils.replyAddressRequest(this, coinUri, selectedAccount);
-            return;
-        }
+        // TODO rework the address request standard
+//        if (coinUri.isAddressRequest() && selectedAccount != null) {
+//            UiUtils.replyAddressRequest(this, coinUri, selectedAccount);
+//            return;
+//        }
 
         if (selectedAccount != null) {
-            setSendFromCoin(selectedAccount, coinUri);
+            payWith(selectedAccount, coinUri);
         } else {
             showPayWithDialog(coinUri);
         }
@@ -506,13 +517,7 @@ final public class WalletActivity extends BaseWalletActivity implements
 
     private void processAddress(String addressStr) throws CoinURIParseException, AddressMalformedException {
         List<CoinType> possibleTypes = GenericUtils.getPossibleTypes(addressStr);
-//        WalletAccount currentAccount = getAccount(lastAccountId);
 
-        // TODO improve
-//        if (currentAccount != null && possibleTypes.contains(currentAccount.getCoinType())) {
-//            AbstractAddress address = currentAccount.getCoinType().newAddress(addressStr);
-//            processUri(CoinURI.convertToCoinURI(address, null, null, null));
-//        } else
         if (possibleTypes.size() == 1) {
             AbstractAddress address = possibleTypes.get(0).newAddress(addressStr);
             processUri(CoinURI.convertToCoinURI(address, null, null, null));
@@ -538,43 +543,27 @@ final public class WalletActivity extends BaseWalletActivity implements
         }
     }
 
-    private void showPayToDialog(String addressStr) {
-        if (selectCoinTypeDialog.getArguments() == null) {
-            selectCoinTypeDialog.setArguments(new Bundle());
-        }
-        selectCoinTypeDialog.getArguments().putString(Constants.ARG_ADDRESS_STRING, addressStr);
-        selectCoinTypeDialog.show(getFM(), null);
+    public void showPayToDialog(String addressStr) {
+        Dialogs.dismissAllowingStateLoss(getFM(), PAY_TO_DIALOG_TAG);
+        SelectCoinTypeDialog.getInstance(addressStr).show(getFM(), PAY_TO_DIALOG_TAG);
     }
 
-    SelectCoinTypeDialog selectCoinTypeDialog = new SelectCoinTypeDialog() {
-        // FIXME crash when this dialog being restored from saved state
-        @Override
-        public void onAddressSelected(AbstractAddress selectedAddress) {
-            try {
-                processUri(CoinURI.convertToCoinURI(selectedAddress, null, null, null));
-            } catch (CoinURIParseException e) {
-                showScanFailedMessage(e);
-            }
+    @Override
+    public void onAddressTypeSelected(AbstractAddress selectedAddress) {
+        try {
+            processUri(CoinURI.convertToCoinURI(selectedAddress, null, null, null));
+        } catch (CoinURIParseException e) {
+            showScanFailedMessage(e);
         }
-    };
+    }
 
     private void showPayWithDialog(CoinURI uri) {
-        if (payWithDialog.getArguments() == null) {
-            payWithDialog.setArguments(new Bundle());
-        }
-        payWithDialog.getArguments().putString(Constants.ARG_URI, uri.toUriString());
-        payWithDialog.show(getFM(), null);
+        Dialogs.dismissAllowingStateLoss(getFM(), PAY_WITH_DIALOG_TAG);
+        PayWithDialog.getInstance(uri).show(getFM(), PAY_WITH_DIALOG_TAG);
     }
 
-    PayWithDialog payWithDialog = new PayWithDialog() {
-        // FIXME crash when this dialog being restored from saved state
-        @Override
-        public void payWith(WalletAccount account, CoinURI uri) {
-            setSendFromCoin(account, uri);
-        }
-    };
-
-    private void setSendFromCoin(final WalletAccount account, final CoinURI coinUri) {
+    @Override
+    public void payWith(final WalletAccount account, final CoinURI coinUri) {
         openAccount(account);
         // Set url asynchronously as the account may need to open
         handler.sendMessage(handler.obtainMessage(SET_URI, coinUri));
@@ -686,13 +675,13 @@ final public class WalletActivity extends BaseWalletActivity implements
     private void refreshWallet() {
         if (getWalletApplication().getWallet() != null) {
             Intent intent;
-            if (accountFragment.isVisible()) {
+            if (isOverviewVisible) {
+                intent = new Intent(CoinService.ACTION_RESET_WALLET, null,
+                        getWalletApplication(), CoinServiceImpl.class);
+            } else {
                 intent = new Intent(CoinService.ACTION_RESET_ACCOUNT, null,
                         getWalletApplication(), CoinServiceImpl.class);
                 intent.putExtra(Constants.ARG_ACCOUNT_ID, lastAccountId);
-            } else {
-                intent = new Intent(CoinService.ACTION_RESET_WALLET, null,
-                        getWalletApplication(), CoinServiceImpl.class);
             }
             getWalletApplication().startService(intent);
         }
@@ -714,7 +703,7 @@ final public class WalletActivity extends BaseWalletActivity implements
         List<WalletAccount> accounts = getAllAccounts();
 
         if (accounts.size() > 1) {
-            if (overviewFragment.isVisible()) {
+            if (isOverviewVisible) {
                 super.onBackPressed();
             } else {
                 // If not in balance screen, back button brings us there
@@ -742,19 +731,19 @@ final public class WalletActivity extends BaseWalletActivity implements
 
     @SuppressWarnings("unused")
     private boolean goToReceive() {
-        return accountFragment.isVisible() && accountFragment.goToReceive();
+        return accountFragment.isVisible() && accountFragment.goToReceive(true);
     }
 
     private boolean goToBalance() {
-        return accountFragment.isVisible() && accountFragment.goToBalance();
+        return accountFragment.isVisible() && accountFragment.goToBalance(true);
+    }
+
+    private boolean goToSend() {
+        return accountFragment.isVisible() && accountFragment.goToSend(true);
     }
 
     private boolean resetSend() {
         return accountFragment.isVisible() && accountFragment.resetSend();
-    }
-
-    private boolean goToSend() {
-        return accountFragment.isVisible() && accountFragment.goToSend();
     }
 
     @Override
@@ -826,6 +815,4 @@ final public class WalletActivity extends BaseWalletActivity implements
             }
         }
     }
-
-
 }

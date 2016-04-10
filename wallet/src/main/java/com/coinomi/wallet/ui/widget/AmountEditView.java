@@ -13,6 +13,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
 import com.coinomi.core.coins.ValueType;
 import com.coinomi.core.util.MonetaryFormat;
@@ -58,10 +59,11 @@ public class AmountEditView extends LinearLayout {
         super(context, attrs);
         LayoutInflater.from(context).inflate(R.layout.amount_edit, this, true);
 
-        amountText = (EditText) getChildAt(0);
+        LinearLayout layout = (LinearLayout) findViewById(R.id.amount_layout);
+        amountText = (EditText) layout.getChildAt(0);
         amountText.addTextChangedListener(amountTextListener);
         amountText.setOnFocusChangeListener(amountTextListener);
-        symbol = (TextView) getChildAt(1);
+        symbol = (TextView) layout.getChildAt(1);
     }
 
     @Override
@@ -100,6 +102,10 @@ public class AmountEditView extends LinearLayout {
         symbol.setText(null);
         type = null;
         hint = null;
+    }
+
+    public void resetType(CoinType type, boolean updateView) {
+        if (resetType(type) && updateView) updateAppearance();
     }
 
     public boolean resetType(final ValueType newType) {

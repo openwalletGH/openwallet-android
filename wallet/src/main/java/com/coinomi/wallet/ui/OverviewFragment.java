@@ -95,7 +95,7 @@ public class OverviewFragment extends Fragment{
 
     @Bind(R.id.swipeContainer) SwipeRefreshLayout swipeContainer;
     @Bind(R.id.account_rows) ListView accountRows;
-    @Bind(R.id.main_amount) Amount mainAmount;
+    @Bind(R.id.account_balance) Amount mainAmount;
 
     private Listener listener;
 
@@ -109,30 +109,19 @@ public class OverviewFragment extends Fragment{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        setRetainInstance(true);
+        setHasOptionsMenu(true);
+
         wallet = application.getWallet();
         if (wallet == null) {
             return;
         }
 
-        setHasOptionsMenu(true);
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
         exchangeRates = ExchangeRatesProvider.getRates(
                 application.getApplicationContext(), config.getExchangeCurrencyCode());
         if (adapter != null) adapter.setExchangeRates(exchangeRates);
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        getLoaderManager().initLoader(ID_RATE_LOADER, null, rateLoaderCallbacks);
-    }
-
-
-    @Override
-    public void onDestroy() {
-        getLoaderManager().destroyLoader(ID_RATE_LOADER);
-        super.onDestroy();
     }
 
     @Override
@@ -212,10 +201,16 @@ public class OverviewFragment extends Fragment{
     }
 
     @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        getLoaderManager().initLoader(ID_RATE_LOADER, null, rateLoaderCallbacks);
+    }
+
+    @Override
     public void onDetach() {
+        getLoaderManager().destroyLoader(ID_RATE_LOADER);
+        listener = null;
         super.onDetach();
-        application = null;
-        wallet = null;
     }
 
     @Override
@@ -242,7 +237,7 @@ public class OverviewFragment extends Fragment{
         super.onPause();
     }
 
-    @OnClick(R.id.main_amount)
+    @OnClick(R.id.account_balance)
     public void onMainAmountClick(View v) {
         if (listener != null) listener.onLocalAmountClick();
     }

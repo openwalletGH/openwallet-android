@@ -1,5 +1,6 @@
 package com.coinomi.wallet.ui;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -25,10 +26,34 @@ import java.util.List;
 /**
  * @author John L. Jegutanis
  */
-abstract public class SelectCoinTypeDialog extends DialogFragment {
+public class SelectCoinTypeDialog extends DialogFragment {
     private static final Logger log = LoggerFactory.getLogger(SelectCoinTypeDialog.class);
+    private Listener listener;
 
     public SelectCoinTypeDialog() {}
+
+    public static DialogFragment getInstance(String addressStr) {
+        DialogFragment dialog = new SelectCoinTypeDialog();
+        dialog.setArguments(new Bundle());
+        dialog.getArguments().putString(Constants.ARG_ADDRESS_STRING, addressStr);
+        return dialog;
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            this.listener = (Listener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.getClass() + " must implement " + Listener.class);
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        listener = null;
+        super.onDetach();
+    }
 
     @Override @NonNull
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -59,7 +84,9 @@ abstract public class SelectCoinTypeDialog extends DialogFragment {
                 addressView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        onAddressSelected(address);
+                        if (listener != null) {
+                            listener.onAddressTypeSelected(address);
+                        }
                         SelectCoinTypeDialog.this.dismiss();
                     }
                 });
@@ -71,5 +98,7 @@ abstract public class SelectCoinTypeDialog extends DialogFragment {
         return builder.setTitle(R.string.ambiguous_address_title).setView(view).create();
     }
 
-    abstract public void onAddressSelected(AbstractAddress address);
+    public interface Listener extends BalanceFragment.Listener, SendFragment.Listener {
+        void onAddressTypeSelected(AbstractAddress address);
+    }
 }

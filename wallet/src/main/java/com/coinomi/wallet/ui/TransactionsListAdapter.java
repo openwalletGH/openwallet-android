@@ -88,6 +88,7 @@ public class TransactionsListAdapter extends BaseAdapter {
 
     private static final int VIEW_TYPE_TRANSACTION = 0;
 
+    @Deprecated // TODO change AbstractWallet to WalletAccount
     public TransactionsListAdapter(final Context context, @Nonnull final AbstractWallet walletPocket) {
         this.context = context;
         inflater = LayoutInflater.from(context);

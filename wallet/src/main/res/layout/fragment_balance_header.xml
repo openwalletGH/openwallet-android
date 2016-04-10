@@ -20,13 +20,13 @@
         android:layout_gravity="center_horizontal">
 
         <com.coinomi.wallet.ui.widget.Amount
-            android:id="@+id/amount_local"
+            android:id="@+id/account_exchanged_balance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             coinomi:single_line="true" />
 
         <com.coinomi.wallet.ui.widget.Amount
-            android:id="@+id/main_amount"
+            android:id="@+id/account_balance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             coinomi:show_big="true"

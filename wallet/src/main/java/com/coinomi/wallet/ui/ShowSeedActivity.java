@@ -8,7 +8,10 @@ import com.coinomi.wallet.R;
 /**
  * @author John L. Jegutanis
  */
-public class ShowSeedActivity  extends BaseWalletActivity implements ShowSeedFragment.Listener {
+public class ShowSeedActivity extends BaseWalletActivity implements ShowSeedFragment.Listener {
+
+    private static final String SHOW_SEED_TAG = "show_seed_tag";
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -16,7 +19,7 @@ public class ShowSeedActivity  extends BaseWalletActivity implements ShowSeedFra
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new ShowSeedFragment())
+                    .add(R.id.container, new ShowSeedFragment(), SHOW_SEED_TAG)
                     .commit();
         }
 
@@ -35,5 +38,13 @@ public class ShowSeedActivity  extends BaseWalletActivity implements ShowSeedFra
                     }
                 })
                 .create().show();
+    }
+
+    @Override
+    public void onPassword(CharSequence password) {
+        ShowSeedFragment f = (ShowSeedFragment) getFM().findFragmentByTag(SHOW_SEED_TAG);
+        if (f != null) {
+            f.setPassword(password);
+        }
     }
 }

@@ -1,22 +1,16 @@
 package com.coinomi.wallet.ui;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.graphics.Typeface;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.view.ActionMode;
@@ -33,20 +27,19 @@ import com.coinomi.core.coins.FiatType;
 import com.coinomi.core.coins.Value;
 import com.coinomi.core.coins.families.BitFamily;
 import com.coinomi.core.coins.families.NxtFamily;
-import com.coinomi.core.exceptions.Bip44KeyLookAheadExceededException;
 import com.coinomi.core.exceptions.UnsupportedCoinTypeException;
 import com.coinomi.core.uri.CoinURI;
 import com.coinomi.core.util.ExchangeRate;
 import com.coinomi.core.util.GenericUtils;
 import com.coinomi.core.wallet.AbstractAddress;
 import com.coinomi.core.wallet.WalletAccount;
-import com.coinomi.core.wallet.WalletPocketHD;
 import com.coinomi.wallet.AddressBookProvider;
 import com.coinomi.wallet.Configuration;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.ExchangeRatesProvider;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
+import com.coinomi.wallet.ui.dialogs.CreateNewAddressDialog;
 import com.coinomi.wallet.ui.widget.AmountEditView;
 import com.coinomi.wallet.util.QrUtils;
 import com.coinomi.wallet.util.ThrottlingWalletChangeListener;
@@ -59,12 +52,16 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
 import static com.coinomi.core.Preconditions.checkNotNull;
 
 /**
  *
  */
-public class AddressRequestFragment extends Fragment {
+public class AddressRequestFragment extends WalletFragment {
     private static final Logger log = LoggerFactory.getLogger(AddressRequestFragment.class);
 
     private static final int UPDATE_VIEW = 0;
@@ -73,28 +70,29 @@ public class AddressRequestFragment extends Fragment {
     // Loader IDs
     private static final int ID_RATE_LOADER = 0;
 
+    // Fragment tags
+    private static final String NEW_ADDRESS_TAG = "new_address_tag";
+
+    private CoinType type;
     @Nullable private AbstractAddress showAddress;
     private AbstractAddress receiveAddress;
     private Value amount;
     private String label;
+    private String accountId;
+    private WalletAccount account;
     private String message;
 
-    private CoinType type;
-    private TextView addressLabelView;
-    private TextView addressView;
-    private ImageView qrView;
-    private CurrencyCalculatorLink amountCalculatorLink;
-    private View previousAddressesLink;
-
-    private NavigationDrawerFragment mNavigationDrawerFragment;
-    private String accountId;
-    private WalletAccount pocket;
-    private String lastQrContent;
+    @Bind(R.id.request_address_label) TextView addressLabelView;
+    @Bind(R.id.request_address) TextView addressView;
+    @Bind(R.id.request_coin_amount) AmountEditView sendCoinAmountView;
+    @Bind(R.id.view_previous_addresses) View previousAddressesLink;
+    @Bind(R.id.qr_code) ImageView qrView;
+    String lastQrContent;
+    CurrencyCalculatorLink amountCalculatorLink;
+    ContentResolver resolver;
 
     private final Handler handler = new MyHandler(this);
     private Configuration config;
-    private ContentResolver resolver;
-    private LoaderManager loaderManager;
 
     private static class MyHandler extends WeakHandler<AddressRequestFragment> {
         public MyHandler(AddressRequestFragment ref) { super(ref); }
@@ -107,6 +105,7 @@ public class AddressRequestFragment extends Fragment {
                     break;
                 case UPDATE_EXCHANGE_RATE:
                     ref.amountCalculatorLink.setExchangeRate((ExchangeRate) msg.obj);
+                    break;
             }
         }
     }
@@ -144,6 +143,12 @@ public class AddressRequestFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        setRetainInstance(true);
+        // The onCreateOptionsMenu is handled in com.coinomi.wallet.ui.AccountFragment
+        // or in com.coinomi.wallet.ui.PreviousAddressesActivity
+        setHasOptionsMenu(true);
+
         WalletApplication walletApplication = (WalletApplication) getActivity().getApplication();
         Bundle args = getArguments();
         if (args != null) {
@@ -153,26 +158,12 @@ public class AddressRequestFragment extends Fragment {
             }
         }
         // TODO
-        pocket = checkNotNull(walletApplication.getAccount(accountId));
-        if (pocket == null) {
+        account = checkNotNull(walletApplication.getAccount(accountId));
+        if (account == null) {
             Toast.makeText(getActivity(), R.string.no_such_pocket_error, Toast.LENGTH_LONG).show();
             return;
         }
-        type = pocket.getCoinType();
-        mNavigationDrawerFragment = (NavigationDrawerFragment)
-                getFragmentManager().findFragmentById(R.id.navigation_drawer);
-
-        loaderManager.initLoader(ID_RATE_LOADER, null, rateLoaderCallbacks);
-
-        // The onCreateOptionsMenu is handled in com.coinomi.wallet.ui.AccountFragment
-        // or in com.coinomi.wallet.ui.PreviousAddressesActivity
-        setHasOptionsMenu(true);
-    }
-
-    @Override
-    public void onDestroy() {
-        loaderManager.destroyLoader(ID_RATE_LOADER);
-        super.onDestroy();
+        type = account.getCoinType();
     }
 
     @Override
@@ -180,63 +171,52 @@ public class AddressRequestFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_request, container, false);
+        ButterKnife.bind(this, view);
 
-        addressLabelView = (TextView) view.findViewById(R.id.request_address_label);
-        addressView = (TextView) view.findViewById(R.id.request_address);
-        View.OnClickListener addressOnClickListener = getAddressOnClickListener();
-        addressLabelView.setOnClickListener(addressOnClickListener);
-        addressView.setOnClickListener(addressOnClickListener);
+        sendCoinAmountView.resetType(type, true);
 
-        qrView = (ImageView) view.findViewById(R.id.qr_code);
-
-        AmountEditView sendCoinAmountView = (AmountEditView) view.findViewById(R.id.send_coin_amount);
-        sendCoinAmountView.setType(type);
-        sendCoinAmountView.setFormat(type.getMonetaryFormat());
-
-        AmountEditView sendLocalAmountView = (AmountEditView) view.findViewById(R.id.send_local_amount);
+        AmountEditView sendLocalAmountView = ButterKnife.findById(view, R.id.request_local_amount);
         sendLocalAmountView.setFormat(FiatType.FRIENDLY_FORMAT);
 
         amountCalculatorLink = new CurrencyCalculatorLink(sendCoinAmountView, sendLocalAmountView);
 
-        previousAddressesLink = view.findViewById(R.id.view_previous_addresses);
-        previousAddressesLink.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), PreviousAddressesActivity.class);
-                intent.putExtra(Constants.ARG_ACCOUNT_ID, accountId);
-                startActivity(intent);
-            }
-        });
-
-        updateView();
-
-        pocket.addEventListener(walletListener);
-
         return view;
     }
 
-    private View.OnClickListener getAddressOnClickListener() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (showAddress != null) {
-                    receiveAddress =  showAddress;
-                }
-                Activity activity = getActivity();
-                ActionMode actionMode = UiUtils.startAddressActionMode(receiveAddress, activity,
-                        getFragmentManager());
-                // Hack to dismiss this action mode when back is pressed
-                if (activity != null && activity instanceof WalletActivity) {
-                    ((WalletActivity) activity).registerActionMode(actionMode);
-                }
-            }
-        };
+    @Override
+    public void onDestroyView() {
+        amountCalculatorLink = null;
+        lastQrContent = null;
+        ButterKnife.unbind(this);
+        super.onDestroyView();
+    }
+
+    @OnClick({R.id.request_address_label, R.id.request_address})
+    public void onAddressClick() {
+        if (showAddress != null) {
+            receiveAddress =  showAddress;
+        }
+        Activity activity = getActivity();
+        ActionMode actionMode = UiUtils.startAddressActionMode(receiveAddress, activity,
+                getFragmentManager());
+        // Hack to dismiss this action mode when back is pressed
+        if (activity != null && activity instanceof WalletActivity) {
+            ((WalletActivity) activity).registerActionMode(actionMode);
+        }
+    }
+
+    @OnClick(R.id.view_previous_addresses)
+    public void onPreviousAddressesClick() {
+        Intent intent = new Intent(getActivity(), PreviousAddressesActivity.class);
+        intent.putExtra(Constants.ARG_ACCOUNT_ID, accountId);
+        startActivity(intent);
     }
 
     @Override
     public void onResume() {
         super.onResume();
 
+        account.addEventListener(walletListener);
         amountCalculatorLink.setListener(amountsListener);
         resolver.registerContentObserver(AddressBookProvider.contentUri(
                 getActivity().getPackageName(), type), true, addressBookObserver);
@@ -248,14 +228,10 @@ public class AddressRequestFragment extends Fragment {
     public void onPause() {
         resolver.unregisterContentObserver(addressBookObserver);
         amountCalculatorLink.setListener(null);
-        super.onPause();
-    }
-
-    @Override
-    public void onDestroyView() {
-        pocket.removeEventListener(walletListener);
+        account.removeEventListener(walletListener);
         walletListener.removeCallbacks();
-        super.onDestroyView();
+
+        super.onPause();
     }
 
     @Override
@@ -268,7 +244,7 @@ public class AddressRequestFragment extends Fragment {
                 UiUtils.copy(getActivity(), receiveAddress.toString());
                 return true;
             case R.id.action_new_address:
-                createNewAddressDialog.show(getFragmentManager(), null);
+                showNewAddressDialog();
                 return true;
             case R.id.action_edit_label:
                 EditAddressBookEntryFragment.edit(getFragmentManager(), type, receiveAddress);
@@ -284,90 +260,46 @@ public class AddressRequestFragment extends Fragment {
         super.onAttach(context);
         this.resolver = context.getContentResolver();
         this.config = ((WalletApplication) context.getApplicationContext()).getConfiguration();
-        this.loaderManager = getLoaderManager();
     }
 
-    DialogFragment createNewAddressDialog = new DialogFragment() {
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            Dialog dialog;
-            DialogInterface.OnClickListener dismissListener = new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dismissAllowingStateLoss();
-                }
-            };
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        getLoaderManager().initLoader(ID_RATE_LOADER, null, rateLoaderCallbacks);
+    }
 
-            // Only WalletPocketHD can create new addresses
-            if (pocket instanceof WalletPocketHD) {
-                final WalletPocketHD pocketHD = (WalletPocketHD) pocket;
-                if (pocketHD.canCreateFreshReceiveAddress()) {
-                    final LayoutInflater inflater = LayoutInflater.from(getActivity());
-                    final View view = inflater.inflate(R.layout.new_address_dialog, null);
-                    final TextView viewLabel = (TextView) view.findViewById(R.id.new_address_label);
+    @Override
+    public void onDetach() {
+        getLoaderManager().destroyLoader(ID_RATE_LOADER);
+        resolver = null;
+        super.onDetach();
+    }
 
-                    final DialogBuilder builder = new DialogBuilder(getActivity());
-                    builder.setTitle(R.string.create_new_address);
-                    builder.setView(view);
-                    builder.setNegativeButton(R.string.button_cancel, dismissListener);
-                    builder.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            try {
-                                AbstractAddress newAddress = pocketHD.getFreshReceiveAddress(
-                                        config.isManualAddressManagement());
-                                final String newLabel = viewLabel.getText().toString().trim();
+    private void showNewAddressDialog() {
+        if (!isVisible() || !isResumed()) return;
+        Dialogs.dismissAllowingStateLoss(getFragmentManager(), NEW_ADDRESS_TAG);
+        DialogFragment dialog = CreateNewAddressDialog.getInstance(account);
+        dialog.show(getFragmentManager(), NEW_ADDRESS_TAG);
+    }
 
-                                if (!newLabel.isEmpty()) {
-                                    final Uri uri =
-                                            AddressBookProvider.contentUri(getActivity().getPackageName(), type)
-                                                    .buildUpon().appendPath(newAddress.toString()).build();
-                                    final ContentValues values = new ContentValues();
-                                    values.put(AddressBookProvider.KEY_LABEL, newLabel);
-                                    resolver.insert(uri, values);
-                                }
-                                updateView();
-                            } catch (Bip44KeyLookAheadExceededException e) {
-                                // Should not happen as we already checked if we can create a new address
-                                Toast.makeText(getActivity(), R.string.too_many_unused_addresses, Toast.LENGTH_LONG).show();
-                            }
-                            dismissAllowingStateLoss();
-                        }
-                    });
-                    dialog = builder.create();
-                } else {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                    builder.setMessage(R.string.too_many_unused_addresses)
-                            .setPositiveButton(R.string.button_ok, dismissListener);
-                    dialog = builder.create();
-                }
-            } else {
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder.setMessage(R.string.error_generic)
-                        .setPositiveButton(R.string.button_ok, dismissListener);
-                dialog = builder.create();
-            }
-            return dialog;
-        }
-    };
-
-    private void updateView() {
+    @Override
+    public void updateView() {
         if (isRemoving() || isDetached()) return;
         receiveAddress = null;
         if (showAddress != null) {
             receiveAddress =  showAddress;
         } else {
-            receiveAddress = pocket.getReceiveAddress();
+            receiveAddress = account.getReceiveAddress();
         }
 
         // Don't show previous addresses link if we are showing a specific address
-        if (showAddress == null && pocket.hasUsedAddresses()) {
+        if (showAddress == null && account.hasUsedAddresses()) {
             previousAddressesLink.setVisibility(View.VISIBLE);
         } else {
             previousAddressesLink.setVisibility(View.GONE);
         }
 
-        // TODO, get amount and description, update QR if needed
+        // TODO, add message
 
         updateLabel();
 
@@ -379,7 +311,7 @@ public class AddressRequestFragment extends Fragment {
             return CoinURI.convertToCoinURI(receiveAddress, amount, label, message);
         } else if (type instanceof NxtFamily){
             return CoinURI.convertToCoinURI(receiveAddress, amount, label, message,
-                    pocket.getPublicKeySerialized());
+                    account.getPublicKeySerialized());
         } else {
             throw new UnsupportedCoinTypeException(type);
         }
@@ -420,6 +352,11 @@ public class AddressRequestFragment extends Fragment {
 
     private String resolveLabel(@Nonnull final AbstractAddress address) {
         return AddressBookProvider.resolveLabel(getActivity(), address);
+    }
+
+    @Override
+    public WalletAccount getAccount() {
+        return account;
     }
 
     private final LoaderManager.LoaderCallbacks<Cursor> rateLoaderCallbacks = new LoaderManager.LoaderCallbacks<Cursor>() {

@@ -21,7 +21,7 @@
         android:layout_gravity="center_horizontal">
 
         <com.coinomi.wallet.ui.widget.Amount
-            android:id="@+id/main_amount"
+            android:id="@+id/account_balance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/amount_margin_bottom"

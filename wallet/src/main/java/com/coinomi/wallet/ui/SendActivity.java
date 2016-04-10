@@ -10,8 +10,10 @@ import org.bitcoinj.core.Transaction;
 
 
 /**
+ * // TODO use WalletActivity to process URIs
  * @author John L. Jegutanis
  */
+@Deprecated
 public class SendActivity extends BaseWalletActivity implements SendFragment.Listener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -35,6 +37,12 @@ public class SendActivity extends BaseWalletActivity implements SendFragment.Lis
     @Override
     public void onTransactionBroadcastFailure(WalletAccount pocket, Transaction transaction) {
         Toast.makeText(this, getString(R.string.get_tx_broadcast_error), Toast.LENGTH_LONG).show();
+        finish();
+    }
+
+    @Override
+    public void showPayToDialog(String addressStr) {
+        Toast.makeText(this, getString(R.string.error_generic), Toast.LENGTH_LONG).show();
         finish();
     }
 }

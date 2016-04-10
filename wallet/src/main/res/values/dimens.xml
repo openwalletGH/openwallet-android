@@ -16,6 +16,9 @@
          http://www.google.com/design/spec/style/typography.html#typography-standard-styles -->
     <dimen name="caption">12sp</dimen>
 
+    <!-- Default elevation -->
+    <dimen name="active_elevation">8dp</dimen>
+
     <!-- Coin icons -->
     <dimen name="generic_icon_size">36dp</dimen>
     <dimen name="generic_medium_icon_size">48dp</dimen>

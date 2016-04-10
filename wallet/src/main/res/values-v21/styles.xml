@@ -3,7 +3,7 @@
     <style name="PagerTabStrip" parent="NormalText">
         <item name="android:background">@color/actionbar_bg</item>
         <item name="android:textColor">@color/actionbar_fg</item>
-        <item name="android:elevation">4dp</item>
+        <item name="android:elevation">@dimen/active_elevation</item>
     </style>
 
     <style name="TransactionRowDirectionFontIcon" parent="SecondaryText">

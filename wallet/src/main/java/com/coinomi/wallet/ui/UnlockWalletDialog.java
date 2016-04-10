@@ -1,5 +1,6 @@
 package com.coinomi.wallet.ui;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -14,8 +15,29 @@ import com.coinomi.wallet.R;
 /**
  * @author John L. Jegutanis
  */
-abstract public class UnlockWalletDialog extends DialogFragment {
+public class UnlockWalletDialog extends DialogFragment {
     private TextView passwordView;
+    private Listener listener;
+
+    public static DialogFragment getInstance() {
+        return new UnlockWalletDialog();
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            listener = (Listener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.getClass() + " must implement " + Listener.class);
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        listener = null;
+        super.onDetach();
+    }
 
     @NonNull
     @Override
@@ -36,8 +58,8 @@ abstract public class UnlockWalletDialog extends DialogFragment {
     DialogInterface.OnClickListener okListener = new DialogInterface.OnClickListener() {
         @Override
         public void onClick(DialogInterface dialog, int which) {
+            if (listener != null) listener.onPassword(passwordView.getText());
             dismissAllowingStateLoss();
-            onPassword(passwordView.getText());
         }
     };
 
@@ -45,10 +67,10 @@ abstract public class UnlockWalletDialog extends DialogFragment {
         @Override
         public void onClick(DialogInterface dialog, int which) {
             dismissAllowingStateLoss();
-            onCancel();
         }
     };
 
-    abstract public void onPassword(CharSequence password);
-    abstract public void onCancel();
+    public interface Listener {
+        void onPassword(CharSequence password);
+    }
 }

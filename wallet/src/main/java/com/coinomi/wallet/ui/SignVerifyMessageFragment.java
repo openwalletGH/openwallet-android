@@ -2,7 +2,6 @@ package com.coinomi.wallet.ui;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,6 +36,8 @@ import static com.coinomi.core.Preconditions.checkNotNull;
  */
 public class SignVerifyMessageFragment extends Fragment {
     private static final Logger log = LoggerFactory.getLogger(SignVerifyMessageFragment.class);
+
+    private static final String PASSWORD_DIALOG_TAG = "password_dialog_tag";
 
     private AutoCompleteTextView signingAddressView;
     private TextView addressError;
@@ -134,7 +135,7 @@ public class SignVerifyMessageFragment extends Fragment {
 
     private void signMessage() {
         if (pocket.isEncrypted()) {
-            signingPasswordDialog.show(getFragmentManager(), null);
+            showUnlockDialog();
         } else {
             maybeStartSigningTask();
         }
@@ -144,13 +145,10 @@ public class SignVerifyMessageFragment extends Fragment {
         maybeStartVerifyingTask();
     }
 
-    DialogFragment signingPasswordDialog = new UnlockWalletDialog() {
-        @Override
-        public void onPassword(CharSequence password) {
-            maybeStartSigningTask(password);
-        }
-        @Override public void onCancel() { }
-    };
+    private void showUnlockDialog() {
+        Dialogs.dismissAllowingStateLoss(getFragmentManager(), PASSWORD_DIALOG_TAG);
+        UnlockWalletDialog.getInstance().show(getFragmentManager(), PASSWORD_DIALOG_TAG);
+    }
 
     private void clearMessages() {
         addressError.setVisibility(View.GONE);
@@ -198,7 +196,7 @@ public class SignVerifyMessageFragment extends Fragment {
         maybeStartSigningTask(null);
     }
 
-    private void maybeStartSigningTask(@Nullable CharSequence password) {
+    public void maybeStartSigningTask(@Nullable CharSequence password) {
         maybeStartSigningVerifyingTask(true, password);
     }
 

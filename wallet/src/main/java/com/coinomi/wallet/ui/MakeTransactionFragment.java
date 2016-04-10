@@ -98,6 +98,9 @@ public class MakeTransactionFragment extends Fragment {
     private static final String WITHDRAW_ADDRESS = "withdraw_address";
     private static final String WITHDRAW_AMOUNT = "withdraw_amount";
 
+    private static final String PREPARE_TRANSACTION_BUSY_DIALOG_TAG = "prepare_transaction_busy_dialog_tag";
+    private static final String SIGNING_TRANSACTION_BUSY_DIALOG_TAG = "signing_transaction_busy_dialog_tag";
+
     private Handler handler = new MyHandler(this);
     @Nullable private String password;
     private Listener listener;
@@ -113,7 +116,6 @@ public class MakeTransactionFragment extends Fragment {
     boolean emptyWallet;
     private CoinType sourceType;
     private SendRequest request;
-    private LoaderManager loaderManager;
     @Nullable private AbstractWallet sourceAccount;
     @Nullable private ExchangeEntry exchangeEntry;
     @Nullable private AbstractAddress tradeDepositAddress;
@@ -144,6 +146,8 @@ public class MakeTransactionFragment extends Fragment {
     public void onCreate(Bundle savedState) {
         super.onCreate(savedState);
         signAndBroadcastTask = null;
+
+        setRetainInstance(true); // To handle async tasks
 
         Bundle args = getArguments();
         checkNotNull(args, "Must provide arguments");
@@ -202,14 +206,6 @@ public class MakeTransactionFragment extends Fragment {
         for (ExchangeRatesProvider.ExchangeRate rate : getRates(getActivity(), localSymbol).values()) {
             localRates.put(rate.currencyCodeId, rate.rate);
         }
-
-        loaderManager.initLoader(ID_RATE_LOADER, null, rateLoaderCallbacks);
-    }
-
-    @Override
-    public void onDestroy() {
-        loaderManager.destroyLoader(ID_RATE_LOADER);
-        super.onDestroy();
     }
 
     @Override
@@ -251,6 +247,12 @@ public class MakeTransactionFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ButterKnife.unbind(this);
+    }
+
     @OnClick(R.id.button_confirm)
     void onConfirmClick() {
         if (passwordView.isShown()) {
@@ -258,12 +260,6 @@ public class MakeTransactionFragment extends Fragment {
             password = passwordView.getText().toString();
         }
         maybeStartSignAndBroadcast();
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        ButterKnife.unbind(this);
     }
 
     private void showTransaction() {
@@ -294,6 +290,8 @@ public class MakeTransactionFragment extends Fragment {
         if (createTransactionTask == null && !transactionBroadcast && error == null) {
             createTransactionTask = new CreateTransactionTask();
             createTransactionTask.execute();
+        } else if (createTransactionTask != null && createTransactionTask.getStatus() == AsyncTask.Status.FINISHED) {
+            Dialogs.dismissAllowingStateLoss(getFragmentManager(), PREPARE_TRANSACTION_BUSY_DIALOG_TAG);
         }
     }
 
@@ -327,6 +325,7 @@ public class MakeTransactionFragment extends Fragment {
             signAndBroadcastTask = new SignAndBroadcastTask();
             signAndBroadcastTask.execute();
         } else if (transactionBroadcast) {
+            Dialogs.dismissAllowingStateLoss(getFragmentManager(), SIGNING_TRANSACTION_BUSY_DIALOG_TAG);
             Toast.makeText(getActivity(), R.string.tx_already_broadcast, Toast.LENGTH_SHORT).show();
             if (listener != null) {
                 listener.onSignResult(error, exchangeEntry);
@@ -355,15 +354,21 @@ public class MakeTransactionFragment extends Fragment {
             contentResolver = context.getContentResolver();
             application = (WalletApplication) context.getApplicationContext();
             config = application.getConfiguration();
-            loaderManager = getLoaderManager();
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString() + " must implement " + Listener.class);
         }
     }
 
     @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        getLoaderManager().initLoader(ID_RATE_LOADER, null, rateLoaderCallbacks);
+    }
+
+    @Override
     public void onDetach() {
         super.onDetach();
+        getLoaderManager().destroyLoader(ID_RATE_LOADER);
         listener = null;
         onStopTradeCountDown();
     }
@@ -537,15 +542,13 @@ public class MakeTransactionFragment extends Fragment {
     }
 
     private class CreateTransactionTask extends AsyncTask<Void, Void, Void> {
-        private Dialogs.ProgressDialogFragment busyDialog;
-
         @Override
         protected void onPreExecute() {
             // Show dialog as we need to make network connections
             if (isExchangeNeeded()) {
-                busyDialog = Dialogs.ProgressDialogFragment.newInstance(
-                        getString(R.string.contacting_exchange));
-                busyDialog.show(getFragmentManager(), null);
+                Dialogs.ProgressDialogFragment.show(getFragmentManager(),
+                        getString(R.string.contacting_exchange),
+                        PREPARE_TRANSACTION_BUSY_DIALOG_TAG);
             }
         }
 
@@ -620,7 +623,8 @@ public class MakeTransactionFragment extends Fragment {
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            if (busyDialog != null) busyDialog.dismissAllowingStateLoss();
+            if (Dialogs.dismissAllowingStateLoss(getFragmentManager(), PREPARE_TRANSACTION_BUSY_DIALOG_TAG)) return;
+
             if (error != null && listener != null) {
                 listener.onSignResult(error, null);
             } else if (error == null) {
@@ -632,14 +636,11 @@ public class MakeTransactionFragment extends Fragment {
     }
 
     private class SignAndBroadcastTask extends AsyncTask<Void, Void, Exception> {
-        private Dialogs.ProgressDialogFragment busyDialog;
-
         @Override
         protected void onPreExecute() {
-            super.onPreExecute();
-            busyDialog = Dialogs.ProgressDialogFragment.newInstance(
-                    getResources().getString(R.string.preparing_transaction));
-            busyDialog.show(getFragmentManager(), null);
+            Dialogs.ProgressDialogFragment.show(getFragmentManager(),
+                    getString(R.string.preparing_transaction),
+                    SIGNING_TRANSACTION_BUSY_DIALOG_TAG);
         }
 
         @Override
@@ -688,7 +689,8 @@ public class MakeTransactionFragment extends Fragment {
         }
 
         protected void onPostExecute(final Exception e) {
-            busyDialog.dismissAllowingStateLoss();
+            if (Dialogs.dismissAllowingStateLoss(getFragmentManager(), SIGNING_TRANSACTION_BUSY_DIALOG_TAG)) return;
+
             if (e instanceof KeyCrypterException) {
                 DialogBuilder.warn(getActivity(), R.string.unlocking_wallet_error_title)
                         .setMessage(R.string.unlocking_wallet_error_detail)

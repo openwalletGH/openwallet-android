@@ -13,20 +13,30 @@ import javax.annotation.Nullable;
 /**
  * @author John L. Jegutanis
  */
-public abstract class AddCoinTask  extends AsyncTask<Void, Void, Void> {
+public final class AddCoinTask  extends AsyncTask<Void, Void, Void> {
+    private final Listener listener;
     protected final CoinType type;
     private final Wallet wallet;
     @Nullable private final CharSequence password;
     private WalletAccount newAccount;
     private Exception exception;
 
-    public AddCoinTask(CoinType type, Wallet wallet, @Nullable CharSequence password) {
+    public interface Listener {
+        void onAddCoinTaskStarted();
+        void onAddCoinTaskFinished(Exception error, WalletAccount newAccount);
+    }
+
+    public AddCoinTask(Listener listener, CoinType type, Wallet wallet, @Nullable CharSequence password) {
+        this.listener = listener;
         this.type = type;
         this.wallet = wallet;
         this.password = password;
     }
 
-    @Override abstract protected void onPreExecute();
+    @Override
+    protected void onPreExecute() {
+        listener.onAddCoinTaskStarted();
+    }
 
     @Override
     protected Void doInBackground(Void... params) {
@@ -47,8 +57,6 @@ public abstract class AddCoinTask  extends AsyncTask<Void, Void, Void> {
 
     @Override
     final protected void onPostExecute(Void aVoid) {
-        onPostExecute(exception, newAccount);
+        listener.onAddCoinTaskFinished(exception, newAccount);
     }
-
-    abstract protected void onPostExecute(Exception exception, WalletAccount newAccount);
 }
