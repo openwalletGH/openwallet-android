@@ -16,7 +16,7 @@ public class ClamsMain extends ClamsFamily {
         transactionVersion = 2;
         dumpedPrivateKeyHeader = 133;
 
-        name = "Clams (beta)";
+        name = "Clams";
         symbol = "CLAM";
         uriScheme = "clams";
         bip44Index = 23;

@@ -15,7 +15,7 @@ public class CanadaeCoinMain extends BitFamily {
         spendableCoinbaseDepth = 120; // COINBASE_MATURITY_NEW
         dumpedPrivateKeyHeader = 156;
 
-        name = "Canada eCoin (beta)";
+        name = "Canada eCoin";
         symbol = "CDN";
         uriScheme = "canadaecoin";
         bip44Index = 34;

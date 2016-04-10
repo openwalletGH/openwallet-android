@@ -12,7 +12,7 @@ public class GcrMain extends PeerFamily {
         spendableCoinbaseDepth = 30;
         dumpedPrivateKeyHeader = 154;
 
-        name = "GCRCoin (beta)";
+        name = "GCRCoin";
         symbol = "GCR";
         uriScheme = "gcr";
         bip44Index = 49;

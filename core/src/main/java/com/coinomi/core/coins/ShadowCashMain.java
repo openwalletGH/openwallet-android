@@ -15,7 +15,7 @@ public class ShadowCashMain extends PeerFamily {
         spendableCoinbaseDepth = 500;
         dumpedPrivateKeyHeader = 191;
 
-        name = "Shadow (beta)"; // TODO The original name is "ShadowCash"
+        name = "ShadowCash (beta)";
         symbol = "SDC";
         uriScheme = "shadowcash";
         bip44Index = 35;

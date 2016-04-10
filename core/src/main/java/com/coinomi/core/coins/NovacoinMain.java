@@ -15,7 +15,7 @@ public class NovacoinMain extends PeerFamily {
         spendableCoinbaseDepth = 520;
         dumpedPrivateKeyHeader = 136;
 
-        name = "Novacoin (beta)";
+        name = "Novacoin";
         symbol = "NVC";
         uriScheme = "novacoin";
         bip44Index = 50;
