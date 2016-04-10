@@ -51,9 +51,9 @@ dependencies {
 //    androidTestCompile 'org.robolectric:robolectric:2.3'
 //    androidTestCompile 'com.squareup:fest-android:1.0.+'
     compile project(':core')
-    compile 'com.android.support:gridlayout-v7:23.2.1'
-    compile 'com.android.support:support-v4:23.2.1'
-    compile 'com.android.support:appcompat-v7:23.2.1'
+    compile 'com.android.support:gridlayout-v7:23.3.0'
+    compile 'com.android.support:support-v4:23.3.0'
+    compile 'com.android.support:appcompat-v7:23.3.0'
 //    compile 'com.android.support:preference-v7:23.2.1'
     compile 'com.google.guava:guava:16.0.1'
     compile 'com.google.code.findbugs:jsr305:2.0.1'
