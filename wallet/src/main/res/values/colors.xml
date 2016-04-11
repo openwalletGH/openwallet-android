@@ -65,9 +65,9 @@
     <color name="scan_result_dots">#c099cc00</color>
 
     <color name="progress_bar_color_1">#7986CB</color>
-    <color name="progress_bar_color_2">#AED581</color>
-    <color name="progress_bar_color_3">#FFD54F</color>
-    <color name="progress_bar_color_4">#E57373</color>
+    <color name="progress_bar_color_2">#FFD54F</color>
+    <color name="progress_bar_color_3">#E57373</color>
+    <color name="progress_bar_color_4">#AED581</color>
 
     <!-- QR code -->
     <color name="qr_code_normal_bg">#00000000</color>
