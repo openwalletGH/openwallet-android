@@ -31,7 +31,7 @@ final public class SignedMessage {
     public SignedMessage(SignedMessage otherMessage, Status newStatus) {
         message = otherMessage.message;
         address = otherMessage.address;
-        signature = otherMessage.address;
+        signature = otherMessage.signature;
         status = newStatus;
     }
 

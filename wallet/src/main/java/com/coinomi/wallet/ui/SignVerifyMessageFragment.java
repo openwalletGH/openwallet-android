@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.wallet.AbstractAddress;
 import com.coinomi.core.wallet.SignedMessage;
 import com.coinomi.core.wallet.WalletAccount;
@@ -28,6 +29,7 @@ import javax.annotation.Nullable;
 
 import static android.view.View.OnClickListener;
 import static com.coinomi.core.Preconditions.checkNotNull;
+import static com.coinomi.core.Preconditions.checkState;
 
 /**
  * Fragment that prepares a transaction
@@ -47,7 +49,8 @@ public class SignVerifyMessageFragment extends Fragment {
     private Button signButton;
     private TextView signatureOK;
     private TextView signatureError;
-    private WalletAccount pocket;
+    private WalletAccount account;
+    private CoinType type;
     private WalletApplication application;
     private SignVerifyMessageTask signVerifyMessageTask;
 
@@ -79,9 +82,10 @@ public class SignVerifyMessageFragment extends Fragment {
         if (args != null) {
             if (args.containsKey(Constants.ARG_ACCOUNT_ID)) {
                 String accountId = args.getString(Constants.ARG_ACCOUNT_ID);
-                pocket = checkNotNull(application.getAccount(accountId));
+                account = checkNotNull(application.getAccount(accountId));
             }
-            checkNotNull(pocket, "No account selected");
+            checkNotNull(account, "No account selected");
+            type = account.getCoinType();
         } else {
             throw new RuntimeException("Must provide account ID");
         }
@@ -95,7 +99,7 @@ public class SignVerifyMessageFragment extends Fragment {
 
         signingAddressView = (AutoCompleteTextView) view.findViewById(R.id.signing_address);
         ArrayAdapter<AbstractAddress> adapter = new ArrayAdapter<>(getActivity(), R.layout.item_simple,
-                pocket.getActiveAddresses());
+                account.getActiveAddresses());
         signingAddressView.setAdapter(adapter);
 
         messageView = (EditText) view.findViewById(R.id.message);
@@ -134,7 +138,7 @@ public class SignVerifyMessageFragment extends Fragment {
     }
 
     private void signMessage() {
-        if (pocket.isEncrypted()) {
+        if (account.isEncrypted()) {
             showUnlockDialog();
         } else {
             maybeStartSigningTask();
@@ -168,6 +172,16 @@ public class SignVerifyMessageFragment extends Fragment {
                 signatureOK.setVisibility(View.VISIBLE);
                 signatureOK.setText(R.string.message_verified);
                 break;
+            default:
+                showSignVerifyError(signedMessage.getStatus());
+        }
+    }
+
+    private void showSignVerifyError(SignedMessage.Status status) {
+        checkState(status != SignedMessage.Status.SignedOK);
+        checkState(status != SignedMessage.Status.VerifiedOK);
+        clearMessages();
+        switch (status) {
             case AddressMalformed:
                 addressError.setVisibility(View.VISIBLE);
                 addressError.setText(R.string.address_error);
@@ -215,7 +229,7 @@ public class SignVerifyMessageFragment extends Fragment {
             } else {
                 signedMessage = new SignedMessage(address, message, signature);
             }
-            signVerifyMessageTask = new SignVerifyMessageTask(pocket, sign, password) {
+            signVerifyMessageTask = new SignVerifyMessageTask(account, sign, password) {
                 @Override
                 protected void onPostExecute(SignedMessage message) {
                     showSignVerifyStatus(message);

@@ -2,9 +2,7 @@ package com.coinomi.wallet.tasks;
 
 import android.os.AsyncTask;
 
-import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.wallet.SignedMessage;
-import com.coinomi.core.wallet.Wallet;
 import com.coinomi.core.wallet.WalletAccount;
 
 import org.acra.ACRA;
