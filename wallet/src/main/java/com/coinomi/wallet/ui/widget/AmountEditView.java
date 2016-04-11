@@ -150,7 +150,7 @@ public class AmountEditView extends LinearLayout {
         }
     }
 
-    @CheckForNull
+    @Nullable
     public Value getAmount() {
         final String str = amountText.getText().toString().trim();
         Value amount = null;

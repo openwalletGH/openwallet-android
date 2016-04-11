@@ -137,6 +137,13 @@ public class Configuration {
         return getFeeFromJson(getFeesJson(), type);
     }
 
+    public void resetFeeValue(CoinType type) {
+        JSONObject feesJson = getFeesJson();
+        feesJson.remove(type.getId());
+        prefs.edit().putString(PREFS_KEY_FEES, feesJson.toString()).apply();
+
+    }
+
     public void setFeeValue(final Value feeValue) {
         JSONObject feesJson = getFeesJson();
         try {

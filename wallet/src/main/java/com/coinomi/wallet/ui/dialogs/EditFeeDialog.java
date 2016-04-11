@@ -84,19 +84,19 @@ public class EditFeeDialog extends DialogFragment {
         DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Value newFee = null;
                 switch (which) {
                     case DialogInterface.BUTTON_POSITIVE:
-                        newFee = feeAmount.getAmount();
+                        Value newFee = feeAmount.getAmount();
+                        if (newFee != null && !newFee.equals(fee)) {
+                            configuration.setFeeValue(newFee);
+                        }
                         break;
                     case DialogInterface.BUTTON_NEUTRAL:
-                        newFee = type.getDefaultFeeValue();
+                        configuration.resetFeeValue(type);
                         break;
                 }
 
-                if (newFee != null && !newFee.equals(fee)) {
-                    configuration.setFeeValue(newFee);
-                }
+
             }
         };
         builder.setNegativeButton(R.string.button_cancel, onClickListener);
