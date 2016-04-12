@@ -233,7 +233,7 @@ public class UiUtils {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             mode.getMenuInflater().inflate(R.menu.account_options, menu);
-            mode.setTitle(account.getDescription());
+            mode.setTitle(account.getDescriptionOrCoinName());
             return true;
         }
 
@@ -256,7 +256,7 @@ public class UiUtils {
                 case R.id.action_delete:
                     new AlertDialog.Builder(activity)
                             .setTitle(activity.getString(R.string.edit_account_delete_title,
-                                    account.getDescription()))
+                                    account.getDescriptionOrCoinName()))
                             .setMessage(R.string.edit_account_delete_description)
                             .setNegativeButton(R.string.button_cancel, null)
                             .setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {

@@ -8,6 +8,8 @@ import org.bitcoinj.utils.Threading;
 
 import java.util.concurrent.locks.ReentrantLock;
 
+import javax.annotation.Nullable;
+
 /**
  * @author John L. Jegutanis
  */
@@ -49,8 +51,17 @@ public abstract class AbstractWallet<T extends AbstractTransaction, A extends Ab
      * Get the description of the wallet. See {@link WalletPocketHD#setDescription(String))}
      */
     @Override
+    @Nullable
     public String getDescription() {
-        if (description == null || description.trim().equals("")) {
+        return description;
+    }
+
+    /**
+     * Get the description or the coin type of the wallet.
+     */
+    @Override
+    public String getDescriptionOrCoinName() {
+        if (description == null || description.trim().isEmpty()) {
             return type.getName();
         } else {
             return description;

@@ -52,12 +52,9 @@ import static com.coinomi.core.Preconditions.checkState;
 
 /**
  * @author Andreas Schildbach
+ * @author John L. Jegutanis
  */
 public class WalletUtils {
-    public static String getDescriptionOrCoinName(WalletAccount account) {
-        return account.getDescription() != null ? account.getDescription() : account.getCoinType().getName();
-    }
-
     public static int getIconRes(CoinType type) {
         return Constants.COINS_ICONS.get(type);
     }

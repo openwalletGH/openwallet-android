@@ -40,7 +40,7 @@ public class CoinListItem extends LinearLayout implements Checkable {
 
     public void setAccount(WalletAccount account) {
         this.type = account.getCoinType();
-        title.setText(WalletUtils.getDescriptionOrCoinName(account));
+        title.setText(account.getDescriptionOrCoinName());
         icon.setImageResource(WalletUtils.getIconRes(account));
     }
 

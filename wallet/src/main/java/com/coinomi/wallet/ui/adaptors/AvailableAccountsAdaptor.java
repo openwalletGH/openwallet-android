@@ -33,7 +33,7 @@ public class AvailableAccountsAdaptor extends BaseAdapter {
 
         public Entry(WalletAccount account) {
             iconRes = WalletUtils.getIconRes(account);
-            title = WalletUtils.getDescriptionOrCoinName(account);
+            title = account.getDescriptionOrCoinName();
             accountOrCoinType = account;
         }
 

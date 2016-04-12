@@ -102,7 +102,7 @@ public class AccountListAdapter extends BaseAdapter {
         icon.setImageResource(Constants.COINS_ICONS.get(account.getCoinType()));
 
         final TextView rowLabel = (TextView) row.findViewById(R.id.account_description);
-        rowLabel.setText(account.getDescription());
+        rowLabel.setText(account.getDescriptionOrCoinName());
 
         final Amount rowValue = (Amount) row.findViewById(R.id.account_balance);
         rowValue.setAmount(GenericUtils.formatFiatValue(account.getBalance(), 4, 0));

@@ -36,6 +36,7 @@ public interface WalletAccount<T extends AbstractTransaction, A extends Abstract
     }
 
     String getId();
+    String getDescriptionOrCoinName();
     String getDescription();
     void setDescription(String description);
     byte[] getPublicKey();

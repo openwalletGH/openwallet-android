@@ -64,6 +64,7 @@ public final class EditAccountFragment extends DialogFragment {
         final View view = inflater.inflate(R.layout.edit_account_dialog, null);
         final EditText descriptionView = ButterKnife.findById(view, R.id.edit_account_description);
         descriptionView.setText(account.getDescription());
+        descriptionView.setHint(account.getCoinType().getName());
 
         dialog.setTitle(R.string.edit_account_title);
         dialog.setView(view);

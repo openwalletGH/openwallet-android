@@ -455,7 +455,7 @@ public class WalletPocketHDTest {
         checkUnspentOutputs(expectedUtxoSet, newPocket);
 
         assertEquals(pocket.getCoinType(), newPocket.getCoinType());
-        assertEquals(pocket.getDescription(), newPocket.getDescription());
+        assertEquals(pocket.getDescriptionOrCoinName(), newPocket.getDescriptionOrCoinName());
         assertEquals(pocket.keys.toProtobuf().toString(), newPocket.keys.toProtobuf().toString());
         assertEquals(pocket.getLastBlockSeenHash(), newPocket.getLastBlockSeenHash());
         assertEquals(pocket.getLastBlockSeenHeight(), newPocket.getLastBlockSeenHeight());

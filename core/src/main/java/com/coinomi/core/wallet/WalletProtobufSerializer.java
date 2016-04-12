@@ -175,12 +175,10 @@ public class WalletProtobufSerializer {
      * @throws UnreadableWalletException thrown in various error conditions (see description).
      */
     public static Wallet readWallet(Protos.Wallet walletProto) throws UnreadableWalletException {
-        if (walletProto.getVersion() > 2)
+        if (walletProto.getVersion() > 3)
             throw new UnreadableWalletException.FutureVersion();
 
-        if (walletProto.getVersion() < 2) {
-            walletProto = updateV1toV2Proto(walletProto);
-        }
+        walletProto = applyProtoUpdates(walletProto);
 
         // Check if wallet is encrypted
         final KeyCrypter crypter = getKeyCrypter(walletProto);
@@ -227,11 +225,30 @@ public class WalletProtobufSerializer {
             wallet.addAccount(pocket);
         }
 
+        applyWalletUpdates(wallet);
+
+        return wallet;
+    }
+
+    private static Protos.Wallet applyProtoUpdates(Protos.Wallet walletProto) {
+        if (walletProto.getVersion() < 2) {
+            walletProto = updateV1toV2Proto(walletProto);
+        }
+
+        if (walletProto.getVersion() < 3) {
+            walletProto = updateV2toV3Proto(walletProto);
+        }
+        return walletProto;
+    }
+
+    private static void applyWalletUpdates(Wallet wallet) {
         if (wallet.getVersion() < 2) {
             updateV1toV2(wallet);
         }
 
-        return wallet;
+        if (wallet.getVersion() < 3) {
+            updateV2toV3(wallet);
+        }
     }
 
     private static CoinType getType(Protos.WalletPocket proto) throws UnreadableWalletException {
@@ -281,6 +298,23 @@ public class WalletProtobufSerializer {
      */
     public static Protos.Wallet parseToProto(InputStream input) throws IOException {
         return Protos.Wallet.parseFrom(input);
+    }
+
+
+    private static Protos.Wallet updateV2toV3Proto(Protos.Wallet walletProto) {
+        checkState(walletProto.getVersion() < 3, "Can update only from version < 3");
+        Protos.Wallet.Builder b = walletProto.toBuilder();
+        for (int i = 0; i < b.getPocketsCount(); i++) {
+            Protos.WalletPocket.Builder account = b.getPocketsBuilder(i);
+            // pre v2 wallets were saving the coin name in the description
+            account.clearDescription();
+        }
+        return b.build();
+    }
+
+    private static void updateV2toV3(Wallet wallet) {
+        checkState(wallet.getVersion() < 3, "Can update only from version < 3");
+        wallet.setVersion(3);
     }
 
     private static Protos.Wallet updateV1toV2Proto(Protos.Wallet walletProto) {
