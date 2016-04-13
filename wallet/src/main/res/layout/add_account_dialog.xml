@@ -8,46 +8,45 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="@dimen/dialog_margin"
         android:paddingBottom="@dimen/dialog_margin"
         android:paddingLeft="@dimen/dialog_margin"
         android:paddingRight="@dimen/dialog_margin"
         android:orientation="vertical" >
 
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="@style/NormalText"
-            android:text="@string/edit_address_book_entry_dialog_address_label" />
+            style="@style/SecondaryText"
+            android:text="@string/edit_account_description_label" />
 
         <EditText
-            android:id="@+id/edit_address_book_entry_address"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/NormalText"
-            android:enabled="false"
-            android:focusable="false"
-            android:imeOptions="flagNoExtractUi"
-            android:inputType="none"
-            android:textColor="@color/fg_less_significant" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/NormalText"
-            android:layout_marginTop="@dimen/activity_vertical_margin"
-            android:text="@string/edit_address_book_entry_dialog_label_label" />
-
-        <EditText
-            android:id="@+id/edit_address_book_entry_label"
+            android:id="@+id/edit_account_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/NormalText"
             android:imeOptions="flagNoExtractUi"
             android:inputType="text"
+            android:singleLine="true" />
+
+        <TextView
+            android:id="@+id/password_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            style="@style/SecondaryText"
+            android:text="@string/enter_password" />
+
+        <EditText
+            android:id="@+id/password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/NormalText"
+            android:imeOptions="flagNoExtractUi"
+            android:inputType="textPassword"
             android:singleLine="true" >
 
             <requestFocus />
+
         </EditText>
     </LinearLayout>
 </ScrollView>

@@ -31,6 +31,10 @@
     <dimen name="generic_circle_bg_size">22dp</dimen>
     <dimen name="generic_circle_text_size">14sp</dimen>
 
+    <!-- Dialogs -->
+    <dimen name="dialog_margin">24dp</dimen>
+    <dimen name="dialog_title_margin_bottom">20dp</dimen>
+
     <!-- Amount Widget -->
     <dimen name="amount_margin_top">16dp</dimen>
     <dimen name="amount_margin_bottom">4dp</dimen>

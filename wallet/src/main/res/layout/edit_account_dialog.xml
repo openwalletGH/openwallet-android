@@ -8,26 +8,23 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+
+        android:paddingBottom="@dimen/dialog_margin"
+        android:paddingLeft="@dimen/dialog_margin"
+        android:paddingRight="@dimen/dialog_margin"
         android:orientation="vertical" >
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            style="@style/NormalText"
-            android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin"
-            android:layout_marginTop="8dp"
-            android:text="@string/edit_account_description" />
+            style="@style/SecondaryText"
+            android:text="@string/edit_account_description_label" />
 
         <EditText
             android:id="@+id/edit_account_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/NormalText"
-            android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin"
-            android:layout_marginBottom="8dp"
-            android:layout_marginTop="8dp"
             android:imeOptions="flagNoExtractUi"
             android:inputType="text"
             android:singleLine="true" >

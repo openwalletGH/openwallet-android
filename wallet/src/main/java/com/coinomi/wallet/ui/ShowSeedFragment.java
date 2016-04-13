@@ -142,22 +142,22 @@ public class ShowSeedFragment extends Fragment {
     }
 
     private void updateView() {
-        if (wallet != null) {
+        if (seedInfo != null) {
+            seedLayout.setVisibility(View.VISIBLE);
+            seedEncryptedLayout.setVisibility(View.GONE);
+            seedView.setText(seedInfo.seedString);
+            QrUtils.setQr(qrView, getResources(), seedInfo.seedString);
+            if (seedInfo.isSeedPasswordProtected) {
+                seedPasswordProtectedView.setVisibility(View.VISIBLE);
+            } else {
+                seedPasswordProtectedView.setVisibility(View.GONE);
+            }
+        } else if (wallet != null) {
             if (wallet.getSeed() == null) {
                 if (listener != null) listener.onSeedNotAvailable();
             } else if (wallet.getSeed().isEncrypted()) {
                 seedEncryptedLayout.setVisibility(View.VISIBLE);
-                if (seedInfo != null) {
-                    seedLayout.setVisibility(View.VISIBLE);
-                    seedEncryptedLayout.setVisibility(View.GONE);
-                    seedView.setText(seedInfo.seedString);
-                    QrUtils.setQr(qrView, getResources(), seedInfo.seedString);
-                    if (seedInfo.isSeedPasswordProtected) {
-                        seedPasswordProtectedView.setVisibility(View.VISIBLE);
-                    } else {
-                        seedPasswordProtectedView.setVisibility(View.GONE);
-                    }
-                } else if (password == null) {
+                if (password == null) {
                     showUnlockDialog();
                 } else {
                     maybeStartDecryptTask();

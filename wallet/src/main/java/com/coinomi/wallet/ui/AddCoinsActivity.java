@@ -64,32 +64,19 @@ public class AddCoinsActivity extends BaseWalletActivity
             return;
         }
 
-        if (wallet.isEncrypted()) {
-            showAddCoinDialog();
-        } else {
-            new AlertDialog.Builder(this)
-                    .setTitle(getString(R.string.adding_coin_confirmation_title, selectedCoin.getName()))
-                    .setPositiveButton(R.string.button_add, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            addCoin(null);
-                        }
-                    })
-                    .setNegativeButton(R.string.button_cancel, null)
-                    .create().show();
-        }
+        showAddCoinDialog();
     }
 
     private void showAddCoinDialog() {
         Dialogs.dismissAllowingStateLoss(getFM(), ADD_COIN_DIALOG_TAG);
-        ConfirmAddCoinUnlockWalletDialog.getInstance(selectedCoin.getName())
+        ConfirmAddCoinUnlockWalletDialog.getInstance(selectedCoin.getName(), wallet.isEncrypted())
                 .show(getFM(), ADD_COIN_DIALOG_TAG);
     }
 
     @Override
-    public void addCoin(@Nullable CharSequence password) {
+    public void addCoin(String description, CharSequence password) {
         if (selectedCoin != null && addCoinTask == null) {
-            addCoinTask = new AddCoinTask(this, selectedCoin, wallet, password);
+            addCoinTask = new AddCoinTask(this, selectedCoin, wallet, description, password);
             addCoinTask.execute();
         }
     }

@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:paddingBottom="8dp"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="16dp" >
+    android:paddingBottom="@dimen/dialog_title_margin_bottom"
+    android:paddingLeft="@dimen/dialog_margin"
+    android:paddingRight="@dimen/dialog_margin"
+    android:paddingTop="@dimen/dialog_margin" >
 
     <ImageView
         android:id="@android:id/icon"
@@ -24,6 +25,7 @@
         android:layout_gravity="bottom"
         android:layout_marginBottom="1dp"
         android:layout_weight="1"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        tools:text="Dialog title"/>
 
 </LinearLayout>

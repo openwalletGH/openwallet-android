@@ -8,17 +8,18 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="@dimen/activity_vertical_margin"
-        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingTop="@dimen/dialog_margin"
+        android:paddingBottom="@dimen/dialog_margin"
+        android:paddingLeft="@dimen/dialog_margin"
+        android:paddingRight="@dimen/dialog_margin"
         android:orientation="vertical" >
 
         <TextView
             android:id="@+id/pay_with_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            style="@style/NormalBoldText"
-            android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:layout_marginBottom="@dimen/dialog_title_margin_bottom"
+            style="@style/NormalText"
             android:text="@string/pay_with" />
 
         <LinearLayout
@@ -32,9 +33,8 @@
             android:id="@+id/exchange_and_pay_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            style="@style/NormalBoldText"
-            android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:layout_marginBottom="@dimen/dialog_title_margin_bottom"
+            style="@style/NormalText"
             android:text="@string/exchange_and_pay_title" />
 
         <LinearLayout
@@ -47,8 +47,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:layout_marginEnd="@dimen/activity_horizontal_margin"
-            android:layout_marginRight="@dimen/activity_horizontal_margin"
             layout="@layout/powered_by_shapeshift"/>
     </LinearLayout>
 </ScrollView>

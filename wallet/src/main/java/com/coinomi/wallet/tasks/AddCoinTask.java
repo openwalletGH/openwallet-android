@@ -17,6 +17,8 @@ public final class AddCoinTask  extends AsyncTask<Void, Void, Void> {
     private final Listener listener;
     protected final CoinType type;
     private final Wallet wallet;
+    @Nullable
+    private final String description;
     @Nullable private final CharSequence password;
     private WalletAccount newAccount;
     private Exception exception;
@@ -26,11 +28,21 @@ public final class AddCoinTask  extends AsyncTask<Void, Void, Void> {
         void onAddCoinTaskFinished(Exception error, WalletAccount newAccount);
     }
 
+    public AddCoinTask(Listener listener, CoinType type, Wallet wallet, @Nullable String description, @Nullable CharSequence password) {
+        this.listener = listener;
+        this.type = type;
+        this.wallet = wallet;
+        this.description = description;
+        this.password = password;
+    }
+
+    @Deprecated
     public AddCoinTask(Listener listener, CoinType type, Wallet wallet, @Nullable CharSequence password) {
         this.listener = listener;
         this.type = type;
         this.wallet = wallet;
         this.password = password;
+        description = null;
     }
 
     @Override
@@ -47,6 +59,9 @@ public final class AddCoinTask  extends AsyncTask<Void, Void, Void> {
                 key = wallet.getKeyCrypter().deriveKey(password);
             }
             newAccount = wallet.createAccount(type, true, key);
+            if (description != null && !description.trim().isEmpty()) {
+                newAccount.setDescription(description);
+            }
             wallet.saveNow();
         } catch (Exception e) {
             exception = e;

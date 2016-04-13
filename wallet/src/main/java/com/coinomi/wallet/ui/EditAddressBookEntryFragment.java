@@ -110,8 +110,6 @@ public final class EditAddressBookEntryFragment extends DialogFragment {
 
         final DialogBuilder dialog = new DialogBuilder(context);
 
-        dialog.setTitle(isAdd ? R.string.edit_address_book_entry_dialog_title_add : R.string.edit_address_book_entry_dialog_title_edit);
-
         final View view = inflater.inflate(R.layout.edit_address_book_entry_dialog, null);
 
         final TextView viewAddress = (TextView) view.findViewById(R.id.edit_address_book_entry_address);
@@ -147,7 +145,7 @@ public final class EditAddressBookEntryFragment extends DialogFragment {
             }
         };
 
-        dialog.setPositiveButton(isAdd ? R.string.button_add : R.string.button_save, onClickListener);
+        dialog.setPositiveButton(R.string.button_save, onClickListener);
         if (!isAdd)
             dialog.setNeutralButton(R.string.button_delete, onClickListener);
         dialog.setNegativeButton(R.string.button_cancel, onClickListener);
