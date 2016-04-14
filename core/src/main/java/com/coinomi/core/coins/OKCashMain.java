@@ -14,7 +14,7 @@ public class OKCashMain extends PeerFamily {
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 500;
 
-        name = "OKCash";
+        name = "OKCash (beta)";
         symbol = "OK";
         uriScheme = "okcash";
         bip44Index = 69;

@@ -15,7 +15,7 @@ public class VergeMain extends PeerFamily {
         spendableCoinbaseDepth = 100;
         dumpedPrivateKeyHeader = 158;
 
-        name = "Verge";
+        name = "Verge (beta)";
         symbol = "XVG";
         uriScheme = "verge";
         bip44Index = 77;

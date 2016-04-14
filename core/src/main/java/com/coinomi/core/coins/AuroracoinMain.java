@@ -15,7 +15,7 @@ public class AuroracoinMain extends BitFamily {
         spendableCoinbaseDepth = 80;
         //dumpedPrivateKeyHeader = 176; // FIXME: do we need this?
 
-        name = "Auroracoin";
+        name = "Auroracoin (beta)";
         symbol = "AUR";
         uriScheme = "auroracoin";
         bip44Index = 85;

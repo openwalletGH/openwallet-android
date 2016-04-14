@@ -12,7 +12,7 @@ public class EguldenMain extends BitFamily {
         spendableCoinbaseDepth = 100;
         dumpedPrivateKeyHeader = 176;
 
-        name = "e-Gulden";
+        name = "e-Gulden (beta)";
         symbol = "EFL";
         uriScheme = "egulden";
         bip44Index = 2;

@@ -15,7 +15,7 @@ public class GuldenMain extends BitFamily {
         spendableCoinbaseDepth = 100;
         dumpedPrivateKeyHeader = 166;
 
-        name = "Gulden";
+        name = "Gulden (beta)";
         symbol = "NLG";
         uriScheme = "gulden";
         bip44Index = 87;

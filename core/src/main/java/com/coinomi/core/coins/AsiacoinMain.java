@@ -12,7 +12,7 @@ public class AsiacoinMain extends PeerFamily {
         acceptableAddressCodes = new int[] { addressHeader, p2shHeader };
         spendableCoinbaseDepth = 520;
 
-        name = "Asiacoin";
+        name = "Asiacoin (beta)";
         symbol = "AC";
         uriScheme = "asiacoin";
         bip44Index = 51;

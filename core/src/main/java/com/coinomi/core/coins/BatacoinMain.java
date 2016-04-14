@@ -7,7 +7,7 @@ import com.coinomi.core.coins.families.BitFamily;
  */
 public class BatacoinMain extends BitFamily {
     private BatacoinMain() {
-        id = "batacoin.main";
+        id = "bata.main";
 
         addressHeader = 25;
         p2shHeader = 5;
@@ -15,10 +15,10 @@ public class BatacoinMain extends BitFamily {
         spendableCoinbaseDepth = 100;
         dumpedPrivateKeyHeader = 153;
 
-        name = "Batacoin";
+        name = "Bata (beta)";
         symbol = "BTA";
-        uriScheme = "batacoin";
-        bip44Index = 92;
+        uriScheme = "bata";
+        bip44Index = 89;
         unitExponent = 8;
         feeValue = value(1000);
         minNonDust = value(1000); // 0.00001 LTC mininput
