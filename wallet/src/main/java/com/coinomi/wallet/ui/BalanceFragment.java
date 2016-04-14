@@ -492,8 +492,7 @@ public class BalanceFragment extends WalletFragment implements LoaderCallbacks<L
         }
 
         @Override
-        public void onLoaderReset(final Loader<Cursor> loader) {
-        }
+        public void onLoaderReset(final Loader<Cursor> loader) { }
     };
 
     @Override

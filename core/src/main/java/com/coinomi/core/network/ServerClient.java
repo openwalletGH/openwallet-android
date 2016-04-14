@@ -66,6 +66,7 @@ public class ServerClient implements BitBlockchainConnection {
     private static final Random RANDOM = new Random();
 
     private static final long MAX_WAIT = 16;
+    private static final long CONNECTION_STABILIZATION = 30;
     private final ConnectivityHelper connectivityHelper;
 
     private CoinType type;
@@ -74,6 +75,7 @@ public class ServerClient implements BitBlockchainConnection {
     private ServerAddress lastServerAddress;
     private StratumClient stratumClient;
     private long retrySeconds = 0;
+    private long reconnectAt = 0;
     private boolean stopped = false;
 
     private File cacheDir;
@@ -82,24 +84,39 @@ public class ServerClient implements BitBlockchainConnection {
     // TODO, only one is supported at the moment. Change when accounts are supported.
     private transient CopyOnWriteArrayList<ListenerRegistration<ConnectionEventListener>> eventListeners;
 
+    private void reschedule(Runnable r, long delay, TimeUnit unit) {
+        connectionExec.remove(r);
+        connectionExec.schedule(r, delay, unit);
+    }
+
     private Runnable reconnectTask = new Runnable() {
-        public boolean isPolling = false;
         @Override
         public void run() {
             if (!stopped) {
-                if (connectivityHelper.isConnected()) {
-                    createStratumClient().startAsync();
-                    isPolling = false;
+                long reconnectIn = Math.max(reconnectAt - System.currentTimeMillis(), 0);
+                // Check if we must reconnect in the next second
+                if (reconnectIn < 1000) {
+                    if (connectivityHelper.isConnected()) {
+                        createStratumClient().startAsync();
+                    } else {
+                        // Start polling for connection to become available
+                        reschedule(reconnectTask, 1, TimeUnit.SECONDS);
+                    }
                 } else {
-                    // Start polling for connection to become available
-                    if (!isPolling) log.info("No connectivity, starting polling.");
-                    connectionExec.remove(reconnectTask);
-                    connectionExec.schedule(reconnectTask, 1, TimeUnit.SECONDS);
-                    isPolling = true;
+                    reschedule(reconnectTask, reconnectIn, TimeUnit.MILLISECONDS);
                 }
             } else {
                 log.info("{} client stopped, aborting reconnect.", type.getName());
-                isPolling = false;
+            }
+        }
+    };
+
+    private Runnable connectionCheckTask = new Runnable() {
+        @Override
+        public void run() {
+            if (isActivelyConnected()) {
+                reconnectAt = 0;
+                retrySeconds = 0;
             }
         }
     };
@@ -111,7 +128,9 @@ public class ServerClient implements BitBlockchainConnection {
             if (isActivelyConnected()) {
                 log.info("{} client connected to {}", type.getName(), lastServerAddress);
                 broadcastOnConnection();
-                retrySeconds = 0;
+
+                // Test that the connection is stable
+                reschedule(connectionCheckTask, CONNECTION_STABILIZATION, TimeUnit.SECONDS);
             }
         }
 
@@ -125,8 +144,10 @@ public class ServerClient implements BitBlockchainConnection {
             // Try to restart
             if (!stopped) {
                 log.info("Reconnecting {} in {} seconds", type.getName(), retrySeconds);
+                connectionExec.remove(connectionCheckTask);
                 connectionExec.remove(reconnectTask);
                 if (retrySeconds > 0) {
+                    reconnectAt = System.currentTimeMillis() + retrySeconds * 1000;
                     connectionExec.schedule(reconnectTask, retrySeconds, TimeUnit.SECONDS);
                 } else {
                     connectionExec.execute(reconnectTask);
@@ -154,11 +175,11 @@ public class ServerClient implements BitBlockchainConnection {
     }
 
     private ServerAddress getServerAddress() {
-        // If we blacklisted all servers, reset and increase back-off time
+        // If we blacklisted all servers, reset
         if (failedAddresses.size() == addresses.size()) {
             failedAddresses.clear();
-            retrySeconds = Math.min(Math.max(1, retrySeconds * 2), MAX_WAIT);
         }
+        retrySeconds = Math.min(Math.max(1, retrySeconds * 2), MAX_WAIT);
 
         ServerAddress address;
         // Not the most efficient, but does the job

@@ -1261,7 +1261,6 @@ abstract public class TransactionWatcherWallet extends AbstractWallet<BitTransac
         fetchingTransactions.clear();
         outOfOrderTransactions.clear();
         lastBalance = type.value(0);
-        lastConnectivity = WalletConnectivityStatus.DISCONNECTED;
     }
 
     /**
