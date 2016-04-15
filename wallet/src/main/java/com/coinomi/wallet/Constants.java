@@ -12,6 +12,7 @@ import com.coinomi.core.coins.BurstMain;
 import com.coinomi.core.coins.CanadaeCoinMain;
 import com.coinomi.core.coins.CannacoinMain;
 import com.coinomi.core.coins.ClamsMain;
+import com.coinomi.core.coins.ClubcoinMain;
 import com.coinomi.core.coins.CoinID;
 import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.DashMain;
@@ -204,7 +205,9 @@ public class Constants {
             new CoinAddress(OKCashMain.get(),       new ServerAddress("ok-cce-1.coinomi.net", 5043),
                                                     new ServerAddress("ok-cce-2.coinomi.net", 5043)),
             new CoinAddress(AsiacoinMain.get(),     new ServerAddress("ac-cce-1.coinomi.net", 5044),
-                                                    new ServerAddress("ac-cce-2.coinomi.net", 5044))
+                                                    new ServerAddress("ac-cce-2.coinomi.net", 5044)),
+            new CoinAddress(ClubcoinMain.get(),     new ServerAddress("club-cce-1.coinomi.net", 5045),
+                                                    new ServerAddress("club-cce-2.coinomi.net", 5045))
     );
 
     public static final HashMap<CoinType, Integer> COINS_ICONS;
@@ -251,6 +254,7 @@ public class Constants {
         COINS_ICONS.put(CoinID.BATACOIN_MAIN.getCoinType(), R.drawable.batacoin);
         COINS_ICONS.put(CoinID.ASIACOIN_MAIN.getCoinType(), R.drawable.asiacoin);
         COINS_ICONS.put(CoinID.EGULDEN_MAIN.getCoinType(), R.drawable.egulden);
+        COINS_ICONS.put(CoinID.CLUBCOIN_MAIN.getCoinType(), R.drawable.clubcoin);
 
         COINS_BLOCK_EXPLORERS = new HashMap<CoinType, String>();
         COINS_BLOCK_EXPLORERS.put(CoinID.BITCOIN_MAIN.getCoinType(), "https://blockchain.info/tx/%s");
@@ -311,6 +315,7 @@ public class Constants {
             CanadaeCoinMain.get(),
             CannacoinMain.get(),
             ClamsMain.get(),
+            ClubcoinMain.get(),
             DashMain.get(),
             DigibyteMain.get(),
             DigitalcoinMain.get(),

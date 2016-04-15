@@ -61,6 +61,7 @@ public enum CoinID {
     BATACOIN_MAIN(BatacoinMain.get()),
     OKCASH_MAIN(OKCashMain.get()),
     EGULDEN_MAIN(EguldenMain.get()),
+    CLUBCOIN_MAIN(ClubcoinMain.get()),
     ;
 
     private static List<CoinType> types;
