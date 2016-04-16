@@ -166,7 +166,7 @@ public class UiUtils {
                     mode.finish();
                     return true;
                 case R.id.action_copy:
-                    UiUtils.copy(context, address.toString());
+                    UiUtils.copy(context, CoinURI.convertToCoinURI(address));
                     mode.finish();
                     return true;
             }

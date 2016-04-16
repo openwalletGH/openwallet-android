@@ -508,6 +508,17 @@ public class CoinURI implements Serializable {
      * Simple coin URI builder using known good fields.
      *
      * @param address The coin address
+     * @return A String containing the coin URI
+     */
+    public static String convertToCoinURI(AbstractAddress address) {
+        return convertToCoinURI(address, null, null, null, null);
+
+    }
+
+    /**
+     * Simple coin URI builder using known good fields.
+     *
+     * @param address The coin address
      * @param amount The amount
      * @param label A label
      * @param message A message

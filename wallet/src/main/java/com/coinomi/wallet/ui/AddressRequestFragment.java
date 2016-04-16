@@ -238,10 +238,10 @@ public class AddressRequestFragment extends WalletFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_share:
-                UiUtils.share(getActivity(), receiveAddress.toString());
+                UiUtils.share(getActivity(), getUri());
                 return true;
             case R.id.action_copy:
-                UiUtils.copy(getActivity(), receiveAddress.toString());
+                UiUtils.copy(getActivity(), getUri());
                 return true;
             case R.id.action_new_address:
                 showNewAddressDialog();
@@ -303,10 +303,10 @@ public class AddressRequestFragment extends WalletFragment {
 
         updateLabel();
 
-        updateQrCode(getQrContent());
+        updateQrCode(getUri());
     }
 
-    private String getQrContent() {
+    private String getUri() {
         if (type instanceof BitFamily) {
             return CoinURI.convertToCoinURI(receiveAddress, amount, label, message);
         } else if (type instanceof NxtFamily){
