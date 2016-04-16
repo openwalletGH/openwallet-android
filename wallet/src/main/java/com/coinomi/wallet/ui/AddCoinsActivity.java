@@ -20,7 +20,6 @@ import org.bitcoinj.crypto.KeyCrypterException;
 import java.util.ArrayList;
 
 import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 
 public class AddCoinsActivity extends BaseWalletActivity
         implements SelectCoinsFragment.Listener, AddCoinTask.Listener,
@@ -69,14 +68,14 @@ public class AddCoinsActivity extends BaseWalletActivity
 
     private void showAddCoinDialog() {
         Dialogs.dismissAllowingStateLoss(getFM(), ADD_COIN_DIALOG_TAG);
-        ConfirmAddCoinUnlockWalletDialog.getInstance(selectedCoin.getName(), wallet.isEncrypted())
+        ConfirmAddCoinUnlockWalletDialog.getInstance(selectedCoin, wallet.isEncrypted())
                 .show(getFM(), ADD_COIN_DIALOG_TAG);
     }
 
     @Override
-    public void addCoin(String description, CharSequence password) {
-        if (selectedCoin != null && addCoinTask == null) {
-            addCoinTask = new AddCoinTask(this, selectedCoin, wallet, description, password);
+    public void addCoin(CoinType type, String description, CharSequence password) {
+        if (type != null && addCoinTask == null) {
+            addCoinTask = new AddCoinTask(this, type, wallet, description, password);
             addCoinTask.execute();
         }
     }

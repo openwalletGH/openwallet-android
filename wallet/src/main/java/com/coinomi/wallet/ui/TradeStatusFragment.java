@@ -472,25 +472,26 @@ public class TradeStatusFragment extends Fragment {
         @Override public void onLoaderReset(final Loader<Cursor> loader) { }
     };
 
-    private DialogFragment emailReceiptDialog = new DialogFragment() {
-        @Override @NonNull
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            final LayoutInflater inflater = LayoutInflater.from(getActivity());
-            final View view = inflater.inflate(R.layout.email_receipt_dialog, null);
-            final TextView emailView = (TextView) view.findViewById(R.id.email);
-
-            return new DialogBuilder(getActivity())
-                    .setTitle(R.string.email_receipt_title)
-                    .setView(view)
-                    .setNegativeButton(R.string.button_cancel, null)
-                    .setPositiveButton(R.string.button_add, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            // TODO implement async task
-                            String email = emailView.getText().toString();
-//                            ShapeShiftEmail reply = application.getShapeShift().requestEmailReceipt(email, exchangeStatus.getShapeShiftTxStatus());
-                        }
-                    }).create();
-        }
-    };
+//    TODO implement
+//    private DialogFragment emailReceiptDialog = new DialogFragment() {
+//        @Override @NonNull
+//        public Dialog onCreateDialog(Bundle savedInstanceState) {
+//            final LayoutInflater inflater = LayoutInflater.from(getActivity());
+//            final View view = inflater.inflate(R.layout.email_receipt_dialog, null);
+//            final TextView emailView = (TextView) view.findViewById(R.id.email);
+//
+//            return new DialogBuilder(getActivity())
+//                    .setTitle(R.string.email_receipt_title)
+//                    .setView(view)
+//                    .setNegativeButton(R.string.button_cancel, null)
+//                    .setPositiveButton(R.string.button_add, new DialogInterface.OnClickListener() {
+//                        @Override
+//                        public void onClick(DialogInterface dialog, int which) {
+//                            // TODO implement async task
+//                            String email = emailView.getText().toString();
+////                            ShapeShiftEmail reply = application.getShapeShift().requestEmailReceipt(email, exchangeStatus.getShapeShiftTxStatus());
+//                        }
+//                    }).create();
+//        }
+//    };
 }

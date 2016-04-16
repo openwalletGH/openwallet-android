@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.coinomi.core.coins.CoinType;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.ui.DialogBuilder;
 
@@ -19,14 +20,14 @@ import butterknife.ButterKnife;
  * @author John L. Jegutanis
  */
 public class ConfirmAddCoinUnlockWalletDialog extends DialogFragment {
-    private static final String ADD_COIN_NAME = "add_coin_name";
+    private static final String ADD_COIN = "add_coin";
     private static final String ASK_PASSWORD = "ask_password";
     private Listener listener;
 
-    public static DialogFragment getInstance(String coinName, boolean askPassword) {
+    public static DialogFragment getInstance(CoinType type, boolean askPassword) {
         DialogFragment dialog = new ConfirmAddCoinUnlockWalletDialog();
         dialog.setArguments(new Bundle());
-        dialog.getArguments().putString(ADD_COIN_NAME, coinName);
+        dialog.getArguments().putSerializable(ADD_COIN, type);
         dialog.getArguments().putBoolean(ASK_PASSWORD, askPassword);
         return dialog;
     }
@@ -49,7 +50,7 @@ public class ConfirmAddCoinUnlockWalletDialog extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        final String coinName = getArguments().getString(ADD_COIN_NAME);
+        final CoinType type = (CoinType) getArguments().getSerializable(ADD_COIN);
         final boolean askPassword = getArguments().getBoolean(ASK_PASSWORD);
         final LayoutInflater inflater = LayoutInflater.from(getActivity());
         final View view = inflater.inflate(R.layout.add_account_dialog, null);
@@ -63,20 +64,20 @@ public class ConfirmAddCoinUnlockWalletDialog extends DialogFragment {
         }
 
         return new DialogBuilder(getActivity())
-                .setTitle(getString(R.string.adding_coin_confirmation_title, coinName))
+                .setTitle(getString(R.string.adding_coin_confirmation_title, type.getName()))
                 .setView(view)
                 .setNegativeButton(R.string.button_cancel, null)
                 .setPositiveButton(R.string.button_add, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (listener != null) {
-                            listener.addCoin(description.getText().toString(), password.getText());
+                            listener.addCoin(type, description.getText().toString(), password.getText());
                         }
                     }
                 }).create();
     }
 
     public interface Listener {
-        void addCoin(String description, CharSequence password);
+        void addCoin(CoinType type, String description, CharSequence password);
     }
 }

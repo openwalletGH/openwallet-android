@@ -36,15 +36,6 @@ public final class AddCoinTask  extends AsyncTask<Void, Void, Void> {
         this.password = password;
     }
 
-    @Deprecated
-    public AddCoinTask(Listener listener, CoinType type, Wallet wallet, @Nullable CharSequence password) {
-        this.listener = listener;
-        this.type = type;
-        this.wallet = wallet;
-        this.password = password;
-        description = null;
-    }
-
     @Override
     protected void onPreExecute() {
         listener.onAddCoinTaskStarted();

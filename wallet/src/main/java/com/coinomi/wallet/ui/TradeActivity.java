@@ -1,12 +1,16 @@
 package com.coinomi.wallet.ui;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 
+import com.coinomi.core.coins.CoinType;
 import com.coinomi.core.coins.Value;
 import com.coinomi.core.wallet.WalletAccount;
 import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.ExchangeHistoryProvider.ExchangeEntry;
 import com.coinomi.wallet.R;
+import com.coinomi.wallet.tasks.AddCoinTask;
+import com.coinomi.wallet.ui.dialogs.ConfirmAddCoinUnlockWalletDialog;
 
 import org.bitcoinj.crypto.KeyCrypterException;
 
@@ -14,7 +18,10 @@ import javax.annotation.Nullable;
 
 
 public class TradeActivity extends BaseWalletActivity implements
-        TradeSelectFragment.Listener, MakeTransactionFragment.Listener, TradeStatusFragment.Listener {
+        TradeSelectFragment.Listener, MakeTransactionFragment.Listener, TradeStatusFragment.Listener,
+        ConfirmAddCoinUnlockWalletDialog.Listener {
+
+    private static final String TRADE_SELECT_FRAGMENT_TAG = "trade_select_fragment_tag";
 
     private int containerRes;
 
@@ -27,7 +34,7 @@ public class TradeActivity extends BaseWalletActivity implements
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .add(containerRes, new TradeSelectFragment())
+                    .add(containerRes, new TradeSelectFragment(), TRADE_SELECT_FRAGMENT_TAG)
                     .commit();
         }
     }
@@ -75,5 +82,13 @@ public class TradeActivity extends BaseWalletActivity implements
     @Override
     public void onFinish() {
         finish();
+    }
+
+    @Override
+    public void addCoin(CoinType type, String description, CharSequence password) {
+        Fragment f = getFM().findFragmentByTag(TRADE_SELECT_FRAGMENT_TAG);
+        if (f != null && f.isVisible() && f instanceof TradeSelectFragment) {
+            ((TradeSelectFragment) f).maybeStartAddCoinAndProceedTask(description, password);
+        }
     }
 }

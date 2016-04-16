@@ -1,7 +1,6 @@
 package com.coinomi.wallet.ui;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -9,8 +8,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -25,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.coinomi.core.coins.CoinType;
+import com.coinomi.core.coins.PeercoinMain;
 import com.coinomi.core.coins.Value;
 import com.coinomi.core.exchange.shapeshift.ShapeShift;
 import com.coinomi.core.exchange.shapeshift.data.ShapeShiftCoins;
@@ -39,6 +37,7 @@ import com.coinomi.wallet.tasks.AddCoinTask;
 import com.coinomi.wallet.tasks.ExchangeCheckSupportedCoinsTask;
 import com.coinomi.wallet.tasks.MarketInfoPollTask;
 import com.coinomi.wallet.ui.adaptors.AvailableAccountsAdaptor;
+import com.coinomi.wallet.ui.dialogs.ConfirmAddCoinUnlockWalletDialog;
 import com.coinomi.wallet.ui.widget.AmountEditView;
 import com.coinomi.wallet.util.Keyboard;
 import com.coinomi.wallet.util.ThrottlingWalletChangeListener;
@@ -75,6 +74,7 @@ public class TradeSelectFragment extends Fragment implements ExchangeCheckSuppor
 
     private static final String INITIAL_TASK_BUSY_DIALOG_TAG = "initial_task_busy_dialog_tag";
     private static final String ADD_COIN_TASK_BUSY_DIALOG_TAG = "add_coin_task_busy_dialog_tag";
+    private static final String ADD_COIN_DIALOG_TAG = "add_coin_dialog_tag";
 
     // UI & misc
     private WalletApplication application;
@@ -332,15 +332,16 @@ public class TradeSelectFragment extends Fragment implements ExchangeCheckSuppor
             return;
         }
 
-        createToAccountAndProceedDialog.show(getFragmentManager(), null);
+        ConfirmAddCoinUnlockWalletDialog.getInstance(destinationType, wallet.isEncrypted())
+                .show(getFragmentManager(), ADD_COIN_DIALOG_TAG);
     }
 
     /**
      * Start account creation task and proceed
      */
-    private void maybeStartAddCoinAndProceedTask(@Nullable CharSequence password) {
+    void maybeStartAddCoinAndProceedTask(@Nullable String description, @Nullable CharSequence password) {
         if (addCoinAndProceedTask == null) {
-            addCoinAndProceedTask = new AddCoinTask(this, destinationType, wallet, password);
+            addCoinAndProceedTask = new AddCoinTask(this, destinationType, wallet, description, password);
             addCoinAndProceedTask.execute();
         }
     }
@@ -1104,35 +1105,4 @@ public class TradeSelectFragment extends Fragment implements ExchangeCheckSuppor
                 })
                 .create().show();
     }
-
-    // FIXME Convert to static
-    private DialogFragment createToAccountAndProceedDialog = new DialogFragment() {
-        @Override @NonNull
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            final LayoutInflater inflater = LayoutInflater.from(getActivity());
-            final View view = inflater.inflate(R.layout.get_password_dialog, null);
-            final TextView passwordView = (TextView) view.findViewById(R.id.password);
-            // If not encrypted, don't ask the password
-            if (!wallet.isEncrypted()) {
-                view.findViewById(R.id.password_message).setVisibility(View.GONE);
-                passwordView.setVisibility(View.GONE);
-            }
-
-            String title = getString(R.string.adding_coin_confirmation_title,
-                    destinationType.getName());
-
-            return new DialogBuilder(getActivity()).setTitle(title).setView(view)
-                    .setNegativeButton(R.string.button_cancel, null)
-                    .setPositiveButton(R.string.button_add, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            if (wallet.isEncrypted()) {
-                                maybeStartAddCoinAndProceedTask(passwordView.getText());
-                            } else {
-                                maybeStartAddCoinAndProceedTask(null);
-                            }
-                        }
-                    }).create();
-        }
-    };
 }
