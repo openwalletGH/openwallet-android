@@ -42,8 +42,8 @@ import javax.annotation.CheckForNull;
 public class CoinServiceImpl extends Service implements CoinService {
     private WalletApplication application;
     private Configuration config;
-    private ConnectivityManager connManager;
     private ConnectivityHelper connHelper;
+    private BroadcastReceiver connectivityReceiver;
 
     @CheckForNull
     private ServerClients clients;
@@ -161,10 +161,16 @@ public class CoinServiceImpl extends Service implements CoinService {
 //    }
 //
 
-    private final BroadcastReceiver connectivityReceiver = new BroadcastReceiver() {
+    private class MyBroadcastReceiver extends BroadcastReceiver {
+        private final ConnectivityManager connectivityManager;
         private boolean hasConnectivity;
         private boolean hasStorage = true;
         private int currentNetworkType = -1;
+
+        public MyBroadcastReceiver(ConnectivityManager connectivityManager) {
+            this.connectivityManager = connectivityManager;
+            checkNetworkType();
+        }
 
         @Override
         public void onReceive(final Context context, final Intent intent) {
@@ -173,15 +179,7 @@ public class CoinServiceImpl extends Service implements CoinService {
             if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action)) {
                 hasConnectivity = !intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
 
-                NetworkInfo activeInfo = connManager.getActiveNetworkInfo();
-                boolean isNetworkChanged;
-                if (activeInfo != null && activeInfo.isConnected()) {
-                    isNetworkChanged = currentNetworkType != activeInfo.getType();
-                    currentNetworkType = activeInfo.getType();
-                } else {
-                    isNetworkChanged = false;
-                    currentNetworkType = -1;
-                }
+                boolean isNetworkChanged = checkNetworkType();
                 log.info("network is " + (hasConnectivity ? "up" : "down"));
                 log.info("network type " + (isNetworkChanged ? "changed" : "didn't change"));
 
@@ -199,7 +197,20 @@ public class CoinServiceImpl extends Service implements CoinService {
             }
         }
 
-//        @SuppressLint("Wakelock")
+        private boolean checkNetworkType() {
+            boolean isNetworkChanged;
+            NetworkInfo activeInfo = connectivityManager.getActiveNetworkInfo();
+            if (activeInfo != null && activeInfo.isConnected()) {
+                isNetworkChanged = currentNetworkType != activeInfo.getType();
+                currentNetworkType = activeInfo.getType();
+            } else {
+                isNetworkChanged = false;
+                currentNetworkType = -1;
+            }
+            return isNetworkChanged;
+        }
+
+        //        @SuppressLint("Wakelock")
         private void check(boolean isNetworkChanged) {
             Wallet wallet = application.getWallet();
             final boolean hasEverything = hasConnectivity && hasStorage && (wallet != null);
@@ -210,7 +221,7 @@ public class CoinServiceImpl extends Service implements CoinService {
 
                 log.info("Creating coins clients");
                 clients = getServerClients(wallet);
-                if (lastAccount != null) clients.startAsync(wallet.getAccount(lastAccount));
+//                if (lastAccount != null) clients.startAsync(wallet.getAccount(lastAccount));
             } else if (hasEverything && isNetworkChanged) {
                 log.info("Restarting coins clients as network changed");
                 clients.resetConnections();
@@ -290,9 +301,10 @@ public class CoinServiceImpl extends Service implements CoinService {
 
         application = (WalletApplication) getApplication();
         config = application.getConfiguration();
-        connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         connHelper = getConnectivityHelper(connManager);
 
+        connectivityReceiver = new MyBroadcastReceiver(connManager);
         final IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         intentFilter.addAction(Intent.ACTION_DEVICE_STORAGE_LOW);
