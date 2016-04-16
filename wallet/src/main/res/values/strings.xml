@@ -2,6 +2,7 @@
 <resources>
     <string name="app_name" translatable="false">Coinomi (dev)</string>
     <string name="app_package" translatable="false">com.coinomi.wallet.dev</string>
+    <string name="coinomi_website" translatable="false">https://coinomi.com</string>
     <string name="almost_equal_to" translatable="false">≈</string>
     <string name="action_scan_qr_code">Scan</string>
     <string name="action_share">Share</string>
@@ -187,8 +188,7 @@
     <!-- About Activity -->
     <string name="title_activity_about">About Coinomi</string>
     <string name="app_name_long">Coinomi for Android</string>
-    <string name="about_coinomi">https://coinomi.com</string>
-    <string name="about_licence">An open source project\nhttps://github.com/Coinomi/coinomi-android\nSource code licensed under GNU General Public License 3</string>
+    <string name="about_licence">An open source project\nhttps://github.com/Coinomi/coinomi-android</string>
     <string name="about_credits_nubits">Server infrastructure donated by NuBits - The World\'s First Stable Digital Currency\nhttps://nubits.com/</string>
     <string name="about_credits_translations">Translations provided by:</string>
     <string name="about_credits_translations_credits" translatable="false">Tamara Castellano (Italian)\nJorge Nicolas Karmis (Spanish)\nGeorge Kimionis (Greek)\n@visvirial (Japanese)\nДенис Рейн (Russian, Ukrainian)</string>
@@ -357,5 +357,59 @@
     <string name="tx_fees_per_kilobyte">per kilobyte of transaction data</string>
     <string name="tx_fees_per_byte">per byte of transaction data</string>
     <string name="tx_fees_per_transaction">per transaction</string>
+
+    <!-- Terms -->
+    <string name="terms_of_service_title">Terms of service</string>
+    <string name="terms_of_service">LEGAL DISCLAIMER\n
+\n
+\n
+1. Risks related to the use of Coinomi Wallet\n
+\n
+Coinomi will not be responsible for any losses, damages or claims arising from events falling within the scope of the following five categories:\n
+\n
+(1) Mistakes made by the user of any cryptocurrency-related software or service, e.g., forgotten passwords, payments sent to wrong coin addresses, and accidental deletion of wallets.\n
+\n
+(2) Software problems of the wallet and/or any cryptocurrency-related software or service, e.g., corrupted wallet file, incorrectly constructed transactions, unsafe cryptographic libraries, malware affecting the wallet and/or any cryptocurrency-related software or service.\n
+\n
+(3) Technical failures in the hardware of the user of any cryptocurrency-related software or service, e.g., data loss due to a faulty or damaged storage device.\n
+\n
+(4) Security problems experienced by the user of any cryptocurrency-related software or service, e.g., unauthorized access to users\' wallets and/or accounts.\n
+\n
+(5) Actions or inactions of third parties and/or events experienced by third parties, e.g., bankruptcy of service providers, information security attacks on service providers, and fraud conducted by third parties.\n
+\n
+\n
+2. Trading and Investment risks\n
+\n
+There is considerable exposure to risk in any crypto-currency exchange transaction. Any transaction involving currencies involves risks including, but not limited to, the potential for changing economic conditions that may substantially affect the price or liquidity of a currency. Investments in crypto-currency exchange speculation may also be susceptible to sharp rises and falls as the relevant market values fluctuate. It is for this reason that when speculating in such markets it is advisable to use only risk capital. \n
+\n
+\n
+3. Electronic Trading Risks\n
+\n
+Before you engage in transactions using an electronic system, you should carefully review the rules and regulations of the exchanges offering the system and/or listing the instruments you intend to trade. Online trading has inherent risk due to system response and access times that may vary due to market conditions, system performance, and other factors. You should understand these and additional risks before trading.\n
+\n
+\n
+4. Compliance with tax obligations\n
+\n
+The users of the wallet are solely responsible to determinate what, if any, taxes apply to their crypto-currency transactions. The owners of, or contributors to, the wallet are NOT responsible for determining the taxes that apply to crypto-currency transactions.\n
+\n
+\n
+5. No warranties\n
+\n
+The wallet is provided on an \"as is\" basis without any warranties of any kind regarding the wallet and/or any content, data, materials and/or services provided on the wallet.\n
+\n
+\n
+6. Limitation of liability\n
+\n
+Unless otherwise required by law, in no event shall the owners of, or contributors to, the wallet be liable for any damages of any kind, including, but not limited to, loss of use, loss of profits, or loss of data arising out of or in any way connected with the use of the wallet. In no way are the owners of, or contributors to, the wallet responsible for the actions, decisions, or other behavior taken or not taken by you in reliance upon the wallet.\n
+\n
+\n
+7. Arbitration\n
+\n
+The user of the wallet agrees to arbitrate any dispute arising from or in connection with the wallet or this disclaimer, except for disputes related to copyrights, logos, trademarks, trade names, trade secrets or patents.\n
+\n
+\n
+8. Last amendment\n
+\n
+This disclaimer was amended for the last time on January 1st, 2016.</string>
 
 </resources>

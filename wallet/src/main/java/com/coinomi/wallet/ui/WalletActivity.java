@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -32,6 +33,7 @@ import com.coinomi.wallet.R;
 import com.coinomi.wallet.service.CoinService;
 import com.coinomi.wallet.service.CoinServiceImpl;
 import com.coinomi.wallet.tasks.CheckUpdateTask;
+import com.coinomi.wallet.ui.dialogs.TermsOfUseDialog;
 import com.coinomi.wallet.util.SystemUtils;
 import com.coinomi.wallet.util.WeakHandler;
 
@@ -57,7 +59,7 @@ import static com.coinomi.wallet.ui.NavDrawerItemType.ITEM_TRADE;
 final public class WalletActivity extends BaseWalletActivity implements
         NavigationDrawerFragment.Listener,
         AccountFragment.Listener, OverviewFragment.Listener, SelectCoinTypeDialog.Listener,
-        PayWithDialog.Listener {
+        PayWithDialog.Listener, TermsOfUseDialog.Listener {
     private static final Logger log = LoggerFactory.getLogger(WalletActivity.class);
 
 
@@ -71,10 +73,11 @@ final public class WalletActivity extends BaseWalletActivity implements
     private static final int OPEN_OVERVIEW = 4;
 
     // Fragment tags
-    private static final String ACCOUNT = "account";
-    private static final String OVERVIEW = "overview";
+    private static final String ACCOUNT_TAG = "account_tag";
+    private static final String OVERVIEW_TAG = "overview_tag";
     private static final String PAY_TO_DIALOG_TAG = "pay_to_dialog_tag";
     private static final String PAY_WITH_DIALOG_TAG = "pay_with_dialog_tag";
+    private static final String TERMS_OF_USE_TAG = "terms_of_use_tag";
 
     // Saved state variables
     private static final String OVERVIEW_VISIBLE = "overview_visible";
@@ -120,7 +123,10 @@ final public class WalletActivity extends BaseWalletActivity implements
                     .create().show();
         }
 
-
+        if (savedInstanceState == null && !getConfiguration().getTermsAccepted()) {
+            TermsOfUseDialog.newInstance().show(getFM(), TERMS_OF_USE_TAG);
+        }
+        
         // Create the overview and account fragments
         FragmentTransaction tr = getFM().beginTransaction();
         if (savedInstanceState == null) {
@@ -130,8 +136,8 @@ final public class WalletActivity extends BaseWalletActivity implements
             accountFragment = AccountFragment.getInstance();
 
             // Add fragments
-            tr.add(R.id.contents, overviewFragment, OVERVIEW).hide(overviewFragment);
-            tr.add(R.id.contents, accountFragment, ACCOUNT).hide(accountFragment);
+            tr.add(R.id.contents, overviewFragment, OVERVIEW_TAG).hide(overviewFragment);
+            tr.add(R.id.contents, accountFragment, ACCOUNT_TAG).hide(accountFragment);
 
             // When we have more than one account, show overview as default
             List<WalletAccount> accounts = getAllAccounts();
@@ -143,8 +149,8 @@ final public class WalletActivity extends BaseWalletActivity implements
             // Else no accounts, how to handle this case? TODO
         } else {
             isOverviewVisible = savedInstanceState.getBoolean(OVERVIEW_VISIBLE);
-            overviewFragment = (OverviewFragment) getFM().findFragmentByTag(OVERVIEW);
-            accountFragment = (AccountFragment) getFM().findFragmentByTag(ACCOUNT);
+            overviewFragment = (OverviewFragment) getFM().findFragmentByTag(OVERVIEW_TAG);
+            accountFragment = (AccountFragment) getFM().findFragmentByTag(ACCOUNT_TAG);
 
             if (isOverviewVisible) {
                 tr.show(overviewFragment).hide(accountFragment);
@@ -780,6 +786,17 @@ final public class WalletActivity extends BaseWalletActivity implements
         // Recreate items
         createNavDrawerItems();
         mNavigationDrawerFragment.setItems(navDrawerItems);
+    }
+
+    @Override
+    public void onTermsAgree() {
+        getConfiguration().setTermAccepted(true);
+    }
+
+    @Override
+    public void onTermsDisagree() {
+        getConfiguration().setTermAccepted(false);
+        finish();
     }
 
     private static class MyHandler extends WeakHandler<WalletActivity> {

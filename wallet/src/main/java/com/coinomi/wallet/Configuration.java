@@ -56,6 +56,8 @@ public class Configuration {
 
     public static final String PREFS_KEY_DEVICE_COMPATIBLE = "device_compatible";
 
+    public static final String PREFS_KEY_TERMS_ACCEPTED = "terms_accepted";
+
     private static final int PREFS_DEFAULT_BTC_SHIFT = 3;
     private static final int PREFS_DEFAULT_BTC_PRECISION = 2;
 
@@ -235,4 +237,13 @@ public class Configuration {
     public boolean isDeviceCompatible() {
         return prefs.getBoolean(PREFS_KEY_DEVICE_COMPATIBLE, true);
     }
+
+    public boolean getTermsAccepted() {
+        return prefs.getBoolean(PREFS_KEY_TERMS_ACCEPTED, false);
+    }
+
+    public void setTermAccepted(final boolean isTermsAccepted) {
+        prefs.edit().putBoolean(PREFS_KEY_TERMS_ACCEPTED, isTermsAccepted).apply();
+    }
+
 }
