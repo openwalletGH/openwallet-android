@@ -35,24 +35,30 @@
                     android:layout_alignParentStart="true"
                     android:layout_alignParentTop="true"
                     android:text="@string/receive_address_label" />
-
-                <TextView
-                    android:id="@+id/request_address_label"
+                
+                <LinearLayout
+                    android:id="@+id/request_address_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/request_address_info"
-                    style="@style/NormalText"
-                    android:textSize="@dimen/receive_address"
-                    tools:text="Fancy address label" />
+                    android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/request_address"
-                    style="@style/SmallHelpText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/request_address_label"
-                    android:typeface="monospace"
-                    tools:text="nUdHX BSBY QPJR EXZM BUdu 8ARn WM2m z3XQp" />
+                    <TextView
+                        android:id="@+id/request_address_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/NormalText"
+                        android:textSize="@dimen/receive_address"
+                        tools:text="Fancy address label" />
+
+                    <TextView
+                        android:id="@+id/request_address"
+                        style="@style/SmallHelpText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:typeface="monospace"
+                        tools:text="nUdHX BSBY QPJR EXZM BUdu 8ARn WM2m z3XQp" />
+                </LinearLayout>
             </RelativeLayout>
 
             <RelativeLayout

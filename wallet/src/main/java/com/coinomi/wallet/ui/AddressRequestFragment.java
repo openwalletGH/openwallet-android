@@ -191,7 +191,7 @@ public class AddressRequestFragment extends WalletFragment {
         super.onDestroyView();
     }
 
-    @OnClick({R.id.request_address_label, R.id.request_address})
+    @OnClick(R.id.request_address_view)
     public void onAddressClick() {
         if (showAddress != null) {
             receiveAddress =  showAddress;

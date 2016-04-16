@@ -53,7 +53,6 @@ public class ConfirmAddCoinUnlockWalletDialog extends DialogFragment {
         final boolean askPassword = getArguments().getBoolean(ASK_PASSWORD);
         final LayoutInflater inflater = LayoutInflater.from(getActivity());
         final View view = inflater.inflate(R.layout.add_account_dialog, null);
-        final View titleView = inflater.inflate(R.layout.dialog_title, null);
         final TextView passwordMessage = ButterKnife.findById(view, R.id.password_message);
         final EditText password = ButterKnife.findById(view, R.id.password);
         final EditText description = ButterKnife.findById(view, R.id.edit_account_description);
@@ -64,7 +63,6 @@ public class ConfirmAddCoinUnlockWalletDialog extends DialogFragment {
         }
 
         return new DialogBuilder(getActivity())
-                .setCustomTitle(titleView)
                 .setTitle(getString(R.string.adding_coin_confirmation_title, coinName))
                 .setView(view)
                 .setNegativeButton(R.string.button_cancel, null)

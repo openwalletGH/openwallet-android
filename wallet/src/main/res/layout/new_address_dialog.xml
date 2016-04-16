@@ -8,15 +8,20 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:padding="@dimen/dialog_margin"
         android:orientation="vertical" >
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/NormalText"
-            android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin"
-            android:layout_marginTop="8dp"
+            android:text="@string/create_new_address" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/NormalText"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
             android:text="@string/create_new_address_name" />
 
         <EditText
@@ -24,10 +29,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/NormalText"
-            android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin"
-            android:layout_marginBottom="8dp"
-            android:layout_marginTop="8dp"
             android:imeOptions="flagNoExtractUi"
             android:inputType="textPersonName"
             android:singleLine="true" >

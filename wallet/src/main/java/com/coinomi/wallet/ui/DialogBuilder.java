@@ -17,18 +17,18 @@ package com.coinomi.wallet.ui;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import javax.annotation.Nullable;
-
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface.OnClickListener;
 import android.graphics.drawable.Drawable;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.coinomi.wallet.R;
+
+import javax.annotation.Nullable;
 
 /**
  * @author Andreas Schildbach
@@ -48,8 +48,6 @@ public class DialogBuilder extends AlertDialog.Builder {
 
     public DialogBuilder(final Context context) {
         super(context);
-
-        setInverseBackgroundForced(true);
 
         this.customTitle = LayoutInflater.from(context).inflate(R.layout.dialog_title, null);
         this.iconView = (ImageView) customTitle.findViewById(android.R.id.icon);

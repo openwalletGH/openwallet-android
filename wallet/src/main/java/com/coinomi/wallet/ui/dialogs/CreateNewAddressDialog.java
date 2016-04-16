@@ -76,7 +76,6 @@ public class CreateNewAddressDialog extends DialogFragment {
                 final TextView viewLabel = (TextView) view.findViewById(R.id.new_address_label);
 
                 final DialogBuilder builder = new DialogBuilder(getActivity());
-                builder.setTitle(R.string.create_new_address);
                 builder.setView(view);
                 builder.setNegativeButton(R.string.button_cancel, dismissListener);
                 builder.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
