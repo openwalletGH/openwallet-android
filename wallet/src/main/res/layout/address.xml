@@ -8,8 +8,8 @@
 
     <ImageView
         android:id="@+id/icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/generic_icon_size"
+        android:layout_height="@dimen/generic_icon_size"
         android:layout_marginRight="@dimen/quarter_standard_margin"
         android:layout_marginEnd="@dimen/quarter_standard_margin"
         android:layout_centerVertical="true"

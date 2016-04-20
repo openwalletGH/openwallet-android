@@ -326,7 +326,7 @@
     <!-- Account details -->
     <string name="title_activity_account_details">Account details</string>
     <string name="account_description_label">Description</string>
-    <string name="account_public_key_label">Dublic key</string>
+    <string name="account_public_key_label">Public key</string>
     <string name="account_extended_public_key_label">Extended public key</string>
     <string name="account_public_key_warning">Sharing your public key will allow anybody to view your balance and transaction history.</string>
     <string name="account_private_key_label">Private key</string>

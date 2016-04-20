@@ -8,8 +8,8 @@ android {
         applicationId "com.coinomi.wallet.dev"
         minSdkVersion 10
         targetSdkVersion 23
-        versionCode 50
-        versionName "v1.6.0"
+        versionCode 52
+        versionName "v1.6.1"
     }
 
     buildTypes {
