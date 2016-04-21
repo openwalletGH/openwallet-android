@@ -17,9 +17,12 @@ package com.coinomi.wallet.ui;
  */
 
 
+import static android.Manifest.permission.CAMERA;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+
+import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -32,10 +35,16 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Process;
 import android.os.Vibrator;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.ContextCompat;
 import android.view.KeyEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.widget.Toast;
 
+import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.camera.CameraManager;
 import com.google.zxing.BinaryBitmap;
@@ -57,8 +66,9 @@ import java.util.Map;
 
 /**
  * @author Andreas Schildbach
+ * @author John L. Jegutanis
  */
-public final class ScanActivity extends Activity implements SurfaceHolder.Callback
+public final class ScanActivity extends FragmentActivity implements SurfaceHolder.Callback
 {
     public static final String INTENT_EXTRA_RESULT = "result";
 
@@ -71,6 +81,7 @@ public final class ScanActivity extends Activity implements SurfaceHolder.Callba
     private Vibrator vibrator;
     private HandlerThread cameraThread;
     private Handler cameraHandler;
+    private boolean isSurfaceCreated = false;
 
     private static final int DIALOG_CAMERA_PROBLEM = 0;
 
@@ -107,13 +118,61 @@ public final class ScanActivity extends Activity implements SurfaceHolder.Callba
         final SurfaceView surfaceView = (SurfaceView) findViewById(R.id.scan_activity_preview);
         surfaceHolder = surfaceView.getHolder();
         surfaceHolder.addCallback(this);
-        surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+
+
+        if (!hasCameraPermission()) {
+            askCameraPermission();
+        } else {
+            openCamera();
+        }
+
+    }
+
+    @Override
+    protected void onPause()
+    {
+        cameraHandler.post(closeRunnable);
+        surfaceHolder.removeCallback(this);
+
+        super.onPause();
+    }
+
+    private void askCameraPermission() {
+        if (!hasCameraPermission()) {
+            ActivityCompat.requestPermissions(this, new String[]{CAMERA},
+                    Constants.PERMISSIONS_REQUEST_CAMERA);
+        }
+    }
+
+    private boolean hasCameraPermission() {
+        return ContextCompat.checkSelfPermission(this, CAMERA) == PERMISSION_GRANTED;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == Constants.PERMISSIONS_REQUEST_CAMERA) {
+            for (int i = 0; i < permissions.length; i++) {
+                if (permissions[i].equals(CAMERA) && grantResults[i] == PERMISSION_GRANTED) {
+                    break;
+                }
+            }
+
+            if (!hasCameraPermission())
+                showErrorToast();
+        }
     }
 
     @Override
     public void surfaceCreated(final SurfaceHolder holder)
     {
-        cameraHandler.post(openRunnable);
+        isSurfaceCreated = true;
+        openCamera();
+    }
+
+    private void openCamera() {
+        if (isSurfaceCreated && hasCameraPermission()) {
+            cameraHandler.post(openRunnable);
+        }
     }
 
     @Override
@@ -124,16 +183,6 @@ public final class ScanActivity extends Activity implements SurfaceHolder.Callba
     @Override
     public void surfaceChanged(final SurfaceHolder holder, final int format, final int width, final int height)
     {
-    }
-
-    @Override
-    protected void onPause()
-    {
-        cameraHandler.post(closeRunnable);
-
-        surfaceHolder.removeCallback(this);
-
-        super.onPause();
     }
 
     @Override
@@ -236,17 +285,26 @@ public final class ScanActivity extends Activity implements SurfaceHolder.Callba
             catch (final IOException x)
             {
                 log.info("problem opening camera", x);
-                //TODO show dialog
-//                showDialog(DIALOG_CAMERA_PROBLEM);
+                showErrorToast();
             }
             catch (final RuntimeException x)
             {
                 log.info("problem opening camera", x);
-                //TODO show dialog
-//                showDialog(DIALOG_CAMERA_PROBLEM);
+                showErrorToast();
             }
         }
     };
+
+    private void showErrorToast() {
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(ScanActivity.this, R.string.error_camera, Toast.LENGTH_LONG).show();
+                finish();
+            }
+        });
+    }
 
     private final Runnable closeRunnable = new Runnable()
     {
@@ -354,44 +412,4 @@ public final class ScanActivity extends Activity implements SurfaceHolder.Callba
             }
         }
     };
-
-
-    /** TODO
-     *
-     * Use the new {@link android.app.DialogFragment} class with
-     * {@link android.app.FragmentManager} instead
-     *
-     */
-
-//    @Override
-//    protected Dialog onCreateDialog(final int id)
-//    {
-//        if (id == DIALOG_CAMERA_PROBLEM)
-//        {
-//            final DialogBuilder dialog = DialogBuilder.warn(this, R.string.scan_camera_problem_dialog_title);
-//            dialog.setMessage(R.string.scan_camera_problem_dialog_message);
-//            dialog.singleDismissButton(new OnClickListener()
-//            {
-//                @Override
-//                public void onClick(final DialogInterface dialog, final int which)
-//                {
-//                    finish();
-//                }
-//            });
-//            dialog.setOnCancelListener(new OnCancelListener()
-//            {
-//                @Override
-//                public void onCancel(final DialogInterface dialog)
-//                {
-//                    finish();
-//                }
-//            });
-//
-//            return dialog.create();
-//        }
-//        else
-//        {
-//            throw new IllegalArgumentException();
-//        }
-//    }
 }

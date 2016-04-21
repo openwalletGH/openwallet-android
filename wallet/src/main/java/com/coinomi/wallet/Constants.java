@@ -90,6 +90,8 @@ public class Constants {
     public static final String ARG_URI = "test_wallet";
     public static final String ARG_PRIVATE_KEY = "private_key";
 
+    public static final int PERMISSIONS_REQUEST_CAMERA = 0;
+
     public static final String WALLET_FILENAME_PROTOBUF = "wallet";
     public static final long WALLET_WRITE_DELAY = 5;
     public static final TimeUnit WALLET_WRITE_DELAY_UNIT = TimeUnit.SECONDS;

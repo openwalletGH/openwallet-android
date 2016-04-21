@@ -24,6 +24,7 @@
     <!-- Errors -->
     <string name="error_generic">Error occurred while performing action</string>
     <string name="error_could_not_read_wallet">Could not read wallet</string>
+    <string name="error_camera">Could not access the device camera</string>
     <!-- Generic items -->
     <string name="button_ok">OK</string>
     <string name="button_next">Next</string>
