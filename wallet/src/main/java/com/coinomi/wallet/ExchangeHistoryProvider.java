@@ -195,7 +195,7 @@ public class ExchangeHistoryProvider extends ContentProvider {
 
     private static class Helper extends SQLiteOpenHelper {
         private static final String DATABASE_NAME = "exchange_history";
-        private static final int DATABASE_VERSION = 1;
+        private static final int DATABASE_VERSION = 2;
 
         private static final String DATABASE_CREATE = "CREATE TABLE " + DATABASE_TABLE + " ("
                 + KEY_ROWID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -233,10 +233,17 @@ public class ExchangeHistoryProvider extends ContentProvider {
 
         private void upgrade(final SQLiteDatabase db, final int oldVersion) {
             if (oldVersion == 1) {
-                // future
+                db.execSQL(renameCoinId(KEY_DEPOSIT_COIN_ID, "darkcoin.main", "dash.main"));
+                db.execSQL(renameCoinId(KEY_WITHDRAW_COIN_ID, "darkcoin.main", "dash.main"));
             } else {
                 throw new UnsupportedOperationException("old=" + oldVersion);
             }
+        }
+
+        private String renameCoinId(String fieldName, String from, String to) {
+            return "UPDATE " + DATABASE_TABLE + " SET " + fieldName +
+                    " = replace(" + fieldName + ", \"" + from + "\", \"" + to + "\") " +
+                    "WHERE " + fieldName + " == \"" + from + "\"";
         }
     }
 
