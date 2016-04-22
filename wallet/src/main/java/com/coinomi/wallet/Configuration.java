@@ -235,7 +235,7 @@ public class Configuration {
     }
 
     public boolean isDeviceCompatible() {
-        return prefs.getBoolean(PREFS_KEY_DEVICE_COMPATIBLE, true);
+        return prefs.getBoolean(PREFS_KEY_DEVICE_COMPATIBLE, false);
     }
 
     public boolean getTermsAccepted() {

@@ -173,10 +173,14 @@ public class WalletApplication extends Application {
      * Some devices have software bugs that causes the EC crypto to malfunction.
      */
     private void performComplianceTests() {
-        if (!HardwareSoftwareCompliance.isEllipticCurveCryptographyCompliant()) {
-            config.setDeviceCompatible(false);
-            ACRA.getErrorReporter().handleSilentException(
-                    new Exception("Device failed EllipticCurveCryptographyCompliant test"));
+        if (!config.isDeviceCompatible()) {
+            if (!HardwareSoftwareCompliance.isEllipticCurveCryptographyCompliant()) {
+                config.setDeviceCompatible(false);
+                ACRA.getErrorReporter().handleSilentException(
+                        new Exception("Device failed EllipticCurveCryptographyCompliant test"));
+            } else {
+                config.setDeviceCompatible(true);
+            }
         }
     }
 
