@@ -85,7 +85,6 @@ public class RestoreFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_restore, container, false);
 
         Fonts.setTypeface(view.findViewById(R.id.coins_icon), Fonts.Font.COINOMI_FONT_ICONS);
-        Fonts.setTypeface(view.findViewById(R.id.warning_icon), Fonts.Font.COINOMI_FONT_ICONS);
 
         ImageButton scanQrButton = (ImageButton) view.findViewById(R.id.scan_qr_code);
         scanQrButton.setOnClickListener(new View.OnClickListener() {
@@ -117,43 +116,24 @@ public class RestoreFragment extends Fragment {
         bip39Passphrase.setVisibility(View.GONE);
         bip39PassphraseTitle.setVisibility(View.GONE);
 
-        // Checkbox to enable/disable password protected seed (BIP39)
-        // For new seed
-        final View seedProtectInfoNew = view.findViewById(R.id.seed_protect_info);
-        seedProtectInfoNew.setVisibility(View.GONE);
-        CheckBox seedProtectNew = (CheckBox) view.findViewById(R.id.seed_protect);
-        if (!isNewSeed) seedProtectNew.setVisibility(View.GONE);
-
         // For existing seed
-        final View seedProtectInfoExisting = view.findViewById(R.id.restore_seed_protected_info);
-        seedProtectInfoExisting.setVisibility(View.GONE);
-        final CheckBox seedProtectExisting = (CheckBox) view.findViewById(R.id.restore_seed_protected);
-        if (isNewSeed) seedProtectExisting.setVisibility(View.GONE);
+        final View bip39Info = view.findViewById(R.id.bip39_info);
+        bip39Info.setVisibility(View.GONE);
+        final CheckBox useBip39Checkbox = (CheckBox) view.findViewById(R.id.use_bip39);
+        if (isNewSeed) useBip39Checkbox.setVisibility(View.GONE);
 
-        // Generic checkbox and info text
-        final View seedProtectInfo;
-        final CheckBox seedProtect;
-
-        if (isNewSeed) {
-            seedProtectInfo = seedProtectInfoNew;
-            seedProtect = seedProtectNew;
-        } else {
-            seedProtectInfo = seedProtectInfoExisting;
-            seedProtect = seedProtectExisting;
-        }
-
-        seedProtect.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        useBip39Checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 isSeedProtected = isChecked;
                 if (isChecked) {
-                    skipButton.setVisibility(View.GONE);
-                    seedProtectInfo.setVisibility(View.VISIBLE);
+                    if (isNewSeed) skipButton.setVisibility(View.GONE);
+                    bip39Info.setVisibility(View.VISIBLE);
                     bip39PassphraseTitle.setVisibility(View.VISIBLE);
                     bip39Passphrase.setVisibility(View.VISIBLE);
                 } else {
-                    skipButton.setVisibility(View.VISIBLE);
-                    seedProtectInfo.setVisibility(View.GONE);
+                    if (isNewSeed) skipButton.setVisibility(View.VISIBLE);
+                    bip39Info.setVisibility(View.GONE);
                     bip39PassphraseTitle.setVisibility(View.GONE);
                     bip39Passphrase.setVisibility(View.GONE);
                     bip39Passphrase.setText(null);
@@ -163,7 +143,7 @@ public class RestoreFragment extends Fragment {
 
         // Skip link
         skipButton = (Button) view.findViewById(R.id.seed_entry_skip);
-        if (seed != null) {
+        if (isNewSeed) {
             skipButton.setOnClickListener(getOnSkipListener());
             skipButton.setVisibility(View.VISIBLE);
         } else {
@@ -220,7 +200,8 @@ public class RestoreFragment extends Fragment {
             Bundle args = getArguments();
             if (args == null) args = new Bundle();
 
-            if (isSeedProtected) {
+            // Do not set a BIP39 passphrase on new recovery phrases
+            if (!isNewSeed && isSeedProtected) {
                 args.putString(Constants.ARG_SEED_PASSWORD, bip39Passphrase.getText().toString());
             }
             args.putString(Constants.ARG_SEED, mnemonicTextView.getText().toString().trim());

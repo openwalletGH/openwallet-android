@@ -74,65 +74,18 @@
                     android:text="@string/restore_error_checksum" />
 
                 <CheckBox
-                    android:id="@+id/restore_seed_protected"
+                    android:id="@+id/use_bip39"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/half_standard_margin"
                     android:text="@string/restore_seed_protected" />
 
                 <TextView
-                    android:id="@+id/restore_seed_protected_info"
+                    android:id="@+id/bip39_info"
                     style="@style/NormalText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/password_wallet_recovery" />
-
-                <CheckBox
-                    android:id="@+id/seed_protect"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/half_standard_margin"
-                    android:text="@string/set_password_seed_protect" />
-
-                <LinearLayout
-                    android:id="@+id/seed_protect_info"
-                    android:orientation="vertical"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        style="@style/NormalText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/set_password_seed_protect_explanation" />
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/half_standard_margin"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:id="@+id/warning_icon"
-                            style="@style/WarningText"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            android:layout_marginEnd="@dimen/standard_margin"
-                            android:layout_marginRight="@dimen/standard_margin"
-                            android:gravity="center"
-                            android:text="@string/font_icon_warning"
-                            android:textSize="@dimen/font_icon_text_size"
-                            tools:text="Δ" />
-
-                        <TextView
-                            style="@style/WarningText"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/set_password_seed_protect_info" />
-
-                    </LinearLayout>
-                </LinearLayout>
 
                 <TextView
                     android:id="@+id/bip39_passphrase_title"

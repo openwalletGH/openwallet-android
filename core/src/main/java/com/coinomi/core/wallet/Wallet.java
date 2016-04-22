@@ -117,8 +117,8 @@ final public class Wallet {
     public static String mnemonicToString(List<String> mnemonicWords) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < mnemonicWords.size(); i++) {
+            if (i != 0) sb.append(' ');
             sb.append(mnemonicWords.get(i));
-            sb.append(' ');
         }
         return sb.toString();
     }
