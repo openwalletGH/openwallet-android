@@ -6,8 +6,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 
-import com.coinomi.core.wallet.Wallet;
-import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 
 public class IntroActivity extends AbstractWalletFragmentActivity
@@ -55,42 +53,40 @@ public class IntroActivity extends AbstractWalletFragmentActivity
 
     @Override
     public void onCreateNewWallet() {
-        replaceFragment(new SeedFragment());
-    }
-
-    @Override
-    public void onRestoreWallet() {
-        replaceFragment(RestoreFragment.newInstance());
-    }
-
-    @Override
-    public void onTestWallet() {
         if (getWalletApplication().getWallet() == null) {
-            makeTestWallet();
+            replaceFragment(new SeedFragment());
         } else {
             new AlertDialog.Builder(this)
-                    .setTitle(R.string.test_wallet_warning_title)
-                    .setMessage(R.string.test_wallet_warning_message)
+                    .setTitle(R.string.override_wallet_warning_title)
+                    .setMessage(R.string.override_new_wallet_warning_message)
                     .setNegativeButton(R.string.button_cancel, null)
                     .setPositiveButton(R.string.button_confirm, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            makeTestWallet();
+                            replaceFragment(new SeedFragment());
                         }
                     })
                     .create().show();
         }
-
     }
 
-    private void makeTestWallet() {
-        Bundle args = new Bundle();
-        args.putString(Constants.ARG_SEED, Wallet.generateMnemonicString(Constants.SEED_ENTROPY_DEFAULT));
-        args.putString(Constants.ARG_PASSWORD, null);
-        args.putStringArrayList(Constants.ARG_MULTIPLE_COIN_IDS, Constants.DEFAULT_TEST_COIN_IDS);
-        args.putBoolean(Constants.ARG_TEST_WALLET, true);
-
-        replaceFragment(FinalizeWalletRestorationFragment.newInstance(args));
+    @Override
+    public void onRestoreWallet() {
+        if (getWalletApplication().getWallet() == null) {
+            replaceFragment(RestoreFragment.newInstance());
+        } else {
+            new AlertDialog.Builder(this)
+                    .setTitle(R.string.override_wallet_warning_title)
+                    .setMessage(R.string.override_restore_wallet_warning_message)
+                    .setNegativeButton(R.string.button_cancel, null)
+                    .setPositiveButton(R.string.button_confirm, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            replaceFragment(RestoreFragment.newInstance());
+                        }
+                    })
+                    .create().show();
+        }
     }
 
     @Override

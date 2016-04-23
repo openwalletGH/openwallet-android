@@ -11,7 +11,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -113,14 +112,6 @@ final public class WalletActivity extends BaseWalletActivity implements
             startIntro();
             finish();
             return;
-        }
-
-        if (getIntent().getBooleanExtra(Constants.ARG_TEST_WALLET, false)) {
-            new AlertDialog.Builder(this)
-                    .setTitle(R.string.test_wallet)
-                    .setMessage(R.string.test_wallet_message)
-                    .setPositiveButton(R.string.button_ok, null)
-                    .create().show();
         }
 
         if (savedInstanceState == null && !getConfiguration().getTermsAccepted()) {

@@ -34,7 +34,6 @@ public class WelcomeFragment extends Fragment {
 
         view.findViewById(R.id.create_wallet).setOnClickListener(getOnCreateListener());
         view.findViewById(R.id.restore_wallet).setOnClickListener(getOnRestoreListener());
-        view.findViewById(R.id.test_wallet).setOnClickListener(getOnTestListener());
 
         return view;
     }
@@ -63,18 +62,6 @@ public class WelcomeFragment extends Fragment {
         };
     }
 
-    private View.OnClickListener getOnTestListener() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                log.info("Clicked test wallet");
-                if (listener != null) {
-                    listener.onTestWallet();
-                }
-            }
-        };
-    }
-
     @Override
     public void onAttach(final Context context) {
         super.onAttach(context);
@@ -94,9 +81,7 @@ public class WelcomeFragment extends Fragment {
     public interface Listener {
         void onCreateNewWallet();
         void onRestoreWallet();
-        void onTestWallet();
         void onSeedCreated(String seed);
         void onSeedVerified(Bundle args);
     }
-
 }

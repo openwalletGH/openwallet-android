@@ -44,8 +44,6 @@ public class FinalizeWalletRestorationFragment extends Fragment {
 
     private final Handler handler = new MyHandler(this);
 
-    private boolean isTestWallet;
-
     // FIXME: Ugly hack to keep a reference to the task even if the fragment is recreated
     private static WalletFromSeedTask walletFromSeedTask;
     private TextView status;
@@ -74,7 +72,6 @@ public class FinalizeWalletRestorationFragment extends Fragment {
             String seed = args.getString(Constants.ARG_SEED);
             String password = args.getString(Constants.ARG_PASSWORD);
             String seedPassword = args.getString(Constants.ARG_SEED_PASSWORD);
-            isTestWallet = args.getBoolean(Constants.ARG_TEST_WALLET, false);
             List<CoinType> coinsToCreate = getCoinsTypes(args);
 
             if (walletFromSeedTask == null) {
@@ -214,7 +211,6 @@ public class FinalizeWalletRestorationFragment extends Fragment {
 
     public void startWalletActivity() {
         Intent intent = new Intent(getActivity(), WalletActivity.class);
-        intent.putExtra(Constants.ARG_TEST_WALLET, isTestWallet);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
         getActivity().finish();

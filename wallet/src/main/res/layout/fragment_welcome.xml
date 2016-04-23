@@ -50,14 +50,6 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:text="@string/restore_wallet" />
-
-            <Button
-                android:visibility="gone"
-                android:id="@+id/test_wallet"
-                android:layout_width="@dimen/intro_button_width"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="@string/test_wallet" />
         </LinearLayout>
     </LinearLayout>
 </FrameLayout>
