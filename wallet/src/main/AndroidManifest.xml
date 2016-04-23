@@ -227,6 +227,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.coinomi.wallet.ui.SettingsActivity" />
         </activity>
+        <activity
+            android:name="com.coinomi.wallet.ui.DebuggingActivity"
+            android:label="@string/title_activity_debugging"
+            android:theme="@style/AppTheme" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.coinomi.wallet.ui.SettingsActivity" />
+        </activity>
 
         <provider
             android:name="com.coinomi.wallet.ExchangeRatesProvider"

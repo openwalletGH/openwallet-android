@@ -26,4 +26,9 @@
         android:title="@string/pref_title_manual_receiving_addresses"
         android:summary="@string/pref_summary_manual_receiving_addresses"
         android:defaultValue="false"/>
+
+    <Preference android:title="@string/title_activity_debugging" >
+        <intent android:targetPackage="@string/app_package"
+            android:targetClass="com.coinomi.wallet.ui.DebuggingActivity" />
+    </Preference>
 </PreferenceScreen>

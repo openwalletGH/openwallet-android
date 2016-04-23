@@ -48,6 +48,9 @@
     <string name="button_agree">Agree</string>
     <string name="button_disagree">Disagree</string>
     <string name="button_add_coins">+ Coins</string>
+    <string name="button_execute">Execute</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
     <string name="scan_qr_code">Scan QR code</string>
     <string name="erase_address">Erase address</string>
     <string name="copied_to_clipboard">Copied to clipboard</string>
@@ -55,6 +58,7 @@
     <string name="wallet_title_balance">balance</string>
     <string name="wallet_title_send">send</string>
     <string name="wallet_locked_message">Your wallet is locked</string>
+    <string name="wallet_is_not_locked_message">Your wallet is not locked</string>
     <string name="unlock_wallet_title">Unlock your wallet</string>
     <string name="unlocking_wallet_working">Unlocking your wallet&#8230;</string>
     <string name="unlocking_wallet_error_title">Could not unlock your wallet</string>
@@ -258,6 +262,11 @@
     <string name="seed_password_protected">This recovery phrase is protected with a BIP39 passphrase</string>
     <!-- Wallet locked -->
     <string name="touch_to_decrypt_wallet">Touch to unlock</string>
+    <!-- Debugging -->
+    <string name="title_activity_debugging">Debugging</string>
+    <string name="debugging_info">You can use a collection of tools to debug various issues with your wallet.</string>
+    <string name="debugging_test_wallet_password">Wallet unlocking tests</string>
+    <string name="debugging_test_wallet_password_results">Unlocked wallet: %1$s\nUnicode normalization: %2$s\nWhitespace trimmed: %3$s\nInput fingerprint: %4$s</string>
     <!-- Overview -->
     <string name="title_activity_overview">Overview</string>
     <!-- Exchange -->
