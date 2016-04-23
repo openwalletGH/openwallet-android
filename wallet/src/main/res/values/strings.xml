@@ -60,6 +60,7 @@
     <string name="wallet_locked_message">Your wallet is locked</string>
     <string name="wallet_is_not_locked_message">Your wallet is not locked</string>
     <string name="unlock_wallet_title">Unlock your wallet</string>
+    <!-- &#8230; is the ... character -->
     <string name="unlocking_wallet_working">Unlocking your wallet&#8230;</string>
     <string name="unlocking_wallet_error_title">Could not unlock your wallet</string>
     <string name="unlocking_wallet_error_detail">Are you using the correct password? Please make sure that your password was entered correctly. Attempt to restore using the recovery phrase if this error persists.</string>
@@ -80,8 +81,9 @@
     <string name="restore_wallet">Restore a wallet</string>
     <string name="test_wallet">Test wallet</string>
     <!-- Intro -->
-    <string name="test_wallet_warning_title">Create a test wallet?</string>
-    <string name="test_wallet_warning_message">If you create a new test wallet, your existing wallet will be lost unless you backed up you <i>recovery phrase</i>.</string>
+    <string name="override_wallet_warning_title">Override existing wallet?</string>
+    <string name="override_new_wallet_warning_message">If you create a new wallet, your existing wallet will be lost unless you backed up you <i>recovery phrase</i>.</string>
+    <string name="override_restore_wallet_warning_message">If you restore a wallet, your existing wallet will be lost unless you backed up you <i>recovery phrase</i>.</string>
     <string name="incompatible_device_warning_title">Incompatible device</string>
     <string name="incompatible_device_warning_message">This device cannot perform certain cryptographic functions due to software or hardware bugs.\nThis could be solved with an update from the device manufacturer.\n\nContact us if you have any questions: support@coinomi.com</string>
     <!-- Recovery fragment -->
@@ -107,6 +109,7 @@
     <string name="pay_with">Send with</string>
     <string name="exchange_and_pay_title">Exchange and send</string>
     <!-- PayToDialog-->
+    <!-- Ambiguous address means that the wallet cannot deduce the correct address coin type -->
     <string name="ambiguous_address_title">Ambiguous address</string>
     <string name="ambiguous_address_message">Please select the correct coin type</string>
     <!-- Balance fragment -->
@@ -118,7 +121,7 @@
     <string name="get_tx_info_error">Could not get transaction information</string>
     <string name="disconnected_label">No connection</string>
     <string name="no_wallet_pocket_selected">No wallet account selected</string>
-    <string name="get_tx_broadcast_error">Error broadcasting transaction</string>
+    <string name="get_tx_broadcast_error">Transaction broadcast error</string>
     <!-- Receive fragment -->
     <string name="receive_address_label">My address</string>
     <string name="create_new_address">Create a new address?</string>
@@ -137,18 +140,21 @@
     <string name="send_coins_failed_msg">Failed!</string>
     <string name="send_coins_error_network">Could not connect to the coin network</string>
     <string name="send_coins_error_dust">The sending amount is too small and will be rejected by the network</string>
+    <!-- Here the %1$s is a detailed error message -->
     <string name="send_coins_error">Could not send coins: %1$s</string>
     <string name="pay_to_label">Pay to</string>
     <string name="amount_to_send_label">Amount</string>
     <string name="scan_error">There was a problem scanning: %1$s</string>
-    <string name="unsupported_coin">Coin is not supported: %1$s</string>
+    <!-- Here the \"%1$s\" is the "coin name"-->
+    <string name="unsupported_coin">Coin \"%1$s\" is not supported.</string>
     <string name="address_error">The provided address is not valid.</string>
     <string name="amount_error">The provided amount is not valid</string>
     <string name="amount_error_empty">Please enter an amount</string>
     <string name="amount_error_negative">Cannot send a negative amount</string>
-    <string name="amount_error_decimal_places">Too many decimal places, try less than %1$d</string>
+    <!-- %1$s is the amount e.g. ... is at least 0.00001 BTC-->
     <string name="amount_error_too_small">The minimum amount is at least %1$s</string>
     <string name="amount_error_not_enough_money_plain">Not enough money</string>
+    <!-- %1$s is the wallet balance e.g. ... current balance is 3.1415 BTC-->
     <string name="amount_error_not_enough_money">Not enough money, current balance is %1$s</string>
     <string name="amount_warn_fees_apply">Slightly less will be sent because of fees</string>
     <!-- Set Password fragment -->
@@ -156,7 +162,9 @@
     <string name="set_bip39_passphrase">Type your BIP39 passphrase</string>
     <string name="set_password1">Type your password</string>
     <string name="set_password2">Re-type your password</string>
+    <!-- Here the \"%1$s\" is the "password"-->
     <string name="password_too_common_error">Password \"%1$s\" is too common to be safely used.</string>
+    <!-- The %1$d is a number of characters, usually 10 characters -->
     <string name="password_too_short_error">Password is too short, minimum %1$d characters.</string>
     <string name="passwords_mismatch">Passwords don\'t match</string>
     <string name="password_error">Could not proceed, password errors detected.</string>
@@ -165,19 +173,24 @@
     <!-- FinalizeWalletRestorationFragment -->
     <string name="wallet_restoration">Please wait while your wallet is being restored</string>
     <string name="wallet_restoration_master_key">Creating master key</string>
+    <!-- The %1$s is a coin name e.g. Creating key for Bitcoin -->
     <string name="wallet_restoration_coin">Creating key for %1$s</string>
+    <!-- The %1$s is an error message -->
     <string name="wallet_restoration_error">Could not restore your wallet.\n\n%1$s</string>
     <!-- PasswordConfirmationFragment -->
     <string name="enter_password">Enter your password</string>
     <!-- SignTransactionFragment -->
+    <!-- &#8230; is the ... character -->
     <string name="contacting_exchange">Contacting exchange&#8230;</string>
     <string name="preparing_transaction">Please wait while your transaction is being prepared and sent.</string>
     <string name="no_such_pocket_error">An error occurred while accessing this wallet account. If the problem persists, try restoring the wallet using the recovery phrase.</string>
     <string name="password_failed">The password entered is not valid.</string>
+    <!-- &#8230; is the ... character -->
     <string name="sending_msg">Sending&#8230;</string>
     <string name="sent_msg">Sent! Please wait for transaction confirmation.</string>
     <string name="tx_already_broadcast">Money already sent</string>
     <string name="trade_expired">Exchange expired</string>
+    <!-- %1$s is the time remaining e.g. ... in the next 8 minutes 35 seconds-->
     <string name="tx_confirm_timer_message">Please confirm this transaction in the next %1$s</string>
     <plurals name="tx_confirm_timer_minute">
         <item quantity="one">%s minute</item>
@@ -204,22 +217,30 @@
     <string name="about_coinomi_copyright" translatable="false">\u00A9 2014–2016 Coinomi</string>
     <!-- Add Coins -->
     <string name="title_activity_add_coins">Add coins</string>
+    <!-- %1$s is the coin name e.g. ... create a Bitcoin account ... -->
     <string name="password_add_coin">You are about to create a %1$s account in your wallet.</string>
+    <!-- %1$s is the coin name e.g. Add Bitcoin? -->
     <string name="adding_coin_confirmation_title">Add %1$s?</string>
+    <!-- %1$s is the coin name e.g. ... a new Bitcoin account -->
     <string name="adding_coin_working">Please wait while creating a new %1$s account</string>
+    <!-- %1$s is the coin name and %2$s is and error message e.g. Error adding Bitcoin: some error message -->
     <string name="add_coin_error">Error adding %1$s: %2$s</string>
+    <!-- %1$s is the coin name e.g. Bitcoin already added -->
     <string name="coin_already_added_title">%1$s already added</string>
     <string name="coin_already_added">Additional accounts are not yet supported</string>
     <!-- Transaction amount visualizer -->
+    <!-- Internal transfer means that the wallet send money to itself.-->
     <string name="internal_transfer">Internal transfer</string>
     <!-- Transaction Details -->
     <string name="title_activity_transaction_details">Transaction details</string>
     <string name="sent">Sent</string>
     <string name="received">Received</string>
+    <!-- Status of a transaction, could be pending for confirmations or confirmed -->
     <string name="status_label">Status</string>
     <string name="date_label">Date</string>
     <string name="transaction_id_label">Transaction id</string>
     <string name="view_at_a_blockchain_explorer_link">View on blockchain explorer</string>
+    <!-- %d is the number of confirmations -->
     <plurals name="status_building">
         <item quantity="one">%d confirmation</item>
         <item quantity="other">%d confirmations</item>
@@ -228,6 +249,7 @@
     <string name="status_unknown">Transaction status unknown</string>
     <!-- Exchange Rates -->
     <string name="title_activity_exchange_rates">Exchange rates</string>
+    <!-- %1$s is the symbol of a fiat currency e.g. Set EUR as a ... -->
     <string name="set_local_currency">Set %1$s as a local currency</string>
     <string name="exchange_rates_loading">Loading exchange rates</string>
     <string name="exchange_rates_load_error">Could not load exchange rates</string>
@@ -246,6 +268,7 @@
     <!-- Edit Account -->
     <string name="edit_account_title">Edit account</string>
     <string name="edit_account_description_label">Description</string>
+    <!-- %1$s is the name of the account e.g. Remove account Bitcoin? -->
     <string name="edit_account_delete_title">Remove account %1$s?</string>
     <string name="edit_account_delete_description">This removes the account from the wallet but it is still possible to re-add it and recover the coins.</string>
     <!-- Settings -->
@@ -258,6 +281,7 @@
     <string name="title_activity_show_seed">Show recovery phrase</string>
     <string name="seed_not_available_title">No recovery phrase found</string>
     <string name="seed_not_available">Your recovery phrase is not saved on this device.\nTry restoring your wallet to solve this.</string>
+    <!-- &#8230; is the ... character -->
     <string name="seed_working">Please wait&#8230;</string>
     <string name="seed_password_protected">This recovery phrase is protected with a BIP39 passphrase</string>
     <!-- Wallet locked -->
@@ -290,13 +314,16 @@
     <string name="trade_status_message">Your order will complete shortly. You can exit this screen without affecting the exchange.</string>
     <string name="trade_status_complete_message">Your order completed successfully.</string>
     <string name="trade_status_label">Status</string>
+    <!-- &#8230; is the ... character -->
     <string name="trade_status_waiting_deposit">Waiting for deposit&#8230;</string>
     <string name="trade_status_received_deposit">Received deposit of %1$s</string>
+    <!-- &#8230; is the ... character -->
     <string name="trade_status_waiting_trade">Waiting for exchange&#8230;</string>
     <string name="trade_status_complete_detail">Exchange complete, sent %1$s</string>
     <string name="trade_status_complete">Exchange complete</string>
     <string name="trade_status_view_transaction">View transaction</string>
     <string name="trade_status_email_receipt">Email receipt</string>
+    <!-- %1$s is an error message -->
     <string name="trade_status_failed_detail">Exchange failed: %1$s</string>
     <string name="trade_status_failed">Exchange failed</string>
     <string name="trade_status_delete_message">Remove from history?</string>
@@ -342,6 +369,7 @@
     <!-- Support -->
     <string name="support_message">Contact Coinomi support</string>
     <!-- Sweep wallet -->
+    <!-- Sweep paper wallet means to redeem coins from a code usually printed on a paper -->
     <string name="title_activity_sweep_wallet">Sweep paper wallet</string>
     <string name="sweep_wallet_info">You are about to transfer coins from a paper wallet to your Coinomi wallet.\nAfter the transfer is complete, please avoid reusing the paper wallet for security reasons.\n\nSupported formats: WIF, BIP38, Mini private key.</string>
     <string name="sweep_wallet_key_title">Private key</string>
@@ -352,8 +380,11 @@
     <string name="sweep_wallet_bad_password">Incorrect password.</string>
     <string name="sweep_wallet_zero_coins">The private key does not contain any funds.</string>
     <string name="sweep_wallet_key_wait">Please wait while sweeping your paper wallet</string>
+    <!-- &#8230; is the ... character -->
     <string name="sweep_wallet_key_decoding">Decoding private key&#8230;</string>
+    <!-- &#8230; is the ... character -->
     <string name="sweep_wallet_key_loading">Loading balance&#8230;</string>
+    <!-- &#8230; is the ... character -->
     <string name="sweep_wallet_key_signing">Creating transaction&#8230;</string>
     <!-- Fees settings -->
     <string name="title_activity_transaction_fees">Transaction fees</string>
@@ -367,7 +398,8 @@
 
     <!-- Terms -->
     <string name="terms_of_service_title">Terms of service</string>
-    <string name="terms_of_service">LEGAL DISCLAIMER\n
+    <!-- TODO translate to other languages -->
+    <string name="terms_of_service" translatable="false">LEGAL DISCLAIMER\n
 \n
 \n
 1. Risks related to the use of Coinomi Wallet\n
