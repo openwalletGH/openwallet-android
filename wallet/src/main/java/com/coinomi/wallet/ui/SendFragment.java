@@ -187,15 +187,13 @@ public class SendFragment extends WalletFragment {
      * @param uri the payment uri
      * @return A new instance of fragment WalletSendCoins.
      */
-    public static SendFragment newInstance(Uri uri) {
+    public static SendFragment newInstance(String accountId, CoinURI uri) {
         SendFragment fragment = new SendFragment();
         Bundle args = new Bundle();
         args.putString(Constants.ARG_URI, uri.toString());
         fragment.setArguments(args);
         return fragment;
     }
-
-
 
     public SendFragment() {
         // Required empty public constructor

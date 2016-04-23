@@ -1,48 +1,24 @@
 package com.coinomi.wallet.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Toast;
 
-import com.coinomi.core.wallet.WalletAccount;
-import com.coinomi.wallet.R;
-
-import org.bitcoinj.core.Transaction;
-
+import com.coinomi.wallet.Constants;
 
 /**
- * // TODO use WalletActivity to process URIs
  * @author John L. Jegutanis
  */
 @Deprecated
-public class SendActivity extends BaseWalletActivity implements SendFragment.Listener {
+public class SendActivity extends BaseWalletActivity {
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_fragment_wrapper);
+        Intent intent = new Intent(this, WalletActivity.class);
+        intent.putExtra(Constants.ARG_URI, getIntent().getDataString());
+        startActivity(intent);
 
-        if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, SendFragment.newInstance(getIntent().getData()))
-                    .commit();
-        }
-    }
-
-    @Override
-    public void onTransactionBroadcastSuccess(WalletAccount pocket, Transaction transaction) {
-        Toast.makeText(this, getString(R.string.sent_msg), Toast.LENGTH_LONG).show();
-        finish();
-    }
-
-    @Override
-    public void onTransactionBroadcastFailure(WalletAccount pocket, Transaction transaction) {
-        Toast.makeText(this, getString(R.string.get_tx_broadcast_error), Toast.LENGTH_LONG).show();
-        finish();
-    }
-
-    @Override
-    public void showPayToDialog(String addressStr) {
-        Toast.makeText(this, getString(R.string.error_generic), Toast.LENGTH_LONG).show();
         finish();
     }
 }

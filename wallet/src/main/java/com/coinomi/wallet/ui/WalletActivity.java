@@ -70,6 +70,7 @@ final public class WalletActivity extends BaseWalletActivity implements
     private static final int SET_URI = 2;
     private static final int OPEN_ACCOUNT = 3;
     private static final int OPEN_OVERVIEW = 4;
+    private static final int PROCESS_URI = 5;
 
     // Fragment tags
     private static final String ACCOUNT_TAG = "account_tag";
@@ -164,6 +165,11 @@ final public class WalletActivity extends BaseWalletActivity implements
                 navDrawerItems);
 
         lastAccountId = getWalletApplication().getConfiguration().getLastAccountId();
+
+        if (getIntent().hasExtra(Constants.ARG_URI)) {
+            handler.sendMessage(handler.obtainMessage(PROCESS_URI,
+                    getIntent().getStringExtra(Constants.ARG_URI)));
+        }
     }
 
     private void setOverviewTitle() {
@@ -819,6 +825,13 @@ final public class WalletActivity extends BaseWalletActivity implements
                     break;
                 case OPEN_OVERVIEW:
                     ref.openOverview();
+                    break;
+                case PROCESS_URI:
+                    try {
+                        ref.processUri((String) msg.obj);
+                    } catch (CoinURIParseException e) {
+                        ref.showScanFailedMessage(e);
+                    }
                     break;
             }
         }
