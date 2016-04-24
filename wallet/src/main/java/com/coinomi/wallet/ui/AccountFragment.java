@@ -2,11 +2,10 @@ package com.coinomi.wallet.ui;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.view.PagerAdapter;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.view.ActionMode;
 import android.view.LayoutInflater;
@@ -15,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.coinomi.core.uri.CoinURI;
 import com.coinomi.core.uri.CoinURIParseException;
@@ -23,6 +23,7 @@ import com.coinomi.wallet.Constants;
 import com.coinomi.wallet.R;
 import com.coinomi.wallet.WalletApplication;
 import com.coinomi.wallet.util.Keyboard;
+import com.coinomi.wallet.util.WeakHandler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,9 +47,13 @@ public class AccountFragment extends Fragment {
     // want to re-render that if we go to the SendFragment and back
     private static final int OFF_SCREEN_LIMIT = 2;
 
+    // Screen ids
     private static final int RECEIVE = 0;
     private static final int BALANCE = 1;
     private static final int SEND = 2;
+
+    // Handler ids
+    private static final int SEND_TO_URI = 0;
 
     private int currentScreen;
     @Bind(R.id.pager) ViewPager viewPager;
@@ -56,7 +61,7 @@ public class AccountFragment extends Fragment {
     @Nullable private WalletAccount account;
     private Listener listener;
     private WalletApplication application;
-    private final Handler handler = new Handler();
+    private final MyHandler handler = new MyHandler(this);
 
     public static AccountFragment getInstance() {
         AccountFragment fragment = new AccountFragment();
@@ -70,7 +75,7 @@ public class AccountFragment extends Fragment {
         return fragment;
     }
 
-    public void setupArgs(String accountId) {
+    private void setupArgs(String accountId) {
         getArguments().putString(Constants.ARG_ACCOUNT_ID, accountId);
     }
 
@@ -78,7 +83,9 @@ public class AccountFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        setRetainInstance(true);
+
+        // TODO handle null account
+        account = application.getAccount(getArguments().getString(Constants.ARG_ACCOUNT_ID));
     }
 
     @Override
@@ -91,10 +98,6 @@ public class AccountFragment extends Fragment {
 
         viewPager.setOffscreenPageLimit(OFF_SCREEN_LIMIT);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int pos, float posOffset, int posOffsetPixels) {
-            }
-
             @Override
             public void onPageSelected(int position) {
                 currentScreen = position;
@@ -116,10 +119,12 @@ public class AccountFragment extends Fragment {
                 }
             }
 
-            @Override
-            public void onPageScrollStateChanged(int state) {
-            }
+            @Override public void onPageScrolled(int pos, float posOffset, int posOffsetPixels) { }
+            @Override public void onPageScrollStateChanged(int state) { }
         });
+
+        viewPager.setAdapter(
+                new AppSectionsPagerAdapter(getActivity(), getChildFragmentManager(), account));
 
         return view;
     }
@@ -129,12 +134,6 @@ public class AccountFragment extends Fragment {
         ButterKnife.unbind(this);
         mNavigationDrawerFragment = null;
         super.onDestroyView();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        applyArguments();
     }
 
     @Override
@@ -149,6 +148,12 @@ public class AccountFragment extends Fragment {
     }
 
     @Override
+    public void onDetach() {
+        listener = null;
+        super.onDetach();
+    }
+
+    @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putInt(ACCOUNT_CURRENT_SCREEN, currentScreen);
     }
@@ -157,8 +162,10 @@ public class AccountFragment extends Fragment {
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         if (savedInstanceState != null) {
             currentScreen = savedInstanceState.getInt(ACCOUNT_CURRENT_SCREEN, BALANCE);
-            updateView();
+        } else {
+            currentScreen = BALANCE;
         }
+        updateView();
         super.onViewStateRestored(savedInstanceState);
     }
 
@@ -192,67 +199,47 @@ public class AccountFragment extends Fragment {
         goToItem(currentScreen, true);
     }
 
-    public void applyArguments() {
-        Bundle args = getArguments();
-        if (args != null && args.containsKey(Constants.ARG_ACCOUNT_ID)) {
-            String accountId = args.getString(Constants.ARG_ACCOUNT_ID);
-            // If no account set or if it was changed
-            if (account == null || !account.getId().equals(accountId) ||
-                    mustUpdatePagerAdapter(viewPager.getAdapter())) {
-                account = application.getAccount(accountId);
-                resetPagerAdapter();
-            }
-        }
-    }
-
-    private void resetPagerAdapter() {
-        if (account != null) {
-            PagerAdapter adapter = new AppSectionsPagerAdapter(getActivity(),
-                    getFragmentManager(), account);
-            viewPager.setAdapter(adapter);
-            adapter.notifyDataSetChanged();
-        }
-    }
-
-    private boolean mustUpdatePagerAdapter(PagerAdapter adapter) {
-        if (adapter instanceof AppSectionsPagerAdapter) {
-            // If the fragment manager changed, must update the adapter
-            if (((AppSectionsPagerAdapter) adapter).fm == getFragmentManager()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     @Nullable
     public WalletAccount getAccount() {
         return account;
     }
 
-    public void setSendFromCoin(final CoinURI coinUri)
-            throws CoinURIParseException{
+    public void sendToUri(final CoinURI coinUri) {
         if (viewPager != null) {
             viewPager.setCurrentItem(SEND);
-            SendFragment f = getSendFragment();
-            if (f != null) {
-                f.updateStateFrom(coinUri);
-            } else {
-                log.warn("Expected fragment to be not null");
-                toastGenericError(getContext());
-            }
+            handler.sendMessage(handler.obtainMessage(SEND_TO_URI, coinUri));
         } else {
             // Should not happen
             toastGenericError(getContext());
         }
     }
 
+    private void setSendToUri(CoinURI coinURI) {
+        if (viewPager != null) viewPager.setCurrentItem(SEND);
+        SendFragment f = getSendFragment();
+        if (f != null) {
+            try {
+                f.updateStateFrom(coinURI);
+            } catch (CoinURIParseException e) {
+                Toast.makeText(getContext(),
+                        getString(R.string.scan_error, e.getMessage()),
+                        Toast.LENGTH_LONG).show();
+            }
+        } else {
+            log.warn("Expected fragment to be not null");
+            toastGenericError(getContext());
+        }
+    }
+
     @Nullable
     private SendFragment getSendFragment() {
-        return (SendFragment) getFragment(getFragmentManager(), SEND);
+        return (SendFragment) getFragment(getChildFragmentManager(), SEND);
     }
 
     @Nullable
     private static Fragment getFragment(FragmentManager fm, int item) {
+        if (fm.getFragments() == null) return null;
+
         for (Fragment f : fm.getFragments()) {
             switch (item) {
                 case RECEIVE:
@@ -271,26 +258,16 @@ public class AccountFragment extends Fragment {
         return null;
     }
 
-
-    private static Fragment getFragmentOrCreate(FragmentManager fm, WalletAccount account, int item) {
-        Fragment f = getFragment(fm, item);
-
-        if (f == null) {
-            f = createFragment(account, item);
-        }
-
-        return f;
-    }
-
-    private static Fragment createFragment(WalletAccount account, int item) {
+    @SuppressWarnings({ "unchecked"})
+    private static <T extends Fragment> T createFragment(WalletAccount account, int item) {
         String accountId = account.getId();
         switch (item) {
             case RECEIVE:
-                return AddressRequestFragment.newInstance(accountId);
+                return (T) AddressRequestFragment.newInstance(accountId);
             case BALANCE:
-                return BalanceFragment.newInstance(accountId);
+                return (T) BalanceFragment.newInstance(accountId);
             case SEND:
-                return SendFragment.newInstance(accountId);
+                return (T) SendFragment.newInstance(accountId);
             default:
                 throw new RuntimeException("Cannot create fragment, unknown screen item: " + item);
         }
@@ -325,15 +302,22 @@ public class AccountFragment extends Fragment {
         return false;
     }
 
-    private static class AppSectionsPagerAdapter extends FragmentStatePagerAdapter {
-        final Context context;
-        final FragmentManager fm;
-        private final WalletAccount account;
+    private static class AppSectionsPagerAdapter extends FragmentPagerAdapter {
+        private final String receiveTitle;
+        private final String sendTitle;
+        private final String balanceTitle;
+
+        private AddressRequestFragment request;
+        private SendFragment send;
+        private BalanceFragment balance;
+
+        private WalletAccount account;
 
         public AppSectionsPagerAdapter(Context context, FragmentManager fm, WalletAccount account) {
             super(fm);
-            this.context = context;
-            this.fm = fm;
+            receiveTitle = context.getString(R.string.wallet_title_request);
+            sendTitle = context.getString(R.string.wallet_title_send);
+            balanceTitle = context.getString(R.string.wallet_title_balance);
             this.account = account;
         }
 
@@ -341,9 +325,14 @@ public class AccountFragment extends Fragment {
         public Fragment getItem(int i) {
             switch (i) {
                 case RECEIVE:
+                    if (request == null) request = createFragment(account, i);
+                    return request;
                 case SEND:
+                    if (send == null) send = createFragment(account, i);
+                    return send;
                 case BALANCE:
-                    return getFragmentOrCreate(fm, account, i);
+                    if (balance == null) balance = createFragment(account, i);
+                    return balance;
                 default:
                     throw new RuntimeException("Cannot get item, unknown screen item: " + i);
             }
@@ -356,15 +345,25 @@ public class AccountFragment extends Fragment {
         }
 
         @Override
-        public CharSequence getPageTitle(int position) {
-            switch (position) {
-                case RECEIVE:
-                    return context.getString(R.string.wallet_title_request);
-                case SEND:
-                    return context.getString(R.string.wallet_title_send);
-                case BALANCE:
-                default:
-                    return context.getString(R.string.wallet_title_balance);
+        public CharSequence getPageTitle(int i) {
+            switch (i) {
+                case RECEIVE: return receiveTitle;
+                case SEND: return sendTitle;
+                case BALANCE: return balanceTitle;
+                default: throw new RuntimeException("Cannot get item, unknown screen item: " + i);
+            }
+        }
+    }
+
+    private static class MyHandler extends WeakHandler<AccountFragment> {
+        public MyHandler(AccountFragment ref) { super(ref); }
+
+        @Override
+        protected void weakHandleMessage(AccountFragment ref, Message msg) {
+            switch (msg.what) {
+                case SEND_TO_URI:
+                    ref.setSendToUri((CoinURI) msg.obj);
+                    break;
             }
         }
     }

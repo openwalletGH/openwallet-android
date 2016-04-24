@@ -100,7 +100,7 @@ final public class WalletActivity extends BaseWalletActivity implements
     private final Handler handler = new MyHandler(this);
     private boolean isOverviewVisible;
     private OverviewFragment overviewFragment;
-    private AccountFragment accountFragment;
+    @Nullable private AccountFragment accountFragment;
 
     public WalletActivity() {}
 
@@ -118,18 +118,17 @@ final public class WalletActivity extends BaseWalletActivity implements
         if (savedInstanceState == null && !getConfiguration().getTermsAccepted()) {
             TermsOfUseDialog.newInstance().show(getFM(), TERMS_OF_USE_TAG);
         }
+
+        lastAccountId = getWalletApplication().getConfiguration().getLastAccountId();
         
         // Create the overview and account fragments
         FragmentTransaction tr = getFM().beginTransaction();
         if (savedInstanceState == null) {
             checkAlerts();
 
+            // Add overview fragment
             overviewFragment = OverviewFragment.getInstance();
-            accountFragment = AccountFragment.getInstance();
-
-            // Add fragments
             tr.add(R.id.contents, overviewFragment, OVERVIEW_TAG).hide(overviewFragment);
-            tr.add(R.id.contents, accountFragment, ACCOUNT_TAG).hide(accountFragment);
 
             // When we have more than one account, show overview as default
             List<WalletAccount> accounts = getAllAccounts();
@@ -144,8 +143,9 @@ final public class WalletActivity extends BaseWalletActivity implements
             overviewFragment = (OverviewFragment) getFM().findFragmentByTag(OVERVIEW_TAG);
             accountFragment = (AccountFragment) getFM().findFragmentByTag(ACCOUNT_TAG);
 
-            if (isOverviewVisible) {
-                tr.show(overviewFragment).hide(accountFragment);
+            if (isOverviewVisible || accountFragment == null) {
+                tr.show(overviewFragment);
+                if (accountFragment != null) tr.hide(accountFragment);
                 setOverviewTitle();
             } else {
                 tr.show(accountFragment).hide(overviewFragment);
@@ -164,11 +164,10 @@ final public class WalletActivity extends BaseWalletActivity implements
                 (DrawerLayout) findViewById(R.id.drawer_layout),
                 navDrawerItems);
 
-        lastAccountId = getWalletApplication().getConfiguration().getLastAccountId();
-
         if (getIntent().hasExtra(Constants.ARG_URI)) {
             handler.sendMessage(handler.obtainMessage(PROCESS_URI,
                     getIntent().getStringExtra(Constants.ARG_URI)));
+            getIntent().removeExtra(Constants.ARG_URI);
         }
     }
 
@@ -304,7 +303,7 @@ final public class WalletActivity extends BaseWalletActivity implements
             setOverviewTitle();
             FragmentTransaction ft = getFM().beginTransaction();
             ft.show(overviewFragment);
-            ft.hide(accountFragment);
+            if (accountFragment != null) ft.hide(accountFragment);
             ft.commit();
             isOverviewVisible = true;
             connectAllCoinService();
@@ -330,21 +329,26 @@ final public class WalletActivity extends BaseWalletActivity implements
     private void openAccount(WalletAccount account, boolean selectInNavDrawer) {
         if (account != null && !isFinishing()) {
             if (isAccountVisible(account)) return;
-            lastAccountId = account.getId();
-            setAccountTitle(account);
 
             FragmentTransaction ft = getFM().beginTransaction();
-            ft.show(accountFragment);
             ft.hide(overviewFragment);
+
+            // If this account fragment is hidden, show it
+            if (accountFragment != null && account.getId().equals(lastAccountId)) {
+                ft.show(accountFragment);
+            } else {
+                // Else create a new fragment for the new account
+                lastAccountId = account.getId();
+                if (accountFragment != null) ft.remove(accountFragment);
+                accountFragment = AccountFragment.getInstance(lastAccountId);
+                ft.add(R.id.contents, accountFragment, ACCOUNT_TAG);
+                getWalletApplication().getConfiguration().touchLastAccountId(lastAccountId);
+            }
             ft.commit();
 
+            setAccountTitle(account);
             isOverviewVisible = false;
 
-            accountFragment.setupArgs(lastAccountId);
-            accountFragment.applyArguments();
-            accountFragment.goToBalance(false);
-
-            getWalletApplication().getConfiguration().touchLastAccountId(lastAccountId);
             connectCoinService(lastAccountId);
             if (selectInNavDrawer) {
                 navDrawerSelectAccount(account, true);
@@ -357,7 +361,8 @@ final public class WalletActivity extends BaseWalletActivity implements
     }
 
     private boolean isAccountVisible(WalletAccount account) {
-        return account != null && accountFragment.isVisible() && account.equals(accountFragment.getAccount());
+        return account != null && accountFragment != null &&
+                accountFragment.isVisible() && account.equals(accountFragment.getAccount());
     }
 
     private void connectCoinService(String accountId) {
@@ -491,7 +496,7 @@ final public class WalletActivity extends BaseWalletActivity implements
             throw new CoinURIParseException(error);
         }
 
-        if (accountFragment.isVisible() && accountFragment.getAccount() != null) {
+        if (accountFragment != null && accountFragment.isVisible() && accountFragment.getAccount() != null) {
             payWith(accountFragment.getAccount(), coinUri);
             return;
         }
@@ -717,7 +722,7 @@ final public class WalletActivity extends BaseWalletActivity implements
                 }
             }
         } else if (accounts.size() == 1) {
-            if (accountFragment.isVisible()) {
+            if (accountFragment != null && accountFragment.isVisible()) {
                 // If not in balance screen, back button brings us there
                 boolean screenChanged = goToBalance();
                 if (!screenChanged) {
@@ -734,19 +739,19 @@ final public class WalletActivity extends BaseWalletActivity implements
 
     @SuppressWarnings("unused")
     private boolean goToReceive() {
-        return accountFragment.isVisible() && accountFragment.goToReceive(true);
+        return accountFragment != null && accountFragment.isVisible() && accountFragment.goToReceive(true);
     }
 
     private boolean goToBalance() {
-        return accountFragment.isVisible() && accountFragment.goToBalance(true);
+        return accountFragment != null && accountFragment.isVisible() && accountFragment.goToBalance(true);
     }
 
     private boolean goToSend() {
-        return accountFragment.isVisible() && accountFragment.goToSend(true);
+        return accountFragment != null && accountFragment.isVisible() && accountFragment.goToSend(true);
     }
 
     private boolean resetSend() {
-        return accountFragment.isVisible() && accountFragment.resetSend();
+        return accountFragment != null && accountFragment.isVisible() && accountFragment.resetSend();
     }
 
     @Override
@@ -814,11 +819,11 @@ final public class WalletActivity extends BaseWalletActivity implements
                     ref.goToSend();
                     break;
                 case SET_URI:
-                    try {
-                        ref.accountFragment.setSendFromCoin((CoinURI) msg.obj);
-                    } catch (CoinURIParseException e) {
-                        ref.showScanFailedMessage(e);
+                    if (ref.accountFragment == null) {
+                        Toast.makeText(ref, ref.getString(R.string.no_wallet_pocket_selected),
+                                Toast.LENGTH_LONG).show();
                     }
+                    ref.accountFragment.sendToUri((CoinURI) msg.obj);
                     break;
                 case OPEN_ACCOUNT:
                     ref.openAccount((WalletAccount) msg.obj);

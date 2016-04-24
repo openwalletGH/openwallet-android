@@ -110,10 +110,11 @@ public class SendFragment extends WalletFragment {
     private static final int REQUEST_CODE_SCAN = 0;
     private static final int SIGN_TRANSACTION = 1;
 
-    private static final int UPDATE_LOCAL_EXCHANGE_RATES = 0;
-    private static final int UPDATE_WALLET_CHANGE = 1;
-    private static final int UPDATE_MARKET = 2;
-    private static final int SET_ADDRESS = 3;
+    private static final int UPDATE_VIEW = 0;
+    private static final int UPDATE_LOCAL_EXCHANGE_RATES = 1;
+    private static final int UPDATE_WALLET_CHANGE = 2;
+    private static final int UPDATE_MARKET = 3;
+    private static final int SET_ADDRESS = 4;
 
     // Loader IDs
     private static final int ID_RATE_LOADER = 0;
@@ -136,7 +137,8 @@ public class SendFragment extends WalletFragment {
     private boolean isTxMessageValid;
     private WalletAccount account;
 
-    private Handler handler = new MyHandler(this);
+    private MyHandler handler = new MyHandler(this);
+    private ContentObserver addressBookObserver = new AddressBookObserver(handler);
     private WalletApplication application;
     private Configuration config;
     private Map<String, ExchangeRate> localRates = new HashMap<>();
@@ -203,8 +205,6 @@ public class SendFragment extends WalletFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // To handle dialogs
-        setRetainInstance(true);
         // The onCreateOptionsMenu is handled in com.coinomi.wallet.ui.AccountFragment
         setHasOptionsMenu(true);
 
@@ -1206,6 +1206,9 @@ public class SendFragment extends WalletFragment {
         @Override
         protected void weakHandleMessage(SendFragment ref, Message msg) {
             switch (msg.what) {
+                case UPDATE_VIEW:
+                    ref.updateView();
+                    break;
                 case UPDATE_LOCAL_EXCHANGE_RATES:
                     ref.onLocalExchangeRatesUpdate((HashMap<String, ExchangeRate>) msg.obj);
                     break;
@@ -1311,10 +1314,17 @@ public class SendFragment extends WalletFragment {
         }
     }
 
-    private final ContentObserver addressBookObserver = new ContentObserver(handler) {
+    private static class AddressBookObserver extends ContentObserver {
+        private final MyHandler handler;
+
+        public AddressBookObserver(MyHandler handler) {
+            super(handler);
+            this.handler = handler;
+        }
+
         @Override
         public void onChange(final boolean selfChange) {
-            updateView();
+            handler.sendEmptyMessage(UPDATE_VIEW);
         }
-    };
+    }
 }

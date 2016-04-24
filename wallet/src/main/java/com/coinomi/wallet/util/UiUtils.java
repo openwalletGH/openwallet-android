@@ -41,7 +41,7 @@ public class UiUtils {
     private static final Logger log = LoggerFactory.getLogger(UiUtils.class);
 
     static public void toastGenericError(Context context) {
-        Toast.makeText(context, R.string.error_generic, Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, R.string.error_generic, Toast.LENGTH_LONG).show();
     }
 
     static public void replyAddressRequest(Activity activity, CoinURI uri, WalletAccount pocket) throws CoinURIParseException {
@@ -52,7 +52,7 @@ public class UiUtils {
         } catch (Exception e) {
             // Should not happen
             ACRA.getErrorReporter().handleSilentException(e);
-            Toast.makeText(activity, R.string.error_generic, Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity, R.string.error_generic, Toast.LENGTH_LONG).show();
         }
     }
 
@@ -81,7 +81,7 @@ public class UiUtils {
         } catch (Exception e) {
             // Should not normally happen
             ACRA.getErrorReporter().handleSilentException(e);
-            Toast.makeText(context, R.string.error_generic, Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, R.string.error_generic, Toast.LENGTH_LONG).show();
         }
     }
 

@@ -8,7 +8,6 @@ import android.database.ContentObserver;
 import android.database.Cursor;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.LoaderManager;
@@ -57,6 +56,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 import static com.coinomi.core.Preconditions.checkNotNull;
+import static com.coinomi.wallet.ExchangeRatesProvider.getRate;
 
 /**
  *
@@ -91,7 +91,8 @@ public class AddressRequestFragment extends WalletFragment {
     CurrencyCalculatorLink amountCalculatorLink;
     ContentResolver resolver;
 
-    private final Handler handler = new MyHandler(this);
+    private final MyHandler handler = new MyHandler(this);
+    private final ContentObserver addressBookObserver = new AddressBookObserver(handler);
     private Configuration config;
 
     private static class MyHandler extends WeakHandler<AddressRequestFragment> {
@@ -104,18 +105,25 @@ public class AddressRequestFragment extends WalletFragment {
                     ref.updateView();
                     break;
                 case UPDATE_EXCHANGE_RATE:
-                    ref.amountCalculatorLink.setExchangeRate((ExchangeRate) msg.obj);
+                    ref.updateExchangeRate((ExchangeRate) msg.obj);
                     break;
             }
         }
     }
 
-    private final ContentObserver addressBookObserver = new ContentObserver(handler) {
+    static class AddressBookObserver extends ContentObserver {
+        private final MyHandler handler;
+
+        public AddressBookObserver(MyHandler handler) {
+            super(handler);
+            this.handler = handler;
+        }
+
         @Override
         public void onChange(final boolean selfChange) {
-            updateView();
+            handler.sendEmptyMessage(UPDATE_VIEW);
         }
-    };
+    }
 
     public static AddressRequestFragment newInstance(Bundle args) {
         AddressRequestFragment fragment = new AddressRequestFragment();
@@ -144,7 +152,6 @@ public class AddressRequestFragment extends WalletFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setRetainInstance(true);
         // The onCreateOptionsMenu is handled in com.coinomi.wallet.ui.AccountFragment
         // or in com.coinomi.wallet.ui.PreviousAddressesActivity
         setHasOptionsMenu(true);
@@ -181,6 +188,14 @@ public class AddressRequestFragment extends WalletFragment {
         amountCalculatorLink = new CurrencyCalculatorLink(sendCoinAmountView, sendLocalAmountView);
 
         return view;
+    }
+
+    @Override
+    public void onViewStateRestored(@android.support.annotation.Nullable Bundle savedInstanceState) {
+        ExchangeRatesProvider.ExchangeRate rate = getRate(getContext(), type.getSymbol(), config.getExchangeCurrencyCode());
+        if (rate != null) updateExchangeRate(rate.rate);
+        updateView();
+        super.onViewStateRestored(savedInstanceState);
     }
 
     @Override
@@ -280,6 +295,10 @@ public class AddressRequestFragment extends WalletFragment {
         Dialogs.dismissAllowingStateLoss(getFragmentManager(), NEW_ADDRESS_TAG);
         DialogFragment dialog = CreateNewAddressDialog.getInstance(account);
         dialog.show(getFragmentManager(), NEW_ADDRESS_TAG);
+    }
+
+    private void updateExchangeRate(ExchangeRate exchangeRate) {
+        amountCalculatorLink.setExchangeRate((ExchangeRate) exchangeRate);
     }
 
     @Override

@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
@@ -67,6 +66,7 @@ public class BalanceFragment extends WalletFragment implements LoaderCallbacks<L
 
     private static final int WALLET_CHANGED = 0;
     private static final int UPDATE_VIEW = 1;
+    private static final int CLEAR_LABEL_CACHE = 2;
 
     private static final int AMOUNT_FULL_PRECISION = 8;
     private static final int AMOUNT_MEDIUM_PRECISION = 6;
@@ -85,9 +85,10 @@ public class BalanceFragment extends WalletFragment implements LoaderCallbacks<L
     private boolean isFullAmount = false;
     private WalletApplication application;
     private Configuration config;
-    private final Handler handler = new MyHandler(this);
+    private final MyHandler handler = new MyHandler(this);
+    private final ContentObserver addressBookObserver = new AddressBookObserver(handler);
 
-    @Bind(R.id.transaction_rows) ListView transactionRows;
+            @Bind(R.id.transaction_rows) ListView transactionRows;
     @Bind(R.id.swipeContainer) SwipeRefreshLayout swipeContainer;
     @Bind(R.id.history_empty) View emptyPocketMessage;
     @Bind(R.id.account_balance) Amount accountBalance;
@@ -96,13 +97,6 @@ public class BalanceFragment extends WalletFragment implements LoaderCallbacks<L
     private TransactionsListAdapter adapter;
     private Listener listener;
     private ContentResolver resolver;
-
-    private final ContentObserver addressBookObserver = new ContentObserver(handler) {
-        @Override
-        public void onChange(final boolean selfChange) {
-            if (adapter != null) adapter.clearLabelCache();
-        }
-    };
 
     /**
      * Use this factory method to create a new instance of
@@ -127,7 +121,6 @@ public class BalanceFragment extends WalletFragment implements LoaderCallbacks<L
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setRetainInstance(true);
         // The onCreateOptionsMenu is handled in com.coinomi.wallet.ui.AccountFragment
         setHasOptionsMenu(true);
 
@@ -522,6 +515,10 @@ public class BalanceFragment extends WalletFragment implements LoaderCallbacks<L
         if (adapter != null) adapter.clearLabelCache();
     }
 
+    private void clearLabelCache() {
+        if (adapter != null) adapter.clearLabelCache();
+    }
+
     private static class MyHandler extends WeakHandler<BalanceFragment> {
         public MyHandler(BalanceFragment ref) { super(ref); }
 
@@ -536,7 +533,24 @@ public class BalanceFragment extends WalletFragment implements LoaderCallbacks<L
                 case UPDATE_VIEW:
                     ref.updateView();
                     break;
+                case CLEAR_LABEL_CACHE:
+                    ref.clearLabelCache();
+                    break;
             }
+        }
+    }
+
+    static class AddressBookObserver extends ContentObserver {
+        private final MyHandler handler;
+
+        public AddressBookObserver(MyHandler handler) {
+            super(handler);
+            this.handler = handler;
+        }
+
+        @Override
+        public void onChange(final boolean selfChange) {
+            handler.sendEmptyMessage(CLEAR_LABEL_CACHE);
         }
     }
 

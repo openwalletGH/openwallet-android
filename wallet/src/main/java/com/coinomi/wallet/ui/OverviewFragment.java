@@ -109,7 +109,6 @@ public class OverviewFragment extends Fragment{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setRetainInstance(true);
         setHasOptionsMenu(true);
 
         wallet = application.getWallet();
