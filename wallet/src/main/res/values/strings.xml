@@ -290,7 +290,7 @@
     <string name="title_activity_debugging">Debugging</string>
     <string name="debugging_info">You can use a collection of tools to debug various issues with your wallet.</string>
     <string name="debugging_test_wallet_password">Wallet unlocking tests</string>
-    <string name="debugging_test_wallet_password_results">Unlocked wallet: %1$s\nUnicode normalization: %2$s\nWhitespace trimmed: %3$s\nInput fingerprint: %4$s</string>
+    <string name="debugging_test_wallet_password_results">Unlocked wallet: %1$s\n\nFingerprints\nInput: %2$s\nKey: %3$s</string>
     <!-- Overview -->
     <string name="title_activity_overview">Overview</string>
     <!-- Exchange -->

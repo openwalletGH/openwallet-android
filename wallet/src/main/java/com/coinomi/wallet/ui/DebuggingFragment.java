@@ -16,11 +16,16 @@ import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.crypto.DeterministicKey;
 import org.bitcoinj.crypto.KeyCrypter;
 import org.bitcoinj.crypto.KeyCrypterException;
+import org.bitcoinj.crypto.KeyCrypterScrypt;
+import org.bitcoinj.wallet.Protos;
+import org.spongycastle.crypto.params.KeyParameter;
 import org.spongycastle.util.encoders.Hex;
 
 import java.io.UnsupportedEncodingException;
 import java.text.Normalizer;
 import java.util.Arrays;
+
+import javax.annotation.Nullable;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -98,7 +103,6 @@ public class DebuggingFragment extends Fragment {
 
     private class PasswordTestTask extends AsyncTask<Void, Void, Void> {
         UnlockResult result = new UnlockResult();
-        Exception error;
 
         @Override
         protected void onPreExecute() {
@@ -109,61 +113,27 @@ public class DebuggingFragment extends Fragment {
         @Override
         protected Void doInBackground(Void... params) {
             DeterministicKey masterKey = wallet.getMasterKey();
-            try {
-                if (masterKey.getKeyCrypter() != null) {
-
-                    if (tryDecrypt(masterKey, password)) {
-                        result.isUnlockSuccess = true;
-                    } else {
-                        tryNormalizationDecryption(masterKey, password, result);
-                    }
-
-                    if (!result.isUnlockSuccess) {
-                        String trimmedPassword = password.toString().trim();
-                        if (!password.equals(trimmedPassword)) {
-                            if (tryDecrypt(masterKey, trimmedPassword)) {
-                                result.isUnlockSuccess = true;
-                                result.isWhitespaceTrimmed = true;
-                            } else {
-                                tryNormalizationDecryption(masterKey, password, result);
-                                result.isWhitespaceTrimmed = true;
-                            }
-                        }
-                    }
-                } else {
-                    throw new RuntimeException("Missing key crypter");
-                }
-            } catch (Exception e) {
-                error = e;
-            }
-
+            tryDecrypt(masterKey, password, result);
             return null;
         }
 
-        private boolean tryNormalizationDecryption(DeterministicKey masterKey, CharSequence password, UnlockResult result) {
-            if (tryDecrypt(masterKey, Normalizer.normalize(password, Normalizer.Form.NFC))) {
-                result.isUnlockSuccess = true;
-                result.normalization = Normalizer.Form.NFC;
-            } else if (tryDecrypt(masterKey, Normalizer.normalize(password, Normalizer.Form.NFD))) {
-                result.isUnlockSuccess = true;
-                result.normalization = Normalizer.Form.NFD;
-            } else if (tryDecrypt(masterKey, Normalizer.normalize(password, Normalizer.Form.NFKD))) {
-                result.isUnlockSuccess = true;
-                result.normalization = Normalizer.Form.NFKD;
-            } else if (tryDecrypt(masterKey, Normalizer.normalize(password, Normalizer.Form.NFKC))) {
-                result.isUnlockSuccess = true;
-                result.normalization = Normalizer.Form.NFKC;
-            }
-            return result.isUnlockSuccess;
-        }
-
-        private boolean tryDecrypt(DeterministicKey masterKey, CharSequence password) {
+        private void tryDecrypt(DeterministicKey masterKey, CharSequence password, UnlockResult result) {
             KeyCrypter crypter = checkNotNull(masterKey.getKeyCrypter());
+            KeyParameter k = crypter.deriveKey(password);
             try {
-                masterKey.decrypt(crypter, crypter.deriveKey(password));
-                return true;
+                result.inputFingerprint = getFingerprint(password.toString().getBytes("UTF-8"));
+            } catch (UnsupportedEncodingException e) { /* Should not happen */ }
+            result.keyFingerprint = getFingerprint(k.getKey());
+            if (crypter instanceof KeyCrypterScrypt) {
+                result.scryptParams = ((KeyCrypterScrypt) crypter).getScryptParameters();
+            }
+
+            try {
+                masterKey.decrypt(crypter, k);
+                result.isUnlockSuccess = true;
             } catch (KeyCrypterException e) {
-                return false;
+                result.isUnlockSuccess = false;
+                result.error = e.getMessage();
             }
         }
 
@@ -171,33 +141,39 @@ public class DebuggingFragment extends Fragment {
             passwordTestTask = null;
             if (Dialogs.dismissAllowingStateLoss(getFragmentManager(), PROCESSING_DIALOG_TAG)) return;
 
-            if (error != null) {
-                DialogBuilder.warn(getActivity(), R.string.error_generic)
-                        .setMessage(error.getMessage())
-                        .setPositiveButton(R.string.button_ok, null).create().show();
-            } else {
-                String yes = getString(R.string.yes);
-                String no = getString(R.string.no);
-                String fingerprint = "";
-                try {
-                    fingerprint = Hex.toHexString(Arrays.copyOf(
-                            Sha256Hash.create(password.toString().getBytes("UTF-8")).getBytes(), 4));
-                } catch (UnsupportedEncodingException e) { /* Should not happen */ }
+            String yes = getString(R.string.yes);
+            String no = getString(R.string.no);
 
-                String message = getString(R.string.debugging_test_wallet_password_results,
-                        result.isUnlockSuccess ? yes : no,
-                        result.normalization != null ? result.normalization : "NONE",
-                        result.isWhitespaceTrimmed ? yes : no, fingerprint);
-                DialogBuilder.warn(getActivity(), R.string.debugging_test_wallet_password)
-                        .setMessage(message)
-                        .setPositiveButton(R.string.button_ok, null).create().show();
+            String message = getString(R.string.debugging_test_wallet_password_results,
+                    result.isUnlockSuccess ? yes : no, result.inputFingerprint, result.keyFingerprint);
+            if (result.scryptParams != null) {
+                Protos.ScryptParameters sp = result.scryptParams;
+                message += "\n\nScrypt:" +
+                        "\nS = " + Hex.toHexString(sp.getSalt().toByteArray()) +
+                        "\nN = " + sp.getN() +
+                        "\nP = " + sp.getP() +
+                        "\nR = " + sp.getR();
             }
+            if (result.error != null) {
+                message += "\n\n" + result.error;
+            }
+            DialogBuilder.warn(getActivity(), R.string.debugging_test_wallet_password)
+                    .setMessage(message)
+                    .setPositiveButton(R.string.button_ok, null).create().show();
         }
     }
 
+    private String getFingerprint(byte[] b) {
+        String inputFingerprint;
+        inputFingerprint = Hex.toHexString(Arrays.copyOf(Sha256Hash.create(b).getBytes(), 4));
+        return inputFingerprint;
+    }
+
     static class UnlockResult {
-        Normalizer.Form normalization;
         boolean isUnlockSuccess = false;
-        boolean isWhitespaceTrimmed = false;
+        String inputFingerprint;
+        String keyFingerprint;
+        @Nullable String error;
+        @Nullable Protos.ScryptParameters scryptParams;
     }
 }
