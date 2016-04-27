@@ -68,8 +68,6 @@
     <string name="restore_wallet">Ανάκτηση πορτοφολιού</string>
     <string name="test_wallet">Δοκιμαστικό πορτοφόλι</string>
     <!-- Intro -->
-    <string name="test_wallet_warning_title">Δημιουργία δοκιμαστικού πορτοφολιού;</string>
-    <string name="test_wallet_warning_message">Αν δημιουργήσετε ένα νέο δοκιμαστικό πορτοφόλι, το υπάρχον πορτοφόλι σας θα χαθεί εκτός αν έχετε ήδη αποθηκεύσει σε ασφαλές μέρος την <i>φράση ανάκτησής</i> σας.</string>
     <string name="incompatible_device_warning_title">Μη συμβατή συσκευή</string>
     <string name="incompatible_device_warning_message">Η συσκευή σας δεν μπορεί να εκτελέσει κάποιες κρυπτογραφικές μεθόδους λόγω ελαττωμάτων στο λογισμικό ή την ίδια τη συσκευή.\nΤο πρόβλημα θα μπόρεσε να λυθεί ύστερα από την ενημέρωση λογισμικού από τον κατασκευαστή της συσκευής.\n\nΠαρακαλώ επικοινωνήστε μαζί μας αν έχετε απορίες: support@coinomi.com</string>
     <!-- Recovery fragment -->
@@ -134,15 +132,12 @@
     <string name="amount_error">Μη έγκυρο ποσό</string>
     <string name="amount_error_empty">Παρακαλώ εισάγετε το ποσόν</string>
     <string name="amount_error_negative">Το ποσόν πρέπει να είναι μεγαλύτερο του μηδενός</string>
-    <string name="amount_error_decimal_places">Υπερβολικά πολλά δεκαδικά ψηφία, παρακαλώ δοκιμάστε με λιγότερα από %1$d</string>
     <string name="amount_error_too_small">Το ελάχιστο ποσόν είναι %1$s</string>
     <string name="amount_error_not_enough_money_plain">Δεν υπάρχουν αρκετά χρήματα</string>
     <string name="amount_error_not_enough_money">Δεν υπάρχουν αρκετά χρήματα, το υπόλοιπό σας είναι %1$s</string>
     <string name="amount_warn_fees_apply">Θα αποσταλούν ελαχίστως λιγότερα λόγω εξόδων συναλλαγής</string>
     <!-- Set Password fragment -->
     <string name="set_password_info">Εισάγετε έναν κωδικό για να προστατέψετε το πορτοφόλι σας κατά την καθημερινή του χρήση.</string>
-    <string name="set_password_seed_protect">Επιθυμώ επίσης να προστατέψω τη φράση ανάκτησης μου (BIP39)</string>
-    <string name="set_password_seed_protect_info">Ο κωδικός δεν μπορεί να αλλάξει μελλοντικά και θα χρειάζεται να εισάγεται κάθε φορά που θα ανακτάτε το πορτοφόλι σας με την φράση ανάκτησης.\nΠΡΟΣΟΧΗ: Αν ξεχάσετε τον κωδικό θα είναι αδύνατον να ανακτήσετε το πορτοφόλι σας!</string>
     <string name="set_password1">Εισάγετε τον κωδικό σας</string>
     <string name="set_password2">Εισάγετε ξανά τον κωδικό σας</string>
     <string name="password_too_common_error">Ο κωδικός \"%1$s\" είναι πολύ κοινότοπος και δεν προσφέρει ουσιαστική ασφάλεια.</string>

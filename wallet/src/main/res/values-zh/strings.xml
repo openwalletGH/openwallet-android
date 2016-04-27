@@ -68,8 +68,6 @@
     <string name="restore_wallet">恢复钱包</string>
     <string name="test_wallet">测试钱包</string>
     <!-- Intro -->
-    <string name="test_wallet_warning_title">创建测试钱包？</string>
-    <string name="test_wallet_warning_message">如果你要创建一个新的测试钱包，你现有的钱包将会丢失，除非你已经备份了 <i>恢复钱包密码</i>.</string>
     <string name="incompatible_device_warning_title">设备不匹配</string>
     <string name="incompatible_device_warning_message">由于软件或硬件原因，此设备无法执行某些加密功能。\n可以通过设备生产商发布的更新来解决。\n\n如果有任何疑问，欢迎和我们联系：support@coinomi.com</string>
     <!-- Recovery fragment -->
@@ -133,15 +131,12 @@
     <string name="amount_error">输入的金额无效。</string>
     <string name="amount_error_empty">请输入金额</string>
     <string name="amount_error_negative">无法发送负数金额。</string>
-    <string name="amount_error_decimal_places">太多小数点，尝试少于 %1$d</string>
     <string name="amount_error_too_small">最低金额不少于 %1$s</string>
     <string name="amount_error_not_enough_money_plain">余额不足</string>
     <string name="amount_error_not_enough_money">余额不足，目前余额为%1$s</string>
     <string name="amount_warn_fees_apply">因手续费实际发送的数量会稍微少一些。</string>
     <!-- Set Password fragment -->
     <string name="set_password_info">设置密码保护你的钱包。</string>
-    <string name="set_password_seed_protect">同时也保护种子。 (BIP39)</string>
-    <string name="set_password_seed_protect_info">密码是永久性的，而且在恢复钱包时也要用到。\n警告：如果密码丢失，则无法恢复钱包！</string>
     <string name="set_password1">输入密码</string>
     <string name="set_password2">再次输入密码</string>
     <string name="password_too_common_error">密码\"%1$s\" 太常见，不安全。</string>

@@ -68,8 +68,6 @@
     <string name="restore_wallet">ウォレットを復旧する</string>
     <string name="test_wallet">ウォレットをテストする</string>
     <!-- Intro -->
-    <string name="test_wallet_warning_title">テストウォレットを作成しますか？</string>
-    <string name="test_wallet_warning_message">新しいテストウォレットを作成すると、<i>復元フレーズ</i>をバックアップしていない場合には既存のウォレットは失われてしまいます。</string>
     <string name="incompatible_device_warning_title">互換性のない端末</string>
     <string name="incompatible_device_warning_message">この端末はソフトウェアもしくはハードウェアのバグにより、いくつかの暗号機能を実行できません。\nこれは端末の製造元によるアップデートにより解決できるかもしれません。\n\n何かご質問があれば support@coinomi.com までお問い合わせください。</string>
     <!-- Recovery fragment -->
@@ -133,15 +131,12 @@
     <string name="amount_error">入力された金額は無効です</string>
     <string name="amount_error_empty">金額を入力してください</string>
     <string name="amount_error_negative">負の金額を送ることはできません</string>
-    <string name="amount_error_decimal_places">小数の桁数が多すぎます。%1$d以下で指定してください</string>
     <string name="amount_error_too_small">最小の送金額は %1$s です</string>
     <string name="amount_error_not_enough_money_plain">おかねが足りません</string>
     <string name="amount_error_not_enough_money">おかねが足りません。現在の残高は %1$s です</string>
     <string name="amount_warn_fees_apply">手数料のために、実際の送金額はわずかに少なくなります</string>
     <!-- Set Password fragment -->
     <string name="set_password_info">日々の利用の際にウォレットを守るため、パスワードを設定します。</string>
-    <string name="set_password_seed_protect">復元フレーズにもパスワードをかける (BIP39)</string>
-    <string name="set_password_seed_protect_info">パスワードは変更不可能になり、復元フレーズを用いてウォレットを復旧する際にはパスワードが必要となります。\n警告：パスワードを忘れた場合にはウォレットの復旧は不可能となります！</string>
     <string name="set_password1">パスワードを入力してください</string>
     <string name="set_password2">パスワードをもう一度入力してください</string>
     <string name="password_too_common_error">パスワード \"%1$s\" は一般的なため、安全ではありません。</string>

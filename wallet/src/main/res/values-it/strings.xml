@@ -68,8 +68,6 @@
     <string name="restore_wallet">Ripristina un portafoglio</string>
     <string name="test_wallet">Test portafoglio</string>
     <!-- Intro -->
-    <string name="test_wallet_warning_title">Creare un test portafoglio?</string>
-    <string name="test_wallet_warning_message">Se crei un nuovo test portafoglio, il tuo portafoglio esistente sarà perso a meno che tu non abbia salvato la tua <i>frase di recupero</i>.</string>
     <string name="incompatible_device_warning_title">Dispositivo non compatibile</string>
     <string name="incompatible_device_warning_message">Questo dispositivo non può eseguire determinate funzioni a causa di difetti nel software o nell\'hardware.\nCiò potrebbe essere risolto tramite un aggiornamento fatto dal fabbricante del dispositivo.\n\nContattaci se hai delle domande: support@coinomi.com</string>
     <!-- Recovery fragment -->
@@ -133,15 +131,12 @@
     <string name="amount_error">L\'importo fornito non è valido.</string>
     <string name="amount_error_empty">Per favore inserisci un importo</string>
     <string name="amount_error_negative">Non è possibile inviare un importo negativo</string>
-    <string name="amount_error_decimal_places">Troppe cifre decimali, prova meno di %1$d</string>
     <string name="amount_error_too_small">L\'importo minimo è almeno %1$s</string>
     <string name="amount_error_not_enough_money_plain">Denaro non sufficiente</string>
     <string name="amount_error_not_enough_money">Denaro non sufficiente, il saldo attuale è %1$s</string>
     <string name="amount_warn_fees_apply">Sarà inviato leggermente meno a causa delle tasse</string>
     <!-- Set Password fragment -->
     <string name="set_password_info">Imposta una password per proteggere il tuo portafoglio nell\'uso quotidiano.</string>
-    <string name="set_password_seed_protect">Proteggere anche la mia frase di recupero (BIP39)</string>
-    <string name="set_password_seed_protect_info">La password diviene permanente ed è richiesta per il ripristino del tuo portafoglio con la frase di recupero.\nATTENZIONE: Se dimentichi la tua password sarà impossibile ripristinare il tuo portafoglio!</string>
     <string name="set_password1">Scrivi la tua password</string>
     <string name="set_password2">Riscrivi la tua password</string>
     <string name="password_too_common_error">La password \"%1$s\" è troppo comune per essere usata in modo sicuro.</string>
