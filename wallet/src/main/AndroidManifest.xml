@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.coinomi.wallet"
+    package="com.openwallet.wallet"
     android:installLocation="internalOnly" >
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -47,14 +47,14 @@
         android:xlargeScreens="true" />
 
     <application
-        android:name="com.coinomi.wallet.WalletApplication"
+        android:name="com.openwallet.wallet.WalletApplication"
         android:allowBackup="false"
         android:hardwareAccelerated="true"
         android:icon="@drawable/ic_launcher_dev"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="com.coinomi.wallet.ui.WalletActivity"
+            android:name="com.openwallet.wallet.ui.WalletActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustResize" >
@@ -65,7 +65,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.coinomi.wallet.ui.SendActivity"
+            android:name="com.openwallet.wallet.ui.SendActivity"
             android:label="@string/send_coins_activity_title"
             android:theme="@style/AppTheme" >
             <intent-filter android:label="@string/app_name" >
@@ -112,145 +112,145 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.coinomi.wallet.ui.IntroActivity"
+            android:name="com.openwallet.wallet.ui.IntroActivity"
             android:theme="@style/AppThemeNoTitleBar"
             android:windowSoftInputMode="adjustResize" >
         </activity>
         <activity
-            android:name="com.coinomi.wallet.ui.PasswordConfirmationActivity"
+            android:name="com.openwallet.wallet.ui.PasswordConfirmationActivity"
             android:theme="@style/AppThemeNoTitleBar"
             android:windowSoftInputMode="adjustResize" >
         </activity>
         <activity
-            android:name="com.coinomi.wallet.ui.SignTransactionActivity"
+            android:name="com.openwallet.wallet.ui.SignTransactionActivity"
             android:theme="@style/AppThemeNoTitleBar"
             android:windowSoftInputMode="stateHidden" >
         </activity>
         <activity
-            android:name="com.coinomi.wallet.ui.ScanActivity"
+            android:name="com.openwallet.wallet.ui.ScanActivity"
             android:configChanges="orientation|keyboard|keyboardHidden"
             android:screenOrientation="landscape"
             android:stateNotNeeded="true"
             android:theme="@style/AppThemeNoTitleBar"
             android:windowSoftInputMode="stateAlwaysHidden" />
         <activity
-            android:name="com.coinomi.wallet.ui.AboutActivity"
+            android:name="com.openwallet.wallet.ui.AboutActivity"
             android:label="@string/title_activity_about"
             android:theme="@style/AppTheme" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.coinomi.wallet.ui.WalletActivity" />
+                android:value="com.openwallet.wallet.ui.WalletActivity" />
         </activity>
         <activity
-            android:name="com.coinomi.wallet.ui.AddCoinsActivity"
+            android:name="com.openwallet.wallet.ui.AddCoinsActivity"
             android:label="@string/title_activity_add_coins"
             android:theme="@style/AppTheme" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.coinomi.wallet.ui.WalletActivity" />
+                android:value="com.openwallet.wallet.ui.WalletActivity" />
         </activity>
         <activity
-            android:name="com.coinomi.wallet.ui.TransactionDetailsActivity"
+            android:name="com.openwallet.wallet.ui.TransactionDetailsActivity"
             android:label="@string/title_activity_transaction_details"
             android:theme="@style/AppTheme" >
         </activity>
         <activity
-            android:name="com.coinomi.wallet.ui.ExchangeRatesActivity"
+            android:name="com.openwallet.wallet.ui.ExchangeRatesActivity"
             android:label="@string/title_activity_exchange_rates"
             android:theme="@style/AppTheme" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.coinomi.wallet.ui.WalletActivity" />
+                android:value="com.openwallet.wallet.ui.WalletActivity" />
         </activity>
         <activity
-            android:name="com.coinomi.wallet.ui.PreviousAddressesActivity"
+            android:name="com.openwallet.wallet.ui.PreviousAddressesActivity"
             android:label="@string/title_activity_previous_addresses"
             android:theme="@style/AppTheme" >
         </activity>
         <activity
-            android:name="com.coinomi.wallet.ui.SettingsActivity"
+            android:name="com.openwallet.wallet.ui.SettingsActivity"
             android:label="@string/title_activity_settings"
             android:theme="@style/AppTheme" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.coinomi.wallet.ui.WalletActivity" />
+                android:value="com.openwallet.wallet.ui.WalletActivity" />
         </activity>
         <activity
-            android:name="com.coinomi.wallet.ui.ShowSeedActivity"
+            android:name="com.openwallet.wallet.ui.ShowSeedActivity"
             android:label="@string/title_activity_show_seed"
             android:theme="@style/AppTheme" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.coinomi.wallet.ui.SettingsActivity" />
+                android:value="com.openwallet.wallet.ui.SettingsActivity" />
         </activity>
         <activity
-            android:name="com.coinomi.wallet.ui.TradeActivity"
+            android:name="com.openwallet.wallet.ui.TradeActivity"
             android:label="@string/title_activity_trade"
             android:theme="@style/AppTheme" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.coinomi.wallet.ui.WalletActivity" />
+                android:value="com.openwallet.wallet.ui.WalletActivity" />
         </activity>
         <activity
-            android:name="com.coinomi.wallet.ui.ExchangeHistoryActivity"
+            android:name="com.openwallet.wallet.ui.ExchangeHistoryActivity"
             android:label="@string/title_activity_exchange_history"
             android:theme="@style/AppTheme" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.coinomi.wallet.ui.TradeActivity" />
+                android:value="com.openwallet.wallet.ui.TradeActivity" />
         </activity>
         <activity
-            android:name="com.coinomi.wallet.ui.TradeStatusActivity"
+            android:name="com.openwallet.wallet.ui.TradeStatusActivity"
             android:label="@string/title_activity_exchange_status"
             android:theme="@style/AppTheme" >
         </activity>
         <activity
-            android:name="com.coinomi.wallet.ui.SignVerifyMessageActivity"
+            android:name="com.openwallet.wallet.ui.SignVerifyMessageActivity"
             android:label="@string/title_activity_sign_verify_message"
             android:theme="@style/AppTheme" >
         </activity>
         <activity
-            android:name="com.coinomi.wallet.ui.AccountDetailsActivity"
+            android:name="com.openwallet.wallet.ui.AccountDetailsActivity"
             android:label="@string/title_activity_account_details"
             android:theme="@style/AppTheme" >
         </activity>
         <activity
-            android:name="com.coinomi.wallet.ui.SweepWalletActivity"
+            android:name="com.openwallet.wallet.ui.SweepWalletActivity"
             android:label="@string/title_activity_sweep_wallet"
             android:theme="@style/AppTheme" >
         </activity>
         <activity
-            android:name="com.coinomi.wallet.ui.FeesSettingsActivity"
+            android:name="com.openwallet.wallet.ui.FeesSettingsActivity"
             android:label="@string/title_activity_transaction_fees"
             android:theme="@style/AppTheme" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.coinomi.wallet.ui.SettingsActivity" />
+                android:value="com.openwallet.wallet.ui.SettingsActivity" />
         </activity>
         <activity
-            android:name="com.coinomi.wallet.ui.DebuggingActivity"
+            android:name="com.openwallet.wallet.ui.DebuggingActivity"
             android:label="@string/title_activity_debugging"
             android:theme="@style/AppTheme" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.coinomi.wallet.ui.SettingsActivity" />
+                android:value="com.openwallet.wallet.ui.SettingsActivity" />
         </activity>
 
         <provider
-            android:name="com.coinomi.wallet.ExchangeRatesProvider"
-            android:authorities="com.coinomi.wallet.dev.exchange_rates"
+            android:name="com.openwallet.wallet.ExchangeRatesProvider"
+            android:authorities="com.openwallet.wallet.dev.exchange_rates"
             android:exported="false" />
         <provider
-            android:name="com.coinomi.wallet.AddressBookProvider"
-            android:authorities="com.coinomi.wallet.dev.address_book"
+            android:name="com.openwallet.wallet.AddressBookProvider"
+            android:authorities="com.openwallet.wallet.dev.address_book"
             android:exported="false" />
         <provider
             android:name=".ExchangeHistoryProvider"
-            android:authorities="com.coinomi.wallet.dev.exchange_history"
+            android:authorities="com.openwallet.wallet.dev.exchange_history"
             android:exported="false" />
 
         <service
-            android:name="com.coinomi.wallet.service.CoinServiceImpl"
+            android:name="com.openwallet.wallet.service.CoinServiceImpl"
             android:exported="false" />
     </application>
 

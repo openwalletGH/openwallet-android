@@ -23,9 +23,9 @@
  * - To regenerate after editing, run: mvn generate-sources -DupdateProtobuf
  */
 
-package com.coinomi.core.protos;
+package com.openwallet.core.protos;
 
-option java_package = "com.coinomi.core.protos";
+option java_package = "com.openwallet.core.protos";
 
 option java_outer_classname = "Protos";
 

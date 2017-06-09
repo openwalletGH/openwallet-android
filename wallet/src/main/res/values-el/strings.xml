@@ -63,13 +63,13 @@
     <string name="trade">μετατροπή</string>
     <string name="receive">λήψη</string>
     <!-- Welcome fragment -->
-    <string name="welcome_text">Καλώς ήλθατε στο Coinomi</string>
+    <string name="welcome_text">Καλώς ήλθατε στο OpenWallet</string>
     <string name="create_wallet">Νέο πορτοφόλι</string>
     <string name="restore_wallet">Ανάκτηση πορτοφολιού</string>
     <string name="test_wallet">Δοκιμαστικό πορτοφόλι</string>
     <!-- Intro -->
     <string name="incompatible_device_warning_title">Μη συμβατή συσκευή</string>
-    <string name="incompatible_device_warning_message">Η συσκευή σας δεν μπορεί να εκτελέσει κάποιες κρυπτογραφικές μεθόδους λόγω ελαττωμάτων στο λογισμικό ή την ίδια τη συσκευή.\nΤο πρόβλημα θα μπόρεσε να λυθεί ύστερα από την ενημέρωση λογισμικού από τον κατασκευαστή της συσκευής.\n\nΠαρακαλώ επικοινωνήστε μαζί μας αν έχετε απορίες: support@coinomi.com</string>
+    <string name="incompatible_device_warning_message">Η συσκευή σας δεν μπορεί να εκτελέσει κάποιες κρυπτογραφικές μεθόδους λόγω ελαττωμάτων στο λογισμικό ή την ίδια τη συσκευή.\nΤο πρόβλημα θα μπόρεσε να λυθεί ύστερα από την ενημέρωση λογισμικού από τον κατασκευαστή της συσκευής.\n\nΠαρακαλώ επικοινωνήστε μαζί μας αν έχετε απορίες: https://reddit.com/r/openwallet</string>
     <!-- Recovery fragment -->
     <string name="seed_info">Αυτή είναι η <i>φράση ανάκτησής</i> σας, από την οποία παράγονται τα κλειδιά για το πορτοφόλι σας. Παρακαλούμε σημειώστε την κάπου και αποθηκεύστε την σε ασφαλές μέρος, όπως ακριβώς θα κάνατε με τα μετρητά σας. Οποιοσδήποτε έχει πρόσβαση στην φράση ανάκτησης έχει πλήρη πρόσβαση στα περιεχόμενα του πορτοφολιού.\nΑν χάσετε τη φράση ανάκτησης, το πορτοφόλι σας δεν θα μπορεί να ανακτηθεί.</string>
     <string name="seed_title">η φράση ανάκτησης σας</string>
@@ -89,7 +89,7 @@
     <!-- Wallet activity -->
     <string name="test_wallet_message">Το παρόν είναι ένα δοκιμαστικό πορτοφόλι, όπου μπορείτε να στείλετε και παραλάβετε δοκιμαστικά νομίσματα Bitcoin, Litecoin, Dogecoin κ.ά.\n\nΑν επιθυμείτε να χρησιμοποιήσετε το πορτοφόλι με αληθινά χρήματα παρακαλώ επιλέξτε: <b>Ρυθμίσεις &gt; Ανάκτηση πορτοφολιού &gt; Δημιουργία νέου πορτοφολιού</b>.</string>
     <string name="wallet_update_title">Νέα έκδοση διαθέσιμη</string>
-    <string name="wallet_update_message">Μια νέα έκδοση του Coinomi η οποία εμπεριέχει νέες δυνατότητες και τυχόν διορθώσεις αδυναμιών είναι διαθέσιμη.</string>
+    <string name="wallet_update_message">Μια νέα έκδοση του OpenWallet η οποία εμπεριέχει νέες δυνατότητες και τυχόν διορθώσεις αδυναμιών είναι διαθέσιμη.</string>
     <string name="pay_with">Αποστολή με</string>
     <string name="exchange_and_pay_title">Μετατροπή και αποστολή</string>
     <!-- PayToDialog-->
@@ -172,11 +172,11 @@
         <item quantity="other">%d δευτερόλεπτα</item>
     </plurals>
     <!-- About Activity -->
-    <string name="title_activity_about">Σχετικά με το Coinomi</string>
-    <string name="app_name_long">Coinomi για το λειτουργικό Android</string>
-    <string name="about_licence">Ένα πρόγραμμα ανοιχτού λογισμικού\nhttps://github.com/Coinomi/coinomi-android\nΟ πηγαίος κώδικας διατίθεται βάσει της άδειας GNU General Public License 3</string>
-    <string name="about_credits_nubits">Οι κεντρικοί εξυπηρετητές είναι μια προσφορά της NuBits\nhttps://nubits.com/</string>
+    <string name="title_activity_about">Σχετικά με το OpenWallet</string>
+    <string name="app_name_long">OpenWallet για το λειτουργικό Android</string>
+    <string name="about_licence">Ένα πρόγραμμα ανοιχτού λογισμικού\nhttps://gitlab.com/openwallet/openwallet-android\nΟ πηγαίος κώδικας διατίθεται βάσει της άδειας GNU General Public License 3</string>
     <string name="about_credits_translations">Μεταφράσεις από τους:</string>
+    <string name="about_credits_coinomi">Forked from Coinomi\nhttps://coinomi.com/</string>
     <string name="about_credits_bitcoinj">Χρησιμοποιείται η βιβλιοθήκη Bitcoinj\nhttp://bitcoinj.github.io/</string>
     <string name="about_credits_electrum">Χρησιμοποιείται λογισμικό του εξυπηρετητή Electrum\nhttps://electrum.org/</string>
     <string name="about_credits_schildbach">Επηρεασμένο από τη δουλειά του Andreas Schildbach \nhttps://github.com/schildbach/bitcoin-wallet/</string>

@@ -6,6 +6,9 @@ configurations {
 }
 
 dependencies {
+    targetCompatibility = '1.7'
+    sourceCompatibility = '1.7'
+
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
     compile 'com.google.guava:guava:16.0.1'

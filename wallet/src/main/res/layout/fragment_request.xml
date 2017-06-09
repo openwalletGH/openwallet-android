@@ -35,7 +35,7 @@
                     android:layout_alignParentStart="true"
                     android:layout_alignParentTop="true"
                     android:text="@string/receive_address_label" />
-                
+
                 <LinearLayout
                     android:id="@+id/request_address_view"
                     android:layout_width="wrap_content"
@@ -112,13 +112,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <com.coinomi.wallet.ui.widget.AmountEditView
+                    <com.openwallet.wallet.ui.widget.AmountEditView
                         android:id="@+id/request_coin_amount"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="0.5" />
 
-                    <com.coinomi.wallet.ui.widget.AmountEditView
+                    <com.openwallet.wallet.ui.widget.AmountEditView
                         android:id="@+id/request_local_amount"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"

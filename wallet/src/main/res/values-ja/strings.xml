@@ -6,7 +6,7 @@
     <string name="action_edit_label">ラベル編集</string>
     <string name="action_empty_wallet">ウォレットを空にする</string>
     <string name="action_settings">設定</string>
-    <string name="action_about">Coinomiについて</string>
+    <string name="action_about">OpenWalletについて</string>
     <string name="action_refresh">更新</string>
     <string name="action_sign_verify_message">メッセージの署名と検証</string>
     <string name="action_account_details">アカウント詳細</string>
@@ -63,13 +63,13 @@
     <string name="trade">両替</string>
     <string name="receive">受け取る</string>
     <!-- Welcome fragment -->
-    <string name="welcome_text">Coinomiウォレットへようこそ</string>
+    <string name="welcome_text">OpenWalletウォレットへようこそ</string>
     <string name="create_wallet">新しいウォレットを作成する</string>
     <string name="restore_wallet">ウォレットを復旧する</string>
     <string name="test_wallet">ウォレットをテストする</string>
     <!-- Intro -->
     <string name="incompatible_device_warning_title">互換性のない端末</string>
-    <string name="incompatible_device_warning_message">この端末はソフトウェアもしくはハードウェアのバグにより、いくつかの暗号機能を実行できません。\nこれは端末の製造元によるアップデートにより解決できるかもしれません。\n\n何かご質問があれば support@coinomi.com までお問い合わせください。</string>
+    <string name="incompatible_device_warning_message">この端末はソフトウェアもしくはハードウェアのバグにより、いくつかの暗号機能を実行できません。\nこれは端末の製造元によるアップデートにより解決できるかもしれません。\n\n何かご質問があれば https://reddit.com/r/openwallet までお問い合わせください。</string>
     <!-- Recovery fragment -->
     <string name="seed_info">これはウォレットの秘密鍵を生成するのに利用される<i>復元フレーズ</i>です。紙に書きとめたうえで、紙幣と同様に安全な場所に保管をしておいてください。この復元フレーズを知ることができる人は誰でもウォレットの残高にアクセスできます。復元フレーズを紛失してしまった場合には、ウォレットの復旧はできなくなります。</string>
     <string name="seed_title">復元フレーズ</string>
@@ -89,7 +89,7 @@
     <!-- Wallet activity -->
     <string name="test_wallet_message">これはテストウォレットです。テストネットのBitcoin、Litecoin、Dogecoinを送ったり受け取ったりできます。\n\n本物のおかねを扱うことのできるウォレットを使いたい場合には、<b>設定 &gt; ウォレットを復旧する &gt; 新しいウォレットを作成する</b>を選択してください。</string>
     <string name="wallet_update_title">新しいバージョンが利用可能です。</string>
-    <string name="wallet_update_message">新しいバージョンのCoinomiが利用可能です。これには新しい機能やバグ修正が含まれます。</string>
+    <string name="wallet_update_message">新しいバージョンのOpenWalletが利用可能です。これには新しい機能やバグ修正が含まれます。</string>
     <string name="pay_with">次のもので送金する：</string>
     <string name="exchange_and_pay_title">両替と送金</string>
     <!-- PayToDialog-->
@@ -169,11 +169,11 @@
         <item quantity="other">%d 秒</item>
     </plurals>
     <!-- About Activity -->
-    <string name="title_activity_about">Coinomiについて</string>
-    <string name="app_name_long">Coinomi for Android</string>
-    <string name="about_licence">オープンソース・プロジェクト\nhttps://github.com/Coinomi/coinomi-android\nソースコードはGNU General Public License 3のもとでライセンスされています</string>
-    <string name="about_credits_nubits">サーバのインフラはNuBits - 世界初の安定したデジタル通貨 - の寄付により成り立っています\nhttps://nubits.com/</string>
+    <string name="title_activity_about">OpenWalletについて</string>
+    <string name="app_name_long">OpenWallet for Android</string>
+    <string name="about_licence">オープンソース・プロジェクト\nhttps://gitlab.com/openwallet/openwallet-android\nソースコードはGNU General Public License 3のもとでライセンスされています</string>
     <string name="about_credits_translations">翻訳提供者:</string>
+    <string name="about_credits_coinomi">Forked from Coinomi\nhttps://coinomi.com/</string>
     <string name="about_credits_bitcoinj">Bitcoinjライブラリを使用しています\nhttp://bitcoinj.github.io/</string>
     <string name="about_credits_electrum">Electrumのサーバソフトウェアを使用しています\nhttps://electrum.org/</string>
     <string name="about_credits_schildbach">Andreas Schildbach氏の影響を受けています\nhttps://github.com/schildbach/bitcoin-wallet/</string>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:coinomi="http://schemas.android.com/apk/res-auto"
+    xmlns:openwallet="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             tools:text="US Dollar" />
 
-        <!--<com.coinomi.wallet.ui.widget.CurrencyTextView-->
+        <!--<com.openwallet.wallet.ui.widget.CurrencyTextView-->
             <!--android:id="@+id/exchange_rate_row_rate"-->
             <!--style="@style/ExchangeRowAmount"-->
             <!--android:layout_width="wrap_content"-->
@@ -47,11 +47,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center_vertical">
-            <com.coinomi.wallet.ui.widget.Amount
+            <com.openwallet.wallet.ui.widget.Amount
                 android:id="@+id/exchange_rate_row_rate_unit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                coinomi:single_line="true" />
+                openwallet:single_line="true" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -60,11 +60,11 @@
                 android:layout_marginLeft="4dp"
                 android:text="@string/almost_equal_to"/>
 
-            <com.coinomi.wallet.ui.widget.Amount
+            <com.openwallet.wallet.ui.widget.Amount
                 android:id="@+id/exchange_rate_row_rate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                coinomi:single_line="true" />
+                openwallet:single_line="true" />
         </LinearLayout>
 
     </LinearLayout>

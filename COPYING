@@ -1,16 +1,18 @@
-### Coinomi for Android ###
+### OpenWallet for Android ###
 
-An open source project https://github.com/Coinomi/coinomi-android
+The first truly free, libre, and open source light wallet for multiple cryptocurrencies (Bitcoin, Ethereum, Ripple, etc) on Android https://gitlab.com/openwallet/openwallet-android 
 
 Wallet module source code licensed under:
 
     - GNU General Public License 3
     - Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
 
-Core module source code licensed under Apache License Version 2.0
+Core module source code licensed under:
 
-Uses Bitcoinj library http://bitcoinj.github.io/
+    - Apache License Version 2.0
+
+Forked from Coinomi https://coinomi.com
+Uses Bitcoinj library https://bitcoinj.github.io
 QR-code functionality by ZXing https://github.com/zxing/zxing
 Crypto-icons by Chris Shepherd https://github.com/shphrd/crypto-icons
-Font-icons by Daniel Bruce http://www.entypo.com
-
+Font-icons by Daniel Bruce https://www.entypo.com

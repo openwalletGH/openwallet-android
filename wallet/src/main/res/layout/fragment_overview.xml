@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     tools:context=".ui.InfoFragment">
 
-    <com.coinomi.wallet.ui.widget.SwipeRefreshLayout
+    <com.openwallet.wallet.ui.widget.SwipeRefreshLayout
         android:id="@+id/swipeContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -16,6 +16,6 @@
             android:divider="@null"
             android:dividerHeight="0dp" />
 
-    </com.coinomi.wallet.ui.widget.SwipeRefreshLayout>
+    </com.openwallet.wallet.ui.widget.SwipeRefreshLayout>
 
 </FrameLayout>

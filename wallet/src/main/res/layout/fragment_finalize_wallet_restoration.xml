@@ -8,7 +8,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:gravity="center"
-    tools:context="com.coinomi.wallet.ui.FinalizeWalletRestorationFragment">
+    tools:context="com.openwallet.wallet.ui.FinalizeWalletRestorationFragment">
 
     <TextView
         android:layout_width="wrap_content"

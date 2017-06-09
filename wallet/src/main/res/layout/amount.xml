@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:coinomi="http://schemas.android.com/apk/res-auto"
+    xmlns:openwallet="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/amount_layout"
     android:layout_width="wrap_content"
@@ -15,7 +15,7 @@
         android:gravity="center_horizontal"
         android:orientation="vertical">
 
-        <com.coinomi.wallet.ui.widget.FontFitTextView
+        <com.openwallet.wallet.ui.widget.FontFitTextView
             android:id="@+id/amount_text"
             style="@style/Amount"
             android:layout_width="wrap_content"

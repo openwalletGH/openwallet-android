@@ -1,24 +1,24 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:coinomi="http://schemas.android.com/apk/res-auto"
+    xmlns:openwallet="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center_vertical">
 
-    <com.coinomi.wallet.ui.widget.SendOutput
+    <com.openwallet.wallet.ui.widget.SendOutput
         android:id="@+id/transaction_output"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal|top"
         android:layout_marginBottom="@dimen/standard_margin" />
 
-    <com.coinomi.wallet.ui.widget.SendOutput
+    <com.openwallet.wallet.ui.widget.SendOutput
         android:id="@+id/transaction_fee"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal|top"
-        coinomi:is_fee="true" />
+        openwallet:is_fee="true" />
 
     <TextView
         android:id="@+id/tx_message_label"

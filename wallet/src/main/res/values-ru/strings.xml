@@ -63,13 +63,13 @@
     <string name="trade">обмен</string>
     <string name="receive">получить</string>
     <!-- Welcome fragment -->
-    <string name="welcome_text">Добро пожаловать в Coinomi</string>
+    <string name="welcome_text">Добро пожаловать в OpenWallet</string>
     <string name="create_wallet">Создать новый кошелёк</string>
     <string name="restore_wallet">Восстановить кошелёк</string>
     <string name="test_wallet">Тестовый кошелёк</string>
     <!-- Intro -->
     <string name="incompatible_device_warning_title">Устройство не поддерживается</string>
-    <string name="incompatible_device_warning_message">Ваш аппарат не может осуществить некоторые криптографические операции по причине дефектов в операционной системе или в самом аппарате.\nЭту проблему может решить обновление ПО от производителя устройства.\n\nПожалуйста, обратитесь к нам , если у Вас есть вопросы : support@coinomi.com</string>
+    <string name="incompatible_device_warning_message">Ваш аппарат не может осуществить некоторые криптографические операции по причине дефектов в операционной системе или в самом аппарате.\nЭту проблему может решить обновление ПО от производителя устройства.\n\nПожалуйста, обратитесь к нам , если у Вас есть вопросы : https://reddit.com/r/openwallet</string>
     <!-- Recovery fragment -->
     <string name="seed_info">Это Ваша <i>восстанавливающая фраза</i>, которая используется при генерации ключей к Вашему кошельку. Пожалуйста, запишите её где-то на бумаге и храните в безопасном месте, также как Вы храните бумажные деньги. Любой у кого есть доступ к фразе, также имеет доступ к накоплениям Вашего кошелька.\nЕсли Вы потеряли Вашу восстанавливающую фразу, мы не сможем восстановить Ваш кошелёк.</string>
     <string name="seed_title">Ваша восстанавливающая фраза</string>
@@ -89,7 +89,7 @@
     <!-- Wallet activity -->
     <string name="test_wallet_message">Это тестовый кошелек, где Вы можете отправлять и получать Bitcoin, Litecoin, Dogecoin используя testnet.\n\nЕсли Вы хотите использовать кошелёк с настоящими деньгами, пожалуйста зайдите в: <b>Настройки &gt; Восстановить кошелёк &gt; Создать новый кошелёк</b>.</string>
     <string name="wallet_update_title">Доступна новая версия</string>
-    <string name="wallet_update_message">Доступна новая версия Coinomi, она содержит новые функции и исправления.</string>
+    <string name="wallet_update_message">Доступна новая версия OpenWallet, она содержит новые функции и исправления.</string>
     <string name="pay_with">Отправить используя</string>
     <string name="exchange_and_pay_title">Обменять и отправить</string>
     <!-- PayToDialog-->
@@ -175,11 +175,11 @@
         <item quantity="many">%d секунд</item>
     </plurals>
     <!-- About Activity -->
-    <string name="title_activity_about">О Coinomi</string>
-    <string name="app_name_long">Coinomi для Android</string>
-    <string name="about_licence">Программа с открытым исходным кодом\nhttps://github.com/Coinomi/coinomi-android\nИсходный код открыт на основе лицензии GNU General Public License 3</string>
-    <string name="about_credits_nubits">Инфраструктура серверов предоставлена NuBits - Первой Всемирной Стабильной Цифровой Валютой \nhttps://nubits.com/</string>
+    <string name="title_activity_about">О OpenWallet</string>
+    <string name="app_name_long">OpenWallet для Android</string>
+    <string name="about_licence">Программа с открытым исходным кодом\nhttps://gitlab.com/openwallet/openwallet-android\nИсходный код открыт на основе лицензии GNU General Public License 3</string>
     <string name="about_credits_translations">Переводы выполнили:</string>
+    <string name="about_credits_coinomi">Forked from Coinomi\nhttps://coinomi.com/</string>
     <string name="about_credits_bitcoinj">Используется библиотека Bitcoinj\nhttp://bitcoinj.github.io/</string>
     <string name="about_credits_electrum">Используется серверное ПО от Electrum\nhttps://electrum.org/</string>
     <string name="about_credits_schildbach">Под влиянием работы Andreas Schildbach\nhttps://github.com/schildbach/bitcoin-wallet/</string>

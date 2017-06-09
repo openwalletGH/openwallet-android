@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:coinomi="http://schemas.android.com/apk/res-auto"
+    xmlns:openwallet="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -20,12 +20,12 @@
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:layout_gravity="center_horizontal">
 
-        <com.coinomi.wallet.ui.widget.Amount
+        <com.openwallet.wallet.ui.widget.Amount
             android:id="@+id/account_balance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/amount_margin_bottom"
-            coinomi:show_big="true"
+            openwallet:show_big="true"
             android:gravity="center_horizontal" />
     </LinearLayout>
 </LinearLayout>

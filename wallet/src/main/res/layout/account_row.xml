@@ -1,5 +1,5 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:coinomi="http://schemas.android.com/apk/res-auto"
+    xmlns:openwallet="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -49,12 +49,12 @@
                 android:layout_marginEnd="4dp"
                 android:text="@string/almost_equal_to" />
 
-            <com.coinomi.wallet.ui.widget.Amount
+            <com.openwallet.wallet.ui.widget.Amount
                 android:id="@+id/exchange_rate_row_rate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                coinomi:show_small="true"
-                coinomi:single_line="true" />
+                openwallet:show_small="true"
+                openwallet:single_line="true" />
         </LinearLayout>
     </LinearLayout>
 
@@ -64,17 +64,17 @@
         android:gravity="end"
         android:orientation="vertical">
 
-        <com.coinomi.wallet.ui.widget.Amount
+        <com.openwallet.wallet.ui.widget.Amount
             android:id="@+id/account_balance_rate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            coinomi:single_line="true" />
+            openwallet:single_line="true" />
 
-        <com.coinomi.wallet.ui.widget.Amount
+        <com.openwallet.wallet.ui.widget.Amount
             android:id="@+id/account_balance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            coinomi:show_small="true"
-            coinomi:single_line="true" />
+            openwallet:show_small="true"
+            openwallet:single_line="true" />
     </LinearLayout>
 </LinearLayout>

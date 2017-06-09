@@ -63,13 +63,13 @@
     <string name="trade">交易所</string>
     <string name="receive">接收</string>
     <!-- Welcome fragment -->
-    <string name="welcome_text">欢迎使用Coinomi钱包</string>
+    <string name="welcome_text">欢迎使用OpenWallet钱包</string>
     <string name="create_wallet">创建新钱包</string>
     <string name="restore_wallet">恢复钱包</string>
     <string name="test_wallet">测试钱包</string>
     <!-- Intro -->
     <string name="incompatible_device_warning_title">设备不匹配</string>
-    <string name="incompatible_device_warning_message">由于软件或硬件原因，此设备无法执行某些加密功能。\n可以通过设备生产商发布的更新来解决。\n\n如果有任何疑问，欢迎和我们联系：support@coinomi.com</string>
+    <string name="incompatible_device_warning_message">由于软件或硬件原因，此设备无法执行某些加密功能。\n可以通过设备生产商发布的更新来解决。\n\n如果有任何疑问，欢迎和我们联系：https://reddit.com/r/openwallet</string>
     <!-- Recovery fragment -->
     <string name="seed_info">这是你的<i>恢复种子密码</i>，请将其记录在纸上并妥善保管，请注意任何得到这张纸的人就能够控制相应钱包内的资金。\n如果你丢失这个密码，我们没有办法恢复你的钱包。</string>
     <string name="seed_title">你的种子密码</string>
@@ -89,7 +89,7 @@
     <!-- Wallet activity -->
     <string name="test_wallet_message">此为测试钱包，你可以发送及接受测试网络上的比特币、莱特币及狗狗币。\n\n如果你想使用主网上的币，请移步: <b>设置 &gt; 恢复钱包 &gt; 创建新钱包</b>.</string>
     <string name="wallet_update_title">新版本可供更新</string>
-    <string name="wallet_update_message">有新版本的Coinomi，其中包含新功能及修复bug.</string>
+    <string name="wallet_update_message">有新版本的OpenWallet，其中包含新功能及修复bug.</string>
     <string name="pay_with">用发送</string>
     <string name="exchange_and_pay_title">换成并发送</string>
     <!-- PayToDialog-->
@@ -171,9 +171,9 @@
     <!-- About Activity -->
     <string name="title_activity_about">关于我们</string>
     <string name="app_name_long">安卓版</string>
-    <string name="about_licence">开源项目\nhttps://github.com/Coinomi/coinomi-android\n源码基于 GNU普通公众许可3开源</string>
-    <string name="about_credits_nubits">服务器由Nubits提供-NBT是世界上首个价格稳定的数字货币\nhttps://nubits.com/</string>
+    <string name="about_licence">开源项目\nhttps://gitlab.com/openwallet/openwallet-android\n源码基于 GNU普通公众许可3开源</string>
     <string name="about_credits_translations">翻译者：</string>
+    <string name="about_credits_coinomi">Forked from Coinomi\nhttps://coinomi.com/</string>
     <string name="about_credits_bitcoinj">使用Bitcoinj库\nhttp://bitcoinj.github.io/</string>
     <string name="about_credits_electrum">使用Electrum 服务器软件\nhttps://electrum.org/</string>
     <string name="about_credits_schildbach">" Andreas Schildbach有贡献\nhttps://github.com/schildbach/bitcoin-wallet/"</string>

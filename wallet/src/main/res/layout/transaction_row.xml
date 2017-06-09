@@ -99,7 +99,7 @@
             android:typeface="monospace"
             tools:text="nUdHX BSBY QPJR EXZM BUdu 8ARn WM2m z3XQp" />
 
-        <com.coinomi.wallet.ui.widget.CurrencyTextView
+        <com.openwallet.wallet.ui.widget.CurrencyTextView
             android:id="@+id/transaction_row_value"
             style="@style/TransactionRowAmount"
             android:layout_width="wrap_content"

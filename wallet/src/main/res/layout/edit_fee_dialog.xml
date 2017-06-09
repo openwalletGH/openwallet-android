@@ -21,7 +21,7 @@
             style="@style/NormalText"
             tools:text="The fee value is per kilobyte of transaction data." />
 
-        <com.coinomi.wallet.ui.widget.AmountEditView
+        <com.openwallet.wallet.ui.widget.AmountEditView
             android:id="@+id/fee_amount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />

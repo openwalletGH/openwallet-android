@@ -3,22 +3,22 @@
 
     <Preference android:title="@string/pref_title_exchange_rates" >
         <intent android:targetPackage="@string/app_package"
-            android:targetClass="com.coinomi.wallet.ui.ExchangeRatesActivity" />
+            android:targetClass="com.openwallet.wallet.ui.ExchangeRatesActivity" />
     </Preference>
 
     <Preference android:title="@string/title_activity_transaction_fees" >
         <intent android:targetPackage="@string/app_package"
-            android:targetClass="com.coinomi.wallet.ui.FeesSettingsActivity" />
+            android:targetClass="com.openwallet.wallet.ui.FeesSettingsActivity" />
     </Preference>
 
     <Preference android:title="@string/title_activity_show_seed" >
         <intent android:targetPackage="@string/app_package"
-            android:targetClass="com.coinomi.wallet.ui.ShowSeedActivity" />
+            android:targetClass="com.openwallet.wallet.ui.ShowSeedActivity" />
     </Preference>
 
     <Preference android:title="@string/pref_title_restore_wallet" >
         <intent android:targetPackage="@string/app_package"
-            android:targetClass="com.coinomi.wallet.ui.IntroActivity" />
+            android:targetClass="com.openwallet.wallet.ui.IntroActivity" />
     </Preference>
 
     <CheckBoxPreference
@@ -29,6 +29,6 @@
 
     <Preference android:title="@string/title_activity_debugging" >
         <intent android:targetPackage="@string/app_package"
-            android:targetClass="com.coinomi.wallet.ui.DebuggingActivity" />
+            android:targetClass="com.openwallet.wallet.ui.DebuggingActivity" />
     </Preference>
 </PreferenceScreen>

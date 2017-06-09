@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">Coinomi (dev)</string>
-    <string name="app_package" translatable="false">com.coinomi.wallet.dev</string>
-    <string name="coinomi_website" translatable="false">https://coinomi.com</string>
+    <string name="app_name" translatable="false">OpenWallet (dev)</string>
+    <string name="app_package" translatable="false">com.openwallet.wallet.dev</string>
+    <string name="openwallet_website" translatable="false">https://openwallet.xyz</string>
     <string name="almost_equal_to" translatable="false">≈</string>
     <string name="action_scan_qr_code">Scan</string>
     <string name="action_share">Share</string>
@@ -63,7 +63,7 @@
     <!-- &#8230; is the ... character -->
     <string name="unlocking_wallet_working">Unlocking your wallet&#8230;</string>
     <string name="unlocking_wallet_error_title">Could not unlock your wallet</string>
-    <string name="unlocking_wallet_error_detail">Are you using the correct password? Please make sure that your password was entered correctly. Attempt to restore using the recovery phrase if this error persists.</string>
+    <string name="unlocking_wallet_error_detail">Are you using the correct password? Please make sure that your password was entered correctly. Attempt to restore your wallet using its recovery phrase if this error persists.</string>
     <string name="powered_by">Powered by</string>
     <!-- Nav drawer -->
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -76,18 +76,18 @@
     <string name="trade">Exchange</string>
     <string name="receive">Receive</string>
     <!-- Welcome fragment -->
-    <string name="welcome_text">Welcome to Coinomi wallet</string>
+    <string name="welcome_text">Welcome to OpenWallet</string>
     <string name="create_wallet">Create a new wallet</string>
     <string name="restore_wallet">Restore a wallet</string>
     <string name="test_wallet">Test wallet</string>
     <!-- Intro -->
     <string name="override_wallet_warning_title">Override existing wallet?</string>
-    <string name="override_new_wallet_warning_message">If you create a new wallet, your existing wallet will be lost unless you backed up you <i>recovery phrase</i>.</string>
-    <string name="override_restore_wallet_warning_message">If you restore a wallet, your existing wallet will be lost unless you backed up you <i>recovery phrase</i>.</string>
+    <string name="override_new_wallet_warning_message">If you create a new wallet, your existing wallet will be lost unless you backed up your <i>recovery phrase</i>.</string>
+    <string name="override_restore_wallet_warning_message">If you restore a wallet, your existing wallet will be lost unless you backed up your <i>recovery phrase</i>.</string>
     <string name="incompatible_device_warning_title">Incompatible device</string>
-    <string name="incompatible_device_warning_message">This device cannot perform certain cryptographic functions due to software or hardware bugs.\nThis could be solved with an update from the device manufacturer.\n\nContact us if you have any questions: support@coinomi.com</string>
+    <string name="incompatible_device_warning_message">This device cannot perform certain cryptographic functions due to software or hardware bugs and limitations.\nIn some cases, this might be solved with an update from the device manufacturer.\n\nFeel free to reach out if you have any questions: https://reddit.com/r/openwallet</string>
     <!-- Recovery fragment -->
-    <string name="seed_info">This is your <i>recovery phrase</i>, which is used to generate the keys for your wallet. Please write it down on a paper and keep it in a secure place, as you would with paper money. Anyone with access to it has access to the wallet\'s funds.\nIf you lose your recovery phrase, your wallet cannot be recovered.</string>
+    <string name="seed_info">This is your <i>recovery phrase</i>, which is used to generate the keys for your wallet. Please write it down on a piece of paper and store it in a secure place. Anyone with access to your <i>recovery phrase</i> has total access to your wallet and all of its funds.\nIf you lose your <i>recovery phrase</i>, your wallet cannot be recovered.</string>
     <string name="seed_title">Your recovery phrase</string>
     <string name="seed_regenerate_title">Touch to generate a new recovery phrase</string>
     <string name="backed_up_seed">I have safely stored my recovery phrase</string>
@@ -96,16 +96,16 @@
     <string name="restore_seed_protected">Use a BIP39 passphrase</string>
     <string name="restore_skip_title">Skipping verification</string>
     <string name="restore_skip_info1">Please make sure that your recovery phrase matches the following:</string>
-    <string name="restore_skip_info2">It is recommended not to skip verification, so that any misspellings could be detected.</string>
-    <string name="restore_error_checksum">Recovery phrase is not valid. Check if some words are misspelled.</string>
+    <string name="restore_skip_info2">It is recommended that you complete verification to ensure the validity of your recovery phrase.</string>
+    <string name="restore_error_checksum">Recovery phrase is not valid. Please check for spelling errors.</string>
     <string name="restore_error_words">Recovery phrase contains unrecognized words.</string>
-    <string name="restore_error_mismatch">Recovery phrase entered does not match your recovery phrase.</string>
+    <string name="restore_error_mismatch">Recovery phrase entered does not match stored recovery phrase.</string>
     <string name="restore_error">Could not verify your recovery phrase. %1$s</string>
     <string name="extra_entropy">Extra entropy</string>
     <!-- Wallet activity -->
-    <string name="test_wallet_message">This is a test wallet, where you can send and receive testnet Bitcoins, Litecoin and Dogecoins.\n\nIf you want to use the wallet with real money please go to: <b>Settings &gt; Restore wallet &gt; Create a new wallet</b>.</string>
+    <string name="test_wallet_message">This is a test wallet, where you can send and receive testnet Bitcoins, Litecoin and Dogecoins.\n\nIf you want to use this wallet with real money please go to: <b>Settings &gt; Restore wallet &gt; Create a new wallet</b>.</string>
     <string name="wallet_update_title">New version available</string>
-    <string name="wallet_update_message">A new version of Coinomi is available, it contains new features and fixes.</string>
+    <string name="wallet_update_message">A new version of OpenWallet is available, and it contains all-new bugs and features!</string>
     <string name="pay_with">Send with</string>
     <string name="exchange_and_pay_title">Exchange and send</string>
     <!-- PayToDialog-->
@@ -153,12 +153,12 @@
     <string name="amount_error_negative">Cannot send a negative amount</string>
     <!-- %1$s is the amount e.g. ... is at least 0.00001 BTC-->
     <string name="amount_error_too_small">The minimum amount is at least %1$s</string>
-    <string name="amount_error_not_enough_money_plain">Not enough money</string>
+    <string name="amount_error_not_enough_money_plain">Insufficient funds</string>
     <!-- %1$s is the wallet balance e.g. ... current balance is 3.1415 BTC-->
-    <string name="amount_error_not_enough_money">Not enough money, current balance is %1$s</string>
-    <string name="amount_warn_fees_apply">Slightly less will be sent because of fees</string>
+    <string name="amount_error_not_enough_money">Insufficient funds, current balance is %1$s</string>
+    <string name="amount_warn_fees_apply">Slightly less will be sent due to the cost of fees</string>
     <!-- Set Password fragment -->
-    <string name="set_password_info">Set a password to protect your wallet in everyday use.</string>
+    <string name="set_password_info">Set a password to protect your wallet during everyday use.</string>
     <string name="set_bip39_passphrase">Type your BIP39 passphrase</string>
     <string name="set_password1">Type your password</string>
     <string name="set_password2">Re-type your password</string>
@@ -168,8 +168,8 @@
     <string name="password_too_short_error">Password is too short, minimum %1$d characters.</string>
     <string name="passwords_mismatch">Passwords don\'t match</string>
     <string name="password_error">Could not proceed, password errors detected.</string>
-    <string name="password_skip_warn">By not setting a password, your wallet can be accessed without authorization.</string>
-    <string name="password_wallet_recovery">To restore your wallet, please provide the same BIP39 passphrase you used when created the protected recovery phrase.\nIf you enter a different passphrase, a new empty wallet will be created.</string>
+    <string name="password_skip_warn">Failure to set a password will allow others to access your wallet.</string>
+    <string name="password_wallet_recovery">To restore your wallet, please provide the same BIP39 passphrase used to create your wallet along with your recovery phrase.\nIf you enter a different recovery phrase, a new empty wallet will be created based on that phrase.</string>
     <!-- FinalizeWalletRestorationFragment -->
     <string name="wallet_restoration">Please wait while your wallet is being restored</string>
     <string name="wallet_restoration_master_key">Creating master key</string>
@@ -183,7 +183,7 @@
     <!-- &#8230; is the ... character -->
     <string name="contacting_exchange">Contacting exchange&#8230;</string>
     <string name="preparing_transaction">Please wait while your transaction is being prepared and sent.</string>
-    <string name="no_such_pocket_error">An error occurred while accessing this wallet account. If the problem persists, try restoring the wallet using the recovery phrase.</string>
+    <string name="no_such_pocket_error">An error occurred while accessing your wallet. If the problem persists, try restoring your wallet using its recovery phrase.</string>
     <string name="password_failed">The password entered is not valid.</string>
     <!-- &#8230; is the ... character -->
     <string name="sending_msg">Sending&#8230;</string>
@@ -201,12 +201,13 @@
         <item quantity="other">%d seconds</item>
     </plurals>
     <!-- About Activity -->
-    <string name="title_activity_about">About Coinomi</string>
-    <string name="app_name_long">Coinomi for Android</string>
-    <string name="about_licence">An open source project\nhttps://github.com/Coinomi/coinomi-android</string>
-    <string name="about_credits_nubits">Server infrastructure donated by NuBits - The World\'s First Stable Digital Currency\nhttps://nubits.com/</string>
+    <string name="title_activity_about">About OpenWallet</string>
+    <string name="app_name_long">OpenWallet for Android</string>
+    <string name="about_licence">An open source project\nhttps://gitlab.com/openwallet/openwallet-android</string>
+    <string name="about_credits_nubits">Server infrastructure powered by your donations</string>
     <string name="about_credits_translations">Translations provided by:</string>
     <string name="about_credits_translations_credits" translatable="false">Tamara Castellano (Italian)\nJorge Nicolas Karmis (Spanish)\nGeorge Kimionis (Greek)\n@visvirial (Japanese)\nДенис Рейн (Russian, Ukrainian)</string>
+    <string name="about_credits_coinomi">Forked from Coinomi\nhttps://coinomi.com/</string>
     <string name="about_credits_bitcoinj">Uses Bitcoinj library\nhttp://bitcoinj.github.io/</string>
     <string name="about_credits_electrum">Uses Electrum server software\nhttps://electrum.org/</string>
     <string name="about_credits_schildbach">Influenced by Andreas Schildbach\nhttps://github.com/schildbach/bitcoin-wallet/</string>
@@ -214,7 +215,7 @@
     <string name="about_credits_crypto_icons">Crypto-icons by Chris Shepherd\nhttps://github.com/shphrd/crypto-icons</string>
     <string name="about_credits_font_icons">Font-icons by Daniel Bruce\nhttp://www.entypo.com</string>
     <string name="about_credits_exchange_rates">Exchange rates provided by\nhttp://www.cryptocoincharts.info/\nhttps://bitcoinaverage.com/</string>
-    <string name="about_coinomi_copyright" translatable="false">\u00A9 2014–2016 Coinomi</string>
+    <string name="about_openwallet_copyright" translatable="false">\u00A9 2017 OpenWallet</string>
     <!-- Add Coins -->
     <string name="title_activity_add_coins">Add coins</string>
     <!-- %1$s is the coin name e.g. ... create a Bitcoin account ... -->
@@ -270,7 +271,7 @@
     <string name="edit_account_description_label">Description</string>
     <!-- %1$s is the name of the account e.g. Remove account Bitcoin? -->
     <string name="edit_account_delete_title">Remove account %1$s?</string>
-    <string name="edit_account_delete_description">This removes the account from the wallet but it is still possible to re-add it and recover the coins.</string>
+    <string name="edit_account_delete_description">This removes the account from the wallet, but it is still possible to re-add it and recover the coins.</string>
     <!-- Settings -->
     <string name="title_activity_settings">Settings</string>
     <string name="pref_title_restore_wallet">Restore wallet</string>
@@ -306,9 +307,9 @@
     <string name="trade_error_no_supported_source_accounts">No supported accounts found</string>
     <string name="trade_error_service_not_available">Service temporary unavailable, please try again in a minute</string>
     <string name="trade_error_market_info">Service temporary unavailable.\nNo information about %1$s - %2$s pair</string>
-    <string name="trade_error_sign_tx_message">An error occurred while signing and broadcasting transaction.\n\nTechnical details:\n\n<b>%1$s</b></string>
-    <string name="trade_error_max_limit">The supplied amount exceeds the limit of %1$s. Please use a smaller amount.</string>
-    <string name="trade_error_min_limit">The minimum amount is at least %1$s</string>
+    <string name="trade_error_sign_tx_message">An error occurred while signing and broadcasting the transaction.\n\nTechnical details:\n\n<b>%1$s</b></string>
+    <string name="trade_error_max_limit">The supplied amount exceeds the maximum of %1$s. Please use a smaller amount.</string>
+    <string name="trade_error_min_limit">The supplied amount is too small. Please use at least %1$s</string>
     <!-- Exchange Status -->
     <string name="title_activity_exchange_status">Exchange status</string>
     <string name="trade_status_message">Your order will complete shortly. You can exit this screen without affecting the exchange.</string>
@@ -367,14 +368,14 @@
     <string name="account_extended_private_key_label">Extended private key</string>
     <string name="account_private_key_warning">The private key allows you to send coins from this account. It is not necessary to backup this key as it is derived from your <i>recovery phrase</i></string>
     <!-- Support -->
-    <string name="support_message">Contact Coinomi support</string>
+    <string name="support_message">Contact OpenWallet support</string>
     <!-- Sweep wallet -->
     <!-- Sweep paper wallet means to redeem coins from a code usually printed on a paper -->
     <string name="title_activity_sweep_wallet">Sweep paper wallet</string>
-    <string name="sweep_wallet_info">You are about to transfer coins from a paper wallet to your Coinomi wallet.\nAfter the transfer is complete, please avoid reusing the paper wallet for security reasons.\n\nSupported formats: WIF, BIP38, Mini private key.</string>
+    <string name="sweep_wallet_info">You are about to transfer coins from a paper wallet to your OpenWallet.\nAfter the transfer is complete, please avoid reusing the paper wallet for security reasons.\n\nSupported formats: WIF, BIP38, miniature private keys.</string>
     <string name="sweep_wallet_key_title">Private key</string>
     <string name="sweep_wallet_key_password">Private key password</string>
-    <string name="sweep_wallet_key_hint">type or scan a private key</string>
+    <string name="sweep_wallet_key_hint">Type or scan a private key</string>
     <string name="sweep_wallet_bad_format">Could not recognize the private key format.</string>
     <string name="sweep_wallet_bad_coin_type">The private key type does not match the destination account type.</string>
     <string name="sweep_wallet_bad_password">Incorrect password.</string>
@@ -397,29 +398,29 @@
     <string name="tx_fees_per_transaction">per transaction</string>
 
     <!-- Terms -->
-    <string name="terms_of_service_title">Terms of service</string>
+    <string name="terms_of_service_title">Terms of Service</string>
     <!-- TODO translate to other languages -->
     <string name="terms_of_service" translatable="false">LEGAL DISCLAIMER\n
 \n
 \n
-1. Risks related to the use of Coinomi Wallet\n
+1. Risks related to the use of OpenWallet\n
 \n
-Coinomi will not be responsible for any losses, damages or claims arising from events falling within the scope of the following five categories:\n
+OpenWallet will not be responsible for any losses, damages or claims arising from events falling within the scope of the following five categories:\n
 \n
-(1) Mistakes made by the user of any cryptocurrency-related software or service, e.g., forgotten passwords, payments sent to wrong coin addresses, and accidental deletion of wallets.\n
+(1) Mistakes made by the user of any cryptocurrency-related software or service (e.g. forgotten passwords, payments sent to the wrong coin addresses, and accidental deletion of wallets).\n
 \n
-(2) Software problems of the wallet and/or any cryptocurrency-related software or service, e.g., corrupted wallet file, incorrectly constructed transactions, unsafe cryptographic libraries, malware affecting the wallet and/or any cryptocurrency-related software or service.\n
+(2) Software problems involving this wallet and/or any other cryptocurrency-related software or service (e.g. corrupted wallet file, incorrectly constructed transactions, unsafe cryptographic libraries, malware affecting this wallet and/or any cryptocurrency-related software or service).\n
 \n
-(3) Technical failures in the hardware of the user of any cryptocurrency-related software or service, e.g., data loss due to a faulty or damaged storage device.\n
+(3) Technical and/or hardware failure impairing cryptocurrency-related software or service (e.g. data loss due to a faulty or damaged storage device).\n
 \n
-(4) Security problems experienced by the user of any cryptocurrency-related software or service, e.g., unauthorized access to users\' wallets and/or accounts.\n
+(4) Security problems experienced by the user of any cryptocurrency-related software or service (e.g., unauthorized access to users\' wallets and/or accounts).\n
 \n
-(5) Actions or inactions of third parties and/or events experienced by third parties, e.g., bankruptcy of service providers, information security attacks on service providers, and fraud conducted by third parties.\n
+(5) Actions or inactions of third parties and/or events experienced by third parties (e.g. bankruptcy of service providers, information security attacks on service providers, and fraud conducted by third parties).\n
 \n
 \n
-2. Trading and Investment risks\n
+2. Trading and Investment Risks\n
 \n
-There is considerable exposure to risk in any crypto-currency exchange transaction. Any transaction involving currencies involves risks including, but not limited to, the potential for changing economic conditions that may substantially affect the price or liquidity of a currency. Investments in crypto-currency exchange speculation may also be susceptible to sharp rises and falls as the relevant market values fluctuate. It is for this reason that when speculating in such markets it is advisable to use only risk capital. \n
+There is considerable exposure to risk in any cryptocurrency exchange. Cryptocurrency transactions carry substantial risks including but not limited to the potential for changing economic conditions that may substantially affect the price or liquidity of a currency. Investments in cryptocurrency exchange speculation may also be susceptible to sharp climbs and falls as the market fluctuates. Only trade what you are willing to lose. \n
 \n
 \n
 3. Electronic Trading Risks\n
@@ -427,28 +428,28 @@ There is considerable exposure to risk in any crypto-currency exchange transacti
 Before you engage in transactions using an electronic system, you should carefully review the rules and regulations of the exchanges offering the system and/or listing the instruments you intend to trade. Online trading has inherent risk due to system response and access times that may vary due to market conditions, system performance, and other factors. You should understand these and additional risks before trading.\n
 \n
 \n
-4. Compliance with tax obligations\n
+4. Compliance with Tax Obligations\n
 \n
-The users of the wallet are solely responsible to determinate what, if any, taxes apply to their crypto-currency transactions. The owners of, or contributors to, the wallet are NOT responsible for determining the taxes that apply to crypto-currency transactions.\n
-\n
-\n
-5. No warranties\n
-\n
-The wallet is provided on an \"as is\" basis without any warranties of any kind regarding the wallet and/or any content, data, materials and/or services provided on the wallet.\n
+The users of this wallet are responsible for determining what, if any, taxes apply to their cryptocurrency transactions. Contributors to OpenWallet know nothing of your particular jurisdiction\'s laws and regulations.\n
 \n
 \n
-6. Limitation of liability\n
+5. No Warranties\n
 \n
-Unless otherwise required by law, in no event shall the owners of, or contributors to, the wallet be liable for any damages of any kind, including, but not limited to, loss of use, loss of profits, or loss of data arising out of or in any way connected with the use of the wallet. In no way are the owners of, or contributors to, the wallet responsible for the actions, decisions, or other behavior taken or not taken by you in reliance upon the wallet.\n
+This wallet is provided on an \"as is\" basis without any warranties of any kind regarding this wallet and/or any content, data, materials and/or services provided through this wallet.\n
+\n
+\n
+6. Limitation of Liability\n
+\n
+Unless otherwise required by law, in no event shall the contributors to this wallet be liable for any damages, including but not limited to loss of use, loss of profits, or loss of data, even when said damages result from use of this wallet. In no way are the contributors to this wallet responsible for your actions and decisions.\n
 \n
 \n
 7. Arbitration\n
 \n
-The user of the wallet agrees to arbitrate any dispute arising from or in connection with the wallet or this disclaimer, except for disputes related to copyrights, logos, trademarks, trade names, trade secrets or patents.\n
+The user of this wallet agrees to arbitrate any dispute arising from or in connection with this wallet or this disclaimer, except for disputes related to copyrights, logos, trademarks, trade names, trade secrets or patents.\n
 \n
 \n
-8. Last amendment\n
+8. Last Amendment\n
 \n
-This disclaimer was amended for the last time on January 1st, 2016.</string>
+This disclaimer was amended for the last time on June 9th, 2017.</string>
 
 </resources>

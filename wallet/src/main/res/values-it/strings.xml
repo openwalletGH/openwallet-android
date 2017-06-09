@@ -6,7 +6,7 @@
     <string name="action_edit_label">Modifica etichetta</string>
     <string name="action_empty_wallet">Svuota portafoglio</string>
     <string name="action_settings">Impostazioni</string>
-    <string name="action_about">Riguardo Coinomi</string>
+    <string name="action_about">Riguardo OpenWallet</string>
     <string name="action_refresh">Aggiorna</string>
     <string name="action_sign_verify_message">Firma/verifica messaggio</string>
     <string name="action_account_details">Dettagli account</string>
@@ -63,13 +63,13 @@
     <string name="trade">scambia</string>
     <string name="receive">ricevi</string>
     <!-- Welcome fragment -->
-    <string name="welcome_text">Benvenuto nel portafoglio di Coinomi</string>
+    <string name="welcome_text">Benvenuto nel portafoglio di OpenWallet</string>
     <string name="create_wallet">Crea un nuovo portafoglio</string>
     <string name="restore_wallet">Ripristina un portafoglio</string>
     <string name="test_wallet">Test portafoglio</string>
     <!-- Intro -->
     <string name="incompatible_device_warning_title">Dispositivo non compatibile</string>
-    <string name="incompatible_device_warning_message">Questo dispositivo non può eseguire determinate funzioni a causa di difetti nel software o nell\'hardware.\nCiò potrebbe essere risolto tramite un aggiornamento fatto dal fabbricante del dispositivo.\n\nContattaci se hai delle domande: support@coinomi.com</string>
+    <string name="incompatible_device_warning_message">Questo dispositivo non può eseguire determinate funzioni a causa di difetti nel software o nell\'hardware.\nCiò potrebbe essere risolto tramite un aggiornamento fatto dal fabbricante del dispositivo.\n\nContattaci se hai delle domande: https://reddit.com/r/openwallet</string>
     <!-- Recovery fragment -->
     <string name="seed_info">Questa è la tua <i>frase di recupero</i>, usata per generare le chiavi del tuo portafoglio. Per favore scrivila su un foglio e conservalo in un posto sicuro, come faresti con soldi di carta. Chi vi ha accesso può conoscere i fondi del tuo portafoglio.\nSe perdi la tua frase di recupero, il tuo portafoglio non potrà essere recuperato.</string>
     <string name="seed_title">la tua frase di recupero</string>
@@ -89,7 +89,7 @@
     <!-- Wallet activity -->
     <string name="test_wallet_message">Questo è un portafoglio di prova, dove puoi inviare e ricevere Bitcoins, Litecoin e Dogecoins di prova.\n\nSe vuoi usare il portafoglio con monete reali per favore vai a:<b>Impostazioni &gt; Ripristina portafoglio &gt; Crea un nuovo portafoglio</b>.</string>
     <string name="wallet_update_title">La nuova versione è disponibile</string>
-    <string name="wallet_update_message">Una nuova versione di Coinomi è disponibile, contiene  nuove caratteristiche e correzioni.</string>
+    <string name="wallet_update_message">Una nuova versione di OpenWallet è disponibile, contiene  nuove caratteristiche e correzioni.</string>
     <string name="pay_with">Invia con</string>
     <string name="exchange_and_pay_title">Scambia e invia</string>
     <!-- PayToDialog-->
@@ -171,11 +171,12 @@
         <item quantity="other">prossimi %d secondi</item>
     </plurals>
     <!-- About Activity -->
-    <string name="title_activity_about">Riguardo Coinomi</string>
-    <string name="app_name_long">Coinomi per Android</string>
-    <string name="about_licence">Un progetto open source\nhttps://github.com/Coinomi/coinomi-android\nSource code con licenza GNU General Public License 3</string>
-    <string name="about_credits_nubits">Server infrastructure donated by NuBits - The World\'s First Stable Digital Currency\nhttps://nubits.com/</string>
+    <string name="title_activity_about">Riguardo OpenWallet</string>
+    <string name="app_name_long">OpenWallet per Android</string>
+    <string name="about_licence">Un progetto open source\nhttps://gitlab.com/openwallet/openwallet-android\nSource code con licenza GNU General Public License 3</string>
+    <string name="about_credits_nubits">Server infrastructure powered by your donations</string>
     <string name="about_credits_translations">Traduzione fornita da:</string>
+    <string name="about_credits_coinomi">Forked from Coinomi\nhttps://coinomi.com/</string>
     <string name="about_credits_bitcoinj">Usa la biblioteca Bitcoinj\nhttp://bitcoinj.github.io/</string>
     <string name="about_credits_electrum">Usa il server software Electrum \nhttps://electrum.org/</string>
     <string name="about_credits_schildbach">Ispirato da Andreas Schildbach\nhttps://github.com/schildbach/bitcoin-wallet/</string>
