@@ -7,7 +7,7 @@ The goal of this project is to build the best free, libre, and open source light
 
 Contributions aren't just welcome, they're financially encouraged! (Well, they will be soon. Hang tight!) Eventually, we hope to set up a cryptocurrency-based (likely BTC or ETH) rewards system for contributions, be they new features, new translations, or new coins. As always, all you've gotta do is fork and pull!
 
-By the way, if you'd like to add new coins, check out this document provided by Coinomi: [document](https://coinomi.com/AddingSupportForANewCurrency/).
+By the way, if you'd like to add new coins, check out this document provided by Coinomi: [document](https://gist.github.com/CosmoJG/5c75b81b4fdf36398760189908692120).
 
 You should find that a lot of Coinomi's documentation applies to OpenWallet as well. This is because OpenWallet was forked from Coinomi before it ditched the open source model in favor of a more proprietary, "source-available" model. **OpenWallet is, and forever will be, free, libre, and open source!**
 
