@@ -1,4 +1,4 @@
-OpenWallet for Android
+Openwallet for Android
 ===============
 
 The goal of this project is to build the best free, libre, and open source light wallet for multiple cryptocurrencies (Bitcoin, Ethereum, Ripple, etc) on Android. Security and usability are, of course, the priorities. For this reason, your private keys never leave the device. Luckily, this wallet is compliant with BIP32, BIP39, and BIP44. A single 24-word mnemonic phrase may be used to recover each and every one of your cryptocurrency wallets.
@@ -9,12 +9,12 @@ Contributions aren't just welcome, they're financially encouraged! (Well, they w
 
 By the way, if you'd like to add new coins, check out this document provided by Coinomi: [document](https://gist.github.com/CosmoJG/5c75b81b4fdf36398760189908692120).
 
-You should find that a lot of Coinomi's documentation applies to OpenWallet as well. This is because OpenWallet was forked from Coinomi before it ditched the open source model in favor of a more proprietary, "source-available" model. **OpenWallet is, and forever will be, free, libre, and open source!**
+You should find that a lot of Coinomi's documentation applies to Openwallet as well. This is because Openwallet was forked from Coinomi before it ditched the open source model in favor of a more proprietary, "source-available" model. **Openwallet is, and forever will be, free, libre, and open source!**
 
 Anyway, back to the coins. Generally you'll need:
 
 * Electrum-server support
-* OpenWallet core support
+* Openwallet core support
 * A beautiful vector icon
 * BIP32, BIP39, and BIP44 compliance
 
@@ -30,7 +30,7 @@ Once built, enable developer options on your Android smartphone as well as USB d
 
 1) Change the following:
 
-* in strings.xml app_name string to "OpenWallet" and app_package to com.openwallet.wallet
+* in strings.xml app_name string to "Openwallet" and app_package to com.openwallet.wallet
 * in build.gradle the package from "com.openwallet.wallet.dev" to "com.openwallet.wallet"
 * in AndroidManifest.xml the android:icon to "ic_launcher" and all "com.openwallet.wallet.dev.*"  to "com.openwallet.wallet.*"
 * remove all ic_launcher_dev icons with `rm wallet/src/main/res/drawable*/ic_launcher_dev.png`
